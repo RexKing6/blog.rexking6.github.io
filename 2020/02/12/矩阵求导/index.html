@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="矩阵求导">
+<meta property="og:url" content="https://blog.rexking6.top/2020/02/12/%E7%9F%A9%E9%98%B5%E6%B1%82%E5%AF%BC/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-02-12T05:06:51.000Z">
+<meta property="article:modified_time" content="2020-02-13T13:28:12.423Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.rexking6.top/2020/02/12/%E7%9F%A9%E9%98%B5%E6%B1%82%E5%AF%BC/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>矩阵求导 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2020/02/12/%E7%9F%A9%E9%98%B5%E6%B1%82%E5%AF%BC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          矩阵求导
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-02-12 13:06:51" itemprop="dateCreated datePublished" datetime="2020-02-12T13:06:51+08:00">2020-02-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-13 21:28:12" itemprop="dateModified" datetime="2020-02-13T21:28:12+08:00">2020-02-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2020/02/12/%E7%9F%A9%E9%98%B5%E6%B1%82%E5%AF%BC/" class="post-meta-item leancloud_visitors" data-flag-title="矩阵求导" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>29k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>27 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>综合转载以下文章：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/24709748">矩阵求导术（上）</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/24863977">矩阵求导术（下）</a></li>
+</ul>
+<p>讲得很好懂。</p>
+<h1 id="标量对矩阵"><a href="#标量对矩阵" class="headerlink" title="标量对矩阵"></a>标量对矩阵</h1><p>小写字母 $x$ 表示标量，粗体小写字母 $\pmb x$ 表示（列）向量，大写字母 $X$ 表示矩阵。</p>
+<p>首先来琢磨一下定义，标量 $f$ 对矩阵 $X$ 的导数，定义为 $\frac{\partial f}{\partial X}=\left[\frac{\partial f}{\partial X_{ij}}\right]$，即 $f$ 对 $X$ 逐元素求导排成与 $X$ 尺寸相同的矩阵。然而，这个定义在计算中并不好用，实用上的原因是对函数较复杂的情形难以逐元素求导；哲理上的原因是逐元素求导破坏了<strong>整体性</strong>。试想，为何要将 $f$ 看做矩阵 $X$ 而不是各元素 $X_{ij}$ 的函数呢？答案是用矩阵运算更整洁。所以在求导时不宜拆开矩阵，而是要找一个从整体出发的算法。</p>
+<p>为此，我们来回顾，一元微积分中的导数（标量对标量的导数）与微分有联系：$df=f’(x)dx$；多元微积分中的梯度（标量对向量的导数）也与微分有联系：$df=\sum_{i=1}^n\frac{\partial f}{\partial x_i}dx_i=\frac{\partial f^T}{\partial \pmb x}d \pmb x$，这里第一个等号是全微分公式，第二个等号表达了梯度与微分的联系：全微分 $df$ 是梯度向量 $\frac{df}{d\pmb x}$ (n×1)与微分向量 $d\pmb x$ (n×1)的内积；受此启发，我们将矩阵导数与微分建立联系：$df=\sum_{i=1}^m\sum_{j=1}^n\frac{\partial f}{\partial X_{ij}}dX_{ij}=\text{tr}\left(\frac{\partial f^T}{\partial X}dX\right)$。其中 $\text{tr}$ 代表迹（trace）是方阵对角线元素之和，满足性质：对尺寸相同的矩阵 $A$，$B$，$\text{tr}(A^TB)=\sum_{i,j}A_{ij}B_{ij}$，即 $\text{tr}(A^TB)$是矩阵 $A$，$B$ 的内积。与梯度相似，这里第一个等号是全微分公式，第二个等号表达了矩阵导数与微分的联系：全微分 $df$ 是导数 $\frac{\partial f}{\partial X}$ （m×n）与微分矩阵 $dX$ （m×n）的内积。</p>
+<p>然后来建立运算法则。回想遇到较复杂的一元函数如 $f=\log (2+\sin x)e^{\sqrt x}$，我们是如何求导的呢？通常不是从定义开始求极限，而是先建立了初等函数求导和四则运算、复合等法则，再来运用这些法则。故而，我们来创立常用的矩阵微分的运算法则：</p>
+<ol>
+<li>加减法：$d(X\pm Y)=dX\pm dY$；矩阵乘法：$d(XY)=(dX)Y+XdY$；转置：$d(X^T)=(dX)^T$；迹：$d\text{tr}(X)=\text{tr}(dX)$。</li>
+<li>逆：$dX^{-1}=-X^{-1}dXX^{-1}$。此式可在 $XX^{-1}=I$ 两侧求微分来证明。</li>
+<li>行列式：$d|X|=\text{tr}(X^\sharp dX)$，其中 $X^\sharp$ 表示 $X$ 的伴随矩阵，在 $X$ 可逆时又可以写作 $d|X|=|X|\text{tr}(X^{-1}dX)$。此式可用Laplace展开来证明。</li>
+<li>逐元素乘法：$d(X\odot Y)=dX\odot Y+X\odot dY$，$\odot$ 表示尺寸相同的矩阵 $X$，$Y$ 逐元素相乘。</li>
+<li>逐元素函数：$d\sigma(X)=\sigma’(X)\odot dX$，$\sigma(X)=[\sigma(X_{ij})]$ 是逐元素标量函数运算，$\sigma’(X)=[\sigma’(X_{ij})]$ 是逐元素求导数。 例如：$X=\left[\begin{array}{ll}{X_{11}} &amp; {X_{12}} \ {X_{21}} &amp; {X_{22}}\end{array}\right], d \sin (X)=\left[\begin{array}{cc}{\cos X_{11} d X_{11}} &amp; {\cos X_{12} d X_{12}} \ {\cos X_{21} d X_{21}} &amp; {\cos X_{22} d X_{22}}\end{array}\right]=\cos (X) \odot d X$。</li>
+</ol>
+<p>我们试图利用矩阵导数与微分的联系 $d f=\operatorname{tr}\left(\frac{\partial f}{\partial X}^{T} d X\right)$ ，在求出左侧的微分 $df$ 后，该如何写成右侧的形式并得到导数呢？这需要一些迹技巧（trace trick）：</p>
+<ol>
+<li>标量套上迹：$a=\operatorname{tr}(a)$；</li>
+<li>转置：$\operatorname{tr}\left(A^{T}\right)=\operatorname{tr}(A)$；</li>
+<li>线性：$\operatorname{tr}(A \pm B)=\operatorname{tr}(A) \pm \operatorname{tr}(B)$；</li>
+<li>矩阵乘法交换：$\operatorname{tr}(A B)=\operatorname{tr}(B A)$，其中 $A$ 与 $B^T$ 尺寸相同。两侧都等于 $\sum_{i, j} A_{i j} B_{j i}$；</li>
+<li>矩阵乘法/逐元素乘法交换：$\operatorname{tr}\left(A^{T}(B \odot C)\right)=\operatorname{tr}\left((A \odot B)^{T} C\right)$，其中 $A$，$B$，$C$ 尺寸相同。两侧都等于 $\sum_{i, j} A_{i j} B_{i j} C_{i j}$。</li>
+</ol>
+<p>观察一下可以断言，<strong>若标量函数f是矩阵X经加减乘法、逆、行列式、逐元素函数等运算构成，则使用相应的运算法则对f求微分，再使用迹技巧给df套上迹并将其它项交换至dX左侧，对照导数与微分的联系</strong> $d f=\operatorname{tr}\left(\frac{\partial f^{T}}{\partial X} d X\right)$ <strong>，即能得到导数。</strong></p>
+<p><strong>特别地，若矩阵退化为向量，对照导数与微分的联系</strong> $d f=\frac{\partial f^{T}}{\partial x} d x$ <strong>，即能得到导数。</strong></p>
+<p>在建立法则的最后，来谈一谈复合：假设已求得 $\frac{\partial f}{\partial Y}$ ，而Y是X的函数，如何求 $\frac{\partial f}{\partial X}$ 呢？在微积分中有标量求导的链式法则 $\frac{\partial f}{\partial x}=\frac{\partial f}{\partial y} \frac{\partial y}{\partial x}$ ，但这里我们<strong>不能随意沿用标量的链式法则</strong>，因为矩阵对矩阵的导数 $\frac{\partial Y}{\partial X}$ 截至目前仍是未定义的。于是我们继续追本溯源，链式法则是从何而来？源头仍然是微分。我们直接从微分入手建立复合法则：先写出 $d f=\operatorname{tr}\left(\frac{\partial f^{T}}{\partial Y} d Y\right)$ ，再将 $dY$ 用 $dX$ 表示出来代入，并使用迹技巧将其他项交换至 $dX$ 左侧，即可得到 $\frac{\partial f}{\partial X}$。</p>
+<p>最常见的情形是 $Y=A X B$，此时 $d f=\operatorname{tr}\left(\frac{\partial f^{T}}{\partial Y} d Y\right)=\operatorname{tr}\left(\frac{\partial f^{T}}{\partial Y} \operatorname{Ad} X B\right)=\operatorname{tr}\left(B \frac{\partial f^{T}}{\partial Y} \begin{array}{c}{A d X} \ {}\end{array}\right)=\operatorname{tr}\left(\left(A^{T} \frac{\partial f}{\partial Y} B^{T}\right)^{T} d X\right)$，可得到 $\frac{\partial f}{\partial X}=A^{T} \frac{\partial f}{\partial Y} B^{T}$。注意这里 $d Y=(d A) X B+A d X B+A X d B=A d X B$，由于 $A$，$B$ 是常量，$d A=0$，$d B=0$，以及我们使用矩阵乘法交换的迹技巧交换了 $\frac{\partial f^{T}}{\partial Y} A d X$ 与 $B$。</p>
+<p>接下来演示一些算例。特别提醒要依据已经建立的运算法则来计算，不能随意套用微积分中标量导数的结论，比如认为 $AX$ 对 $X$ 的导数为 $A$，这是没有根据、意义不明的。</p>
+<p>例1：$f=\boldsymbol{a}^{T} X \boldsymbol{b}$，求 $\frac{\partial f}{\partial X}$。其中 $\boldsymbol{a}$ 是 $m \times 1$ 列向量，$X$ 是 $m\times n$ 矩阵，$\pmb b$ 是 $n\times 1$ 列向量，$f$ 是标量。</p>
+<p>解：先使用矩阵乘法法则求微分，$d f=d \boldsymbol{a}^{T} X \boldsymbol{b}+\boldsymbol{a}^{T} d X \boldsymbol{b}+\boldsymbol{a}^{T} X d \boldsymbol{b}=\boldsymbol{a}^{T} d X \boldsymbol{b}$，注意这里的 $\pmb a$，$\pmb b$ 是常量，$d \boldsymbol{a}=\mathbf{0}$，$d \boldsymbol{b}=\mathbf{0}$。由于 $df$ 是标量，它的迹等于自身，$d f=\operatorname{tr}(d f)$，套上迹并做矩阵乘法交换：$d f=\operatorname{tr}\left(\boldsymbol{a}^{T} d X \boldsymbol{b}\right)=\operatorname{tr}\left(\boldsymbol{b} \boldsymbol{a}^{T} d X\right)=\operatorname{tr}\left(\left(\boldsymbol{a} \boldsymbol{b}^{T}\right)^{T} d X\right)$，注意这里我们根据 $\operatorname{tr}(A B)=\operatorname{tr}(B A)$ 交换了 $\boldsymbol{a}^{T} d X$ 与 $\pmb b$。对照导数与微分的联系：$d f=\operatorname{tr}\left(\frac{\partial f^{T}}{\partial X} d X\right)$，得到 $\frac{\partial f}{\partial X}=\boldsymbol{a} \boldsymbol{b}^{T}$ 。</p>
+<p>注意：这里不能用 $\frac{\partial f}{\partial X}=\boldsymbol{a}^{T} \frac{\partial X}{\partial X} \boldsymbol{b}=?$ ，导数与矩阵乘法的交换是不合法则的运算（而微分是合法的）。有些资料在计算矩阵导数时，会略过求微分这一步，这是逻辑上解释不通的。</p>
+<p>例2：$f=\boldsymbol{a}^{T} \exp (X \boldsymbol{b})$，求 $\frac{\partial f}{\partial X}$ 。其中 $\pmb a$ 是 $m\times 1$ 列向量，$X$ 是 $m\times n$ 矩阵， $\pmb b$  是 $n\times 1$ 列向量，$\exp$ 表示逐元素求指数，$f$ 是标量。</p>
+<p>解：先使用矩阵乘法、逐元素函数法则求微分：$d f=\boldsymbol{a}^{T}(\exp (X \boldsymbol{b}) \odot(d X \boldsymbol{b}))$，再套上迹并做交换：$d f=\operatorname{tr}\left(\boldsymbol{a}^{T}(\exp (X \boldsymbol{b}) \odot(d X \boldsymbol{b}))\right)=\operatorname{tr}\left((\boldsymbol{a} \odot \exp (X \boldsymbol{b}))^{T} d X \boldsymbol{b}\right)=\operatorname{tr}\left(\boldsymbol{b}(\boldsymbol{a} \odot \exp (X \boldsymbol{b}))^{T} d X\right)=\operatorname{tr}\left(\left((\boldsymbol{a} \odot \exp (X \boldsymbol{b}))^{T}\right)^{T} d X\right)$，注意这里我们先根据 $\operatorname{tr}\left(A^{T}(B \odot C)\right)=\operatorname{tr}\left((A \odot B)^{T} C\right)$ 交换了 $\pmb a$、$\exp(X\pmb b)$ 与 $dX\pmb b$，再根据 $\operatorname{tr}(A B)=\operatorname{tr}(B A)$ 交换了 $(\boldsymbol{a} \odot \exp (X \boldsymbol{b}))^{T} d X$ 与 $\pmb b$。对照导数与微分的联系 $d f=\operatorname{tr}\left(\frac{\partial f^{T}}{\partial X} d X\right)$，得到 $\frac{\partial f}{\partial X}=(\boldsymbol{a} \odot \exp (X \boldsymbol{b})) \boldsymbol{b}^{T}$。</p>
+<p>例3：$f=\operatorname{tr}\left(Y^{T} M Y\right)$，$Y=\sigma(WX)$，求 $\frac{\partial f}{\partial X}$。其中 $W$ 是 $l\times m$ 矩阵，$X$ 是 $m\times n$ 矩阵，$Y$ 是 $l\times n$ 矩阵，$M$ 是 $l\times l$ 对称矩阵，$\sigma$ 是逐元素函数，$f$ 是标量。</p>
+<p>解：先求 $\frac{\partial f}{\partial Y}$，求微分，使用矩阵乘法、转置法则：$d f=\operatorname{tr}\left((d Y)^{T} M Y\right)+\operatorname{tr}\left(Y^{T} M d Y\right)=\operatorname{tr}\left(Y^{T} M^{T} d Y\right)+\operatorname{tr}\left(Y^{T} M d Y\right)=\operatorname{tr}\left(Y^{T}\left(M+M^{T}\right) d Y\right)$，对照导数与微分的联系，得到 $\frac{\partial f}{\partial Y}=\left(M+M^{T}\right) Y=2 M Y$ ，注意这里$M$ 是对称矩阵。为求 $\frac{\partial f}{\partial X}$，写出 $d f=\operatorname{tr}\left(\frac{\partial f}{\partial Y}^{T} d Y\right)$ ，再将 $dY$ 用 $dX$ 表示出来代入，并使用矩阵乘法/逐元素乘法交换：$d f=\operatorname{tr}\left(\frac{\partial f}{\partial Y}^{T}\left(\sigma^{\prime}(W X) \odot(W d X)\right)\right)=\operatorname{tr}\left(\left(\frac{\partial f}{\partial Y} \odot \sigma^{\prime}(W X)\right)^{T} W d X\right)$，对照导数与微分的联系，得到 $\frac{\partial f}{\partial X}=W^{T}\left(\frac{\partial f}{\partial Y} \odot \sigma^{\prime}(W X)\right)=W^{T}\left((2 M \sigma(W X)) \odot \sigma^{\prime}(W X)\right)$。</p>
+<p>例4 线性回归：$l=|X \boldsymbol{w}-\boldsymbol{y}|^{2}$， 求 $\pmb w$ 的最小二乘估计，即求 $\frac{\partial l}{\partial \boldsymbol{w}}$ 的零点。其中 $\pmb y$ 是 $m\times 1$ 列向量，$X$ 是 $m\times n$ 矩阵， $\pmb w$ 是 $n\times 1$ 列向量，$l$ 是标量。</p>
+<p>解：这是标量对向量的导数，不过可以把向量看做矩阵的特例。先将向量模平方改写成向量与自身的内积：$l=(X \boldsymbol{w}-\boldsymbol{y})^{T}(X \boldsymbol{w}-\boldsymbol{y})$，求微分，使用矩阵乘法、转置等法则：$d l=(X d \boldsymbol{w})^{T}(X \boldsymbol{w}-\boldsymbol{y})+(X \boldsymbol{w}-\boldsymbol{y})^{T}(X d \boldsymbol{w})=2(X \boldsymbol{w}-\boldsymbol{y})^{T} X d \boldsymbol{w}$。对照导数与微分的联系 $d l=\frac{\partial l}{\partial \boldsymbol{w}}^{T} d \boldsymbol{w}$ ，得到 $\frac{\partial l}{\partial \boldsymbol{w}}=2 X^{T}(X \boldsymbol{w}-\boldsymbol{y})$。$\frac{\partial l}{\partial \boldsymbol{w}}=0$ 即 $X^{T} X \boldsymbol{w}=X^{T} \boldsymbol{y}$ ，得到 $\pmb w$ 的最小二乘估计为 $\boldsymbol{w}=\left(X^{T} X\right)^{-1} X^{T} \boldsymbol{y}$。</p>
+<p>例5 方差的最大似然估计：样本 $\boldsymbol{x}_{1}, \dots, \boldsymbol{x}_{N} \sim \mathcal{N}(\boldsymbol{\mu}, \Sigma)$ ，求方差 $\Sigma$ 的最大似然估计。写成数学式是：$l=\log |\Sigma|+\frac{1}{N} \sum_{i=1}^{N}\left(\boldsymbol{x}_{i}-\overline{\boldsymbol{x}}\right)^{T} \Sigma^{-1}\left(\boldsymbol{x}_{i}-\overline{\boldsymbol{x}}\right)$，求 $\frac{\partial l}{\partial \Sigma}$ 的零点。其中 $\pmb x_i$ 是 $m\times 1$ 列向量，$\overline{\boldsymbol{x}}=\frac{1}{N} \sum_{i=1}^{N} \boldsymbol{x}_{i}$ 是样本均值，$\Sigma$ 是 $m\times m$ 对称正定矩阵，$l$ 是标量，$\log$ 表示自然对数。</p>
+<p>解：首先求微分，使用矩阵乘法、行列式、逆等运算法则，第一项是 $d \log |\Sigma|=|\Sigma|^{-1} d|\Sigma|=\operatorname{tr}\left(\Sigma^{-1} d \Sigma\right)$，第二项是 $\frac{1}{N} \sum_{i=1}^{N}\left(\boldsymbol{x}_{i}-\overline{\boldsymbol{x}}\right)^{T} d \Sigma^{-1}\left(\boldsymbol{x}_{i}-\overline{\boldsymbol{x}}\right)=-\frac{1}{N} \sum_{i=1}^{N}\left(\boldsymbol{x}_{i}-\overline{\boldsymbol{x}}\right)^{T} \Sigma^{-1} d \Sigma \Sigma^{-1}\left(\boldsymbol{x}_{i}-\overline{\boldsymbol{x}}\right)$。再给第二项套上迹做交换：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+&\operatorname{tr}\left(\frac{1}{N} \sum_{i=1}^{N}\left(\boldsymbol{x}_{i}-\overline{\boldsymbol{x}}\right)^{T} \Sigma^{-1} d \Sigma \Sigma^{-1}\left(\boldsymbol{x}_{i}-\overline{\boldsymbol{x}}\right)\right)\\
+=&\frac{1}{N} \sum_{i=1}^{N} \operatorname{tr}\left(\left(\boldsymbol{x}_{i}-\overline{\boldsymbol{x}}\right)^{T} \Sigma^{-1} d \Sigma \Sigma^{-1}\left(\boldsymbol{x}_{i}-\overline{\boldsymbol{x}}\right)\right)\\
+=&\frac{1}{N} \sum_{i=1}^{N} \operatorname{tr}\left(\Sigma^{-1}\left(\boldsymbol{x}_{i}-\overline{\boldsymbol{x}}\right)\left(\boldsymbol{x}_{i}-\overline{\boldsymbol{x}}\right)^{T} \Sigma^{-1} d \Sigma\right)=\operatorname{tr}\left(\Sigma^{-1} S \Sigma^{-1} d \Sigma\right)
+\end{aligned}</script><p>其中先交换迹与求和，然后将 $\Sigma^{-1}\left(\boldsymbol{x}_{i}-\overline{\boldsymbol{x}}\right)$ 交换到左边，最后再交换迹与求和，并定义 $S=\frac{1}{N} \sum_{i=1}^{N}\left(\boldsymbol{x}_{i}-\overline{\boldsymbol{x}}\right)\left(\boldsymbol{x}_{i}-\overline{\boldsymbol{x}}\right)^{T}$ 为样本方差矩阵。得到 $d l=\operatorname{tr}\left(\left(\Sigma^{-1}-\Sigma^{-1} S \Sigma^{-1}\right) d \Sigma\right)$。对照导数与微分的联系，有 $\frac{\partial l}{\partial \Sigma}=\left(\Sigma^{-1}-\Sigma^{-1} S \Sigma^{-1}\right)^{T}$，其零点即 $\Sigma$ 的最大似然估计为 $\Sigma=S$。</p>
+<p>例6 多元logistic回归：$l=-\boldsymbol{y}^{T} \log \operatorname{softmax}(W \boldsymbol{x})$，求 $\frac{\partial l}{\partial W}$。其中 $\pmb y$ 是除一个元素为1外其它元素为0的 $m \times 1$ 列向量，$W$ 是 $m\times n$ 矩阵，$\pmb x$ 是 $n\times 1$ 列向量，$l$ 是标量；$\log$ 表示自然对数，$\operatorname{softmax}(\boldsymbol{a})=\frac{\exp (\boldsymbol{a})}{\mathbf{1}^{T} \exp (\boldsymbol{a})}$ ，其中 $\exp (\boldsymbol{a})$ 表示逐元素求指数，$\pmb 1$ 代表全1向量。</p>
+<p>解1：首先将softmax函数代入并写成 $l=-\boldsymbol{y}^{T}\left(\log (\exp (W \boldsymbol{x}))-\mathbf{1} \log \left(\mathbf{1}^{T} \exp (W \boldsymbol{x})\right)\right)=-\boldsymbol{y}^{T} \boldsymbol{W} \boldsymbol{x}+\log \left(\mathbf{1}^{T} \exp (W \boldsymbol{x})\right)$ ，这里要注意逐元素 $\log$ 满足等式 $\log (\boldsymbol{u} / c)=\log (\boldsymbol{u})-\mathbf{1} \log (c)$ ，以及 $\pmb y$ 满足 $\pmb y^T\pmb 1=1$。求微分，使用矩阵乘法、逐元素函数等法则：$d l=-\boldsymbol{y}^{T} d W \boldsymbol{x}+\frac{\mathbf{1}^{T}(\exp (W \boldsymbol{x}) \odot(d W \boldsymbol{x}))}{\mathbf{1}^{T} \exp (W \boldsymbol{x})}$。再套上迹并做交换，注意可化简 $\mathbf{1}^{T}(\exp (W \boldsymbol{x}) \odot(d W \boldsymbol{x}))=\exp (W \boldsymbol{x})^{T} d W \boldsymbol{x}$，这是根据等式 $\mathbf{1}^{T}(\boldsymbol{u} \odot \boldsymbol{v})=\boldsymbol{u}^{T} \boldsymbol{v}$，故 $d l=\operatorname{tr}\left(-\boldsymbol{y}^{T} d W \boldsymbol{x}+\frac{\exp (W \boldsymbol{x})^{T} d W \boldsymbol{x}}{\mathbf{1}^{T} \exp (W \boldsymbol{x})}\right)=\operatorname{tr}\left(-\boldsymbol{y}^{T} d W \boldsymbol{x}+\operatorname{softmax}(W \boldsymbol{x})^{T} d W \boldsymbol{x}\right)=\operatorname{tr}\left(\boldsymbol{x}(\operatorname{softmax}(W \boldsymbol{x})-\boldsymbol{y})^{T} d W\right)$。对照导数与微分的联系，得到 $\frac{\partial l}{\partial W}=(\operatorname{softmax}(W \boldsymbol{x})-\boldsymbol{y}) \boldsymbol{x}^{T}$。</p>
+<p>解2：定义 $\boldsymbol{a}=\boldsymbol{W} \boldsymbol{x}$，则 $l=-\boldsymbol{y}^{T} \log \operatorname{softmax}(\boldsymbol{a})$，先同上求出 $\frac{\partial l}{\partial \boldsymbol{a}}=\operatorname{softmax}(\boldsymbol{a})-\boldsymbol{y}$，再利用复合法则：$d l=\operatorname{tr}\left(\frac{\partial l^{T}}{\partial \boldsymbol{a}} d \boldsymbol{a}\right)=\operatorname{tr}\left(\frac{\partial l^{T}}{\partial \boldsymbol{a}} d W \boldsymbol{x}\right)=\operatorname{tr}\left(\boldsymbol{x} \frac{\partial l^{T}}{\partial \boldsymbol{a}} d W\right)$，得到 $\frac{\partial l}{\partial W}=\frac{\partial l}{\partial a} \boldsymbol{x}^{T}$。</p>
+<p>最后一例留给经典的神经网络。神经网络的求导术是学术史上的重要成果，还有个专门的名字叫做BP算法，我相信如今很多人在初次推导BP算法时也会颇费一番脑筋，事实上使用矩阵求导术来推导并不复杂。为简化起见，我们推导二层神经网络的BP算法。</p>
+<p>例7 二层神经网络：$l=-\boldsymbol{y}^{T} \log \operatorname{softmax}\left(W_{2} \sigma\left(W_{1} \boldsymbol{x}\right)\right)$，求 $\frac{\partial l}{\partial W_{1}}$ 和 $\frac{\partial l}{\partial W_{2}}$。其中 $\pmb y$ 是除一个元素为1外其它元素为0的的 $m\times \pmb 1$ 列向量，$W_2$ 是 $m\times p$ 矩阵，$W_1$ 是 $p\times n$ 矩阵，$\pmb x$ 是 $n\times 1$ 列向量，$l$ 是标量；$\log$ 表示自然对数，$\operatorname{softmax}(\boldsymbol{a})=\frac{\exp (\boldsymbol{a})}{\mathbf{1}^{T} \exp (\boldsymbol{a})}$ 同上，$\sigma$ 是逐元素sigmoid函数 $\sigma (a)=\frac{1}{1+\exp(-a)}$。</p>
+<p>解：定义 $\pmb a_1=W_1\pmb x$，$\pmb h_1=\sigma(\pmb a_1)$，$\pmb a_2=W_2\pmb h_1$，则 $l=-\pmb y ^T\log \text{softmax}(\pmb a_2)$。在前例中已求出 $\frac{\partial l}{\partial \boldsymbol{a}_{2}}=\operatorname{softmax}\left(\boldsymbol{a}_{2}\right)-\boldsymbol{y}$ 。使用复合法则，$d l=\operatorname{tr}\left(\frac{\partial l^{T}}{\partial \boldsymbol{a}_{2}} d \boldsymbol{a}_{2}\right)=\operatorname{tr}\left(\frac{\partial l^{T}}{\partial \boldsymbol{a}_{2}} d W_{2} \boldsymbol{h}_{1}\right)+\underbrace{\operatorname{tr}\left(\frac{\partial l^{T}}{\partial \boldsymbol{a}_{2}} W_{2} d \boldsymbol{h}_{1}\right)}_{d l_{2}}$，使用矩阵乘法交换的迹技巧从第一项得到 $\frac{\partial l}{\partial W_{2}}=\frac{\partial l}{\partial \boldsymbol{a}_{2}} \boldsymbol{h}_{1}^{T}$，从第二项得到 $\frac{\partial l}{\partial \boldsymbol{h}_{1}}=W_{2}^{T} \frac{\partial l}{\partial \boldsymbol{a}_{2}}$。接下来对第二项继续使用复合法则来求 $\frac{\partial l}{\partial \boldsymbol{a}_{1}}$，并利用矩阵乘法和逐元素乘法交换的迹技巧：$d l_{2}=\operatorname{tr}\left(\frac{\partial l^{T}}{\partial \boldsymbol{h}_{1}} d \boldsymbol{h}_{1}\right)=\operatorname{tr}\left(\frac{\partial l^{T}}{\partial \boldsymbol{h}_{1}}\left(\sigma^{\prime}\left(\boldsymbol{a}_{1}\right) \odot d \boldsymbol{a}_{1}\right)\right)=\operatorname{tr}\left(\left(\frac{\partial l}{\partial \boldsymbol{h}_{1}} \odot \sigma^{\prime}\left(\boldsymbol{a}_{1}\right)\right)^{T} d \boldsymbol{a}_{1}\right)$，得到 $\frac{\partial l}{\partial \boldsymbol{a}_{1}}=\frac{\partial l}{\partial \boldsymbol{h}_{1}} \odot \sigma^{\prime}\left(\boldsymbol{a}_{1}\right)$。为求 $\frac{\partial l}{\partial W_{1}}$，再用一次复合法则：$d l_{2}=\operatorname{tr}\left(\frac{\partial l^{T}}{\partial \boldsymbol{a}_{1}}^{T} d \boldsymbol{a}_{1}\right)=\operatorname{tr}\left(\frac{\partial l^{T}}{\partial \boldsymbol{a}_{1}} d W_{1} \boldsymbol{x}\right)=\operatorname{tr}\left(\boldsymbol{x} \frac{\partial l^{T}}{\partial \boldsymbol{a}_{1}} d W_{1}\right)$，得到 $\frac{\partial l}{\partial W_{1}}=\frac{\partial l}{\partial \boldsymbol{a}_{1}} \boldsymbol{x}^{T}$。</p>
+<p>推广：样本 $\left(\boldsymbol{x}_{1}, y_{1}\right), \ldots,\left(\boldsymbol{x}_{N}, y_{N}\right)$，$l=-\sum_{i=1}^{N} \boldsymbol{y}_{i}^{T} \log \operatorname{softmax}\left(W_{2} \sigma\left(W_{1} \boldsymbol{x}_{i}+\boldsymbol{b}_{1}\right)+\boldsymbol{b}_{2}\right)$，其中 $\pmb b_1$ 是 $p\times 1$ 列向量，$\pmb b_2$ 是 $m\times 1$ 列向量，其余定义同上。</p>
+<p>解1：定义 $\boldsymbol{a}_{1, i}=W_{1} \boldsymbol{x}_{i}+\boldsymbol{b}_{1}$，$\quad \boldsymbol{h}_{1, i}=\sigma\left(\boldsymbol{a}_{1, i}\right)$，$\quad \boldsymbol{a}_{2, i}=W_{2} \boldsymbol{h}_{1, i}+\boldsymbol{b}_{2}$，则 $l=-\sum_{i=1}^{N} \boldsymbol{y}_{i}^{T} \log \operatorname{softmax}\left(\boldsymbol{a}_{2, i}\right)$ 。先同上可求出 $\frac{\partial l}{\partial \boldsymbol{a}_{2, i}}=\operatorname{softmax}\left(\boldsymbol{a}_{2, i}\right)-\boldsymbol{y}_{i}$ 。使用复合法则，$d l=\operatorname{tr}\left(\sum_{i=1}^{N} \frac{\partial l^{T}}{\partial a_{2, i}} d a_{2, i}\right)=\operatorname{tr}\left(\sum_{i=1}^{N} \frac{\partial l}{\partial a_{2, i}} d W_{2, i}\right)+\underbrace{\operatorname{tr}\left(\sum_{i=1}^{N} \frac{\partial l}{\partial a_{2 i}}^{T} W_{2} d h_{1, i}\right)}_{d / 2}+\operatorname{tr}\left(\sum_{i=1}^{N} \frac{\partial l}{\partial a_{2, i}} d b_{2}\right)$，从第一项得到得到 $\frac{\partial l}{\partial W_{2}}=\sum_{i=1}^{N} \frac{\partial l}{\partial \boldsymbol{a}_{2, i}} \boldsymbol{h}_{1, i}^{T}$，从第二项得到 $\frac{\partial l}{\partial \boldsymbol{h}_{1, i}}=W_{2}^{T} \frac{\partial l}{\partial \boldsymbol{a}_{2, i}}$，从第三项得到 $\frac{\partial l}{\partial \boldsymbol{b}_{2}}=\sum_{i=1}^{N} \frac{\partial l}{\partial \boldsymbol{a}_{2, i}}$。接下来对第二项继续使用复合法则，得到 $\frac{\partial l}{\partial \boldsymbol{a}_{1, i}}=\frac{\partial l}{\partial \boldsymbol{h}_{1, i}} \odot \sigma^{\prime}\left(\boldsymbol{a}_{1, i}\right)$。为求 $\frac{\partial l}{\partial W_{1}}, \frac{\partial l}{\partial b_{1}}$，再用一次复合法则：$d l_{2}=\operatorname{tr}\left(\sum_{i=1}^{N} \frac{\partial l}{\partial \boldsymbol{a}_{1, i}}^{T} d \boldsymbol{a}_{1, i}\right)=\operatorname{tr}\left(\sum_{i=1}^{N} \frac{\partial l}{\partial \boldsymbol{a}_{1, i}} d W_{1} \boldsymbol{x}_{i}\right)+\operatorname{tr}\left(\sum_{i=1}^{N} \frac{\partial l}{\partial \boldsymbol{a}_{1, i}}^{T} d \boldsymbol{b}_{1}\right)$，得到 $\frac{\partial l}{\partial W_{1}}=\sum_{i=1}^{N} \frac{\partial l}{\partial \boldsymbol{a}_{1, i}} \boldsymbol{x}_{i}^{T}$​，$\quad \frac{\partial l}{\partial \boldsymbol{b}_{1}}=\sum_{i=1}^{N} \frac{\partial l}{\partial \boldsymbol{a}_{1, i}}$。</p>
+<p>解2：可以用矩阵来表示N个样本，以简化形式。定义 $X=\left[\boldsymbol{x}_{1}, \cdots, \boldsymbol{x}_{N}\right]$，$A_{1}=\left[\boldsymbol{a}_{1,1}, \cdots, \boldsymbol{a}_{1, N}\right]=W_{1} X+\boldsymbol{b}_{1} \mathbf{1}^{T}$，$\quad H_{1}=\left[\boldsymbol{h}_{1,1}, \cdots, \boldsymbol{h}_{1, N}\right]=\sigma\left(A_{1}\right)$，$A_{2}=\left[\boldsymbol{a}_{2,1}, \cdots, \boldsymbol{a}_{2, N}\right]=W_{2} H_{1}+\boldsymbol{b}_{2} \mathbf{1}^{T}$，注意这里使用全1向量来扩展维度。先同上求出 $\frac{\partial l}{\partial A_{2}}=\left[\operatorname{softmax}\left(\boldsymbol{a}_{2,1}\right)-\boldsymbol{y}_{1}, \cdots, \operatorname{softmax}\left(\boldsymbol{a}_{2, N}\right)-\boldsymbol{y}_{N}\right]$。使用复合法则，$=\operatorname{tr}\left(\frac{\partial l^{T}}{\partial A_{2}} d A_{2}\right)=\operatorname{tr}\left(\frac{\partial l}{\partial A_{2}}^{T} d W_{2} H_{1}\right)+\underbrace{\operatorname{tr}\left(\frac{\partial l^{T}}{\partial A_{2}} W_{2} d H_{1}\right)}_{d l_{2}}+\operatorname{tr}\left(\frac{\partial l^{T}}{\partial A_{2}} d b_{2} \mathbf{1}^{T}\right)$，从第一项得到 $\frac{\partial l}{\partial W_{2}}=\frac{\partial l}{\partial A_{2}} H_{1}^{T}$，从第二项得到 $\frac{\partial l}{\partial H_{1}}=W_{2}^{T} \frac{\partial l}{\partial A_{2}}$，从第三项得到 $\frac{\partial l}{\partial \boldsymbol{b}_{2}}=\frac{\partial l}{\partial A_{2}} \mathbf{1}$。接下来对第二项继续使用复合法则，得到 $\frac{\partial l}{\partial A_{1}}=\frac{\partial l}{\partial H_{1}} \odot \sigma^{\prime}\left(A_{1}\right)$。为求 $\frac{\partial l}{\partial W_{1}}, \frac{\partial l}{\partial b_{1}}$，再用一次复合法则：$d l_{2}=\operatorname{tr}\left(\frac{\partial l}{\partial A_{1}}^{T} d A_{1}\right)=\operatorname{tr}\left(\frac{\partial l}{\partial A_{1}}^{T} d W_{1} X\right)+\operatorname{tr}\left(\frac{\partial l^{T}}{\partial A_{1}} d b_{1} \mathbf{1}^{T}\right)$，得到$\frac{\partial l}{\partial W_{1}}=\frac{\partial l}{\partial A_{1}} X^{T}$，$\frac{\partial l}{\partial b_{1}}=\frac{\partial l}{\partial A_{1}} \mathbf{1}$。</p>
+<h1 id="矩阵对矩阵"><a href="#矩阵对矩阵" class="headerlink" title="矩阵对矩阵"></a>矩阵对矩阵</h1><p>矩阵对矩阵的求导采用了向量化的思路，常应用于二阶方法中Hessian矩阵的分析。</p>
+<p>首先来琢磨一下定义。矩阵对矩阵的导数，需要什么样的定义？第一，矩阵$F$（p×q）对矩阵 $X$（m×n）的导数应包含所有 m×n×p×q 个偏导数 $\frac{\partial F_{k l}}{\partial X_{i j}}$，从而不损失信息；第二，导数与微分有简明的联系，因为在计算导数和应用中需要这个联系；第三，导数有简明的从整体出发的算法。我们先定义向量 $\pmb f$（p×1）对向量 $\pmb x$（m×1）的导数 $\frac{\partial \boldsymbol{f}}{\partial \boldsymbol{x}}=\left[\begin{array}{cccc}{\frac{\partial f_{1}}{\partial x_{1}}} &amp; {\frac{\partial f_{2}}{\partial x_{1}}} &amp; {\cdots} &amp; {\frac{\partial f_{p}}{\partial x_{1}}} \ {\frac{\partial f_{1}}{\partial x_{2}}} &amp; {\frac{\partial f_{2}}{\partial x_{2}}} &amp; {\cdots} &amp; {\frac{\partial f_{p}}{\partial x_{2}}} \ {\vdots} &amp; {\vdots} &amp; {\ddots} &amp; {\vdots} \ {\frac{\partial f_{1}}{\partial x_{m}}} &amp; {\frac{\partial f_{2}}{\partial x_{m}}} &amp; {\cdots} &amp; {\frac{\partial f_{p}}{\partial x_{m}}}\end{array}\right]$（m×p），有 $d \boldsymbol{f}=\frac{\partial \boldsymbol{f}^{T}}{\partial \boldsymbol{x}} d \boldsymbol{x}$；再定义矩阵的（按列优先）向量化 $\operatorname{vec}(X)=\left[X_{11}, \ldots, X_{m 1}, X_{12}, \ldots, X_{m 2}, \ldots, X_{1 n}, \ldots, X_{m n}\right]^{T}$（mn×1），并定义矩阵 $F$ 对矩阵 $X$ 的导数 $\frac{\partial F}{\partial X}=\frac{\partial \operatorname{vec}(F)}{\partial \operatorname{vec}(X)}$（mn×pq）。导数与微分有联系 $\operatorname{vec}(d F)=\frac{\partial F}{\partial X}^{T} \operatorname{vec}(d X)$。几点说明如下：</p>
+<ol>
+<li>按此定义，标量 $f$ 对矩阵 $X$（m×n）的导数 $\frac{\partial f}{\partial X}$ 是mn×1向量，与上篇的定义不兼容，不过二者容易相互转换。为避免混淆，用记号 $\nabla_X f$ 表示上篇定义的m×n矩阵，则有 $\frac{\partial f}{\partial X}=\operatorname{vec}\left(\nabla_{X} f\right)$。虽然本篇的技术可以用于标量对矩阵求导这种特殊情况，但使用上篇中的技术更方便。读者可以通过上篇中的算例试验两种方法的等价转换。</li>
+<li>标量对矩阵的二阶导数，又称Hessian矩阵，定义为 $\nabla_{X}^{2} f=\frac{\partial^{2} f}{\partial X^{2}}=\frac{\partial \nabla_{X} f}{\partial X}$（mn×mn），是对称矩阵。对向量  $\frac{\partial f}{\partial X}$ 或矩阵 $\nabla_X f$ 求导都可以得到Hessian矩阵，但从矩阵 $\nabla_X f$ 出发更方便。</li>
+<li>$\frac{\partial F}{\partial X}=\frac{\partial \operatorname{vec}(F)}{\partial X}=\frac{\partial F}{\partial \operatorname{vec}(X)}=\frac{\partial \operatorname{vec}(F)}{\partial \operatorname{vec}(X)}$ ，求导时矩阵被向量化，弊端是这在一定程度破坏了矩阵的结构，会导致结果变得形式复杂；好处是多元微积分中关于梯度、Hessian矩阵的结论可以沿用过来，只需将矩阵向量化。例如优化问题中，牛顿法的更新 $\Delta X$，满足 $\operatorname{vec}(\Delta X)=-\left(\nabla_{X}^{2} f\right)^{-1} \operatorname{vec}\left(\nabla_{X} f\right)$。</li>
+<li>在资料中，矩阵对矩阵的导数还有其它定义，比如 $\frac{\partial F}{\partial X}=\left[\frac{\partial F_{k l}}{\partial X}\right]$ （mp×nq），或是 $\frac{\partial F}{\partial X}=\left[\frac{\partial F}{\partial X_{i j}}\right]$（mp×nq），它能兼容上篇中的标量对矩阵导数的定义，但微分与导数的联系（$dF$ 等于 $\frac{\partial f}{\partial X}$ 中逐个m×n子块分别与 $dX$ 做内积）不够简明，不便于计算和应用。资料[5]综述了以上定义，并批判它们是坏的定义，能配合微分运算的才是好的定义。</li>
+</ol>
+<p>然后来建立运算法则。仍然要利用导数与微分的联系 $\operatorname{vec}(d F)=\frac{\partial F}{\partial X} \operatorname{vec}(d X)$，求微分的方法与上篇相同，而从微分得到导数需要一些向量化的技巧：</p>
+<ol>
+<li>线性：$\text {vec}(A+B)=\text {vec}(A)+\text{vec}(B)$。</li>
+<li>矩阵乘法：$\operatorname{vec}(A X B)=\left(B^{T} \otimes A\right) \operatorname{vec}(X)$，其中 $\otimes$ 表示Kronecker积，$A$（m×n）与 $B$（p×q）的Kronecker积是 $A \otimes B=\left[A_{i j} B\right]_{(\mathrm{mp} \times n q)}$。此式证明见张贤达《矩阵分析与应用》第107-108页。</li>
+<li><p>转置：$\operatorname{vec}\left(A^{T}\right)=K_{m n} \operatorname{vec}(A)$，$A$ 是m×n矩阵，其中 $K_{mn}$（mn×mn）是交换矩阵(commutation matrix)，将按列优先的向量化变为按行优先的向量化。例如 $K_{22}=\left[\begin{array}{cccc}{1} &amp; {0} &amp; {0} &amp; {0} \ {0} &amp; {0} &amp; {1} &amp; {0} \ {0} &amp; {1} &amp; {0} &amp; {0} \ {0} &amp; {0} &amp; {0} &amp; {1}\end{array}\right], \operatorname{vec}\left(A^{T}\right)=\left[\begin{array}{c}{A_{11}} \ {A_{12}} \ {A_{21}} \ {A_{22}}\end{array}\right], \operatorname{vec}(A)=\left[\begin{array}{c}{A_{11}} \ {A_{21}} \ {A_{12}} \ {A_{22}}\end{array}\right]$</p>
+</li>
+<li><p>逐元素乘法：$\operatorname{vec}(A \odot X)=\operatorname{diag}(A) \operatorname{vec}(X)$，其中 $\text{diag}(A)$（mn×mn）是用 $A$ 的元素（按列优先）排成的对角阵。</p>
+</li>
+</ol>
+<p>观察一下可以断言，<strong>若矩阵函数F是矩阵X经加减乘法、逆、行列式、逐元素函数等运算构成，则使用相应的运算法则对F求微分，再做向量化并使用技巧将其它项交换至vec(dX)左侧，对照导数与微分的联系</strong> $\operatorname{vec}(d F)=\frac{\partial F}{\partial X}^{T} \operatorname{vec}(d X)$<strong>，即能得到导数。</strong></p>
+<p><strong>特别地，若矩阵退化为向量，对照导数与微分的联系</strong> $d \boldsymbol{f}=\frac{\partial \boldsymbol{f}^{T}}{\partial \boldsymbol{x}} d \boldsymbol{x}$<strong>，即能得到导数。</strong></p>
+<p>再谈一谈复合：假设已求得 $\frac{\partial F}{\partial Y}$，而 $Y$ 是 $X$ 的函数，如何求 $\frac{\partial F}{\partial X}$呢？从导数与微分的联系入手，$\operatorname{vec}(d F)=\frac{\partial F}{\partial Y}^{T} \operatorname{vec}(d Y)=\frac{\partial F}{\partial Y}^{T} \frac{\partial Y}{\partial X}^{T} \operatorname{vec}(d X)$，可以推出链式法则 $\frac{\partial F}{\partial X}=\frac{\partial Y}{\partial X} \frac{\partial F}{\partial Y}$。</p>
+<p>和标量对矩阵的导数相比，矩阵对矩阵的导数形式更加复杂，从不同角度出发常会得到形式不同的结果。有一些Kronecker积和交换矩阵相关的恒等式，可用来做等价变形：</p>
+<ol>
+<li>$(A \otimes B)^{T}=A^{T} \otimes B^{T}$。</li>
+<li>$\operatorname{vec}\left(\boldsymbol{a} \boldsymbol{b}^{T}\right)=\boldsymbol{b} \otimes \boldsymbol{a}$</li>
+<li>$(A \otimes B)(C \otimes D)=(A C) \otimes(B D)$。可以对 $F=D^{T} B^{T} X A C$ 求导来证明，一方面，直接求导得到 $\frac{\partial F}{\partial X}=(A C) \otimes(B D)$；另一方面，引入 $Y=B^{T} X A$，有 $\frac{\partial F}{\partial Y}=C \otimes D, \frac{\partial Y}{\partial X}=A \otimes B$，用链式法则得到 $\frac{\partial F}{\partial X}=(A \otimes B)(C \otimes D)$。</li>
+<li>$K_{m n}=K_{n m}^{T}, K_{m n} K_{n m}=I$。</li>
+<li>$K_{p m}(A \otimes B) K_{n q}=B \otimes A$，$A$ 是m×n矩阵，$B$ 是p×q矩阵。可以对 $AXB^T$ 做向量化来证明，一方面，$\operatorname{vec}\left(A X B^{T}\right)=(B \otimes A) \operatorname{vec}(X)$；另一方面，$\operatorname{vec}\left(A X B^{T}\right)=K_{p m} \operatorname{vec}\left(B X^{T} A^{T}\right)=K_{p m}(A \otimes B) \operatorname{vec}\left(X^{T}\right)=K_{p m}(A \otimes B) K_{n q} \operatorname{vec}(X)$。</li>
+</ol>
+<p>接下来演示一些算例。</p>
+<p>例1：$F=AX$，$X$ 是m×n矩阵，求 $\frac{\partial F}{\partial X}$。</p>
+<p>解：先求微分：$d F=A d X$，再做向量化，使用矩阵乘法的技巧，注意在 $dX$ 右侧添加单位阵：$\operatorname{vec}(d F)=\operatorname{vec}(A d X)=\left(I_{n} \otimes A\right) \operatorname{vec}(d X)$，对照导数与微分的联系得到 $\frac{\partial F}{\partial X}=I_{n} \otimes A^{T}$。</p>
+<p>特例：如果 $X$退化为向量，即 $\boldsymbol{f}=A \boldsymbol{x}$，则根据向量的导数与微分的关系 $d \boldsymbol{f}=\frac{\partial \boldsymbol{f}^{T}}{\partial \boldsymbol{x}} d \boldsymbol{x}$，得到 $\frac{\partial \boldsymbol{f}}{\partial \boldsymbol{x}}=A^{T}$。</p>
+<p>例2：$f=\log |X|$，$X$ 是n×n矩阵，求 $\nabla_{X} f$ 和 $\nabla_{X}^{2} f$。</p>
+<p>解：使用上篇中的技术可求得$\nabla_{X} f=X^{-1 T}$。为求 $\nabla_{X}^{2} f$，先求微分：$d \nabla_{X} f=-\left(X^{-1} d X X^{-1}\right)^{T}$，再做向量化，使用转置和矩阵乘法的技巧 $\operatorname{vec}\left(d \nabla_{X} f\right)=-K_{n n} \operatorname{vec}\left(X^{-1} d X X^{-1}\right)=-K_{n n}\left(X^{-1 T} \otimes X^{-1}\right) \operatorname{vec}(d X)$，对照导数与微分的联系，得到 $\nabla_{X}^{2} f=-K_{n n}\left(X^{-1 T} \otimes X^{-1}\right)$，注意它是对称矩阵。在 $X$ 是对称矩阵时，可简化为 $\nabla_{X}^{2} f=-X^{-1} \otimes X^{-1}$。</p>
+<p>例3：$F=A \exp (X B)$，$A$ 是l×m矩阵，$X$ 是m×n矩阵，$B$ 是n×p矩阵，$\exp$ 为逐元素函数，求 $\frac{\partial F}{\partial X}$。</p>
+<p>解：先求微分：$d F=A(\exp (X B) \odot(d X B))$，再做向量化，使用矩阵乘法的技巧：$\operatorname{vec}(d F)=\left(I_{p} \otimes A\right) \operatorname{vec}(\exp (X B) \odot(d X B))$，再用逐元素乘法的技巧：$\operatorname{vec}(d F)=\left(I_{p} \otimes A\right) \operatorname{diag}(\exp (X B)) \operatorname{vec}(d X B)$，再用矩阵乘法的技巧：$\operatorname{vec}(d F)=\left(I_{p} \otimes A\right) \operatorname{diag}(\exp (X B))\left(B^{T} \otimes I_{m}\right) \operatorname{vec}(d X)$，对照导数与微分的联系得到 $\frac{\partial F}{\partial X}=\left(B \otimes I_{m}\right) \operatorname{diag}(\exp (X B))\left(I_{p} \otimes A^{T}\right)$。</p>
+<p>例4 一元logistic回归：$l=-y \boldsymbol{x}^{T} \boldsymbol{w}+\log \left(1+\exp \left(\boldsymbol{x}^{T} \boldsymbol{w}\right)\right)$，求 $\nabla_{\boldsymbol{w}} l$ 和 $\nabla_{\boldsymbol{w}}^{2} l$。其中 $y$ 是取值0或1的标量，$\pmb x$，$\pmb w$ 是 $n\times 1$ 列向量。</p>
+<p>解：使用上篇中的技术可求得 $\nabla_{\boldsymbol{w}} l=\boldsymbol{x}\left(\sigma\left(\boldsymbol{x}^{T} \boldsymbol{w}\right)-y\right)$，其中 $\sigma(a)=\frac{\exp (a)}{1+\exp (a)}$ 为sigmoid函数。为求 $\nabla_{\boldsymbol{w}}^{2} l$，先求微分：$d \nabla_{\boldsymbol{w}} l=\boldsymbol{x} \sigma^{\prime}\left(\boldsymbol{x}^{T} \boldsymbol{w}\right) \boldsymbol{x}^{T} d \boldsymbol{w}$，其中 $\sigma^{\prime}(a)=\frac{\exp (a)}{(1+\exp (a))^{2}}$ 为sigmoid函数的导数，对照导数与微分的联系，得到 $\nabla_{w}^{2} l=\boldsymbol{x} \sigma^{\prime}\left(\boldsymbol{x}^{T} \boldsymbol{w}\right) \boldsymbol{x}^{T}$。</p>
+<p>推广：样本 $\left(\boldsymbol{x}_{1}, y_{1}\right), \ldots,\left(\boldsymbol{x}_{N}, y_{N}\right), l=\sum_{i=1}^{N}\left(-y_{i} \boldsymbol{x}_{i}^{T} \boldsymbol{w}+\log \left(1+\exp \left(\boldsymbol{x}_{i}^{T} \boldsymbol{w}\right)\right)\right)$，求 $\nabla_{\boldsymbol{w}} l$ 和 $\nabla_{\boldsymbol{w}}^{2} l$。有两种方法，解1：先对每个样本求导，然后相加；解2：定义矩阵 $X=\left[\begin{array}{c}{\boldsymbol{x}_{1}^{T}} \ {\vdots} \ {\boldsymbol{x}_{n}^{T}}\end{array}\right]$，向量$\boldsymbol{y}=\left[\begin{array}{c}{y_{1}} \ {\vdots} \ {y_{n}}\end{array}\right]$，将 $l$ 写成矩阵形式 $l=-\boldsymbol{y}^{T} \boldsymbol{X} \boldsymbol{w}+\mathbf{1}^{T} \log (\mathbf{1}+\exp (X \boldsymbol{w}))$，进而可以使用上篇中的技术求得$\nabla_{\boldsymbol{w}} l=X^{T}(\sigma(X \boldsymbol{w})-\boldsymbol{y})$ 。为求 $\nabla_{\boldsymbol{w}}^{2} l$，先求微分，再用逐元素乘法的技巧：$d \nabla_{w} l=X^{T}\left(\sigma^{\prime}(X \boldsymbol{w}) \odot(X d \boldsymbol{w})\right)=X^{T} \operatorname{diag}\left(\sigma^{\prime}(X \boldsymbol{w})\right) X d \boldsymbol{w}$，对照导数与微分的联系，得到 $\nabla_{w}^{2} l=X^{T} \operatorname{diag}\left(\sigma^{\prime}(X \boldsymbol{w})\right) X$。</p>
+<p>例5 多元logistic回归：$l=-\boldsymbol{y}^{T} \log \operatorname{softmax}(W \boldsymbol{x})=-\boldsymbol{y}^{T} \boldsymbol{W} \boldsymbol{x}+\log \left(\mathbf{1}^{T} \exp (W \boldsymbol{x})\right)$，求 $\nabla_{\boldsymbol{w}} l$ 和 $\nabla_{\boldsymbol{w}}^{2} l$。其中 $\pmb y$ 是除一个元素为1外其它元素为0的 $m\times 1$列向量，$W$ 是 $m\times n$ 矩阵，$\pmb x$ 是 $n\times 1$ 列向量，$l$ 是标量。</p>
+<p>解：上篇中已求得 $\nabla_{W} l=(\operatorname{softmax}(W \boldsymbol{x})-\boldsymbol{y}) \boldsymbol{x}^{T}$ 。为求 $\nabla_{\boldsymbol{w}}^{2} l$，先求微分：定义 $\boldsymbol{a}=W \boldsymbol{x}$，$d \nabla_{W} l=\left(\frac{\exp (a) \odot d a}{\mathbf{1}^{T} \exp (a)}-\frac{\exp (a)\left(\mathbf{1}^{T}(\exp (a) \odot d a)\right)}{\left(\mathbf{1}^{T} \exp (a)\right)^{2}}\right) \boldsymbol{x}^{T}=\left(\frac{\operatorname{diag}(\exp (a))}{\mathbf{1}^{T} \exp (a)}-\frac{\exp (a) \exp (a)^{T}}{\left(\mathbf{1}^{T} \exp (a)\right)^{2}}\right) d \boldsymbol{a} \boldsymbol{x}^{T}=\left(\operatorname{diag}(\operatorname{softmax}(\boldsymbol{a}))-\operatorname{softmax}(\boldsymbol{a}) \operatorname{softmax}(\boldsymbol{a})^{T}\right) d \boldsymbol{a} \boldsymbol{x}^{T}$，注意这里化简去掉逐元素乘法，第一项中 $\exp (\boldsymbol{a}) \odot d \boldsymbol{a}=\operatorname{diag}(\exp (\boldsymbol{a})) d \boldsymbol{a}$，第二项中 $\mathbf{1}^{T}(\exp (\boldsymbol{a}) \odot d \boldsymbol{a})=\exp (\boldsymbol{a})^{T} d \boldsymbol{a}$ 。定义矩阵 $D(\boldsymbol{a})=\operatorname{diag}(\operatorname{softmax}(\boldsymbol{a}))-\operatorname{softmax}(\boldsymbol{a}) \operatorname{softmax}(\boldsymbol{a})^{T}$，$d \nabla_{W} l=D(\boldsymbol{a}) d \boldsymbol{a} \boldsymbol{x}^{T}=D(W \boldsymbol{x}) d W \boldsymbol{x} \boldsymbol{x}^{T}$，做向量化并使用矩阵乘法的技巧，得到 $\nabla_{W}^{2} l=\left(\boldsymbol{x} \boldsymbol{x}^{T}\right) \otimes D(W \boldsymbol{x})$。</p>
+<p>总结。我们发展了从<strong>整体</strong>出发的矩阵求导的技术，<strong>导数与微分的联系是计算的枢纽</strong>，标量对矩阵的导数与微分的联系是 $d f=\operatorname{tr}\left(\nabla_{X}^{T} f d X\right)$，先对f求微分，再使用迹技巧可求得导数，特别地，标量对向量的导数与微分的联系是 $d f=\nabla_{x}^{T} f d x$；矩阵对矩阵的导数与微分的联系是 $\operatorname{vec}(d F)=\frac{\partial F}{\partial X}^{T} \operatorname{vec}(d X)$，先对 $F$ 求微分，再使用向量化的技巧可求得导数，特别地，向量对向量的导数与微分的联系是 $d f=\frac{\partial f^{T}}{\partial x} d x$。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ol>
+<li>张贤达. <em>矩阵分析与应用</em>. 清华大学出版社有限公司, 2004.</li>
+<li>Fackler, Paul L. “Notes on matrix calculus.” <em>North Carolina State University</em>(2005).</li>
+<li>Petersen, Kaare Brandt, and Michael Syskind Pedersen. “The matrix cookbook.” <em>Technical University of Denmark</em> 7 (2008): 15.</li>
+<li>HU, Pili. “Matrix Calculus: Derivation and Simple Application.” (2012).</li>
+<li>Magnus, Jan R., and Heinz Neudecker. “Matrix Differential Calculus with Applications in Statistics and Econometrics.” Wiley, 2019.</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\03\21\Fisher线性判别\" rel="bookmark">Fisher线性判别</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\02\13\cs229中文笔记-一二\" rel="bookmark">cs229中文笔记(一二)</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\02\18\cs229中文笔记-七\" rel="bookmark">cs229中文笔记(七)</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2020/02/12/%E7%9F%A9%E9%98%B5%E6%B1%82%E5%AF%BC/" title="矩阵求导">https://blog.rexking6.top/2020/02/12/矩阵求导/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/11/Dynamic-Time-Warping-%E5%8A%A8%E6%80%81%E6%97%B6%E9%97%B4%E8%A7%84%E6%95%B4/" rel="prev" title="Dynamic Time Warping 动态时间规整">
+      <i class="fa fa-chevron-left"></i> Dynamic Time Warping 动态时间规整
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/02/13/%E5%8F%98%E5%88%86%E6%8E%A8%E6%96%AD%EF%BC%88Variational-Inference%EF%BC%89%E6%9C%80%E6%96%B0%E8%BF%9B%E5%B1%95%E7%AE%80%E8%BF%B0/" rel="next" title="变分推断（Variational Inference）最新进展简述">
+      变分推断（Variational Inference）最新进展简述 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A0%87%E9%87%8F%E5%AF%B9%E7%9F%A9%E9%98%B5"><span class="nav-number">2.</span> <span class="nav-text">标量对矩阵</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9F%A9%E9%98%B5%E5%AF%B9%E7%9F%A9%E9%98%B5"><span class="nav-number">3.</span> <span class="nav-text">矩阵对矩阵</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

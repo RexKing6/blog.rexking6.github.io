@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《SinGAN: Learning a Generative Model from a Single Natural Image》笔记">
+<meta property="og:url" content="https://blog.rexking6.top/2019/11/24/%E3%80%8ASinGAN-Learning-a-Generative-Model-from-a-Single-Natural-Image%E3%80%8B%E7%AC%94%E8%AE%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1574732892.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1574732970.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1574733044.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1574733078.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1574733120.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1574737539.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1574737571.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1574737775.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1574737906.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1574738037.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1574738149.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1574751449.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1574751476.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1574751529.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1574751560.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1574751609.png">
+<meta property="article:published_time" content="2019-11-24T14:26:09.000Z">
+<meta property="article:modified_time" content="2021-07-10T05:14:11.036Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="计算机视觉">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1574732892.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2019/11/24/%E3%80%8ASinGAN-Learning-a-Generative-Model-from-a-Single-Natural-Image%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《SinGAN: Learning a Generative Model from a Single Natural Image》笔记 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2019/11/24/%E3%80%8ASinGAN-Learning-a-Generative-Model-from-a-Single-Natural-Image%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《SinGAN: Learning a Generative Model from a Single Natural Image》笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-24 22:26:09" itemprop="dateCreated datePublished" datetime="2019-11-24T22:26:09+08:00">2019-11-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-10 13:14:11" itemprop="dateModified" datetime="2021-07-10T13:14:11+08:00">2021-07-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" itemprop="url" rel="index"><span itemprop="name">计算机视觉</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2019/11/24/%E3%80%8ASinGAN-Learning-a-Generative-Model-from-a-Single-Natural-Image%E3%80%8B%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="《SinGAN: Learning a Generative Model from a Single Natural Image》笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>3.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>一篇令人眼前一亮的文章，关键词重要性排序：金字塔GAN&gt;非条件性(随机变量)&gt;单张图像。<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1905.01164">文章链接</a>。</p>
+<p>转载：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzI5NTIxNTg0OA==&amp;mid=2247498525&amp;idx=1&amp;sn=4d4e46b17024e1bcb45b642d57f519dc">ICCV 2019 最佳论文《SinGAN：从单张自然图像学习生成式模型》中文全译</a>。</p>
+<h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>作者们提出了 SinGAN，这是一个可以从单张自然图像学习的非条件性生成式模型。这个模型可以捕捉给定图像中各个小块内的内在分布，接着就能够生成带有和给定图像中的视觉内容相同的高质量且多样的新图像。SinGAN的结构是多个全卷积GAN组成的金字塔，这些全卷积GAN都负责学习图像中的某个小块中的数据分布，不同的GAN学习的小块的大小不同。这种设计可以让它生成具有任意大小和比例的新图像，这些新图像在具有给定的训练图像的全局结构和细节纹理的同时，还可以有很高的可变性。与此前的从单张图像学习GAN的研究不同的是，作者的方法不仅仅可以学习图像中的纹理，而且是一个非条件性模型（也就是说它是从噪声生成图像的）。作者做实验让人分辨原始图像和生成的图像，结果表明很难区分两者。作者也在多种图像任务中展示了SinGAN的作用。 </p>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>生成式对抗网络（GAN）[19]在可视化数据的高维分布建模方面取得了巨大的飞跃。特别是，在特定类数据集（例如，面部[33]，卧室[47]）上进行训练时，无条件GAN在生成真实、高质量的样本方面表现出了显著的成功。但是，捕获多种不同的类别组成的数据集的分布（例如ImageNet[12]）仍然被认为是一个主要的挑战，通常需要根据另一个输入信号对生成过程做限制（条件式生成）[6]或为特定的任务训练模型（例如超分辨率[30]，inpainting[41]，重定向[45]）。</p>
+<p>在这里，我们将GAN的使用带入了一个新的领域——从单一的自然图像中进行无条件生成学习。具体来说，我们证明了单个自然图像中patch的内部统计信息通常包含了足够的信息，可以用来学习一个强大的生成模型。我们的单一图像生成模型SinGAN允许我们处理包含复杂结构和纹理的一般自然图像，而不需要依赖于来自同一类别的图像的数据库。这是通过一个由全卷积的轻量级GAN组成的金字塔来实现的，每个GAN负责捕获不同尺度的patch分布。一旦经过训练，SinGAN可以生成各种高质量的图像样本（任意维度），这些样本在语义上与训练图像相似，但包含新的对象配置和结构（图1）。 </p>
+<p><img src="http://image.rexking6.top/img/clip1574732892.png" alt=""></p>
+<p><em>图1：<strong>从单个训练图像中学习的图像生成</strong>。我们提出了一种基于单一自然图像的无条件生成模型，使用一种专门的多尺度对抗训练方案，在多个尺度上学习图像中的小块的数据分布；然后，它可以用来生成新的逼真的图像样本，在创建新的对象配置和结构时，保持原始的小块分布。</em></p>
+<p>对单个自然图像中的patch内部分布进行建模长期以来一直被认为是许多计算机视觉任务的重要先验[64]。经典的例子包括去噪[65]，去模糊[39]，超分辨率[18]，去雾[2,15]，图像编辑[37,21,9,11,50]。在这方面最相关的工作是[48]，其中定义了一个双向的patch相似性度量，并对其进行了优化，以保证处理后的图像patch与原始图像的patch是相同的。在这些工作的启发下，在这里，我们展示了如何在一个简单的统一学习框架中使用SinGAN来解决各种图像处理任务，包括从单个图像到图像的绘制、编辑、协调、超分辨率和动画。在这些情况下，我们的模型产生了高质量的结果，保持了训练图像的内部patch统计（见图2和我们的项目网页）。所有的任务都是在相同的生成网络中完成的，没有任何额外的信息或原始训练图像之外的进一步训练。 </p>
+<p><img src="http://image.rexking6.top/img/clip1574732970.png" alt=""></p>
+<p><em>图2：<strong>图像操控</strong>。SinGAN 可以用来执行多种图像操控任务，包括：把一张剪贴画转换成具有真实感的照片，编辑、重新排列图像中的物体，让添加到图像中的物体变得协调一致，图像超分辨率，或者从单张输入生成动画。在所有这些例子中，模型都只观察过第一横行的训练图像，所有这些应用也都是以同样的方式训练的，没有额外的模型架构修改或者精细调节。</em></p>
+<h1 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h1><h2 id="单图像生成模型"><a href="#单图像生成模型" class="headerlink" title="单图像生成模型"></a>单图像生成模型</h2><p>最近的一些研究工作提出将深度模型“过拟合”到单个训练样例中[51,60,46,7,1]。然而，这些方法是为特定的任务而设计的（例如超分辨率[46]，纹理扩展[60]）。Shocher等人[44,45]首先为单个自然图像引入了基于内部GAN的模型，并在重定向的背景下进行了描述。然而，它们的生成取决于输入图像（即将图像映射到图像），而不是用来绘制随机样本。相比之下，我们的框架是纯生成式的（即将噪声映射到图像样本），因此适合许多不同的图像处理任务。无条件的单图像GAN仅在纹理生成的环境中被探索过[3,27,31]。当对非纹理图像进行训练时，这些模型不会生成有意义的样本（图3）。另一方面，我们的方法不局限于纹理，可以处理一般的自然图像（如图1）。</p>
+<p><img src="http://image.rexking6.top/img/clip1574733044.png" alt=""></p>
+<p><em>图3：<strong>SinGAN对比单个图像纹理生成</strong>。用于纹理生成的单一图像模型[3,16]并不是为了处理自然图像而设计的。我们的模型可以生成包含复杂纹理和非重复全局结构的真实图像样本。</em></p>
+<h2 id="生成式图像编辑模型"><a href="#生成式图像编辑模型" class="headerlink" title="生成式图像编辑模型"></a>生成式图像编辑模型</h2><p>在许多不同的图像处理任务中，最近的基于GAN的方法已经证明了对抗性学习的力量[61,10,62,8,53,56,42,53]。例如交互式图像编辑[61,10]、sketch2image[8,43]，以及其他图像到图像的翻译任务[62,52,54]。然而，所有这些方法都是在类特定的数据集上训练的，而且正如上文所说，它们通常需要有另一个输入信号作为生成条件。我们不感兴趣的是捕获同一类图像之间的共同特征，而是考虑不同的训练数据来源——单个自然图像的多个尺度上的所有重叠补丁。我们证明了一个强大的生成模型可以从这些数据中学习，并可用于许多图像处理任务。 </p>
+<p><img src="http://image.rexking6.top/img/clip1574733078.png" alt=""></p>
+<p><em>图4：<strong>SinGAN的多尺度管道</strong>。我们的模型由许多GAN组成一个金字塔，其中训练和推理都是以一种由粗到精的方式完成的。在每个尺度上，$G_n$学习生成图像样本，其中所有的重叠patch用判别器 $D_n$ 无法从下采样训练图像 $x_n$中的patch中识别出；当我们沿着金字塔向上移动时，有效的patch大小会减小（在原始图像上用黄色标记以作说明）。$G_n$的输入是随机噪声图像 $z_n$,和生成的图像从之前的尺度 $\tilde x_n$，向上采样到当前分辨率（除了纯生成的最粗级别）。第 $n$ 级的生成过程涉及所有生成器 $\{G_N,\cdots,G_n\}$ 和所有的噪声映射 $\{z_N,\cdots,z_n\}$到这个层次。详见第2节。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1574733120.png" alt=""></p>
+<p><em>图5：<strong>单尺度的生成</strong>。在每个尺度 $n$，图像从以前的尺度 $\tilde x_{n+1}$上采样并添加到输入噪声映射 $z_n$。结果送入卷积层的输出是一个残差图像添加回 $(\tilde x_{n+1})↑^r$。这是 $G_n$ 输出的 $\tilde x_n$。</em></p>
+<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p>我们的目标是学习一个无条件生成模型，它可以捕获单个训练图像 $x$ 的内部统计信息。这个任务在概念上与传统的GAN设定类似，只是这里的训练样本是单个图像的patch，而不是来自数据库的整个图像样本。</p>
+<p>我们选择不局限于纹理生成，要能够处理更一般的自然图像。这需要在许多不同的尺度上获取复杂图像结构的统计信息。例如，我们希望捕获全局属性，例如图像中大型对象的排列和形状（例如顶部的天空，底部的地面），以及精细的细节和纹理信息。为了实现这一目标，我们生成框架如图4所示，由层次性的patch-GAN（马尔科夫判别器）组成[31,26]，每个patch-GAN负责捕捉 $x$ 的不同尺度的patch分布。这些GAN的接受域小，容量有限，无法记住单个图像。而类似的多尺度体系结构已经在传统的GAN设定环境中得到了探索（例如[28,52,29,52,13,24]），我们是第一个从单一的图像探索它的内部学习。</p>
+<h2 id="多尺度结构"><a href="#多尺度结构" class="headerlink" title="多尺度结构"></a>多尺度结构</h2><p>我们的模型由一个生成器金字塔组成 $\{G_0,\cdots,G_N\}$，针对 $x:\{x_0,\cdots,x_N\}$  的图像金字塔进行训练，其中 $x_N$  是一个因子 $r^n$ 的 $x$ 的的下采样版本，对于某个 $r&gt;1$。每个生成器 $G_n$ 负责生成真实的图像样本，即对应图像 $x_n$ 中的patch分布。这是通过对抗训练实现的，在这种训练中，$G_n$ 学会欺骗一个对应的识别器 $D_n$，该识别器试图将生成的样本中的patch与 $x_n$ 中的patch区分开来。</p>
+<p>图像样本的生成从最粗的尺度开始，依次通过所有生成器，直到最细的尺度，在每个尺度注入噪声。所有的生成器和判别器都有相同的接收域，因此在生成过程中捕获的结构尺寸都在减小。在最粗的尺度上是纯生成，即 $G_N$ 映射空间高斯白噪声 $z_N$ 到图像样本 $\tilde x_N$。</p>
+<script type="math/tex; mode=display">
+\tilde x_N=G_N(z_N) \tag 1</script><p>这一层的有效接受域通常为图像高度的一半，因此 $G_N$ 生成图像的总体布局和对象的全局结构。每个更小尺度上的生成器 $G_n$（$n&lt;N$）都添加了以前的尺度没有生成的细节。因此，除了空间噪声 $z_n$ 外，每个生成器 $G_n$ 还接受较粗尺度图像的上采样版本，即</p>
+<script type="math/tex; mode=display">
+\tilde x_n=G_n(z_n,(\tilde x_{n+1})\uparrow^r),n<N\tag2</script><p>所有的生成器都具有相似的架构，如图5所示。具体来说，噪音 $z_n$ 是添加到图像 $(\tilde x_{n+1})\uparrow^r$，被送入一个卷积序列层。这确保了GAN不会忽略噪声，就像随机条件规划中经常发生的那样[62,36,63]。卷积层的作用是生成 $(\tilde x_{n+1})\uparrow^r$ 中遗漏的细节（残差学习[22,57]）。即 $G_n$ 执行操作 </p>
+<script type="math/tex; mode=display">
+\tilde x_n=(\tilde x_{n+1})\uparrow^r+\psi_n(z_n+(\tilde x_{n+1})\uparrow^r),</script><p>其中，$\psi_n$  是一个有着5个Conv-3×3-BatchNorm-LeakyReLU[25]卷积块。我们在最粗糙的尺度上从每个块32个核开始，然后每4个尺度增加2倍。因为生成器是全卷积的，所以我们可以在测试时生成任意大小和宽高比的图像（通过改变噪声图的尺寸）。 </p>
+<h2 id="训练"><a href="#训练" class="headerlink" title="训练"></a>训练</h2><p>我们按顺序训练我们的多尺度体系结构，从最粗糙的尺度到最精细的尺度。一旦每个GAN被训练，它就会被固定下来。我们对第 $n$ 个GAN的训练损失包括一个对抗性公式和一个重构公式， </p>
+<script type="math/tex; mode=display">
+\min_{G_n}\max_{D_n}\mathcal L_{\text{adv}}(G_n,D_n)+\alpha\mathcal L_{\text{rec}}(G_n).</script><p>对抗的损失 $\mathcal L_{\text{adv}}$ 惩罚 $x_n$ 的patch分布与生成样本 $\tilde x_n$ 的patch分布之间的距离。重构损失 $\mathcal L_{\text{rec}}$ 保证了一组特定的噪声映射的存在，这些噪声映射可以产生 $x_n$，这是图像处理的一个重要特征（第4节）。 </p>
+<h3 id="对抗损失"><a href="#对抗损失" class="headerlink" title="对抗损失"></a>对抗损失</h3><p>每个生成器 $G_n$ 都与一个马尔可夫链判别器 $D_n$ 对应，该判别器将其输入的每个重叠的patch分类为真或假[31,26]。我们使用WGAN-GP损失[20]来增加训练的稳定性，其中最终的判别分数是patch判别映射的平均值。相对于纹理的单图像GAN（例如[31,27,3]），在这里，我们定义整个图像的损失，而不是随机剪裁（批量大小为1），这允许网络学习边界条件（见补充资料），这是我们设定的一个重要特性。$D_n$ 的架构和 $G_n$ 所包含的网络 $ψ_n$ 相同，所以它的patch大小（网络的接受域）是11×11。</p>
+<h3 id="重构损失"><a href="#重构损失" class="headerlink" title="重构损失"></a>重构损失</h3><p>我们要确保存在一组特定的输入噪声映射，生成原始图像 $x$。我们具体选择 $\{z_N^{\text{rec}},z_{N-1}^{\text{rec}},\cdots,z_0^{\text{rec}}\}=\{z^\ast,0,\cdots,0\}$， 其中 $z^\ast$ 是一些固定的噪声映射（确定一次，在训练时保持固定）。当使用这些噪声映射时，用 $\tilde x^{\text{rec}}_n$  表示在第 $n$ 个尺度上生成的图像。对于 $n &lt; N$ 时，</p>
+<script type="math/tex; mode=display">
+\mathcal L_{\text{rec}}=||G_n(0,(\tilde x^{\text{rec}}_{n+1})\uparrow^r)-x_n||^2\tag 5</script><p>对于 $n=N$，我们使用 $\mathcal L_{\text{rec}}=||G_N(z^\ast)-x_N||^2$。重建图像 $\tilde x^{\text{rec}}_n$ 在训练中还有另一个作用，就是确定噪声 $z_n$ 在每个尺度的标准差 $\sigma_n$。具体来说，我们把 $\sigma_n$ 当成 在 $(\tilde x^{\text{rec}}_{n+1})$ 和 $x_n$ 之间的均方误差(RMSE)的比例，表示在该尺度下需要添加的细节量。 </p>
+<h1 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h1><h2 id="定性评价"><a href="#定性评价" class="headerlink" title="定性评价"></a>定性评价</h2><p>我们对我们的方法进行了定性和定量的测试，包括城市和自然风景，以及艺术和纹理图像。我们使用的图像取自Berkeley Segmentation 数据集（BSD）[35]、Places[59]和Web。我们总是在最粗糙的尺度设置最小尺寸为25px，并选择尺度的数量 $N$，比例因子 $r$ 尽可能接近4/3。对于所有的结果，（除非另有说明），我们将训练图像调整为最大尺寸250px。</p>
+<p>我们生成的随机图像样本的定性示例如图1和图6所示，补充资料中包含了更多的示例。对于每个例子，我们都展示了一些随机样本，它们的宽高比与原始图像相同，并且在每个轴上都有缩小和扩大的尺寸。可以看出，在所有这些情况下，生成的样本描述了新的真实的对象结构和配置，同时保留了训练图像的视觉内容。我们的模型成功地保存了对象的全局结构，例如山脉（图1）、气球或金字塔（图6），以及精细的纹理信息。由于网络的接受域有限（小于整个图像），它可以生成训练图像中不存在的新patch组合。此外，我们注意到，在许多情况下反射和阴影是实际合成，可以在图6、图1和图8的第一个样例看到。注意，SinGAN的架构是与分辨率无关，因此可以用于高分辨率的图像，如图7中所示（见补充资料中4Mpix结果）。在这里，所有尺度的结构都很好地生成了从天空、云和山脉的整体布局，到雪的精细纹理。 </p>
+<p><img src="http://image.rexking6.top/img/clip1574737539.png" alt=""></p>
+<p><em>图6：<strong>随机图像样本</strong>。通过对单个图像进行训练，可以生成描述新结构和对象配置的逼真随机图像，同时保留训练图像的patch分布。由于我们的模型是全卷积的，因此生成的图像可能具有任意大小和纵横比。请注意，我们的目标不是图像重定向—我们的图像样本是随机的和优化的，以维护patch分布，而不是保留突出的目标。更多结果和图像重定向方法的定性比较请参见补充资料。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1574737571.png" alt=""></p>
+<p><em>图7：高分辨率图像生成。我们的模型生成的随机样本，训练在243×1024的图像上（右上角）；新的全局结构以及精细的细节被真实地生成。参见补充资料中的4Mpix示例。</em></p>
+<h3 id="测试中尺度数量的影响"><a href="#测试中尺度数量的影响" class="headerlink" title="测试中尺度数量的影响"></a>测试中尺度数量的影响</h3><p>我们的多尺度体系结构允许通过选择在测试时开始生成的尺度来控制样本之间的变化量。为了从比例 $n$ 开始，我们把噪声映射固定为 $\{z_N^{\text{rec}},\cdots,z_{n+1}^{\text{rec}}\}$，只对 $\{z_n,\cdots,z_0\}$ 做随机取值。其效果如图8所示。可以看出，在最粗糙的尺度上开始生成（$n = N$），全局结构有可能会发生较大变化。在某些情况下，一个大的突出的物体，如斑马图像的例子中，这可能导致生成不真实的样本。然而，从更细的尺度开始生成，就可以保持全局结构不变，而只改变更细的图像特征（例如斑马的条纹）。参见补充资料获得更多的例子。 </p>
+<p><img src="http://image.rexking6.top/img/clip1574737775.png" alt=""></p>
+<p><em>图8：<strong>从不同的尺度生成（推理时）</strong>。我们展示了从给定的 $n$级开始分层生成的效果。对于我们的完整生成方案（$n = N$），最粗糙的输入是随机噪声。为了生成更精细的 $n$，我们插入向下采样的原始图像 $x_n$ 作为该比例的输入。这使得我们可以控制生成结构的尺度，例如，我们可以保持斑马的形状和姿势，只有从 $n=N−1$ 开始生成才能改变其条纹纹理。</em></p>
+<h3 id="训练中尺度数量的影响"><a href="#训练中尺度数量的影响" class="headerlink" title="训练中尺度数量的影响"></a>训练中尺度数量的影响</h3><p>图9显示了使用较少的尺度尺度数量的训练效果。用少量的尺度，在最粗糙的水平上有效的接受域更小，只允许捕获精细的纹理。随着尺度数量的增加，出现了更大的支撑结构，全局对象的排列得到了更好的保留。 </p>
+<p><img src="http://image.rexking6.top/img/clip1574737906.png" alt=""></p>
+<p><em>图9：<strong>使用不同数量的尺度进行训练的效果</strong>。SinGAN架构中的尺度数量对结果有很大的影响。只有少量比例的模型才能捕获纹理。随着尺度数量的增加，SinGAN成功地捕捉到了更大的结构以及场景中物体的整体布局。</em></p>
+<h2 id="定量评价"><a href="#定量评价" class="headerlink" title="定量评价"></a>定量评价</h2><p>为了量化生成图像的真实性以及它们如何捕获训练图像的内部统计数据，我们使用了两个指标:(i) Amazon Mechanical Turk（AMT，亚马逊众包）“真实/虚假”用户研究，(ii)Frechet Inception距离[23]的新单图像版本。 </p>
+<h3 id="AMT感知研究"><a href="#AMT感知研究" class="headerlink" title="AMT感知研究"></a>AMT感知研究</h3><p>我们遵循[26,58]的方案，在两种情况下进行感知实验。</p>
+<ol>
+<li><p>配对（真与假）：研究人员向参与者展示了50个实验序列，每个实验中，一张假图像（由SinGAN生成）与它的真实训练图像进行1秒钟的对比。工作人员被要求挑选出假照片。</p>
+</li>
+<li><p>非配对（真或假）：工作人员看到一张图片1秒钟，然后被问及这是否是假的。总共有50张真实的图像和50张不相关的假图像被随机分配给每个参与者。</p>
+</li>
+</ol>
+<p>我们对两种类型的生成过程重复了这两个过程:从最粗糙的尺度 $N$ 开始生成，从 $N -1$ 尺度开始生成（如图8所示）。为了量化生成图像的多样性，对于每个训练示例，我们计算每个像素超过100个生成图像的强度值的标准差(std)，在所有像素上取平均值，然后根据训练图像的强度值的std进行标准化。真实的图片是从“places”数据库[59]中随机选取的，来自山脉、丘陵、沙漠和天空的子类别。在这四个测试中，我们有50个不同的参与者。在所有测试中，前10个测试都是包含反馈的教程。结果见表1。</p>
+<p><img src="http://image.rexking6.top/img/clip1574738037.png" alt=""></p>
+<p><em>表1：<strong>“真/假”AMT测试</strong>。我们报告了两个生成过程的混淆率：从最粗糙尺度 $N$ 开始（生成具有大量多样性的样本），从第二个最粗糙尺度 $N-1$ 开始（保留原始图像的全局结构）。在每种情况下，我们都进行了配对研究（真-vs-假图像对显示），和一个未配对的图像显示。方差由bootstrap[14]估计。</em></p>
+<p>正如所预料的那样，在未配对的情况下，混淆的比例总是更大，因此没有可比性。此外，很明显，混淆率随着生成图像的多样性而降低。然而，即使改变了大型结构，我们生成的图像也很难与真实图像区分开来（50%的分数意味着完全混淆了真实图像和虚假图像）。完整的测试图像包含在补充资料中。 </p>
+<h3 id="单幅图像FID"><a href="#单幅图像FID" class="headerlink" title="单幅图像FID"></a>单幅图像FID</h3><p>接下来，我们将量化SinGAN在多大程度上捕获了 $x$ 的内部统计信息。GAN评价的一个常用指标是Frechet Inception Distance（FID）[23]，它测量生成图像的深度特征分布与真实图像的分布之间的偏差。然而，在我们的设置中，我们只有一个真实的图像，并且对它的内部patch统计非常感兴趣。因此，我们提出了单图像FID度量（SIFID）。在Inception网络[49]的最后一个池化层（每个图像一个向量）之后，我们在第二个池化层（图中每个位置一个向量）之前使用卷积层而不是使用激活向量输出的深层特征的内部分布。我们的SIFID是真实图像和生成的样本中这些特征的统计数据之间的FID。</p>
+<p><img src="http://image.rexking6.top/img/clip1574738149.png" alt=""></p>
+<p><em>表2：<strong>单图像FID（SIFID）</strong>。我们将FID指标应用于单个图像，并报告50幅图像的平均分，对于完整的生成（第一行），以及从第二个最粗糙尺度（第二行）开始。与AMT结果的相关性表明，SIFID与人类排名高度一致。</em></p>
+<p>从表2中可以看出，尺度 $N - 1$ 生成的SIFID平均值低于尺度 $N$ 生成的SIFID平均值，这与用户研究结果一致。我们还报告了SIFID分数和假图像的混淆率之间的相关性。请注意，这两者之间存在显著的（反）相关性，这意味着一个小的SIFID通常可以很好地指示出较大的混淆率。成对测试的相关性更强，因为SIFID是成对的措施（它作用于对 $x_n,\tilde x_n$）。 </p>
+<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><p>我们将探讨SinGAN在许多图像处理任务中的应用。为此，我们在训练后使用我们的模型，不进行架构更改或进一步调优，并对所有应用采用相同的方法。该思想是利用这样一个事实，即在推理时，SinGAN只能生成与训练图像具有相同patch分布的图像。因此，可以通过在 $n&lt;N$ 的某个尺度将图像（可能是向下采样的版本）注入到生成金字塔中，并通过生成器将其前馈传输，从而使其patch分布与训练图像的patch分布匹配，从而进行操作。不同的注入尺度导致不同的效果。我们考虑以下应用（更多结果和注入尺度见补充资料）。</p>
+<h2 id="超分辨率"><a href="#超分辨率" class="headerlink" title="超分辨率"></a>超分辨率</h2><p>将输入图像的分辨率提高一个因子 $s$。我们训练我们的模型在低分辨率（LR）图像，重建低损失权重 $α=100$ 和金字塔尺度因子 $r=\sqrt[k]{s},k\in N$。</p>
+<p>由于小型结构往往在自然场景[18]的尺度上反复出现，在测试时，我们通过一个 $r$ 因子对LR图像进行上采样，并将其（连同噪声）注入最后一个生成器 $G_0$。我们重复 $k$ 次以获得最终的高分辨率输出。示例结果如图10所示。可以看出，我们重建的视觉性能超过了最先进的内部方法[51,46]，外部方法的目的是PSNR最大化[32]。有趣的是，它可以与外部训练的SR-GAN方法[30]相媲美，尽管它只暴露在一张图像中。在[4]之后，我们在BSD100数据集[35]上比较表3中5种方法的失真程度(RMSE)和感知质量(NIQE[40])是两个在根本上冲突的指标[5]。可以看出，SinGAN在感知质量上非常优秀；其NIQE分数仅略低于SRGAN，其RMSE稍好一些。  </p>
+<p><img src="http://image.rexking6.top/img/clip1574751449.png" alt=""></p>
+<p><em>图10：<strong>超分辨率</strong>。当SinGAN被训练在一个低分辨率的图像上时，我们能够进行超分。这是通过迭代地对图像进行采样并将其输入到SinGAN的最精细的比例生成器来实现的。可以看出，SinGAN的图像质量优于SOTA内标法ZSSR[46]和DIP[51]。它也比EDSR[32]好，可以与SRGAN[30]相比，后者是在大型数据集上训练的外部方法。括号中显示了相应的PSNR和NIQE[40]。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1574751476.png" alt=""></p>
+<p><em>表3：<strong>超分辨率评估</strong>。在[5]之后，我们在BSD100[35]上报告了失真(RMSE)和感知性能（NIQE[40]，越低越好）。可以看出，SinGAN的性能与SRGAN[30]类似。</em></p>
+<h2 id="图画-图像（Paint-to-Image）"><a href="#图画-图像（Paint-to-Image）" class="headerlink" title="图画-图像（Paint-to-Image）"></a>图画-图像（Paint-to-Image）</h2><p>将剪贴画转换成逼真的图像。这是通过向下采样剪贴画图像并将其输入一个粗尺度（例如 $N−1$ 或 $N−2$）来实现的。从图2和图11可以看出，我们保留了画面的整体结构，真实地生成了与原图匹配的纹理和高频信息。我们的方法在视觉性能上优于风格迁移方法[38,17]（图11）。 </p>
+<p><img src="http://image.rexking6.top/img/clip1574751529.png" alt=""></p>
+<p><em>图11：<strong>Paint-to-Image</strong>。我们在目标图像上训练SinGAN，并在测试时将一个向下采样的图画注入到一个粗糙的水平。我们生成的图像保留了剪贴画的布局和一般结构，同时生成与训练图像匹配的真实纹理和精细细节。著名的风格迁移方法[17,38]在此任务中失败。</em></p>
+<h2 id="协调（Harmonization）"><a href="#协调（Harmonization）" class="headerlink" title="协调（Harmonization）"></a>协调（Harmonization）</h2><p>把粘贴的对象与背景图像融为一体。我们在背景图像上训练SinGAN，并在测试时注入原始粘贴对象的下采样版本。在这里，我们将生成的图像与原始背景相结合。从图2和图13可以看出，我们的模型对粘贴对象的纹理进行了裁剪以匹配背景，并且经常比[34]更好地保留了对象的结构。缩放2、3、4通常会在保持对象结构和转移背景纹理之间取得良好的平衡。 </p>
+<p><img src="http://image.rexking6.top/img/clip1574751560.png" alt=""></p>
+<p>图13：<strong>协调</strong>。我们的模型能够保持粘贴对象的结构，同时调整其外观和纹理。专用的协调方法[34]过度混合对象与背景。 </p>
+<h2 id="编辑（Editing）"><a href="#编辑（Editing）" class="headerlink" title="编辑（Editing）"></a>编辑（Editing）</h2><p>把图像中一个区域的内容复制粘贴到另一个区域后，仍然保持真实的观感。这里，我们再次将复合材料的下采样版本注入到粗糙尺度之一。然后我们将SinGAN在编辑区域的输出与原始图像结合起来。如图2和图12所示，SinGAN重新生成了精细的纹理，并无缝地缝合了粘贴的部分，比Photoshop的Content-Aware-Move（内容感知剪切）效果更好。 </p>
+<p><img src="http://image.rexking6.top/img/clip1574751609.png" alt=""></p>
+<p>图12：<strong>编辑</strong>。我们从原始图像(a)中复制并粘贴一些patch，然后将编辑后的图像(b)的下采样版本输入到我们的模型的中间层（在(a)上进行预训练）。在生成的图像(d)中，这些局部编辑被转换成连续逼真的结构。(c)与Photoshop的contentaware move比较。 </p>
+<h2 id="单图像动画（SingleImage-Animation）"><a href="#单图像动画（SingleImage-Animation）" class="headerlink" title="单图像动画（SingleImage Animation）"></a>单图像动画（SingleImage Animation）</h2><p>从一个单一的输入图像创建一个简短的视频剪辑与现实物体的运动。自然图像往往包含重复，这揭示了不同的“快照”在同一动态对象[55]的时间（例如一群鸟的图像揭示了一个鸟的所有翼姿态）。使用SinGAN，我们可以沿着图像中物体的所有表象的表面前进，从而从一个单一的图像合成运动。我们发现，对于许多类型的图像，一个现实的效果是通过 $z$ 空间中的随机漫步实现的，从 $z^{\text{rec}}$ 开始在所有的生成尺度的第一帧（见补充资料视频）。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>我们介绍了一个新的非条件生成方案SinGAN，它是从一个单一的自然图像中学习来的。我们展示了它不仅限于纹理的学习能力，并为自然复杂的图像生成多样的真实样本。与外部训练的生成方法相比，内部学习在语义多样性方面存在固有的局限性。例如，如果训练图像包含一条狗，我们的模型将不会生成不同犬种的样本。不过，我们的实验证明，SinGAN可以为广泛的图像处理任务提供一个非常强大的工具。 </p>
+<p><a target="_blank" rel="noopener" href="http://webee.technion.ac.il/people/tomermic/SinGAN/SinGAN.htm">补充材料地址</a>。</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ul>
+<li>[1] Yuki M Asano, Christian Rupprecht, and Andrea Vedaldi. Surprising effectiveness of few-image unsupervised feature learning. arXiv preprint arXiv:1904.13132, 2019.</li>
+<li>[2] Yuval Bahat and Michal Irani. Blind dehazing using internal patch recurrence. In 2016 IEEE International Conference on Computational Photography (ICCP), pages 1–9. IEEE, 2016.</li>
+<li>[3] Urs Bergmann, Nikolay Jetchev, and Roland Vollgraf. Learning texture manifolds with the periodic spatial GAN. arXiv preprint arXiv:1705.06566, 2017.</li>
+<li>[4] Yochai Blau, Roey Mechrez, Radu Timofte, Tomer Michaeli, and Lihi Zelnik-Manor. The 2018 pirm challenge on perceptual image super-resolution. In European Conference on Computer Vision Workshops, pages 334–355. Springer, 2018.</li>
+<li>[5] Yochai Blau and Tomer Michaeli. The perception-distortion tradeoff. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 6228–6237, 2018.</li>
+<li>[6] Andrew Brock, Jeff Donahue, and Karen Simonyan. Large scale GAN training for high fidelity natural image synthesis. arXiv preprint arXiv:1809.11096, 2018.</li>
+<li>[7] Caroline Chan, Shiry Ginosar, Tinghui Zhou, and Alexei A Efros. Everybody dance now. arXiv preprint arXiv:1808.07371, 2018.</li>
+<li>[8] Wengling Chen and James Hays. Sketchygan: towards diverse and realistic sketch to image synthesis. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 9416–9425, 2018.</li>
+<li>[9] Taeg Sang Cho, Moshe Butman, Shai Avidan, and William T Freeman. The patch transform and its applications to image editing. In 2008 IEEE Conference on Computer Vision and Pattern Recognition, pages 1–8. IEEE, 2008.</li>
+<li>[10] Tali Dekel, Chuang Gan, Dilip Krishnan, Ce Liu, and William T Freeman. Sparse, smart contours to represent and edit images. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 3511–3520, 2018.</li>
+<li>[11] Tali Dekel, Tomer Michaeli, Michal Irani, and William T Freeman. Revealing and modifying non-local variations in a single image. ACM Transactions on Graphics (TOG), 34(6):227, 2015.</li>
+<li>[12] J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li, and L. Fei-Fei. ImageNet: A Large-Scale Hierarchical Image Database. In CVPR09, 2009.</li>
+<li>[13] Emily L Denton, Soumith Chintala, Rob Fergus, et al. Deep generative image models using a laplacian pyramid of adversarial networks. In Advances in neural information processing systems, pages 1486–1494, 2015.</li>
+<li>[14] Bradley Efron. Bootstrap methods: another look at the jackknife. In Breakthroughs in statistics, pages 569–593. Springer, 1992.</li>
+<li>[15] Gilad Freedman and Raanan Fattal. Image and video upscaling from local self-examples. ACM Transactions on Graphics (TOG), 30(2):12, 2011.</li>
+<li>[16] Leon Gatys, Alexander S Ecker, and Matthias Bethge. Texture synthesis using convolutional neural networks. In Advances in neural information processing systems, pages 262–270, 2015.</li>
+<li>[17] Leon A Gatys, Alexander S Ecker, and Matthias Bethge. Image style transfer using convolutional neural networks. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 2414–2423, 2016.</li>
+<li>[18] Daniel Glasner, Shai Bagon, and Michal Irani. Superresolution from a single image. In 2009 IEEE 12th International Conference on Computer Vision (ICCV), pages 349–356. IEEE, 2009.</li>
+<li>[19] Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio. Generative adversarial nets. In Advances in Neural Information Processing Systems, pages 2672–2680, 2014.</li>
+<li>[20] Ishaan Gulrajani, Faruk Ahmed, Martin Arjovsky, Vincent Dumoulin, and Aaron C Courville. Improved training of wasserstein GANs. In Advances in Neural Information Processing Systems, pages 5767–5777, 2017.</li>
+<li>[21] Kaiming He and Jian Sun. Statistics of patch offsets for image completion. In European Conference on Computer Vision, pages 16–29. Springer, 2012.</li>
+<li>[22] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition, pages 770–778, 2016.</li>
+<li>[23] Martin Heusel, Hubert Ramsauer, Thomas Unterthiner, Bernhard Nessler, and Sepp Hochreiter. GANs trained by a two time-scale update rule converge to a local nash equilibrium. In Advances in Neural Information Processing Systems, pages 6626–6637, 2017.</li>
+<li>[24] Xun Huang, Yixuan Li, Omid Poursaeed, John Hopcroft, and Serge Belongie. Stacked generative adversarial networks. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 5077–5086, 2017.</li>
+<li>[25] Sergey Ioffe and Christian Szegedy. Batch normalization: Accelerating deep network training by reducing internal covariate shift. arXiv preprint arXiv:1502.03167, 2015.</li>
+<li>[26] Phillip Isola, Jun-Yan Zhu, Tinghui Zhou, and Alexei A Efros. Image-to-image translation with conditional adversarial networks. arXiv preprint, 2017.</li>
+<li>[27] Nikolay Jetchev, Urs Bergmann, and Roland Vollgraf. Texture synthesis with spatial generative adversarial networks. Workshop on Adversarial Training, NIPS, 2016.</li>
+<li>[28] Tero Karras, Timo Aila, Samuli Laine, and Jaakko Lehtinen. Progressive growing of GANs for improved quality, stability, and variation. arXiv preprint arXiv:1710.10196, 2017.</li>
+<li>[29] Tero Karras, Samuli Laine, and Timo Aila. A style-based generator architecture for generative adversarial networks. arXiv preprint arXiv:1812.04948, 2018.</li>
+<li>[30] Christian Ledig, Lucas Theis, Ferenc Huszar, Jose Caballero, Andrew Cunningham, Alejandro Acosta, Andrew Aitken, Alykhan Tejani, Johannes Totz, Zehan Wang, et al. Photorealistic single image super-resolution using a generative adversarial network. In Proceedings of the IEEE conference on computer vision and pattern recognition, pages 4681–4690, 2017.</li>
+<li>[31] Chuan Li and Michael Wand. Precomputed real-time texture synthesis with markovian generative adversarial networks. In European Conference on Computer Vision, pages 702–716. Springer, 2016.</li>
+<li>[32] Bee Lim, Sanghyun Son, Heewon Kim, Seungjun Nah, and Kyoung Mu Lee. Enhanced deep residual networks for single image super-resolution. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition Workshops, pages 136–144, 2017. 7</li>
+<li>[33] Ziwei Liu, Ping Luo, Xiaogang Wang, and Xiaoou Tang. Deep learning face attributes in the wild. In Proceedings of the IEEE International Conference on Computer Vision, pages 3730–3738, 2015.</li>
+<li>[34] Fujun Luan, Sylvain Paris, Eli Shechtman, and Kavita Bala. Deep painterly harmonization. arXiv preprint arXiv:1804.03189, 2018.</li>
+<li>[35] David Martin, Charless Fowlkes, Doron Tal, and Jitendra Malik. A database of human segmented natural images and its application to evaluating segmentation algorithms and measuring ecological statistics. In null, page 416. IEEE, 2001.</li>
+<li>[36] Michael Mathieu, Camille Couprie, and Yann LeCun. Deep multi-scale video prediction beyond mean square error. arXiv preprint arXiv:1511.05440, 2015.</li>
+<li>[37] Roey Mechrez, Eli Shechtman, and Lihi Zelnik-Manor. Saliency driven image manipulation. In 2018 IEEE Winter Conference on Applications of Computer Vision (WACV), pages 1368–1376. IEEE, 2018.</li>
+<li>[38] Roey Mechrez, Itamar Talmi, and Lihi Zelnik-Manor. The contextual loss for image transformation with non-aligned data. In Proceedings of the European Conference on Computer Vision (ECCV), pages 768–783, 2018.</li>
+<li>[39] Tomer Michaeli and Michal Irani. Blind deblurring using internal patch recurrence. In European Conference on Computer Vision, pages 783–798. Springer, 2014.</li>
+<li>[40] Anish Mittal, Rajiv Soundararajan, and Alan C Bovik. Making a completely blind image quality analyzer. IEEE Signal Processing Letters, 20(3):209–212, 2013.</li>
+<li>[41] Deepak Pathak, Philipp Krahenbuhl, Jeff Donahue, Trevor Darrell, and Alexei A Efros. Context encoders: Feature learning by inpainting. In Proceedings of the IEEE conference on computer vision and pattern recognition, pages 2536–2544, 2016.</li>
+<li>[42] Guim Perarnau, Joost van de Weijer, Bogdan Raducanu, and Jose M Alvarez. Invertible conditional GANs for image editing. arXiv preprint arXiv:1611.06355, 2016.</li>
+<li>[43] Patsorn Sangkloy, Jingwan Lu, Chen Fang, Fisher Yu, and James Hays. Scribbler: Controlling deep image synthesis with sketch and color. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 5400–5409, 2017.</li>
+<li>[44] Assaf Shocher, Shai Bagon, Phillip Isola, and Michal Irani. Ingan: Capturing and remapping the “DNA” of a natural image. arXiv preprint arXiv: arXiv:1812.00231, 2018.</li>
+<li>[45] Assaf Shocher, Shai Bagon, Phillip Isola, and Michal Irani. InGAN: Capturing and Remapping the “DNA” of a Natural Image. International Conference on Computer Vision (ICCV), 2019.</li>
+<li>[46] Assaf Shocher, Nadav Cohen, and Michal Irani. Zero-Shot Super-Resolution using Deep Internal Learning. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 3118–3126, 2018.</li>
+<li>[47] Nathan Silberman, Derek Hoiem, Pushmeet Kohli, and Rob Fergus. Indoor segmentation and support inference from rgbd images. In European Conference on Computer Vision, pages 746–760. Springer, 2012.</li>
+<li>[48] Denis Simakov, Yaron Caspi, Eli Shechtman, and Michal Irani. Summarizing visual data using bidirectional similarity. In IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 1–8. IEEE, 2008.</li>
+<li>[49] Christian Szegedy, Wei Liu, Yangqing Jia, Pierre Sermanet, Scott Reed, Dragomir Anguelov, Dumitru Erhan, Vincent Vanhoucke, and Andrew Rabinovich. Going deeper with convolutions. In Proceedings of the IEEE conference on computer vision and pattern recognition, pages 1–9, 2015.</li>
+<li>[50] Tal Tlusty, Tomer Michaeli, Tali Dekel, and Lihi ZelnikManor. Modifying non-local variations across multiple views. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 6276–6285, 2018.</li>
+<li>[51] Dmitry Ulyanov, Andrea Vedaldi, and Victor Lempitsky. Deep image prior. IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2018.</li>
+<li>[52] Ting-Chun Wang, Ming-Yu Liu, Jun-Yan Zhu, Andrew Tao, Jan Kautz, and Bryan Catanzaro. High-resolution image synthesis and semantic manipulation with conditional GANs. arXiv preprint arXiv:1711.11585, 2017.</li>
+<li>[53] Xiaolong Wang and Abhinav Gupta. Generative image modeling using style and structure adversarial networks. 2016.</li>
+<li>[54] Wenqi Xian, Patsorn Sangkloy, Varun Agrawal, Amit Raj, Jingwan Lu, Chen Fang, Fisher Yu, and James Hays. Texturegan: Controlling deep image synthesis with texture patches. In The IEEE Conference on Computer Vision and Pattern Recognition (CVPR), June 2018.</li>
+<li>[55] Xuemiao Xu, Liang Wan, Xiaopei Liu, Tien-Tsin Wong, Liansheng Wang, and Chi-Sing Leung. Animating animal motion from still. ACM Transactions on Graphics (TOG), 27(5):117, 2008.</li>
+<li>[56] Jiahui Yu, Zhe Lin, Jimei Yang, Xiaohui Shen, Xin Lu, and Thomas S Huang. Generative image inpainting with contextual attention. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 5505–5514, 2018.</li>
+<li>[57] Kai Zhang, Wangmeng Zuo, Yunjin Chen, Deyu Meng, and Lei Zhang. Beyond a gaussian denoiser: Residual learning of deep cnn for image denoising. IEEE Transactions on Image Processing, 26(7):3142–3155, 2017.</li>
+<li>[58] Richard Zhang, Phillip Isola, and Alexei A Efros. Colorful image colorization. In European conference on computer vision, pages 649–666. Springer, 2016.</li>
+<li>[59] Bolei Zhou, Agata Lapedriza, Jianxiong Xiao, Antonio Torralba, and Aude Oliva. Learning deep features for scene recognition using places database. In Advances in neural information processing systems, pages 487–495, 2014.</li>
+<li>[60] Yang Zhou, Zhen Zhu, Xiang Bai, Dani Lischinski, Daniel Cohen-Or, and Hui Huang. Non-stationary texture synthesis by adversarial expansion. arXiv preprint arXiv:1805.04487, 2018.</li>
+<li>[61] Jun-Yan Zhu, Philipp Krahenb ¨ uhl, Eli Shechtman, and ¨ Alexei A Efros. Generative visual manipulation on the natural image manifold. In European Conference on Computer Vision (ECCV), pages 597–613. Springer, 2016.</li>
+<li>[62] Jun-Yan Zhu, Taesung Park, Phillip Isola, and Alexei A Efros. Unpaired image-to-image translation using cycleconsistent adversarial networks. In IEEE International Conference on Computer Vision, 2017.</li>
+<li>[63] Jun-Yan Zhu, Richard Zhang, Deepak Pathak, Trevor Darrell, Alexei A Efros, Oliver Wang, and Eli Shechtman. Toward multimodal image-to-image translation. In Advances in Neural Information Processing Systems, pages 465–476, 2017.</li>
+<li>[64] Maria Zontak and Michal Irani. Internal statistics of a single natural image. In CVPR 2011, pages 977–984. IEEE, 2011.</li>
+<li>[65] Maria Zontak, Inbar Mosseri, and Michal Irani. Separating signal from noise using patch recurrence across scales. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 1195–1202, 2013.</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\24\SURF特征详解\" rel="bookmark">SURF特征详解</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\11\23\《Unknown-Identity-Rejection-Loss-Utilizing-Unlabeled-Data-for-Face-Recognition》笔记\" rel="bookmark">《Unknown Identity Rejection Loss: Utilizing Unlabeled Data for Face Recognition》笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\10\06\背景检测\" rel="bookmark">背景检测</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2019/11/24/%E3%80%8ASinGAN-Learning-a-Generative-Model-from-a-Single-Natural-Image%E3%80%8B%E7%AC%94%E8%AE%B0/" title="《SinGAN: Learning a Generative Model from a Single Natural Image》笔记">https://blog.rexking6.top/2019/11/24/《SinGAN-Learning-a-Generative-Model-from-a-Single-Natural-Image》笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/23/%E3%80%8AUnknown-Identity-Rejection-Loss-Utilizing-Unlabeled-Data-for-Face-Recognition%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="prev" title="《Unknown Identity Rejection Loss: Utilizing Unlabeled Data for Face Recognition》笔记">
+      <i class="fa fa-chevron-left"></i> 《Unknown Identity Rejection Loss: Utilizing Unlabeled Data for Face Recognition》笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/27/gnuplot%E5%85%A5%E9%97%A8/" rel="next" title="gnuplot入门">
+      gnuplot入门 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">3.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">相关工作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E5%9B%BE%E5%83%8F%E7%94%9F%E6%88%90%E6%A8%A1%E5%9E%8B"><span class="nav-number">4.1.</span> <span class="nav-text">单图像生成模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E5%BC%8F%E5%9B%BE%E5%83%8F%E7%BC%96%E8%BE%91%E6%A8%A1%E5%9E%8B"><span class="nav-number">4.2.</span> <span class="nav-text">生成式图像编辑模型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%B9%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E5%B0%BA%E5%BA%A6%E7%BB%93%E6%9E%84"><span class="nav-number">5.1.</span> <span class="nav-text">多尺度结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83"><span class="nav-number">5.2.</span> <span class="nav-text">训练</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E6%8A%97%E6%8D%9F%E5%A4%B1"><span class="nav-number">5.2.1.</span> <span class="nav-text">对抗损失</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E6%9E%84%E6%8D%9F%E5%A4%B1"><span class="nav-number">5.2.2.</span> <span class="nav-text">重构损失</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C"><span class="nav-number">6.</span> <span class="nav-text">结果</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E6%80%A7%E8%AF%84%E4%BB%B7"><span class="nav-number">6.1.</span> <span class="nav-text">定性评价</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E4%B8%AD%E5%B0%BA%E5%BA%A6%E6%95%B0%E9%87%8F%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">6.1.1.</span> <span class="nav-text">测试中尺度数量的影响</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E4%B8%AD%E5%B0%BA%E5%BA%A6%E6%95%B0%E9%87%8F%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">6.1.2.</span> <span class="nav-text">训练中尺度数量的影响</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E9%87%8F%E8%AF%84%E4%BB%B7"><span class="nav-number">6.2.</span> <span class="nav-text">定量评价</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AMT%E6%84%9F%E7%9F%A5%E7%A0%94%E7%A9%B6"><span class="nav-number">6.2.1.</span> <span class="nav-text">AMT感知研究</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%95%E5%B9%85%E5%9B%BE%E5%83%8FFID"><span class="nav-number">6.2.2.</span> <span class="nav-text">单幅图像FID</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%94%E7%94%A8"><span class="nav-number">7.</span> <span class="nav-text">应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87"><span class="nav-number">7.1.</span> <span class="nav-text">超分辨率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E7%94%BB-%E5%9B%BE%E5%83%8F%EF%BC%88Paint-to-Image%EF%BC%89"><span class="nav-number">7.2.</span> <span class="nav-text">图画-图像（Paint-to-Image）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%8F%E8%B0%83%EF%BC%88Harmonization%EF%BC%89"><span class="nav-number">7.3.</span> <span class="nav-text">协调（Harmonization）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%BE%91%EF%BC%88Editing%EF%BC%89"><span class="nav-number">7.4.</span> <span class="nav-text">编辑（Editing）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E5%9B%BE%E5%83%8F%E5%8A%A8%E7%94%BB%EF%BC%88SingleImage-Animation%EF%BC%89"><span class="nav-number">7.5.</span> <span class="nav-text">单图像动画（SingleImage Animation）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">8.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">9.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

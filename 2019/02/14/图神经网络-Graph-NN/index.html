@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图神经网络(Graph NN)">
+<meta property="og:url" content="https://blog.rexking6.top/2019/02/14/%E5%9B%BE%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C-Graph-NN/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1550133855.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1550133908.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1550134021.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1550134051.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1550134085.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1550134209.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1550134342.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1550134363.png">
+<meta property="article:published_time" content="2019-02-14T08:39:43.000Z">
+<meta property="article:modified_time" content="2019-02-14T08:56:11.392Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1550133855.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2019/02/14/%E5%9B%BE%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C-Graph-NN/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>图神经网络(Graph NN) | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2019/02/14/%E5%9B%BE%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C-Graph-NN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          图神经网络(Graph NN)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2019-02-14 16:39:43 / 修改时间：16:56:11" itemprop="dateCreated datePublished" datetime="2019-02-14T16:39:43+08:00">2019-02-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2019/02/14/%E5%9B%BE%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C-Graph-NN/" class="post-meta-item leancloud_visitors" data-flag-title="图神经网络(Graph NN)" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>纯转载，了解一下图网络。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&amp;mid=2652038201&amp;idx=2&amp;sn=356b3bd150a6cc8cf43a76f038e8b226">为什么说图网络是 AI 的未来？</a></li>
+</ul>
+<h1 id="总述"><a href="#总述" class="headerlink" title="总述"></a>总述</h1><p>回顾 2018 年机器学习的进展，2018年6月 DeepMind 团队发表的论文 <a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&amp;mid=2652020224&amp;idx=1&amp;sn=8b1d43f1f8a36e3f0ff58fbe7ecba911&amp;chksm=f121eaf1c65663e778a366a064a00d98113b368b19cd9921326c82a865bb24e4565b5e4d74a8&amp;scene=21#wechat_redirect">“Relational inductive biases, deep learning, and graph networks”</a>，是一篇重要的论文，引起业界热议。</p>
+<p>随后，很多学者沿着他们的思路，继续研究，其中包括清华大学孙茂松团队。他们于2018年12月，发表了一篇综述，题目是<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzI3MTA0MTk1MA==&amp;mid=2652034713&amp;idx=1&amp;sn=66be74a9435810f1e782bc0de44b3791&amp;chksm=f121a268c6562b7e9d3905468b6995427b689fe580c3283ada699f1b928236aeb771f15eb91c&amp;scene=21#wechat_redirect">“Graph neural networks: A review of methods and applications”</a>。</p>
+<p>2019年1月，俞士纶教授团队，也写了一篇综述，这篇综述的覆盖面更全面，题目是“A Comprehensive Survey on Graph Neural Networks”。</p>
+<p><img src="http://image.rexking6.top/img/clip1550133855.png" alt=""></p>
+<p><em>俞士纶教授团队综述GNN，来源：arxiv</em></p>
+<p>DeepMind 团队的这篇论文，引起业界这么热烈的关注，或许有三个原因：</p>
+<ol>
+<li>声望：自从 AlphaGo 战胜李世乭以后，DeepMind 享誉业界，成为机器学习业界的领军团队，DeepMind 团队发表的论文，受到同行普遍关注；</li>
+</ol>
+<ol>
+<li>开源：DeepMind 团队发表论文 [1] 以后不久，就在 Github 上开源了他们开发的软件系统，项目名称叫 Graph Nets [4]；</li>
+</ol>
+<ol>
+<li>主题：声望和开源，都很重要，但是并不是被业界热议的最主要的原因。最主要的原因是主题，DeepMind 团队研究的主题是，如何用深度学习方法处理图谱。</li>
+</ol>
+<h1 id="图谱"><a href="#图谱" class="headerlink" title="图谱"></a>图谱</h1><p>图谱 (Graph) 由点 (Node) 和边 (Edge) 组成。</p>
+<p>图谱是一个重要的数学模型，可以用来解决很多问题。</p>
+<p>譬如我们把城市地铁线路图当成图谱，每个地铁站就是一个点，相邻的地铁站之间的连线就是边，输入起点到终点，我们可以通过图谱的计算，计算出从起点到终点，时间最短、换乘次数最少的行程路线。</p>
+<p>又譬如 Google 和百度的搜索引擎，搜索引擎把世界上每个网站的每个网页，都当成图谱中的一个点。每个网页里，经常会有链接，引用其它网站的网页，每个链接都是图谱中的一条边。哪个网页被引用得越多，就说明这个网页越靠谱，于是，在搜索结果的排名也就越靠前。</p>
+<p>图谱的操作，仍然有许多问题有待解决。</p>
+<p>譬如输入几亿条滴滴司机行进的路线，每条行进路线是按时间排列的一连串（时间、GPS经纬度）数组。如何把几亿条行进路线，叠加在一起，构建城市地图？</p>
+<p>不妨把地图也当成一个图谱，每个交叉路口，都是一个点，连接相邻的两个交叉路口，是一条边。</p>
+<p>貌似很简单，但是细节很麻烦。</p>
+<p>举个例子，交叉路口有很多形式，不仅有十字路口，还有五角场、六道口，还有环形道立交桥——如何从多条路径中，确定交叉路口的中心位置？ </p>
+<p><img src="http://image.rexking6.top/img/clip1550133908.png" alt=""></p>
+<p><em>日本大阪天保山立交桥，你能确定这座立交桥的中心位置吗？</em></p>
+<h1 id="深度学习-图谱"><a href="#深度学习-图谱" class="headerlink" title="深度学习+图谱"></a>深度学习+图谱</h1><p>把深度学习，用来处理图谱，能够扩大我们对图谱的处理能力。</p>
+<p>深度学习在图像和文本的处理方面，已经取得了巨大的成功。如何扩大深度学习的成果，使之应用于图谱处理？</p>
+<p>图像由横平竖直的像素矩阵组成。如果换一个角度，把每个像素视为图谱中的一个点，每个像素点与它周边的 8 个相邻像素之间都有边，而且每条边都等长。通过这个视角，重新审视图像，图像是广义图谱的一个特例。</p>
+<p>处理图像的诸多深度学习手段，都可以改头换面，应用于广义的图谱，譬如 convolution、residual、dropout、pooling、attention、encoder-decoder 等等。这就是深度学习图谱处理的最初想法，很朴实很简单。</p>
+<p>虽然最初想法很简单，但是深入到细节，各种挑战层出不穷。每种挑战，都意味着更强大的技术能力，都孕育着更有潜力的应用场景。</p>
+<p>深度学习图谱处理这个研究方向，业界没有统一的称谓。</p>
+<p>强调图谱的数学属性的团队，把这个研究方向命名为 Geometric Deep Learning。孙茂松团队和俞士纶团队，强调神经网络在图谱处理中的重要性，强调思想来源，他们把这个方向命名为 Graph Neural Networks。DeepMind 团队却反对绑定特定技术手段，他们使用更抽象的名称，Graph Networks。</p>
+<p>命名不那么重要，但是用哪种方法去梳理这个领域的诸多进展，却很重要。把各个学派的目标定位和技术方法，梳理清楚，有利于加强同行之间的相互理解，有利于促进同行之间的未来合作。</p>
+<h1 id="子方向"><a href="#子方向" class="headerlink" title="子方向"></a>子方向</h1><p>俞士纶团队把深度学习图谱处理的诸多进展，梳理成 5 个子方向，非常清晰好懂。</p>
+<p><img src="http://image.rexking6.top/img/clip1550134021.png" alt=""></p>
+<p><em>俞士纶团队把深度学习图谱处理梳理成 5 个子方向，来源：论文 A Comprehensive Survey on Graph Neural Networks</em></p>
+<ol>
+<li>Graph Convolution Networks</li>
+<li>Graph Attention Networks</li>
+<li>Graph Embedding</li>
+<li>Graph Generative Networks</li>
+<li>Graph Spatial-temporal Networks</li>
+</ol>
+<h2 id="Graph-Convolution-Networks"><a href="#Graph-Convolution-Networks" class="headerlink" title="Graph Convolution Networks"></a>Graph Convolution Networks</h2><p>先说 Graph Convolution Networks (GCNs)。</p>
+<p><img src="http://image.rexking6.top/img/clip1550134051.png" alt=""></p>
+<p><em>GCN 类别汇总，来源：论文 A Comprehensive Survey on Graph Neural Networks</em></p>
+<p>GCN 把 CNN 诸般武器，应用于广义图谱。CNN 主要分为四个任务，</p>
+<ol>
+<li>点与点之间的融合。在图像领域，点与点之间的融合主要通过卷积技术 (convolution) 来实现。在广义图谱里，点与点之间的关系，用边来表达。所以，在广义图谱里，点点融合，有比卷积更强大的办法。Messsage passing [5] 就是一种更强大的办法。</li>
+</ol>
+<ol>
+<li>分层抽象。CNN 使用 convolution 的办法，从原始像素矩阵中，逐层提炼出更精炼更抽象的特征。更高层的点，不再是孤立的点，而是融合了相邻区域中其它点的属性。融合邻点的办法，也可以应用于广义图谱中。</li>
+</ol>
+<ol>
+<li>特征提炼。CNN 使用 pooling 等手段，从相邻原始像素中，提炼边缘。从相邻边缘中，提炼实体轮廓。从相邻实体中，提炼更高层更抽象的实体。CNN 通常把 convolution 和 pooling 交替使用，构建结构更复杂，功能更强大的神经网络。对于广义图谱，也可以融汇 Messsage passing 和 Pooling，构建多层图谱。</li>
+</ol>
+<ol>
+<li>输出层。CNN 通常使用 softmax 等手段，对整张图像进行分类，识别图谱的语义内涵。对于广义图谱来说，输出的结果更多样，不仅可以对于整个图谱，输出分类等等结果。而且也可以预测图谱中某个特定的点的值，也可以预测某条边的值。</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1550134085.png" alt=""></p>
+<p><em>GCN 和Graph Attention Networks 的区别 来源：论文 A Comprehensive Survey on Graph Neural Networks</em></p>
+<p>Graph Attention Networks 要解决的问题，与 GCN 类似，区别在于点点融合、多层抽象的方法。</p>
+<p>Graph Convolution Networks 使用卷积方式，实现点点融合和分层抽象。Convolution 卷积方式仅仅适用于融合相邻的点，而 attention 聚焦方式却不限于相邻的点，每个点可以融合整个图谱中所有其它点，不管是否相邻，是否融合如何融合，取决于点与点之间的关联强弱。</p>
+<p>Attention 能力更强大，但是对于算力的要求更高，因为需要计算整个图谱中任意两个点之间的关联强弱。所以 Graph Attention Networks 研究的重点，是如何降低计算成本，或者通过并行计算，提高计算效率。</p>
+<h2 id="Graph-Embedding"><a href="#Graph-Embedding" class="headerlink" title="Graph Embedding"></a>Graph Embedding</h2><p>Graph Embedding 要解决的问题，是给图谱中每个点每条边，赋予一个数值张量。图像不存在这个问题，因为像素天生是数值张量。但是，文本由文字词汇语句段落构成，需要把文字词汇，转化成数值张量，才能使用深度学习的诸多算法。</p>
+<p>如果把文本中的每个文字或词汇，当成图谱中的一个点，同时把词与词之间的语法语义关系，当成图谱中的一条边，那么语句和段落，就等同于行走在文本图谱中的一条行进路径。</p>
+<p>如果能够给每个文字和词汇，都赋予一个贴切的数值张量，那么语句和段落对应的行进路径，多半是最短路径。</p>
+<p>有多种实现 Graph Embedding 的办法，其中效果比较好的办法是 Autoencoder。用 GCN 的办法，把图谱的点和边转换成数值张量，这个过程称为编码 (encoding)，然后通过计算点与点之间的距离，把数值张量集合，反转为图谱，这个过程称为解码 (decoding)。通过不断地调参，让解码得到的图谱，越来越趋近于原始图谱，这个过程称为训练。</p>
+<p>Graph Embedding 给图谱中的每个点每条边，赋予贴切的数值张量，但是它不解决图谱的结构问题。</p>
+<p>如果输入大量的图谱行进路径，如何从这些行进路径中，识别哪些点与哪些点之间有连边？难度更大的问题是，如果没有行进路径，输入的训练数据是图谱的局部，以及与之对应的图谱的特性，如何把局部拼接成图谱全貌？这些问题是 Graph Generative Networks 要解决的问题。</p>
+<h2 id="Graph-Generative-Networks"><a href="#Graph-Generative-Networks" class="headerlink" title="Graph Generative Networks"></a>Graph Generative Networks</h2><p>Graph Generative Networks 比较有潜力的实现方法，是使用 Generative Adversarial Networks (GAN)。</p>
+<p>GAN 由生成器 (generator) 和辨别器 (discriminator) 两部分构成：1. 从训练数据中，譬如海量行进路径，生成器猜测数据背后的图谱应该长什么样；2. 用生成出来的图谱，伪造一批行进路径；3. 从大量伪造的路径和真实的路径中，挑选几条路径，让辨别器识别哪几条路径是伪造的。</p>
+<p>如果辨别器傻傻分不清谁是伪造路径，谁是真实路径，说明生成器生成出的图谱，很接近于真实图谱。</p>
+<p><img src="http://image.rexking6.top/img/clip1550134209.png" alt=""></p>
+<p><em>GCN 以外的其他 4 种图谱神经网络，来源：论文 A Comprehensive Survey on Graph Neural Networks</em></p>
+<h2 id="Graph-Spatial-temporal-Networks"><a href="#Graph-Spatial-temporal-Networks" class="headerlink" title="Graph Spatial-temporal Networks"></a>Graph Spatial-temporal Networks</h2><p>以上我们讨论了针对静态图谱的若干问题，但是图谱有时候是动态的，譬如地图中表现的道路是静态的，但是路况是动态的。</p>
+<p>如何预测春节期间，北京天安门附近的交通拥堵情况？解决这个问题，不仅要考虑空间 spatial 的因素，譬如天安门周边的道路结构，也要考虑时间 temporal 的因素，譬如往年春节期间该地区交通拥堵情况。这就是 Graph Spatial-temporal Networks 要解决的问题之一。</p>
+<p>Graph Spatial-temporal Networks 还能解决其它问题，譬如输入一段踢球的视频，如何在每一帧图像中，识别足球的位置？这个问题的难点在于，在视频的某些帧中，足球有可能是看不见的，譬如被球员的腿遮挡了。</p>
+<p>解决时间序列问题的通常思路，是 RNN，包括 LSTM 和 GRU 等等。</p>
+<p>DeepMind 团队在 RNN 基础上，又添加了编码和解码 (encoder-decoder) 机制。</p>
+<h1 id="现有工作"><a href="#现有工作" class="headerlink" title="现有工作"></a>现有工作</h1><p>在 DeepMind 团队的这篇论文里[1]，他们声称自己的工作，“part position paper, part review, and part unification”，既是提案，又是综述，又是融合。这话怎么理解？</p>
+<p><img src="http://image.rexking6.top/img/clip1550134342.png" alt=""></p>
+<p>DeepMind联合谷歌大脑、MIT等机构27位作者发表重磅论文，提出“图网络”（Graph network），将端到端学习与归纳推理相结合，有望解决深度学习无法进行关系推理的问题。</p>
+<p>前文说到，俞士纶团队把深度学习图谱处理的诸多进展，梳理成 5 个子方向：1) Graph Convolution Networks、2) Graph Attention Networks、3) Graph Embedding、4) Graph Generative Networks、5) Graph Spatial-temporal Networks。</p>
+<p>DeepMind 团队在 5 个子方向中着力解决后 4 个方向，分别是 Graph Attention Networks、Graph Embedding、Graph Generative Networks 和 Graph Spatial-temporal Networks。他们把这四个方向的成果，“融合”成统一的框架，命名为 Graph Networks。</p>
+<p>在他们的论文中，对这个四个子方向沿途的诸多成果，做了“综述”，但是并没有综述 Graph Convolution Networks 方向的成果。然后他们从这四个子方向的诸多成果中，挑选出了他们认为最有潜力的方法，形成自己的“提案”，这就是他们开源的代码 [4]。</p>
+<p><img src="http://image.rexking6.top/img/clip1550134363.png" alt=""></p>
+<p><em>DeepMind在2018年10月开源的Graph Nets library，用于在TensorFlow中构建简单而强大的关系推理网络。来源：github.com/deepmind/graph_nets</em></p>
+<p>虽然论文中，他们声称他们的提案解决了四个子方向的问题，但是查看他们开源的代码，发现其实他们着力解决的是后两个子方向，Graph Attention Networks 和 Graph Spatial-temporal Networks。</p>
+<p>DeepMind 的思路是这样的：首先，把 [5] 的 message passing 点点融合的机制，与 [6] 图谱全局的聚焦机制相结合，构建通用的 graph block 模块；其次，把 LSTM 要素融进 encoder-decoder 框架，构建时间序列机制；最后，把 graph block 模块融进 encoder-decoder 框架，形成 Graph Spatial-temporal Networks 通用系统。</p>
+<h1 id="图网络的重要性"><a href="#图网络的重要性" class="headerlink" title="图网络的重要性"></a>图网络的重要性</h1><p>为什么 DeepMind 的成果很重要？事关四件大事。</p>
+<h2 id="一、深度学习过程的解释"><a href="#一、深度学习过程的解释" class="headerlink" title="一、深度学习过程的解释"></a>一、深度学习过程的解释</h2><p>从原理上讲，深度学习譬如 CNN 的成果，来自于对图像的不断抽象。也就是，从原始的像素矩阵中，抽象出线段。从首尾相连的相邻线段中，抽象出实体的轮廓。从轮廓抽象出实体，从实体抽象出语义。</p>
+<p>但是，如果窥探 CNN 每一层的中间结果，实际上很难明确，究竟是哪一层的哪些节点，抽象出了轮廓，也不知道哪一层的哪些节点，抽象出了实体。总而言之，CNN 的网络结构是个迷，无法明确地解释网络结构隐藏的工作过程的细节。</p>
+<p>无法解释工作过程的细节，也就谈不上人为干预。如果 CNN 出了问题，只好重新训练。但重新训练后的结果，是否能达到期待的效果，无法事先语料。往往按下葫芦浮起瓢，解决了这个缺陷，却引发了其它缺陷。</p>
+<p>反过来说，如果能明确地搞清楚 CNN 工作过程的细节，就可以有针对性地调整个别层次的个别节点的参数，事先人为精准干预。</p>
+<h2 id="二、小样本学习"><a href="#二、小样本学习" class="headerlink" title="二、小样本学习"></a>二、小样本学习</h2><p>深度学习依赖训练数据，训练数据的规模通常很大，少则几万，多大几百万。从哪里收集这么多训练数据，需要组织多少人力去对训练数据进行标注，都是巨大挑战。</p>
+<p>如果对深度学习的过程细节，有更清晰的了解，我们就可以改善卷积这种蛮力的做法，用更少的训练数据，训练更轻巧的深度学习模型。</p>
+<p>卷积的过程，是蛮力的过程，它对相邻的点，无一遗漏地不分青红皂白地进行卷积处理。</p>
+<p>如果我们对点与点之间的关联关系，有更明确的了解，就不需要对相邻的点，无一遗漏地不分青红皂白地进行卷积处理。只需要对有关联的点，进行卷积或者其它处理。</p>
+<p>根据点与点之间的关联关系，构建出来的网络，就是广义图谱。广义图谱的结构，通常比 CNN 网络更加简单，所以，需要的训练数据量也更少。</p>
+<h2 id="三、迁移学习和推理"><a href="#三、迁移学习和推理" class="headerlink" title="三、迁移学习和推理"></a>三、迁移学习和推理</h2><p>用当今的 CNN，可以从大量图片中，识别某种实体，譬如猫。</p>
+<p>但是，如果想给识别猫的 CNN 扩大能力，让它不仅能识别猫，还能识别狗，就需要额外的识别狗的训练数据。这是迁移学习的过程。</p>
+<p>能不能不提供额外的识别狗的训练数据，而只是用规则这样的方式，告诉电脑猫与狗的区别，然后让电脑识别狗？这是推理的目标。</p>
+<p>如果对深度学习过程有更精准的了解，就能把知识和规则，融进深度学习。</p>
+<p>从广义范围说，深度学习和知识图谱，是机器学习阵营中诸多学派的两大主流学派。迄今为止，这两大学派隔岸叫阵，各有胜负。如何融合两大学派，取长补短，是困扰学界很久的难题。把深度学习延伸到图谱处理，给两大学派的融合，带来了希望。</p>
+<h2 id="四、空间和时间的融合，像素与语义的融合"><a href="#四、空间和时间的融合，像素与语义的融合" class="headerlink" title="四、空间和时间的融合，像素与语义的融合"></a>四、空间和时间的融合，像素与语义的融合</h2><p>视频处理，可以说是深度学习的最高境界。</p>
+<ol>
+<li>视频处理融合了图像的空间分割，图像中实体的识别，实体对应的语义理解。</li>
+<li>多帧静态图像串连在一起形成视频，实际上是时间序列。同一个实体，在不同帧中所处的位置，蕴含着实体的运动。运动的背后，是物理定律和语义关联。</li>
+<li>如何从一段视频，总结出文本标题。或者反过来，如何根据一句文本标题，找到最贴切的视频。这是视频处理的经典任务，也是难度超大的任务。</li>
+</ol>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ol>
+<li>Relational inductive biases, deep learning, and graph networks，<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1806.01261">https://arxiv.org/abs/1806.01261</a></li>
+<li>Graph neural networks: A review ofmethods and applications，<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1812.08434">https://arxiv.org/abs/1812.08434</a></li>
+<li>A Comprehensive Survey on Graph Neural Networks，<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1901.00596">https://arxiv.org/abs/1901.00596</a></li>
+<li>Graph nets，<a target="_blank" rel="noopener" href="https://github.com/deepmind/graph_nets">https://github.com/deepmind/graph_nets</a></li>
+<li>Neural message passing for quantum chemistry，<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1704.01212">https://arxiv.org/abs/1704.01212</a></li>
+<li>Non-local neural networks，<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1711.07971">https://arxiv.org/abs/1711.07971</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\28\AMPC-1080Ti机器-深度环境搭建\" rel="bookmark">AMPC-1080Ti机器-深度环境搭建</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\09\22\Transformer\" rel="bookmark">Transformer</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\04\07\triplet-loss原理推导及变体\" rel="bookmark">triplet loss原理推导及变体</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2019/02/14/%E5%9B%BE%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C-Graph-NN/" title="图神经网络(Graph NN)">https://blog.rexking6.top/2019/02/14/图神经网络-Graph-NN/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag"># 深度学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/01/29/%E3%80%8AOn-the-Persistence-of-Clustering-Solutions-and-True-Number-of-Clusters-in-a-Dataset%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="prev" title="《On the Persistence of Clustering Solutions and True Number of Clusters in a Dataset》笔记">
+      <i class="fa fa-chevron-left"></i> 《On the Persistence of Clustering Solutions and True Number of Clusters in a Dataset》笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/02/14/%E3%80%8ADeep-and-Confident-Prediction-for-Time-Series-at-Uber%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="next" title="《Deep and Confident Prediction for Time Series at Uber》笔记">
+      《Deep and Confident Prediction for Time Series at Uber》笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E8%BF%B0"><span class="nav-number">2.</span> <span class="nav-text">总述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%BE%E8%B0%B1"><span class="nav-number">3.</span> <span class="nav-text">图谱</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0-%E5%9B%BE%E8%B0%B1"><span class="nav-number">4.</span> <span class="nav-text">深度学习+图谱</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%90%E6%96%B9%E5%90%91"><span class="nav-number">5.</span> <span class="nav-text">子方向</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Graph-Convolution-Networks"><span class="nav-number">5.1.</span> <span class="nav-text">Graph Convolution Networks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Graph-Embedding"><span class="nav-number">5.2.</span> <span class="nav-text">Graph Embedding</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Graph-Generative-Networks"><span class="nav-number">5.3.</span> <span class="nav-text">Graph Generative Networks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Graph-Spatial-temporal-Networks"><span class="nav-number">5.4.</span> <span class="nav-text">Graph Spatial-temporal Networks</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%8E%B0%E6%9C%89%E5%B7%A5%E4%BD%9C"><span class="nav-number">6.</span> <span class="nav-text">现有工作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%BE%E7%BD%91%E7%BB%9C%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7"><span class="nav-number">7.</span> <span class="nav-text">图网络的重要性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E8%BF%87%E7%A8%8B%E7%9A%84%E8%A7%A3%E9%87%8A"><span class="nav-number">7.1.</span> <span class="nav-text">一、深度学习过程的解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%B0%8F%E6%A0%B7%E6%9C%AC%E5%AD%A6%E4%B9%A0"><span class="nav-number">7.2.</span> <span class="nav-text">二、小样本学习</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A8%E7%90%86"><span class="nav-number">7.3.</span> <span class="nav-text">三、迁移学习和推理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E7%A9%BA%E9%97%B4%E5%92%8C%E6%97%B6%E9%97%B4%E7%9A%84%E8%9E%8D%E5%90%88%EF%BC%8C%E5%83%8F%E7%B4%A0%E4%B8%8E%E8%AF%AD%E4%B9%89%E7%9A%84%E8%9E%8D%E5%90%88"><span class="nav-number">7.4.</span> <span class="nav-text">四、空间和时间的融合，像素与语义的融合</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">8.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

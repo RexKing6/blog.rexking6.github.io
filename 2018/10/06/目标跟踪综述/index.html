@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="目标跟踪综述">
+<meta property="og:url" content="https://blog.rexking6.top/2018/10/06/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA%E7%BB%BC%E8%BF%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538839520.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538840619.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538840634.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538876748.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538876795.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538876805.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538876883.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538876903.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538876960.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538876979.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538876551.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538876567.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538877195.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538877204.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538877216.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538877503.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538877549.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538877561.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538877572.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538877796.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538877964.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538878042.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538878066.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538878259.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538878268.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538878280.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538878311.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538878475.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538878587.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538878685.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538878730.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538878802.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538878944.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538878961.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538879047.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538879116.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538879132.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538879144.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538879161.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538887507.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538887526.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538887541.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538887560.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538887784.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538887804.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538887823.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538887857.png">
+<meta property="article:published_time" content="2018-10-06T14:21:42.000Z">
+<meta property="article:modified_time" content="2018-10-22T06:33:34.624Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="计算机视觉">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1538839520.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/10/06/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA%E7%BB%BC%E8%BF%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>目标跟踪综述 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/10/06/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA%E7%BB%BC%E8%BF%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          目标跟踪综述
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-10-06 22:21:42" itemprop="dateCreated datePublished" datetime="2018-10-06T22:21:42+08:00">2018-10-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2018-10-22 14:33:34" itemprop="dateModified" datetime="2018-10-22T14:33:34+08:00">2018-10-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" itemprop="url" rel="index"><span itemprop="name">计算机视觉</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/10/06/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA%E7%BB%BC%E8%BF%B0/" class="post-meta-item leancloud_visitors" data-flag-title="目标跟踪综述" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>33k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>30 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>这学期选了王菡子老师的《视频分析前沿》，使用opencv-python编写了多目标跟踪，看了一些单目标跟踪和多目标跟踪的综述，作下记录。</p>
+<p>综合转载以下文章：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/IcDPHIe9_NsdkY1n_rBRgw">专栏 | 从传统方法到深度学习，目标跟踪方法的发展概述</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jjwu/p/8512730.html">目标跟踪简介</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.leiphone.com/news/201711/d5dMai7835B1uAnR.html">计算机视觉中，有哪些比较好的目标跟踪算法？（上）</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.leiphone.com/news/201709/kLil97MnXF8Gh3sC.html">计算机视觉中，究竟有哪些好用的目标跟踪算法（下）</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jqr.com/article/000383">用OpenCV实现八种不同的目标跟踪算法</a></li>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzU2OTA0NzE2NA==&amp;mid=2247485417&amp;idx=3&amp;sn=c6dcaba675873c0f35a4c510842b0d32&amp;chksm=fc85e6facbf26fec9a1668f6b89bec245ccc6741fd795d95e71c644fcb792be26ae37047b2e9&amp;scene=21#wechat_redirect">【专知荟萃18】目标跟踪Object Tracking知识资料全集（入门/进阶/论文/综述/视频/专家，附查看）</a></li>
+</ul>
+<h1 id="视觉目标跟踪基本流程与框架"><a href="#视觉目标跟踪基本流程与框架" class="headerlink" title="视觉目标跟踪基本流程与框架"></a>视觉目标跟踪基本流程与框架</h1><p>视觉目标跟踪是计算机视觉中的一个重要研究方向，有着广泛的应用，如：视频监控，人机交互， 无人驾驶等。过去二三十年视觉目标跟踪技术取得了长足的进步，特别是最近两年利用深度学习的目标跟踪方法取得了令人满意的效果，使目标跟踪技术获得了突破性的进展。本文旨在简要介绍：目标跟踪的基本流程与框架，目标跟踪存在的挑战，目标跟踪相关方法，以及目标跟踪最新的进展等，希望通过这篇文章能让读者对视觉目标跟踪领域有一个较为全面的认识。</p>
+<p>  视觉目标（单目标）跟踪任务就是在给定某视频序列初始帧的目标大小与位置的情况下，预测后续帧中该目标的大小与位置。这一基本任务流程可以按如下的框架划分：</p>
+<p><img src="http://image.rexking6.top/img/clip1538839520.png" alt=""></p>
+<p>输入初始化目标框，在下一帧中产生众多候选框（Motion Model），提取这些候选框的特征（Feature Extractor），然后对这些候选框评分（Observation Model），最后在这些评分中找一个得分最高的候选框作为预测的目标（Prediction A），或者对多个预测值进行融合（Ensemble）得到更优的预测目标。</p>
+<p>根据如上的框架，我们可以把目标跟踪划分为5项主要的研究内容. （1）运动模型：如何产生众多的候选样本。（2）特征提取：利用何种特征表示目标。（3）观测模型：如何为众多候选样本进行评分。（4）模型更新：如何更新观测模型使其适应目标的变化。（5）集成方法：如何融合多个决策获得一个更优的决策结果。下面分别简要介绍这5项研究内容。</p>
+<p><strong>运动模型（Motion Model）</strong>：生成候选样本的速度与质量直接决定了跟踪系统表现的优劣。常用的有两种方法：粒子滤波（Particle Filter）和滑动窗口（Sliding Window）。粒子滤波是一种序贯贝叶斯推断方法，通过递归的方式推断目标的隐含状态。而滑动窗口是一种穷举搜索方法，它列出目标附近的所有可能的样本作为候选样本。</p>
+<p><strong>特征提取（Feature Extractor）</strong>: 鉴别性的特征表示是目标跟踪的关键之一。常用的特征被分为两种类型：手工设计的特征（Hand-crafted feature）和深度特征（Deep feature）。常用的手工设计的特征有灰度特征（Gray），方向梯度直方图（HOG），哈尔特征（Haar-like），尺度不变特征（SIFT）等。与人为设计的特征不同，深度特征是通过大量的训练样本学习出来的特征，它比手工设计的特征更具有鉴别性。因此，利用深度特征的跟踪方法通常很轻松就能获得一个不错的效果。</p>
+<p><strong>观测模型（Observation Model）</strong>:大多数的跟踪方法主要集中在这一块的设计上。根据不同的思路，观测模型可分为两类：生成式模型（Generative Model）和判别式模型（Discriminative Model）. 生成式模型通常寻找与目标模板最相似的候选作为跟踪结果，这一过程可以视为模板匹配。常用的理论方法包括：子空间，稀疏表示，字典学习等。而判别式模型通过训练一个分类器去区分目标与背景，选择置信度最高的候选样本作为预测结果。判别式方法已经成为目标跟踪中的主流方法，因为有大量的机器学习方法可以利用。常用的理论方法包括：逻辑回归，岭回归，支持向量机，多示例学习，相关滤波等。</p>
+<p><strong>模型更新（Model Update）</strong>: 模型更新主要是更新观测模型，以适应目标表观的变化，防止跟踪过程发生漂移。模型更新没有一个统一的标准，通常认为目标的表观连续变化，所以常常会每一帧都更新一次模型。但也有人认为目标过去的表观对跟踪很重要，连续更新可能会丢失过去的表观信息，引入过多的噪音，因此利用长短期更新相结合的方式来解决这一问题。</p>
+<p><strong>集成方法（Ensemble Method）</strong>: 集成方法有利于提高模型的预测精度，也常常被视为一种提高跟踪准确率的有效手段。可以把集成方法笼统的划分为两类：在多个预测结果中选一个最好的，或是利用所有的预测加权平均。</p>
+<h1 id="视觉目标跟踪面临的挑战"><a href="#视觉目标跟踪面临的挑战" class="headerlink" title="视觉目标跟踪面临的挑战"></a>视觉目标跟踪面临的挑战</h1><p>视觉运动目标跟踪是一个极具挑战性的任务，因为对于运动目标而言，其运动的场景非常复杂并且经常发生变化，或是目标本身也会不断变化。那么如何在复杂场景中识别并跟踪不断变化的目标就成为一个挑战性的任务。如下图我们列出了目标跟踪中几个主要的挑战因素：</p>
+<p><img src="http://image.rexking6.top/img/clip1538840619.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1538840634.png" alt=""></p>
+<p>其中<br><strong>遮挡（Occlusion）</strong>是目标跟踪中最常见的挑战因素之一，遮挡又分为部分遮挡（Partial Occlusion）和完全遮挡（Full Occlusion）。解决部分遮挡通常有两种思路：（1）利用检测机制判断目标是否被遮挡，从而决定是否更新模板，保证模板对遮挡的鲁棒性。（2）把目标分成多个块，利用没有被遮挡的块进行有效的跟踪。对于目标被完全遮挡的情况，当前也并没有有效的方法能够完全解决。</p>
+<p><strong>形变（Deformation）</strong>也是目标跟踪中的一大难题，目标表观的不断变化，通常导致跟踪发生漂移（Drift）。解决漂移问题常用的方法是更新目标的表观模型，使其适应表观的变化，那么模型更新方法则成为了关键。什么时候更新，更新的频率多大是模型更新需要关注的问题。</p>
+<p><strong>背景杂斑（Background Clutter）</strong>指得是要跟踪的目标周围有非常相似的目标对跟踪造成了干扰。解决这类问题常用的手段是利用目标的运动信息，预测运动的大致轨迹，防止跟踪器跟踪到相似的其他目标上，或是利用目标周围的大量样本框对分类器进行更新训练，提高分类器对背景与目标的辨别能力。</p>
+<p><strong>尺度变换（Scale Variation）</strong>是目标在运动过程中的由远及近或由近及远而产生的尺度大小变化的现象。预测目标框的大小也是目标跟踪中的一项挑战，如何又快又准确的预测出目标的尺度变化系数直接影响了跟踪的准确率。通常的做法有：在运动模型产生候选样本的时候，生成大量尺度大小不一的候选框，或是在多个不同尺度目标上进行目标跟踪，产生多个预测结果，选择其中最优的作为最后的预测目标。</p>
+<p>当然，除了上述几个常见的挑战外，还有一些其他的挑战性因素：光照（illumination）,低分辨率（Low Resolution）,运动模糊（Motion Blur）,快速运动（Fast Motion），超出视野（Out of View），旋转（Rotation）等。所有的这些挑战因数共同决定了目标跟踪是一项极为复杂的任务。更多信息请参考<a target="_blank" rel="noopener" href="http://cvlab.hanyang.ac.kr/tracker_benchmark/datasets.html。">http://cvlab.hanyang.ac.kr/tracker_benchmark/datasets.html。</a></p>
+<h1 id="视觉目标跟踪方法"><a href="#视觉目标跟踪方法" class="headerlink" title="视觉目标跟踪方法"></a>视觉目标跟踪方法</h1><p>视觉目标跟踪方法根据观测模型是生成式模型或判别式模型可以被分为生成式方法（Generative Method）和判别式方法（Discriminative Method）。</p>
+<p>经典的有Meanshift、粒子滤波（Particle Filter）方法和检测与跟踪相结合的方法。前几年最火的生成式跟踪方法大概是稀疏编码（Sparse Coding）了, 而近来判别式跟踪方法逐渐占据了主流地位，以相关滤波（Correlation Filter）和深度学习（Deep Learning）为代表的判别式方法也取得了令人满意的效果。下面我们分别简要概括这几种方法的大体思想和其中的一些具体的跟踪方法。</p>
+<h2 id="Meanshift"><a href="#Meanshift" class="headerlink" title="Meanshift"></a>Meanshift</h2><p>2010 年以前，目标跟踪领域大部分采用一些经典的跟踪方法，比如 Meanshift、Particle Filter 和 Kalman Filter，以及基于特征点的光流算法等。Meanshift 方法是一种基于概率密度分布的跟踪方法，使目标的搜索一直沿着概率梯度上升的方向，迭代收敛到概率密度分布的局部峰值上。首先 Meanshift 会对目标进行建模，比如利用目标的颜色分布来描述目标，然后计算目标在下一帧图像上的概率分布，从而迭代得到局部最密集的区域。Meanshift 适用于目标的色彩模型和背景差异比较大的情形，早期也用于人脸跟踪。由于 Meanshift 方法的快速计算，它的很多改进方法也一直适用至今。</p>
+<p><img src="http://image.rexking6.top/img/clip1538876748.png" alt=""></p>
+<h2 id="粒子滤波（Particle-Filter）方法"><a href="#粒子滤波（Particle-Filter）方法" class="headerlink" title="粒子滤波（Particle Filter）方法"></a>粒子滤波（Particle Filter）方法</h2><p>粒子滤波（Particle Filter）方法是一种基于粒子分布统计的方法。以跟踪为例，首先对跟踪目标进行建模，并定义一种相似度度量确定粒子与目标的匹配程度。在目标搜索的过程中，它会按照一定的分布（比如均匀分布或高斯分布）撒一些粒子，统计这些粒子的相似度，确定目标可能的位置。在这些位置上，下一帧加入更多新的粒子，确保在更大概率上跟踪上目标。Kalman Filter 常被用于描述目标的运动模型，它不对目标的特征建模，而是对目标的运动模型进行了建模，常用于估计目标在下一帧的位置。另外，经典的跟踪方法还有基于特征点的光流跟踪，在目标上提取一些特征点，然后在下一帧计算这些特征点的光流匹配点，统计得到目标的位置。在跟踪的过程中，需要不断补充新的特征点，删除置信度不佳的特征点，以此来适应目标在运动中的形状变化。本质上可以认为光流跟踪属于用特征点的集合来表征目标模型的方法。</p>
+<p>在深度学习和相关滤波的跟踪方法出现后，经典的跟踪方法都被舍弃，这主要是因为这些经典方法无法处理和适应复杂的跟踪变化，它们的鲁棒性和准确度都被前沿的算法所超越，但是，了解它们对理解跟踪过程是有必要的，有些方法在工程上仍然有十分重要的应用，常常被当作一种重要的辅助手段。</p>
+<h2 id="检测与跟踪相结合的方法"><a href="#检测与跟踪相结合的方法" class="headerlink" title="检测与跟踪相结合的方法"></a>检测与跟踪相结合的方法</h2><p>在 2010 年左右，目标跟踪的方法通常分成基于产生式模型的方法和基于鉴别式模型的方法。前面介绍的经典跟踪方法都可以归类为产生式模型的方法，而基于鉴别式模型的方法是指利用分类来做跟踪的方法，即把跟踪的目标作为前景，利用在线学习或离线训练的检测器来区分前景目标和背景，从而得到前景目标的位置。虽然此时通用物体的检测率还非常低（ImageNet 的检测率不超过 20%），因为物体检测主要基于手工设计的特征，但是，通过在新更新检测器的模型和各种底层特征的提出，鉴别式跟踪方法更能适应跟踪过程中的复杂变化，所以利用检测来做跟踪（Tracking By Detection）逐渐成为主流。</p>
+<p>人们开始采用一种在线学习的方法来训练跟踪的检测器，比如，在第一帧目标出现的位置建立初始的检测模型，并在后续帧更新模型以适应目标的变化，这里介绍当时 Surrey 大学博士生 Z.Kalal 提出的一种长效跟踪的 TLD（Tracking-Learning-Detection）方法。</p>
+<p><img src="http://image.rexking6.top/img/clip1538876795.png" alt=""></p>
+<p>TLD 方法的整个框架有三个模块，其中跟踪器（Tracking）负责用经典的方法跟踪目标，论文中采用基于光流的特征点统计方法确定目标在下一帧的跟踪位置，检测器（Detection）负责在一定的范围内检测目标，并且与跟踪结果综合得到最终的输出结果。在确定目标的最佳位置之后，学习模块（Learning）负责对跟踪结果和检测器进行修正，在目标的周围选取更多的正负样本在线更新检测器的模型。</p>
+<p><img src="http://image.rexking6.top/img/clip1538876805.png" alt=""></p>
+<p>作者利用了多级分类器的方式来提高检测器的检测能力，降低误检，级联了一个在线学习的随机森林分类器和最近邻的分类器。为了平衡整个检测器的稳定性和学习能力，作者提出了一种半监督的学习方法，利用 P-N 限制条件更新模型，使检测器能够收敛到一个稳定的状态。从整个框架的设计上看，TLD 的工程意义要大于算法本身，作者对每个模块都做了很多细节上的调整，比如利用 Backward-Forward 来过滤不可靠的光流特征点，对物体的变化做了尺度上的估计，利用 P-N 样本集更新随机森林分类器等。</p>
+<p>TLD 的代码也公开了，人们可以很容易重现论文的结果。这种跟踪和检测相结合的框架和思想，极大地推动了跟踪算法的发展。那时对于跟踪算法的评测还没有公认的数据集和评测标准，很难对不同跟踪方法的进行比较。所以，在 2013 年左右，人们开始建立公共的测试视频集，定义了跟踪的初始条件和评价指标，比如 OTB 数据集（Object Tracking Benchmark）和 VOT 竞赛（Visual Object Tracking），其中 OTB 数据集至今已经有 100 多段视频，以短时跟踪为主，里面包含了各种复杂的变化场景，VOT 竞赛每年举办一次，迄今已经举办了 4 年，自此跟踪的模型和算法日新月异，比如 2013 年的冠军 Struck，利用结构化 SVM 方法在线学习的一个分类器，2014 年的冠军 DSST，一种改进的基于相关滤波的多尺度跟踪方法，之后陆续又出现了很多基于深度学习的方法。</p>
+<h2 id="稀疏表示（Sparse-Representation）"><a href="#稀疏表示（Sparse-Representation）" class="headerlink" title="稀疏表示（Sparse Representation）"></a>稀疏表示（Sparse Representation）</h2><p>给定一组过完备字典，将输入信号用这组过完备字典线性表示，对线性表示的系数做一个稀疏性的约束（即使得系数向量的分量尽可能多的为0），那么这一过程就称为稀疏表示。基于稀疏表示的目标跟踪方法则将跟踪问题转化为稀疏逼近问题来求解。如稀疏跟踪的开山之作L1Tracker, 认为候选样本可以被稀疏的表示通过目标模板和琐碎模板，而一个好的候选样本应该拥有更稀疏的系数向量。稀疏性可通过解决一个L1正则化的最小二乘优化问题获得，最后将与目标模板拥有最小重构误差的候选样本作为跟踪结果。L1Tracker中利用琐碎模板处理遮挡，利用对稀疏系数的非负约束解决背景杂斑问题。随后在L1Tracker基础上的改进则有很多，比较有代表性的有ALSA，L1APG等。</p>
+<h2 id="相关滤波（Correlation-Filter）"><a href="#相关滤波（Correlation-Filter）" class="headerlink" title="相关滤波（Correlation Filter）"></a>相关滤波（Correlation Filter）</h2><p>相关滤波源于信号处理领域，相关性用于表示两个信号之间的相似程度，通常用卷积表示相关操作。</p>
+<p>相关滤波的跟踪算法始于 2012 年 P.Martins 提出的 CSK 方法，作者提出了一种基于循环矩阵的核跟踪方法，并且从数学上完美解决了密集采样（Dense Sampling）的问题，利用傅立叶变换快速实现了检测的过程。在训练分类器时，一般认为离目标位置较近的是正样本，而离目标较远的认为是负样本。回顾前面提到的 TLD 或 Struck，他们都会在每一帧中随机地挑选一些块进行训练，学习到的特征是这些随机子窗口的特征，而 CSK 作者设计了一个密集采样的框架，能够学习到一个区域内所有图像块的特征。</p>
+<p><img src="http://image.rexking6.top/img/clip1538876883.png" alt=""></p>
+<p>密集采样的过程可以通过作者提出的循环矩阵来实现，并且整个分类器的学习过程可以用快速傅立叶变换转化成频域内的计算，不受 SVM 或 Boost 等学习方法的限制。无论是用线性分类还是核分类，整个学习过程十分高效，证明过程完备，易于理解。在论文中作者给出的算法实现只需要十几行代码。利用快速傅立叶变换，CSK 方法的跟踪帧率能达到 100～400fps，奠定了相关滤波系列方法在实时性应用中的基石。</p>
+<p><img src="http://image.rexking6.top/img/clip1538876903.png" alt=""></p>
+<p>相关滤波系列的方法发展很快，比如 CSK 作者引用的 MOSSE 方法，后续他又提出了基于 HOG 特征的 KCF 方法。后续还有考虑多尺度或颜色特征（Color Name 表）的方法以及用深度学习提取的特征结合 KCF 的方法（比如 DeepSRDCF 方法）等。从它的发展过程来看，考虑的尺度越来越多，特征信息也更加丰富，当然计算时间也会相应增加，但总体上说，相关滤波系列的跟踪方法在实时性上优势明显，采用哪种改进版本的方法视具体的应用而定。相关滤波的方法也有一些缺陷，比如目标的快速移动，形状变化大导致更多背景被学习进来等都会对 CF 系列方法造成影响。虽然后续的研究也有一些针对性的改进，比如改进边界效应，改善背景更新策略或提高峰值响应图的置信度等，但普适性还需要进一步研究，特别是对不同的应用针对性地调整。</p>
+<p>基于相关滤波的跟踪方法的基本思想就是，寻找一个滤波模板，让下一帧的图像与我们的滤波模板做卷积操作，响应最大的区域则是预测的目标。根据这一思想先后提出了大量的基于相关滤波的方法，如最早的平方误差最小输出和（MOSSE）利用的就是最朴素的相关滤波思想的跟踪方法。随后基于MOSSE有了很多相关的改进，如引入核方法（Kernel Method）的CSK，KCF等都取得了很好的效果，特别是利用循环矩阵计算的KCF，跟踪速度惊人。在KCF的基础上又发展了一系列的方法用于处理各种挑战。如：DSST可以处理尺度变化，基于分块的（Reliable Patches）相关滤波方法可处理遮挡等。但是所有上述的基于相关滤波的方法都受到边界效应（Boundary Effect）的影响。为了克服这个问题SRDCF应运而生，SRDCF利用空间正则化惩罚了相关滤波系数获得了可与深度学习跟踪方法相比的结果。</p>
+<h2 id="深度学习（CNN-Based）"><a href="#深度学习（CNN-Based）" class="headerlink" title="深度学习（CNN-Based）"></a>深度学习（CNN-Based）</h2><p>因为深度特征对目标拥有强大的表示能力，深度学习在计算机视觉的其他领域，如：检测，人脸识别中已经展现出巨大的潜力。但早前两年，深度学习在目标跟踪领域的应用并不顺利，因为目标跟踪任务的特殊性，只有初始帧的图片数据可以利用，因此缺乏大量的数据供神经网络学习。只到研究人员把在分类图像数据集上训练的卷积神经网络迁移到目标跟踪中来，基于深度学习的目标跟踪方法才得到充分的发展。如：CNN-SVM利用在ImageNet分类数据集上训练的卷积神经网络提取目标的特征，再利用传统的SVM方法做跟踪。与CNN-SVM提取最后一层的深度特征不同的是，FCN利用了目标的两个卷积层的特征构造了可以选择特征图的网络，这种方法比只利用最后的全连接层的CNN-SVM效果有些许的提升。随后HCF, HDT等方法则更加充分的利用了卷积神经网络各层的卷积特征，这些方法在相关滤波的基础上结合多层次卷积特征进一步的提升了跟踪效果。然而，跟踪任务与分类任务始终是不同的，分类任务关心的是区分类间差异，忽视类内的区别。目标跟踪任务关心的则是区分特定目标与背景，抑制同类目标。两个任务有着本质的区别，因此在分类数据集上预训练的网络可能并不完全适用于目标跟踪任务。于是，Nam设计了一个专门在跟踪视频序列上训练的多域（Multi-Domain）卷积神经网络（MDNet），结果取得了VOT2015比赛的第一名。但是MDNet在标准集上进行训练多少有一点过拟合的嫌疑，于是VOT2016比赛中禁止在标准跟踪数据集上进行训练。2016年SRDCF的作者继续发力，也利用了卷积神经网络提取目标特征然后结合相关滤波提出了C-COT的跟踪方法取得了VOT2016的冠军。</p>
+<p>以 GOTURN 方法为例，介绍来自斯坦福大学的 D.Held 发表 ECCV2016 上的文章，目前 GOTURN 方法已经集成在 OpenCV 3.2.0 的开发版本中。</p>
+<p><img src="http://image.rexking6.top/img/clip1538876960.png" alt=""></p>
+<p>GOTURN 方法利用 ALOV300+视频序列集和 ImageNet 检测数据集训练了一个基于图像对输入的卷积网络，输出在搜索区域内相对于上一帧位置的变化，从而得到目标在当前帧上的位置。为了得到网络训练所需的大数据集，作者不仅利用了视频序列集中的随机连续帧对图，而且利用了更多的单张图片集进行数据增强。对于数据的扰动分布，作者也做了大量的实验，使得跟踪的位置变化更加平滑。</p>
+<p>从网络结构中可以看出，GOTURN 先从输入的图像对中分别提取前一帧和当前帧的卷积特征，再送入三个全连接层，最后得到预测的位置变化。其中卷积层是通过 ImageNet 预训练得到，并且在跟踪网络训练中固定这部分参数（防止过拟合），学习全连接层的参数。本质上说，GOTURN 也利用了深度学习强大的特征表达能力，但是，它建立了第一个基于深度学习的端到端输出的跟踪框架，而且在 GPU GTX680 上跟踪速度在能达到 100fps。</p>
+<p><img src="http://image.rexking6.top/img/clip1538876979.png" alt=""></p>
+<p>基于深度学习的跟踪框架目前还在不断发展中，比如牛津大学的 Luca Bertinetto 提出的端到端的跟踪框架，从 SiameseFC 到今年的 CFNet。虽然相比于相关滤波等传统方法，在性能上还非常慢，但是这种端到端输出可以与其他的任务一起训练，特别是和检测分类网络相结合，在实际应用中有着十分广泛的前景。</p>
+<h1 id="视觉目标跟踪最新进展"><a href="#视觉目标跟踪最新进展" class="headerlink" title="视觉目标跟踪最新进展"></a>视觉目标跟踪最新进展</h1><p>  目标跟踪最近几年发展迅速，以基于相关滤波（Correlation Filter）和卷积神经网络（CNN）的跟踪方法已经占据了目标跟踪的大半江山。如下图给出的2014-2017年以来表现排名靠前的一些跟踪方法。</p>
+<p>  <img src="http://image.rexking6.top/img/clip1538876551.png" alt=""></p>
+<p>可以看到前三名的方法不是基于相关滤波的方法就是基于卷积神经网络的方法,或是两者结合的方法。比如ECCV2016的C-COT就是在相关滤波的基础上结合卷积神经网络的杰作。下图给出这些方法在标准跟踪数据集OTB2013上的跟踪结果：</p>
+<p><img src="http://image.rexking6.top/img/clip1538876567.png" alt=""></p>
+<p>可以看到基于卷积神经网络的方法取得了惊人的突破。预计未来两年相关滤波和卷积神经网络将仍然会是目标跟踪领域的主角。</p>
+<h1 id="YaqiLYU对这几年目标跟踪进展的介绍"><a href="#YaqiLYU对这几年目标跟踪进展的介绍" class="headerlink" title="YaqiLYU对这几年目标跟踪进展的介绍"></a>YaqiLYU对这几年目标跟踪进展的介绍</h1><p>相信很多来这里的人和我第一次到这里一样，都是想找一种比较好的目标跟踪算法，或者想对目标跟踪这个领域有比较深入的了解，虽然这个问题是经典目标跟踪算法，但事实上，可能我们并不需要那些曾经辉煌但已被拍在沙滩上的tracker(目标跟踪算法)，而是那些即将成为经典的，或者就目前来说最好用、速度和性能都看的过去tracker。我比较关注目标跟踪中的相关滤波方向，接下来我帮您介绍下我所认识的目标跟踪，尤其是相关滤波类方法，分享一些我认为比较好的算法，顺便谈谈我的看法。</p>
+<h2 id="第一部分：目标跟踪速览"><a href="#第一部分：目标跟踪速览" class="headerlink" title="第一部分：目标跟踪速览"></a>第一部分：目标跟踪速览</h2><p>先跟几个SOTA的tracker混个脸熟，大概了解一下目标跟踪这个方向都有些什么。一切要从2013年的那个数据库说起。。如果你问别人近几年有什么比较niubility的跟踪算法，大部分人都会扔给你吴毅老师的论文，OTB50和OTB100(OTB50这里指OTB-2013，OTB100这里指OTB-2015，50和100分别代表视频数量，方便记忆)：</p>
+<blockquote>
+<p>Wu Y, Lim J, Yang M H. Online object tracking: A benchmark [C]// CVPR, 2013.<br>Wu Y, Lim J, Yang M H. Object tracking benchmark [J]. TPAMI, 2015.</p>
+</blockquote>
+<p>顶会转顶刊的顶级待遇，在加上引用量1480+320多，影响力不言而喻，已经是做tracking必须跑的数据库了，测试代码和序列都可以下载： <a target="_blank" rel="noopener" href="http://t.cn/RYhz9Sd">Visual Tracker Benchmark</a>，OTB50包括50个序列，都经过人工标注：</p>
+<p><img src="http://image.rexking6.top/img/clip1538877195.png" alt=""></p>
+<p>两篇论文在数据库上对比了包括2012年及之前的29个顶尖的tracker，有大家比较熟悉的OAB, IVT, MIL, CT, TLD, Struck等，大都是顶会转顶刊的神作，由于之前没有比较公认的数据库，论文都是自卖自夸，大家也不知道到底哪个好用，所以这个database的意义非常重大，直接促进了跟踪算法的发展，后来又扩展为OTB100发到TPAMI，有100个序列，难度更大更加权威，我们这里参考OTB100的结果，首先是29个tracker的速度和发表时间(标出了一些性能速度都比较好的算法)：</p>
+<p><img src="http://image.rexking6.top/img/clip1538877204.png" alt=""></p>
+<p>接下来再看结果(更加详细的情况建议您去看论文比较清晰)：</p>
+<p><img src="http://image.rexking6.top/img/clip1538877216.png" alt=""></p>
+<p>直接上结论：平均来看Struck, SCM, ASLA的性能比较高，排在前三不多提，着重强调CSK，第一次向世人展示了相关滤波的潜力，排第四还362FPS简直逆天了。速度排第二的是经典算法CT(64fps)(与SCM, ASLA等都是那个年代最热的稀疏表示)。如果对更早期的算法感兴趣，推荐另一篇经典的survey(反正我是没兴趣也没看过):</p>
+<blockquote>
+<p>Yilmaz A, Javed O, Shah M. Object tracking: A survey [J]. CSUR, 2006.</p>
+</blockquote>
+<p>2012年以前的算法基本就是这样，自从2012年AlexNet问世以后，CV各个领域都有了巨大变化，所以我猜你肯定还想知道2013到2017年发生了什么，抱歉我也不知道(容我卖个关子)，不过我们可以肯定的是，2013年以后的论文一定都会引用OTB50这篇论文，借助谷歌学术中的被引用次数功能，得到如下结果：</p>
+<p><img src="http://image.rexking6.top/img/clip1538877503.png" alt=""></p>
+<p>这里仅列举几个引用量靠前的，依次是Struck转TPAMI, 三大相关滤波方法KCF, CN, DSST, 和VOT竞赛，这里仅作示范，有兴趣可以亲自去试试。(这么做的理论依据是：一篇论文，在它之前的工作可以看它的引用文献，之后的工作可以看谁引用了它；虽然引用量并不能说明什么，但好的方法大家基本都会引用的(表示尊重和认可)；之后还可以通过限定时间来查看某段时间的相关论文，如2016-2017就能找到最新的论文了，至于论文质量需要仔细甄别；其他方向的重要论文也可以这么用，顺藤摸瓜，然后你就知道大牛是哪几位，接着关注跟踪一下他们的工作 ) 这样我们就大致知道目标跟踪领域的最新进展应该就是相关滤波无疑了，再往后还能看到相关滤波类算法有SAMF, LCT, HCF, SRDCF等等。当然，引用量也与时间有关，建议分每年来看。此外，最新版本OPENCV3.2除了TLD，也包括了几个很新的跟踪算法 OpenCV: <a target="_blank" rel="noopener" href="http://t.cn/RYhzun2">Tracking API</a>：</p>
+<p>TrackerKCF接口实现了KCF和CN，影响力可见一斑，还有个GOTURN是基于深度学习的方法，速度虽快但精度略差，值得去看看。tracking方向的最新论文，可以跟进三大会议(CVPR/ICCV/ECCV) 和arXiv。</p>
+<h2 id="第二部分：背景介绍"><a href="#第二部分：背景介绍" class="headerlink" title="第二部分：背景介绍"></a>第二部分：背景介绍</h2><p>接下来总体介绍下目标跟踪。这里说的目标跟踪，是通用单目标跟踪，第一帧给个矩形框，这个框在数据库里面是人工标注的，在实际情况下大多是检测算法的结果，然后需要跟踪算法在后续帧紧跟住这个框，以下是VOT对跟踪算法的要求：</p>
+<p><img src="http://image.rexking6.top/img/clip1538877549.png" alt=""></p>
+<p>通常目标跟踪面临几大难点(吴毅在VALSE的slides)：外观变形，光照变化，快速运动和运动模糊，背景相似干扰：</p>
+<p><img src="http://image.rexking6.top/img/clip1538877561.png" alt=""></p>
+<p>平面外旋转，平面内旋转，尺度变化，遮挡和出视野等情况：</p>
+<p><img src="http://image.rexking6.top/img/clip1538877572.png" alt=""></p>
+<p>正因为这些情况才让tracking变得很难，目前比较常用的数据库除了OTB，还有前面找到的VOT竞赛数据库(类比ImageNet)，已经举办了四年，VOT2015和VOT2016都包括60个序列，所有序列也是免费下载 <a target="_blank" rel="noopener" href="http://t.cn/RYhZqT2">VOT Challenge | Challenges</a>：</p>
+<p>Kristan M, Pflugfelder R, Leonardis A, et al. The visual object tracking vot2013 challenge results [C]// ICCV, 2013.</p>
+<p>Kristan M, Pflugfelder R, Leonardis A, et al. The Visual Object Tracking VOT2014 Challenge Results [C]// ECCV, 2014.</p>
+<p>Kristan M, Matas J, Leonardis A, et al. The visual object tracking vot2015 challenge results [C]// ICCV, 2015.</p>
+<p>Kristan M, Ales L, Jiri M, et al. The Visual Object Tracking VOT2016 Challenge Results [C]// ECCV, 2016.</p>
+<p><strong>OTB和VOT区别</strong>：OTB包括25%的灰度序列，但VOT都是彩色序列，这也是造成很多颜色特征算法性能差异的原因；两个库的评价指标不一样，具体请参考论文；VOT库的序列分辨率普遍较高，这一点后面分析会提到。对于一个tracker，如果论文在两个库(最好是OTB100和VOT2016)上都结果上佳，那肯定是非常优秀的(两个库调参你能调好，我服，认了~)，如果只跑了一个，个人更偏向于VOT2016，因为序列都是精细标注，且评价指标更好(人家毕竟是竞赛，评价指标发过TP AMI的)，<strong>差别最大的地方</strong>，OTB有随机帧开始，或矩形框加随机干扰初始化去跑，作者说这样更加符合检测算法给的框框；而VOT是第一帧初始化去跑，每次跟踪失败(预测框和标注框不重叠)时，5帧之后重新初始化，VOT以short-term为主，且认为跟踪检测应该在一起不分离，detecter会多次初始化tracker。</p>
+<p>补充：OTB在2013年公开了，对于2013以后的算法是透明的，论文都会去调参，尤其是那些只跑OTB的论文，如果关键参数直接给出还精确到小数点后两位，建议您先实测(人心不古啊~被坑的多了)。VOT竞赛的数据库是每年更新，还动不动就重新标注，动不动就改变评价指标，对当年算法是难度比较大，所以结果相对更可靠。（相信很多人和我一样，看每篇论文都会觉得这个工作太好太重要了，如果没有这篇论文，必定地球爆炸，宇宙重启~所以就像大家都通过历年ILSVRC竞赛结果为主线了解深度学习的发展一样，第三方的结果更具说服力，所以我也以竞赛排名+是否公开源码+实测性能为标准，优选几个算法分析）</p>
+<p>目标视觉跟踪(Visual Object Tracking)，大家比较公认分为两大类：生成(generative)模型方法和判别(discriminative)模型方法，目前比较流行的是判别类方法，也叫检测跟踪tracking-by-detection，为保持回答的完整性，以下简单介绍。</p>
+<p><strong>生成类方法</strong>，在当前帧对目标区域建模，下一帧寻找与模型最相似的区域就是预测位置，比较著名的有卡尔曼滤波，粒子滤波，mean-shift等。举个例子，从当前帧知道了目标区域80%是红色，20%是绿色，然后在下一帧，搜索算法就像无头苍蝇，到处去找最符合这个颜色比例的区域，推荐算法<a target="_blank" rel="noopener" href="http://t.cn/RYhZoH3">ASMS vojirt/asms</a>：</p>
+<ul>
+<li>Vojir T, Noskova J, Matas J. Robust scale-adaptive mean-shift for tracking [J]. Pattern Recognition Letters, 2014.</li>
+</ul>
+<p>ASMS与DAT并称“颜色双雄”(版权所有翻版必究)，都是仅颜色特征的算法而且速度很快，依次是VOT2015的第20名和14名，在VOT2016分别是32名和31名(中等水平)。ASMS是VOT2015官方推荐的实时算法，平均帧率125FPS，在经典mean-shift框架下加入了尺度估计，经典颜色直方图特征，加入了两个先验(尺度不剧变+可能偏最大)作为正则项，和反向尺度一致性检查。作者给了C++代码，在相关滤波和深度学习盛行的年代，还能看到mean-shift打榜还有如此高的性价比实在不容易，实测性能还不错，如果您对生成类方法情有独钟，这个非常推荐您去试试。</p>
+<p><strong>判别类方法</strong>，OTB50里面的大部分方法都是这一类，CV中的经典套路图像特征+机器学习， 当前帧以目标区域为正样本，背景区域为负样本，机器学习方法训练分类器，下一帧用训练好的分类器找最优区域：</p>
+<p><img src="http://image.rexking6.top/img/clip1538877796.png" alt=""></p>
+<p>与生成类方法最大的区别是，分类器采用机器学习，训练中用到了背景信息，这样分类器就能专注区分前景和背景，所以判别类方法普遍都比生成类好。举个例子，在训练时告诉tracker目标80%是红色，20%是绿色，还告诉它背景中有橘红色，要格外注意别搞错了，这样的分类器知道更多信息，效果也相对更好。tracking-by-detection和检测算法非常相似，如经典行人检测用HOG+SVM，Struck用到了haar+structured output SVM，跟踪中为了尺度自适应也需要多尺度遍历搜索，区别仅在于跟踪算法对特征和在线机器学习的速度要求更高，检测范围和尺度更小而已。这点其实并不意外，大多数情况检测识别算法复杂度比较高不可能每帧都做，这时候用复杂度更低的跟踪算法就很合适了，只需要在跟踪失败(drift)或一定间隔以后再次检测去初始化tracker就可以了。其实我就想说，FPS才TMD是最重要的指标，慢的要死的算法可以去死了(同学别这么偏激，速度是可以优化的)。经典判别类方法推荐Struck和TLD，都能实时性能还行，Struck是2012年之前最好的方法，TLD是经典long-term的代表，思想非常值得借鉴：</p>
+<ul>
+<li><p>Hare S, Golodetz S, Saffari A, et al. Struck: Structured output tracking with kernels [J]. IEEE TPAMI, 2016.</p>
+</li>
+<li><p>Kalal Z, Mikolajczyk K, Matas J. Tracking-learning-detection [J]. IEEE TPAMI, 2012.</p>
+</li>
+</ul>
+<p>长江后浪推前浪，前面的已被排在沙滩上，这个后浪就是相关滤波和深度学习。相关滤波类方法correlation filter简称CF，也叫做discriminative correlation filter简称DCF，注意和后面的DCF算法区别，包括前面提到的那几个，也是后面要着重介绍的。深度学习（Deep ConvNet based）类方法，因为深度学习类目前不适合落地就不瞎推荐了，可以参考Winsty的几篇 Naiyan Wang - Home，还有VOT2015的冠军MDNet Learning Multi-Domain Convolutional Neural Networks for Visual Tracking，以及VOT2016的冠军TCNN ，速度方面比较突出的如80FPS的SiamFC SiameseFC tracker和100FPS的GOTURN davheld/GOTURN，注意都是在GPU上。基于ResNet的SiamFC-R(ResNet)在VOT2016表现不错，很看好后续发展，有兴趣也可以去VALSE听作者自己讲解 VALSE-20160930-LucaBertinetto-Oxford-JackValmadre-Oxford-pu，至于GOTURN，效果比较差，但优势是跑的很快100FPS，如果以后效果也能上来就好了。做科研的同学深度学习类是关键，能兼顾速度就更好了。</p>
+<ul>
+<li><p>Nam H, Han B. Learning multi-domain convolutional neural networks for visual tracking [C]// CVPR, 2016.</p>
+</li>
+<li><p>Nam H, Baek M, Han B. Modeling and propagating cnns in a tree structure for visual tracking. arXiv preprint arXiv:1608.07242, 2016.</p>
+</li>
+<li><p>Bertinetto L, Valmadre J, Henriques J F, et al. Fully-convolutional siamese networks for object tracking [C]// ECCV, 2016.</p>
+</li>
+<li><p>Held D, Thrun S, Savarese S. Learning to track at 100 fps with deep regression networks [C]// ECCV, 2016.</p>
+</li>
+</ul>
+<p>最后，深度学习END2END的强大威力在目标跟踪方向还远没有发挥出来，还没有和相关滤波类方法拉开多大差距(速度慢是天生的我不怪你，但效果总该很好吧，不然你存在的意义是什么呢。。革命尚未成功，同志仍须努力)。另一个需要注意的问题是目标跟踪的数据库都没有严格的训练集和测试集，需要离线训练的深度学习方法就要非常注意它的训练集有没有相似序列，而且一直到VOT2017官方才指明要限制训练集，不能用相似序列训练模型。</p>
+<p>最后强力推荐两个资源。王强维护的<a target="_blank" rel="noopener" href="http://t.cn/RV08A2h">benchmark_results</a> ：大量顶级方法在OTB库上的性能对比，各种论文代码应有尽有，大神自己C++实现并开源的CSK, KCF和DAT，还有他自己的DCFNet论文加源码，找不着路的同学请跟紧。</p>
+<p>@H Hakase维护的<a target="_blank" rel="noopener" href="http://t.cn/RYhAlJn">相关滤波类资源</a>，详细分类和论文代码资源，走过路过别错过，相关滤波类算法非常全面，非常之用心！</p>
+<p><img src="http://image.rexking6.top/img/clip1538877964.png" alt=""></p>
+<h2 id="相关滤波"><a href="#相关滤波" class="headerlink" title="相关滤波"></a>相关滤波</h2><p>介绍最经典的高速相关滤波类跟踪算法CSK, KCF/DCF, CN。很多人最早了解CF，应该和我一样，都是被下面这张图吸引了：</p>
+<p><img src="http://image.rexking6.top/img/clip1538878042.png" alt=""></p>
+<p>这是KCF/DCF算法在OTB50上(2014年4月就挂arVix了, 那时候OTB100还没有发表)的实验结果，Precision和FPS碾压了OTB50上最好的Struck，看惯了勉强实时的Struck和TLD，飙到高速的KCF/DCF突然有点让人不敢相信，其实KCF/DCF就是在OTB上大放异彩的CSK的多通道特征改进版本。注意到那个超高速615FPS的MOSSE(严重超速这是您的罚单)，这是目标跟踪领域的第一篇相关滤波类方法，这其实是真正第一次显示了相关滤波的潜力。和KCF同一时期的还有个CN，在2014’CVPR上引起剧烈反响的颜色特征方法，其实也是CSK的多通道颜色特征改进算法。从MOSSE(615)到 CSK(362) 再到 KCF(172FPS), DCF(292FPS), CN(152FPS), CN2(202FPS)，速度虽然是越来越慢，但效果越来越好，而且始终保持在高速水平：</p>
+<ul>
+<li><p>Bolme D S, Beveridge J R, Draper B A, et al. Visual object tracking using adaptive correlation filters [C]// CVPR, 2010.</p>
+</li>
+<li><p>Henriques J F, Caseiro R, Martins P, et al. Exploiting the circulant structure of tracking-by- detection with kernels [C]// ECCV, 2012.</p>
+</li>
+<li><p>Henriques J F, Rui C, Martins P, et al. High-Speed Tracking with Kernelized Correlation Filters [J]. IEEE TPAMI, 2015.</p>
+</li>
+<li><p>Danelljan M, Shahbaz Khan F, Felsberg M, et al. Adaptive color attributes for real-time visual tracking [C]// CVPR, 2014.</p>
+</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1538878066.png" alt=""></p>
+<p>CSK和KCF都是Henriques J F(牛津大学)João F. Henriques 大神先后两篇论文，影响后来很多工作，核心部分的岭回归，循环移位的近似密集采样，还给出了整个相关滤波算法的详细推导。还有岭回归加kernel-trick的封闭解，多通道HOG特征。</p>
+<p>Martin Danelljan大牛(林雪平大学)用多通道颜色特征Color Names(CN)去扩展CSK得到了不错的效果，算法也简称CN。</p>
+<p>MOSSE是单通道灰度特征的相关滤波，CSK在MOSSE的基础上扩展了密集采样(加padding)和kernel-trick，KCF在CSK的基础上扩展了多通道梯度的HOG特征，CN在CSK的基础上扩展了多通道颜色的Color Names。HOG是梯度特征，而CN是颜色特征，两者可以互补，所以HOG+CN在近两年的跟踪算法中成为了hand-craft特征标配。最后，根据KCF/DCF的实验结果，讨论两个问题：</p>
+<ol>
+<li>为什么只用单通道灰度特征的KCF和用了多通道HOG特征的KCF速度差异很小？</li>
+</ol>
+<p>第一，作者用了HOG的快速算法fHOG，来自Piotr’s Computer Vision Matlab Toolbox，C代码而且做了SSE优化。如对fHOG有疑问，请参考论文Object Detection with Discriminatively Trained Part Based Models第12页。<br>第二，HOG特征常用cell size是4，这就意味着，100<em>100的图像，HOG特征图的维度只有25</em>25，而Raw pixels是灰度图归一化，维度依然是100<em>100，我们简单算一下：27通道HOG特征的复杂度是27</em>625<em>log(625)=47180，单通道灰度特征的复杂度是10000</em>log(10000)=40000，理论上也差不多，符合表格。</p>
+<p>看代码会发现，作者在扩展后目标区域面积较大时，会先对提取到的图像块做因子2的下采样到50<em>50，这样复杂度就变成了2500</em>log(2500)=8495，下降了非常多。那你可能会想，如果下采样再多一点，复杂度就更低了，但这是以牺牲跟踪精度为代价的，再举个例子，如果图像块面积为200<em>200，先下采样到100</em>100，再提取HOG特征，分辨率降到了25<em>25，这就意味着响应图的分辨率也是25</em>25，也就是说，响应图每位移1个像素，原始图像中跟踪框要移动8个像素，这样就降低了跟踪精度。在精度要求不高时，完全可以稍微牺牲下精度提高帧率(但看起来真的不能再下采样了)。</p>
+<ol>
+<li>HOG特征的KCF和DCF哪个更好？</li>
+</ol>
+<p>大部分人都会认为KCF效果超过DCF，而且各属性的准确度都在DCF之上，然而，如果换个角度来看，以DCF为基准，再来看加了kernel-trick的KCF，mean precision仅提高了0.4%，而FPS下降了41%，这么看是不是挺惊讶的呢？除了图像块像素总数，KCF的复杂度还主要和kernel-trick相关。所以，下文中的CF方法如果没有kernel-trick，就简称基于DCF，如果加了kernel-trick，就简称基于KCF(剧透基本各占一半)。当然这里的CN也有kernel-trick，但请注意，这是Martin Danelljan大神第一次使用kernel-trick，也是最后一次……</p>
+<p>这就会引发一个疑问，kernel-trick这么强大的东西，怎么才提高这么点？这里就不得不提到Winsty的另一篇大作：</p>
+<ul>
+<li>Wang N, Shi J, Yeung D Y, et al. Understanding and diagnosing visual tracking systems[C]// ICCV, 2015.</li>
+</ul>
+<p>一句话总结，别看那些五花八门的机器学习方法，那都是虚的，目标跟踪算法中特征才是最重要的（就是因为这篇文章我粉了WIN叔哈哈），以上就是最经典的三个高速算法，CSK, KCF/DCF和CN，推荐。</p>
+<h2 id="14年的尺度自适应"><a href="#14年的尺度自适应" class="headerlink" title="14年的尺度自适应"></a>14年的尺度自适应</h2><p>VOT与OTB一样最早都是2013年出现的，但VOT2013序列太少，第一名的PLT代码也找不到，没有参考价值就直接跳过了。直接到了VOT2014竞赛 （<a target="_blank" rel="noopener" href="http://t.cn/RYh2FSL">http://t.cn/RYh2FSL</a> ）。这一年有25个精挑细选的序列，38个算法，那时候深度学习的战火还没有烧到tracking，所以主角也只能是刚刚展露头角就独霸一方的CF，下面是前几名的详细情况：</p>
+<p><img src="http://image.rexking6.top/img/clip1538878259.png" alt=""></p>
+<p>前三名都是相关滤波CF类方法，第三名的KCF已经很熟悉了，这里稍微有点区别就是加了多尺度检测和子像素峰值估计，再加上VOT序列的分辨率比较高(检测更新图像块的分辨率比较高)，导致竞赛中的KCF的速度只有24.23(EFO换算66.6FPS)。这里speed是EFO(Equivalent Filter Operations)，在VOT2015和VOT2016里面也用这个参数衡量算法速度，这里一次性列出来供参考(MATLAB实现的tracker实际速度要更高一些)：</p>
+<p><img src="http://image.rexking6.top/img/clip1538878268.png" alt=""></p>
+<p>其实前三名除了特征略有差异，核心都是KCF为基础扩展了多尺度检测，概要如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1538878280.png" alt=""></p>
+<p>尺度变化是跟踪中比较基础和常见的问题，前面介绍的KCF/DCF和CN都没有尺度更新，如果目标缩小，滤波器就会学习到大量背景信息，如果目标扩大，滤波器就跟着目标局部纹理走了，这两种情况都很可能出现非预期的结果，导致漂移和失败。</p>
+<p>SAMF，浙大Yang Li的工作，基于KCF，特征是HOG+CN，多尺度方法是平移滤波器在多尺度缩放的图像块上进行目标检测，取响应最大的那个平移位置及所在尺度：</p>
+<ul>
+<li>Li Y, Zhu J. A scale adaptive kernel correlation filter tracker with feature integration [C]// ECCV, 2014.</li>
+</ul>
+<p>Martin Danelljan的DSST，只用了HOG特征，DCF用于平移位置检测，又专门训练类似MOSSE的相关滤波器检测尺度变化，开创了平移滤波+尺度滤波，之后转TPAMI做了一系列加速的版本fDSST，非常+非常+非常推荐：</p>
+<ul>
+<li><p>Danelljan M, Häger G, Khan F, et al. Accurate scale estimation for robust visual tracking [C]// BMVC, 2014.</p>
+</li>
+<li><p>Danelljan M, Hager G, Khan F S, et al. Discriminative Scale Space Tracking [J]. IEEE TPAMI, 2017.</p>
+</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1538878311.png" alt=""></p>
+<p>简单对比下这两种尺度自适应的方法：</p>
+<p>DSST和SAMF所采用的尺度检测方法哪个更好？</p>
+<p>首先给大家讲个笑话：Martin Danelljan大神提出DSST之后，他的后续论文就再没有用过(直到最新CVPR的ECO-HC中为了加速用了fDSST)。</p>
+<ol>
+<li><p>虽然SAMF和DSST都可以跟上普通的目标尺度变化，但SAMF只有7个尺度比较粗，而DSST有33个尺度比较精细准确；</p>
+</li>
+<li><p>DSST先检测最佳平移再检测最佳尺度，是分步最优，而SAMF是平移尺度一起检测，是平移和尺度同时最优，而往往局部最优和全局最优是不一样的；</p>
+</li>
+<li><p>DSST将跟踪划分为平移跟踪和尺度跟踪两个问题，可以采用不同的方法和特征，更加灵活，但需要额外训练一个滤波器，每帧尺度检测需要采样33个图像块，之后分别计算特征、加窗、FFT等，尺度滤波器比平移滤波器慢很多；SAMF只需要一个滤波器，不需要额外训练和存储，每个尺度检测就一次提特征和FFT，但在图像块较大时计算量比DSST高。</p>
+</li>
+</ol>
+<p>所以尺度检测DSST并不总是比SAMF好，其实在VOT2015和VOT2016上SAMF都是超过DSST的，当然这主要是因为特征更好，但至少说明尺度方法不差。总的来说，DSST做法非常新颖，速度更快，SAMF同样优秀也更加准确。</p>
+<p><strong>DSST一定要33个尺度吗？</strong></p>
+<p>DSST标配33个尺度非常非常敏感，轻易降低尺度数量，即使你增加相应步长，尺度滤波器也会完全跟不上尺度变化。关于这一点可能解释是，训练尺度滤波器用的是一维样本，而且没有循环移位，这就意味着一次训练更新只有33个样本，如果降低样本数量，会造成训练不足，分类器判别力严重下降，不像平移滤波器有非常多的移位样本(个人看法欢迎交流)。总之，请不要轻易尝试大幅降低尺度数量，如果非要用尺度滤波器33和1.02就很好。</p>
+<p>以上就是两种推荐的尺度检测方法，以后简称为类似DSST的多尺度和类似SAMF的多尺度。如果更看重速度，加速版的fDSST，和仅3个尺度的SAMF(如VOT2014中的KCF)就是比较好的选择；如果更看重精确，33个尺度的DSST，及7个尺度的SAMF就比较合适。</p>
+<h2 id="VOT-2015"><a href="#VOT-2015" class="headerlink" title="VOT 2015"></a>VOT 2015</h2><p>VOT2015竞赛 <a target="_blank" rel="noopener" href="http://votchallenge.net/vot2015/">VOT2015 Challenge | Home</a> 如期而至，这一年有60个精挑细选的序列，62个tracker，最大看点是深度学习开始进击tracking，MDNet直接拿下当年的冠军，而结合深度特征的相关滤波方法DeepSRDCF是第二名，主要解决边界效应的SRDCF仅HOG特征排在第四：</p>
+<p><img src="http://image.rexking6.top/img/clip1538878475.png" alt=""></p>
+<p>随着VOT竞赛的影响力扩大，举办方也是用心良苦，经典的和顶尖的齐聚一堂，百家争鸣，多达62个tracker皇城PK，华山论剑。除了前面介绍的深度学习和相关滤波，还有结合object proposals(类物体区域检测)的EBT(<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/26654891">EBT：Proposal与Tracking不得不说的秘密 - 知乎专栏</a>)排第三，Mean-Shift类颜色算法ASMS是推荐实时算法，还请注意另一个颜色算法DAT，而第9的那个Struck已经不是原来的了。除此之外，还能看到经典方法如OAB, STC, CMT, CT, NCC等都排在倒数位置， 经典方法已经被远远拉开了距离，所以在决定用那些经典方法之前，可以先测试几个新算法看看，说不定有惊喜。</p>
+<p><strong>在介绍SRDCF之前，先来分析下相关滤波有什么缺点。总体来说，相关滤波类方法对快速变形和快速运动情况的跟踪效果不好。</strong></p>
+<p><strong>快速变形主要因为CF是模板类方法。</strong>容易跟丢这个比较好理解，前面分析了相关滤波是模板类方法，如果目标快速变形，那基于HOG的梯度模板肯定就跟不上了，如果快速变色，那基于CN的颜色模板肯定也就跟不上了。这个还和模型更新策略与更新速度有关，固定学习率的线性加权更新，如果学习率太大，部分或短暂遮挡和任何检测不准确，模型就会学习到背景信息，积累到一定程度模型跟着背景私奔了，一去不复返。如果学习率太小，目标已经变形了而模板还是那个模板，就会变得不认识目标。(举个例子，多年不见的同学，你很可能就认不出了，而经常见面的同学，即使变化很大你也认识，因为常见的同学在你大脑里面的模型在持续更新，而多年不见就是很久不更新)</p>
+<p><strong>快速运动主要是边界效应(Boundary Effets)。</strong>而且边界效应产生的错误样本会造成分类器判别力不够强，下面分训练阶段和检测阶段分别讨论。</p>
+<p><strong>训练阶段，合成样本降低了判别能力。</strong>如果不加余弦窗，那么移位样本是长这样的：</p>
+<p><img src="http://image.rexking6.top/img/clip1538878587.png" alt=""></p>
+<p>除了那个最原始样本，其他样本都是“合成”的，100*100的图像块，只有1/10000的样本是真实的，这样的样本集根本不能拿来训练。如果加了余弦窗，由于图像边缘像素值都是0，循环移位过程中只要目标保持完整那这个样本就是合理的，只有目标中心接近边缘时，目标跨越边界的那些样本是错误的，这样虽不真实但合理的样本数量增加到了大约2/3(padding= 1)，即使这样仍然有1/3(3000/10000)的样本是不合理的，这些样本会降低分类器的判别能力。再者，加余弦窗也不是“免费的”，余弦窗将图像块的边缘区域像素全部变成0，大量过滤掉分类器本来非常需要学习的背景信息，原本训练时判别器能看到的背景信息就非常有限，我们还加了个余弦窗挡住了背景，这样进一步降低了分类器的判别力(是不是上帝在我前遮住了帘。不是上帝，是余弦窗)。</p>
+<p><strong>检测阶段，相关滤波对快速运动的目标检测比较乏力。</strong>相关滤波训练的图像块和检测的图像块大小必须是一样的，这就是说你训练了一个100<em>100的滤波器，那你也只能检测100</em>100的区域，如果打算通过加更大的padding来扩展检测区域，那样除了扩展了复杂度，并不会有什么好处。目标运动可能是目标自身移动，或摄像机移动，按照目标在检测区域的位置分四种情况来看：</p>
+<ol>
+<li><p>如果目标在中心附近，检测准确且成功。</p>
+</li>
+<li><p>如果目标移动到了边界附近但还没有出边界，加了余弦窗以后，部分目标像素会被过滤掉，这时候就没法保证这里的响应是全局最大的，而且，这时候的检测样本和训练过程中的那些不合理样本很像，所以很可能会失败。</p>
+</li>
+<li><p>如果目标的一部分已经移出了这个区域，而我们还要加余弦窗，很可能就过滤掉了仅存的目标像素，检测失败。</p>
+</li>
+<li><p>如果整个目标已经位移出了这个区域，那肯定就检测失败了。</p>
+</li>
+</ol>
+<p><strong>以上就是边界效应(Boundary Effets)，推荐两个主流的解决边界效应的方法，但速度比较慢，并不推荐用于实时场合。</strong></p>
+<p>一种方法是Martin Danelljan大牛的SRDCF <a target="_blank" rel="noopener" href="http://www.cvl.isy.liu.se/research/objrec/visualtracking/regvistrack/index.html">Learning Spatially Regularized Correlation Filters for Visual Tracking</a>，主要思路：既然边界效应发生在边界附近，那就忽略所有移位样本的边界部分像素，或者说边界附近滤波器系数为0：</p>
+<p>Danelljan M, Hager G, Shahbaz Khan F, et al. Learning spatially regularized correlation filters for visual tracking [C]// ICCV. 2015.</p>
+<p><img src="http://image.rexking6.top/img/clip1538878685.png" alt=""></p>
+<p>SRDCF基于DCF，类SAMF多尺度，采用更大的检测区域(padding = 4)，同时加入空域正则化，惩罚边界区域的滤波器系数，没有闭合解，采用高斯-塞德尔方法迭代优化。</p>
+<p>另一种方法是Hamed Kiani提出的基于灰度特征MOSSE的CFLM <a target="_blank" rel="noopener" href="http://www.hamedkiani.com/cfwlb.html">Correlation Filters with Limited Boundaries</a>和基于HOG特征的BACF，主要思路是采用较大尺寸检测图像块和较小尺寸滤波器来提高真实样本的比例，或者说滤波器填充0以保持和检测图像一样大，同样没有闭合解，采用ADMM迭代优化：</p>
+<ul>
+<li><p>Kiani Galoogahi H, Sim T, Lucey S. Correlation filters with limited boundaries [C]// CVPR, 2015.</p>
+</li>
+<li><p>Kiani Galoogahi H,, Fagg A, Lucey S. Learning Background-Aware Correlation Filters for Visual Tracking [C]// arXiv preprint arXiv:1703.04590, 2017.</p>
+</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1538878730.png" alt=""></p>
+<p>其实这两个解决方案挺像的，都是用更大的检测和更新图像块，训练作用域比较小的相关滤波器，不同点是SRDCF的滤波器系数从中心到边缘平滑过渡到0，而CFLM直接用0填充滤波器边缘。</p>
+<p>VOT2015相关滤波方面还有排在第二名，结合深度特征的DeepSRDCF，因为深度特征都非常慢，在CPU上别说高速，实时都到不了，虽然性能非常高，但这里就不推荐，先跳过。</p>
+<h2 id="VOT-2016"><a href="#VOT-2016" class="headerlink" title="VOT 2016"></a>VOT 2016</h2><p>VOT2016竞赛 <a target="_blank" rel="noopener" href="http://votchallenge.net/vot2016/">VOT2016 Challenge | Home</a>，依然是VOT2015那60个序列，不过这次做了重新标注更加公平合理，今年有70位参赛选手，意料之中深度学习已经雄霸天下了，8个纯CNN方法和6个结合深度特征的CF方法大都名列前茅，还有一片的CF方法，最最最重要的是，良心举办方竟然公开了他们能拿到的38个tracker，部分tracker代码和主页下载地址：<a target="_blank" rel="noopener" href="http://votchallenge.net/vot2016/trackers.html">VOT2016 Challenge | Trackers</a>(以后妈妈再也不用担心我找不到源码了~)，注意部分是下载链接，部分是源码压缩包，部分源码是二进制文件，好不好用一试便知，方便对比和研究，需要的赶快去试试。马上来看竞赛结果(这里仅列举前60个)：</p>
+<p><img src="http://image.rexking6.top/img/clip1538878802.png" alt=""></p>
+<p>标出来了前面介绍过的或比较重要的方法，结合多层深度特征的相关滤波C-COT排第一名，而CNN方法TCNN是VOT2016的冠军，作者和MDNet是同一人，纯颜色方法DAT和ASMS都在中等水平(其实两种方法实测表现非常接近)，其他tracker的情况请参考论文。再来看速度，SMACF没有公开代码，ASMS依然那么快，排在前10的方法中也有两个速度比较快，分别是排第5的Staple，和其改进算法排第9的STAPLE+，而且STAPLE+是今年的推荐实时算法。首先恭喜Luca Bertinetto大牛的SiamFC和Staple都表现非常不错，然后再为大牛默哀三分钟(VOT2016的paper原文)：</p>
+<blockquote>
+<p>This was particularly obvious in case of SiamFC trackers, which runs orders higher than realtime (albeit on GPU), and Staple, which is realtime, but are incorrectly among the non-realtime trackers.</p>
+</blockquote>
+<p>VOT2016竟然发生了乌龙事件，Staple在论文中是80FPS，怎么EFO在这里只有11？幸好公开代码有Staple和STAPLE+，有兴趣您可以去实测下，虽然我电脑不如Luca Bertinetto大牛，但Staple我也能跑60-70FPS，而更可笑的是，STAPLE+比Staple慢了大约7-8倍，竟然EFO高出4倍，到底怎么回事呢？</p>
+<p><strong>首先看Staple的代码</strong>，如果您直接下载Staple并设置params.visualization = 1来跑，Staple调用Computer Vision System Toolbox来显示序列图像，而恰好如果您没有这个工具箱，默认每帧都会用imshow(im)来显示图像所以非常非常慢，而设置<code>params.visualization = 0</code>就跑的飞快，建议您将显示图像部分代码替换成DSST中对应部分代码就可以正常跑和显示了。</p>
+<p><strong>再来看STAPLE+的代码</strong>，改进包括额外从颜色概率图中提取HOG特征，特征增加到56通道(Staple是28通道)，平移检测额外加入了大位移光流运动估计的响应，所以才会这么慢，而且肯定会这么慢。</p>
+<p>所以很大可能是VOT举办方把Staple和STAPLE+的EFO弄反了，VOT2016的实时推荐算法应该是排第5的Staple，相关滤波结合颜色方法，没有深度特征更没有CNN，跑80FPS还能排在第五，这就是接下来主要介绍的，2016年最NIUBILITY的目标跟踪算法之一Staple (让排在后面的一众深度学习算法汗颜，怀疑人生)。</p>
+<p>颜色特征，在目标跟踪中颜色是个非常重要的特征，不管多少个人在一起，只要目标穿不同颜色的衣服就非常明显。前面介绍过2014年CVPR的CN是相关滤波框架下的模板颜色方法，这里隆重介绍统计颜色特征方法DAT Learning, Recognition, and Surveillance @ ICG，帧率15FPS：</p>
+<ul>
+<li>Possegger H, Mauthner T, Bischof H. In defense of color-based model-free tracking [C]// CVPR, 2015.</li>
+</ul>
+<p>如果要用一句话介绍Luca Bertinetto大牛(牛津大学)的Staple <a target="_blank" rel="noopener" href="http://www.robots.ox.ac.uk/~luca/staple.html">Staple tracker</a>，那就是把模板特征方法DSST(基于DCF)和统计特征方法DAT结合：</p>
+<ul>
+<li>Bertinetto L, Valmadre J, Golodetz S, et al. Staple: Complementary Learners for Real-Time Tracking [C]// CVPR, 2016.</li>
+</ul>
+<p>前面分析了相关滤波模板类特征(HOG)对快速变形和快速运动效果不好，但对运动模糊光照变化等情况比较好；而颜色统计特征(颜色直方图)对变形不敏感，而且不属于相关滤波框架没有边界效应，快速运动当然也是没问题的，但对光照变化和背景相似颜色不好。综上，这两类方法可以互补，也就是说DSST和DAT可以互补结合：</p>
+<p><img src="http://image.rexking6.top/img/clip1538878944.png" alt=""></p>
+<p>两个框架的算法高效无缝结合，25FPS的DSST和15FPS的DAT，而结合后速度竟然达到了80FPS。DSST框架把跟踪划分为两个问题，即平移检测和尺度检测，DAT就加在平移检测部分，相关滤波有一个响应图，像素级前景概率也有一个响应图，两个响应图线性加权得到最终响应图，其他部分与DSST类似，平移滤波器、尺度滤波器和颜色概率模型都以固定学习率线性加权更新。</p>
+<p>另一种相关滤波结合颜色概率的方法是CSR-DCF，提出了空域可靠性和通道可靠性，13FPS性能直逼C-COT:</p>
+<ul>
+<li>Lukežič A, Vojíř T, Čehovin L, et al. Discriminative Correlation Filter with Channel and Spatial Reliability [C]// CVPR, 2017.</li>
+</ul>
+<p>CSR-DCF中的空域可靠性得到的二值掩膜就类似于CFLM中的掩膜矩阵P，在这里自适应选择更容易跟踪的目标区域且减小边界效应；以往多通道特征都是直接求和，而CSR-DCF中通道采用加权求和，而通道可靠性就是那个自适应加权系数。采用ADMM迭代优化。</p>
+<p><img src="http://image.rexking6.top/img/clip1538878961.png" alt=""></p>
+<p>相关滤波还有第一名的C-COT，和DeepSRDCF一样先跳过。</p>
+<h2 id="Long-Term"><a href="#Long-Term" class="headerlink" title="Long Term"></a>Long Term</h2><p>以前提到的很多CF算法，也包括VOT竞赛，都是针对short-term的跟踪问题，即短期跟踪，我们只关注短期内(如100~500帧)跟踪是否准确。但在实际应用场合，我们希望正确跟踪时间长一点，如几分钟或十几分钟，这就是长期跟踪问题。</p>
+<p>Long-term就是希望tracker能长期正确跟踪，我们分析了前面介绍的方法不适合这种应用场合，必须是short-term tracker + detecter配合才能实现正确的长期跟踪。</p>
+<blockquote>
+<p>用一句话介绍Long-term，就是给普通tracker配一个detecter，在发现跟踪出错的时候调用自带detecter重新检测并矫正tracker</p>
+</blockquote>
+<p>接下来介绍CF方向一篇比较有代表性的long-term方法，马超大神的LCT <a target="_blank" rel="noopener" href="https://github.com/chaoma99/lct-tracker">chaoma99/lct-tracker</a>：</p>
+<ul>
+<li>Ma C, Yang X, Zhang C, et al. Long-term correlation tracking[C]// CVPR, 2015.</li>
+</ul>
+<p>LCT在DSST一个平移相关滤波Rc和一个尺度相关滤波的基础上，又加入第三个负责检测目标置信度的相关滤波Rt，检测模块Online Detector是TLD中所用的随机蕨分类器(random fern)，在代码中改为SVM。第三个相关滤波类似MOSSE不加padding，而且特征也不加cosine窗，放在平移检测之后。</p>
+<p><img src="http://image.rexking6.top/img/clip1538879047.png" alt=""></p>
+<p>LCT加入检测机制，对遮挡和出视野等情况理论上较好，速度27fps，实验只跑了OTB-2013，跟踪精度非常高，根据其他论文，LCT在OTB-2015和 VOT上效果略差一点可能是两个核心阈值没有自适应， 关于long-term，TLD和LCT的思想都值得参考 。</p>
+<p>接下来介绍跟踪置信度。 跟踪算法需要能反映每一次跟踪结果的可靠程度，这一点非常重要，不然就可能造成跟丢了还不知道的情况。有两种指标可以反映相关滤波类方法的跟踪置信度：前面见过的最大响应值，和没见过的响应模式，或者综合反映这两点的指标。</p>
+<p>LMCF(<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/visual-tracking">MM Wang的目标跟踪专栏：目标跟踪算法 - 知乎专栏</a> )提出了多峰检测和高置信度更新：</p>
+<ul>
+<li>Wang M, Liu Y, Huang Z. Large Margin Object Tracking with Circulant Feature Maps [C]// CVPR, 2017.</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1538879116.png" alt=""></p>
+<p>高置信度更新，只有在跟踪置信度比较高的时候才更新跟踪模型，避免目标模型被污染，同时提升速度。 第一个置信度指标是最大响应分数Fmax，就是最大响应值(Staple和LCT中都有提到)。第二个置信度指标是平均峰值相关能量(average peak-to correlation energy, APCE)，反映响应图的波动程度和检测目标的置信水平，这个(可能)是目前最好的指标，推荐：</p>
+<p><img src="http://image.rexking6.top/img/clip1538879132.png" alt=""></p>
+<p>跟踪置信度指标还有，MOSSE中的峰值旁瓣比(Peak to Sidelobe Ratio, PSR)， 由相关滤波峰值，与11*11峰值窗口以外旁瓣的均值与标准差计算得到，推荐：</p>
+<p><img src="http://image.rexking6.top/img/clip1538879144.png" alt=""></p>
+<p>跟踪置信度指标还有，在CSR-DCF的空域可靠性中，也用了两个类似指标反映通道可靠性， 第一个指标也是每个通道的最大响应峰值，就是Fmax，第二个指标是响应图中第二和第一主模式之间的比率，反映每个通道响应中主模式的表现力，但需要先做极大值检测：</p>
+<p><img src="http://image.rexking6.top/img/clip1538879161.png" alt=""></p>
+<p>以上就是目前相关滤波方法中提到的比较好的跟踪置信度指标。</p>
+<h2 id="Martin-Danelljan"><a href="#Martin-Danelljan" class="headerlink" title="Martin Danelljan"></a>Martin Danelljan</h2><p>最后这部分是Martin Danelljan的专场，主要介绍他的一些工作，尤其是结合深度特征的相关滤波方法，代码都在他主页<a target="_blank" rel="noopener" href="http://www.cvl.isy.liu.se/research/objrec/visualtracking/">Visual Tracking</a>，就不一一贴出了。</p>
+<ul>
+<li>Danelljan M, Shahbaz Khan F, Felsberg M, et al. Adaptive color attributes for real-time visual tracking [C]// CVPR, 2014.</li>
+</ul>
+<p>在CN中提出了非常重要的多通道颜色特征Color Names，用于CSK框架取得非常好的效果，还提出了加速算法CN2，通过类PCA的自适应降维方法，对特征通道数量降维(10 -&gt; 2)，平滑项增加跨越不同特征子空间时的代价，也就是PCA中的协方差矩阵线性更新防止降维矩阵变化太大。</p>
+<ul>
+<li>Danelljan M, Hager G, Khan F S, et al. Discriminative Scale Space Tracking [J]. IEEE TPAMI, 2017.</li>
+</ul>
+<p>DSST是VOT2014的第一名，开创了平移滤波+尺度滤波的方式。在fDSST中对DSST进行加速，PCA方法将平移滤波HOG特征的通道降维(31 -&gt; 18)，QR方法将尺度滤波器~1000*17的特征降维到17*17，最后用三角插值(频域插值)将尺度数量从17插值到33以获得更精确的尺度定位。</p>
+<p>SRDCF是VOT2015的第四名，为了减轻边界效应扩大检测区域，优化目标增加了空间约束项，用高斯-塞德尔方法迭代优化，并用牛顿法迭代优化平移检测的子网格精确目标定位。</p>
+<ul>
+<li>Danelljan M, Hager G, Shahbaz Khan F, et al. Adaptive decontamination of the training set: A unified formulation for discriminative visual tracking [C]// CVPR, 2016. </li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1538887507.png" alt=""></p>
+<p>SRDCFdecon在SRDCF的基础上，改进了样本和学习率问题。以前的相关滤波都是固定学习率线性加权更新模型，虽然这样比较简单不用保存以前样本，但在定位不准确、遮挡、背景扰动等情况会污染模型导致漂移。SRDCFdecon选择保存以往样本(图像块包括正，负样本)，在优化目标函数中添加样本权重参数和正则项，采用交替凸搜索，首先固定样本权重，高斯-塞德尔方法迭代优化模型参数，然后固定模型参数，凸二次规划方法优化样本权重。</p>
+<ul>
+<li>Danelljan M, Hager G, Shahbaz Khan F, et al. Convolutional features for correlation filter based visual tracking [C]// ICCVW, 2015.</li>
+</ul>
+<p>DeepSRDCF是VOT2015的第二名，将SRDCF中的HOG特征替换为CNN中单层卷积层的深度特征(也就是卷积网络的激活值)，效果有了极大提升。这里用imagenet-vgg-2048 network，VGG网络的迁移能力比较强，而且MatConvNet就是VGG组的，MATLAB调用非常方便。论文还测试了不同卷积层在目标跟踪任务中的表现：</p>
+<p><img src="http://image.rexking6.top/img/clip1538887526.png" alt=""></p>
+<p>第1层表现最好，第2和第5次之。由于卷积层数越高语义信息越多，但纹理细节越少，从1到4层越来越差的原因之一就是特征图的分辨率越来越低，但第5层反而很高，是因为包括完整的语义信息，判别力比较强(本来就是用来做识别的)。</p>
+<p><img src="http://image.rexking6.top/img/clip1538887541.png" alt=""></p>
+<p>注意区分这里的深度特征和基于深度学习的方法，深度特征来自ImageNet上预训练的图像分类网络，没有fine-turn这一过程，不存在过拟合的问题。而基于深度学习的方法大多需要在跟踪序列上end-to-end训练或fine-turn，如果样本数量和多样性有限就很可能过拟合。</p>
+<ul>
+<li>Ma C, Huang J B, Yang X, et al. Hierarchical convolutional features for visual tracking [C]// ICCV, 2015.</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1538887560.png" alt=""></p>
+<p>值得一提的还有马超大神的HCF，结合多层卷积特征提升效果，用了VGG19的Conv5-4, Conv4-4和Conv3-4的激活值作为特征，所有特征都缩放到图像块分辨率，虽然按照论文应该是由粗到细确定目标，但代码中比较直接，三种卷积层的响应以固定权值1, 0.5, 0.02线性加权作为最终响应。虽然用了多层卷积特征，但没有关注边界效应而且线性加权的方式过于简单，HCF在VOT2016仅排在28名（单层卷积深度特征的DeepSRDCF是第13名）。</p>
+<ul>
+<li>Danelljan M, Robinson A, Khan F S, et al. Beyond correlation filters: Learning continuous convolution operators for visual tracking [C]// ECCV, 2016.</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1538887784.png" alt=""></p>
+<p>C-COT是VOT2016的第一名，综合了SRDCF的空域正则化和SRDCFdecon的自适应样本权重，还将DeepSRDCF的单层卷积的深度特征扩展为多层卷积的深度特征（VGG第1和5层），为了应对不同卷积层分辨率不同的问题，提出了连续空间域插值转换操作，在训练之前通过频域隐式插值将特征图插值到连续空域，方便集成多分辨率特征图，并且保持定位的高精度。目标函数通过共轭梯度下降方法迭代优化，比高斯-塞德尔方法要快，自适应样本权值直接采用先验权值，没有交替凸优化过程，检测中用牛顿法迭代优化目标位置。</p>
+<p>注意以上SRDCF, SRDCFdecon，DeepSRDCF，C-COT都无法实时，这一系列工作虽然效果越来越好，但也越来越复杂，在相关滤波越来越慢失去速度优势的时候，Martin Danelljan在2017CVPR的ECO来了一脚急刹车，大神来告诉我们什么叫又好又快，不忘初心：</p>
+<ul>
+<li>Danelljan M, Bhat G, Khan F S, et al. ECO: Efficient Convolution Operators for Tracking [C]// CVPR, 2017.</li>
+</ul>
+<p>ECO是C-COT的加速版，从模型大小、样本集大小和更新策略三个方面加速，速度比C-COT提升了20倍，加量还减价，EAO提升了13.3%，最最最厉害的是， hand-crafted features的ECO-HC有60FPS。吹完了，来看看具体做法。</p>
+<p>第一减少模型参数，定义了factorized convolution operator(分解卷积操作)，效果类似PCA，用PCA初始化，然后仅在第一帧优化这个降维矩阵，以后帧都直接用，简单来说就是有监督降维，深度特征时模型参数减少了80%。</p>
+<p><img src="http://image.rexking6.top/img/clip1538887804.png" alt=""></p>
+<p>第二减少样本数量， compact generative model(紧凑的样本集生成模型)，采用Gaussian Mixture Model (GMM)合并相似样本，建立更具代表性和多样性的样本集，需要保存和优化的样本集数量降到C-COT的1/8。</p>
+<p><img src="http://image.rexking6.top/img/clip1538887823.png" alt=""></p>
+<p>第三改变更新策略，sparser updating scheme(稀疏更新策略)，每隔5帧做一次优化更新模型参数，不但提高了算法速度，而且提高了对突变、遮挡等情况的稳定性。但样本集是每帧都更新的，稀疏更新并不会错过间隔期的样本变化信息。</p>
+<p>ECO的成功当然还有很多细节，而且有些我也看的不是很懂，总之很厉害就是了。ECO实验跑了四个库(VOT2016, UAV123, OTB-2015, and TempleColor)都是第一，而且没有过拟合的问题，仅性能来说ECO是目前最好的相关滤波算法，也有可能是最好的目标跟踪算法。hand-crafted features版本的ECO-HC，降维部分原来HOG+CN的42维特征降到13维，其他部分类似，实验结果虽然没给ECO-HC在VOT2016的结果，但其他三个都很高，而且论文给出速度是60FPS。</p>
+<p>最后是来自Luca Bertinetto的CFNet <a target="_blank" rel="noopener" href="http://www.robots.ox.ac.uk/~luca/cfnet.html">End-to-end representation learning for Correlation Filter based tracking</a>，除了上面介绍的相关滤波结合深度特征，相关滤波也可以end-to-end方式在CNN中训练了：</p>
+<ul>
+<li>Valmadre J, Bertinetto L, Henriques J F, et al. End-to-end representation learning for Correlation Filter based tracking [C]// CVPR, 2017. </li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1538887857.png" alt=""></p>
+<p>在SiamFC的基础上，将相关滤波也作为CNN中的一层，最重要的是cf层的前向传播和反向传播公式推导，两层卷积层的CFNet在GPU上是75FPS，综合表现并没有很惊艳，可能是难以处理CF层的边界效应吧，持观望态度。</p>
+<h2 id="组"><a href="#组" class="headerlink" title="组"></a>组</h2><p>目前相关滤波方向贡献最多的是以下两个组(有创新有代码)：</p>
+<p>牛津大学：Joao F. Henriques和Luca Bertinetto，代表：CSK, KCF/DCF, Staple, CFNet (其他SiamFC, Learnet)</p>
+<p>林雪平大学：Martin Danelljan，代表：CN, DSST, SRDCF, DeepSRDCF, SRDCFdecon, C-COT, ECO</p>
+<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><p>OPENCV中提供了八种目标跟踪Tracker：</p>
+<ul>
+<li><p>BOOSTING Tracker：和Haar cascades（AdaBoost）背后所用的机器学习算法相同，但是距其诞生已有十多年了。这一追踪器速度较慢，并且表现不好，但是作为元老还是有必要提及的。（最低支持OpenCV 3.0.0）</p>
+</li>
+<li><p>MIL Tracker：比上一个追踪器更精确，但是失败率比较高。（最低支持OpenCV 3.0.0）</p>
+</li>
+<li><p>KCF Tracker：比BOOSTING和MIL都快，但是在有遮挡的情况下表现不佳。（最低支持OpenCV 3.1.0）</p>
+</li>
+<li><p>CSRT Tracker：比KCF稍精确，但速度不如后者。（最低支持OpenCV 3.4.2）</p>
+</li>
+<li><p>MedianFlow Tracker：在报错方面表现得很好，但是对于快速跳动或快速移动的物体，模型会失效。（最低支持OpenCV 3.0.0）</p>
+</li>
+<li><p>TLD Tracker：我不确定是不是OpenCV和TLD有什么不兼容的问题，但是TLD的误报非常多，所以不推荐。（最低支持OpenCV 3.0.0）</p>
+</li>
+<li><p>MOSSE Tracker：速度真心快，但是不如CSRT和KCF的准确率那么高，如果追求速度选它准没错。（最低支持OpenCV 3.4.1）</p>
+</li>
+<li><p>GOTURN Tracker：这是OpenCV中唯一一深度学习为基础的目标检测器。它需要额外的模型才能运行，本文不详细讲解。（最低支持OpenCV 3.2.0）</p>
+</li>
+</ul>
+<p>我个人的建议：</p>
+<ul>
+<li><p>如果追求高准确度，又能忍受慢一些的速度，那么就用CSRT</p>
+</li>
+<li><p>如果对准确度的要求不苛刻，想追求速度，那么就选KCF</p>
+</li>
+<li><p>纯粹想节省时间就用MOSSE</p>
+</li>
+</ul>
+<p>单目标跟踪：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">import wx</span><br><span class="line">import cv2 as cv</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class bucky(wx.Frame):</span><br><span class="line">    </span><br><span class="line">    def __init__(self, parent=None, id=-1):</span><br><span class="line">        wx.Frame.__init__(self, parent, id, &#x27;目标跟踪&#x27;)</span><br><span class="line">        box = wx.MessageDialog(None, &#x27;您要使用摄像头吗？不要就选择一个视频吧&#x27;, &#x27;文件/摄像头&#x27;, wx.YES_NO)</span><br><span class="line">        answer = box.ShowModal()</span><br><span class="line">        box.Destroy()</span><br><span class="line">        OPENCV_OBJECT_TRACKERS = &#123;</span><br><span class="line">                &quot;csrt&quot;: cv.TrackerCSRT_create,</span><br><span class="line">                &quot;kcf&quot;: cv.TrackerKCF_create,</span><br><span class="line">                &quot;boosting&quot;: cv.TrackerBoosting_create,</span><br><span class="line">                &quot;mil&quot;: cv.TrackerMIL_create,</span><br><span class="line">                &quot;tld&quot;: cv.TrackerTLD_create,</span><br><span class="line">                &quot;medianflow&quot;: cv.TrackerMedianFlow_create,</span><br><span class="line">                &quot;mosse&quot;: cv.TrackerMOSSE_create</span><br><span class="line">        &#125;</span><br><span class="line">        tracker = &#x27;csrt&#x27;</span><br><span class="line">        tracker = OPENCV_OBJECT_TRACKERS[tracker]()</span><br><span class="line">        cv.namedWindow(&#x27;Frame&#x27;, cv.WINDOW_NORMAL)</span><br><span class="line">        </span><br><span class="line">        if answer == 5103:</span><br><span class="line">            vs = cv.VideoCapture(0)</span><br><span class="line">            cv.waitKey(1500)   </span><br><span class="line">        else:</span><br><span class="line">            openFileDialog = wx.FileDialog(None, &quot;Choose&quot;, &quot;./&quot;, &quot;race.mp4&quot;, </span><br><span class="line">                                           &quot;MP4 files (*.mp4)|*.mp4|AVI files (*.avi)|*.avi&quot;,</span><br><span class="line">                                           wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)</span><br><span class="line">            openFileDialog.ShowModal()</span><br><span class="line">            path = openFileDialog.GetPath()</span><br><span class="line">            openFileDialog.Destroy()</span><br><span class="line">            vs = cv.VideoCapture(path)</span><br><span class="line">            </span><br><span class="line">        initBB = None</span><br><span class="line">        width = int(vs.get(cv.CAP_PROP_FRAME_WIDTH))</span><br><span class="line">        height = int(vs.get(cv.CAP_PROP_FRAME_HEIGHT))</span><br><span class="line">        fps = vs.get(cv.CAP_PROP_FPS)</span><br><span class="line">        out = cv.VideoWriter(&#x27;output.avi&#x27;, -1, fps, (width, height))</span><br><span class="line">            </span><br><span class="line">        while(True):</span><br><span class="line">            ret, frame = vs.read()</span><br><span class="line">            if ret is False:</span><br><span class="line">                break</span><br><span class="line">            if initBB is None:</span><br><span class="line">                initBB = cv.selectROI(&quot;Frame&quot;, frame, fromCenter=False, showCrosshair=True)</span><br><span class="line">                tracker.init(frame, initBB)</span><br><span class="line">                </span><br><span class="line">            (success, box) = tracker.update(frame)</span><br><span class="line">            if success:</span><br><span class="line">                (x, y, w, h) = [int(v) for v in box]</span><br><span class="line">                cv.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)</span><br><span class="line">            </span><br><span class="line">            cv.imshow(&quot;Frame&quot;, frame)</span><br><span class="line">            out.write(frame) </span><br><span class="line">            if cv.waitKey(1) &amp; 0XFF == ord(&#x27;q&#x27;):</span><br><span class="line">                break</span><br><span class="line">            </span><br><span class="line">        vs.release()</span><br><span class="line">        out.release()</span><br><span class="line">        cv.destroyAllWindows()</span><br><span class="line">        </span><br><span class="line">        </span><br><span class="line">if __name__==&#x27;__main__&#x27;:</span><br><span class="line">    app = wx.PySimpleApp()</span><br><span class="line">    frame = bucky(parent=None, id=-1)</span><br><span class="line">    frame.Show()</span><br><span class="line">    app.MainLoop()</span><br></pre></td></tr></table></figure></p>
+<p>多目标跟踪：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">import wx</span><br><span class="line">import cv2 as cv</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class bucky(wx.Frame):</span><br><span class="line">    </span><br><span class="line">    def __init__(self, parent=None, id=-1):</span><br><span class="line">        wx.Frame.__init__(self, parent, id, &#x27;目标跟踪&#x27;)</span><br><span class="line">        box = wx.MessageDialog(None, &#x27;您要使用摄像头吗？不要就选择一个视频吧&#x27;, &#x27;文件/摄像头&#x27;, wx.YES_NO)</span><br><span class="line">        answer = box.ShowModal()</span><br><span class="line">        box.Destroy()</span><br><span class="line"></span><br><span class="line">        tracker = cv.MultiTracker_create()</span><br><span class="line">        cv.namedWindow(&#x27;Frame&#x27;, cv.WINDOW_NORMAL)</span><br><span class="line">        </span><br><span class="line">        if answer == 5103:</span><br><span class="line">            vs = cv.VideoCapture(0)</span><br><span class="line">            cv.waitKey(1500)   </span><br><span class="line">        else:</span><br><span class="line">            openFileDialog = wx.FileDialog(None, &quot;Choose&quot;, &quot;./&quot;, &quot;race.mp4&quot;, </span><br><span class="line">                                           &quot;MP4 files (*.mp4)|*.mp4|AVI files (*.avi)|*.avi&quot;,</span><br><span class="line">                                           wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)</span><br><span class="line">            openFileDialog.ShowModal()</span><br><span class="line">            path = openFileDialog.GetPath()</span><br><span class="line">            openFileDialog.Destroy()</span><br><span class="line">            vs = cv.VideoCapture(path)</span><br><span class="line">            </span><br><span class="line">        initBB1 = None</span><br><span class="line">        width = int(vs.get(cv.CAP_PROP_FRAME_WIDTH))</span><br><span class="line">        height = int(vs.get(cv.CAP_PROP_FRAME_HEIGHT))</span><br><span class="line">        fps = vs.get(cv.CAP_PROP_FPS)</span><br><span class="line">        out = cv.VideoWriter(&#x27;output.avi&#x27;, -1, fps, (width, height))</span><br><span class="line">            </span><br><span class="line">        while(True):</span><br><span class="line">            ret, frame = vs.read()</span><br><span class="line">            if ret is False:</span><br><span class="line">                break</span><br><span class="line">            if initBB1 is None:</span><br><span class="line">                initBB1 = cv.selectROI(&quot;Frame&quot;, frame, fromCenter=False, showCrosshair=True)</span><br><span class="line">                initBB2 = cv.selectROI(&quot;Frame&quot;, frame, fromCenter=False, showCrosshair=True)</span><br><span class="line">                initBB3 = cv.selectROI(&quot;Frame&quot;, frame, fromCenter=False, showCrosshair=True)</span><br><span class="line">                tracker.add(cv.TrackerCSRT_create(), frame, initBB1)</span><br><span class="line">                tracker.add(cv.TrackerCSRT_create(), frame, initBB2)</span><br><span class="line">                tracker.add(cv.TrackerCSRT_create(), frame, initBB3)</span><br><span class="line"></span><br><span class="line">            (success, boxes) = tracker.update(frame)</span><br><span class="line">            if success:</span><br><span class="line">                for box in boxes:</span><br><span class="line">                    (x, y, w, h) = [int(v) for v in box]</span><br><span class="line">                    cv.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)</span><br><span class="line">                    </span><br><span class="line">            cv.imshow(&quot;Frame&quot;, frame)</span><br><span class="line">            out.write(frame) </span><br><span class="line">            if cv.waitKey(1) &amp; 0XFF == ord(&#x27;q&#x27;):</span><br><span class="line">                break</span><br><span class="line">            </span><br><span class="line">        vs.release()</span><br><span class="line">        out.release()</span><br><span class="line">        cv.destroyAllWindows()</span><br><span class="line">        </span><br><span class="line">        </span><br><span class="line">if __name__==&#x27;__main__&#x27;:</span><br><span class="line">    app = wx.PySimpleApp()</span><br><span class="line">    frame = bucky(parent=None, id=-1)</span><br><span class="line">    frame.Show()</span><br><span class="line">    app.MainLoop()</span><br></pre></td></tr></table></figure></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\24\SURF特征详解\" rel="bookmark">SURF特征详解</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\11\23\《Unknown-Identity-Rejection-Loss-Utilizing-Unlabeled-Data-for-Face-Recognition》笔记\" rel="bookmark">《Unknown Identity Rejection Loss: Utilizing Unlabeled Data for Face Recognition》笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\10\06\背景检测\" rel="bookmark">背景检测</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/10/06/%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA%E7%BB%BC%E8%BF%B0/" title="目标跟踪综述">https://blog.rexking6.top/2018/10/06/目标跟踪综述/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/10/06/%E5%A4%9A%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA%E7%BB%BC%E8%BF%B0/" rel="prev" title="多目标跟踪综述">
+      <i class="fa fa-chevron-left"></i> 多目标跟踪综述
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/10/08/Spatial-Verification%E7%A9%BA%E9%97%B4%E9%AA%8C%E8%AF%81/" rel="next" title="Spatial Verification空间验证">
+      Spatial Verification空间验证 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%86%E8%A7%89%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B%E4%B8%8E%E6%A1%86%E6%9E%B6"><span class="nav-number">2.</span> <span class="nav-text">视觉目标跟踪基本流程与框架</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%86%E8%A7%89%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA%E9%9D%A2%E4%B8%B4%E7%9A%84%E6%8C%91%E6%88%98"><span class="nav-number">3.</span> <span class="nav-text">视觉目标跟踪面临的挑战</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%86%E8%A7%89%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA%E6%96%B9%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">视觉目标跟踪方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Meanshift"><span class="nav-number">4.1.</span> <span class="nav-text">Meanshift</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B2%92%E5%AD%90%E6%BB%A4%E6%B3%A2%EF%BC%88Particle-Filter%EF%BC%89%E6%96%B9%E6%B3%95"><span class="nav-number">4.2.</span> <span class="nav-text">粒子滤波（Particle Filter）方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E6%B5%8B%E4%B8%8E%E8%B7%9F%E8%B8%AA%E7%9B%B8%E7%BB%93%E5%90%88%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">4.3.</span> <span class="nav-text">检测与跟踪相结合的方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%80%E7%96%8F%E8%A1%A8%E7%A4%BA%EF%BC%88Sparse-Representation%EF%BC%89"><span class="nav-number">4.4.</span> <span class="nav-text">稀疏表示（Sparse Representation）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E6%BB%A4%E6%B3%A2%EF%BC%88Correlation-Filter%EF%BC%89"><span class="nav-number">4.5.</span> <span class="nav-text">相关滤波（Correlation Filter）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%EF%BC%88CNN-Based%EF%BC%89"><span class="nav-number">4.6.</span> <span class="nav-text">深度学习（CNN-Based）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%86%E8%A7%89%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA%E6%9C%80%E6%96%B0%E8%BF%9B%E5%B1%95"><span class="nav-number">5.</span> <span class="nav-text">视觉目标跟踪最新进展</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#YaqiLYU%E5%AF%B9%E8%BF%99%E5%87%A0%E5%B9%B4%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA%E8%BF%9B%E5%B1%95%E7%9A%84%E4%BB%8B%E7%BB%8D"><span class="nav-number">6.</span> <span class="nav-text">YaqiLYU对这几年目标跟踪进展的介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%EF%BC%9A%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA%E9%80%9F%E8%A7%88"><span class="nav-number">6.1.</span> <span class="nav-text">第一部分：目标跟踪速览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%EF%BC%9A%E8%83%8C%E6%99%AF%E4%BB%8B%E7%BB%8D"><span class="nav-number">6.2.</span> <span class="nav-text">第二部分：背景介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E6%BB%A4%E6%B3%A2"><span class="nav-number">6.3.</span> <span class="nav-text">相关滤波</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#14%E5%B9%B4%E7%9A%84%E5%B0%BA%E5%BA%A6%E8%87%AA%E9%80%82%E5%BA%94"><span class="nav-number">6.4.</span> <span class="nav-text">14年的尺度自适应</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VOT-2015"><span class="nav-number">6.5.</span> <span class="nav-text">VOT 2015</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VOT-2016"><span class="nav-number">6.6.</span> <span class="nav-text">VOT 2016</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Long-Term"><span class="nav-number">6.7.</span> <span class="nav-text">Long Term</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Martin-Danelljan"><span class="nav-number">6.8.</span> <span class="nav-text">Martin Danelljan</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84"><span class="nav-number">6.9.</span> <span class="nav-text">组</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81"><span class="nav-number">7.</span> <span class="nav-text">代码</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

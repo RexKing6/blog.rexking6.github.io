@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AlexNet论文翻译">
+<meta property="og:url" content="https://blog.rexking6.top/2018/03/11/AlexNet%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520729067.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520729260.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520730062.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520730132.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520730236.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520730310.png">
+<meta property="article:published_time" content="2018-03-11T00:32:54.000Z">
+<meta property="article:modified_time" content="2021-07-10T05:21:15.430Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="计算机视觉">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1520729067.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/03/11/AlexNet%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>AlexNet论文翻译 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/03/11/AlexNet%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          AlexNet论文翻译
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-03-11 08:32:54" itemprop="dateCreated datePublished" datetime="2018-03-11T08:32:54+08:00">2018-03-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-10 13:21:15" itemprop="dateModified" datetime="2021-07-10T13:21:15+08:00">2021-07-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" itemprop="url" rel="index"><span itemprop="name">计算机视觉</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/03/11/AlexNet%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91/" class="post-meta-item leancloud_visitors" data-flag-title="AlexNet论文翻译" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>14k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>12 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>《ImageNet Classification with Deep Convolutional Neural Networks》，参考<a target="_blank" rel="noopener" href="http://noahsnail.com/2017/07/18/2017-7-18-AlexNet%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E2%80%94%E2%80%94%E4%B8%AD%E6%96%87%E7%89%88/">Tyan的论文翻译</a>，做了少许修改。</p>
+<h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>我们训练了一个大型的深度卷积神经网络来将<code>ImageNet LSVRC-2010</code>竞赛的120万高分辨率的图像分到1000不同的类别中。在测试数据上，我们得到<code>top-1 37.5%</code>，<code>top-5 17.0%</code>的错误率，这个结果比之前最好的结果好得多。这个神经网络有6000万个参数和650000个神经元，包含5个卷积层（一些卷积层后面带有池化层）和3个全连接层，最后是一个1000维的<code>softmax</code>。为了训练得更快，我们使用了非饱和神经元并且对卷积操作进行了非常有效的GPU实现。为了减少全连接层的过拟合，我们使用了最近开发的名为“<code>dropout</code>”的正则化方法，结果证明是非常有效的。我们也使用了这个模型的一个变种参加了<code>ILSVRC-2012</code>竞赛，赢得了冠军并且与<code>top-5 26.2%</code>的错误率相比，我们取得了<code>top-5 15.3%</code>的错误率。</p>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>当前目标识别的方法基本都使用了机器学习方法。为了提高性能，我们可以收集更大的数据集，学习更强大的模型，使用更好的技术来防止过拟合。直到最近，被标注图像的数据集都相对较小——在几万张图像的数量级上（例如，NORB[16]，Caltech-101/256[8,9]和CIFAR-10/100[12]。简单的识别任务在这种大小的数据集上可以被解决得相当好，尤其是如果通过标签保留变换进行数据增强的情况下。例如，目前在MNIST数字识别任务上（\&lt;0.3%）的最好准确率已经接近了人类水平[4]。但是真实环境中的对象表现出了相当大的变化。因此为了学习识别它们，有必要使用更大的训练数据集。实际上，小图像数据集的缺点已经被广泛认识到（例如，Pinto等人[21]），但收集上百万张图像的标注数据集仅在最近才变得可能。新的更大的数据集包括LabelMe[23]，它包含了数十万张完全分割的图像，还有ImageNet[6]，它包含了22000个类别上的超过1500万张标注的高分辨率图像。<br>为了从数百万张图像中学习几千个对象，我们需要一个有很强学习能力的模型。但是对象识别任务的巨大复杂性意味着这个问题不能被指定，即使通过像ImageNet这样的大数据集，所以我们的模型应该也有大量的先验知识来补偿我们所没有的数据。卷积神经网络（CNN）构成一个这样的模型[16,11,13,18,15,22,26]。它们的能力可以通过改变它们的深度和广度来加以控制，它们也可以对图像的本质进行强大且通常正确的假设（也就是说，统计的稳定性和像素依赖的局部性）。因此，与具有层次大小相似的标准前馈神经网络，CNN有更少的连接和参数，因此它们更容易训练，而它们理论上的最佳性能可能仅比标准前馈神经网络差一点。<br>尽管CNN具有引人注目的质量，尽管它们的局部架构相当有效，但将它们大规模的应用到高分辨率图像中仍然是极其昂贵的。幸运的是，目前的GPU，搭配了高度优化的2D卷积实现，强大到足够促进有趣的大型CNN训练，最近的数据集例如ImageNet包含足够的标注样本来训练这样的模型而没有严重的过拟合。<br>本文具体的贡献如下：我们在ILSVRC-2010和ILSVRC-2012[2]的ImageNet子集上训练了到目前为止最大的神经网络之一，并取得了迄今为止在这些数据集上报道过的最好结果。我们编写了高度优化的2D卷积GPU实现以及训练卷积神经网络内部的所有其它操作，我们把它公开了。我们的网络包含许多新的不寻常的特性，这些特性提高了神经网络的性能并减少了训练时间，详见第3节。我们的网络大小使过拟合成为一个明显的问题，即使使用了120万标注的训练样本，因此我们使用了一些有效的技术来防止过拟合，详见第4节。我们最终的网络包含5个卷积层和3个全连接层，该深度似乎是重要的：我们发现移除任何卷积层（每个卷积层包含的参数不超过模型参数的1%）都会导致更差的性能。最后，网络大小主要受限于目前GPU的内存容量和我们能接受的训练时间。我们的网络在两个GTX 580 3GB GPU上训练五六天。我们的所有实验表明我们的结果可以简单地通过等待更快的GPU和更大的可用数据集来提高。</p>
+<h1 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h1><p>ImageNet是一个有超过1500万的标注高分辨率图像的数据集，这些图像属于大约22000个类别。这些图像是从网上收集的，使用了Amazon’s Mechanical Turk的众包工具通过人工标注的。从2010年起，作为Pascal视觉对象挑战赛的一部分，每年都会举办ImageNet大规模视觉识别挑战赛（ILSVRC）。ILSVRC使用ImageNet的一个子集，1000个类别每个类别大约1000张图像。总计，大约120万张训练图像，5万张验证图像和15万张测试图像。ILSVRC-2010是ILSVRC中唯一可以获得测试集标签的版本，因此我们大多数实验都是在这个版本上进行的。由于我们也使用我们的模型参加了ILSVRC-2012竞赛，因此在第六节我们也报告了模型在这个版本的数据集上的结果，这个版本的测试标签是不可获得的。在ImageNet上，按照惯例报告两个错误率：<code>top-1</code>和<code>top-5</code>，<code>top-5</code>错误率是指测试图像的正确标签不在模型认为的五个最可能的便签之中。<br>ImageNet包含各种分辨率的图像，而我们的系统要求固定不变的输入维度。因此，我们将图像进行下采样到固定的<code>256×256</code>分辨率。给定一个矩形图像，我们首先缩放图像短边长度为256，然后从结果图像中裁剪中心的<code>256×256</code>大小的图像块。除了在训练集上对每个像素减去平均活跃度外，我们不对图像做其它任何的预处理。因此我们在原始的RGB像素值（中心的）上训练我们的网络。</p>
+<h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><p>我们的网络架构概括为图2。它包含8个学习层——5个卷积层和3个全连接层。下面，我们将描述我们网络结构中的一些新奇的不寻常的特性。3.1-3.4小节按照我们对它们评估的重要性进行排序，最重要的优先。</p>
+<h2 id="ReLU非线性"><a href="#ReLU非线性" class="headerlink" title="ReLU非线性"></a>ReLU非线性</h2><p>神经元输出<code>f</code>建模为输入<code>x</code>的函数的标准方式是用$f(x)=tanh⁡(x)$或$f(x)=\frac{1}{1+e^{-x}}$。考虑到梯度下降法的训练时间，这些饱和的非线性比非饱和非线性$f(x)=max⁡(0,x)$慢得多。根据Nair和Hinton[20]的说法，我们将这种非线性神经元称为修正线性单元(ReLU)。采用ReLU的深度卷积神经网络训练时间比等价的<code>tanh</code>单元要快几倍。在图1中，对于一个特定的四层卷积网络，在CIFAR-10数据集上达到25%的训练误差所需要的迭代次数可以证实这一点。这幅图表明，如果我们采用传统的饱和神经元模型，我们将不能在如此大型的神经网络上实验该工作。</p>
+<p><img src="http://image.rexking6.top/img/clip1520729067.png" alt=""></p>
+<p>图1：使用ReLU的四层卷积神经网络（实线）在CIFAR-10数据集上达到25%的训练误差比使用tanh神经元的等价网络（虚线）快六倍。为了使训练尽可能快，每个网络的学习率是单独选择的。没有采用任何类型的正则化。影响的大小随着网络结构的变化而变化，这一点已得到证实，但使用ReLU的网络都比等价的饱和神经元快几倍。</p>
+<p>我们不是第一个考虑替换CNN中传统神经元模型的。例如，Jarrett等人[11]声称非线性函数<code>f(x)=|tanh⁡(x)|</code>与其对比度归一化一起，然后是局部均值池化，在Caltech-101数据集上工作的非常好。然而，在这个数据集上主要的关注点是防止过拟合，因此他们观测到的影响不同于我们使用ReLU拟合数据集时的加速能力。更快地学习对大型数据集上训练大型模型的性能有很大的影响。</p>
+<h2 id="多GPU训练"><a href="#多GPU训练" class="headerlink" title="多GPU训练"></a>多GPU训练</h2><p>单个GTX580 GPU只有3G内存，这限制了可以在GTX580上进行训练的网络最大尺寸。事实证明120万张图像用来进行网络训练是足够的，但网络太大因此不能在单个GPU上进行训练。因此我们将网络分布在两个GPU上。目前的GPU非常适合跨GPU并行，因为它们可以直接互相读写内存，而不需要通过主机内存。我们采用的并行化方案基本上每个GPU放置一半的核（或神经元），还有一个额外的技巧：只在某些特定的层上进行GPU通信。这意味着，例如，第3层的核会将第2层的所有核映射作为输入。然而，第4层的核只将位于相同GPU上的第3层的核映射作为输入。选择连接模式是一个交叉验证问题，但这可以让我们准确地调整通信数量，直到它的计算量在可接受的范围内。<br>除非我们的列不独立（看图2），否则最终架构有些类似于Ciresan等人[5]采用的“柱状” CNN。与每个卷积层一半的核在单GPU上训练的网络相比，这个方案降分别降低了我们的<code>top-1 1.7%</code>，<code>top-5 1.2%</code>的错误率。双GPU网络比单GPU网络稍微减少了训练时间。</p>
+<p><img src="http://image.rexking6.top/img/clip1520729260.png" alt=""></p>
+<p>图2：我们CNN架构图解，明确描述了两个GPU之间的职责划分。在图的顶部，一个GPU运行在部分层上，而在图的底部，另一个GPU运行在部分层上。GPU只在特定的层进行通信。网络的输入是150,528维，网络剩下层的神经元数目分别是253,440–186,624–64,896–64,896–43,264–4096–4096–1000（8层）。</p>
+<h2 id="局部响应归一化"><a href="#局部响应归一化" class="headerlink" title="局部响应归一化"></a>局部响应归一化</h2><p>ReLU具有理想的特性，它不需要通过输入归一化来防止饱和。如果至少一些训练样本对ReLU产生了正输入，那么那个神经元上将发生学习。然而，我们仍然发现接下来的局部响应归一化方案有助于泛化。$a_{x,y}^i$表示神经元激活，通过在$(x,y)$位置应用核$i$，然后应用ReLU非线性来计算，响应归一化激活$b_{x,y}^i$通过下式给定：</p>
+<script type="math/tex; mode=display">b^i_{x,y} = a_{x,y}^i / ( k + \alpha \sum _{j = max(0, i-n / 2)} ^{min(N-1, i+n / 2)} (a_{x,y}^i)^2 )^\beta</script><p>求和运算在n个“毗邻的”核映射的同一位置上执行，N是本层的核数目。核映射的顺序当然是任意的，在训练开始前确定。响应归一化的顺序实现了一种侧抑制形式，灵感来自于真实神经元中发现的类型，为使用不同核进行神经元输出计算的大型活动创造了竞争。常量k，n，α，β是超参数，它们的值通过验证集确定；我们设k=2，n=5，α=10-4，β=0.75。我们在特定的层使用的ReLU非线性之后应用了这种归一化（请看3.5小节）。<br>这个方案与Jarrett等人[11]的局部对比度归一化方案有一定的相似性，但我们更恰当地称其为“亮度归一化”，因为我们没有减去均值。响应归一化分别减少了<code>top-1 1.4%</code>，<code>top-5 1.2%</code>的错误率。我们也在CIFAR-10数据集上验证了这个方案的有效性：一个没有归一化的四层CNN取得了13%的错误率，而使用归一化取得了11%的错误率。</p>
+<h2 id="重叠池化"><a href="#重叠池化" class="headerlink" title="重叠池化"></a>重叠池化</h2><p>CNN中的池化层归纳了同一核映射上相邻组神经元的输出。按惯例，相邻池化单元归纳的区域是不重叠的（例如[17, 11, 4]）。更确切的说，池化层可看作由池化单元网格组成，网格间距为s个像素，每个网格归纳池化单元中心位置z × z大小的邻居。如果设置s=z，我们会得到通常在CNN中采用的传统局部池化。如果设置s\&lt;z，我们会得到重叠池化。这就是我们网络中所使用的，设置s=2，z=3。这个方案分别降低了<code>top-1 0.4%</code>，<code>top-5 0.3%</code>的错误率，与非重叠方案s=2，z=2相比，输出的维度是相等的。我们在训练过程中通常观察采用重叠池化的模型，发现它更难过拟合。</p>
+<h2 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h2><p>现在我们准备描述我们的CNN的整体架构。如图2所示，我们的网络包含8个带权重的层；前5层是卷积层，剩下的3层是全连接层。最后一层全连接层的输出是1000维<code>softmax</code>的输入，<code>softmax</code>会产生1000类标签的分布。我们的网络最大化多项逻辑回归的目标，这等价于最大化预测分布下训练样本正确标签的对数概率的均值。<br>第2，4，5卷积层的核只与位于同一GPU上的前一层的核映射相连接（看图2）。第3卷积层的核与第2层的所有核映射相连。全连接层的神经元与前一层的所有神经元相连。第1，2卷积层之后是响应归一化层。3.4小节描述的这种最大池化层在响应归一化层和第5卷积层之后。ReLU非线性应用在每个卷积层和全连接层的输出上。<br>第1卷积层使用96个核对<code>224 × 224 × 3</code>的输入图像进行滤波，核大小为<code>11 × 11 × 3</code>，步长是4个像素（核映射中相邻神经元感受野中心之间的距离）。第2卷积层将第1卷积层的输出（响应归一化和池化）作为输入，并使用256个核进行滤波，核大小为<code>5 × 5 × 48</code>。第3，4，5卷积层互相连接，中间没有接入任何池化层和归一化层。第3卷积层有384个核，核大小为<code>3 × 3 × 256</code>，与第2卷积层的输出（归一化的，池化的）相连。第4卷积层有384个核，核大小为<code>3 × 3 × 192</code>，第5卷积层有256个核，核大小为<code>3 × 3 × 192</code>。每个全连接层有4096个神经元。</p>
+<h1 id="减少过拟合"><a href="#减少过拟合" class="headerlink" title="减少过拟合"></a>减少过拟合</h1><p>我们的神经网络架构有6000万参数。尽管ILSVRC的1000类使每个训练样本从图像到标签的映射上强加了10比特的约束，但这不会导致学习这么多的参数而没有相当大的过拟合。下面，我们会描述我们用来克服过拟合的两种主要方式。</p>
+<h2 id="数据增强"><a href="#数据增强" class="headerlink" title="数据增强"></a>数据增强</h2><p>图像数据上最简单常用的用来减少过拟合的方法是使用标签保留变换（例如[25, 4, 5]）来人工增大数据集。我们使用了两种独特的数据增强方式，这两种方式都可以从原始图像通过非常少的计算量生成变换的图像，因此变换图像不需要存储在硬盘上。在我们的实现中，变换图像通过CPU的Python代码生成，而此时GPU正在训练前一批图像。因此，实际上这些数据增强方案是免费计算的。<br>第一种数据增强方式包括产生图像变换和水平翻转。我们从<code>256×256</code>图像上通过随机提取<code>224 × 224</code>的图像块（包括它们的水平翻转）实现了这种方式，然后在这些提取的图像块上进行训练。这通过一个2048因子增大了我们的训练集，尽管最终的训练样本是高度相关的。没有这个方案，我们的网络会有大量的过拟合，这会迫使我们使用更小的网络。在测试时，网络会提取5个<code>224 × 224</code>的图像块（四个角上的图像块和中心的图像块）和它们的水平翻转（因此总共10个图像块）进行预测，然后对网络在10个图像块上的<code>softmax</code>层所得出来的预测进行平均。<br>第二种数据增强方式包括改变训练图像的RGB通道的强度。具体地，我们在ImageNet训练集上对RGB像素值集合执行PCA。对于每幅训练图像，我们加上多倍找到的主成分，大小成正比的对应特征值乘以一个随机变量，随机变量通过均值为0，标准差为0.1的高斯分布得到。因此对于每幅RGB图像像素$I_xy = [I^R_{xy} , I^G_{xy} , I^B_{xy} ]^T$我们加上下面的数量：</p>
+<script type="math/tex; mode=display">[p_1, p_2, p_3][\alpha_1\lambda_1, \alpha_2\lambda_2, \alpha_3\lambda_3]^T</script><p>$p_i$，$λ_i$分别是RGB像素值<code>3 × 3</code>协方差矩阵的第i个特征向量和特征值，$α_i$是前面提到的随机变量。对于某个训练图像的所有像素，每个$α_i$只获取一次，直到图像进行下一次训练时才重新获取。这个方案近似抓住了自然图像的一个重要特性，即光照的强度和颜色发生变化时，目标身份是不变的。这个方案减少了<code>top 1</code>错误率1%以上。</p>
+<h2 id="失活"><a href="#失活" class="headerlink" title="失活"></a>失活</h2><p>结合许多不同模型的预测是降低测试误差[1, 3]的一个非常成功的方法，但对于已经需要花费几天来训练的大型神经网络来说，这似乎太昂贵了。然而，有一个非常有效的模型结合版本，它只花费两倍的训练成本。这种最近引入的技术，叫做“失活”[10]，它会以0.5的概率对每个隐层神经元的输出设为0。那些“失活”的神经元不再进行前向传播并且不参与反向传播。因此每次输入时，神经网络会采样一个不同的架构，但所有架构共享权重。这个技术减少了复杂的神经元互适应，因为一个神经元不能依赖特定的其它神经元的存在。因此，神经元被强迫学习更鲁棒的特征，它在与许多不同的其它神经元的随机子集结合时是有用的。在测试时，我们使用所有的神经元但它们的输出乘以0.5，对指数级的许多失活网络的预测分布进行几何平均，这是一种合理的近似。<br>我们在图2中的前两个全连接层使用失活。如果没有失活，我们的网络表现出大量的过拟合。失活大致上使要求收敛的迭代次数翻了一倍。</p>
+<h1 id="学习细节"><a href="#学习细节" class="headerlink" title="学习细节"></a>学习细节</h1><p>我们使用随机梯度下降来训练我们的模型，样本的批次大小为128，动量为0.9，权重衰减为0.0005。我们发现少量的权重衰减对于模型的学习是重要的。换句话说，权重衰减不仅仅是一个正则项：它减少了模型的训练误差。权重w的更新规则是</p>
+<script type="math/tex; mode=display">v_{i+1} := 0.9 \bullet v_i - 0.0005 \bullet \varepsilon \bullet w_i - \varepsilon \bullet \langle \frac{\partial L} {\partial w} |_{w_i}\rangle _{D_i}</script><p>$i$是迭代索引，$v$是动量变量，$ε$是学习率，$\langle \frac{\partial L} {\partial w} |_{w_i}\rangle _{D_i}$是目标函数对$w$，在$w_i$上的第$i$批微分$D_i$的平均。我们使用均值为0，标准差为0.01的高斯分布对每一层的权重进行初始化。<br>我们对第2，4，5卷积层和全连接隐层的神经元偏置初始化为常量1。这个初始化通过为ReLU提供正输入加速了学习的早期阶段。我们对剩下层的神经元偏置初始化为0。<br>我们对所有的层使用相等的学习率，这个是在整个训练过程中我们手动调整得到的。当验证误差在当前的学习率下停止增长时，我们遵循启发式的方法将学习率除以10。学习率初始化为0.01，在训练停止之前降低三次。我们在120万张图像的训练数据集上训练神经网络大约90个循环，在两个NVIDIA GTX 580 3GB GPU上花费了五到六天。</p>
+<h1 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h1><p>我们在<code>ILSVRC-2010</code>上的结果概括为表1。我们的神经网络在<code>top1</code>和<code>top5</code>测试集上分别取得了<code>37.5%</code>和<code>17.0%</code>的错误率。在<code>ILSVRC-2010</code>竞赛中最佳结果是<code>top-1 47.1%</code>，<code>top-5 28.2%</code>，使用的方法是对6个在不同特征上训练的稀疏编码模型生成的预测进行平均，从那时起已公布的最好结果是<code>top-1 45.7%</code>，<code>top-5 25.7%</code>，使用的方法是平均在Fisher向量（FV）上训练的两个分类器的预测结果，Fisher向量是通过两种密集采样特征计算得到的[24]。</p>
+<p><img src="http://image.rexking6.top/img/clip1520730062.png" alt=""></p>
+<p>表1：<code>ILSVRC-2010</code>测试集上的结果对比。斜体是其它人取得的最好结果。</p>
+<p>我们也用我们的模型参加了<code>ILSVRC-2012</code>竞赛并在表2中报告了我们的结果。由于<code>ILSVRC-2012</code>的测试集标签不可以公开得到，我们不能报告我们尝试的所有模型的测试错误率。在这段的其余部分，我们会互换使用验证误差率和测试误差率，因为在我们的实验中它们的差别不会超过0.1%（看表2）。本文中描述的CNN取得了<code>top-5 18.2%</code>的错误率。五个类似的CNN预测的平均误差率为16.4%。为了对ImageNet 2011秋季发布的整个数据集（1500万张图像，22000个类别）进行分类，我们在最后的池化层之后有一个额外的第6卷积层，训练了一个CNN，然后在它上面进行“微调”，在<code>ILSVRC-2012</code>取得了16.6%的错误率。对在ImageNet 2011秋季发布的整个数据集上预训练的两个CNN和前面提到的五个CNN的预测进行平均得到了15.3%的错误率。第二名的最好竞赛输入取得了26.2%的错误率，他的方法是对FV上训练的一些分类器的预测结果进行平均，FV在不同类型密集采样特征计算得到的。</p>
+<p><img src="http://image.rexking6.top/img/clip1520730132.png" alt=""></p>
+<p>表2：<code>ILSVRC-2012</code>验证集和测试集的误差对比。斜线部分是其它人取得的最好的结果。带星号的是“预训练的”对ImageNet 2011秋季数据集进行分类的模型。详见第6节。</p>
+<p>最后，我们也报告了我们在ImageNet 2009秋季数据集上的误差率，ImageNet 2009秋季数据集有10,184个类，890万张图像。在这个数据集上我们按照惯例用一半的图像来训练，一半的图像来测试。由于没有建立测试集，我们的数据集分割有必要不同于以前作者的数据集分割，但这对结果没有明显的影响。我们在这个数据集上的<code>top-1</code>和<code>top-5</code>错误率是67.4%和40.9%，使用的是上面描述的在最后的池化层之后有一个额外的第6卷积层网络。这个数据集上公开的最好结果是78.1%和60.9%[19]。</p>
+<h2 id="定性评估"><a href="#定性评估" class="headerlink" title="定性评估"></a>定性评估</h2><p>图3显示了网络的两个数据连接层学习到的卷积核。网络学习到了大量的频率核、方向选择核，也学到了各种颜色点。注意两个GPU表现出的专业化，3.5小节中描述的受限连接的结果。GPU 1上的核在很大程度上与颜色无关，而GPU 2上的核在很大程度上与颜色相关。这种专业化在每次运行时都存在，并且是与任何特定的随机权重初始化（以GPU的重新编号为模）无关的。</p>
+<p><img src="http://image.rexking6.top/img/clip1520730236.png" alt=""></p>
+<p>图3：第一卷积层在224 × 224 × 3的输入图像上学习到的大小为11 × 11 × 3的96个卷积核。上面的48个核是在GPU 1上学习到的而下面的48个卷积核是在GPU 2上学习到的。详见6.1小节。</p>
+<p>在图4的左边部分，我们通过在8张测试图像上计算它的<code>top-5</code>预测定性地评估了网络学习到的东西。注意到，即使是不在图像中心的目标，例如左上角的小虫，也能被网络识别。大多数的top-5标签是显得合理的。例如，对于美洲豹来说，只有其它类型的猫被认为是看似合理的标签。在某些案例（格栅，樱桃）中，网络在意的图片焦点真的很含糊。</p>
+<p><img src="http://image.rexking6.top/img/clip1520730310.png" alt=""></p>
+<p>图4：（左）8张<code>ILSVRC-2010</code>测试图像和我们的模型认为最可能的5个标签。正确标签写在每张图像的下面，正确标签的概率用红条表示（如果正确标签在top 5中）。（右）第一列是5张<code>ILSVRC-2010</code>测试图像。剩下的列展示了6张训练图像，这些图像在最后的隐藏层的特征向量与测试图像的特征向量有最小的欧氏距离。</p>
+<p>探索网络可视化知识的另一种方式是考虑最后的4096维隐藏层在图像上得到的特征激活。如果两幅图像生成的特征激活向量之间有较小的欧式距离，我们可以认为神经网络的更高层特征认为它们是相似的。图4表明根据这个度量标准，测试集的5张图像和训练集的6张图像中的每一张都是最相似的。注意在像素级别，检索到的训练图像与第一列的查询图像在L2上一般是不接近的。例如，检索到的狗和大象似乎有很多姿态。我们在补充材料中对更多的测试图像呈现了这种结果。<br>通过两个4096维实值向量间的欧氏距离来计算相似性是效率低下的，但通过训练一个自动编码器将这些向量压缩为短二值编码可以使其变得高效。这应该会产生一种比将自动编码器应用到原始像素上[14]更好的图像检索方法，自动编码器应用到原始像素上的方法没有使用图像标签，因此会趋向于检索与要检索的图像具有相似边缘模式的图像，无论它们是否是语义上相似。</p>
+<h1 id="探讨"><a href="#探讨" class="headerlink" title="探讨"></a>探讨</h1><p>我们的结果表明一个大型深度卷积神经网络在一个具有高度挑战性的数据集上使用纯有监督学习能够取得破纪录的结果。值得注意的是，如果移除一个卷积层，我们的网络性能会降低。例如，移除任何中间层都会引起网络损失大约2%的top-1性能。因此深度对于实现我们的结果非常重要。为了简化我们的实验，我们没有使用任何无监督的预训练，尽管我们希望它会有所帮助，尤其是在如果我们能获得足够的计算能力来显著增加网络的大小而标注的数据量没有对应增加的情况下。到目前为止，我们的结果已经提高了，因为我们的网络更大、训练时间更长，但为了匹配人类视觉系统的下颞线（视觉专业术语）我们仍然有许多数量级要达到。最后我们想在视频序列上使用非常大型的深度卷积网络，视频序列的时序结构会提供非常有帮助的信息，这些信息在静态图像上是缺失的或远不那么明显。</p>
+<h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><p>[1] R.M. Bell and Y. Koren. Lessons from the netflix prize challenge. ACM SIGKDD Explorations Newsletter,<br>9(2):75–79, 2007.<br>[2] A. Berg, J. Deng, and L. Fei-Fei. Large scale visual recognition challenge 2010. www.imagenet.org/challenges. 2010.<br>[3] L. Breiman. Random forests. Machine learning, 45(1):5–32, 2001.<br>[4] D. Cire¸san, U. Meier, and J. Schmidhuber. Multi-column deep neural networks for image classification.<br>Arxiv preprint arXiv:1202.2745, 2012.<br>[5] D.C. Cire¸san, U. Meier, J. Masci, L.M. Gambardella, and J. Schmidhuber. High-performance neural<br>networks for visual object classification. Arxiv preprint arXiv:1102.0183, 2011.<br>[6] J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li, and L. Fei-Fei. ImageNet: A Large-Scale Hierarchical<br>Image Database. In CVPR09, 2009.<br>[7] J. Deng, A. Berg, S. Satheesh, H. Su, A. Khosla, and L. Fei-Fei. ILSVRC-2012, 2012. URL<br><a target="_blank" rel="noopener" href="http://www.image-net.org/challenges/LSVRC/2012/">http://www.image-net.org/challenges/LSVRC/2012/</a>.<br>[8] L. Fei-Fei, R. Fergus, and P. Perona. Learning generative visual models from few training examples: An<br>incremental bayesian approach tested on 101 object categories. Computer Vision and Image Understanding, 106(1):59–70, 2007.<br>[9] G. Griffin, A. Holub, and P. Perona. Caltech-256 object category dataset. Technical Report 7694, California Institute of Technology, 2007. URL <a target="_blank" rel="noopener" href="http://authors.library.caltech.edu/7694">http://authors.library.caltech.edu/7694</a>.<br>[10] G.E. Hinton, N. Srivastava, A. Krizhevsky, I. Sutskever, and R.R. Salakhutdinov. Improving neural networks by preventing co-adaptation of feature detectors. arXiv preprint arXiv:1207.0580, 2012.<br>[11] K. Jarrett, K. Kavukcuoglu, M. A. Ranzato, and Y. LeCun. What is the best multi-stage architecture for<br>object recognition? In International Conference on Computer Vision, pages 2146–2153. IEEE, 2009.<br>[12] A. Krizhevsky. Learning multiple layers of features from tiny images. Master’s thesis, Department of<br>Computer Science, University of Toronto, 2009.<br>[13] A. Krizhevsky. Convolutional deep belief networks on cifar-10. Unpublished manuscript, 2010.<br>[14] A. Krizhevsky and G.E. Hinton. Using very deep autoencoders for content-based image retrieval. In<br>ESANN, 2011.<br>[15] Y. Le Cun, B. Boser, J.S. Denker, D. Henderson, R.E. Howard, W. Hubbard, L.D. Jackel, et al. Handwritten digit recognition with a back-propagation network. In Advances in neural information processing<br>systems, 1990.<br>[16] Y. LeCun, F.J. Huang, and L. Bottou. Learning methods for generic object recognition with invariance to<br>pose and lighting. In Computer Vision and Pattern Recognition, 2004. CVPR 2004. Proceedings of the<br>2004 IEEE Computer Society Conference on, volume 2, pages II–97. IEEE, 2004.<br>[17] Y. LeCun, K. Kavukcuoglu, and C. Farabet. Convolutional networks and applications in vision. In<br>Circuits and Systems (ISCAS), Proceedings of 2010 IEEE International Symposium on, pages 253–256.<br>IEEE, 2010.<br>[18] H. Lee, R. Grosse, R. Ranganath, and A.Y. Ng. Convolutional deep belief networks for scalable unsupervised learning of hierarchical representations. In Proceedings of the 26th Annual International Conference<br>on Machine Learning, pages 609–616. ACM, 2009.<br>[19] T. Mensink, J. Verbeek, F. Perronnin, and G. Csurka. Metric Learning for Large Scale Image Classification: Generalizing to New Classes at Near-Zero Cost. In ECCV - European Conference on Computer<br>Vision, Florence, Italy, October 2012.<br>[20] V. Nair and G. E. Hinton. Rectified linear units improve restricted boltzmann machines. In Proc. 27th<br>International Conference on Machine Learning, 2010.<br>[21] N. Pinto, D.D. Cox, and J.J. DiCarlo. Why is real-world visual object recognition hard? PLoS computational biology, 4(1):e27, 2008.<br>[22] N. Pinto, D. Doukhan, J.J. DiCarlo, and D.D. Cox. A high-throughput screening approach to discovering<br>good forms of biologically inspired visual representation. PLoS computational biology, 5(11):e1000579,<br>2009.<br>[23] B.C. Russell, A. Torralba, K.P. Murphy, and W.T. Freeman. Labelme: a database and web-based tool for<br>image annotation. International journal of computer vision, 77(1):157–173, 2008.<br>[24] J. Sánchez and F. Perronnin. High-dimensional signature compression for large-scale image classification.<br>In Computer Vision and Pattern Recognition (CVPR), 2011 IEEE Conference on, pages 1665–1672. IEEE,<br>2011.<br>[25] P.Y. Simard, D. Steinkraus, and J.C. Platt. Best practices for convolutional neural networks applied to<br>visual document analysis. In Proceedings of the Seventh International Conference on Document Analysis<br>and Recognition, volume 2, pages 958–962, 2003.<br>[26] S.C. Turaga, J.F. Murray, V. Jain, F. Roth, M. Helmstaedter, K. Briggman, W. Denk, and H.S. Seung. Convolutional networks can learn to generate affinity graphs for image segmentation. Neural Computation,<br>22(2):511–538, 2010.</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\24\SURF特征详解\" rel="bookmark">SURF特征详解</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\11\23\《Unknown-Identity-Rejection-Loss-Utilizing-Unlabeled-Data-for-Face-Recognition》笔记\" rel="bookmark">《Unknown Identity Rejection Loss: Utilizing Unlabeled Data for Face Recognition》笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\10\06\背景检测\" rel="bookmark">背景检测</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/03/11/AlexNet%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91/" title="AlexNet论文翻译">https://blog.rexking6.top/2018/03/11/AlexNet论文翻译/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/02/27/cs229%E4%B8%AD%E6%96%87%E7%AC%94%E8%AE%B0-%E5%8D%81%E4%B8%83/" rel="prev" title="cs229中文笔记(十七)">
+      <i class="fa fa-chevron-left"></i> cs229中文笔记(十七)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/03/12/coursera%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="next" title="coursera深度学习笔记">
+      coursera深度学习笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">3.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">4.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84"><span class="nav-number">5.</span> <span class="nav-text">架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ReLU%E9%9D%9E%E7%BA%BF%E6%80%A7"><span class="nav-number">5.1.</span> <span class="nav-text">ReLU非线性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9AGPU%E8%AE%AD%E7%BB%83"><span class="nav-number">5.2.</span> <span class="nav-text">多GPU训练</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E5%93%8D%E5%BA%94%E5%BD%92%E4%B8%80%E5%8C%96"><span class="nav-number">5.3.</span> <span class="nav-text">局部响应归一化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%8F%A0%E6%B1%A0%E5%8C%96"><span class="nav-number">5.4.</span> <span class="nav-text">重叠池化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="nav-number">5.5.</span> <span class="nav-text">整体架构</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%87%8F%E5%B0%91%E8%BF%87%E6%8B%9F%E5%90%88"><span class="nav-number">6.</span> <span class="nav-text">减少过拟合</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA"><span class="nav-number">6.1.</span> <span class="nav-text">数据增强</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%B1%E6%B4%BB"><span class="nav-number">6.2.</span> <span class="nav-text">失活</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E7%BB%86%E8%8A%82"><span class="nav-number">7.</span> <span class="nav-text">学习细节</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C"><span class="nav-number">8.</span> <span class="nav-text">结果</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E6%80%A7%E8%AF%84%E4%BC%B0"><span class="nav-number">8.1.</span> <span class="nav-text">定性评估</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8E%A2%E8%AE%A8"><span class="nav-number">9.</span> <span class="nav-text">探讨</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">10.</span> <span class="nav-text">引用</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大数据近似最近邻搜索哈希方法综述">
+<meta property="og:url" content="https://blog.rexking6.top/2019/01/27/%E5%A4%A7%E6%95%B0%E6%8D%AE%E8%BF%91%E4%BC%BC%E6%9C%80%E8%BF%91%E9%82%BB%E6%90%9C%E7%B4%A2%E5%93%88%E5%B8%8C%E6%96%B9%E6%B3%95%E7%BB%BC%E8%BF%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1548601071.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1548601113.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1548601139.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1548601151.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1548601166.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1548601322.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1548601872.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1548604969.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1548605504.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1548605517.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1548605895.png">
+<meta property="article:published_time" content="2019-01-27T14:46:54.000Z">
+<meta property="article:modified_time" content="2019-03-06T09:10:47.181Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="图像检索">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1548601071.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2019/01/27/%E5%A4%A7%E6%95%B0%E6%8D%AE%E8%BF%91%E4%BC%BC%E6%9C%80%E8%BF%91%E9%82%BB%E6%90%9C%E7%B4%A2%E5%93%88%E5%B8%8C%E6%96%B9%E6%B3%95%E7%BB%BC%E8%BF%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>大数据近似最近邻搜索哈希方法综述 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2019/01/27/%E5%A4%A7%E6%95%B0%E6%8D%AE%E8%BF%91%E4%BC%BC%E6%9C%80%E8%BF%91%E9%82%BB%E6%90%9C%E7%B4%A2%E5%93%88%E5%B8%8C%E6%96%B9%E6%B3%95%E7%BB%BC%E8%BF%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          大数据近似最近邻搜索哈希方法综述
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-01-27 22:46:54" itemprop="dateCreated datePublished" datetime="2019-01-27T22:46:54+08:00">2019-01-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 17:10:47" itemprop="dateModified" datetime="2019-03-06T17:10:47+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%9B%BE%E5%83%8F%E6%A3%80%E7%B4%A2/" itemprop="url" rel="index"><span itemprop="name">图像检索</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2019/01/27/%E5%A4%A7%E6%95%B0%E6%8D%AE%E8%BF%91%E4%BC%BC%E6%9C%80%E8%BF%91%E9%82%BB%E6%90%9C%E7%B4%A2%E5%93%88%E5%B8%8C%E6%96%B9%E6%B3%95%E7%BB%BC%E8%BF%B0/" class="post-meta-item leancloud_visitors" data-flag-title="大数据近似最近邻搜索哈希方法综述" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>8.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>8 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>朋友介绍的一篇哈希检索的综述，作下转载：</p>
+<ul>
+<li>Yuan Cao, Heng Qi, Wenrui Zhou, Kato Jien, Keqiu Li, Xiulong Liu, and Jie Gui. “Binary hashing for<br>approximate nearest neighbor search on big data: A survey.” IEEE Access 6 (2018): 2039-2054. </li>
+</ul>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>最近邻搜索(Nearest Neighbor Search)也称作最近点搜索， 是指在一个尺度空间中搜索与查询点最近点的优化问题。 具体定义如下： 在尺度空间 $M$ 中给定一个数据库点集 $S$ 和一个查询点 $q∈M$， 在 $S$ 中找到距离 $q$ 最近的点。 其中 $M$ 为多维的欧几里得空间，距离由欧几里得距离决定。 最近邻搜索在很多领域中都有广泛应用， 如： 计算机视觉、信息检索、 数据挖掘、 机器学习， 大规模学习等。 其中在计算机视觉领域中应用最广，如： 计算机图形学、 图像检索、 复本检索、 物体识别、 场景识别、 场景分类、 姿势评估，特征匹配等。</p>
+<p>随着互联网和电子技术的高速发展， 网络上信息量的增长异常迅速， 每秒钟都会上传大量的文本， 图像等信息。 这给很多需要进行高效最近邻搜索的领域带来了极大的挑战。 当数据库中的信息量较少的时候， 我们可以使用最简单有效的穷尽搜索方式， 即：将数据库中的点与查询点一一比较欧式距离， 最终根据距离的大小排序。 时间复杂度为线性复杂度 $O(dn)$， $d$ 和 $n$ 分别是数据的维度和样本数。 但当数据库的规模庞大， 如有上百万到上亿个点时， 线性搜索的方式已不适用。 另外， 如在计算机视觉领域， 已越来越倾向使用高维度数据或结构化数据来更加精确地表达图像信息， 并使用复杂的相似度公式计算图像间距离， 在这些情况下， 穷尽搜索的方式无法高效完成最近邻搜索。</p>
+<p>因此， 人们开始使用近似最近邻搜索(Approximate Nearest Neighbor Search)方法快速搜索有效解， 其定义为： $d(r,q)\le (1+\varepsilon)·d(r^\ast,q),\varepsilon \ge 0$。 其中， $q$ 为查询点，$r^\ast$ 为精确解，$\varepsilon$ 为近似误差， $d$ 为某种距离函数。 早期被大量使用的是通过各种树形结构对特征空间分割的方式， 最经典的以 K-D 树为代表。 不过， 虽然这些利用树形结构做近似最近邻搜索的方法在处理低维数据的时候有较好的性能， 但随着数据维度的增长， 该类方法的时间性能显著降低， 有时甚至比线性搜索还差。</p>
+<p>后来就不断有人提出各种基于哈希编码的近似最近邻搜索方法。 哈希编码即将数据库中的点（高维向量） 通过编码的方式转化为二进制向量， 同时尽可能保持原始空间中点之间的距离关系。 查询过程一般分为三步：</p>
+<ol>
+<li>计算查询点的二进制编码；</li>
+<li>找到与查询点具有相同二进制码的哈希篮子；</li>
+<li>将该哈希篮子中的所有点导入内存并根据要求对它们重新排序。</li>
+</ol>
+<p>哈希编码主要有两大优点：</p>
+<ol>
+<li>空间复杂度低。 原始空间中的点一般为几百到几千维， 每一维都是实数值（占多位二进制） ， 而哈希码为二进制向量， 维度大概只有几十到几百维；</li>
+<li>时间复杂度低。 哈希码之间的距离用汉明距离计算， 在计算机中仅仅为一个异或操作的时间复杂度。 同时， 由于哈希码占有较少的空间， 可以更多地存入内存， 因而在计算时减少 CPU 访问外存的次数， 从而减少时间复杂度。</li>
+</ol>
+<p>当然， 哈希编码的最大缺点就是损失了大量原始信息从而降低检索精度。 因此， 自哈希编码提出以来， 人们不断探寻可以提高哈希编码精度的方法。 但 Antonio Torralba 等人早在 2008 年就提出： 以图像压缩为例， 我们可以使用少量位数表示图像信息而不影响图像识别的准确率（如图 1.1） 。 因此， 哈希方法是可以在保证正确率的前提下减少检索时间的， 如今哈希编码被广泛应用在各个领域。 </p>
+<p><img src="http://image.rexking6.top/img/clip1548601071.png" alt=""></p>
+<h2 id="基于哈希的近似最近邻搜索框架"><a href="#基于哈希的近似最近邻搜索框架" class="headerlink" title="基于哈希的近似最近邻搜索框架"></a>基于哈希的近似最近邻搜索框架</h2><p>图 1.2 描述了一种典型的基于阈值哈希的近似最近邻搜索框架。 如图所示， 原始空间 $D$ 中有 $n$ 个 $m$ 维的向量， 这些向量可来自于各种应用领域， 如图像、 文本、 生物医学等。 当 $n$ 与 $m$ 的数值较大时（ $n$ 达到百万至亿数量级， $m$ 达到几千维以上） ， 我们使用哈希方法可以有效解决大规模近似最近邻搜索问题。 由于基于阈值的哈希方法是最常用的哈希编码方法， 因此我们以其为例阐述近似最近邻搜索的完整过程。</p>
+<p>基于哈希的近似最近邻搜索过程主要分为两阶段： Offline 和 Online。 图中虚线上面为 Offline 阶段， 即对数据库中点进行与查询点无关的哈希编码。 该过程可分为两步：首先使用 $k$ 个哈希函数将原始空间 $D$ 中 $n$ 个 $m$ 维的点映射到 $k$ 维的投影空间 P中， 该映射要尽可能保持原始空间中点间的相似度关系。 然后再使用 $k$ 个阈值将投影空间中的点映射到二进制空间 $B$ 中， 即将其每一维度映射为“0” 或“1” ， 阈值的选择要满足哈希特性（如平衡性） ； 图中虚线下面为 Online 阶段， 即对查询点哈希编码。 对于查询点，我们使用与 Offline 阶段中同样的哈希函数与阈值， 将 $m$ 维查询点编码为 $k$ 维二进制。最后， 通过比较查询点二进制码和数据库中点二进制码之间的汉明距离即可将数据库中的点按照汉明距离由小到大排序。 </p>
+<p><img src="http://image.rexking6.top/img/clip1548601113.png" alt=""></p>
+<p>下面我们从不同的角度将哈希方法分类。 首先哈希方法可以分为两大类： 哈希编码和哈希排序。 哈希编码又可以从三个角度分类： 哈希机理特性， 数据自身特性，哈希平台。 哈希排序可以分为两类： 加权汉明距离和非对称距离。 具体分类细节如图 1.3 所示。 </p>
+<p><img src="http://image.rexking6.top/img/clip1548601139.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1548601151.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1548601166.png" alt=""></p>
+<h1 id="哈希编码方法简介"><a href="#哈希编码方法简介" class="headerlink" title="哈希编码方法简介"></a>哈希编码方法简介</h1><p>哈希编码即将数据库中的点（高维向量） 通过编码的方式转化为二进制向量， 同时尽可能保持原始空间中点之间的距离关系。 将其符号化为： 数据库矩阵 $D=R^{n\ast m}$ ， 其中每个行向量代表一个 $m$ 维的点， 共 $n$ 个点。 哈希编码就是采用某种映射的方式将矩阵 $D$ 映射为二进制矩阵 $H=B^{n\ast k}$ ， 矩阵中每个值为二进制 $0$ 或 $1$， $k$ 为二进制的码长。 对于查询点 $q \in R^m$， 采用同样的哈希编码方法将其映射为 $H_q \in B^k$ 。 $H_q$ 与 $H_i(i\in 1,…,n)$ 之间的汉明距离为： $\text{Hamm}(H_q,H_i) = H_q  \oplus H_i,i\in 1,…,n$。在查询时， 对数据库 $D$ 中的 $n$ 个点按 $\text{Hamm}(H_q,H_i)$ 由小到大排序。</p>
+<p>哈希编码必须满足的要求主要有以下三个：</p>
+<ol>
+<li>码长短。 因为我们要将大量的信息存入到内存中， 如： 普通的工作站有 16GB 的内存， 若存储 250 百万幅图像， 每幅图像最多可以用 64 位二进制表示；</li>
+<li>保距。 即原始空间中相似（任意相似度： 欧氏距离、 核距离、 语义相似度等）的点编码后二进制编码间的汉明距离要短；</li>
+<li>效率高。 即无论是在训练时学习哈希编码的参数， 还是对新的输入点编码， 速度都要快。</li>
+</ol>
+<p>为了得到更加高效的哈希码， 哈希编码一般还需要满足以下两个特性： 平衡性和独立性。</p>
+<ol>
+<li>平衡性： 即编码后的所有点的每一维度都有一半编码为 0， 一半编码为 1。 当编码达到平衡时， 熵达到最大， 信息量最大， 哈希编码最好。 如图 1.4 所示， 左右两幅图的哈希方法都可以使带有标签的点对正确编码， 但很明显右侧图哈希的空间分割有较大的熵， 包含更大的信息量， 因此比左侧图哈希好。 </li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1548601322.png" alt=""></p>
+<ol>
+<li>独立性： 即不同哈希函数之间相互独立。 各个哈希函数若不相互独立则会产生类似的哈希结果， 造成信息冗余， 因此相互独立的哈希函数才可以对数据空间进行最有效的分割。</li>
+</ol>
+<p>常见哈希编码方法的分类如表 2.1 所示， 其中标号为[1]中参考文献。 </p>
+<p><img src="http://image.rexking6.top/img/clip1548601872.png" alt=""></p>
+<h2 id="哈希机理特性"><a href="#哈希机理特性" class="headerlink" title="哈希机理特性"></a>哈希机理特性</h2><h3 id="数据依赖性"><a href="#数据依赖性" class="headerlink" title="数据依赖性"></a>数据依赖性</h3><p>如图 1.2 所示， 哈希编码的第一步是学习 $k$ 个哈希函数将原始空间 $D$ 中 $n$ 个 $m$ 维的点映射到 $k$ 维的投影空间 $P$ 中。 早期哈希函数的学习是不依赖于数据分布的， 如Locality-Sensitive Hashing (LSH) ， 哈希函数是从符合高斯分布的数据中随机选取的若干个投影分布。 尽管随着投影分布数量的增加， LSH 搜索结果渐近逼近理论值， 但是为了获得满意的精度往往需要较长的码长和较多的哈希表。 由于时间空间的限制很难扩展到上百万的数据集上。 因此， 依赖于数据分布的哈希方法被不断提出。 早期经典的依赖于数据分布学习哈希函数的哈希方法以 Spectral Hashing (SH) 为代表， SH 在数据库数据集上构造了一个目标函数保持原始空间和汉明空间之间的相似度表示， 即原始空间中相似的数据点要投影到汉明空间中相似的二进制码上。 再加上上面提到的独立性和平衡性限制， 最小化 SH 目标函数得到的数据库二进制码的解即为： 其拉普拉斯矩阵的前 $k$ 个最小特征值（除了 0）所对应的 $k$ 个特征向量。 </p>
+<p>尽管 SH 与 LSH 相比由于利用到了数据分布信息往往可以表示出较高的精度， 但 SH 有以下三个缺点：</p>
+<ol>
+<li>SH 由于没有学习明确的哈希函数使得无法将其直接应用到新输入的数据点上；</li>
+<li>SH 没有明确的理论依据， 即随着码长的增加， 哈希码之间的汉明距离是否会收敛于原始空间的相似度表示是不明确的；</li>
+<li>在实际应用中， 投影后的数据点的信息往往只分布在前几个维度上， 导致 SH 只在较短码长的二进制码上性能较好。</li>
+</ol>
+<p>在下一节的哈希过程中， 我们会详细描述 SH 的哈希函数和哈希码学习过程。 </p>
+<h3 id="哈希过程"><a href="#哈希过程" class="headerlink" title="哈希过程"></a>哈希过程</h3><h4 id="传统哈希方法"><a href="#传统哈希方法" class="headerlink" title="传统哈希方法"></a>传统哈希方法</h4><p>在 2014 年以前， 大多数哈希方法都依赖于传统的两步走哈希框架： 投影和量化。在投影阶段， 使用 $k$ 个哈希函数将原始空间 $D$ 中 $n$ 个 $m$ 维的点映射到 $k$ 维的投影空间 $P$ 中， 该映射要尽可能保持原始空间中点间的相似度关系。 在量化阶段， 使用 $k$ 个阈值将投影空间中的点映射到二进制空间 $B$ 中， 即将其每一维度映射为“0” 或“1” 。</p>
+<p>下面我们用矩阵运算的形式表示投影量化两阶段过程。 假设原始空间中的数据点表示为 $\{x_1,x_2,…,x_n\},\forall x_i \in R^d$，组成的数据库矩阵为 $X\in R^{n\ast d}$ 。 哈希方法的目标即找到一个投影矩阵 $W\in R^{d\ast k}$ ，其中 $c$ 表示二进制码长度。对于 $j =1,…,k$ ，哈希函数定义为： </p>
+<script type="math/tex; mode=display">
+y_{ij}=x_iw_j\\
+B_{ij}=Q(y_{ij})</script><p>其中 $w_j \in R^d$ 是矩阵 $P$ 的一列，$B \in R^{d\ast k}$ 是数据库点对应的二进制码矩阵， 同时</p>
+<script type="math/tex; mode=display">
+Q(y_{ij})=\left\{
+\begin{aligned}
+1, && y_{ij}\ge t_j \\
+0, && \text{otherwise}
+\end{aligned}
+\right.</script><p>其中，$t_j$ 是由哈希方法确定的第 $j$ 位阈值。 由此， 哈希编码的整个过程可以表示为：$B = Q(XW)$。从式中， 我们可以看出一个哈希函数可以将数据点投影为一位， 如果想要获得 $k$ 位哈希码， 我们需要 $k$ 个哈希函数。 各个传统哈希方法之间的区别主要在于投影矩阵 $W$ 的计算上。 下面我们举例分析哈希方法是如何学习投影矩阵以及如何量化投影空间中的数据点的。</p>
+<ol>
+<li><p>投影<br>我们将投影过程定义为 $P = XW$ 。 目前大多数传统哈希方法通过构造目标函数学习哈希函数， 最大化或最小化目标函数可以保持原始空间和汉明空间中点之间的相似度表示。 同时为了进一步提高哈希函数的性能， 还需要满足一些限制， 如： 平衡性和独立性。</p>
+<p>下面我们以 SH 为例分析哈希方法的投影过程， 以下是 SH 的目标函数和限制条件：</p>
+<script type="math/tex; mode=display">
+\text{minimize}: \sum_{lij}S_{i,j}(y(i,l)-y(j,l))^2\\
+\text{subject to}: Y(i,j)\in \{-1,1\},\\
+Y^T1=0,\\
+Y^TY=I</script><p>其中， $y(i,l)$ 和 $y(j,l)$ 分别表示点 $i$ 和点 $j$ 在投影空间中的第 $l$ 位。 $S_{ij}\in [0,1]$ 表示点 $i$ 和点 $j$ 在原始空间中的相似度。 观察发现， 在原始空间中如果两个点很相似， 则 $S_{ij}$ 值较大，那么 $(y(i,l) - y(j,l))^2$ 应当较小。 因此， SH 通过最小化目标函数同时满足平衡和独立两限制条件学习哈希函数。 </p>
+</li>
+<li><p>量化 </p>
+<p>在量化阶段， 投影空间中的点通过阈值量化为二进制码 。 目前大多数哈希方法将每个投影维度用一个阈值量化， 被称作单位量化。 阈值通常由平衡性限制 $(Y^T1 = 0)​$求得。然而单位量化一个比较严重的缺点是其阈值往往分布在数据密度最高的区域， 这将导致很多邻近的数据点被量化为完全不同的二进制码。 因此， 双位量化被提出。 双位量化即对每个投影维度动态学习两个阈值并将其编码为两位二进制码(01,00,10)。 阈值的学习使其避免设置在数据点密集的区域。 除此之外， 由于一些哈希函数可能比另一些携带更多的信息， 变位量化被提出为每个哈希超平面分配变化位数的哈希码。 变位量化首先构造一个目标函数使得为那些更好保持数据在原始空间中相似度关系的维度分配更多的哈希位。 与单位量化和双位量化相比， 变位量化可以获得更高的精度。 </p>
+</li>
+</ol>
+<h4 id="基于深度学习的哈希方法"><a href="#基于深度学习的哈希方法" class="headerlink" title="基于深度学习的哈希方法"></a>基于深度学习的哈希方法</h4><p>对于图像检索应用中的哈希方法， 输入的图像往往由人工视觉特征向量表示。 这些人工视觉特征向量并不能严格保持图像对之间的精确语义相似度信息， 这将导致学习的哈希函数性能较低。 因此， 基于深度学习的哈希方法被不断提出。 这类方法的不同主要体现在四个方面： </p>
+<ol>
+<li><p>监督性</p>
+<p>监督性即在使用深度神经网络框架学习哈希码的过程中是否利用到原始图像的标签或相似点对信息， 分为监督和非监督。 对于监督的基于深度学习的哈希方法， 除了传统的依赖于图像标签信息的监督哈希方法， 另一些利用相似对信息的监督哈希方法又可以分为两类， 一类依赖于成对相似度信息， 另一类依赖于三元组相似度信息。 </p>
+</li>
+<li><p>网络并行性</p>
+<p>即只使用单一的深度神经网络还是并行使用多个深度神经网络学习哈希码。 </p>
+</li>
+<li><p>网络层数<br>即使用的深度神经网络的层数。 </p>
+</li>
+<li>独立性<br>即从图像中学习特征表示和哈希编码两个过程是联合学习的还是独立学习的。</li>
+</ol>
+<p>对当前几种经典的基于深度学习哈希方法的分类细节详见表2.2， 其中标号为[1]中参考文献。 </p>
+<p><img src="http://image.rexking6.top/img/clip1548604969.png" alt=""></p>
+<h2 id="数据自身特性"><a href="#数据自身特性" class="headerlink" title="数据自身特性"></a>数据自身特性</h2><h3 id="相似度度量"><a href="#相似度度量" class="headerlink" title="相似度度量"></a>相似度度量</h3><h4 id="欧氏距离"><a href="#欧氏距离" class="headerlink" title="欧氏距离"></a>欧氏距离</h4><p>通常情况下， 原始空间中的两个点 $x$ 和 $y$ 之间的相似度是由欧氏距离度量的： </p>
+<script type="math/tex; mode=display">
+E_d(x,y)=||x-y||_2=\sqrt{\sum_{i=1}^m(x_i-y_i)^2}</script><p>大多数哈希方法都基于此， 如上面提到的 LSH 和 SH。 </p>
+<h4 id="核距离"><a href="#核距离" class="headerlink" title="核距离"></a>核距离</h4><p>上面提到的哈希方法有一定的局限性， 即假设原始空间中的点是由向量形式表示的。 然而在很多实际应用中， 如多媒体、 生物、 网络等， 数据点往往具有复杂的表现形式， 如图、 树、 序列， 集合等。 对于这些常见的数据类型， 大量复杂的核被用来定义数据点之间的相似度。 而且在图像检索等视觉应用中， 即使图像是由向量形式表示的， 核距离与欧氏距离相比可以更好地展现出图像之间的语义相似度。 除此之外， 对于很多机器学习应用， 无法知道原始空间的明确数据， 只可以计算点对的核函数相似度。 因此在这些情况下， 很多处理核函数相似度的哈希方法被提出， 它们既可以适用于向量输入也可以适用于非向量输入。</p>
+<p>核函数包括线性核函数， 多项式核函数， 高斯核函数等。 其中，高斯核函数是最常见的， 也叫做径向基函数， 它是一种沿着径向对称的标量函数， 定义如下： </p>
+<script type="math/tex; mode=display">
+k(||x-xc||)=e^{-\frac{||x-xc||^2}{2\sigma^2}}</script><p>其中， $xc$ 是核函数的中心， $\sigma$ 是宽度系数。我们可以看出高斯核函数是欧氏距离的反依赖函数。 Optimized Kernel Hashing (OKH) 是典型的处理核相似度的哈希方法， 详见[1]。 </p>
+<h4 id="语义距离"><a href="#语义距离" class="headerlink" title="语义距离"></a>语义距离</h4><p>非监督哈希方法不需要利用带标签训练数据点的标签信息， 其目标函数的构造依赖于预先设定的相似度矩阵。 然而在图像检索等应用中， 图像之间相似度并不是由一个简单的度量标准定义的， 因为它并不能保证图像之间的语义相似度。 语义相似度往往由带标签的图像对给出， 也就是说， 原始空间中相似的图像对至少拥有一个共同的标签。 对于这样的成对标签数据， 监督哈希方法可以生成保持语义相似度的哈希码。 其中，Semi-Supervised Hashing (SSH) 是经典的处理语义相似度的哈希方法， 详见[1]。 </p>
+<h3 id="数据模态"><a href="#数据模态" class="headerlink" title="数据模态"></a>数据模态</h3><h4 id="单模态"><a href="#单模态" class="headerlink" title="单模态"></a>单模态</h4><p>近年来， 大多数哈希方法都依赖于同质相似度， 即数据库中的数据本体都是同一种类型的， 这样的哈希方法称作单模态哈希方法。 但是随着因特网和多媒体设备的快速发展， 我们可以很容易获得大量数据， 如文本， 图像， 视频等。 随着数据规模的扩大， 数据本体的密度也不断扩大。 在实际应用中， 异质本体也是普遍存在的， 即一些数据库包含的同一种数据本体有多种视角。 因此， 多模态哈希方法被提出来解决从多种异构领域中搜索出相似数据本体的问题。 </p>
+<h4 id="多模态"><a href="#多模态" class="headerlink" title="多模态"></a>多模态</h4><p>初始的多模态哈希方法一般通过将原始空间中的异质数据点映射到一个统一的汉明空间中再进行相似度搜索排序。 这种方法的关键问题是如何同时构造多种模态之间的潜在联系以及如何保持在每个模态下的相似度关系。 一种方法将多模态本体的每个模态翻译成其中的同一种模态， 然后进行单模态搜索。 然而这种类型方法有两大缺点：</p>
+<ol>
+<li>在翻译过程中有一定的近似误差而且很依赖于具体应用。</li>
+<li>翻译过程往往很慢， 导致无法适用于很多实际应用。 </li>
+</ol>
+<p>因此， 近期又产生了一些新的多模态哈希方法， 详见[1]。 </p>
+<h3 id="数据流动性"><a href="#数据流动性" class="headerlink" title="数据流动性"></a>数据流动性</h3><h4 id="固定数据库"><a href="#固定数据库" class="headerlink" title="固定数据库"></a>固定数据库</h4><p>目前大多数哈希方法处理数据库中的数据是固定的。 但在实际应用中， 数据往往连续生成。 比如， 百度的数据中心搜索机器每天都新增大量文本图像之类的网页。 对于这种流动性数据， 已有的哈希方法必须重新训练新的哈希函数， 这种效率根本无法适应数据库中数据数量的增长和多样性的变化。 </p>
+<h4 id="在线数据库"><a href="#在线数据库" class="headerlink" title="在线数据库"></a>在线数据库</h4><p>因此， 近期出现了一些可以处理流动数据的在线哈希方法。 详见[1]。 </p>
+<h2 id="哈希平台"><a href="#哈希平台" class="headerlink" title="哈希平台"></a>哈希平台</h2><h3 id="单机"><a href="#单机" class="headerlink" title="单机"></a>单机</h3><p>之前讨论的哈希方法处理的都是单一中心机器上的数据， 然而随着数据库规模的扩大， 数据常常是分布式存储的， 一种直观的方法是将所有的数据读取到同一个工作站中，然后像在单机上一样训练哈希函数。 但是这将导致计算， 时间和空间复杂度太高。 </p>
+<h3 id="分布式"><a href="#分布式" class="headerlink" title="分布式"></a>分布式</h3><p>Hashing for Distributed Data (HDD) 是一种分布式哈希方法。 HDD 分布式地学习哈希函数。 由于在训练过程中没有节点之间训练数据的交换， 通信成本很小， 使得 HDD可以适用于任何大规模分布式应用。 </p>
+<h1 id="哈希排序方法简介"><a href="#哈希排序方法简介" class="headerlink" title="哈希排序方法简介"></a>哈希排序方法简介</h1><p>哈希排序指的是在哈希过程的最后一步， 对数据库中所有点哈希得到的二进制码的排序问题。 汉明距离是最常用的二进制码排序标准， 但它无法对那些与查询点具有相同汉明距离的二进制码排序。 如图 3.1 所示， 假设数据库中的点都是二维的， 红色叉表示查询点并被编码为“11” ， 绿色圆点表示查询点的真实 $\varepsilon$-最近邻。 很显然， 所有编码为 “01” 和 “10” 的点都与查询点具有相同的汉明距离。 然而， 由于查询点的真实 $\varepsilon$-最近邻中包含了部分编码为 “01” 的点而并不包含任何编码为 “10” 的点， 因此编码 “01” 应该排在编码 “10” 的前面。 在这个例子中， 汉明距离无法给出一个合理的哈希排序。 </p>
+<p><img src="http://image.rexking6.top/img/clip1548605504.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1548605517.png" alt=""></p>
+<p>因此从 2011 年开始不断有人研究哈希排序算法。 近年来的哈希排序成果主要基于两类距离： 加权汉明距离和非对称距离。 几种代表性的哈希排序方法分类详见表 3.1， 其中标号为[1]中参考文献。 </p>
+<h2 id="加权汉明距离"><a href="#加权汉明距离" class="headerlink" title="加权汉明距离"></a>加权汉明距离</h2><p>加权汉明距离的权重一般由两部分组成： Offline 权重和 Online 权重。 Offline 权重不依赖于查询点， 根据数据库中点的分布计算得出。 该权重一般在投影空间中求解， 因为投影空间 $P$ 的信息量远远大于二进制空间 $B$；Online 权重依赖于查询点， 根据查询点与数据库中点的相对分布关系求解。 加权汉明距离的权重基本上有两种计算方法： 按位算权重和按类别算权重。 </p>
+<h3 id="按位算距离"><a href="#按位算距离" class="headerlink" title="按位算距离"></a>按位算距离</h3><p>按位算权重即对哈希后的每一位计算一个权重 $w_k$ ，并满足 $\sum_{j=1}^kw_j=1$ 。则查询点 $q$ 和数据库中点 $x_i$ 的加权汉明距离 $\text{WHamm}(h(q),h(x_i))$ 计算如下： </p>
+<script type="math/tex; mode=display">
+\text{WHamm}(h(q),h(x_i))=\sum_{j=1}^k w_j·\text{Hamm}(h_j(q),h_j(x_i))</script><p>经典的代表算法有 QsRank， WhRank 等， 详见[1]。</p>
+<h3 id="按类别算距离"><a href="#按类别算距离" class="headerlink" title="按类别算距离"></a>按类别算距离</h3><p>按类别算权重适用于将标签作为相似度表示的数据库， 如 CIFAR， NUS-WIDE 等。我们以 Lost in Binarization 为例阐述类别权重的计算方法。</p>
+<ol>
+<li><p>Offline 权重学习阶段。 输入数据库点的二进制码以及类别间的相似度就可以迭代输出 $k$ 个类别的权重 $a_i,i=1,…,k$。其目标函数旨在最大化类间距离和最小化类内距离。 </p>
+</li>
+<li><p>Online 权重学习阶段。 首先， 计算查询点 $q$ 与数据库中所有点哈希后的二进制码之间的汉明距离， 返回与查询点 $q$ 最相近的前 $k$ 个点， 并记录它们的标签集合为 $T$ 以及每个标签中含有点的个数（ $k$ 近邻中） 为 $m_i$ 。 则查询点 $q$ 的最终权重 $a_q$</p>
+<p>定义如下： </p>
+<script type="math/tex; mode=display">
+a_q=\sum_{i\in T}(m_ia_i)/\sum_{i\in T}m_i</script></li>
+</ol>
+<p>图 3.2 显示了以图像搜索为例， 应用上述权重对汉明距离进行重排序的完整过程。 </p>
+<p><img src="http://image.rexking6.top/img/clip1548605895.png" alt=""></p>
+<h2 id="非对称距离"><a href="#非对称距离" class="headerlink" title="非对称距离"></a>非对称距离</h2><p>哈希编码分为投影和量化为二进制两个过程。 非对称的意思是只对数据库中的点二进制化， 而对查询点只投影不量化。 因此， 将非二进制的查询点与二进制的数据库点之间的距离称作非对称距离， 详见[1]。 非对称距离可以提高检索精度主要有以下两点原因：</p>
+<ol>
+<li>由于没有对查询点二进制化， 因此可以获取查询点更精准的位置信息， 从而提高检索精度。 在存储上， 仅仅多额外存储一个查询点的非二进制化向量与检索过程的整个存储量级相比是可以忽略的。</li>
+<li>非对称距离的实数量级与汉明距离的整数量级相比， 可以对距离空间进行更浓密的划分。 也就是说， 非对称距离可以将汉明距离无法区分的二进制码重新排序， 从而提高检索精度。 </li>
+</ol>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>我们简述了哈希方法的发展历史， 并从一个新颖的角度对哈希方法进行清晰地分类。 该文很适合对哈希方向感兴趣的读者快速找到他们感兴趣的分支。 </p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\24\Bag-of-visual-word视觉词袋\" rel="bookmark">Bag-of-visual word视觉词袋</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\10\12\Fisher-Kernel-Fisher-Vector\" rel="bookmark">Fisher Kernel&Fisher Vector</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\28\Geometric-Verification几何验证\" rel="bookmark">Geometric Verification几何验证</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2019/01/27/%E5%A4%A7%E6%95%B0%E6%8D%AE%E8%BF%91%E4%BC%BC%E6%9C%80%E8%BF%91%E9%82%BB%E6%90%9C%E7%B4%A2%E5%93%88%E5%B8%8C%E6%96%B9%E6%B3%95%E7%BB%BC%E8%BF%B0/" title="大数据近似最近邻搜索哈希方法综述">https://blog.rexking6.top/2019/01/27/大数据近似最近邻搜索哈希方法综述/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%9B%BE%E5%83%8F%E6%A3%80%E7%B4%A2/" rel="tag"># 图像检索</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/01/27/ANN-Search%E5%8F%8A%E4%B8%80%E4%BA%9B%E6%96%B9%E6%B3%95/" rel="prev" title="ANN Search及一些方法">
+      <i class="fa fa-chevron-left"></i> ANN Search及一些方法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/01/29/%E3%80%8AOn-the-Persistence-of-Clustering-Solutions-and-True-Number-of-Clusters-in-a-Dataset%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="next" title="《On the Persistence of Clustering Solutions and True Number of Clusters in a Dataset》笔记">
+      《On the Persistence of Clustering Solutions and True Number of Clusters in a Dataset》笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%93%88%E5%B8%8C%E7%9A%84%E8%BF%91%E4%BC%BC%E6%9C%80%E8%BF%91%E9%82%BB%E6%90%9C%E7%B4%A2%E6%A1%86%E6%9E%B6"><span class="nav-number">1.2.</span> <span class="nav-text">基于哈希的近似最近邻搜索框架</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E7%BC%96%E7%A0%81%E6%96%B9%E6%B3%95%E7%AE%80%E4%BB%8B"><span class="nav-number">2.</span> <span class="nav-text">哈希编码方法简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E6%9C%BA%E7%90%86%E7%89%B9%E6%80%A7"><span class="nav-number">2.1.</span> <span class="nav-text">哈希机理特性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E4%BE%9D%E8%B5%96%E6%80%A7"><span class="nav-number">2.1.1.</span> <span class="nav-text">数据依赖性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E8%BF%87%E7%A8%8B"><span class="nav-number">2.1.2.</span> <span class="nav-text">哈希过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%A0%E7%BB%9F%E5%93%88%E5%B8%8C%E6%96%B9%E6%B3%95"><span class="nav-number">2.1.2.1.</span> <span class="nav-text">传统哈希方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%9A%84%E5%93%88%E5%B8%8C%E6%96%B9%E6%B3%95"><span class="nav-number">2.1.2.2.</span> <span class="nav-text">基于深度学习的哈希方法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E8%87%AA%E8%BA%AB%E7%89%B9%E6%80%A7"><span class="nav-number">2.2.</span> <span class="nav-text">数据自身特性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E4%BC%BC%E5%BA%A6%E5%BA%A6%E9%87%8F"><span class="nav-number">2.2.1.</span> <span class="nav-text">相似度度量</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AC%A7%E6%B0%8F%E8%B7%9D%E7%A6%BB"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">欧氏距离</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E8%B7%9D%E7%A6%BB"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">核距离</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%AD%E4%B9%89%E8%B7%9D%E7%A6%BB"><span class="nav-number">2.2.1.3.</span> <span class="nav-text">语义距离</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%A8%A1%E6%80%81"><span class="nav-number">2.2.2.</span> <span class="nav-text">数据模态</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%95%E6%A8%A1%E6%80%81"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">单模态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%9A%E6%A8%A1%E6%80%81"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">多模态</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%B5%81%E5%8A%A8%E6%80%A7"><span class="nav-number">2.2.3.</span> <span class="nav-text">数据流动性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%BA%E5%AE%9A%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">2.2.3.1.</span> <span class="nav-text">固定数据库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A8%E7%BA%BF%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">2.2.3.2.</span> <span class="nav-text">在线数据库</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E5%B9%B3%E5%8F%B0"><span class="nav-number">2.3.</span> <span class="nav-text">哈希平台</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%95%E6%9C%BA"><span class="nav-number">2.3.1.</span> <span class="nav-text">单机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F"><span class="nav-number">2.3.2.</span> <span class="nav-text">分布式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E6%8E%92%E5%BA%8F%E6%96%B9%E6%B3%95%E7%AE%80%E4%BB%8B"><span class="nav-number">3.</span> <span class="nav-text">哈希排序方法简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E6%9D%83%E6%B1%89%E6%98%8E%E8%B7%9D%E7%A6%BB"><span class="nav-number">3.1.</span> <span class="nav-text">加权汉明距离</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%89%E4%BD%8D%E7%AE%97%E8%B7%9D%E7%A6%BB"><span class="nav-number">3.1.1.</span> <span class="nav-text">按位算距离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%89%E7%B1%BB%E5%88%AB%E7%AE%97%E8%B7%9D%E7%A6%BB"><span class="nav-number">3.1.2.</span> <span class="nav-text">按类别算距离</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%9E%E5%AF%B9%E7%A7%B0%E8%B7%9D%E7%A6%BB"><span class="nav-number">3.2.</span> <span class="nav-text">非对称距离</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

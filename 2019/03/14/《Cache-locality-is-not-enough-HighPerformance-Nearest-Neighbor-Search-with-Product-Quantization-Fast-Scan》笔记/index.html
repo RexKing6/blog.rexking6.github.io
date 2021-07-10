@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Cache locality is not enough: HighPerformance Nearest Neighbor Search with Product Quantization Fast Scan》笔记">
+<meta property="og:url" content="https://blog.rexking6.top/2019/03/14/%E3%80%8ACache-locality-is-not-enough-HighPerformance-Nearest-Neighbor-Search-with-Product-Quantization-Fast-Scan%E3%80%8B%E7%AC%94%E8%AE%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552616133.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552616721.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552788812.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552618842.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552629307.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552630256.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552630761.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552632358.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552632408.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552638195.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552638268.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552638313.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552638666.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552639142.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552639379.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552650224.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552650396.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552650883.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552660224.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552660124.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552661227.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552662733.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552748435.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552746724.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552748500.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552748571.png">
+<meta property="article:published_time" content="2019-03-14T14:22:15.000Z">
+<meta property="article:modified_time" content="2019-05-19T08:24:22.571Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="图像检索">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1552616133.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2019/03/14/%E3%80%8ACache-locality-is-not-enough-HighPerformance-Nearest-Neighbor-Search-with-Product-Quantization-Fast-Scan%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《Cache locality is not enough: HighPerformance Nearest Neighbor Search with Product Quantization Fast Scan》笔记 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2019/03/14/%E3%80%8ACache-locality-is-not-enough-HighPerformance-Nearest-Neighbor-Search-with-Product-Quantization-Fast-Scan%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Cache locality is not enough: HighPerformance Nearest Neighbor Search with Product Quantization Fast Scan》笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-03-14 22:22:15" itemprop="dateCreated datePublished" datetime="2019-03-14T22:22:15+08:00">2019-03-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-05-19 16:24:22" itemprop="dateModified" datetime="2019-05-19T16:24:22+08:00">2019-05-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%9B%BE%E5%83%8F%E6%A3%80%E7%B4%A2/" itemprop="url" rel="index"><span itemprop="name">图像检索</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2019/03/14/%E3%80%8ACache-locality-is-not-enough-HighPerformance-Nearest-Neighbor-Search-with-Product-Quantization-Fast-Scan%E3%80%8B%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="《Cache locality is not enough: HighPerformance Nearest Neighbor Search with Product Quantization Fast Scan》笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>10k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>9 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>高维最近邻（NN）搜索是许多应用（例如图像检索，多媒体数据库）中的重要功能。 乘积量化（PQ）是一种广泛使用的解决方案，其提供高性能，即低响应时间，同时保持高精度。 PQ通过紧凑编码表示高维向量（例如图像描述符）。 因此，非常大的数据库可以存储在内存中，允许NN查询而无需借助慢速I/O操作（指硬盘读取）。 PQ使用缓存驻留查找表计算到近邻的距离，因此其性能仍受限于(i) 算法所需的许多缓存访问，以及(ii) 无法利用现代CPU上可用的SIMD指令。</p>
+<blockquote>
+<p>SIMD，单指令流多数据流（SingleInstruction Multiple Data，SIMD）是一种采用一个控制器来控制多个处理器，同时对一组数据（又称“数据向量”）中的每一个分别执行相同的操作从而实现空间上的并行性的技术。在微处理器中，单指令流多数据流技术则是一个控制器控制多个平行的处理微元，例如Intel的MMX或SSE以及AMD的3D Now!技术。</p>
+</blockquote>
+<p>在本文中，我们认为缓存局部性不足以提高效率。 为了解决这些限制，我们设计了一种新的算法，PQ快速扫描，它将缓存驻留查找表转换为适合SIMD寄存器的小型表。 该转换允许(i) 寄存器内查找代替缓存访问和(ii) 高效的SIMD实现。 PQ快速扫描具有与PQ完全相同的精度，同时响应时间降低4到6倍（例如对于2500万个向量，扫描时间从74ms减少到13ms）。</p>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>高维空间最近邻搜索是机器学习、多媒体数据库和信息检索等领域的一个重要功能。多媒体数据，如音频、图像或视频，可以表示为特征向量，表示其内容。因此，要找到与给定查询对象相似的多媒体对象，需要将查询对象表示为高维向量，并在特征向量空间中确定其最近邻。虽然存在有效的方法来解决低维空间中的NN搜索问题，但”臭名昭著“的维度诅咒在高维度上挑战了这些解决方案。随着维数的增加，这些方法被蛮力线性扫描所超越，大型数据库使得这个问题更加突出。为了解决这个问题，研究界一直关注近似最近邻搜索（ANN），该搜索旨在找到足够接近的向量而不是精确的最接近的向量。</p>
+<p>局部敏感哈希（LSH）[11,8]被提出来解决ANN问题。然而，其巨大的存储开销和重要的I/O成本限制了它在大型数据库中的适用性。基于LSH的方法的最新进展[19,26]处理了这两个问题，但是使用这些解决方案的ANN搜索仍然需要I/O操作。我们专注于另一种方法，称为乘积量化（PQ）[14,27]。PQ的独特之处在于它将数据库向量存储为紧凑编码，允许将非常大的数据库完全存储在内存中。在大多数情况下，向量可以用8字节编码表示，这使得一台配备256G内存的普通服务器能够在内存中存储320亿个向量。因此，使用PQ的ANN搜索不需要I/O操作。PQ背后的关键思想是将每个向量分成 $m$ 个不同的子向量，并分别对每个子向量进行编码。为了处理响应ANN查询，PQ使用缓存驻留查找表计算查询向量与大量数据库向量之间的距离。这个过程称为PQ扫描，具有很高的CPU成本，是本文的重点。</p>
+<p>由于依赖于内存，PQ扫描每秒可以扫描数亿个数据库向量。然而，由于PQ扫描执行许多表查找，所以它不能充分利用现代cpu的功能。因此，它的cpu成本仍然很高，正如在[19]中报告的那样。尤其是，PQ扫描不能利用SIMD指令，而SIMD指令对性能仍然至关重要。本文以PQ扫描为例，研究了基于查找表的算法不能利用SIMD指令的原因。我们提出了缓存驻留查找表的替代方案，从而提高了性能。在此基础上，设计了一种新的PQ快速扫描算法。PQ快速扫描比PQ扫描性能好4-6倍，同时返回完全相同的结果。更具体地说，本文的贡献如下：</p>
+<ul>
+<li>我们广泛地分析了PQ扫描性能。我们的研究表明，根据L1缓存调整查找表的大小对性能来说是不够的。我们还证明了使用SIMD指令不能有效地实现PQ扫描，即使使用最新一代英特尔cpu中可用的<code>gather</code>指令也不行。</li>
+<li>我们设计PQ快速扫描来解决这些问题。PQ快速扫描背后的关键思想是构建小表，它的大小适合SIMD寄存器，可以使用快速SIMD指令查找。我们使用这些小表来计算距离的下界，并避免不必要地访问驻留在缓存中的查找表。该技术能够减少95%以上的L1缓存访问，从而显著提高了性能。为了构建这些小表，我们依赖于：(i) 相似向量的分组；(ii) 最小表的计算；(iii) 将点距离量化到8位整数。</li>
+<li>我们在英特尔CPU上实施PQ快速扫描，并评估其在高维向量的公共ANN SIFT1B数据集上的性能。 我们分析影响其性能的参数，并通过实验证明它比PQ扫描实现了4-6倍的加速。</li>
+<li>我们讨论了PQ快速扫描中使用的技术在ANN搜索范围之外的应用。</li>
+</ul>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>本节描述(i) 如何使用乘积量化（PQ）通过紧凑编码表示高维向量，以及(ii) 用PQ处理响应ANN查询所涉及的各个步骤。</p>
+<h2 id="乘积量化"><a href="#乘积量化" class="headerlink" title="乘积量化"></a>乘积量化</h2><p>乘积量化建立在向量量化上，通过紧凑编码表示高维向量[14]。向量量化是一个函数 $q$，它将一个 $d$ 维向量 $x$ 映射到一个 $d$ 维向量 $c_i$，$c_i$ 属于一个预定义的向量集 $\mathcal {C}$。向量 $c_i$ 被称为中心，并且大小为 $k$ 的中心集合 $\mathcal C$ 是码本。</p>
+<script type="math/tex; mode=display">
+q:\mathbb{R}^d\rightarrow\mathcal C=(c_0,...,c_{k-1})\\
+q(x)=\mathcal{C}[i]=c_i</script><p>我们考虑Lloyd-优化量化器，它将向量映射到它们最近的中心，并且可以使用k均值[20]构建。</p>
+<script type="math/tex; mode=display">
+q(x)=\text{arg min}_{c_i\in\mathcal{C}}||x-c_i||</script><p>向量量化器利用最接近中心 $c_i$ 的索引 $i$ 作为代表，用紧凑编码表示向量。这使得浮点数的128维向量（128x32位或512字节的存储）能够由其最接近的中心的索引（单个64位整数或8个字节的存储）表示。</p>
+<script type="math/tex; mode=display">
+\text{code}(x)=i,\text{ such that }q(x)=\mathcal C[i]</script><p>为了保持量化误差较低，有必要构建一个具有大量中心的量化器（例如 $k = 2^{64}$ 个中心）。然而，构建这样一个量化器在处理和内存需求方面都是棘手的。</p>
+<p>乘积量化（PQ）通过将维度 $d$ 的输入子向量 $x$ 划分为 $m$ 个不同的子向量 $u_j(x),0\le j \le m$ 来解决该问题，并使用不同的较低复杂度的子量化器分别量化每个子向量。 每个子向量 $u_j(x)$ 具有维度 $d^\ast = d/m$，其中 $d$ 是 $m$ 的倍数。</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+x=(\underbrace{x_0,...,x_{d^\ast-1}}_{u_0(x)},...,\underbrace{x_{d-d^\ast},...,x_{d-1}}_{u_{m-1}(x)})
+\end{equation}</script><p>乘积量化器 $q_p$ 使用 $m$ 个子量化器来量化输入向量 $x$。每个子量化器 $q_j, 0\le j&lt;m$ 是维数 $d$ 的向量量化器，具有不同的码本 $\mathcal C_j$。</p>
+<script type="math/tex; mode=display">
+q_j:\mathbb{R}^{d^\ast}\rightarrow\mathcal{C}_j=(c_{j,0},...,c_{j,k^\ast-1})</script><p>乘积量化器 $q_p$ 映射维数为 $d$ 的输入向量 $x$，如下所示：</p>
+<script type="math/tex; mode=display">
+q_p:\mathbb{R}^d\rightarrow \mathcal C_0\times...\times \mathcal{C}_m\\
+\begin{align*}
+q_p(x)&=(q_0(u_0(x)),...,q_{m-1}(u_{m-1}(x)))\\
+&=(\mathcal{C}_0[i_0],...,\mathcal{C}_m[i_m])
+\end{align*}</script><p>通过将 $m$ 个子量化器 $q_j$ 返回的 $m$ 个中心的索引拼接起来，乘积量化器 $q_p$ 可以用紧凑编码 $\text{pqcode}(x)$ 表示输入向量 $x$：</p>
+<script type="math/tex; mode=display">
+\text{pqcode}(x)=(i_0,...,i_m),\\
+\text{such that }q_p(x)=(\mathcal{C}_0[i_0],...,\mathcal C_m[i_m])</script><p>我们只考虑子量化器码本 $\mathcal C_j$ 具有相同大小 $k^\ast$ 的乘积量化，乘积量化的主要优点是它们能够从中心数 $k^\ast$ 较低的子量化器中产生大量的中心 $k$，即 $k = (k^\ast)^m$。例如，一个包含8个子量化器的 $2^8$ 个中心的乘积量化，其总数 $k=(2^8)^8 = 2^{64}$ 个中心。我们专注于 $2^{64}$ 个中心的乘积量化器，因为它们在复杂度和质量之间为近邻搜索[14]提供了一个很好的平衡点。</p>
+<p>我们引入符号 $\text{PQ }m\times\text{log}_2(k^\ast)$ 来指定具有 $m$ 个子量化器和每个子量化器的 $k^\ast$ 个中心的乘积量化器。因此，$\text{PQ}8\times8$ 表示具有 $8$ 个子量化器的乘积量化器，并且每个子量化器具有 $2^8 = 256$ 个中心。任何 $(m,k^\ast)$ 配置使得 $m\times\text{log}_2(k^\ast)= 64$ 允许构建具有 $2^{64}$ 个中心的乘积量化器。$m$ 和 $k^\ast$ 参数影响(i) 学习乘积量化器的复杂性；(ii) 其准确性和(iii) 数据库向量的存储表示。$m$ 值越低，$k$ 值越高，以增加学习复杂度为代价，为乘积量化器提供了更低的量化误差。数据库向量存储为 $\text {pqcodes}$，由 $m$ 个 $\text{log}_2(k^\ast)$ 位索引组成。因此，在本文的其余部分中，我们将存储在数据库中的 $\text{pqcode}$ 称为数据库向量，或者简称为向量。图1显示了6个数据库向量 $p,…,u$ 采用 $\text{PQ }8\times8$ 量化器编码的内存表示。每个向量由8个8位的索引组成。</p>
+<p><img src="http://image.rexking6.top/img/clip1552616133.png" alt=""></p>
+<p><em>图1. 存储中的数据库向量。</em></p>
+<h2 id="乘积量化用于ANN搜索"><a href="#乘积量化用于ANN搜索" class="headerlink" title="乘积量化用于ANN搜索"></a>乘积量化用于ANN搜索</h2><p>最近邻搜索需要计算存储在数据库中的向量与查询向量 $y$ 之间的距离。 我们考虑平方距离，因为它们在保留顺序的同时避免了平方根计算。 非对称距离计算（ADC）方法允许计算查询向量 $y$ 和数据库向量 $p$ 之间的距离，而无需量化查询向量[14]。 ADC近似查询向量 $y$ 与数据库向量 $p$ 之间的距离为：</p>
+<script type="math/tex; mode=display">
+\tilde d(p,y)=\sum_{j=0}^{m-1}d(u_j(y),\mathcal{C}_j[p[j]])</script><p>其中 $d(u_j(y),\mathcal{C}_j[p[j]])$ 是查询向量 $y$ 的第 $j$ 个子向量和数据库向量 $p$ 关联的第 $j$ 个中心 $\mathcal{C}_j[p[j]]$ 之间的平方距离。</p>
+<p>为了实现快速ANN查询，已经提出了IVFADC [14]系统。 该系统在乘积量化器和ADC之上添加倒排索引（IVF）。 索引是从基本的向量量化器构建的，称为粗量化器。 粗量化器的每个Voronoi单元形成数据库的分区。 使用IVFADC回答ANN查询涉及三个步骤（算法1）：</p>
+<ol>
+<li>使用索引选择数据库的分区。所选分区对应于查询向量所在的粗量化器的Voronoi单元。</li>
+<li>计算距离表，用于加速ADC计算。</li>
+<li>扫描分区，即计算查询向量与分区的所有向量之间的ADC。我们将此步骤命名为PQ扫描。</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1552616721.png" alt=""></p>
+<p>PQ通过扫描大量的向量来获得较高的召回率。根据数据库大小和索引参数，所选分区通常包含数千到数百万个向量。我们关注非常大的数据库和超过300万个向量的分区。在这种情况下，步骤1和步骤2占用的CPU时间不到1%，而步骤3占用的CPU时间超过99%。</p>
+<p>一旦选择了分区，就计算 $m$ 个距离表 $D_j, 0\le j&lt;m$（步骤2）。这些距离表特定于给定的查询向量。每个 $D_j$ 距离表由查询向量 $y$ 的第 $j$ 个子向量与第 $j$ 个子量化器的每个中心之间的距离组成：</p>
+<script type="math/tex; mode=display">
+D_j=(d(u_j(y),\mathcal{C}_j[0]),...,d(u_j(y),\mathcal{C}_j[k^\ast-1]))</script><p>为了更容易表示，我们在算法1中省略了计算距离表的定义，但它对应于式(2)的实现。利用这些距离表，可以将ADC式(1)改写为：</p>
+<script type="math/tex; mode=display">
+\tilde d(p,y)=\sum_{j=0}^{m-1}D_j[p[j]]</script><p>PQ扫描（步骤3）迭代所选分区的所有向量（算法1，第9行），并使用 <code>PQDISTANCE</code> 函数计算查询向量与分区的每个向量之间的ADC（算法1，第11行）。<code>PQDISTANCE</code>函数是式(3)的实现，图2为查询向量与第一个数据库向量之间的 <code>PQDISTANCE</code> 计算。使用第一个中心索引（$p[0] = 02$）在第一个距离表（$D_0$）中查找一个值，使用第二个中心索引（$p[1] = 04$）在第二个距离表（$D_1$）中查找一个值，等等。然后将所有查找到的值相加，以计算最终的距离。</p>
+<p><img src="http://image.rexking6.top/img/clip1552788812.png" alt=""></p>
+<p><em>图2. PQ距离计算。</em></p>
+<h1 id="PQ扫描的限制"><a href="#PQ扫描的限制" class="headerlink" title="PQ扫描的限制"></a>PQ扫描的限制</h1><p>在本节中，我们展示了尽管其复杂度明显较低，但PQ扫描无法在CPU上高效实施。 我们确定了限制其性能的两个基本瓶颈：(i) 它执行的许多缓存访问以及(ii) 使用SIMD无法有效地实现它。 识别这些瓶颈是设计克服PQ扫描限制的新算法的关键。</p>
+<h2 id="内存访问"><a href="#内存访问" class="headerlink" title="内存访问"></a>内存访问</h2><p>由于PQ扫描通过在不同的核上运行每个查询来自然地在多个查询上并行化，所以我们将重点放在单内核性能上。PQ扫描计算查询向量与每个数据库向量之间的 <code>pqdistance</code>，这几乎占用了所有CPU周期。每个 <code>pqdistance</code> 计算所需的操作数取决于乘积量化器的参数 $m$。每个 <code>pqdistance</code> 计算包括：</p>
+<ul>
+<li>$m$ 内存访问加载中心索引 $p[j]$（算法1，第22行）$[mem1]$</li>
+<li>$m$ 内存访问从距离表加载 $D_j[\text{index}]$ 值（算法1，第23行）$[mem2]$</li>
+<li>$m$ 个加法（算法1，第23行）</li>
+</ul>
+<p>我们区分了两种类型的内存访问：$mem1$ 对中心索引的访问和 $mem2$ 对距离表的访问，因为它们可能达到不同的缓存级别。我们分析了这两种类型内存访问的局部性。由于现代cpu中包含了硬件预取器，$mem1$ 访问总是命中L1缓存。事实上，硬件预取器能够检测顺序内存访问并预取数据到L1缓存。我们按顺序访问 $p[j]$ 值，即首先访问$p[0]$，其中 $p$ 是第一个数据库向量，然后访问 $p[1]$，直到 $p[m-1]$。接下来，对第二个数据库向量执行相同的访问，直到遍历所有数据库向量。</p>
+<p>$mem2$ 访问的缓存级别取决于乘积量化器的 $m$ 和 $k$ 参数。实际上，距离表的大小是由 $m\times k\times \text{sizeof(float)}$ 给出的，它会影响存储的缓存级别。为了得到一个具有 $2^{64}$ 个中心的乘积量化器，$m\times \text{log}_2(k^\ast) = 64$，这对精度很重要。因此，更小的 $m$ 值导致更少的内存访问和加法，但意味着更高的 $k^\ast$ 值，即更大的距离表，这些表存储在更高的缓存级别。表1总结了不同缓存级别的属性，以及可以存储距离表的乘积量化器组合。</p>
+<p><img src="http://image.rexking6.top/img/clip1552618842.png" alt=""></p>
+<p><em>表1. 缓存级别属性（Nehalem-Haswell）。</em></p>
+<p>$\text{PQ }16\times 4$ 并不吸引人，因为它需要比 $\text{PQ }8\times 8$ 更多的内存访问，而且对于这两种设置，距离表都可以存储在L1缓存中。$\text{PQ }4\times 16$ 所需的内存访问量比 $\text{PQ }8\times8$ 少两倍，但 $\text{PQ }4\times 16$ 距离表存储在L3缓存中，其延迟时间比L1缓存高5倍。 总的来说，$\text{PQ }8\times 8$ 提供了最佳的性能，是文献中最常用的配置[14,27,4,10,21]。 因此，从现在开始，我们专注于 $\text{PQ }8\times 8$。</p>
+<p>我们使用性能计数器来实验分析不同PQ扫描实现的性能（图3）。对于所有实现，具有挂起加载操作（周期 $w$ /加载）的周期数几乎等于周期数，这表明PQ扫描是一种内存密集型算法。我们还测量了L1缓存未命中的次数（图3中没有显示）。L1缓存未命中的次数占所有实现的内存访问的1%以下，这意味着 $mem1$ 和 $mem2$ 访问都命中L1缓存。PQ扫描的朴素实现（算法1）对每个扫描向量执行16个L1负载：8个 $mem1$ 访问和8个 $mem2$ 访问。[14]的作者发布了libpq库，其中包括PQ扫描的优化实现。我们在商业许可下获得了libpq的副本。  PQ扫描的libpq实现不是加载每个8位的8个中心索引（$mem1$ 访问），而是将64位字加载到寄存器中，并执行8位移位以访问各个中心索引。这允许将 $mem1$ 访问次数从8减少到1.因此，PQ扫描的libpq实现每个扫描向量执行9个L1加载：1个 $mem1$ 访问和8个 $mem2$ 访问。但总的来说，libpq实现比我们的Haswell处理器上的简单实现略慢。实际上，指令数量的增加抵消了IPC（每周期指令）的增加和L1负载的减少。</p>
+<p><img src="http://image.rexking6.top/img/clip1552629307.png" alt=""></p>
+<p><em>图3. 4种PQ扫描实现的扫描次数和性能计数器（25M向量）。</em></p>
+<h2 id="无法利用SIMD指令"><a href="#无法利用SIMD指令" class="headerlink" title="无法利用SIMD指令"></a>无法利用SIMD指令</h2><p>除了缓存访问之外，PQ扫描还需要每次 <code>pqdistance</code> 计算中进行 $m$ 次加法。 我们评估SIMD指令的适用性，以减少用于添加的指令数和CPU周期。 SIMD指令对一个指令中的多个数据元素执行相同的操作，例如加法。 为此，SIMD指令在宽寄存器上运行。 SSE SIMD指令在128位寄存器上运行，而最近推出的AVX SIMD指令在256位寄存器上运行[2]。 SSE指令可以以4种浮点方式（4x32位，128位）运行，而AVX指令可以以8种浮点方式（8x32位，256位）运行。 在本小节中，我们考虑AVX指令，因为它们在我们的实验中提供了最好的结果。 我们表明PQ扫描结构阻止了SIMD指令的有效使用。</p>
+<p>为了使用快速的垂直SIMD加法，我们一次计算查询向量与8个数据库向量之间的 <code>pqdistance</code>，由字母 $a$ 到 $h$ 指定。我们仍然发出8条加法指令，但是每条指令包含8个不同的向量，如图4所示。总的来说，用于加法的指令数除以8。然而，使用SIMD加法所带来的周期收益被需要逐个设置SIMD寄存器的方式所抵消。当所有方式的所有值在内存中连续并且可以在一条指令中加载时，SIMD处理效果最佳。因为它们是在表中查找的，$D_0[a[0]],D_0[b[0]],…,D_0[h[0]]$ 的值在内存中不是连续的。因此，我们需要以SIMD寄存器的第一种方式插入 $D_0[a[0]]$，然后以第二种方式插入 $D_0[b[0]]$，等等。除了内存访问之外，这样做还需要许多SIMD指令，其中一些指令具有很高的延迟。总的来说，这抵消了SIMD添加所带来的好处。这就解释了为什么依赖于查找表（如PQ扫描）的算法很难从SIMD处理中获益。图3显示了PQ扫描的AVX实现需要的指令比简单的实现稍微少一些，并且只稍微快一些。</p>
+<p><img src="http://image.rexking6.top/img/clip1552630256.png" alt=""></p>
+<p><em>图4. 用SIMD垂直加法的PQ扫描。</em></p>
+<p>为了解决这个问题，英特尔在其最新架构Haswell[2]中引入了一个<code>gather</code>SIMD指令。给定一个包含8个索引的SIMD寄存器和一个存储在内存中的表，<code>gather</code>从表中查找8个对应的元素并将它们存储在寄存器中，只需一条指令。这避免了必须使用许多SIMD指令来设置SIMD寄存器的8种方式。图5显示了如何使用<code>gather</code>在第一个距离表（$D_0$）中查找8个值。特别地，要使用<code>gather</code>，我们需要一个 $a[0],…,h[0]$ 连续存储在内存中，以便可以在一条指令中加载它们。为此，我们对图1中所示的数据库的内存布局进行了转换。我们连续存储8个向量的第一个分量（$a[0],…,h[0]$），然后是相同8个向量的第二个分量（$a[1],…,h[1]$）而不是存储第一个向量的所有分量（$a[0],…,,a[7]$），其次是第二个向量的分量（$b[0],…,b[7]$）。这还允许将 $mem1$ 访问次数从8次减少到1次，类似于libpq实现。</p>
+<p><img src="http://image.rexking6.top/img/clip1552630761.png" alt=""></p>
+<p><em>图5. SIMD gather操作。</em></p>
+<p>然而，PQ扫描的<code>gather</code>实现比原始版本慢（图3），这可以由几个因素解释。首先，即使它只包含一条指令，<code>gather</code>也会对它加载的每个元素执行1个内存访问，这意味着内存延迟的问题；第二，在硬件层面，<code>gather</code>执行34 μops<sup>2</sup>（表2），其中大部分指令只执行1μops。图3显示了<code>gather</code>实现指令数量过低，但μops计数高。对于其他实现，μops的数量仅略高于指令的数量。它还具有18个周期的高延迟和10个周期的吞吐量（表2），这意味着需要等待10个周期，以便在发出一个新的gather指令之后再对其进行操作。 这变成为流水线的利用率不佳，如gather使用的IPC非常低（图3）。在其文档中，英特尔承认收集指令可能只会在特定情况下带来性能优势[1]，其他作者报告了类似的结果[13]。</p>
+<p><img src="http://image.rexking6.top/img/clip1552632358.png" alt=""></p>
+<p><em>表2. 指令属性（Haswell）。</em></p>
+<h1 id="PQ快速扫描"><a href="#PQ快速扫描" class="headerlink" title="PQ快速扫描"></a>PQ快速扫描</h1><p>在本节中，我们提出了一种新的PQ快速扫描算法，该算法克服了PQ扫描的局限性。PQ快速扫描每个扫描向量执行少于2个L1缓存访问，并允许使用SIMD指令高效地实现添加。根据设计，PQ快速扫描返回的结果与 $\text{PQ }8\times 8$ 量化器的PQ扫描完全相同，同时执行速度快4-6倍。</p>
+<h2 id="描述"><a href="#描述" class="headerlink" title="描述"></a>描述</h2><p>PQ快速扫描背后的关键思想是使用小表，大小为 $t$ 个SIMD寄存器，而不是缓存驻留的距离表。这些小表用于计算距离的下界，而不访问L1缓存。因此，下界计算速度很快。此外，它们是使用SIMD加法来实现的，进一步提高了性能。我们使用下界计算来修剪缓慢的 <code>pqdistance</code> 计算，这些计算访问L1缓存，并且不能从SIMD的加法中获益。图6显示了应用于每个数据库向量 $p$ 的处理步骤。符号 $\otimes$ 表示我们丢弃向量 $p$ 并移动到下一个数据库向量。最小值是查询向量到当前最近邻的距离。我们在SIFT数据上的实验结果表明，PQ快速扫描能够去除95%的 <code>pqdistance</code> 计算。</p>
+<p><img src="http://image.rexking6.top/img/clip1552632408.png" alt=""></p>
+<p><em>图6. PQ快速扫描概述。</em></p>
+<p>为了计算下界，我们需要查找存储在SIMD寄存器中的小表中的值。为此，我们使用了<code>pshufb</code>指令，这是PQ快速扫描性能的关键。与<code>gather</code>类似，<code>pshufb</code>在表中查找与存储在SIMD寄存器中的索引对应的值。但是，对于<code>gather</code>，表存储在内存中，而对于<code>pshufb</code>，表存储在SIMD寄存器中。这允许<code>pshufb</code>具有比<code>gather</code>低得多的延迟，但将小表的大小限制为16个元素，每个元素8位（16x8位，128位）。此外，<code>pshufb</code>使用16个索引，而<code>gather</code>只使用8个索引。表2总结了<code>gather</code>和<code>pshufb</code>的属性。</p>
+<p>为了计算 <code>pqdistance</code>，原始PQ扫描算法（具有 $\text{PQ }8\times 8$ 量化器）使用8个距离表 $D_j,0\le j &lt;8$，并且每个距离表包括256个32位元素。 因此，一个距离表（256个32位）不适合SIMD寄存器，这就是我们需要构建小型表的原因。 就像有8个距离表 $D_j,0\le j&lt; 8$，我们构建8个小表 $S_j,0\le j &lt;8$。每个小表 $S_j$ 存储在不同的SIMD寄存器中，并通过将变换应用于相应的 $D_j$ 表来构建。</p>
+<p>为了构建适合计算距离下限的8个小表，我们结合了三种技术：(1) 向量分组；(2) 最小表的计算和(3) 距离的量化。 前两种技术，向量分组和最小表的计算，用于构建16个元素（16x32位）的表。 第三种技术，距离量化，用于将每个元素缩小到8位（16x32位$\rightarrow$16x8位）。我们将向量和量化距离分组以构建前四个小表 $S_0,…,S_3$。我们计算最小表并量化距离以构建最后四个小表，$S_4,…,S_7$。 图7总结了这个过程。</p>
+<p><img src="http://image.rexking6.top/img/clip1552638195.png" alt=""></p>
+<p><em>图7. 小表构建过程。</em></p>
+<h2 id="向量分组"><a href="#向量分组" class="headerlink" title="向量分组"></a>向量分组</h2><p>数据库向量是 $\text{pqcode}$，它由8个8位的分量组成（图9a）。在计算 <code>pqdistance</code> 时，将每个分量作为对应距离表中的索引，例如将第一个分量作为第一个距离表中的索引。向量分组背后的关键思想是对向量进行分组，使属于一个组的所有向量都能命中距离表中16个元素的相同部分。</p>
+<p><img src="http://image.rexking6.top/img/clip1552638268.png" alt=""></p>
+<p><em>图9. 向量分组。</em></p>
+<p>我们关注第一个距离表 $D_0$。我们在第一个分量上对向量进行分组，将 $D_0$ 表分成16个部分，每个部分由16个元素组成（图8）。 具有在 <code>00</code> 和 <code>0f</code>（0到15）之间的第一分量 $p[0]$ 的所有数据库向量 $p$ 将在计算 <code>pqdistance</code> 时触发 $D_0$ 的部分 <code>0</code> 中的查找。 这些向量形成组 $0$。所有具有 <code>10</code> 和 <code>1f</code>（16到31）之间的第一分量的向量将触发 $D_0$ 的部分 <code>1</code> 中的查找。 这些向量构成组 $1$。我们以这种方式定义了16个组。 每个组由整数 $i$ 标识，并包含数据库向量 $p$ ，使得：</p>
+<script type="math/tex; mode=display">
+16(i-1)\le p[0]<16i</script><p>并且仅需要第一距离表的部分 $i$，$D_0$。 我们在第2，第3和第4个分量上应用相同的分组程序。 最终，每个组由四个整数（$i_0,i_1,i_2,i_3$）标识，每个整数属于 $[0,16]$ 并包含以下向量：</p>
+<script type="math/tex; mode=display">
+16(i_0-1)\le p[0]< 16i_0 \wedge 16(i_1-1)\le p[1]< 16i_1\wedge16(i_2-1)\le p[2]< 16i_2\wedge16(i_3-1)\le p[3]< 16i_3</script><p>图9b显示了一个数据库，其中对所有向量进行了分组。我们可以看到组（$3,1,2,0$）具有 <code>30</code> 和 <code>3f</code> 之间的第一个分量，<code>10</code> 和 <code>1f</code> 之间的第二个分量，以此类推。要计算查询向量到组中的任意向量（$i_0,i_1,i_2,i_3$）的<code>pqdistance</code>，只需要 $D_0$、$D_1$、$D_2$ 和 $D_3$ 的一部分。在扫描组之前，我们加载 $D_0,…,D_3$ 的相关部分到4个SIMD寄存器中，将它们用作小表 $S_0,…,S_3$。此过程如图13中的实线箭头所示。我们不对所有8个分量分组，以免创建太小的组。组的平均大小 $s$ 由 $s = n/16^c$ 给出，其中 $n$ 为扫描分区中的向量个数，$c$ 为分组所用的分量个数。为了获得最佳性能，$s$ 应该超过50个向量。实际上，在扫描组之前，我们将部分距离表加载到SIMD寄存器中，这是非常昂贵的。如果这个组包含的向量少于50个，那么大部分CPU时间都花在加载距离表上。这不利于性能，如我们的实验结果所示（第5.6节）。因此，能够在 $c$ 分量上对向量进行分组的最小分区大小 $n_{min}(c)$ 由 $n_{min}(c)= 50·16^c$ 确定，并且随着用于分组的分量的数量呈指数增加。在本文中，我们以 $n = 3.2-25$ 万个向量的分区为目标，因此我们总是在 $c = 4$ 个分量上进行分组。</p>
+<p><img src="http://image.rexking6.top/img/clip1552638313.png" alt=""></p>
+<p><em>图8. 第一个距离表的部分。</em></p>
+<p>分组向量还允许将数据库消耗的内存减少大约25%。在一个组中，所有向量的第一个分量都有相同的4个最重要的位。当我们对前4个分量进行分组时，它们的第2、3和4个分量也具有相同的最重要位。因此，我们可以避免存储每个数据库向量的前4个组件的4个最重要的位。这节省了 $4\times 4=16$ 位，而每个向量的 $8\times 8=64$ 位，这将减少25%的内存消耗。因此，在图9b中，灰色的十六进制数字（表示4位）可能不会被存储。</p>
+<h2 id="最小表"><a href="#最小表" class="headerlink" title="最小表"></a>最小表</h2><p>我们将向量分组来构建前四个小表 $S_0,…,S_3$。要构建最后四个小表，$S_4,…,S_7$ 我们计算最小表。这包括划分原始距离表 $D_4,…,D_7$，分为16个元素中的16个部分。然后，我们保留每个部分的最小值，以获得一个包含16个元素的表。这个过程如图10所示。仅使用最小表技术会导致包含低值的小表，这不利于PQ快速扫描性能。如果这些值过低，则计算的下界不紧，即远离实际的 <code>pqdistance</code>。这限制了PQ快速扫描的能力，即删除昂贵的 <code>pqdistance</code> 计算。</p>
+<p><img src="http://image.rexking6.top/img/clip1552638666.png" alt=""></p>
+<p><em>图10. 最小表。</em></p>
+<p>为了获得具有更高值的小表，我们引入了子量化器中心索引的优化分配。距离表中的每个值 $D_j[i]$ 是查询向量的第 $j$ 个子向量与第 $j$ 个子量化器的索引 $i$ 的中心之间的距离（第2.2节）。学习子量化器时，任意分配质心索引。因此，在具有对应于距离表的一部分的索引的中心（例如具有在 <code>00</code> 和 <code>0f</code> 之间的索引的中心）之间没有特定关系。相反，我们的优化分配确保对应于给定部分（例如 <code>00</code> 到 <code>0f</code> ）的所有索引被分配给彼此接近的中心，如图11所示。对应于相同部分的中心具有相同的背景颜色。为清楚起见，图11显示了4个索引的4个部分，但实际上我们有16个索引的16个部分。这种优化的分配是有益的，因为接近给定中心的查询子向量很可能也接近附近的中心。因此，距离表的给定部分中的所有值都将接近。这允许计算具有更高值的最小表，并因此更低的下限。为了获得这种优化的分配，我们将中心分为16个元素的16个聚类，每个元素使用k均值的变体来强制相同大小的组[24]。给予同一聚类中的中心连续索引，对应于距离表的一部分。这种中心索引的优化分配取代了学习子量化器时应用的任意分配。</p>
+<p><img src="http://image.rexking6.top/img/clip1552639142.png" alt=""></p>
+<p><em>图11. 中心索引分配。</em></p>
+<h2 id="距离量化"><a href="#距离量化" class="headerlink" title="距离量化"></a>距离量化</h2><p>向量分组和最小表技术用于从原始 $D_j$ 距离表（256x32位）构建16个元素的表，每个元素32位。为了使这些表可以用作小表，我们还需要将每个元素压缩到8位。为此，我们将浮点数距离量化为8位整数。由于没有SIMD指令来比较无符号8位整数，我们将距离量化为有符号8位整数，只使用它们的正范围，即0-127。我们将 $qmin$ 和 $qmax$ 之间的浮点距离量化为 $n = 127$ 个bin。每个bin的大小为 $(qmax-qmin)/n$， bin编号（0-126）作为量化浮点数的表示值。$qmax$ 以上的所有距离都量化为127（图12）。</p>
+<p><img src="http://image.rexking6.top/img/clip1552639379.png" alt=""></p>
+<p><em>图12. 量化边界的选择。</em></p>
+<p>我们将 $qmin$ 设置为所有距离表的最小值，这是我们需要表示的最小距离。将 $qmax$ 设置为最大可能的距离，即所有距离表的最大值之和，导致高量化误差。因此，为了确定 $qmax$ ，我们使用原始的PQ扫描算法在数据库的前$keep$%的向量（通常为 $keep=1$%）中找到查询向量的临时最近邻。然后，我们使用查询向量和这个临时最近邻居之间的距离作为 $qmax$ 边界。我们不需要表示高于这个距离的距离，因为所有未来的最近邻候选项都将比这个临时最近邻更接近查询向量。$qmin$ 和 $qmax$ 界限的选择允许我们表示一个小的但是相关的距离范围（图12）。因此，量化误差是最小的，正如我们的实验结果（第5.5节）。最后，为了避免整数溢出问题，我们使用饱和SIMD加法。</p>
+<h2 id="在小表中查找"><a href="#在小表中查找" class="headerlink" title="在小表中查找"></a>在小表中查找</h2><p>在本小节中，我们将描述如何通过查找小表中的值并添加它们来计算下限。前四个小表 $S_0,…,S_3$ 对应于 $D_0,…,D_3$的量化部分。 我们在扫描每组之前将这些量化部分加载到SIMD寄存器中，如图13中的实线箭头所示。因此，两个不同的组使用不同的小表 $S_0,…,S_3$。 相反，通过计算最小表构建的后四个小表 $S_4,…,S_7$ 不会更改，并用于扫描整个数据库。 它们在扫描过程开始时加载到SIMD寄存器中。</p>
+<p>由于小表包含16个值，所以按4位进行索引。 给定数据库向量 $p$，我们使用 $p[0],…,p[3]$ 的4个最低有效位来索引$S_0,…,S_3$ 中的值和 $p[4]…p[7]$ 的4个最重要的位到 $S_4,…,S_7$ 中的索引值。索引在图13中圈出（4个最重要的位对应于第一个十六进制数字，4个最不重要的位对应于第二个十六进制数字），小表中的查找用虚线箭头表示。 虚线箭头描绘的查找使用 <code>pshufb</code> 执行。 要计算下限，我们添加8个查找值。 为了决定修剪 <code>pqdistance</code> 计算，将下限与最小的量化值（查询向量与当前最近邻之间的距离）进行比较。</p>
+<p><img src="http://image.rexking6.top/img/clip1552650224.png" alt=""></p>
+<p><em>图13. 使用小表计算下界。</em></p>
+<h1 id="评价"><a href="#评价" class="headerlink" title="评价"></a>评价</h1><p>本部分的目的有两个方面：一是评价PQ快速扫描的性能，二是分析PQ快速扫描的相关参数。我们证明，在常见的使用场景中，PQ快速扫描的性能比PQ扫描好4-6倍。</p>
+<h2 id="实验设置"><a href="#实验设置" class="headerlink" title="实验设置"></a>实验设置</h2><p>我们在c++中使用内联函数实现了PQ快速扫描来访问SIMD指令。我们的实现使用来自SSSE3、SSE3和SSE2指令集的SIMD指令。我们将PQ快速扫描的实现与3.1节介绍的PQ扫描的libpq实现进行了比较。在所有测试平台上，我们都使用gcc和g++编译器版本4.9.2，并使用以下编译选项：<code>-O3 -m64 -march=native -ffast-math</code>。我们在Clear BSD许可下发布了源代码。</p>
+<p>我们在最大的公共高维向量集ANN SIFT1B上对PQ快速扫描进行了评价。它由3个部分组成：1亿个向量的学习集、10亿个向量的基集和1万个向量的查询集。我们将乘积量化器的学习集限制为1000万个向量。该数据集的向量是维度128的SIFT描述符。我们使用ANN SIFT1B的两个子集进行实验：</p>
+<ul>
+<li>ANN SIFT100M1，是1亿个基集合向量的子集，我们建立了一个包含8个分区的索引；每个查询被定向到最相关的分区，然后用PQ快速扫描和PQ扫描进行扫描。表3总结了不同分区的大小。</li>
+<li>ANN SIFT1B，包含10亿个向量的完整基集，在更大的范围内测试我们的算法。</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1552650396.png" alt=""></p>
+<p><em>表3. 用于实验的分区大小。</em></p>
+<p>我们研究了以下影响PQ快速扫描性能的参数：</p>
+<ul>
+<li>$keep$，保存在数据库开头的向量的百分比（第4.4节）。即使使用PQ快速扫描，这些向量也会使用初始的PQ扫描算法进行扫描，以找到临时的最近邻。然后将查询向量到临时最近邻的距离用作距离表量化的 $qmax$ 值。</li>
+<li>$topk$，搜索过程返回的最近邻居的数量。为了简单起见，我们将PQ扫描和PQ快速扫描描述为返回一个最近的邻居。实际上，它们返回多个最近的邻居，例如topk = 100，用于多媒体数据库中的信息检索。</li>
+<li>$partition size$，扫描分区中的向量个数。</li>
+</ul>
+<p>我们比较了PQ快速扫描（表示为 $fastpq$）和PQ扫描的libpq实现（表示为 $libpq$）的性能。 我们比较它们各自的扫描速度，用每秒扫描的数百万个向量表示 [M vecs/s]。 通过将响应时间除以分区大小来获得扫描速度。 我们不评估PQ快速扫描的准确度，召回率或精度，因为PQ快速扫描返回与PQ扫描完全相同的结果，PQ精度已经得到了广泛的研究[14]。 除了理论保证之外，我们检查了PQ快速扫描返回的结果与每次实验的PQ扫描的libpq实现相同。 最后，我们在各种不同的平台上运行PQ快速扫描（表5），并证明它始终优于PQ扫描4-6倍。 所有实验都在单处理器核心上运行。除非另有说明，否则在笔记本电脑（A）上进行实验（表5）。</p>
+<p><img src="http://image.rexking6.top/img/clip1552650883.png" alt=""></p>
+<p><em>表5. 测试平台的配置。</em></p>
+<h2 id="响应时间分布"><a href="#响应时间分布" class="headerlink" title="响应时间分布"></a>响应时间分布</h2><p>我们研究了PQ快速扫描响应时间的分布规律。与PQ扫描相反，PQ快速扫描响应时间随查询向量的变化而变化。实际上，PQ的快速扫描性能取决于可以修剪的 <code>pqdistance</code> 计算量，这取决于查询向量。图14显示了在分区0上执行的2595个最近邻查询的响应时间分布。正如所预期的，PQ扫描在不同的查询向量上的响应时间几乎是恒定的。PQ快速扫描响应时间更加分散，但是它对大量查询的响应速度是PQ扫描的4-6倍，如表4所示。在本节的其余部分，当研究不同参数对PQ快速扫描性能的影响时，我们绘制中值响应时间或中值扫描速度。我们使用第1/4（第25百分位）和第3/4（第75百分位）来绘制误差线。因为它直接影响性能，我们还绘制了修剪pqdistance计算的百分比。</p>
+<p><img src="http://image.rexking6.top/img/clip1552660224.png" alt=""></p>
+<p><em>图14. 扫描次数分布（分区0，$keep=0.5$%，$topk=100$）。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1552660124.png" alt=""></p>
+<p><em>表4. 响应时间分布。</em></p>
+<h2 id="性能计数器"><a href="#性能计数器" class="headerlink" title="性能计数器"></a>性能计数器</h2><p>我们使用性能计数器来测量扫描分区0时PQ快速扫描和PQ扫描的CPU资源使用情况（图15）。由于使用了寄存器小表，PQ快速扫描仅对每个扫描向量执行1.3个L1负载，其中PQ扫描的libpq实现需要9个L1负载。 由于使用SIMD指令而不是标量指令（每个扫描向量分别为3.7和34个指令），PQ快速扫描所需的指令比PQ扫描少89％。 PQ快速扫描比PQ扫描使用的周期少83％（每个向量分别为1.9和11个周期）。由于PQ快速扫描比PQ扫描具有更低的IPC，由于PQ快速扫描比PQ扫描具有更低的IPC，因此周期的减少略微不如指令的减少。 这是因为SIMD指令可以比标量指令更容易流水线化。</p>
+<p><img src="http://image.rexking6.top/img/clip1552661227.png" alt=""></p>
+<p><em>图15. 性能计数器（分区0，$keep=0.5$%，$topk=100$）。</em></p>
+<h2 id="keep-和-topk-参数的影响"><a href="#keep-和-topk-参数的影响" class="headerlink" title="$keep$ 和 $topk$ 参数的影响"></a>$keep$ 和 $topk$ 参数的影响</h2><p>$keep$ 和 $topk$ 都会影响修剪距离计算量，从而影响PQ的快速扫描性能。对于多媒体数据库中的信息检索，$topk$ 通常设置在100到1000之间。因此，我们首先研究 $keep$ 对于 $topk = 100$ 和 $topk = 1000$ 的影响。$keep$ 参数影响用于量化的 $qmax$ 界的紧密性。较高的 $keep$ 值意味着使用初始的PQ扫描算法对更多向量进行扫描，以找到临时的最近邻（第4.4节）。这使得 $qmax$ 界更紧，并减小了距离量化误差。由图16可知，修剪功率随着保持而增大；然而，这种增长是适度的。$topk = 1000$ 时，修剪功率低于 $topk = 100$ 时，且对 $keep$ 更敏感。如果当前被扫描向量的下界大于查询向量与当前第 $topk$ 最近邻之间的距离，则PQ快速扫描可以删除 <code>pqdistance</code> 计算。$topk$ 值越大，表示查询向量与第 $topk$ 最近邻之间的距离越大。因此，可以减少 <code>pqdistance</code>计算量。</p>
+<p><img src="http://image.rexking6.top/img/clip1552662733.png" alt=""></p>
+<p><em>图16. $keep$ 参数的影响（所有分区）。</em></p>
+<p>随着更多的距离计算被修剪，扫描速度随着保持略微增加，直到阈值开始崩溃。 在该阈值之后，由使用慢速PQ扫描算法扫描第一 $keep$ ％向量所花费的时间增加，超过了由更紧密的 $qmax$ 界限提供的修剪距离计算的增加。 总的来说，PQ快速扫描对 $keep$ 不是很敏感，并且很快找到了合适的 $qmax$ 界限。 任何保持值在0.1％和1％之间是合适的。 我们为其余的实验设置了 $keep = 0.5$％。最后，我们评估PQ快速扫描性能以获得更多的 $topk$ 值。 图18表明PQ快速扫描性能随着 $topk$ 而降低。</p>
+<p><img src="http://image.rexking6.top/img/clip1552748435.png" alt=""></p>
+<p><em>图18. $topk$参数的影响(所有分区，$keep=0.5$%）。</em></p>
+<h2 id="距离量化的影响"><a href="#距离量化的影响" class="headerlink" title="距离量化的影响"></a>距离量化的影响</h2><p>PQ快速扫描使用三种技术来构建小表：(1) 向量分组；(2) 最小表和(3) 距离量化。在这三种技术中，最小表和距离量化会影响下界的紧密度，从而影响修剪能力。为了评估这两种技术对修剪能力的各自影响，我们实现了仅量化的PQ快速扫描版本，它仅依赖于距离量化（图17）。此版本使用256个8位整数的表，而完整版的PQ快速扫描使用16个8位整数的表。因此，仅量化版本不能使用SIMD并且不能加速。因此，图17仅显示了修剪功率，并未显示扫描速度。仅量化版本的PQ快速扫描可实现99.9％至99.97％的修剪功率。这高于完整版PQ快速扫描（即使用三种技术）的修剪能力，即98％至99.7％（图16）。这表明我们的量化方案是高度有效的，并且修剪能力的大部分损失来自最小表。</p>
+<p><img src="http://image.rexking6.top/img/clip1552746724.png" alt=""></p>
+<p><em>图17. 仅使用量化的修剪功率（所有分区）。</em></p>
+<h2 id="分区大小的影响"><a href="#分区大小的影响" class="headerlink" title="分区大小的影响"></a>分区大小的影响</h2><p>分区大小会影响扫描速度而不会影响修剪功率（图19）。 分区0,7,2,4,5和3的大小包含在1000万个向量和2500万个向量之间，并且PQ快速扫描速度在所有这些分区中几乎是恒定的。 较小的分区，例如分区6和1，表现出较低的扫描速度。 PQ快速扫描将4个分量上的向量分组，用于超过300万个向量的分区（第4.2节）。 随着分区大小接近该阈值，扫描速度降低。 对于包含少于3百万个向量的分区，有必要将载体分组在3个分量而不是4个分量上。</p>
+<p><img src="http://image.rexking6.top/img/clip1552748500.png" alt=""></p>
+<p><em>图19. 分区大小的影响（所有分区，$keep=0.5$%，$topk=100$）。</em></p>
+<h2 id="大规模实验"><a href="#大规模实验" class="headerlink" title="大规模实验"></a>大规模实验</h2><p>我们在10亿个载体（ANN SIFT1B）的完整数据库上测试PQ快速扫描。 对于此数据库，我们构建一个包含128个分区的索引。 因此，分区的平均大小约为800万个向量。 我们运行10000个近邻查询。 使用索引选择每个查询的最合适的分区，并扫描到最近邻。 我们使用PQ扫描和PQ快速扫描扫描分区，并将平均响应时间与查询进行比较（图20，SIFT1B）。 除了较低的响应时间外，PQ快速扫描还允许通过向量分组减少数据库消耗的内存量（第4.2节）。 与先前的实验不同，该实验在工作站（B）而不是笔记本电脑（A）上运行（表5）。 选择参数 $keep = 1$％，$topk = 100$。</p>
+<p><img src="http://image.rexking6.top/img/clip1552748571.png" alt=""></p>
+<p><em>图20. 不同平台上的实验（参见表5）。</em></p>
+<h2 id="CPU架构的影响"><a href="#CPU架构的影响" class="headerlink" title="CPU架构的影响"></a>CPU架构的影响</h2><p>为了对我们的评估部分作出结论，我们比较了2009年至2014年间发布的各种使用处理器的PQ快速扫描和PQ扫描（表5）。 在所有这些系统中，PQ快速扫描中值速度超过PQ扫描中值速度4-6倍，从而验证了我们的性能分析和设计假设（图20，扫描速度）。 PQ快速扫描性能对处理器架构不敏感。 对于每个下限计算，PQ快速扫描从内存加载6个字节。 因此，1800M vecs / s的扫描速度对应于使用10.8GB/s的带宽。 英特尔服务器处理器的内存带宽范围为40GB/s至70GB/s。 当在8核服务器处理器上同时处理8个查询时，PQ快速扫描受到内存带宽的限制，从而证明了其对CPU资源的高度使用。</p>
+<h1 id="讨论"><a href="#讨论" class="headerlink" title="讨论"></a>讨论</h1><p>虽然本文主要研究的是ANN搜索，但是在PQ快速扫描中使用的技术可以应用到其他领域。我们现在讨论如何将它们推广。</p>
+<p>PQ快速扫描背后的主要思想是构建查找表，使它们不在SIMD寄存器中，而将它们存储在L1缓存中通常被认为是提高效率的最佳实践。因此，任何依赖于查询表的算法都可以应用这个思想。查找表的实际用途之一是在紧凑数据库中执行查询。紧凑方案，通用[23,12,3,25]或特定（例如，时间序列的SAX [18]），已在数据库系统中广泛采用。在基于字典的紧凑（或量化）的情况下，数据库存储紧凑编码。字典（或码本）保存对应于紧凑代码的实际值。然后，查询执行依赖于从字典派生的查找表。在这种情况下，将查找表存储在SIMD寄存器中可以获得更好的性能。如果查找表足够小（16个条目），则在将元素量化为8位整数后，它们可以直接存储在SIMD寄存器中。否则，可以为不同类型的查询构建小表。对于top-k查询，可以构建小表，以便计算下限或上限。与PQ快速扫描一样，下限可用于限制L1缓存访问。要计算上限而不是下限，可以使用最大表而不是最小表。对于近似聚合查询（例如，近似平均值），可以使用聚合表（例如均值表）代替最小表。</p>
+<p>PQ快速扫描背后的另一个想法是使用8位饱和算法。这种思想可以应用于不使用查询表的查询，例如对非紧凑数据执行的查询。Top-k查询需要对少量项进行精确的分数评估，因此可以使用8位算术来删除候选项。同样，8位算法可以为近似查询提供足够的精度。在SIMD处理上下文中，8位算法允许每条指令处理的数据是32位浮点算法的4倍，因此提供了显著的加速。</p>
+<p>为了在存储在SIMD寄存器中的表中执行查找，我们使用SIMD的shuffle指令（包含在Intel SSSE3指令集中）。这类指令也可以在ARM处理器上使用，使用Neon指令集。最后，AVX-512 SIMD指令集可以在即将到来的英特尔处理器上使用，它将允许在SIMD寄存器中存储更大的表。这将使我们的技术具有更好的性能和更广泛的适用性。</p>
+<h1 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h1><p>ANN的乘积量化。乘积量化是大型数据库中ANN搜索的一种广泛使用的解决方案。 一些文献扩展了[14]中提出的原始方法。 在这些文献中，有一部分侧重于开发可以与乘积量化结合使用的有效索引方案[4,28]。 文献的另一部分侧重于优化子量化器的学习以提高召回率[21,10,15]，这与我们的工作正交。 PQ快速扫描适应这些优化的乘积量化器非常简单，因为它们也依赖于距离表进行ANN搜索。</p>
+<p>ANN的其他方法。 局部敏感哈希（LSH）是ANN搜索的另一种突出方法。 原始方法[8]对大型数据库具有过高的存储要求，但对返回的邻居的质量提供了理论上的保证。 最近提出了具有较低存储要求的基于LSH的系统[9,19]。 尽管最近有所改进，但基于LSH的系统比基于乘积量化的系统具有更高的存储要求。 因此，基于LSH的系统不太适合在内存中存储非常大的数据库。</p>
+<p>SIMD寄存器中的查找表。 用于提供可靠存储的擦除校正码的实现依赖于高速缓存驻留查找表。 作者建议缩小这些表并将它们存储到SIMD寄存器中[22,17]。 与以前的方法相比，这使得吞吐量显着提高。 这些查找表用于实现关联有限域算法，这些关联属性可用于收缩查找表。 在PQ扫描中，距离计算不是关联的，因此我们开发了其他技术来缩小查找表。</p>
+<p>快速查询处理。 直接在紧凑数据（或紧凑表示）上操作，如在PQ快速扫描中，已被证明可以加速其他场景中的查询处理[3,25]。 此外，已经广泛研究了使用SIMD来加速数据库中的查询处理[6]。 特别是，SIMD已被用于对数据[7]进行排序并执行关系连接[5,16]。 我们工作的具体目标是专注于使用SIMD来加速依赖于查找表的算法，例如PQ扫描。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>在本文中，我们提出了PQ快速扫描，这是一种新的ANN搜索算法，能够在单个核心上每秒检查超过10亿个候选向量。 PQ快速扫描建立在乘积量化的基础上，这是最近推出的一种越来越流行的高维空间ANN搜索方法。 PQ快速扫描设计源于对PQ扫描局限性的全面分析，PQ扫描是基于乘积量化的ANN搜索的原始算法。</p>
+<p>PQ扫描的一个重要特性是它依赖于L1缓存驻留查找表来计算距离。 虽然通常认为使用缓存驻留查找表足以满足效率，但我们证明在SIMD寄存器中存储查找表可以显着缩短查询响应时间。 我们的主要贡献在于设计将缓存驻留查找表转换为小型表的技术，其大小适合于SIMD寄存器。 使用这些小表使PQ快速扫描的执行速度比PQ扫描快4-6倍，从而提高了高维ANN搜索的技术水平。</p>
+<h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><ol>
+<li>Intel® 64 and IA-32 Architectures Optimization Reference Manual, April 2012.</li>
+<li>Intel® 64 and IA-32 Architectures Software Developer’s Manual, Volume 1: Basic Architecture, June 2015.</li>
+<li>D. J. Abadi, S. R. Madden, and M. C. Ferreira. Integrating Compression and Execution in Column-Oriented Database Systems. In SIGMOD, pages 671-682, 2006.</li>
+<li>A. Babenko and V. Lempitsky. The Inverted Multi-Index. In CVPR, pages 3069-3076, 2012.</li>
+<li>C. Balkesen, G. Alonso, J. Teubner, and M. T. Ozsu. Multi-Core, Main-Memory Joins: Sort vs. Hash Revisited. PVLDB, 7(1):85-96, 2013.</li>
+<li>P. Boncz, M. Zukowski, and N. Nes. MonetDB/X100:Hyper-Pipelining Query Execution. In CIDR, pages 225-237, 2005.</li>
+<li>J. Chhugani, A. D. Nguyen, V. W. Lee, W. Macy, M. Hagog, Y.-K. Chen, A. Baransi, S. Kumar, and P. Dubey. Ecient implementation of sorting on multi-core SIMD CPU architecture. PVLDB, 1(2):1313-1324, 2008.</li>
+<li>M. Datar, N. Immorlica, P. Indyk, and V. S. Mirrokni. Locality-sensitive hashing scheme based on p-stable distributions. In SCG, pages 253-262. ACM, 2004.</li>
+<li>J. Gan, J. Feng, Q. Fang, and W. Ng. Locality-sensitive Hashing Scheme Based on Dynamic Collision Counting. In SIGMOD, pages 541-552, 2012.</li>
+<li>T. Ge, K. He, Q. Ke, and J. Sun. Optimized Product Quantization. IEEE Transactions on Pattern Analysis and Machine Intelligence, 36(4):744-755, 2014.</li>
+<li>A. Gionis, P. Indyk, and R. Motwani. Similarity Search in High Dimensions via Hashing. In VLDB, pages 518-529, 1999.</li>
+<li>G. Graefe and L. D. Shapiro. Data compression and database performance. In SAC, pages 22-27, 1991.</li>
+<li>J. Hofmann, J. Treibig, G. Hager, and G. Wellein. Comparing the Performance of Dierent x86 SIMD Instruction Sets for a Medical Imaging Application on Modern Multi- and Manycore Chips. In WPMVP, pages 57-64. ACM, 2014.</li>
+<li>H. Jegou, M. Douze, and C. Schmid. Product quantization for nearest neighbor search. IEEE Transactions on Pattern Analysis and Machine Intelligence, 33(1):117-28, 2011.</li>
+<li>Y. Kalantidis and Y. Avrithis. Locally Optimized Product Quantization for Approximate Nearest Neighbor Search. In CVPR, pages 2329-2336, 2014.</li>
+<li>C. Kim, T. Kaldewey, V. W. V. Lee, E. Sedlar, A. D. Nguyen, N. Satish, J. Chhugani, A. Di Blas, and P. Dubey. Sort vs. Hash Revisited: Fast Join Implementation on Modern Multi-core CPUs. PVLDB, 2(2):1378-1389, 2009.</li>
+<li>H. Li and Q. Huan-yan. Parallelized Network Coding with SIMD Instruction Sets. In ISCSCT, volume 1, pages 364-369, 2008.</li>
+<li>J. Lin, E. Keogh, L. Wei, and S. Lonardi. Experiencing SAX: a novel symbolic representation of time series. Data Mining and Knowledge Discovery, 15(2):107-144, 2007.</li>
+<li>Y. Liu, J. Cui, Z. Huang, H. Li, and H. Shen. SK-LSH: An Ecient Index Structure for Approximate Nearest Neighbor Search. PVLDB, 7(9):745-756, 2014.</li>
+<li>S. Lloyd. Least squares quantization in PCM. IEEE Transactions on Information Theory, 28(2):129-137, 1982.</li>
+<li>M. Norouzi and D. J. Fleet. Cartesian K-Means. In CVPR, pages 3017-3024, 2013.</li>
+<li>J. S. Plank, K. Greenan, and E. L. Miller. Screaming Fast Galois Field Arithmetic Using Intel SIMD Extensions. In FAST, pages 298-306, 2013.</li>
+<li>M. A. Roth and S. J. Van Horn. Database compression. ACM Sigmod Record, 22(3):31-39, 1993.</li>
+<li>E. Schubert. Same-size k-means variation, 2012. <a target="_blank" rel="noopener" href="http://elki.dbs.ifi.lmu.de/wiki/Tutorial/SameSizeKMeans">http://elki.dbs.ifi.lmu.de/wiki/Tutorial/SameSizeKMeans</a>.</li>
+<li>M. Stonebraker, D. J. Abadi, A. Batkin, X. Chen, M. Cherniack, M. Ferreira, E. Lau, A. Lin, S. Madden, E. O’Neil, et al. C-store: a column-oriented DBMS. In VLDB, pages 553-564, 2005.</li>
+<li>Y. Sun, W. Wang, J. Qin, Y. Zhang, and X. Lin. SRS: Solving c -Approximate Nearest Neighbor Queries in High Dimensional Euclidean Space with a Tiny Index. PVLDB, 8(1):1-12, 2014.</li>
+<li>R. Tavenard, H. Jegou, M. Douze, and L. Amsaleg. Searching in one billion vectors: Re-rank with source coding. In ICASSP, pages 861-864, 2011.</li>
+<li>Y. Xia, K. He, F. Wen, and J. Sun. Joint Inverted Indexing. In ICCV, pages 3416-3423, 2013.</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\24\Bag-of-visual-word视觉词袋\" rel="bookmark">Bag-of-visual word视觉词袋</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\10\12\Fisher-Kernel-Fisher-Vector\" rel="bookmark">Fisher Kernel&Fisher Vector</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\28\Geometric-Verification几何验证\" rel="bookmark">Geometric Verification几何验证</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2019/03/14/%E3%80%8ACache-locality-is-not-enough-HighPerformance-Nearest-Neighbor-Search-with-Product-Quantization-Fast-Scan%E3%80%8B%E7%AC%94%E8%AE%B0/" title="《Cache locality is not enough: HighPerformance Nearest Neighbor Search with Product Quantization Fast Scan》笔记">https://blog.rexking6.top/2019/03/14/《Cache-locality-is-not-enough-HighPerformance-Nearest-Neighbor-Search-with-Product-Quantization-Fast-Scan》笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%9B%BE%E5%83%8F%E6%A3%80%E7%B4%A2/" rel="tag"># 图像检索</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/03/14/%E3%80%8AParticular-object-retrieval-with-integral-max-pooling-of-CNN-activations%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="prev" title="《Particular object retrieval with integral max-pooling of CNN activations》笔记">
+      <i class="fa fa-chevron-left"></i> 《Particular object retrieval with integral max-pooling of CNN activations》笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/03/19/PowerShell-%E6%94%B9%E9%80%A0/" rel="next" title="PowerShell 改造">
+      PowerShell 改造 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">2.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">3.</span> <span class="nav-text">背景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%98%E7%A7%AF%E9%87%8F%E5%8C%96"><span class="nav-number">3.1.</span> <span class="nav-text">乘积量化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%98%E7%A7%AF%E9%87%8F%E5%8C%96%E7%94%A8%E4%BA%8EANN%E6%90%9C%E7%B4%A2"><span class="nav-number">3.2.</span> <span class="nav-text">乘积量化用于ANN搜索</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PQ%E6%89%AB%E6%8F%8F%E7%9A%84%E9%99%90%E5%88%B6"><span class="nav-number">4.</span> <span class="nav-text">PQ扫描的限制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E8%AE%BF%E9%97%AE"><span class="nav-number">4.1.</span> <span class="nav-text">内存访问</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A0%E6%B3%95%E5%88%A9%E7%94%A8SIMD%E6%8C%87%E4%BB%A4"><span class="nav-number">4.2.</span> <span class="nav-text">无法利用SIMD指令</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PQ%E5%BF%AB%E9%80%9F%E6%89%AB%E6%8F%8F"><span class="nav-number">5.</span> <span class="nav-text">PQ快速扫描</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%8F%E8%BF%B0"><span class="nav-number">5.1.</span> <span class="nav-text">描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E5%88%86%E7%BB%84"><span class="nav-number">5.2.</span> <span class="nav-text">向量分组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%B0%8F%E8%A1%A8"><span class="nav-number">5.3.</span> <span class="nav-text">最小表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%9D%E7%A6%BB%E9%87%8F%E5%8C%96"><span class="nav-number">5.4.</span> <span class="nav-text">距离量化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8%E5%B0%8F%E8%A1%A8%E4%B8%AD%E6%9F%A5%E6%89%BE"><span class="nav-number">5.5.</span> <span class="nav-text">在小表中查找</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%84%E4%BB%B7"><span class="nav-number">6.</span> <span class="nav-text">评价</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="nav-number">6.1.</span> <span class="nav-text">实验设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%8D%E5%BA%94%E6%97%B6%E9%97%B4%E5%88%86%E5%B8%83"><span class="nav-number">6.2.</span> <span class="nav-text">响应时间分布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E8%AE%A1%E6%95%B0%E5%99%A8"><span class="nav-number">6.3.</span> <span class="nav-text">性能计数器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#keep-%E5%92%8C-topk-%E5%8F%82%E6%95%B0%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">6.4.</span> <span class="nav-text">$keep$ 和 $topk$ 参数的影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%9D%E7%A6%BB%E9%87%8F%E5%8C%96%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">6.5.</span> <span class="nav-text">距离量化的影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%8C%BA%E5%A4%A7%E5%B0%8F%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">6.6.</span> <span class="nav-text">分区大小的影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%A7%E8%A7%84%E6%A8%A1%E5%AE%9E%E9%AA%8C"><span class="nav-number">6.7.</span> <span class="nav-text">大规模实验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU%E6%9E%B6%E6%9E%84%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">6.8.</span> <span class="nav-text">CPU架构的影响</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%A8%E8%AE%BA"><span class="nav-number">7.</span> <span class="nav-text">讨论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">8.</span> <span class="nav-text">相关工作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">9.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">10.</span> <span class="nav-text">引用</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

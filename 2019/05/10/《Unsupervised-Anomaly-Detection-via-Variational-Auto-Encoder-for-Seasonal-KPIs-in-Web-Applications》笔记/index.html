@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Unsupervised Anomaly Detection via Variational Auto-Encoder for Seasonal KPIs in Web Applications》笔记">
+<meta property="og:url" content="https://blog.rexking6.top/2019/05/10/%E3%80%8AUnsupervised-Anomaly-Detection-via-Variational-Auto-Encoder-for-Seasonal-KPIs-in-Web-Applications%E3%80%8B%E7%AC%94%E8%AE%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557365721.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557366348.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557369507.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557369774.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557385931.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557387245.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557387945.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557388162.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557388450.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557400439.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557401111.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557402929.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557404165.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557473278.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557473344.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557475008.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557475592.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557476475.png">
+<meta property="article:published_time" content="2019-05-10T09:03:09.000Z">
+<meta property="article:modified_time" content="2019-09-03T12:25:48.320Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="AIOps">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1557365721.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2019/05/10/%E3%80%8AUnsupervised-Anomaly-Detection-via-Variational-Auto-Encoder-for-Seasonal-KPIs-in-Web-Applications%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《Unsupervised Anomaly Detection via Variational Auto-Encoder for Seasonal KPIs in Web Applications》笔记 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2019/05/10/%E3%80%8AUnsupervised-Anomaly-Detection-via-Variational-Auto-Encoder-for-Seasonal-KPIs-in-Web-Applications%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Unsupervised Anomaly Detection via Variational Auto-Encoder for Seasonal KPIs in Web Applications》笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-05-10 17:03:09" itemprop="dateCreated datePublished" datetime="2019-05-10T17:03:09+08:00">2019-05-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-09-03 20:25:48" itemprop="dateModified" datetime="2019-09-03T20:25:48+08:00">2019-09-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AIOps/" itemprop="url" rel="index"><span itemprop="name">AIOps</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2019/05/10/%E3%80%8AUnsupervised-Anomaly-Detection-via-Variational-Auto-Encoder-for-Seasonal-KPIs-in-Web-Applications%E3%80%8B%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="《Unsupervised Anomaly Detection via Variational Auto-Encoder for Seasonal KPIs in Web Applications》笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>30k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>28 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>为了确保业务不受干扰，大型互联网公司需要密切监控其Web应用程序的各种KPI（例如页面浏览量、在线用户数量和订单数量），以准确地发现异常并及时触发故障排除/缓解。然而，对于这些具有各种模式和数据质量的季节性KPI异常检测一直是一个巨大的挑战，尤其是在没有标签的情况下。提出了一种基于VAE的无监督异常检测算法——Donut。由于我们的一些关键技术，Donu的性能大大超过了现有的监督集成方法和基线VAE方法，并且在全球顶级互联网公司的KPI研究中，其最佳F-score从0.75到0.9不等。提出了一种新的Donut重构KDE解释方法，使其成为第一个具有较强的理论解释力的基于VAE的异常检测算法，。</p>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>为了确保业务不受干扰，大型互联网公司需要密切监视其Web应用程序的各种KPI（关键性能指标），以准确地检测异常并及时触发故障排除/缓解。KPI是时间序列数据，度量诸如页面访问量、在线用户数量和订单数量等指标。在所有的KPI中，大部分是与业务相关的KPI（本文的重点），这些KPI受用户行为和进度的影响很大，因此大致上具有定期发生的季节性模式（例如，每日和/或每周）。然而，对于这些具有各种模式和数据质量的季节性KPI异常检测一直是一个巨大的挑战，尤其是在没有标签的情况下。</p>
+<p>关于KPI异常的检测已有丰富的文献[1, 2, 5-8, 17, 18, 21, 23-27, 29, 31, 35, 36, 40, 41]。如2.2所述，现有的异常检测算法存在算法选取/参数调优困难、严重依赖标签、性能不理想、缺乏理论基础等问题。</p>
+<p>本文提出了一种基于变分自编码的无监督异常检测算法Donut（一种有代表性的深度生成模型），理论解释扎实，该算法可以在完全没有标签的情况下工作，并且可以利用偶尔出现的标签。</p>
+<p>本文的贡献可以总结如下。</p>
+<ul>
+<li>在Donut中，改进的ELBO和缺失数据注入训练技术，以及MCMC填充检测技术，使其性能大大优于现有的监督和基于VAE的异常检测算法。在全球顶级互联网公司的KPI研究中，无监督Donut的最佳F-score从0.75到0.9不等。</li>
+<li>在文献中，我们第一次发现，采用VAE（或一般生成模型）进行异常检测，需要同时对正常数据和异常数据进行训练，这与通常的直觉相反。</li>
+<li>我们提出了一种新的Donut的z空间KDE解释方法，使其成为具有不同于[2,36]的坚实理论解释的基于VAE的异常检测算法。这一解释可能有利于其他深层生成模型在异常检测中的设计。我们在潜在z空间中发现了时间梯度效应，这很好地解释了Donut在季节KPI异常检测中的优异性能。</li>
+</ul>
+<h1 id="背景和问题"><a href="#背景和问题" class="headerlink" title="背景和问题"></a>背景和问题</h1><h2 id="上下文和异常检测"><a href="#上下文和异常检测" class="headerlink" title="上下文和异常检测"></a>上下文和异常检测</h2><p>在本文中，我们主要关注与业务相关的KPI。这些时间序列受到用户行为和时间表的严重影响，因此大致上具有定期发生的季节性模式（例如，每天或每周）。另一方面，在每个重复周期中KPI曲线的形状并不完全相同，因为用户行为可能随着时间的推移而变化。我们研究的是具有局部变化的季节性KPI。图1显示了此类KPI的示例。另一种局部变化是随时间的增加趋势，可以通过holt - winter[41]和时间序列分解[6]来识别。除非正确处理这些局部变化，否则异常检测算法可能无法很好地工作。</p>
+<p><img src="http://image.rexking6.top/img/clip1557365721.png" alt=""></p>
+<p><em>图1：本文中季节性KPI数据集的2.5天片段，红色为异常，橙色为缺失点（零填充）。在每个数据集中，在不同的日子里，相同的时间段都有不同的变化。</em></p>
+<p>除了KPI形状的季节性模式和局部变化外，这些KPI上还存在噪声，我们假设这些KPI在每一点上都是独立的零均值高斯分布。高斯噪声的精确值是没有意义的，因此我们只关注这些噪声的统计，即，噪声的方差。</p>
+<p>我们现在可以将季节KPI的正常模式形式化为两个组成部分的组合：(1)带有局部变化的季节模式；(2)高斯噪声的统计。</p>
+<p>我们使用异常来表示记录的不符合正常模式的点（例如突然的尖峰和低谷），而使用异常来表示异常和缺失点。异常点和缺失点的例子见图1。因为kpi是定期监视的（例如每分钟），所以缺失的点被记录为null（当监视系统没有接收到数据时），因此很容易识别。因此，我们关注于KPI检测异常。</p>
+<p>由于操作人员需要处理异常以进行故障排除/缓解，因此有些异常情况会被标记出来。请注意，这种偶尔的少数的异常的标签覆盖率远远不是典型的监督学习算法所需要的。</p>
+<p>KPI异常检测可以表示为:对于任意时刻 $t$，给定历史观测值 $x_{t-T+1},\dots,x_t$，确定是否发生异常（用 $y_t = 1$ 表示）。异常检测算法通常计算一个表示确定有 $y_t = 1$ 的实值得分，如 $p(y_t = 1|x_{t-T +1},\dots,x_t)$，而不是直接计算 $y_t$。然后，人工操作符可以通过选择阈值来影响是否声明异常，其中得分超过此阈值的数据点表示异常。</p>
+<h2 id="以往的工作"><a href="#以往的工作" class="headerlink" title="以往的工作"></a>以往的工作</h2><p><strong>传统的统计模型。</strong>近年来，基于传统统计模型（如[6,17,18,24,26,27,31,40,41]，大多是时间序列模型）的异常检测器被提出来计算异常评分。由于这些算法通常对适用的KPI有简单的假设，因此需要专家的努力为给定的KPI选择合适的检测器，然后根据训练数据调整检测器的参数。根据[25]，这些检测器的简单集成，如多数票选[8]和标准化[35]，也没有多大帮助。因此，这些检测器在实际应用中只能得到有限的应用。</p>
+<p><strong>监督集成方法。</strong>为了克服传统统计异常检测器算法/参数调整的困难，提出了基于EGADS[21]和Opprentice[25]的监督集成方法。他们使用用户反馈作为标签，使用传统检测器输出的异常分数作为特征来训练异常分类器。EGADS和Opprentice都显示出了有希望的结果，但它们严重依赖于良好的标签（比我们平时记录的异常标签多得多），这在大规模应用中通常是不可行的。此外，在检测过程中运行多个传统的检测器来提取特征会带来大量的计算开销，这是一个实际问题。</p>
+<p><strong>无监督方法和深层生成模型。</strong>近年来，采用无监督机器学习算法进行异常检测有上升趋势，如单类SVM[1,7]，基于聚类的[9]方法，如K-Means[28]和GMM [23]， KDE [29]， VAE[2]和VRNN[36]。其理念是关注正常模式而不是异常：由于KPI通常主要由正常数据组成，即使没有标签，也可以轻松地训练模型。粗略地说，它们都是先识别出原始或某些潜在特征空间中的正常区域，然后通过测量观测到的距离正常区域有多远来计算异常分值。</p>
+<p>沿着这个方向，我们对深层生成模型感兴趣，原因如下。首先，学习正常模式可以看作是学习训练数据的分布，这是生成模型的一个主题。其次，近年来利用深度学习技术（GAN[13]和deep Bayesian network）训练生成模型取得了很大进展[4,39]。后者是深度生成模型家族，采用图的模型框架[30]和变分技术[3]，VAE[16,32]为其代表性工作。第三，尽管在异常检测深生成模型大有前途，现有基于VAE的异常检测方法[2]并不是专为KPI（时间序列），和在我们的设置中不能很好地起作用（见4），而且没有理论基础来支持其设计深度生成模型的异常检测（见5）。第四，简单地采用基于VRNN的更复杂的模型[36]训练时间长,在我们的实验表现不佳。第五，[2]假设只训练干净的数据，这在我们的实际场景中是不可行的，而[36]没有讨论这个问题。</p>
+<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>综上所述，现有的异常检测算法存在着算法选取/参数调优困难、严重依赖标签、性能不理想和/或缺乏理论基础等问题。现有的方法要么是无监督的，要么是监督的，但严重依赖于标签。然而，在我们的实际场景中，标签有时是可用的，尽管还远远不够完整，但应该以某种方式加以利用。</p>
+<p>本文的问题陈述如下。我们的目标是一种基于深度生成模型的无监督异常检测算法，具有较强的理论解释力，该算法可以利用偶尔可用的标签。因为VAE是深度贝叶斯网络的基础模型，所以我们选择了VAE作为我们工作的起点。</p>
+<h2 id="变分自编码器的背景"><a href="#变分自编码器的背景" class="headerlink" title="变分自编码器的背景"></a>变分自编码器的背景</h2><p>深度贝叶斯网络利用神经网络来表达变量之间的关系，使它们不再局限于简单的分布族，从而可以很容易地应用于复杂的数据。变分推理技术[12]是训练和预测中常用的一种方法，是求解神经网络分布后验值的有效方法。</p>
+<p>VAE是一个深度贝叶斯网络。它对两个随机变量隐变量 $\textbf z$ 和可见变量 $\bf x$ 之间的关系建模，$\bf z$ 的先验，这通常是多元标准高斯分布 $\mathcal N (0, \textbf  I)$。之后，$\bf x$ 是从 $p_θ(\textbf x |\textbf z)$ 抽样的，这是来自一个神经网络参数 $θ$。$p_θ(\textbf x |\textbf z)$ 的确切形式选择根据任务的需求。通过分析方法来求出真正的后验 $p_θ(\textbf z|\textbf x)$ 是棘手的，但对于训练是必要的，在预测中也很有用，因此，变分推理技术用于将另一个神经网络拟合近似为后验 $q_\phi(\textbf z |\textbf x)$。该后验通常假设为 $\mathcal N(\pmb \mu_ϕ(\textbf x),\pmb σ^2_\phi (\textbf x))$，其中 $\pmb \mu_ϕ(\textbf x)$ 和 $\pmb σ_ϕ(\textbf x)$ 是由神经网络拟合而来。VAE的结构如图2所示。</p>
+<p><img src="http://image.rexking6.top/img/clip1557366348.png" alt=""></p>
+<p>图2. VAE的架构。$\bf z$ 的先验被认为是生成模型的一部分（实线），因此整个生成模型被表示为 $p_θ(\textbf x, \textbf z) = p_θ(\textbf x |\textbf z)p_θ(\textbf z)$。近似后验（虚线）来标示 $q_ϕ(\textbf z | \textbf x)$。</p>
+<p>SGVB[16,32]是一种常与VAE一起使用的变分推理算法，其中通过最大化证据下界（ELBO，下式）来联合训练近似后验和生成模型。我们没有采用更高级的变分推理算法，因为SGVB起作用了。</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+\log p_\theta(\textbf x)&\ge \log p_\theta(\textbf x)-\text{KL}[q_\phi(\textbf z|\textbf x)||p_\theta(\textbf z|\textbf x)]\\
+&=\mathcal L(\textbf x)\\
+&=\mathbb E_{q_\phi(\textbf z|\textbf x)}[\log p_\theta(\textbf x)+\log p_\theta(\textbf z|\textbf x)-\log q_\phi(\textbf z|\textbf x)]\\
+&=\mathbb E_{q_\phi(\textbf z|\textbf x)}[\log p_\theta(\textbf x,\textbf z)-\log q_\theta(\textbf z|\textbf x)]\\
+&=\mathbb E_{q_\phi(\textbf z|\textbf x)}[\log p_\theta(\textbf x|\textbf z)+\log p_\theta(\textbf z)-\log q_\phi(\textbf z|\textbf x)]
+\end{align*}</script><p>通常采用蒙特卡罗积分[10]近似上式中的期望，即下式，其中 $\textbf z^{(l)},l = 1,\dots,L$ 是从 $q_ϕ(\textbf z | \textbf x)$ 中采样。在本文中，我们始终坚持这种方法。</p>
+<script type="math/tex; mode=display">
+\mathbb E_{q_\phi(\textbf z|\textbf x)}[f(\textbf z)]\approx \frac{1}{L}\sum_{l=1}^Lf(\textbf z^{(l)})</script><h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><p>算法的总体结构如图3所示。在训练过程中修改ELBO和缺失数据注入，在检测过程中进行MCMC填充，是这三个关键方法。</p>
+<p><img src="http://image.rexking6.top/img/clip1557369507.png" alt=""></p>
+<p><em>图3. Donut的总体架构。</em></p>
+<h2 id="网络结构"><a href="#网络结构" class="headerlink" title="网络结构"></a>网络结构</h2><p>如2.1所述，本文研究的KPI假设为具有高斯噪声的时间序列。但是VAE不是一个序列模型，因此我们在KPI上应用了纵向为 $W$ 的滑动窗口[34]：对于每个点 $x_t$，我们使用 $x_{t-W +1},\dots, x_t$ 作为VAE的 $\bf x$ 向量。这种滑动窗最初被采用是因为它的简单，但它实际上带来了一个重要的和有益的后果，这将在5.1中讨论。</p>
+<p>Donut整体网络结构如图4所示，其中双线边框（如左下角滑动窗口 $x$，为 $W$ 维）的部分是我们的新设计，其余构件均来自标准VAE。先验 $p_θ(\textbf z)$ 选为 $\mathcal N (0, \textbf I)$。$\bf x$ 和 $\bf z$ 后都选择分量独立混合高斯：$p_θ(\textbf x |\textbf z) = \mathcal N (\pmb \mu_{\textbf x},\pmb σ_{\textbf x}^2\textbf I)$ 和 $q_ϕ(\textbf z |\textbf x) =\mathcal N (\mu_{\textbf z},\pmb σ^2_{\textbf z}\textbf I)$，其中 $\pmb \mu_{\textbf x},\pmb \mu_{\textbf z}$ 和 $\pmb σ_{\textbf x},\pmb σ_{\textbf z}$ 是每个独立的高斯分量的均值和标准差。$\bf z$ 是 $K$ 维的。通过分开的隐藏层 $f_\phi(\textbf x)$ 和 $f_θ(\textbf z)$ 从 $\bf x$ 和 $\bf z$ 提取隐含特征。$\bf x$ 和 $\bf z$ 的高斯参数来自于隐含特征。均值来自线性层：$\pmb\mu_{\textbf x}=\textbf W_{\pmb \mu_{\textbf x}}^Tf_\theta(\textbf z)+\textbf b_{\pmb \mu_{\textbf x}}$ 和$\pmb\mu_{\textbf z}=\textbf W_{\pmb \mu_{\textbf z}}^Tf_\phi(\textbf z)+\textbf b_{\pmb \mu_{\textbf z}}$。标准差来自于soft-plus层，加上一个非负小的数 $\pmb ϵ$：$\pmb σ_{\textbf x} = \text{SofPlus}[\textbf W_{\pmb σ_{\textbf x}}^Tf_\theta(\textbf z)+\textbf b_{\pmb \mu_{\textbf x}}]$ 和 $\pmb σ_{\textbf z} = \text{SofPlus}[\textbf W_{\pmb σ_{\textbf z}}^Tf_\theta(\textbf x)+\textbf b_{\pmb \mu_{\textbf z}}] $，其中 $\text{SoftPlus}[a]=\log[\exp(a)+1]$。这里给出的 $\textbf W$ 和 $\textbf b$ 都是对应层的参数。注意当标量函数 $f(x)$ 作用于向量 $\bf x$ 时，它意味着作用于每一个分量。</p>
+<p><img src="http://image.rexking6.top/img/clip1557369774.png" alt=""></p>
+<p><em>图4. Donut的网络结构。灰色节点是随机变量，白色节点是层。双线边框是我们对一般VAE作出的特殊设计。</em></p>
+<p>我们选择以这种方式导出 $\pmb σ_{\textbf x}$ 和 $\pmb σ_{\textbf z}$，而不是像其他人那样使用线性层导出 $\log \pmb σ_{\textbf x}$ 和 $\log\pmb σ_{\textbf z}$，原因如下。 我们感兴趣的KPI的局部变化是非常小，以至于 $\pmb σ_{\textbf x}$ 和 $\pmb σ_{\textbf z}$可能非常接近于零，使得 $\log \pmb σ_{\textbf x}$ 和 $\log\pmb σ_{\textbf z}$ 无界限。 在计算高斯变量的似然时，这将导致严重的数值问题。 因此，我们使用soft-plus和 $\pmb ε$ 技巧来防止这些问题。</p>
+<p>我们选择了全连接层作为隐藏层的结构，使得整个架构相当简单。这是因为我们的目标是开发一种基于VAE的异常检测算法，该算法具有扎实的理论解释，简单的网络结构可以灵活地使复杂的变分自编码器内部行为分析更加容易。</p>
+<h2 id="训练"><a href="#训练" class="headerlink" title="训练"></a>训练</h2><p>通过使用SGVB[16]算法对ELBO进行优化，训练非常简单。根据[16]，使用SGVB算法训练VAE时，适用一个样本可以很好地计算ELBO，因此我们在训练时取采样数 $L = 1$。我们还根据SGVB应用重参数化技巧：采用一个专门的随机变量 $ξ\sim \mathcal N(0, \textbf I)$ 采样而不是通过 $\textbf z\sim \mathcal N (\pmb \mu_{\textbf z},\pmb σ^2_{\textbf z}\textbf I)$ 采样，这样可以重写 $\textbf z$ 为 $\textbf z(ξ)=\pmb \mu_{\textbf z} +ξ·\pmb σ_{\textbf z}$。通过 $ξ $ 抽样与参数 $\phi$ 是独立的，这样可以把VAE看作一个普通的神经网络而应用随机梯度下降法。$\bf x$ 的窗口在每个epoch之前都是随机打乱的，这有利于随机梯度下降。在每个小批量中都要取大量的 $\bf x$，这对于稳定训练非常重要，因为抽样会引入额外的随机性。</p>
+<p>正如2.2所讨论的，基于VAE的异常检测是通过学习正常模式来实现的，因此我们需要尽可能避免学习异常模式。注意，训练中的“异常”被标记为异常，并且对于给定的KPI不能有任何标签，在这种情况下，异常检测将是无监督的。</p>
+<p>人们可能倾向于用综合生成的值替换训练数据中的标记异常（如果有的话）和缺失点（已知的）。以前的一些工作提出了一些方法来估算缺失的数据，例如[37]，但是很难产生足够符合正常模式的数据。更重要的是，用另一种算法生成的数据训练生成模型是非常荒谬的，因为生成模型的一个主要应用就是生成数据。使用任何弱于VAE的算法输入的数据都可能降低性能。因此我们在训练VAE之前不采用缺失数据注入，相反，我们选择将缺失数据注入为0（在图3中的数据准备步骤），然后修改ELBO排除异常和缺失的贡献点（显示为Modifed ELBO，之后简称M-ELBO，如训练步骤图3)。</p>
+<p>更具体地说，我们修改标准ELBO为我们的版本，下式，</p>
+<script type="math/tex; mode=display">
+\widetilde {\cal L}(\textbf x)=\mathbb E_{q_\phi(\textbf z|\textbf x)}\left[\sum_{w=1}^W\alpha_w\log p_\theta(x_w|\textbf z)+\beta\log p_\theta(\textbf z)-\log q_\phi(\textbf z|\textbf x)\right]</script><p>$α_w$ 被定义指标，在 $\alpha_w = 1$ 表示 $x_w$ 不是异常或缺失，否则 $\alpha_w = 0$。$β$ 被定义为 $(\sum_{w=1}^Wα_w) / W$。注意，当训练数据中没有标记异常时，上式仍然成立。$p_θ(x_w|\textbf z)$ 标记的异常和缺失点由 $α_w$ 直接排除在外，然而比例因子 $β$ 能够根据 $\textbf x$ 中异常的比例来缩小 $p_θ(\textbf z)$ 的贡献。即使 $\bf x$ 中的某些点存在异常，此修改也会训练Donut正确重构出 $\bf x$ 中的正常点。我们不缩小 $q_ϕ(\textbf z |\textbf  x)$，由于以下两个方面的考虑。不像 $p_θ(\textbf z)$ 是生成网络的一部分（即“正常模式”的模型），$q_ϕ(\textbf z |\textbf x)$ 描述了从 $\bf x$ 到 $\bf z$ 的映射，而不考虑正常模式。因此，缩小 $q_ϕ(\textbf z |\textbf x)$ 的贡献似乎没有必要。另一个原因是，$\mathbb E_{q_\phi(\textbf z|\textbf x)}[-\log q_\phi(\textbf z|\textbf x)]$是 $q_ϕ(\textbf z |\textbf x)$ 的熵。这个熵实际上在训练中还有一些其他的作用（将在5.3中讨论），因此最好保持原样。除上式外，处理异常和缺失点的另一种方法是从训练数据中排除包含这些点的所有窗口。事实证明，这种方法不如M-ELBO。我们将在4.5中展示这两种方法的性能。</p>
+<p>此外，我们还将介绍训练阶段的缺失数据注入：我们随机设置正常点中的 $λ$ 比率的点为零，类似缺失点。随着缺失点的增多，当 $\bf x$ 异常时，对Donut进行更多的训练来重建正常点，从而增强了M-ELBO的效果。这种填充在每个epoch之前完成，一旦epoch完成，这些点就会被恢复。缺失的数据填充如图3中的训练步骤所示。</p>
+<h2 id="检测"><a href="#检测" class="headerlink" title="检测"></a>检测</h2><p>与仅为一个目的而设计的判别模型（例如，一个分类器只用于计算分类概率 $p(y|x))$ 不同，VAE这样的生成模型可以得到各种输出。在异常检测范围内，观测窗 $\bf x$ 的似然值，VAE中的 $p_θ(\textbf x)$ 是一个重要的输出，因为我们希望看到如何给定 $\bf x$ 遵循正常的模式。可以采用蒙特卡罗方法计算 $\bf x$ 的概率密度，由 $p_θ(\textbf x) =\mathbb E_{p_θ(\textbf z)} [p_θ(\textbf x |\textbf z)]$。尽管理论上解释得很好，但在实践中，从先验分布中采样实际上并不能很好地工作，如第4节所示。</p>
+<p>相比于对先验采样，尝试变分后验 $q_\phi(\textbf z|\textbf x)$ 可能能得到更有用的输出。一个选择是计算 $\mathbb E_{q_{ϕ(\textbf z |\textbf x)}} [p_θ(\textbf x |\textbf z)]$。虽然类似于 $p_θ(\textbf x)$，它实际上不是一个明确的概率密度。另一个选择是计算[2]中采用的 $\mathbb E_{q_ϕ(\textbf z |\textbf x)} [\log p_θ(\textbf x |\textbf z)]$ 命名为重建概率。这两个选择非常相似。由于在异常检测中只考虑异常值的排序，而不考虑异常值的精确值，所以我们遵循[2]并使用后者。作为替代，ELBO也可以用于近似 $\log p_θ(\textbf x)$，如[36]。然而，ELBO额外的项 $\mathbb E _{q_ϕ(\textbf z |\textbf x)} [\log p_θ(\textbf z) -\log q_ϕ(\textbf z |\textbf x)]$ 使其内部机制难以理解。由于在[36]中的实验并不支持这种选择的优越性，我们选择不使用它。</p>
+<p>在检测过程中，检测窗口 $\bf x$ 中的异常点和缺失点会对映射的 $\bf z$ 产生偏差，进而使得重建概率不准确，我们将在5.2中讨论。由于缺失点总是已知的（称为null），我们有机会消除由缺失点引入的偏差。我们选择了[32]提出的基于MCMC的带训练VAE的缺失数据输入技术。同时，在检测前我们不知道异常的准确位置，因此不能采用MCMC对异常进行检测。</p>
+<p>更具体地说，测试 $\textbf x$ 分为观察到的和缺失的部分，即 $(\textbf x_o,\textbf x_m)$。$\bf z$ 样本是来自 $q_ϕ(\textbf z|\textbf x_o,\textbf x_m)$，然后从 $p_\theta(\textbf x_o,\textbf x_m|\textbf z)$ 重建样本 $(\textbf x_o’,\textbf x_m’)$ 。$(\textbf x_o,\textbf x_m)$ 然后被 $(\textbf x_o,\textbf x_m’)$ 替换，即则对观察到的点进行固定，并将缺失的点设置为新值。该过程迭代 $M$ 次，然后用最后的 $(\textbf x_o,\textbf x_m’)$ 计算重构概率。中间 $\textbf x_m’$ 将在整个过程中不断接近正常值。在给定极大值 $M$ 的情况下，可以减小误差，得到更精确的重建概率。MCMC方法如图5所示，检测步骤如图3所示。</p>
+<p><img src="http://image.rexking6.top/img/clip1557385931.png" alt=""></p>
+<p><em>图5. MCMC中的一个迭代。将 $\bf x$ 分解为 $(\textbf x_o,\textbf x_m)$，然后对 $\textbf x_o$ 进行固定，并将 $\textbf x_m$ 替换为重构样本中的 $\textbf x_m’$，以得到新的 $x’$ 。</em></p>
+<p>在MCMC之后，我们取 $L$ 个 $\bf z$ 样本，通过蒙特卡罗积分计算重构概率。值得一提的是，虽然我们可以计算 $\bf x$ 的每个窗口中每个点的重建概率，但我们只使用最后一个点的分数（即 $x_{t-T+1},\dots,x_t$ 中的 $x_t$），因为我们想在检测过程中尽快对异常做出响应。之后，我们仍将使用向量符号，与VAE的体系结构相对应。虽然可以通过延迟决策和在不同时间考虑相同点的更多分数来提高检测性能，但是我们将其留作以后的工作。</p>
+<h1 id="评价"><a href="#评价" class="headerlink" title="评价"></a>评价</h1><h2 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h2><p>我们从一家大型互联网公司获得18个维护良好的业务KPI集（时间跨度足够长，可以进行训练和评估）。所有KPI在两次观察之间都有1分钟的间隔。我们选择了3个数据集，分别表示为 $\cal A$、$\cal B$、$\cal C$，如图6所示，这样我们就可以对Donut在不同水平上的噪声进行评估。我们将每个数据集分为训练集、验证集和测试集，它们的比例分别为49%、21%和30%。数据集A、B、C的数据如图1所示，统计数据如表1所示。这家互联网公司的运营商把这三个数据集中的所有异常都标记了出来。为了便于评估，我们可以认为我们掌握了这三个数据集中所有异常的基本事实。</p>
+<p><img src="http://image.rexking6.top/img/clip1557387245.png" alt=""></p>
+<p><em>表1. $\cal A$、$\cal B$、$\cal C$ 的统计量。每个滑动窗口的长度 $W = 120$，每个异常窗口至少包含一个异常点或缺失点。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1557387945.png" alt=""></p>
+<p><em>图6. 数据集的 $\frac{1}{N}\sum_{t=2}^N |x-t-x_{t-1}|$ 的CDF，通过在每个数据集上设置高斯核绘制。$x_t$ 的值事先标准化为零均值和单位方差。三角形表示 $\cal A$、$\cal B$ 和 $\cal C$，圆圈表示其他的。从CDF可以看出，$\cal A$、$\cal B$、$\cal C$具有相对较小、中等和较大的噪声。</em></p>
+<h2 id="性能指标"><a href="#性能指标" class="headerlink" title="性能指标"></a>性能指标</h2><p>在我们的评估中，我们完全忽略了所有算法在缺失点(“null”)的输出，因为它们很容易识别。</p>
+<p>本文所评估的所有算法都为每个点计算一个异常值。可以选择阈值来进行决策：如果某点的得分大于阈值，则应该触发警报。这样，异常检测就像一个分类问题，我们可以计算出每个阈值对应的精度和召回率。我们还可以进一步计算AUC，这是给定所有可能阈值的召回平均精度；或者F-score，它是给定一个特定阈值的精确度和召回率的调和平均值。我们也可以列举所有的阈值，获得所有的F-score，并使用最好的F-score作为度量。在给定一个最优全局阈值的情况下，最佳F-score表示模型在特定测试集上可能的最佳性能。在实践中,最好的F-score主要与AUC一致，除了轻微的差异（见图8）。我们更喜欢AUC上最好的F-score，因为在一定的阈值上获得优秀的F分数比在大多数阈值上具有高但不是那么优秀的F-score更重要。</p>
+<p><img src="http://image.rexking6.top/img/clip1557388162.png" alt=""></p>
+<p><em>图8. AUC，最佳F-Score，与最佳F-Score对应的平均报警延迟。$\cal A$、$\cal B$ 和 $\cal C$ 是三个数据集。0%，10%和100%是训练中保留的标签的比例。注意，当异常标签为0%时，Opprentice没有结果。每个条形上的黑线是10次重复实验的偏差。</em></p>
+<p>在实际应用中，人工操作符通常不关心逐点度量。如果延迟不太长，算法可以为相邻异常段中的任何点触发警报。已经提出了一些用于异常检测的指标来适应这种偏好，例如[22]，但是大多数指标没有被广泛接受，可能是因为它们太复杂了。相反，我们使用一个简单的策略：如果可以用一个选择的阈值检测到ground truth中异常段中的任何点，那么我们说该段被正确检测到，并且该段中的所有点都被视为可以用这个阈值检测到。同时，对异常段以外的点按常规处理。然后计算出精度、召回率、AUC、F-score和最佳F-score。这种方法如图7所示。</p>
+<p><img src="http://image.rexking6.top/img/clip1557388450.png" alt=""></p>
+<p><em>图7. 修改后的度量策略的说明。第一行是ground truth，有10个相邻的点和两个异常段突出显示在阴影方块中。检测器得分显示在第二行。第三行显示了阈值为0.5的逐点检测器结果。第四行是调整后的检测器结果。我们将得到精确度0.6，召回率0.5。从第三行开始，第一个段的警报延迟为1个间隔（1分钟）。</em></p>
+<p>除了精度指标外，我们还计算了每个检测段的报警延迟，这对操作人员也很重要。对于一个真实的正段，报警延迟是该段中第一个点与检测到的第一个点之间的时间差。</p>
+<h2 id="实验设置"><a href="#实验设置" class="headerlink" title="实验设置"></a>实验设置</h2><p>我们将窗口大小 $W$ 设置为120，在数据集中跨度为2小时。$W$ 的选择受到两个因素的限制。一方面，太小的 $W$ 将导致模型无法捕获模式，因为只有来自窗口的信息，模型才能识别正常模式是什么（参见5.1）。另一方面，太大的 $W$ 会增加过拟合的风险，因为我们使用全连接层，没有权值共享，所以模型参数的数量与 $W$ 成正比。我们设置了$\cal B$ 和 $\cal C$ 的隐藏维度 $K=3$，因为3维空间可以很容易地可视化分析和幸运的是实际情况中 $\cal B$ 和 $\cal C$ ，$K = 3$ 能工作得很好。对于 $\cal A$，我们发现3太小,所以我们经验增加 $K = 8$。$K$ 的这些经验选择在测试集中被证明是非常好的，如图10所示。$q_ϕ(\textbf z |\textbf x)$ 和 $pθ(\textbf x |\textbf z)$ 的隐藏层都是选为两个ReLU层，每层100个神经元，使变分和生成网络平等大小。我们没有对隐藏网络的结构进行详尽的搜索。</p>
+<p>其他超参数也是经验选择的。我们设置标准差层的 $ϵ$ 为 $10^{-4}$。我们用0.01作为注入比 $λ$。我们使用10作为MCMC迭代计数 $M$，使用1024作为蒙特卡罗积分的采样数 $L$。我们使用256作为训练的批大小，运行250个epoch。我们使用Adam optimizer[15]，初始学习率为 $10^{-3}$。每10个epch，我们将学习率衰减0.75。我们将L2正则化应用于隐藏层，其系数为 $10^{-3}$。我们用范数裁剪梯度，其极限为10.0。</p>
+<p>为了评估没有标签的Donut，我们忽略了所有的标签。对于出现部分的标签，我们对训练和验证的异常标签进行降采样，使其包含10%的异常标签。注意，缺失点不是向下采样的。我们不断地随机丢弃异常段，其概率与每个段的长度成正比，直到达到所需的下采样率。我们使用这种方法而不是随机丢弃单个异常点，因为KPI是时间序列，每个异常点都可能影响其邻近点的信息，从而导致对性能的高估。这样的下采样做了10次，这使我们能够做10个独立的，重复的实验。总的来说，对于每个数据集，我们有三个版本：0%标签、10%标签和100%标签。</p>
+<h2 id="整体性能"><a href="#整体性能" class="headerlink" title="整体性能"></a>整体性能</h2><p>在图8中，我们测量了Donut的AUC、最佳F-score以及与最佳F-score对应的平均报警延迟，并与三种选择算法进行了比较。</p>
+<p><strong>Opprentice[25]</strong>是一个使用随机森林分类器的集成监督框架。在与我们相似的数据集上，Opprentice的报告一致且显著优于14个基于传统统计模型的异常检测器（例如[6,17,18,24,26,27,31,40,41]），这些检测器共列举了133个超参数的混杂。因此，在我们对Donut的评价中，Opprentice不仅作为一种来自非深度学习领域的最先进的竞争算法，而且作为一种代理方法与这些传统异常检测器的经验性能上界进行比较。</p>
+<p><strong>VAE基线。</strong>[2]中基于VAE的异常检测不用于处理时间序列，因此我们将VAE基线设置为：首先VAE基线具有与Donut相同的网络结构，如图4所示。其次，在图3中的所有技术中，只使用了数据准备步骤中的技术。第三，根据[2]的建议，我们从训练数据中排除了所有包含标记异常或缺失点的窗口。</p>
+<p><strong>Donut先验。</strong>考虑到生成模型学习 $p (\textbf x)$，而VAE的 $p(\bf x)$ 定义为 $\mathbb E_{p_θ(\textbf z)} [p_θ(\textbf x |\textbf z))$，我们也评估直接采用先验的重建概率，即 $\mathbb E_{p_θ(\textbf z)} [\log p_θ(\textbf x |\textbf z))$。我们只需要一个先验的基线，所以我们通过简单的蒙特卡罗积分来计算先验期望，而没有使用先进的技术来改进结果。</p>
+<p>在完全无监督的情况下，Donut的F-score最好，范围在0.75 ~ 0.9之间，在所有情况下都优于有监督的Opprentice。事实上，当标签不完整时，Opprentice的最佳F-score在 $\cal A$ 和 $\cal B$ 中大幅下降，只在 $\cal C$ 中保持可接受的水平。$\cal C$ 中异常的数量远远大于 $\cal A$ 和 $\cal B$，而10%的标签可能仅够训练。Donut在无监督的情况下有出色的性能，我们看到，在Donut中添加异常标签通常会使其工作得更好。然而，Donut有一个不寻常的行为，在 $\cal C$ 中，F-score最高，在 $\cal B$ 和 $\cal C$ 中，AUC得分最高，在100%的标签下略低于10%。这可能是一个优化问题，未标记的异常可能导致训练不稳定，并意外地将模型拉出次优均衡（5.4）。当 $K$ 从3（$\cal B$ 和 $\cal C$）增加到8（$\cal A）时，这种现象似乎减少了。幸运的是，这并不重要，所以我们建议尽可能在Donut中使用标签。</p>
+<p>Donut在 $\cal A$ 和 $\cal B$ 中都比VAE基线表现出较大的优势，而在 $\cal C$ 中并没有表现出如此大的优势。事实上，Donut在 $\cal A$ 中相对优势最大，在 $\cal B$ 中相对优势中等，在 $\cal C$ 中相对优势最小。VAE自然地对正常的 $\bf x$ 进行建模，因此重建概率实际上期望 $\bf x$ 基本上是正常的（见5.1）。然而，由于 $\bf x$ 是KPI的滑动窗口，我们需要为每个点产生一个异常分数，有时在 $\bf x$ 中有不正常的点是不可避免的。这导致VAE基线性能下降很多。相比之下，本文中提出的方法提高了Donut的产生可靠的输出能力，即使异常出现在同一个窗口中的较靠前的点中。同时，KPI越平滑，相似异常幅度的异常点出现的异常程度越高。考虑到 $\cal A$ 是最光滑的，$\cal B$ 是中等的，$\cal C$ 是最不光滑的，在相对优势上面的观察并不令人惊讶。</p>
+<p>最后，当 $\bf z$ 维数较大时，Donut-先验的最佳F-score远低于重构概率。但值得注意的是，重建概率中的后验期望仅在一定条件下有效（5.2）。幸运的是，这个问题对Donut来说并不太重要（参见5.2）。因此，重构概率的使用无需过多考虑。</p>
+<p>Donut、Opprentice和VAE基线的平均警报延迟在所有数据集上都是可接受的，而Donut先验则不能。与此同时，Donut的最佳F-score也比其他的要好得多。综上所述，Donut可以在不增加报警延迟的情况下获得最佳的性能，因此Donut对于操作者来说是实用的。</p>
+<h2 id="Donut方法的效果"><a href="#Donut方法的效果" class="headerlink" title="Donut方法的效果"></a>Donut方法的效果</h2><p>本文提出了三种技术：(1) M-ELBO、(2) 缺失数据注入和(3) MCMC填充。在图10中，我们给出了四种可能的技术组合下Donut的最佳F-score，以及用于比较的VAE基线。这些技术与KDE解释密切相关，将在5.2中进一步讨论。</p>
+<p><img src="http://image.rexking6.top/img/clip1557400439.png" alt=""></p>
+<p><em>图10. 不同 $K$ 值无监督Donut的最佳F-score，平均重复实验10次以上。</em></p>
+<p>M-ELBO对VAE基线的改善贡献最大。它通过训练Donut来适应可能出现的 $\bf x$ 异常点，并在这种情况下产生预期的输出。虽然我们预计M-ELBO会成功，但我们没想到它会如此成功。综上所述，仅使用正常数据训练VAE进行异常检测并不是一个好的做法，尽管这对于生成模型来说似乎是很自然的（5.2）。据我们所知，M-ELBO及其重要性在以前的工作中从未阐明，因此是我们的一项重大贡献。</p>
+<p>缺失数据注入是为了放大M-ELBO的影响而设计的，实际上可以看作是一种数据增强方法。事实上，如果我们在训练中不仅注入缺失点，而且综合生成异常，效果会更好。但是，产生与实际异常足够相似的异常是很困难的，这应该是一个很大的主题，超出了本文的范围。因此，我们只注入缺失的点。使用缺失数据注入的最佳F-score的改善并不十分显著，在 $\cal B$ 和 $\cal C$ 标签为0%的情况下，仅略低于M-ELBO。这可能是因为注入为训练引入了额外的随机性，因此与仅使用M-ELBO的情况相比，它需要更大的训练周期。我们不确定在采用注入时要运行多少个epoch，以便得到一个客观的比较，因此我们在所有情况下都使用相同的epoch，让结果保持原样。我们仍然建议使用缺失的数据注入，即使需要花费更大的训练时间，因为它很大可能性能起作用。</p>
+<p>MCMC填充也是为了帮助Donut处理异常点。虽然在某些情况下，使用MCMC的Donut能显著提高F-score，但并不会影响性能。根据[32]，这应该是一个预期的结果。因此，我们建议在检测中始终采用MCMC。</p>
+<p>总之，我们推荐使用Donut的所有这三种技术。这种设置的结果也如图9所示。</p>
+<p><img src="http://image.rexking6.top/img/clip1557401111.png" alt=""></p>
+<p><em>图9. (1)VAE基线、(2)M-ELBO、(3)M-ELBO+缺失数据注入、(4)M-ELBO + MCMC、(5)M-ELBO + MCMC和注入。单是M-ELBO就贡献了大部分改进。</em></p>
+<h2 id="K-的影响"><a href="#K-的影响" class="headerlink" title="$K$ 的影响"></a>$K$ 的影响</h2><p>$\bf z$ 维数，即 $K$ 起着重要的作用。$K$ 过小可能导致拟合不足或次优平衡（见5.4）。另一方面，过大的 $K$ 值可能导致重建概率无法找到一个好的后验（见5.1）。在完全没有监督的情况下，选择一个好的 $K$ 是很困难的，因此我们把它留作以后的工作。</p>
+<p>在图10中，我们给出了非监督Donut在不同 $K$ 值下的平均最佳F-score。这并不能帮助我们选择最好的 $K$ （因为我们不能使用测试集来选择 $K$)，但是可以表明我们的实证选择 $8,3,3$ 是相当好的。最好的F-score在 $\cal A$ 中取5，$\cal B$ 中取4，$\cal C$ 中取3。换句话说，最好的F-score可以用很小的 $K$ 来达到。最后，我们注意到更平滑的KPI似乎需要更大的 $K$，这一现象在本文中并没有得到充分的研究，我们将其留作以后的工作。根据图10中的观察，对于KPI类似于 $\cal A$、$\cal B$ 或 $\cal C$，我们建议 $K$ 在5到10之间的经验选择。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><h2 id="KDE的解释"><a href="#KDE的解释" class="headerlink" title="KDE的解释"></a>KDE的解释</h2><p>虽然重建概率 $\mathbb E_{q_ϕ(\textbf z |\textbf x)}[\log p_θ(\textbf x |\textbf z)]$ 被采用于[2,36]，它实际上是如何运作尚未明确。有些人可能认为这是一个变种的 $\mathbb E_{q_ϕ(\textbf z|\textbf x)} [p_θ(\textbf x |\textbf z)]$，但 $\mathbb E_{q_ϕ(\textbf z |\textbf x)}[p_θ(\textbf x |\textbf z)] = \int p_θ(\textbf x |\textbf z) q_ϕ (\textbf z |\textbf x)$，这不是明确的概率（一般来说它不应该通过使用一个潜在异常 $\bf x$ 来计算在后验 $q_ϕ(\textbf z |\textbf x)$ 的 $\log p_θ(\textbf x |\textbf z)$ 的期望，来给出有用的信息）。因此，这两个[2,36]都不能用概率框架来解释。在此，我们提出了重建概率的KDE（核密度估计）解释，以及整个Donut算法。</p>
+<p>正常的 $\bf x$ 的后验 $q_\phi(\textbf z |\textbf x)$ 表现出时间梯度，如图11a所示。连续时间的 $\bf x$ 窗口（以下简称连续 $\bf x$）映射到附近的 $q_\phi(\textbf z |\textbf x)$，大多数较小的方差 $\pmb σ_{\textbf z}$（参见图12）。</p>
+<p><img src="http://image.rexking6.top/img/clip1557402929.png" alt="s"></p>
+<p><em>图11. 数据集 $\cal B$ 的 $\bf z$ 空间，(a)Donut，(b)未经训练的VAE，(c)训练损失使用 $\mathbb E[\log p_θ(\textbf z)]+H[\textbf z|\textbf x]$ 的VAE。从 $q_\phi(\textbf z|\textbf x)$ 抽样出 $\bf z$ 数据绘制出图，相应地，正常的 $\bf x$ 从测试集中随机选取。$K$ 选为2，所以 $x$ 轴和 $y$ 轴是采样得到的 $\bf z$ 的两个维度。我们绘制 $q_\phi(\textbf z|\textbf x)$ 的 $\pmb \mu_{\textbf z}$ 来替代 $\bf z$ ，因为我们要考虑图中 $\pmb \sigma_{\textbf z}$ 的影响。样本 $\bf z$ 的颜色表示它在一天中的时间。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1557404165.png" alt=""></p>
+<p><em>图12. KDE解释说明。对于给定的含有潜在异常的 $\bf x$，Donut试图识别它遵循的正常模式，编码为 $q_ϕ(\textbf z |\textbf x)$。中间的黑色椭圆表示 $q_ϕ(\textbf z|\textbf x)$ 的 $3-\pmb \sigma_{\textbf z}$ 区域。从 $q_\phi(\textbf z|\textbf x)$ 抽样的 $L$ 个 $\bf z$ 样本，用图中的圈表示。每个 $\bf z$ 与核密度估计 $\log p_θ(\textbf x |\textbf z)$。右边的两张图中的蓝色曲线是每个核的 $\pmb \mu_{\textbf x}$ ，周围的条纹是 $\pmb \sigma_{\textbf x}$。最后，$\log p_θ(\textbf x|\textbf z)$ 的值由每个核计算，并进一步取平均作为重建概率。</em></p>
+<p>正常 $\bf x$ 的后验 $q_\phi(\textbf z |\textbf x)$ 表现出时间梯度，如图11a所示。$\bf x$ 的窗口在连续的时间（之后，简称连续 $\bf x$）映射到附近 $q_ϕ(\textbf z |\textbf x)$，主要用小方差 $\pmb σ_{\textbf z}$（见图12）。$q_ϕ(\textbf z |\textbf x)$ 因此看起来是平稳变化的，导致 $\bf z$ 样本表现出图中的颜色梯度。我们把这个结构命名为时间梯度。本文的KPI一般是光滑的，因此相邻的 $\bf x$ 是高度相似的。时间梯度的根源是 $q_ϕ(\textbf z|\textbf x)$ 在 $\bf x$ 形状中的过渡（而不是在时间上的过渡），因为Donut只利用了 $\bf x$ 的形状而没有时间信息。时间梯度有利于Donut对看不见的数据的泛化：如果我们有一个后验 $q_ϕ(\textbf z |\textbf x)$，介于两个训练后验，它将被明确定义，避免荒谬的检测输出。</p>
+<p>含有部分异常的 $\bf x$，降维将允许Donut识别到正常模式 $\tilde {\textbf x}$，并导致 $q_ϕ(\textbf z |\textbf x)$ 趋近于 $q_ϕ(\textbf z |\tilde{\textbf x})$。造成这种影响的原因如下。Donut被训练为重建正常的训练样本点，虽然低维导致Donut只能从 $\bf x$ 获取少量的信息。因此，在 $q_\phi(\textbf z|\textbf x)$ 中只对整体形状编码。异常信息很可能在此过程中被删除。然而，如果 $\bf x$ 是太异常时，Donut可能无法识别任何正常 $\bf x$，这样 $q_ϕ(\textbf z |\textbf x)$ 会变得模糊。</p>
+<p>含有部分异常 $\bf x$ 的 $q_ϕ(\textbf z |\textbf x)$ 将类似于 $q_ϕ(\textbf z |\textbf x)$ 的这一事实给Donut的重建概率带来了特别的意义。由于M-ELBO在训练期间关于正常模式的最大化，对 $\textbf z\sim q_\phi(\textbf z|\tilde{\textbf x})$ 的 $\log p_θ(\textbf x |\textbf z)$ 应该在 $\bf x$ 类似于 $\tilde {\textbf x}$ 时给出高分，反之亦然。也就是说，每个 $\log p_θ(\textbf x |\textbf z)$ 可以用作密度估计量，表示 $\bf x$ 有多遵循正常的模式 $\tilde {\textbf x}$。之后后验期望加和来源于 $\log p_\theta(\textbf x|\textbf z)$ 的得分，每个得分的权重为 $\bf z$ 的 $q_\phi(\textbf z|\textbf x)$ 。这个过程非常类似于加权核密度估计 [11, 14]。我们因此采用了KDE解释：Donut的重建概率 $\mathbb E_{q_ϕ(\textbf z |\textbf x)} [\log p_θ(\textbf x |\textbf z))$ 可以看作是加权核密度估计，其中 $q_ϕ(\textbf z |\textbf x)$ 作为权重，$\log p_θ(\textbf x |\textbf z)$ 作为核。</p>
+<p>图12是KDE解释的示意图。我们还可视化了图13中所有数据集的三维潜在空间。从KDE的解释，我们怀疑先验期望不会很好地工作，无论采用什么技术来改进结果：对先验的采样会获得所有模式的 $\bf x$ 作为核，这可能会混淆对特定 $\bf x$ 的密度估计。</p>
+<p><img src="http://image.rexking6.top/img/clip1557473278.png" alt=""></p>
+<p><em>图13. 三个数据集的三维潜在空间。</em></p>
+<h2 id="为异常的-bf-x-找到好的后验"><a href="#为异常的-bf-x-找到好的后验" class="headerlink" title="为异常的 $\bf x$ 找到好的后验"></a>为异常的 $\bf x$ 找到好的后验</h2><p>Donut可以识别部分异常 $\bf x$ 的正常模式，并有一个很好的后验来估计 $\bf x$ 是否符合正常模式。现在，我们来分析一下Donut的技术是如何提高找到好的后验的这种能力。</p>
+<p>在训练过程中，M-ELBO强制Donut在异常窗口内正确重建正常点。因此，它被明确地训练来寻找好的后验。这也是M-ELBO在图9中发挥重要作用的主要原因。缺失数据注入增强了M-ELBO的效果，综合生成缺失点。另一方面，MCMC填充并没有改变训练过程。相反，它通过迭代逼近更好的后验值来改进检测，如图14所示。</p>
+<p><img src="http://image.rexking6.top/img/clip1557473344.png" alt=""></p>
+<p><em>图14. MCMC可视化。选择正常的一个 $\bf x$，其后验 $q_\phi(\textbf z |\textbf x)$ 绘制在右侧：十字表示 $\pmb \mu_{\textbf x}$，椭圆表示 $3-\pmb σ_{\textbf x}$ 的范围。我们随机选取15%的 $\bf x$ 作为缺失点，为了得到异常的 $\textbf x’$。我们对 $\textbf x’$ 用10次迭代运行MCMC。首先，$\bf z$ 离 $q_\phi(\textbf z|\textbf x)$ 很远。之后，$\bf z$快速趋近 $q_ϕ(\textbf z |\textbf x)$，并在3个迭代后开始在 $q_ϕ(\textbf z |\textbf x)$ 周围移动。</em></p>
+<p>尽管有这些技术，但如果 $\bf x$ 中有太多异常，Donut可能仍然无法找到一个好的后验。在我们的场景中，KPI是时间序列，每分钟作为一个点。对于持续时间较长的异常，在第一时间内获得正确的检测分数并发出警报是非常必要的。一旦任何分数达到阈值，操作人员就可以采取行动，只需忽略之后不准确的分数。然而，KDE解释可以帮助我们了解重构概率的局限性，以便正确地使用它。</p>
+<h2 id="时间梯度成因"><a href="#时间梯度成因" class="headerlink" title="时间梯度成因"></a>时间梯度成因</h2><p>在这一节中，我们讨论了时间梯度效应产生的原因。为了简化讨论，让我们假设训练 $\bf x$ 都是正常的，因此M-ELBO现在等同于原始ELBO。然后，M-ELBO可以分解为三个项，如下式（我们省略了一些下标以获得更短的表示）。</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+\mathcal L(\textbf x)&=\mathbb E_{q_\phi(\textbf z|\textbf x)}[\log p_\theta(\textbf x|\textbf z)+\log p_\theta(\textbf z)-\log q_\phi(\textbf z|\textbf x)]\\
+&=\mathbb E[\log p_\theta(\textbf x|\textbf z)]+\mathbb E[\log p_\theta(\textbf z)]+H[\textbf z|\textbf x]
+\end{align*}</script><p>第一项要求来自 $q_\phi(\textbf z |\textbf x)$ 的样本 $\bf z$ 具有重构出 $\bf x$ 的高可能性。结果，分离出具有不同形状的 $\bf x$ 的 $q_\phi(\textbf z |\textbf x)$。 第二项使 $q_\phi(\textbf z |\textbf x)$ 集中于 $\mathcal N(0,\textbf I)$。第3项，$q_\phi(\textbf z |\textbf x)$ 的熵，使得 $q_\phi(\textbf z |\textbf x)$ 在任何可能的情况下泛化。 回想第2项设定 $q_\phi(\textbf z |\textbf x)$ 扩展的限制区域（第2和第3项的组合效果参见图11c）。考虑到第一项，如果两个不相似的 $\bf x$ 的 $q_\phi(\textbf z |\textbf x)$ 相互接近，这种扩展也会停止。为了使每个 $q_\phi(\textbf z |\textbf x)$ 在训练收敛时具有最大区域（即这三个项达到平衡），类似的 $\bf x$ 必须彼此接近，允许 $q_\phi(\textbf z |\textbf x)$ 变大即使边界重叠。 由于连续 $\bf x$ 在季节性KPI中相似（反之亦然），如果可以实现这种平衡，时间梯度将是自然会出现的结果。</p>
+<p>接下来我们将讨论如何实现平衡。 如图15所示，SGVB算法在训练期间保持推进不相似的 $\bf x$ 的 $q_\phi(\textbf z |\textbf  x)$ 越远。越不相似的两个 $q_\phi(\textbf z |\textbf x)$，它们被推开得越远。 由于我们随机初始化变分网络，所以当训练刚刚开始时，$q_\phi(\textbf z |\textbf x)$ 在各处混合，如图11b所示。 此时，每个 $q_\phi(\textbf z |\textbf x)$ 被所有其他 $q_\phi(\textbf z |\textbf x)$ 推开。 由于 $\bf x$ 是KPI的滑动窗口，因此在时间上远离的 $\bf x$ 对通常会更加不相似，因此会彼此远离。这给出了 $q_\phi(\textbf z |\textbf x)$ 的初始布局。随着训练的进行，时间梯度被调整并逐渐建立，如图16a所示。 训练动态也表明学习率衰退技术非常重要，因为它可以逐步稳定布局。</p>
+<p><img src="http://image.rexking6.top/img/clip1557475008.png" alt=""></p>
+<p><em>图15. 假设 $\pmb \mu_{\textbf z^{(1)}}$ 和 $\pmb \mu_{\textbf z^{(2)}}$ 是对应于训练数据 $\textbf x^{(1)}$ 和 $\textbf x^{(2)}$ 的 $q_\phi(\textbf z |\textbf x)$ 的平均值，其中周围的圆圈表示 $\pmb σ_{\textbf z^{(1)}}$ 和 $\pmb \sigma_{\textbf z^{(2)}}$。当这两个分布在训练期间意外重叠时，来自 $q_\phi(\textbf z |\textbf x^{(1)})$ 的样本 $z^{(1)}$ 可能过于接近 $\pmb \mu_{\textbf z^{(2)}}$，使得 $\textbf x^{(2)}$ 的 $\textbf z^{(2)}$ 重构分布将接近 $p_θ(\textbf x |\textbf z^{(2)})$。 如果 $\textbf x^{(1)}$ 和 $\textbf x^{(2)}$ 不相似，则损失中的 $\log p_θ(\textbf x^{(1)}|\textbf z^{(2)})$ 将有效地将 $\pmb \mu_{\textbf z^{(1)}}$ 推离 $\pmb \mu_{\textbf z^{(2)}}$。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1557475592.png" alt=""></p>
+<p><em>图16. 训练期间数据集 $\cal B$ 的 $\bf z$ 空间的演变。 我们从验证集中采样出正常的 $\bf x$，并相应地绘制 $\bf z$ 样本。(a)收敛到一个良好的均衡，最终F-score为0.871，而(b)收敛到次优收益，最终F-score为0.826。我们在(a)中绘制Step 4300，因为它是一个非常重要的转折点，绿点开始远离紫点。</em></p>
+<p>令人惊讶的是，我们无法在M-ELBO中找到任何直接将相似 $\bf x$ 的 $q_\phi(\textbf z|\textbf x)$拉到一起的项。时间梯度可能主要由扩展（$H[\textbf z |\textbf x]$），缩小（$\mathbb E[\log p_θ(\bf z)]$），推（$\mathbb E [\log p_θ(\textbf x |\textbf z)]$）和训练动态（随机初始化和SGVB）。这有时可能会造成麻烦，并导致次优布局，我们将在5.4中看到。</p>
+<h2 id="次优平衡"><a href="#次优平衡" class="headerlink" title="次优平衡"></a>次优平衡</h2><p>$q_\phi(\textbf z|\textbf x)$ 有时会收敛到次优平衡。 图16b表现出了这样的问题，其中紫点在Step 100之后意外地经过绿点。紫点将绿点向两侧推开，导致绿点在5000步左右被完全切断。随着训练的进行，绿点将被进一步推动，使得模型被锁定到这种次优平衡并且永远不会逃脱。图17描绘了图16b的训练和验证损失。很明显，在绿点分成两半后，模型很快就会开始过拟合。$\bf z$ 的这种不良布局破坏了时间梯度，其中绿色模式中的测试 $\bf x$ 可能会意外地映射到绿色两半之间的某处并被识别为紫色。 根据KDE的解释，这肯定会降低检测性能。</p>
+<p><img src="http://image.rexking6.top/img/clip1557476475.png" alt=""></p>
+<p><em>图17. 图16b的训练和验证损失。</em></p>
+<p>当存在未标记的异常时，训练将变得不稳定，从而使模型可能意外地脱离次优平衡并且之后实现更好的平衡。 在训练期间的早期停止的帮助下，最终选择曾出现过的最佳平衡。 这就解释了为什么有时拥有完整的标签不会提高性能。对于较大的 $K$，这种效果可能不那么明显，因为具有更多的维度使得 $q_\phi(\textbf z|\textbf x)$ 具有更大的增长自由度，从而减少了布局不良的可能性。 当次优平衡不是一个至关重要的问题时，训练的收敛就变得更加重要，而更多的标签可以有效地帮助稳定训练。 总之，只要 $K$ 足够大，在Donut中使用异常标签可能会提高性能。</p>
+<h1 id="讨论"><a href="#讨论" class="headerlink" title="讨论"></a>讨论</h1><h2 id="更广泛的影响"><a href="#更广泛的影响" class="headerlink" title="更广泛的影响"></a>更广泛的影响</h2><p><strong>重建。</strong>Donut的降维丢弃了异常点的信息。 这意味着异常 $\bf x$ 的 $\bf z$ 可能与正常 $\bf x$ 无法区分，因此不能直接用于检测异常。 因此，重建是Donut的重要一步。我们相信这个结论在其他涉及降维的算法中也是如此。 例如，基于PCA的异常检测 [19,20,33] 的性能对主成分的数量敏感。 我们认为使用这些算法中的重建样本（如Donut中所做的那样）可以消除这种敏感性。</p>
+<p><strong>KDE解释</strong>是Donut的核心。 我们怀疑这种解释也可能可以用于异常检测中其他深度生成模型的设计。 同时，本文的技术（即M-ELBO，缺失数据注入和MCMC）被设计为根据密度估计步骤所需的异常 $\bf x$ 来增强对良好后验的结合的能力。 这些技术也很容易适用于其他深度生成模型。</p>
+<p><strong>时间梯度效应</strong>可以在更一般类型的季节性或周期性序列中发生，而不仅仅是季节性KPI。 相似的 $\bf x$ 被映射到 $q_\phi(\textbf z|\textbf x)$ 的邻域，使得除了异常检测（例如从大型数据库检索类似的曲线）之外，Donut或其变体可能在处理序列相似性的任务中可能是有用的。</p>
+<h2 id="未来的工作"><a href="#未来的工作" class="headerlink" title="未来的工作"></a>未来的工作</h2><p>如4.6所述，我们将选择 $K$ 作为未来的工作。$\bf z$ 的拓扑结构可能是解决这个问题的关键，因为我们已经看到了次优均衡如何影响性能（参见5.4）。此外，我们还怀疑，在 $K$ 较大的情况下，次优均衡发生的可能性较小，尽管我们可能还需要更多的实验和分析来证明这一点。</p>
+<p>我们没有讨论如何选择正确的检测阈值。这也是一个相当棘手的问题，尤其是在无监督的情况下。一些工作（如[21]）已经被提出如何选择一个适当的阈值，这可能适用于Donut。</p>
+<p>可以采用更复杂的结构来扩展Donut。例如，序列到序列的RNN结构[38]可以代替Donut中全连接层，从而处理更大的窗口，更好地处理点间的相关性。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>本文提出了一种基于VAE的无监督异常检测算法来检测局部变化的季节KPI。一些新技术使Donut能够大大超过现有的监督和基于VAE的异常检测算法。对所研究的KPI，Donut的最佳F-score范围在0.75到0.90之间。</p>
+<p>用KDE解释理论分析和时间梯度效应的新发现解释了Donut的优异性能。我们的实验和理论分析意味着更广泛的影响：基于降维的异常检测需要使用重构；生成模型的异常检测需要同时训练正常和异常数据。</p>
+<h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><ol>
+<li>Mennatallah Amer, Markus Goldstein, and Slim Abdennadher. 2013. Enhancing one-class support vector machines for unsupervised anomaly detection. In Proceedings of the ACM SIGKDD Workshop on Outlier Detection and Description. ACM, 8–15.</li>
+<li>Jinwon An and Sungzoon Cho. 2015. Variational Autoencoder based Anomaly Detection using Reconstruction Probability. Technical Report. SNU Data Mining Center. 1–18 pages.</li>
+<li>Matthew James Beal. 2003. Variational algorithms for approximate Bayesian inference. University of London London.</li>
+<li>Christopher M Bishop. 2006. Pattern recognition and machine learning. springer.</li>
+<li>Varun Chandola, Arindam Banerjee, and Vipin Kumar. 2009. Anomaly detection: A survey. ACM computing surveys (CSUR) 41, 3 (2009), 15.</li>
+<li>Yingying Chen, Ratul Mahajan, Baskar Sridharan, and Zhi-Li Zhang. 2013. A Provider-side View of Web Search Response Time. In Proceedings of the ACM SIGCOMM 2013 Conference on SIGCOMM (SIGCOMM ’13). ACM, New York, NY, USA, 243–254. <a target="_blank" rel="noopener" href="https://doi.org/10.1145/2486001.2486035">https://doi.org/10.1145/2486001.2486035</a></li>
+<li>Sarah M Erfani, Sutharshan Rajasegarar, Shanika Karunasekera, and Christopher Leckie. 2016. High-dimensional and large-scale anomaly detection using a linear one-class SVM with deep learning. Pattern Recognition 58 (2016), 121–134.</li>
+<li>Romain Fontugne, Pierre Borgnat, Patrice Abry, and Kensuke Fukuda. 2010. MAWILab: Combining Diverse Anomaly Detectors for Automated Anomaly Labeling and Performance Benchmarking. In Proceedings of the 6th International COnference (Co-NEXT ’10). ACM, Article 8, 12 pages. <a target="_blank" rel="noopener" href="https://doi.org/10.1145/">https://doi.org/10.1145/</a> 1921168.1921179</li>
+<li>Zhouyu Fu, Weiming Hu, and Tieniu Tan. 2005. Similarity based vehicle trajectory clustering and anomaly detection. In Image Processing, 2005. ICIP 2005. IEEE International Conference on, Vol. 2. IEEE, II–602.</li>
+<li>John Geweke. 1989. Bayesian inference in econometric models using Monte Carlo integration. Econometrica: Journal of the Econometric Society (1989), 1317–1339.</li>
+<li>Francisco J Goerlich Gisbert. 2003. Weighted samples, kernel density estimators and convergence. Empirical Economics 28, 2 (2003), 335–351.</li>
+<li>Ian Goodfellow, Yoshua Bengio, and Aaron Courville. 2016. Deep Learning. MIT Press.</li>
+<li>Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio. 2014. Generative adversarial nets. In Advances in neural information processing systems. 2672–2680.</li>
+<li>Wolfgang Härdle, Axel Werwatz, Marlene Müller, and Stefan Sperlich. 2004. Nonparametric density estimation. Nonparametric and Semiparametric Models (2004), 39–83.</li>
+<li>Diederik Kingma and Jimmy Ba. 2014. Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980 (2014).</li>
+<li>Diederik P Kingma and Max Welling. 2014. Auto-Encoding Variational Bayes. In Proceedings of the International Conference on Learning Representations.</li>
+<li>Florian Knorn and Douglas J Leith. 2008. Adaptive kalman fltering for anomaly detection in software appliances. In INFOCOM Workshops 2008, IEEE. IEEE, 1–6.</li>
+<li>Balachander Krishnamurthy, Subhabrata Sen, Yin Zhang, and Yan Chen. 2003. Sketch-based change detection: methods, evaluation, and applications. In Proceedings of the 3rd ACM SIGCOMM conference on Internet measurement. ACM, 234–247.</li>
+<li>Anukool Lakhina, Mark Crovella, and Christophe Diot. 2004. Diagnosing Network-wide Trafc Anomalies. In Proceedings of the 2004 Conference on Applications, Technologies, Architectures, and Protocols for Computer Communications (SIGCOMM ’04). ACM, New York, NY, USA, 219–230. <a target="_blank" rel="noopener" href="https://doi.org/10.1145/">https://doi.org/10.1145/</a> 1015467.1015492</li>
+<li>Anukool Lakhina, Mark Crovella, and Christophe Diot. 2005. Mining Anomalies Using Trafc Feature Distributions. In Proceedings of the 2005 Conference on Applications, Technologies, Architectures, and Protocols for Computer Communications (SIGCOMM ’05). ACM, New York, NY, USA, 217–228. <a target="_blank" rel="noopener" href="https://doi.org/10.1145/1080091.1080118">https://doi.org/10.1145/1080091.1080118</a></li>
+<li>Nikolay Laptev, Saeed Amizadeh, and Ian Flint. 2015. Generic and scalable framework for automated time-series anomaly detection. In Proceedings of the 21th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining. ACM, 1939–1947.</li>
+<li>Alexander Lavin and Subutai Ahmad. 2015. Evaluating Real-Time Anomaly Detection Algorithms–The Numenta Anomaly Benchmark. In Machine Learning and Applications (ICMLA), 2015 IEEE 14th International Conference on. IEEE, 38–44.</li>
+<li>Rikard Laxhammar, Goran Falkman, and Egils Sviestins. 2009. Anomaly detection in sea trafc-a comparison of the gaussian mixture model and the kernel density estimator. In Information Fusion, 2009. FUSION’09. 12th International Conference on. IEEE, 756–763.</li>
+<li>Suk-Bok Lee, Dan Pei, MohammadTaghi Hajiaghayi, Ioannis Pefkianakis, Songwu Lu, He Yan, Zihui Ge, Jennifer Yates, and Mario Kosseif. 2012. Threshold compression for 3g scalable monitoring. In INFOCOM, 2012 Proceedings IEEE. IEEE, 1350–1358.</li>
+<li>Dapeng Liu, Youjian Zhao, Haowen Xu, Yongqian Sun, Dan Pei, Jiao Luo, Xiaowei Jing, and Mei Feng. 2015. Opprentice: Towards Practical and Automatic Anomaly Detection Through Machine Learning. In Proceedings of the 2015 ACM Conference on Internet Measurement Conference (IMC ’15). ACM, New York, NY, USA, 211–224. <a target="_blank" rel="noopener" href="https://doi.org/10.1145/2815675.281567">https://doi.org/10.1145/2815675.281567</a>.</li>
+<li>Wei Lu and Ali A Ghorbani. 2009. Network anomaly detection based on wavelet analysis. EURASIP Journal on Advances in Signal Processing 2009 (2009), 4.</li>
+<li>Ajay Mahimkar, Zihui Ge, Jia Wang, Jennifer Yates, Yin Zhang, Joanne Emmons, Brian Huntley, and Mark Stockert. 2011. Rapid detection of maintenance induced changes in service performance. In Proceedings of the Seventh COnference on emerging Networking EXperiments and Technologies. ACM, 13.</li>
+<li>Gerhard Münz, Sa Li, and Georg Carle. 2007. Trafc anomaly detection using k-means clustering. In GI/ITG Workshop MMBnet.</li>
+<li>Miguel Nicolau, James McDermott, et al. 2016. One-Class Classifcation for Anomaly Detection with Kernel Density Estimation and Genetic Programming. In European Conference on Genetic Programming. Springer, 3–18.</li>
+<li>Thomas Dyhre Nielsen and Finn Verner Jensen. 2009. Bayesian networks and decision graphs. Springer Science &amp; Business Media.</li>
+<li>Brandon Pincombe. 2005. Anomaly detection in time series of graphs using arma processes. Asor Bulletin 24, 4 (2005), 2.</li>
+<li>Danilo Jimenez Rezende, Shakir Mohamed, and Daan Wierstra. 2014. Stochastic Backpropagation and Approximate Inference in Deep Generative Models. In Proceedings of the 31st International Conference on International Conference on Machine Learning - Volume 32 (ICML’14). JMLR.org, Beijing, China, II–1278–II– 1286.</li>
+<li>Haakon Ringberg, Augustin Soule, Jennifer Rexford, and Christophe Diot. 2007. Sensitivity of PCA for Trafc Anomaly Detection. In Proceedings of the 2007 ACM SIGMETRICS International Conference on Measurement and Modeling of Computer Systems (SIGMETRICS ’07). ACM, New York, NY, USA, 109–120. <a target="_blank" rel="noopener" href="https://doi.org/10.1145/1254882.1254895">https://doi.org/10.1145/1254882.1254895</a></li>
+<li>Terrence J Sejnowski and Charles R Rosenberg. 1987. Parallel networks that learn to pronounce English text. Complex systems 1, 1 (1987), 145–168.</li>
+<li>Shashank Shanbhag and Tilman Wolf. 2009. Accurate anomaly detection through parallelism. Network, IEEE 23, 1 (2009), 22–28.</li>
+<li>Maximilian Sölch, Justin Bayer, Marvin Ludersdorfer, and Patrick van der Smagt. 2016. Variational inference for on-line anomaly detection in high-dimensional time series. International Conference on Machine Laerning Anomaly detection Workshop (2016).</li>
+<li>Jonathan AC Sterne, Ian R White, John B Carlin, Michael Spratt, Patrick Royston, Michael G Kenward, Angela M Wood, and James R Carpenter. 2009. Multiple imputation for missing data in epidemiological and clinical research: potential and pitfalls. Bmj 338 (2009), b2393.</li>
+<li>Ilya Sutskever, Oriol Vinyals, and Quoc V Le. 2014. Sequence to sequence learning with neural networks. In Advances in neural information processing systems. 3104–3112.</li>
+<li>Hao Wang and Dit-Yan Yeung. 2016. Towards Bayesian deep learning: A survey. arXiv preprint arXiv:1604.01662 (2016).</li>
+<li>Asrul H Yaacob, Ian KT Tan, Su Fong Chien, and Hon Khi Tan. 2010. Arima based network anomaly detection. In Communication Software and Networks, 2010. ICCSN’10. Second International Conference on. IEEE, 205–209.</li>
+<li>He Yan, Ashley Flavel, Zihui Ge, Alexandre Gerber, Dan Massey, Christos Papadopoulos, Hiren Shah, and Jennifer Yates. 2012. Argus: End-to-end service anomaly detection and localization from an ISP’s point of view. In INFOCOM, 2012 Proceedings IEEE. IEEE, 2756–2760.</li>
+</ol>
+<h1 id="个人看法"><a href="#个人看法" class="headerlink" title="个人看法"></a>个人看法</h1><p>裴丹的方法主要对原来的VAE作了三点改进：</p>
+<ol>
+<li>允许加入先验：原本的VAE只是无监督模型，假设使用者拥有少数的先验信息也无法加入，这里的先验是指异常数据点的标签或者异常数据所占的比例，通过修改损失来实验这个改进，即M-ELEO；</li>
+<li>缺失数据注入：针对原本数据预处理中的填零操作，在训练中，主动随机设置小比例的数据点为缺失并填零，比较好地适应了预处理后的数据分布；</li>
+<li>MCMC填充：在检测中，因为VAE已经训练完成，说明有重新生成数据的功能，用这个功能再对之前缺失进行填充。</li>
+</ol>
+<p>时间梯度展示得很奇妙，也很符合逻辑。关于次优平衡，$K$ 取大或者初始化时不要随机，有意地将不同时间点设置得分开一些。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\04\10\AIOps资料\" rel="bookmark">AIOps资料</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\02\17\《Time-series-Extreme-Event-Forecasting-with-Neural-Networks-at-Uber》笔记\" rel="bookmark">《Time-series Extreme Event Forecasting with Neural Networks at Uber》笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2020\12\29\时间序列分解\" rel="bookmark">时间序列分解</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2019/05/10/%E3%80%8AUnsupervised-Anomaly-Detection-via-Variational-Auto-Encoder-for-Seasonal-KPIs-in-Web-Applications%E3%80%8B%E7%AC%94%E8%AE%B0/" title="《Unsupervised Anomaly Detection via Variational Auto-Encoder for Seasonal KPIs in Web Applications》笔记">https://blog.rexking6.top/2019/05/10/《Unsupervised-Anomaly-Detection-via-Variational-Auto-Encoder-for-Seasonal-KPIs-in-Web-Applications》笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AIOps/" rel="tag"># AIOps</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/04/10/Jupyter%20Notebook%20'signal%20only%20works%20in%20main%20thread'/" rel="prev" title="Jupyter Notebook 'signal only works in main thread'">
+      <i class="fa fa-chevron-left"></i> Jupyter Notebook 'signal only works in main thread'
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/05/30/%E5%8F%98%E5%88%86%E6%8E%A8%E7%90%86/" rel="next" title="变分推理">
+      变分推理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">2.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E5%92%8C%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">背景和问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E5%92%8C%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B"><span class="nav-number">3.1.</span> <span class="nav-text">上下文和异常检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A5%E5%BE%80%E7%9A%84%E5%B7%A5%E4%BD%9C"><span class="nav-number">3.2.</span> <span class="nav-text">以往的工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="nav-number">3.3.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E5%88%86%E8%87%AA%E7%BC%96%E7%A0%81%E5%99%A8%E7%9A%84%E8%83%8C%E6%99%AF"><span class="nav-number">3.4.</span> <span class="nav-text">变分自编码器的背景</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84"><span class="nav-number">4.</span> <span class="nav-text">架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84"><span class="nav-number">4.1.</span> <span class="nav-text">网络结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83"><span class="nav-number">4.2.</span> <span class="nav-text">训练</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E6%B5%8B"><span class="nav-number">4.3.</span> <span class="nav-text">检测</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%84%E4%BB%B7"><span class="nav-number">5.</span> <span class="nav-text">评价</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">5.1.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87"><span class="nav-number">5.2.</span> <span class="nav-text">性能指标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="nav-number">5.3.</span> <span class="nav-text">实验设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%80%A7%E8%83%BD"><span class="nav-number">5.4.</span> <span class="nav-text">整体性能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Donut%E6%96%B9%E6%B3%95%E7%9A%84%E6%95%88%E6%9E%9C"><span class="nav-number">5.5.</span> <span class="nav-text">Donut方法的效果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#K-%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">5.6.</span> <span class="nav-text">$K$ 的影响</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-number">6.</span> <span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#KDE%E7%9A%84%E8%A7%A3%E9%87%8A"><span class="nav-number">6.1.</span> <span class="nav-text">KDE的解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E5%BC%82%E5%B8%B8%E7%9A%84-bf-x-%E6%89%BE%E5%88%B0%E5%A5%BD%E7%9A%84%E5%90%8E%E9%AA%8C"><span class="nav-number">6.2.</span> <span class="nav-text">为异常的 $\bf x$ 找到好的后验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E6%A2%AF%E5%BA%A6%E6%88%90%E5%9B%A0"><span class="nav-number">6.3.</span> <span class="nav-text">时间梯度成因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AC%A1%E4%BC%98%E5%B9%B3%E8%A1%A1"><span class="nav-number">6.4.</span> <span class="nav-text">次优平衡</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%A8%E8%AE%BA"><span class="nav-number">7.</span> <span class="nav-text">讨论</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E5%B9%BF%E6%B3%9B%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">7.1.</span> <span class="nav-text">更广泛的影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AA%E6%9D%A5%E7%9A%84%E5%B7%A5%E4%BD%9C"><span class="nav-number">7.2.</span> <span class="nav-text">未来的工作</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">8.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">9.</span> <span class="nav-text">引用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%AA%E4%BA%BA%E7%9C%8B%E6%B3%95"><span class="nav-number">10.</span> <span class="nav-text">个人看法</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

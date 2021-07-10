@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Weakly-Supervised Semantic Segmentation Network with Deep Seeded Region Growing》笔记">
+<meta property="og:url" content="https://blog.rexking6.top/2018/07/26/%E3%80%8AWeakly-Supervised-Semantic-Segmentation-Network-with-Deep-Seeded-Region-Growing%E3%80%8B%E7%AC%94%E8%AE%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532611003.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532778059.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532779142.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532791772.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532792078.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532792613.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532793060.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532793216.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532793415.png">
+<meta property="article:published_time" content="2018-07-26T08:17:21.000Z">
+<meta property="article:modified_time" content="2019-03-06T10:17:05.341Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="语义分割">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1532611003.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/07/26/%E3%80%8AWeakly-Supervised-Semantic-Segmentation-Network-with-Deep-Seeded-Region-Growing%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《Weakly-Supervised Semantic Segmentation Network with Deep Seeded Region Growing》笔记 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/07/26/%E3%80%8AWeakly-Supervised-Semantic-Segmentation-Network-with-Deep-Seeded-Region-Growing%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Weakly-Supervised Semantic Segmentation Network with Deep Seeded Region Growing》笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-07-26 16:17:21" itemprop="dateCreated datePublished" datetime="2018-07-26T16:17:21+08:00">2018-07-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 18:17:05" itemprop="dateModified" datetime="2019-03-06T18:17:05+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2/" itemprop="url" rel="index"><span itemprop="name">语义分割</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/07/26/%E3%80%8AWeakly-Supervised-Semantic-Segmentation-Network-with-Deep-Seeded-Region-Growing%E3%80%8B%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="《Weakly-Supervised Semantic Segmentation Network with Deep Seeded Region Growing》笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>15k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>14 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>开始看cvpr18的弱监督语义分割方向，并且找到相关代码。</p>
+<h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>本文研究了仅使用图像级标签作为监督来学习图像语义分割网络的问题，这一点很重要，因为它可以显着减少人类的标注工作。最近关于该问题的最新方法首先使用深度分类网络推断每个对象类的稀疏和鉴别区域，然后使用鉴别区域作为监督来训练语义分割网络。在种子区域扩展的传统图像分割方法的启发下，我们提出从鉴别区域开始训练语义分割网络，逐步增加种子区域扩展的像素级监督。种子区域扩展模块集成在深度分割网络中，可以从深层特征中受益。与具有固定/静态标签的传统深度网络不同，所提出的弱监督网络使用图像内的上下文信息生成新标签。所提出的方法明显优于使用静态标签的弱监督语义分割方法，并获得最先进的性能，在PASCAL VOC 2012测试集上获得63.2％的mIoU分数，在COCO数据集上获得26.0％的mIoU分数。</p>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>由于大量的完全标注图像，深度卷积神经网络（DCNN）在图像语义分割问题上取得了巨大的成功[5,18]。 然而，收集大规模精确的像素级标注是耗时的并且通常需要大量的金融投入。 然而，未标记和弱标记的视觉数据可以以相对快速且廉价的方式大量收集。 因此，计算机视觉研究的一个有希望的方向是开发可以从未标记或弱标记的图像中学习的对象识别方法[14,32]。</p>
+<p>在本文中，我们研究了从弱标记图像学习语义分割网络的问题。 在弱标签的各种设置中，图像级标注是最经济和最有效的设置之一。 在这种情况下，每个训练图像都有其图像类/类别标签。 这意味着属于类标签的对象出现在图像中。 但是，对象的位置是未知的。 我们需要推断对象的像素级位置。 因此，训练弱监督语义分割网络的主要问题是如何准确地将图像级标签分配给它们对应的像素。</p>
+<p>为了在训练中建立所需的像素标签对应关系，有一项非常有见地的研究工作。 Kolesnikov等人 [14] 采用图像分类网络和分类激活图（CAM）[37]方法来选择最具鉴别力的区域，并将这些区域用作分割网络的像素级监督。 与早期的弱监督语义分割方法[22,20]相比，基于鉴别区域的方法显着改善了这一具有挑战性的任务的性能。 然而，在[14]中，鉴别区域是小而稀疏的，如图1中的epoch #0图像所示。在训练中，语义分割网络的监督被固定为稀疏鉴别区域。 因此，我们将[14]中的学习策略命名为“静态监督”。 静态监督设置偏离了语义分割任务的要求，需要准确和完整的对象区域来训练分割模型。</p>
+<p><img src="http://image.rexking6.top/img/clip1532611003.png" alt=""></p>
+<p>图1. 最顶行有序地显示了具有图像级标签的训练图像，我们提出的方法的分割结果仅使用图像级监督，以及真实情况。 我们的分割结果非常接近人类标注的真实情况。 底行显示了在所提出的弱监督语义分割网络的训练期间的几个时期的动态监督。 （黑色代表背景，白色代表未标记/忽略像素）。</p>
+<p>为了解决这个问题，我们建议在训练分割网络中扩展鉴别区域以覆盖整个对象。实际上，鉴别区域周围的像素总是属于相同的对象，因为同一对象的语义标签具有空间连续性。我们的动机是，使用图像标签能够从感兴趣的对象中找到小而稀疏的鉴别区域，称为“种子线索”，具有相似特征（例如颜色，纹理或深度特征）的种子线索的相邻像素可能具有与种子线索相同的标签。我们利用经典的种子区域增长（SRG）方法 [1] 对此过程进行建模，以生成准确完整的像素级标签。在这里，我们可以在像素级标签的监督下训练语义分割网络。与 [14,19] 不同，像素级标签是动态的。动态监督与使用固定监督的传统网络训练有很大不同。在我们的例子中，我们让网络生成输入训练示例的新标签，即训练图像。 SRG已集成到深度分割网络中，可以端到端进行优化，并享有深层功能。我们将所提出的方法命名为“深度种子区域扩展（DSRG）”，用于弱监督语义分割。</p>
+<p>在训练中，由分类网络定位的种子线索很小但具有高精度。 选择种子线索作为SRG中的种子点是一种自然的方式。 此外，为了测量种子点和相邻像素之间的区域扩展相似性，我们利用分割网络输出的分割图作为特征。 因此，SRG将种子线索视为初始种子点; 然后，在其对应类别上具有高概率的分割图中的相邻像素采用与种子线索相同的标记。 重复该过程直到没有满足上述约束的像素。 最后，DSRG的输出用作训练分割网络的监督。 在训练阶段，监督用于形成损失函数，称为“种子损失”。 在种子区域，损失与[5]中的完全监督损失函数相同；种子损失忽略了其他位置。</p>
+<p>在训练期间，DSRG方法逐渐丰富了分割网络的监督信息。 如图1所示，epoch #0中的监督实际上是由分类模型生成的种子线索，提示定位人和马的头部，这是图像中最具鉴别力的区域。 随着epoch的增加，动态监督逐渐接近真实情况并准确地覆盖整个对象内容。 同时，动态监督使网络产生竞争性的分割结果。 为了确保训练的稳定性，DSRG始终选择原始种子线索作为初始种子点。</p>
+<p>在实验中，我们证明了我们的方法对具有挑战性的PASCAL VOC 2012语义分割基准 [8] 和COCO的有效性，并表明我们实现了最先进的最新结果。 此外，我们通过进行一些模块研究来提供DSRG方法的分析。</p>
+<p>总之，本文的主要贡献总结如下：</p>
+<ul>
+<li><p>在深度语义分割网络中，我们利用种子区域扩展 [1] 机制，使网络能够安全地生成新的像素级标签，用于弱监督语义分割。 此外，网络可以端到端的方式进行优化，易于训练。</p>
+</li>
+<li><p>我们的工作在PASCAL VOC分割基准和COCO数据集上获得了最先进的弱监督语义分割性能。 我们方法的mIoU分别在PASCAL VOC验证集和测试集上分别为61.4％和63.2％，优于许多复杂系统，并且越来越接近全监督的分割系统 [6]（67.6/70.3％ mIoU 在验证集/测试集）。</p>
+</li>
+</ul>
+<p>本文的其余部分安排如下。 我们首先回顾第2节中的相关工作，并在第3节中描述我们方法的体系结构。在第4节中，讨论了提高动态监督质量的详细程序，并分析了实验结果。 第5节介绍了我们的结论和未来的工作。</p>
+<h1 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h1><p>最近几年，人们对弱监督的视觉学习产生了新的兴趣。 已经提出了各种弱监督方法用于学习使用较粗略的标注来执行语义分割，例如图像标签 [20, 36] ，点 [2] ，线 [16] 和边界框 [7, 20] 等。 在工作中，我们注重以图像标签为主要监督形式，这是对训练语义分割模型的简单监督。</p>
+<h2 id="图像级别监督的像素标签"><a href="#图像级别监督的像素标签" class="headerlink" title="图像级别监督的像素标签"></a>图像级别监督的像素标签</h2><p>Pinheiro等人 [23] 提出了一种新颖的LSE池化方法，它更加重视像素，这对于在训练期间对图像进行分类非常重要。 Papandreou等人 [20] 采用基于期望最大化算法的交替训练程序来动态预测语义前景和背景像素。 Qi等人 [24] 提出了一个统一的框架，包括语义分割和对象定位分支。 [27]提出了一种从预训练网络本身提取明显更准确的mask的新方法。 Wei等[35]提出了一种简单到复杂的学习方法，以逐步增强分割网络。 [29]提出了一种基于CNN的类特定显着图和完全连接的CRF的方法。 Roy等人[26]提出了一种新颖的深层架构，它融合了三种不同的语义分割线索。</p>
+<p>最近，Kolesnikov等人 [14] 提出根据训练分割网络的分类网络定位种子线索。 然而，[14]只能获得用于监督的小而稀疏的对象相关种子。为了解决这个问题，Oh等人 [19] 提出使用显着性模型作为利用对象范围的附加信息。 Wei等人 [33] 使用对抗性擦除方式迭代训练多个分类网络以扩展鉴别区域。 Arslan等人 [4] 也利用对抗性擦除方式，允许显着性检测网络发现对象的新显着区域。 一旦产生了真正的负面区域，它们就没有机会纠正它们。 相比之下，我们提出的DSRG方法从种子线索开始非常简单方便，并逐步细化像素级标签作为训练阶段的动态监督。</p>
+<p>[20] 和提出的方法都生成动态像素级标签来训练语义分割网络。 但是，本文有几个主要的改进。 与通过在偏置分割图上应用argmax函数来近似潜在像素级监督的 [20] 不同，我们建议使用种子区域扩展来找到准确和可靠的潜在像素级监督。 在对象种子线索的帮助下，我们的DSRG训练方法在训练开始时对非常嘈杂的分割图具有鲁棒性，并且始终以高精度生成像素级监督。</p>
+<h2 id="种子区域扩展"><a href="#种子区域扩展" class="headerlink" title="种子区域扩展"></a>种子区域扩展</h2><p>种子区域扩展（SRG）[1]是一种无监督的分割方法，用于检查初始种子点的相邻像素，并根据区域相似性标准确定是否应将相邻像素添加到该区域。在基于区域增长执行分割时必须处理两个主要问题：将初始种子放置在图像域中的位置以及应采用哪种相似性标准来表征图像区域。基于简单的手工制作标准 [28] （例如颜色，强度或纹理）选择一些种子像素作为种子的最常用方法。同时，相似性标准 [3] 总是在手工制作的特征上定义。这些设置会导致过度分割和错误分割。相反，DSRG利用由分类网络生成的种子线索作为初始种子以避免错误的种子放置。此外，我们使用深度学习功能计算像素相似度，这些功能已被证明具有高级语义。因此，DSRG可以减少过分割并且不具有传统SRG的合并过程。</p>
+<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p>在本节中，我们给出了弱监督语义分割的DSRG训练方法的细节。 首先，我们将介绍如何从深度分类网络生成种子线索。 然后，我们将介绍一种平衡种子损失函数，它使用种子线索作为监督来指导弱监督的语义分割网络。 最后，为了解决种子线索小而稀疏的问题，我们提出了DSRG训练。</p>
+<h2 id="种子生成与分类网络"><a href="#种子生成与分类网络" class="headerlink" title="种子生成与分类网络"></a>种子生成与分类网络</h2><p>我们利用深度分类网络将鉴别区域定位为图像级监督下的种子线索。 图像级标签没有明确提供有关语义对象位置的任何信息。 但是，最近已经表明，通过在图像级标签的监督下学习分类网络，可以获得指示鉴别对象区域的高质量种子 [30,37]。 分类网络是完全卷积的，并且鉴别对象区域的位置保留在网络的深层中。</p>
+<p>在我们的框架中，我们使用CAMs [37] 方法来定位前景类。 程序简要描述如下。 我们使用修改后的VGG-16网络[14]来初始化我们的分类网络。 在网络中，全局平均池化层（GAP）应用于conv7；生成的张量用作图像表示，并使用全连接层进行分类; 最后，将全连接的分类器应用于conv7，为每个对象类生成热力图。 然后，通过将硬阈值应用于热力图来获得鉴别对象区域。</p>
+<p>除了前景中的种子线索，我们还在背景中找到种子线索。 对于定位背景，我们利用 [12] 中的显着性检测技术，并简单地选择像素具有低显着性值的标准化显着图中的区域作为背景。 将来自前景和背景的结果种子提示堆叠在一起形成单个通道分割mask。</p>
+<h2 id="种子损失"><a href="#种子损失" class="headerlink" title="种子损失"></a>种子损失</h2><p>在获得种子线索之后，我们介绍如何使用种子线索训练图像语义分割网络。 提出平衡种子损失以鼓励对分割网络的预测仅匹配由分类网络给出的种子线索，同时忽略图像中的其余像素。 考虑到前景和背景种子线索的不均衡分布，平衡种子损失分别具有前景和背景的两个归一化系数，这与[14]中的种子损失不同。</p>
+<p>设$\mathcal {C}$是图像中存在的类集（背景除外），$\overline{\mathcal {C}}$是背景。 假设$S_c$是一组分类为$c$类的位置。 然后，平衡种子损失$ℓ_{seed}$定义如下：</p>
+<script type="math/tex; mode=display">\begin{align*}
+ℓ_{seed}=&-\frac{1}{\sum_{c \in \mathcal{C}}|S_c|} \sum_{c \in \mathcal{C}}\sum_{u \in S_c}log \space H_{u,c} \\
+&-\frac{1}{\sum_{c \in \overline{\mathcal{C}}}|S_c|} \sum_{c \in \overline{\mathcal{C}}}\sum_{u \in S_c}log \space H_{u,c}
+\end{align*}</script><p>其中$H_{u,c}$表示分割图$H$的位置$u$处的类$c$的概率。</p>
+<p>此外，我们使用 [14] 中提出的边界损失$ℓ_{boundary}$来鼓励分割图与对象边界相匹配。 最终，通过最小化损失函数来优化分割网络：</p>
+<script type="math/tex; mode=display">ℓ=ℓ_{seed}+ℓ_{boundary}</script><h2 id="深度种子区域扩展"><a href="#深度种子区域扩展" class="headerlink" title="深度种子区域扩展"></a>深度种子区域扩展</h2><p>在引入的种子损失中，我们可以发现种子线索很稀疏。 在实践中，大约有40％的像素具有标签。 在训练期间，标签在传统的训练深度网络设置之后被固定。 我们的想法是将种子线索扩展到未标记的像素。 因此，我们可以进行更密集的监督，以训练更好的分割网络。 种子线索扩展的基础是在图像中存在小的均匀区域，其中像素应该具有相同的标记。 小的均匀区域通常用于低级视觉，例如产生超像素[25]。 为了形成种子线索扩展问题，这里我们参考经典算法，种子区域增长（SRG）[1]。</p>
+<p>在SRG中，最初基于一些简单的手工制作标准（例如颜色，强度或纹理）选择一些种子像素。 一旦放置了初始种子，扩展过程试图获得均匀的图像区域，即它试图将图像分割成具有区域的每个连通分量恰好包含初始种子之一的特性的区域。</p>
+<p>我们建议将SRG集成到深度分割网络中，以进行弱监督语义分割。 生成方法被称为“深度种子区域扩展（DSRG）”。</p>
+<p>一旦通过分类网络初始化初始种子，则根据区域相似性标准将区域从这些种子点扩展到相邻的未标记点。 相似性标准定义候选像素是否应该合并到特定区域中。 现在，在基于区域增长来学习语义分割网络时必须处理主要问题：应该采用哪种相似性标准来表征图像区域？ 在下文中，我们将详细介绍处理该问题的策略。</p>
+<p>这里我们做出的相似性标准$P$是由分割网络生成的分割图$H$中的像素的简单概率阈值。</p>
+<script type="math/tex; mode=display">P(H_{u,c},\theta_c)=\left\{
+\begin{aligned}
+TURE &,\space \space \space H_{u,c}  \ge \theta_c \space and \space c=argmax_{c'}H_{u,c'} \\
+FALSE &,\space \space \space otherwise
+\end{aligned}
+\right.</script><p>其中$H_{u,c}$指的是属于$c$类的位置$u$处的像素的概率值。$θ$是概率阈值。 实际上，我们没有为不同的类别设置不同的阈值。 前景类别共享相同的阈值$θ_f$，并且背景具有另一阈值$θ_b$。 传统的SRG通常具有过度分割的现象，因为低级图像特征对于对象的类间外观不鲁棒。 在DSRG中，我们使用已经证明具有高级语义的深度学习功能来计算像素相似性。 因此，DSRG可以减少过分割并且不具有传统SRG的合并过程。</p>
+<p>现在，我们可以将分割图$H$和种子线索$S$作为输入来执行区域扩展。DSRG是每个类的迭代访问过程。 我们将类$c$的迭代访问过程表示为$V_c$，$c∈[0,|C|]$，其中$c=0$表示背景类。 在$V_c$的迭代中，我们以行首的方式访问$S_c$中的所有位置。 当访问像素$Q$时，我们将$Q$的8连通性邻域中的未标记像素集表示为$R$.对于$R_u∈R$，其如$c$类的概率如上所述表示为$H_{u,c}$。 然后根据$P$对$R_u$进行分类如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1532778059.png" alt=""></p>
+<p>在访问所有位置后，我们将所有新标记的像素附加到$S_c$。一旦$S_c$改变，我们将再次访问更新的$S_c$。否则，$V_c$停止。终止标准与经典SRG不同，其中每个像素必须具有标签。因为难以通过分割网络预测具有低置信度的像素的标签。然而，随着分割网络能力的增加，未标记像素的数量减少，并且对象范围被正确的标签覆盖。此外，为了减少$V_c$中的冗余访问，我们首先计算满足等式(3)中要求的区域的连通分量，然后由初始种子区域组成的连通分量采用与初始种子相同的标记。选择这些连通组件作为训练分割网络的新监督。我们表示$|C|+1$迭代访问过程为$DSRG(S,H)$，这意味着一个区域扩展步骤。最终更新的$S=[S_0,···,S_C]$用作监督并应用于等式(1)中具有种子损失的训练分割网络。在图2中，$DSRG(S,H)$被插入到所提出的分割网络的框架中。</p>
+<p><img src="http://image.rexking6.top/img/clip1532779142.png" alt=""></p>
+<p>图2. 提出的深度种子区域扩展训练方法概述。 区域扩展模块采用种子线索和分割图作为输入产生潜在的像素监督，其比种子线索更准确和更完整。 我们的方法在细化像素监督和优化分割网络的参数之间进行迭代。</p>
+<h1 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h1><h2 id="实验设置"><a href="#实验设置" class="headerlink" title="实验设置"></a>实验设置</h2><p><strong>数据集和评价指标</strong><br>我们评估了PASCAL VOC 2012细分基准数据集 [8] 和COCO数据集 [17] 的提出方法。PASCAL VOC：它包含三个部分：训练（train，1464图像），验证（val，1449图像）和测试（test，1456图像）。按照惯例 [6, 33] ，我们通过 [9] 中的附加图像增加训练部分。在我们的实验中，只有图像级标签用于训练。我们将我们的方法在验证集和测试集上的其他最新方法进行比较。采用标准交叉联合（IOU）标准和像素精度来评估PASCAL验证集。通过将预测结果提交给官方PASCAL VOC评估服务器获得测试集的结果。 COCO：它的训练集包含80k样本，只有图像级标签，它的验证集包含40k样本用于测试。根据81个类别的mIoU评估性能。所提出的方法的实验分析在验证集上进行。</p>
+<p><strong>训练集/测试集设置</strong><br>我们采用[14]中16层VGG网络的略微修改版本作为分类网络，采用[6]中的DeepLab-ASPP作为分割网络。 它们都是由ImageNet预训练的VGG-16 [31] 初始化的。 具有小批量的SGD用于训练分类和分割网络。 我们使用0.9的动量和0.0005的重量衰减。 批量大小为20，失活率为0.5，权重衰减参数为0.0005。 初始学习率为5e-4，每2000次迭代减少10倍。</p>
+<p>对于种子生成，属于热力图中最大值的前20％（由 [14, 33] 提出的数值）的那些像素被认为是前景对象区域。 我们使用[12]中的显着性映射来产生背景定位线索。 我们采用归一化显着性值0.06作为阈值来获得背景定位提示（即，显着性值小于0.06的像素被视为背景）。 对于DSRG中的相似性标准，我们将$θ_b$和$θ_f$分别设置为0.99和0.85。 对于CRF，我们使用Koltun公开实现中的默认值作为成对交互的参数。</p>
+<p>在测试阶段，应用学习的分割网络以产生每个测试图像的概率图。 然后，我们升级预测概率图以匹配输入图像的大小，然后应用全连接的CRF [15]来细化分割结果。</p>
+<p><strong>复现性</strong><br>我们的方法是基于Caffe [11]实现的。 所有网络都在单个NVIDIA GeForce GTX TITAN X GPU上进行训练。 该代码可在<a target="_blank" rel="noopener" href="https://github.com/speedinghzl/DSRG">https://github.com/speedinghzl/DSRG</a> 获得。</p>
+<h2 id="与现有方法进行比较"><a href="#与现有方法进行比较" class="headerlink" title="与现有方法进行比较"></a>与现有方法进行比较</h2><p>PASCAL VOC验证数据集和测试数据集中其他最先进的弱监督语义分割解决方案的结果总结在表1中。我们提供这些结果供参考，并强调它们不应与我们的方法直接比较。 因为这些方法是在不同的训练集或不同类型的标注，边界框，实例点和图像级标签上训练的。 在这些方法中，CCNN [21]，MIL-seg [23]，STC [35]，GuidedSeg [19]和TransferNet [10]使用更多图像进行训练（分别为700K，700K，50K，20K和70K）。 所有其他方法都基于10K训练图像，并建立在VGG16模型之上。</p>
+<p><img src="http://image.rexking6.top/img/clip1532791772.png" alt=""></p>
+<p>表1. 在 VOC 2012 验证集和测试集上的弱监督语义分割方法的比较</p>
+<p>结果表明，我们的方法基本上优于使用图像级标签进行弱监督的所有先前技术。 AE-PSL [33]和DCSP [4] 在基准中实现了最佳性能。然而，AE-PSL采用对抗性擦除来扩展监督的种子线索，这需要迭代地训练多个分类网络。 DCSP还利用对抗性擦除方式，允许显着性网络发现对象的新显着区域。在每次擦除之后不需要重新训练网络，但是DCSP可能由于过度擦除而引入一些真正的负区域。相比之下，提出的DSRG方法非常简单方便，可以在线完善监督，我们的方法比DCSP和AE-PSL获得更好的结果。与仅使用图像级标签进行监督的方法相比，所提出的DSRG（VGG16）方法在测试集上的最佳性能提高了1.2％以上。可以看出，我们的方法在测试集上达到60.4％mIoU。此外，我们的DSRG（Resnet101）在测试集上达到了63.2％的mIOU。</p>
+<h2 id="定性结果"><a href="#定性结果" class="headerlink" title="定性结果"></a>定性结果</h2><p>图3显示了一些成功的分割结果。 它表明，即使对于复杂的图像，我们的方法也可以产生精确的分割，并恢复边界的精细细节。 一个典型的失败情况在图3的底行给出。这种故障模式是模型不能精确地从背景中挑选出对象区域。 正如弱监督系统的典型情况一样，强烈共存的类别（例如火车和铁轨，双桨和桨，雪地自行车和雪）如果没有精细化的信息就无法分开[13]。</p>
+<p><img src="http://image.rexking6.top/img/clip1532792078.png" alt=""></p>
+<p>图3. VOC 2012 验证集的定性分割结果。 最后一行显示了一个失败情况。</p>
+<h2 id="模块研究"><a href="#模块研究" class="headerlink" title="模块研究"></a>模块研究</h2><p>为了进一步证明不同组分的效果，我们使用基于VGG16的DSRG的不同设置进行一些模块实验。在表2中，“baseline”表示我们实施的SEC [14]，由于不同的背景定位技术[12]和细节，我们的结果比[14]（没有$L_{expand}$的50.4 mAP）好得多。 “+BSL”表示用等式(1)中的加权种子损失代替原始种子损失；“+DSRG”表示添加DSRG训练方法。我们可以观察到，与基准相比，加权种子损失使性能提高了1.1％。而且，DSRG将性能进一步提高了4％，证明了DSRG的显着效果。对动物和人来说最明显的是，例如分割狗/马/牛/人的改善率约为10％。此外，我们首先在所有训练图像上采用训练好的“+DSRG”分割模型。然后，预测的分割mask用作监督，以完全监督的方式训练分割网络用于另一轮。如表2所示，这种额外培训（表示为“+Retrain”）提供的性能进一步从57.6％提高到59.0％。我们不会通过执行额外的训练步骤来进一步提升性能。</p>
+<p><img src="http://image.rexking6.top/img/clip1532792613.png" alt=""></p>
+<p>表2.使用我们的方法对 VOC 2012 验证集的不同设置的mIoU比较</p>
+<p>此外，我们尝试了不同的$θ_f$和$θ_b$值来找到性能最佳的区域扩展策略。 结果显示在表4中不同的$θ$值。结果表明我们的方法对区域扩展阈值$θ$是稳健的。 为了探索仅对前景或背景物体进行区域扩展的效果，我们设置$θ_b=∞$，$θ_f= 0.85$仅为前景物体的生成区域扩展，PASCAL VOC 验证数据集的性能为55.9％mIoU。 当$θ_b= 0.99$，$θ_f=∞$时，性能为54.3％mIoU。 结果表明，只有前景物体或背景物体的生成区域扩展也能提高性能。 然而，当同时为前景物体和背景物体进行区域扩展时，它可以实现最佳性能。</p>
+<p><img src="http://image.rexking6.top/img/clip1532793060.png" alt=""></p>
+<p>表4.不同$θ$的PASCAL VOC 2012 验证数据集的性能</p>
+<h2 id="动态监督对epoch的质量改进"><a href="#动态监督对epoch的质量改进" class="headerlink" title="动态监督对epoch的质量改进"></a>动态监督对epoch的质量改进</h2><p>在本节中，评估了在每个epoch从DSRG获得的作为动态监督的新像素标签的质量。与人类标注的真实情况相比，我们可以使用平均准确度，平均召回率和IoU来衡量我们的方法所改进的监督质量。在图4中，由分类网络产生的监督具有稍高的精度（62.6％），低召回率（32.1％）和低IoU（30.0％）。随着时代的增加，种子的精确度仍然很高，召回率和IoU得到了显着的改善。在epoch 12，平均精确度，平均召回率和平均IoU分别为63.9％，65.4％和57.1％。它表明DSRG可以找到对象范围并提高监督质量，这就解释了为什么提出的DSRG训练过程在弱监督语义分割任务上表现出色。补充材料中的其他例子显示了从训练期间的种子线索开始逐步完善监督。</p>
+<p><img src="http://image.rexking6.top/img/clip1532793216.png" alt=""></p>
+<p>图4. 关于epoch的动态监督质量（％）。</p>
+<h2 id="COCO结果"><a href="#COCO结果" class="headerlink" title="COCO结果"></a>COCO结果</h2><p>为了进一步证明我们方法的一般性，我们对COCO进行了一系列实验。 与PASCAL VOC不同，大多数COCO样本是在复杂的自然环境中从非标志性图像中收集的。 我们提供SEC的每级IoU [14]，BFBP [27]和我们在表3中的方法。我们的基于VGG16的DSRG获得了非常好的结果，特别是在人，动物，车辆等中，但在小型的物体上表现不佳，例如室内和厨具。 总而言之，我们的DSRG方法在验证集设置上的最佳性能提高了3.6％以上。 可以看出，我们的方法在验证集上达到26.0％mIoU。 同时，与全监督方法（40.98％mIoU）的性能相比，COCO证明了弱监督语义分割有很大的发展空间。 开发处理小物体的解决方案可能是未来研究的一个有趣方向。</p>
+<p><img src="http://image.rexking6.top/img/clip1532793415.png" alt=""></p>
+<p>表3.在训练期间使用图像标记在COCO上的每级IOU</p>
+<h1 id="结论和未来的工作"><a href="#结论和未来的工作" class="headerlink" title="结论和未来的工作"></a>结论和未来的工作</h1><p>我们已经解决了仅使用图像级监督来训练语义分割网络的问题。 单独的图像级标签可以提供高质量的种子或有鉴别的对象区域，但推断完整的对象范围是一个非常困难的问题。 我们提出了一种DSRG训练方法，逐步提高对象区域的质量和范围，并且本身也是对象区域的监督。 我们证明我们的方法在相同的实验条件下优于先前的最先进方法。 我们还清楚地确定了实验中语义分割网络中区域扩展机制的有效性。 在未来的工作中，我们将专注于设计更有效的弱监督策略和提高种子质量。</p>
+<h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><p>[1] R. Adams and L. Bischof. Seeded region growing. IEEE TPAMI, 16(6):641–647, 1994. 2, 3, 4<br>[2] A. Bearman, O. Russakovsky, V. Ferrari, and L. Fei-Fei. Whats the point: Semantic segmentation with point supervision. In Proc. ECCV, pages 549–565. Springer, 2016. 2<br>[3] V. Borges, M. C. F. de Oliveira, T. Silva, A. Vieira, and B. Hamann. Region growing for segmenting green microalgae images. IEEE/ACM Transactions on Computational Biology and Bioinformatics, 2016. 3<br>[4] A. Chaudhry, P. K. Dokania, and P. H. Torr. Discovering class-specific pixels for weakly-supervised semantic segmentation. arXiv preprint arXiv:1707.05821, 2017. 3, 6<br>[5] L.-C. Chen, G. Papandreou, I. Kokkinos, K. Murphy, and A. L. Yuille. Semantic image segmentation with deep convolutional nets and fully connected crfs. arXiv preprint arXiv:1412.7062, 2014. 1, 2<br>[6] L.-C. Chen, G. Papandreou, I. Kokkinos, K. Murphy, and A. L. Yuille. Deeplab: Semantic image segmentation with deep convolutional nets, atrous convolution, and fully connected crfs. arXiv preprint arXiv:1606.00915, 2016. 2, 5<br>[7] J. Dai, K. He, and J. Sun. Boxsup: Exploiting bounding boxes to supervise convolutional networks for semantic segmentation. In Proc. ICCV, pages 1635–1643, 2015. 3<br>[8] M. Everingham, S. A. Eslami, L. Van Gool, C. K. Williams, J. Winn, and A. Zisserman. The pascal visual object classes challenge: A retrospective. IJCV, 111(1):98–136, 2015. 2, 5<br>[9] B. Hariharan, P. Arbelaez, L. Bourdev, S. Maji, and J. Malik. ´ Semantic contours from inverse detectors. In Proc. ICCV, pages 991–998. IEEE, 2011. 5<br>[10] S. Hong, J. Oh, H. Lee, and B. Han. Learning transferrable knowledge for semantic segmentation with deep convolutional neural network. In Proc. CVPR, pages 3204–3212, 2016. 6<br>[11] Y. Jia, E. Shelhamer, J. Donahue, S. Karayev, J. Long, R. Girshick, S. Guadarrama, and T. Darrell. Caffe: Convolutional architecture for fast feature embedding. In Proc. ACM, pages 675–678. ACM, 2014. 6<br>[12] H. Jiang, J. Wang, Z. Yuan, Y. Wu, N. Zheng, and S. Li. Salient object detection: A discriminative regional feature integration approach. In Proc. CVPR, pages 2083–2090, 2013. 3, 5, 7<br>[13] A. Kolesnikov and C. H. Lampert. Improving weaklysupervised object localization by micro-annotation. arXiv preprint arXiv:1605.05538, 2016. 7<br>[14] A. Kolesnikov and C. H. Lampert. Seed, expand and constrain: Three principles for weakly-supervised image segmentation. In Proc. ECCV, pages 695–711. Springer, 2016. 1, 2, 3, 4, 5, 6, 7, 8<br>[15] V. Koltun. Efficient inference in fully connected crfs with gaussian edge potentials. Proc. NIPS, 2(3):4, 2011. 6<br>[16] D. Lin, J. Dai, J. Jia, K. He, and J. Sun. Scribblesup: Scribble-supervised convolutional networks for semantic segmentation. In Proc. CVPR, pages 3159–3167, 2016. 2<br>[17] T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Dollar, and C. L. Zitnick. Microsoft coco: Com- ´ mon objects in context. In European conference on computer vision, pages 740–755. Springer, 2014. 5<br>[18] J. Long, E. Shelhamer, and T. Darrell. Fully convolutional networks for semantic segmentation. In Proc. CVPR, pages 3431–3440, 2015. 1<br>[19] S. J. Oh, R. Benenson, A. Khoreva, Z. Akata, M. Fritz, and B. Schiele. Exploiting saliency for object segmentation from image level labels. arXiv preprint arXiv:1701.08261, 2017. 2, 3, 6<br>[20] G. Papandreou, L.-C. Chen, K. Murphy, and A. L. Yuille. Weakly-and semi-supervised learning of a dcnn for semantic image segmentation. arXiv preprint arXiv:1502.02734, 2015. 2, 3, 6<br>[21] D. Pathak, P. Krahenbuhl, and T. Darrell. Constrained convolutional neural networks for weakly supervised segmentation. In Proceedings CVPR, pages 1796–1804, 2015. 6<br>[22] D. Pathak, E. Shelhamer, J. Long, and T. Darrell. Fully convolutional multi-class multiple instance learning. arXiv preprint arXiv:1412.7144, 2014. 2, 6<br>[23] P. O. Pinheiro and R. Collobert. From image-level to pixellevel labeling with convolutional networks. In Proc. CVPR, pages 1713–1721, 2015. 3, 6<br>[24] X. Qi, Z. Liu, J. Shi, H. Zhao, and J. Jia. Augmented feedback in semantic segmentation under image level supervision. In Proc. ECCV, pages 90–105. Springer, 2016. 3, 6<br>[25] X. Ren and J. Malik. Learning a classification model for segmentation. In null, page 10. IEEE, 2003. 4<br>[26] A. Roy and S. Todorovic. Combining bottom-up, top-down, and smoothness cues for weakly supervised image segmentation. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 3529–3538, 2017. 3, 6<br>[27] F. Saleh, M. S. A. Akbarian, M. Salzmann, L. Petersson, S. Gould, and J. M. Alvarez. Built-in foreground/background prior for weakly-supervised semantic segmentation. In Proc. ECCV, pages 413–432. Springer, 2016. 3, 6, 8<br>[28] F. Y. Shih and S. Cheng. Automatic seeded region growing for color image segmentation. Image and vision computing, 23(10):877–886, 2005. 3<br>[29] W. Shimoda and K. Yanai. Distinct class-specific saliency maps for weakly supervised semantic segmentation. In Proc. ECCV, pages 218–234. Springer, 2016. 3, 6<br>[30] K. Simonyan, A. Vedaldi, and A. Zisserman. Deep inside convolutional networks: Visualising image classification models and saliency maps. arXiv preprint arXiv:1312.6034, 2013. 3<br>[31] K. Simonyan and A. Zisserman. Very deep convolutional networks for large-scale image recognition. arXiv preprint arXiv:1409.1556, 2014. 5<br>[32] P. Tang, X. Wang, X. Bai, and W. Liu. Multiple instance detection network with online instance classifier refinement. In Proc. CVPR, 2017. 1<br>[33] Y. Wei, J. Feng, X. Liang, M.-M. Cheng, Y. Zhao, and S. Yan. Object region mining with adversarial erasing: A simple classification to semantic segmentation approach. arXiv preprint arXiv:1703.08448, 2017. 3, 5, 6<br>[34] Y. Wei, X. Liang, Y. Chen, Z. Jie, Y. Xiao, Y. Zhao, and S. Yan. Learning to segment with image-level annotations. Pattern Recognition, 59:234–244, 2016. 6<br>[35] Y. Wei, X. Liang, Y. Chen, X. Shen, M.-M. Cheng, J. Feng, Y. Zhao, and S. Yan. Stc: A simple to complex framework for weakly-supervised semantic segmentation. IEEE TPAMI, 2016. 3, 6<br>[36] J. Xu, A. G. Schwing, and R. Urtasun. Learning to segment under various forms of weak supervision. In Proc. CVPR, pages 3781–3790, 2015. 2<br>[37] B. Zhou, A. Khosla, A. Lapedriza, A. Oliva, and A. Torralba. Learning deep features for discriminative localization. In Proc. CVPR, pages 2921–2929, 2016. 2, 3</p>
+<h1 id="自己的看法"><a href="#自己的看法" class="headerlink" title="自己的看法"></a>自己的看法</h1><p>本文是以SEC为基础改进的，主要有两点改进，首先是前景和背景的加权种子损失，然后是将种子区域扩展结合到深度分割网络，但是看模型图有些不太明白，到时候看看代码，包括相似度的衡量在文中也没有注意到，看看代码应该能理解得好一些。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\05\CAM-Learning-Deep-Features-for-Discriminative-Localization-阅读笔记\" rel="bookmark">CAM-Learning Deep Features for Discriminative Localization 阅读笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\05\Visualizing-and-Understanding-Convolutional-Networks-阅读笔记\" rel="bookmark">Visualizing and Understanding Convolutional Networks 阅读笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\21\《Transferable-Semi-supervised-Semantic-Segmentation》笔记\" rel="bookmark">《Transferable Semi-supervised Semantic Segmentation》笔记</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/07/26/%E3%80%8AWeakly-Supervised-Semantic-Segmentation-Network-with-Deep-Seeded-Region-Growing%E3%80%8B%E7%AC%94%E8%AE%B0/" title="《Weakly-Supervised Semantic Segmentation Network with Deep Seeded Region Growing》笔记">https://blog.rexking6.top/2018/07/26/《Weakly-Supervised-Semantic-Segmentation-Network-with-Deep-Seeded-Region-Growing》笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2/" rel="tag"># 语义分割</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/07/21/%E3%80%8ATransferable-Semi-supervised-Semantic-Segmentation%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="prev" title="《Transferable Semi-supervised Semantic Segmentation》笔记">
+      <i class="fa fa-chevron-left"></i> 《Transferable Semi-supervised Semantic Segmentation》笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/29/%E3%80%8ALearning-Pixel-level-Semantic-Affinity-with-Image-level-Supervision-for-Weakly-Supervised-Semantic-Segmentation%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="next" title="《Learning Pixel-level Semantic Affinity with Image-level Supervision for Weakly Supervised Semantic Segmentation》笔记">
+      《Learning Pixel-level Semantic Affinity with Image-level Supervision for Weakly Supervised Semantic Segmentation》笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">3.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">相关工作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E7%BA%A7%E5%88%AB%E7%9B%91%E7%9D%A3%E7%9A%84%E5%83%8F%E7%B4%A0%E6%A0%87%E7%AD%BE"><span class="nav-number">4.1.</span> <span class="nav-text">图像级别监督的像素标签</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A7%8D%E5%AD%90%E5%8C%BA%E5%9F%9F%E6%89%A9%E5%B1%95"><span class="nav-number">4.2.</span> <span class="nav-text">种子区域扩展</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%B9%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A7%8D%E5%AD%90%E7%94%9F%E6%88%90%E4%B8%8E%E5%88%86%E7%B1%BB%E7%BD%91%E7%BB%9C"><span class="nav-number">5.1.</span> <span class="nav-text">种子生成与分类网络</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A7%8D%E5%AD%90%E6%8D%9F%E5%A4%B1"><span class="nav-number">5.2.</span> <span class="nav-text">种子损失</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E7%A7%8D%E5%AD%90%E5%8C%BA%E5%9F%9F%E6%89%A9%E5%B1%95"><span class="nav-number">5.3.</span> <span class="nav-text">深度种子区域扩展</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C"><span class="nav-number">6.</span> <span class="nav-text">实验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="nav-number">6.1.</span> <span class="nav-text">实验设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8E%E7%8E%B0%E6%9C%89%E6%96%B9%E6%B3%95%E8%BF%9B%E8%A1%8C%E6%AF%94%E8%BE%83"><span class="nav-number">6.2.</span> <span class="nav-text">与现有方法进行比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E6%80%A7%E7%BB%93%E6%9E%9C"><span class="nav-number">6.3.</span> <span class="nav-text">定性结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9D%97%E7%A0%94%E7%A9%B6"><span class="nav-number">6.4.</span> <span class="nav-text">模块研究</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E7%9B%91%E7%9D%A3%E5%AF%B9epoch%E7%9A%84%E8%B4%A8%E9%87%8F%E6%94%B9%E8%BF%9B"><span class="nav-number">6.5.</span> <span class="nav-text">动态监督对epoch的质量改进</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#COCO%E7%BB%93%E6%9E%9C"><span class="nav-number">6.6.</span> <span class="nav-text">COCO结果</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E5%92%8C%E6%9C%AA%E6%9D%A5%E7%9A%84%E5%B7%A5%E4%BD%9C"><span class="nav-number">7.</span> <span class="nav-text">结论和未来的工作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-number">8.</span> <span class="nav-text">References</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%87%AA%E5%B7%B1%E7%9A%84%E7%9C%8B%E6%B3%95"><span class="nav-number">9.</span> <span class="nav-text">自己的看法</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

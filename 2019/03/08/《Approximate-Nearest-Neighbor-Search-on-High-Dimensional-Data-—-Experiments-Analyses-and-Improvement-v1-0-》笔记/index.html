@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Approximate Nearest Neighbor Search on High Dimensional Data — Experiments, Analyses, and Improvement (v1.0)》笔记">
+<meta property="og:url" content="https://blog.rexking6.top/2019/03/08/%E3%80%8AApproximate-Nearest-Neighbor-Search-on-High-Dimensional-Data-%E2%80%94-Experiments-Analyses-and-Improvement-v1-0-%E3%80%8B%E7%AC%94%E8%AE%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552184557.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552189013.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552202449.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552202508.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552202822.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552202872.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552203330.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552203395.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552203763.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552203832.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552204269.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552204330.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552204410.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552204453.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552205215.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552205438.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552205483.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552206383.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552207795.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552207995.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552229336.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552230056.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552265481.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552265792.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552265846.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552266086.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552267325.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552268669.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552268751.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552268902.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552269270.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552269528.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552301997.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552302186.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552302263.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552302299.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552302517.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552302766.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552302572.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552303296.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552303365.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552303422.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552303495.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552303661.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552303730.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552303817.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552303895.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552303988.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1552304056.png">
+<meta property="article:published_time" content="2019-03-08T08:35:54.000Z">
+<meta property="article:modified_time" content="2019-03-15T03:21:52.395Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="图像检索">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1552184557.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2019/03/08/%E3%80%8AApproximate-Nearest-Neighbor-Search-on-High-Dimensional-Data-%E2%80%94-Experiments-Analyses-and-Improvement-v1-0-%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《Approximate Nearest Neighbor Search on High Dimensional Data — Experiments, Analyses, and Improvement (v1.0)》笔记 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2019/03/08/%E3%80%8AApproximate-Nearest-Neighbor-Search-on-High-Dimensional-Data-%E2%80%94-Experiments-Analyses-and-Improvement-v1-0-%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Approximate Nearest Neighbor Search on High Dimensional Data — Experiments, Analyses, and Improvement (v1.0)》笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-03-08 16:35:54" itemprop="dateCreated datePublished" datetime="2019-03-08T16:35:54+08:00">2019-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-15 11:21:52" itemprop="dateModified" datetime="2019-03-15T11:21:52+08:00">2019-03-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%9B%BE%E5%83%8F%E6%A3%80%E7%B4%A2/" itemprop="url" rel="index"><span itemprop="name">图像检索</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2019/03/08/%E3%80%8AApproximate-Nearest-Neighbor-Search-on-High-Dimensional-Data-%E2%80%94-Experiments-Analyses-and-Improvement-v1-0-%E3%80%8B%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="《Approximate Nearest Neighbor Search on High Dimensional Data — Experiments, Analyses, and Improvement (v1.0)》笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>35k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>32 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>近似近邻搜索（ANNS）是数据库、机器学习、多媒体、计算机视觉等多种主流应用中最基本、最基本的操作。虽然在上述领域的文献中，每年都有很多算法被不断地提出，但是并没有对它们的性能进行全面的评估和分析。</p>
+<p>在本文中，我们对近似最近邻搜索的最先进方法进行了全面的实验评估。 我们的研究（1）是跨学科的（即，包括不同领域和实践者的16种算法）和（2）评估了各种各样的设置，包括20个数据集，几个评估指标和不同的查询工作负载。 仔细报告和分析实验结果，以了解性能结果。 此外，我们提出了一种新方法，可以在广泛的设置下对大多数数据集实现高查询效率和高召回率。</p>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>最近邻搜索在参考数据库中查找与查询对象的距离最小的对象。 它是许多领域应用程序中的基础和必要操作，包括数据库，计算机视觉，多媒体，机器学习和推荐系统。</p>
+<p>尽管对这一问题进行了大量的研究，但由于[26]的维数诅咒，人们普遍认为在高维欧氏空间中寻找精确的最近邻是非常昂贵的。实验表明，在维数较高的情况下(如大于20)，精确的方法很少能超过蛮力线性扫描方法。然而，返回足够近的目标，即近似最近邻搜索(ANNS)，可以有效地执行，对于许多实际问题都非常有用，因此吸引了大量的研究工作。精确和近似的NNS问题也可以扩展到它们的top-k版本。</p>
+<h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>关于（近似）最近邻搜索算法的研究已有数百篇论文发表，但对这些算法的系统和全面的比较却很少。基于以下需求，本文对文献中最先进的近似最近邻搜索算法进行了全面的实验评估。</p>
+<p><strong>1. 覆盖来自不同领域的竞争对手算法和数据集。</strong></p>
+<p>由于对近似近邻搜索的需求在如此多的不同领域中自然产生，研究人员提出了许多方法，而不知道在另一个领域提出的替代方法。此外，还有一些实践者提出的实用方法，并被部署到大型项目中，如spotify.com[7]上的音乐推荐系统。因此，来自不同领域的重要算法常常被忽略，没有进行比较。例如，Rank Cover Tree[23]（来自机器学习）、Product Quantization[27,20]（来自多媒体）、SRS[39]（来自数据库）和KGraph[15]（来自从业者）之间没有评估。此外，每个领域通常都有一小组常用的数据集来评估ANNS算法；所有这些域使用的数据集很少。相比之下，我们使用来自不同领域的有代表性的或最新的算法进行了全面的实验，并在20个数据集上对所有算法进行了测试，包括之前在不同领域的研究中经常使用的算法。我们的研究证实，在这些数据集中，所有算法的性能都有很大的变化。</p>
+<p><strong>2. 忽视评估措施/设置。</strong></p>
+<p>可以从各个方面测量NNS算法，包括 (i) 搜索时间复杂度，(ii) 搜索质量，(iii) 索引大小，(iv) 关于对象数量和维度数量的可伸缩性，(v) 对数据集，查询工作负载和参数设置的稳健性，(vi) 可更新性，以及 (vii) 调整其参数所需的工作。 不幸的是，之前的研究都没有完全彻底地评估这些措施。</p>
+<p>例如，大多数现有研究使用的查询工作负载本质上与数据分布相同。在不同的查询工作负载下测量算法是一个重要的问题，但是很少有结果是已知的。在本文中，我们在各种设置和度量下评估算法的性能，以全面了解每种算法（参见表6）。</p>
+<p><strong>3. 现有结果的差异。</strong></p>
+<p>关于这一领域的一些著名文献报告的实验结果存在差异。例如，在从业者使用的ann-benchmark[8]中，FLANN的表现优于KGraph，而在[15]中的研究则表明情况并非如此。虽然许多差异可以通过使用的不同设置、数据集和调优方法以及实现差异来解释，但是始终希望得到最大程度的一致结果，以便在不同的场景中为研究人员和实践者提供最新的经验建议。</p>
+<p>在本文中，我们尽力在所有评估方法之间进行公平比较，并在所有20个数据集上进行测试。 例如，所有搜索程序都用C++实现，并且禁用所有特定于硬件的优化（例如，基于SIMD的距离计算）。 最后，我们还将发布源代码，数据集和其他文档，以便轻松复制结果。</p>
+<p>我们将常用的kNN算法分为三类：基于LSH的、基于空间划分的和基于邻域的。第3-6节将介绍该方法的每个类别的关键思想。</p>
+<h2 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h2><p>我们的主要贡献概括如下。</p>
+<ul>
+<li>对几个不同研究领域的最新ANNS方法进行综合实验研究。 我们的综合实验研究延伸到以往的研究之外：(i) 比较所有方法而不添加任何实施技巧，这使得比较更公平；(ii) 使用多种措施评估所有方法；(iii) 我们提供有关如何在不同设置下选择方法的经验法则建议。 我们相信这样一个全面的实验评估将对科学界和从业者都有益，并且已经在其他领域进行了类似的研究（例如，分类算法[12]）。</li>
+<li>我们将算法分为几类（第3, 4, 5和6节），然后对类别内和类别间评估进行详细分析（第8节）。 我们的基于数据的分析提供确认有用的原则，一些最佳方法的优点和缺点，以及对一些数据集比其他数据集更难的初步解释和理解。 我们在整个研究过程中获得的经验和见解使我们能够设计出一种新的经验算法DPG（第7节），该算法在广泛的设置下实现了对大多数数据集的高查询效率和高召回率。</li>
+</ul>
+<p>我们的论文安排如下。 第2节介绍了问题定义以及本文中的一些约束。 第3,4,5和6节描述了我们评估的一些最先进的ANNS算法。 第7节介绍了我们改进的ANNS方法。 综合实验和分析是第8节的报告。第10部分是论文的总结和未来的工作。附录A对测试算法的参数进行了评估，附录B给出了第二轮测试的一些补充结果。</p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><h2 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h2><p>本文主要研究数据点为 $\mathbb{R}^d$ 中的 $d$ 维向量，距离度量为欧氏距离的情况。今后，我们将交替使用点和向量。设 $||p,q||_2$ 为两个数据点 $p$ 和 $q$ 的欧氏距离，$\mathcal{X}=\{x_1, x_2,…, x_n\}$ 为一组参考数据点。一个给定查询点 $q$ 的kNN搜索被定义为返回关于 $q$ 的 $k$ 个最近邻 $\text{kNN}(q)\in \mathcal{X}$ ，这样 $|\text{kNN}(q)|=k$ 和 $\forall x\in \text{kNN}(q), \forall x’\in \mathcal{X}\backslash \text{kNN(q)}, ||x,q||_2\le ||x’,q||_2$。</p>
+<p>由于维数的诅咒[26]，许多研究工作集中在高维数据上 $k$ 近邻搜索问题的近似解。 让算法返回的结果为 $X=\{x_i|1\le i \le k\}$。衡量 $X$ 质量的常用方法是召回率，定义为 $\frac{|X \cap \text{kNN}(q)|}{k}$，在某些论文中也被称为精确率。</p>
+<h2 id="适用范围"><a href="#适用范围" class="headerlink" title="适用范围"></a>适用范围</h2><p>在数据库、理论、计算机视觉、机器学习等众多文献中，对高维数据的ANNS问题进行了广泛的研究。已有上百种算法从不同的角度来解决这一问题，由于其重要性和巨大的挑战，这一研究方向在上述领域仍然非常活跃。为了对ANNS算法进行全面而有重点的比较，本文通过施加以下约束来限制研究范围。</p>
+<p><strong>具有代表性和竞争性的ANNS算法。</strong></p>
+<p>我们考虑了几个领域中最先进的算法，并忽略了其他算法，除非有强有力的证据反对以前的发现。</p>
+<p><strong>没有特定于硬件的优化。</strong></p>
+<p>并不是我们获得或实现的所有实现在利用硬件特定功能来加速查询处理方面具有相同的复杂程度。 因此，我们修改了几个实现，以便没有算法使用多个线程，多个CPU，SIMD指令，硬件预取或GPU。</p>
+<p><strong>密集向量。</strong></p>
+<p>我们主要关注输入数据向量密集的情况，即，在大多数维度上都是非零的。</p>
+<p><strong>支持欧氏距离。</strong></p>
+<p>欧氏距离是高维数据集中应用最广泛的度量方法之一。它也被大多数的ANNS算法所支持。</p>
+<p><strong>确切的kNN作为ground-truth。</strong></p>
+<p>在已有的一些工作中，每个数据点都有一个标签（通常在分类或聚类应用中），在评价ANNS的召回率时，这些标签被视为groung-truth。在本文中，我们使用精确的kNN点作为ground-truth，因为这适用于所有数据集和大多数应用程序。</p>
+<p><strong>先前的基准研究。</strong></p>
+<p>最近有两个NNS基准研究：[34]和ann-benchmark[8]。前者考虑了除欧式距离之外的大量其他距离度量，而后者没有禁用一般实现技巧。在这两种情况下，他们的研究都不如我们的全面，例如，在评估的算法和数据集的数量方面。有关基准测试结果比较的更多讨论于第9.3节。</p>
+<h1 id="基于LSH的方法"><a href="#基于LSH的方法" class="headerlink" title="基于LSH的方法"></a>基于LSH的方法</h1><p>这些方法通常基于局部敏感哈希(LSH)的思想，LSH通过一组适当选择的随机投影函数将高维点映射到低维点。即使在最坏的情况下，这类方法在查询结果质量、效率和索引大小方面也具有良好的概率理论保证。另一方面，从经验上看，数据无关的方法往往优于数据相关的方法，因为后者不能利用数据分布。</p>
+<p>局部敏感哈希（LSH）是由Indyk和Motwani在[26]中首先引入的。用于距离函数 $f$  的LSH函数族 $\mathcal{H}$ 被定义为$(r_1,r_2,p_1,p_2)$ -对于任何两个数据点 $x$ 和 $y$ 的敏感，是指存在两个距离阈值 $r_1$ 和 $r_2$ 以及两个概率阈值 $p_1$ 和 $p_2$  满足</p>
+<script type="math/tex; mode=display">
+\left\{\begin{aligned}&\text{Pr}_{h\in\mathcal{H}}[h(x)=h(y)]\ge p_1,&&\text{if }f(x,y)<r_1\\&\text{Pr}_{h\in\mathcal{H}}[h(x)=h(y)]\le p_2,&&\text{if }f(x,y)>r_2\end{aligned}\right..</script><p>这意味着，将两点 $x, y$ 映射到相同值的机会随着距离 $f(x, y)$ 的减小而增加。2-稳定分布，即高斯/正态分布可以用来构造欧氏距离的LSH函数族。数据点根据随机投影和描述方法映射到散列值（例如桶）。同时使用一定数量的哈希函数来保证性能保证，使用不同的方案，如 AND-then-OR 方案[14]、OR-then-AND 方案[45]、基于倒排的方案[18,25]或基于树的方案[39]。在这一类别中，我们评估了两种最新的基于LSH的方法，并给出了理论保证：SRS[39]和QALSH[25]。它们都可以在任意 $c &gt; 1​$ 下工作。注意，我们排除了最近的一些工作，因为要么没有已知的实际实现（例如[3]），要么它们不支持欧氏距离（例如FALCONN[2]）。也有一些基于LSH的经验方法失去了理论保证，其中一些将被纳入其他类别。</p>
+<h2 id="SRS"><a href="#SRS" class="headerlink" title="SRS"></a>SRS</h2><p>SRS将高维数据集投影到低维空间（不超过10维）中进行精确的 kNN 搜索。我们将查询 $q​$ 与原始空间中任意点 $o​$ 的距离记为 $dist(o)​$，投影空间中的距离记为 $\Delta(o)​$。SRS的关键观测为任意点 $o​$，$\frac{\Delta(o)^2}{dist(o)^2}​$ 服从标准的 $\mathcal{X}^2(m)​$ 分布。因此，求解 c-ANN 问题的基本方法分为两步：(1) 通过对数据点的 $m​$ 维投影进行 $k=T’​$ 的 kNN 查询，得到有序的候选集；(2) 按顺序检查这些候选点的距离，如果满足“早终止检验”（如果存在一个 c-ANN 点，且概率至少为给定阈值），或者算法已检查了 $T’​$ 个点，则返回到目前距离最小的点。设 $m = O(1)​$，算法保证返回点距离不超过 $c​$ 乘以最近邻距离，且概率不变；空间和时间的复杂性在 $n​$ 中都是线性的，并且与 $d​$ 无关。</p>
+<h2 id="QALSH"><a href="#QALSH" class="headerlink" title="QALSH"></a>QALSH</h2><p>传统上，LSH函数是以查询无关的方式构造的，即在任何查询到达之前对桶进行分区。然而，更接近查询的对象可能被划分到不同的桶中，这是不可取的。QALSH提出了查询感知桶分区的概念，并据此开发了新的查询感知LSH函数。在给定预先指定的桶宽 $w$ 的情况下，先前工作中使用哈希函数 $h_{\vec a,b}(o)=\vec a·\vec o+b$，QALSH使用函数 $h_{\vec a}(o)=\vec a·\vec o$。与以往一样，第一个对象 $o$ 沿着随机线 $\vec a$ 投影。当查询 $q$ 到达时，计算 $q$ 的投影（即$h_{\vec  a(q)}$），并用查询投影（或简化为查询）作为桶分区的锚。桶分区的这种方法被称为查询感知的。在预处理步骤中，计算所有数据对象沿随机线 $\vec a$ 的投影，并使用 $B^+$-tree对所有数据投影进行索引。当查询对象 $q$ 到达时，QALSH计算查询投影，并使用 $B^+$-tree定位落在 $[h_{\vec a}(q) - \frac{w}{2},h_{\vec a}(q) + \frac{w}{2}]$ 区间内的对象。此外，QALSH可以逐步地定位离查询更远的数据对象，就像执行 $B^+$-tree范围搜索一样。</p>
+<h1 id="基于编码的方法"><a href="#基于编码的方法" class="headerlink" title="基于编码的方法"></a>基于编码的方法</h1><p>大量的工作致力于从数据分布中学习哈希函数，使哈希编码空间中最近邻的搜索结果尽可能接近原始空间中的搜索结果。综述请参考[42,41]。</p>
+<p>我们在此类别中评估的一些示例方法包括Neighbor Sensitive Hashing [35]，Selective Hashing [19]，Anchor Graph Hashing [30]，Scalable Graph Hashing [28]，Neighborhood APProximation index [34]和Optimal Product Quantization [20]。</p>
+<p>我们排除了最近的工作[4]，优化了基于乘积量化的方法的性能，因为它主要基于利用硬件特定的功能。</p>
+<h2 id="锚-图哈希"><a href="#锚-图哈希" class="headerlink" title="锚 图哈希"></a>锚 图哈希</h2><p>现有无监督哈希方法的最大缺点是需要指定一个全局距离度量。相反，在许多实际应用程序中，数据都存在于低维流形上，为了捕获有意义的最近邻居，应该考虑到低维流形。对于这些，只能指定局部距离度量，而全局距离由底层流形自动确定。AGH是一种基于图的哈希方法，它自动发现数据中固有的邻域结构，以无监督的方式学习合适的紧凑编码。</p>
+<p>图哈希方法的第一步是用所有数据点构建邻域图。为了有效地计算邻域图，AGH利用锚点图建立了一个近似邻域图，其中一对数据点之间的相似性是相对于少量锚点来测量的。所得到的图是在 $O(n)$ 时间复杂度下构造的，并且随着锚点数量的增加，性能接近真正的kNN图，具有足够的稀疏性。</p>
+<p>AGH使用锚点图来近似邻域图，并相应地使用锚点图上的图拉普拉斯矩阵来近似原图的图拉普拉斯矩阵。这样就可以快速计算出特征向量。它还使用层次哈希来解决边界问题。</p>
+<h2 id="可伸缩的图哈希"><a href="#可伸缩的图哈希" class="headerlink" title="可伸缩的图哈希"></a>可伸缩的图哈希</h2><p>AGH和一些有代表性的无监督哈希方法直接利用相似度（邻域结构）来指导哈希学习过程，被认为是一种图哈希方法。一般情况下，如果学习算法足够有效，则预期图哈希方法比非基于图的哈希方法具有更好的性能。然而，图哈希方法需要计算任意两个数据点之间的成对相似性。因此，对于大型数据集，从整个相似性图中学习是一件耗费内存和时间甚至是棘手的事情。现有的方法必须采用近似或子采样方法对大规模数据集进行图哈希。但是，不能保证近似的精度。</p>
+<p>SGH采用特征变换方法，在不显式计算相似图矩阵的情况下，有效地逼近整个图。因此，在SGH中避免了 $O(n^2)$ 的计算成本和存储成本。SGH的目标是通过学习的哈希码逼近相似矩阵 $S$，得到如下目标函数：</p>
+<script type="math/tex; mode=display">
+\text{min}_{\{b_l\}_{l=1}^n}\sum_{i,j=1}^n(\tilde S_{ij}-\frac{1}{c}b_i^Tb_j)^2</script><p>其中 $\tilde S_{ij}=2S_{ij}-1$ 集成了核LSH的思想，$b_i$ 的第 $k$ 位的哈希函数定义如下：</p>
+<script type="math/tex; mode=display">
+h_k(x_i)=\text{sgn}(\sum_{j=1}^mW_{kj}\phi(x_i,x_j)+bias_k)</script><p>其中 $W\in R^{c\times m}$ 是权重矩阵，$\phi(x_i,x_j)$ 是核函数。</p>
+<p>SGH应用一种特征转换方法来使用所有的相似性，而不需要显式地计算 $\tilde S_{ij}$。离散的 $\text{sgn}(·)$ 函数使得问题很难求解。SGH以位的方式使用顺序学习策略，其中由前位引起的残差可以在之后的位中互补地捕获。</p>
+<h2 id="近邻敏感哈希"><a href="#近邻敏感哈希" class="headerlink" title="近邻敏感哈希"></a>近邻敏感哈希</h2><p>对于基于哈希的方法，判断准确度的方法是通过它们在汉明空间中保存 kNN 关系（原始项之间）的有效性。也就是说，最优哈希函数的目标是原始项的相对距离理想地与相对汉明距离成线性关系。为了保持原始距离，现有的哈希技术倾向于均匀地放置分离器，而这些技术对于 rNN 搜索更有效。</p>
+<p>现有方法的目标是分配哈希码，使每对项之间的汉明距离尽可能接近其原始距离的线性函数。然而，NSH改变了投影函数的形状，当一对对象之间的原始距离较小时，投影函数的斜率较大，使得汉明距离在一定距离之外保持稳定。</p>
+<p>给定参考点 $p$，NSH改变投影函数的形状，当与 $p$ 的原始距离较小时，该投影函数施加较大的斜率，并允许投影距离保持稳定超过一定距离。 因此，当在投影空间下使用传统函数时，更可能为接近 $p$ 的点分配不同的哈希码。 如果查询 $q$ 和 $p$ 之间的距离小于阈值，则上述属性也适用于 $q$ 。 为了处理所有可能的查询，NSH选择多个数据点并限制数据点与其最近邻数据点之间的最大平均距离，以确保任何新颖查询将至少有一个附近的数据点。</p>
+<h2 id="NAPP"><a href="#NAPP" class="headerlink" title="NAPP"></a>NAPP</h2><p>置换方法是一种降维方法，它是根据物体到某些参考点的相对距离来评估物体的相似性，而不是直接根据实际距离值。置换方法的优点是不依赖于原始距离的度量性质，可以成功地应用于非度量空间。置换方法的基本假设是，通过检索与查询的数据点排序相似的一小部分数据点，可以找到大多数最近邻。</p>
+<p>置换方法的基本方法是从数据点中随机选择 $m$ 个数据点 $Π_i$。 对于每个数据点 $x$，数据点按照与 $x$ 的距离增加的顺序排列。 这种数据点排列的本质上是一个低维整数值向量，其第 $i$ 个元素是按照它们与 $x$ 的距离排序的数据点组中的第 $i$ 个数据点的排序顺序。对于最接近数据点的数据点，向量元素的值为1，而对于最远距离的数据点，值为 $m$。</p>
+<p>在搜索步骤中，检索到一定数量的候选点，这些候选点的排列与查询向量的排列足够接近。然后，搜索方法根据原始距离函数对这些候选数据点进行排序。</p>
+<p>这一基本方法可以从几个方面加以改进。例如，可以索引置换而不是按顺序搜索：可以使用置换前缀树、倒排索引或为度量空间设计的索引，例如VPtree。</p>
+<p>邻域近似索引（NAPP）由Bilegsaikhan实现。首先，该算法选择 $m$ 个数据点，计算数据点引起的排列。对于每个数据点，$m_i \le m$ 最接近的数据点都在一个倒排中建立索引。在查询时，选择与查询共享至少 $t$ 个最近邻数据点的数据点。然后，根据实际距离将这些候选点直接与查询进行比较。</p>
+<h2 id="选择性哈希"><a href="#选择性哈希" class="headerlink" title="选择性哈希"></a>选择性哈希</h2><p>LSH用于查找查询点半径固定范围内的点，即搜索半径。对于 kNN 问题（例如搜索引擎的第一个页面结果），不同查询点的对应半径可能会根据查询点周围区域的填充密度而变化几个数量级。</p>
+<p>最近，设计基于学习的哈希函数来减轻LSH的限制引起了越来越多的兴趣。如果数据分布只有全局密度模式，那么哈希函数的良好选择是可能的。但是，不可能构造全局哈希函数来捕获不同的局部模式。实际上，kNN距离（即，所需的搜索范围）取决于查询周围的本地密度。</p>
+<p>选择性哈希（SH）特别适用于基于LSH等半径搜索算法的kNN搜索。SH的主要创新点是创建多个具有不同粒度的LSH索引（即半径）。然后，每个数据对象只存储在一个选定的索引中，具有特定的粒度，这对于它附近的kNN搜索特别有效。</p>
+<p>具有多个索引的传统 LSH 相关方法包括每个索引中的所有数据点，而选择性哈希构建多个索引，每个对象只放在一个索引中。因此，与一个固定半径相比，几乎没有额外的存储开销。密集区域的数据点存储在粒度较小的索引中，稀疏区域的数据点存储在粒度较大的索引中。在查询阶段，算法将下推查询并检查具有合适粒度的单元格。</p>
+<h2 id="优化乘积量化（OPQ）"><a href="#优化乘积量化（OPQ）" class="headerlink" title="优化乘积量化（OPQ）"></a>优化乘积量化（OPQ）</h2><p>向量量化（VQ）[21]是一种流行且成功的ANN搜索方法，可用于构建非穷举搜索的倒排索引。 向量 $x\in \mathbb{R}^d$ 被映射到码本 $\textbf{C} = \{\textbf{c}_j\}$ 中的码字 $c$，其中 $i$ 在有限索引集中。 称为量化器的映射由下式表示：$x\rightarrow \textbf{c}(i(x))$，其中函 数 $i(·)$ 和 $\textbf{c}(·)$ 分别称为编码器和解码器。 k均值方法已被广泛用于构造码本 $\textbf{C}$，其中 $i(x)$ 是 $x$ 的最近均值的索引，而 $\textbf{c}(i(x))$ 是对应的均值。 随后可以构建倒排索引以返回映射到相同代码字的所有数据向量。</p>
+<p>当需要大量码字时，乘积量化器[27]是VQ的一个解决方案。其核心思想是将原始向量空间分解为 $M$ 个低维子空间的笛卡尔积，并分别对每个子空间进行量化。假设 $M = 2$，维度被均匀地划分。每个向量 $x$ 可以表示为两个子向量的串联：$[x^{(1)}, x^{(2)}]$，然后我们有 $\bf C = C^{(1)} \times C^{(2)}$，其中 $\bf C^{(1)}$ （$\bf C^{(2)}$）是通过对包含第一个（第二个）一半维度的子空间应用k均值算法构造的。因此，其中有 $k\times k$ 个码字，$x$ 最接近的码字 $\bf c$ 是 $\bf C$ 中两个最接近的子码字 $\textbf{c}^{(1)}$ 和 $\textbf{c}^{(2)}$ 分别根据其子向量 $x^{(1)}$ 和 $x^{(2)}$ 拼接而成。给定查询向量 $q = [q^{(1)},q^{(2)}]$，[6]的搜索算法首先检索 $L$ 个最近子码字 $\pmb {\{C_j^i\}}_{i\in \{1,2\},j\in\{1,2,…,L\}}$ 在每个基于 $q^{(1)}$ 和 $q^{(2)}$ 的子空间，分别然后应用多序列算法于基于一个优先队列遍历集合对 $\{\pmb{C_j^1,C_j^2}\}$ 在增加距离去实现候选码字集 $\mathcal{C}$。最后，在 $\mathcal{C}$ 中，属于一个码字的点的距离是通过倒排索引来检查的。</p>
+<p>最近，优化乘积量化（OPQ）方法[20]被提出，该方法通过对空间分解和量化码字的量化失真最小化来优化指标。</p>
+<h1 id="基于树的空间划分方法"><a href="#基于树的空间划分方法" class="headerlink" title="基于树的空间划分方法"></a>基于树的空间划分方法</h1><p>基于树的空间划分方法已广泛应用于精确和近似NNS问题。一般情况下，空间按层次划分，主要有两种分区方案：旋转分区方案和紧凑分区方案。旋转方法根据数据点到中心的距离对向量空间进行分区，而紧凑分区方法要么将数据点划分为聚类、近似Voronoi分区，要么随机划分空间。在本节中，我们介绍了两种具有代表性的紧凑划分方法：Annoy[7]和FLANN[33]。因为它们被用于商业推荐系统中，并被广泛应用于机器学习和计算机视觉社区。此外，在实验中，我们也评估了一种经典的旋转分区方法——Vantage-Point 树[44]（VP-tree）。</p>
+<h2 id="FLANN"><a href="#FLANN" class="headerlink" title="FLANN"></a>FLANN</h2><p>FLANN是一种自动最近邻算法配置方法，对于特定数据集，它从随机kd树[38]，分层k均值树[17]和线性扫描方法中选择最合适的算法。</p>
+<p><strong>随机kd树</strong>与传统的随机kd树相比，FLANN的随机kd树与传统kd树的主要区别在于：(i) 首先选择一个分割维数，递归地将数据点分成两半，然后使用以所有输入数据点维数平均值为中心的垂直超平面；(ii) 根据输入数据点，从样本方差最大的前5个维度中随机选择分割维度；(iii) 构建多个随机kd树作为索引。</p>
+<p>为了回答查询 $q$，使用由一些启发式评分函数优先化的深度优先搜索来搜索具有共享优先级队列和候选结果集的多个随机化kd树。 评分函数总是倾向于更接近查询点的子节点，并且在所有随机树之间保持较低的边界距离。</p>
+<p><strong>分层k均值树</strong>是利用k均值聚类将每一层的数据点划分为 $K$ 个区域来构造的。然后递归地对每个区域的数据点应用相同的方法。递归停止时每个叶结点的数据点数量小于 $K$。树由最初搜索遍历树从根到最近的叶结点，在此期间该算法总是取最近的内部节点查询点，和添加所有未知的分支路径优先队列。</p>
+<p><strong>FLANN</strong>通过最小化成本函数来仔细选择三种候选算法中的一种，该成本函数是搜索时间，索引构建时间和存储开销的组合，以确定搜索算法。 成本函数定义如下：</p>
+<script type="math/tex; mode=display">
+c(\theta)=\frac{s(\theta)+\omega_bb(\theta)}{\text{min}_{\theta\in\Theta}(s(\theta)+\omega_bb(\theta))}+\omega_mm(\theta)</script><p>其中 $s(\theta),b(\theta),m(\theta)$ 分别表示由参数 $\theta$ 构建和查询的树的搜索时间，树构建时间和存储开销。在运行优化时，FLANN使用随机子抽样交叉验证来生成数据和查询点。优化可以在完整的数据集上运行，以获得最精确的结果，或者使用数据集的一小部分来实现更快的自动调优过程。</p>
+<h2 id="Annoy"><a href="#Annoy" class="headerlink" title="Annoy"></a>Annoy</h2><p>Annoy是一种经验设计的算法，已在spotify.com的推荐引擎中使用，并被认为是最好的ANN库之一。</p>
+<p><strong>索引构建。</strong></p>
+<p>在早期版本中，Annoy构造了多个随机投影树[13]。在最新的版本(截至2016年3月)中，它构建了多个分层的2-means树。每棵树都是通过递归地划分数据点来独立构造的，如下所示。在每次迭代中，通过对输入数据点的一个子集运行一个简化的聚类算法，形成两个中心。这两个中心定义了一个与中心等距的划分超平面。然后利用超平面将数据点划分为两个子树，并递归地在每个子树上建立索引。</p>
+<p><strong>搜索。</strong></p>
+<p>搜索过程是通过多个RP树的树节点进行的。最初，RP树的根被推入一个键值为无穷大的最大优先级队列。对于具有父节点np的给定树节点ni，如果查询q落在ni的子树中，ni的键为其父节点的最小值和到超平面的距离;否则，键值为其父节点的最小值和到超平面距离的负值。在每次迭代中，选择键值最大的节点进行探索。</p>
+<h2 id="VP树"><a href="#VP树" class="headerlink" title="VP树"></a>VP树</h2><p>VP树是一种经典的空间分解树，它相对于随机选择的枢轴 $π$ 递归地划分空间。对于每个分区，计算从当前分区中的 $π$ 到每个其他点的距离的中值 $R$。具有半径 $R$ 的以枢轴为中心的球用于分隔空间：内部点被放置在左子树中，而外部点被放置在右子树中（与π的距离为 $R$ 的点可以任意放置）。当数据点的个数低于阈值 $b$ 时，分区停止。</p>
+<p>在经典的VP树中，三角不等式可以用于修剪无效分区，如下所示：假设 $r$ 是查询的半径，并且查询点在枢轴中心球内（即在左子树中）。如果 $R-d(π,q)&gt; r$，则右分区不能有答案，可以安全地修剪右子树。 最近邻搜索被模拟为半径递减的距离搜索：每次我们评估 $q$ 和数据点之间的距离时，我们将该距离与 $r$ 进行比较。 如果距离较小，则它变为 $r$ 的新值。 在[34]中，采用了一种简单的多项式修剪。 更具体地，如果查询在左分区中并且 $(R-d(\pi,q))^\beta\alpha_{left}&gt;r$，则可以修剪右分区。如果查询在右分区中并且 $(d(\pi,q)-R)^\beta\alpha_{left}&gt;r$，则可以修剪左分区。</p>
+<h1 id="基于邻域的方法"><a href="#基于邻域的方法" class="headerlink" title="基于邻域的方法"></a>基于邻域的方法</h1><p>通常，基于邻域的方法通过将每个单独数据点的邻域信息保留到其他数据点或一组枢轴点来构建索引。在本节中，我们介绍了具有代表性的基于邻域的方法，即层次导航小世界(HNSW[32])和KGraph[16]。在本小节中，我们介绍了基于邻域的代表性方法，即Hierarchical Navigable Small World（HNSW [32]）和KGraph [16]。 此外，我们还评估了其他两种代表性方法，包括Small World（SW [31]）和Rank Cover Tree（RCT [23]）。</p>
+<h2 id="KGraph"><a href="#KGraph" class="headerlink" title="KGraph"></a>KGraph</h2><p>KGraph[15]是kNN图构造和最近邻搜索的代表技术。</p>
+<p><strong>索引构建。</strong></p>
+<p>kNN图是一个简单的有向图，其中每个节点有 $K$ 个出边，指向其最近的 $K$ 个数据点。 由于kNN图的精确计算成本很高，因此在文献中提出了许多启发式算法[16,5]。 在[16]中，K-NN图的构造依赖于一个简单的原则：邻居的邻居很可能也是邻居。 从每个数据点的随机选取的 $k$ 个节点开始，它通过将每个数据点与其当前邻居的邻居（包括KNN和反向KNN）进行比较来迭代地改进近似，并且在不能进行改进时停止。 然后，应用四个优化（局部连接，增量搜索，采样和提前终止）以减少冗余计算并加快索引操作以便以可接受的准确度停止。</p>
+<p><strong>搜索。</strong></p>
+<p>[16]采用贪心搜索算法从查询点 $q$ 中找出 $k$ 个最近邻。从 $p$ 随机选择的节点（即数据点），搜索维护了一个节点列表来存储当前最好的 $k$ 节点按距离排序的查询，并递归计算从查询 $q$ 到节点列表中第一个未搜索数据点的每个相邻点的距离（通过图的边）。节点列表由离查询的更近邻点更新。当节点列表中的每个数据点 $x$ 比它的任何邻居都更接近查询时，这个贪心算法就停止了。</p>
+<h2 id="Small-World"><a href="#Small-World" class="headerlink" title="Small World"></a>Small World</h2><p>小世界（SW）方法是可导航的小世界图数据结构的变体。 小世界图包含Delaunay图的近似值，并且具有远程链接以及小世界导航属性。SW使用与K-NNG相同的搜索方法。K-NNG与SW最大的区别在于节点的连接结构。K-NNG力求得到每个节点的局部近似最优解，而SW则通过增量构造策略来探索插入点的当前最优链接。此外，SW对每条边保持双向连接，而K-NNG只保留每个节点的kNN邻居。</p>
+<p><strong>索引构建。</strong></p>
+<p>SW的构造是一个自下而上的过程，它连续插入所有的数据点。对于每一个新的输入点，他们从图中找到它最近的邻居的集合，并创建无向边来连接集合和点。随着越来越多的元素被插入到图中，以前用作短程链接的链接现在变成了远程链接，从而形成了一个可导航的小世界。</p>
+<p><strong>搜索。</strong></p>
+<p>因此，最近邻搜索算法是一个贪心的搜索过程，它执行多个子搜索。子搜索从一个随机节点开始，然后扩展一组遍历的节点，这些节点不会被相邻的链接访问。当不能找到比已经找到的 $M$ 个最近的点更接近的点时，子搜索停止（M是一个搜索参数）。</p>
+<h2 id="Hierarchical-Navigable-Small-World"><a href="#Hierarchical-Navigable-Small-World" class="headerlink" title="Hierarchical Navigable Small World"></a>Hierarchical Navigable Small World</h2><p>分层导航小世界（HNSW）算法的核心思想是根据链接的长度对链接进行分割。在这种情况下，可以限制所有层中每个元素的平均链接。</p>
+<p><strong>索引构建。</strong></p>
+<p>HNSW可以看作是接近图的多层多分辨率变体。一个地面（零级）层包含所有的数据点，而更高的层包含更少的点。与SW类似，HNSW是由逐点递增插入数据点构造的。对于每个数据点，随机选择一个最大层 $m$，并将新点添加到从层 $m$ 开始一直到层 $0$ 的所有层中。插入过程可以分为两个步骤。第一步从顶层开始到 $m + 1$，贪心地遍历图，以找到该层中最近的邻居，该邻居用作下一层中继续搜索的入口点。第二步从 $m$ 层开始直到 $0$ 。找到 $M$ 个最近邻，并与新点连接。搜索质量由参数 $ef$ 控制，$ef$ 是进入点的个数，与KGraph中的 $p$ 起类似的作用。在第一个步骤中，$ef$ 的数量设置为1。</p>
+<p><strong>搜索。</strong></p>
+<p>搜索算法大致相当于最大级别 $m = 0$ 的项的插入算法。在底层找到的最近邻作为搜索结果返回。</p>
+<h2 id="Rank-Cover-Tree"><a href="#Rank-Cover-Tree" class="headerlink" title="Rank Cover Tree"></a>Rank Cover Tree</h2><p>排名覆盖树（RCT）[23]是一种用于相似性搜索的概率数据结构，完全避免了使用三角形不等式等数值约束。该搜索算法基于与查询相关的点的排名，并及时返回正确的结果，而正确的结果取决于对数据集的内在维度的度量。</p>
+<p>RCT的结构融合了SASH[24]和Cover Tree[9]的一些设计特点。它是一个分层树，其中底层（0级）的每个节点都与一个数据点相关联，而 $j$ 级的节点则是从 $j-1$ 级的集合中随机抽取，具有一定的概率。 通过将节点从高级别插入到低级别来执行RCT的索引构造。 如果级别 $j$ 中的一个节点 $x$ 出现在RCT树中，则索引算法将在级别 $j + 1$ 中搜索其最近的邻居 $v$，然后将 $x$ 链接到 $v$ 。否则，该节点链接到其级别 $j+1$ 中的 $x$。</p>
+<p>RCT的搜索从树的根开始，在每一级 $j$ 中，只保留 $V_j$ 节点的子集，因为 $V_j$ 中的节点与查询最相似。搜索算法迭代执行上述过程，直到到达底层。</p>
+<h1 id="Diversified-Proximity-Graph"><a href="#Diversified-Proximity-Graph" class="headerlink" title="Diversified Proximity Graph"></a>Diversified Proximity Graph</h1><p>我们从这项研究中获得的经验和见解使我们能够设计一种新的方法，多样化邻近图（DPG），它构造了一个不同的邻域图，以实现更好和更鲁棒的搜索性能。</p>
+<h2 id="动机-1"><a href="#动机-1" class="headerlink" title="动机"></a>动机</h2><p>在K-NN图构造中，我们只考虑每个数据点的邻域距离。但直觉上我们也应该考虑邻居的覆盖面。如图1所示，点 $p$ 最近的两个邻居分别是 $a_3$ 和 $a_4$ ，因此在2-NN图中，$p$ 不能将搜索引向 $q$ 的最近邻（即节点 $b$），虽然它很接近$b$。因为 $a_1,…, a_4$ 是聚类的，将 $a_3$ 和 $a_4$ 同时保留在 $p$ 的K-NN列表中是不划算的。这就促使我们在考虑距离的同时考虑 $p$ 的K-NN链表的方向多样性（即角度的差异性），从而得到了K-NN图的多样性。对于这个例子，对于 $p$ 的K-NN列表，包含 $a_3$ 和 $b$ 是更好的选择。</p>
+<p><img src="http://image.rexking6.top/img/clip1552184557.png" alt=""></p>
+<p><em>图1. 二维数据集的示例，$K = 2$。</em></p>
+<p>现在假设我们用边 $(p, b)$ （即图1中的虚线），但仍然存在另一个问题。我们可以看到 $p$ 没有入边，因为它离两个点群相对较远（即 $p$ 不是这些数据点的2-NN）。这意味着 $p$ 是孤立的，在本例中，两个点群是不连接的。这在高维数据中并不少见，因为在高维数据中存在着hubness现象[36]，其中大部分数据点很少作为其他数据点的K-NN，因此在K-NN图中没有或者只有少数的传入边。这也促使我们在多样化的K-NN图中使用反向k-NN；也就是说，我们保留一个双向多元化K-NN图作为指标，并将其命名为多样化邻近图（DPG）。</p>
+<h2 id="多样化邻近图"><a href="#多样化邻近图" class="headerlink" title="多样化邻近图"></a>多样化邻近图</h2><p>DPG的构造是对已有的K-NN图进行多样化处理，然后添加反向边。</p>
+<p>给定参考数据点 $p$，$p$ 的K-NN列表 $\mathcal{L}$ 中的两个点 $x$ 和 $y$ 的相似性被定义为 $\measuredangle xpy$ 的角度，由 $θ(x,y)$ 表示。我们的目标是从 $\mathcal{L}$ 中选择 $κ$ 个数据点的子集，表示为 $\mathcal{S}$，以使 $\mathcal S$ 中两点之间的平均角度最大化；或者相当于 $\mathcal S=\text{arg min}_{\mathcal S\subseteq \mathcal N,|\mathcal S|=κ}\sum_{o_i,o_j\in \mathcal S}\theta(o_i,o_j)$。</p>
+<p>上述问题是NP难的[29]。 因此，我们设计了一个简单的贪心启发式算法。 最初，$\mathcal S$ 被设置为 $\mathcal L$ 中最接近的 $p$ 点。在随后的每次 $κ-1$ 迭代中，一个点从 $\mathcal L\backslash \mathcal S$ 移动到 $\mathcal S$，使得 $\mathcal S$ 中的点的平均成对角度相似性最小化。然后对于 $\mathcal S$ 中的每个数据点 $u$ ，我们在多样化邻近图中包括边 $(p,u)$ 和 $(u,p)$。 多样化过程的时间复杂度为 $O(κ^2Kn)$，其中 $n$ 是数据点的数量，并且在多样化的邻近图中总共存在至多 $2κn$ 条边。</p>
+<p>在多样化的邻近图中找到所需 $κ$ 的适当 $K$ 值是至关重要的，我们需要找到一个好的多样性和距离之间的权衡。在我们的实证研究中，当 $K =2κ$ 时，DPG算法通常达到最佳性能。因此，我们为多样化的邻近图构造设置 $K =2κ$ 。尽管基于角度相似度的DPG算法可以实现非常好的搜索性能，但是 $O(κ^2Kn)$ 的多样化时间仍然是昂贵的。在我们的实现中，我们使用另一种启发式方法来构建多样化的K-NN图，如下所示。我们为数据点 $p$ 的K-NN列表 $\mathcal L$ 中的每个数据点都保留一个计数器。对于每对点 $u, v\in L$，如果 $v$ 比 $p$ 更接近 $u$ ，也就是 $||v,u||_2&lt;||v,p||_2$，我们将 $v$ 的计数器增加1。然后,我们只是为 $p$ 保持 $κ$ 个数据点中计数最低的一个，因为直觉上，数据点的计数高的话说明还有许多其他点具有相似的方向。这就导致了 $O(K^2n)$ 分散化的时间复杂度。我们的实证研究表明，我们可以实现相似的搜索性能，同时显著降低分散时间。我们还证明了多样化和反向边都有助于提高搜索性能。</p>
+<p>注意，DPG的搜索过程与第6.1节中介绍的KGraph的搜索过程相同。</p>
+<h1 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h1><p>在这一部分，我们提出了我们的实验评估。</p>
+<h2 id="实验设置"><a href="#实验设置" class="headerlink" title="实验设置"></a>实验设置</h2><h3 id="算法评估"><a href="#算法评估" class="headerlink" title="算法评估"></a>算法评估</h3><p>我们使用了这三类已有的15种代表性的NNS算法和我们提出的多样化邻近图（DPG）方法。所有源代码都是公开的。算法是用c++实现的，除非另有说明。我们仔细检查了所有的实现，并进行了必要的修改，以便进行公平的比较。例如，我们在c++中重新实现了一些算法的搜索过程。我们还禁用多线程、SIMD指令、快速数学和硬件预取技术。本文使用的所有修改过的源代码在GitHub[40]上都是公开的。</p>
+<ol>
+<li><p><strong>基于LSH的方法。</strong>我们评估了查询感知LSH[25]（QALSH，PVLDB’15）和SRS[39]（SRS，PVLDB’14）。</p>
+</li>
+<li><p><strong>基于编码的方法。</strong>我们评估了可伸缩图哈希[28]（SGH，IJCAI’15）、锚图哈希[30]（AGH，ICML’11）、近邻敏感哈希[35]（NSH，PVLDB’15）。我们使用FLANN中的分层聚类树对生成的二进制向量进行索引，以支持对上述算法更有效的搜索。由于增加了汉明空间的稀疏性与更多的比特，当使用较长的编码时，精度在汉明半径2显着下降。因此，我们检查最多 $N$ 个数据点的真实距离，以实现搜索质量和搜索速度之间的权衡。</p>
+<p>我们还评估了选择性哈希[19]（SH，KDD‘15），优化乘积量化[20]（OPQ，TPAMI’14）和邻域近似索引[34]（NAPP，PVLDB’15）。 注意，我们使用反向多索引技术[6]来执行OPQ的非穷举搜索。</p>
+</li>
+<li><p><strong>基于树的空间划分方法。</strong>我们评估FLANN（[33]，TPAMI’14），Annoy和高级VP树[10]（VP-tree，NIPS‘13）。</p>
+</li>
+<li><p><strong>基于邻域的方法。</strong>我们评估Small World Graph [31]（SW，IS’14），Hierarchical Navigable Small World [32]（HNSW，CoRR’16），Rank Cover Tree [23]（RCT，TPAMI’15），K-NN图[16, 15]（KGraph，WWW’11），以及我们的多样化近邻图（DPG）。</p>
+</li>
+</ol>
+<p><strong>计算环境。</strong>所有c++源代码均由g++4.7编译，MATLAB源代码（仅用于某些算法的索引构造）由MATLAB 8.4编译。 所有实验均在Linux服务器上进行，该服务器采用2.9GHz的Intel Xeon 8核CPU和32G内存。</p>
+<h3 id="数据集和查询工作负载"><a href="#数据集和查询工作负载" class="headerlink" title="数据集和查询工作负载"></a>数据集和查询工作负载</h3><p>我们部署了18个由现有工作使用的真实数据集，涵盖了广泛的应用程序，包括图像、音频、视频和文本数据。我们还使用两个合成数据集。表1总结了数据集的特征，包括数据点的数量、维数、相对对比度（RC[22]）、局部固有维数（LID[1]）以及用RC和LID描述数据集困难。</p>
+<p><img src="http://image.rexking6.top/img/clip1552189013.png" alt=""></p>
+<p><em>表1. 数据集总结。</em></p>
+<p><strong>相对对比度</strong>在任意标准度量空间中同时评估几个关键数据特征（如维度，稀疏度和数据库大小）的影响。</p>
+<p>假设 $X=\{x_i,i=1,…,n\}$ 和查询 $q$，其中 $x_i$，$q \in R^d$ 是来自未知分布 $p(x)$ 的样本。令 $D_{min}^q = \text{min}_{i = 1,…,n}D(x_i,q)$ 是到最近的数据库样本的距离，$D_{mean}^q=E_x[D(x,q)]$ 是随机数据库样本与查询q的期望距离。查询 $q$ 的数据库 $X$ 的相对对比度定义为 $C_r^q=\frac{D_{mean}^q}{D_{min}^q}$。 数据集 $X$ 的相对对比度给出为 $C_r=\frac{E_q[D_{mean}^q]}{E_q[D_{min}^q]}=\frac{D_{mean}}{D_{min}}$。</p>
+<p>直观地，$C_r$ 捕捉了 $X$ 中NN搜索难易度的概念。$C_r$ 越小，搜索越难。如果 $C_r$ 接近1，那么查询 $q$ 到其最近邻的平均距离将与到 $X$ 中的随机点的距离几乎相同。</p>
+<p>我们还可以将k最近邻设置的相对对比度定义为 $C_r^k=\frac{D_{mean}}{D_{knn}}$，其中 $D_{knn}$ 是到第 $k$ 个最近邻的预期距离。 较小的RC值意味着数据集更难。</p>
+<p><strong>局部固有维数</strong>评估当考虑的距离范围从参考位置扩展时，遇到的对象数量增长的速度。我们使用RVE（使用规则变化的函数估计）来计算LID的值。该方法基于分布尾部作为规则变化函数的特征，对其固有维数进行了自适应估计。具有较高LID值的数据集意味着比其他数据集更困难。</p>
+<p>我们使用星号标记表1中的前四个数据集，以根据其RC和LID值与其他数据集相比较，表示它们是比较难的数据集。</p>
+<p>下面，我们将描述实验中使用的数据集。</p>
+<ul>
+<li><strong>Nusw</strong>包含大约270万张网络图像，每个图像都是一个500维的词袋向量。</li>
+<li><strong>Gist</strong>是一个图像数据集，它包含大约100万个数据点和960个维度。</li>
+<li><strong>Random</strong>包含一个维度为100的单位超球面上随机选取的1M个点。</li>
+<li><strong>Glove</strong>包含120万个从Tweets中提取的100维单词特征向量。</li>
+<li><strong>Cifar</strong>是TinyImage数据集的一个标记子集，该数据集包含10个类中的60000张32色图像，每幅图像由512维GIST特征向量表示。</li>
+<li><strong>Audio</strong>拥有美国国防部高级研究计划局TIMIT音频速度数据集中Marsyas库提取的约0.05万个192维音频特征向量。</li>
+<li><strong>Mnist</strong>由70k张手写数字图像组成，每一张都是将所有像素连接起来的784维矢量。</li>
+<li><strong>Sun397</strong>包含约80万张512维的GIST图像特征。</li>
+<li><strong>Enron</strong>起源于一系列电子邮件。yifang等人提取bi-gram，形成1369维特征向量。</li>
+<li><strong>Trevi</strong>由40万张1024位图（.bmp）组成，每个位图包含16x16个图像补丁数组。每个patch被采样为64x64灰度，具有一个标准的尺度和方向。因此，Trevi patch数据集由大约100,000个4096维的向量组成。</li>
+<li><strong>Notre</strong>包含了大约30万张128维的Flickr图片，并进行了重建。</li>
+<li><strong>Youtube Faces</strong>包含了3425个视频，涉及1595个不同的人。所有视频都是从YouTube上下载的。从帧中提取了30万个向量，每个向量包含1770个特征。</li>
+<li><strong>Msong</strong>是一个拥有420个维度的100万首当代流行音乐曲目的音频功能和元数据集合。</li>
+<li><strong>Sift</strong>由一百万个128维 SIFT向量组成。</li>
+<li><strong>Deep</strong>数据集包含卷积神经网络激活获得的自然图像的深层神经代码，包含约100万个数据点，256维。</li>
+<li><strong>UKbench</strong>包含了大约一百二十万张图像的128维特征。</li>
+<li><strong>ImageNet</strong>是由ImageNet大尺度视觉识别挑战（ILSVRC）引入并使用的，该挑战包含约240万个数据点，具有150维密集SIFT特征。</li>
+<li><strong>Gauss</strong>是随机选择1000个空间中的簇中心 $[0,10]^{512}$ 生成的，每个簇在每个维度上都服从一个偏差为1的高斯分布。</li>
+<li><strong>UQ_Video</strong>是视频数据集，提取了基于某些关键帧的局部特征，包括256维。</li>
+<li><strong>Bann</strong>被用为评估算法的可伸缩性，从自然图像提取的128维SIFT描述符中抽取1M、2M、4M、6M、8M、10M数据点作为样本。</li>
+</ul>
+<p><strong>查询工作负载。</strong></p>
+<p>按照约定，我们随机删除200个数据点作为每个数据集的查询点。报告了k-NN搜索的平均性能。在默认值为20的实验中，$k$ 值从1到100不等。在本文中，我们对ANNS使用欧氏距离。</p>
+<h2 id="评价指标"><a href="#评价指标" class="headerlink" title="评价指标"></a>评价指标</h2><p>由于蛮力线性扫描算法（BF）可以找到精确的kNN，所以我们以其查询时间为基线，将算法 $A$ 的加速速度比定义为 $\frac{t_{BF}}{t_A}$，其中 $t_x$ 为算法 $x$ 的平均搜索时间。</p>
+<p>$k$ 个返回点的搜索质量由标准的召回量对kNN点进行度量（参见2.1节）。</p>
+<p>所有报告的度量均针对查询工作负载中的所有查询进行平均。 我们还评估了其他方面，例如索引构建时间，索引大小和可伸缩性。</p>
+<p>请注意，相同的算法可以实现不同的加速比和召回率组合（通常通过对已验证的点数使用不同的阈值，即 $N$）。</p>
+<h2 id="参数调整"><a href="#参数调整" class="headerlink" title="参数调整"></a>参数调整</h2><p>下面是8.5第二轮评估中算法的关键参数的默认设置。</p>
+<ul>
+<li><strong>SRS。</strong>投影数（$m$）设置为8。</li>
+<li><strong>OPQ。</strong>子空间的数量是2，并且每个子空间默认可以具有210个码字（即聚类中心）。</li>
+<li><strong>Annoy。</strong>Annoy树的数量 $m$ 被设置为50。</li>
+<li><strong>FLANN。</strong>我们让算法调整它自己的参数。</li>
+<li><strong>HNSW。</strong>每个点的连接数 $M$ 被设置为10。</li>
+<li><strong>KGraph。</strong>默认情况下，我们使用 $K = 40$ 作为KNN图索引。</li>
+<li><strong>DPG。</strong>我们使用 $κ= \frac{K}{2} = 20$，以便在最坏的情况下DPG的索引大小与KGraph的索引大小相同。</li>
+</ul>
+<p>关于如何优化每个算法的更多细节，以及我们基于计数的DPG和基于角度的DPG的比较，见附录A。</p>
+<h2 id="每个分类中的比较"><a href="#每个分类中的比较" class="headerlink" title="每个分类中的比较"></a>每个分类中的比较</h2><p>在本小节中，我们评估每个类别中所有算法的加速比和召回率之间的权衡。考虑到基于空间分区的算法数量众多，我们分别在基于编码的子类别和基于树的子类别中对它们进行了评估。这一轮评估的目标是从每个类别中选择几个算法作为第二轮评估的代表（第8.5节）。</p>
+<h3 id="基于LSH的方法-1"><a href="#基于LSH的方法-1" class="headerlink" title="基于LSH的方法"></a>基于LSH的方法</h3><p>图2描绘了Sift和Audio上两个最新的数据无关算法SRS和QALSH的加速比和召回率之间的权衡。 由于两种算法最初都是基于外部存储的方法，我们通过数据集的总页数除以搜索期间访问的页数来评估加速。 它表明SRS始终优于QALSH。 表2显示了SRS和QALSH的构建时间和索引大小，我们可以看到SRS的索引大小小于QALSH（至少比SRS大5倍）。 因此，选择SRS作为第二轮评估中的代表，其中将使用基于覆盖树的内存实现。</p>
+<p><img src="http://image.rexking6.top/img/clip1552202449.png" alt=""></p>
+<p><em>图2. 加速比vs召回率（数据无关）。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1552202508.png" alt=""></p>
+<p><em>表2.索引大小和构建时间（数据无关）</em></p>
+<h3 id="基于编码的方法-1"><a href="#基于编码的方法-1" class="headerlink" title="基于编码的方法"></a>基于编码的方法</h3><p>我们评估了六种基于编码的算法，包括OPQ、NAPP、SGH、AGH、NSH和SH。图3显示，在所有方法中，OPQ的搜索性能在大多数数据集上都大大优于其他算法。</p>
+<p>表3报告了基于编码的方法的构建时间（秒）和索引大小（MB）。对于大多数数据集，NSH的索引大小最小，其次是AGH、SGH和OPQ。SH具有最大的索引大小，因为它需要长哈希表来减少桶中的数据点的数量，而多个哈希表可以实现较高的查全率。</p>
+<p>NSH和AGH花费相对较少的时间来构建索引。 OPQ的索引时间值与子码字的长度和数据点的维度有很强的关联。 然而，与第二轮评估中的其他算法相比，OPQ的索引构建时间仍然非常具有竞争力。 因此，我们选择OPQ作为基于编码的方法的代表。</p>
+<p><img src="http://image.rexking6.top/img/clip1552202822.png" alt=""></p>
+<p><em>图3. 加速比vs召回率（编码）。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1552202872.png" alt=""></p>
+<p><em>表3. 索引大小和构建时间（编码）。</em></p>
+<h3 id="基于树的空间划分方法-1"><a href="#基于树的空间划分方法-1" class="headerlink" title="基于树的空间划分方法"></a>基于树的空间划分方法</h3><p>在这一分类中，我们评估了三种算法：FLANN、Annoy和VP树。为了更好地说明FLANN的性能，我们报告了随机kd树和分层k均值树的性能，即FLANN-KD和FLANN-HKM。注意，在实验部署的20个数据集中，FLANN在Enron、Trevi、UQ-V、BANN和Gauss5个数据集中选择了随机kd树方法。线性扫描用于最困难的数据集：Rand，其余14个数据集中使用分层k均值树（FLANN-HKM）。图4显示了在不同的数据集中，Annoy、FLANN-HKM和FLANN-KD可以获得最高的性能。</p>
+<p>注意VP树的索引大小是索引期间使用的内存大小。从表4可以看出，VP树几乎拥有最大的索引时间，这是因为VP树自动调优参数的时间较长。虽然在所有的设置下，VP树的搜索性能与FLANN和Annoy相比没有什么竞争力，所以它被排除在了下一轮评估之外。</p>
+<p><img src="http://image.rexking6.top/img/clip1552203330.png" alt=""></p>
+<p><em>图4. 加速比vs召回率（基于树）。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1552203395.png" alt=""></p>
+<p><em>表4. 索引大小和构建时间（基于树）。</em></p>
+<h3 id="基于邻域的方法-1"><a href="#基于邻域的方法-1" class="headerlink" title="基于邻域的方法"></a>基于邻域的方法</h3><p>在基于邻域的方法中，我们评估了现有的四种方法：KGraph、SW、HNSW和RCT。图5显示，KGraph和HNSW的搜索性能在大多数数据集上都明显优于其他两种算法。</p>
+<p>RCT具有最小的索引大小，并且KGraph和HNSW的构建时间相对较大。 由于KGraph和HNSW的出色搜索性能，我们选择它们作为基于邻域的方法的代表。 请注意，我们把DPG放到了第二轮评估的比较。</p>
+<p><img src="http://image.rexking6.top/img/clip1552203763.png" alt=""></p>
+<p><em>图5. 加速比vs召回率（基于邻域）。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1552203832.png" alt=""></p>
+<p><em>表5. 索引大小和构建时间（基于邻域）。</em></p>
+<h2 id="第二轮评估"><a href="#第二轮评估" class="headerlink" title="第二轮评估"></a>第二轮评估</h2><p>在第二轮评估中，我们对7种代表性算法进行了综合实验：SRS、OPQ、FLANN、Annoy、HNSW、KGraph和DPG。</p>
+<h3 id="搜索质量和时间"><a href="#搜索质量和时间" class="headerlink" title="搜索质量和时间"></a>搜索质量和时间</h3><p>在第一组实验中，图6报告了7种算法在20个数据集中达到0.8左右召回率时的速度。注意，如果一个算法不能超过线性扫描算法，则将加速比设置为1.0。在7种算法中，DPG和HNSW的总体搜索性能最好，KGraph紧随其后。结果表明，DPG增强了KGraph的性能，特别是在较难的数据集：Nusw、Gist、Glove和Rand上。此后的报告显示，召回率越高，召回率的改善也越显著。例如，在此设置下（召回率0.8），DPG在三个数据集上的排名在KGraph之后，但最终在较高的召回率上超过KGraph。总的来说，DPG和HNSW对于不同的数据集具有最佳的性能。</p>
+<p><img src="http://image.rexking6.top/img/clip1552204269.png" alt=""></p>
+<p><em>图6. 召回率为0.8的加速比。</em></p>
+<p>OPQ还可以在所有设置下实现良好的加速。不足为奇的是，SRS比其他竞争对手要慢，而且由于它没有利用数据分布。图7中也报告了类似的观察结果，它描述了算法在加速比约50的情况下实现的召回率。</p>
+<p><img src="http://image.rexking6.top/img/clip1552204330.png" alt=""></p>
+<p><em>图7. 加速比为50的召回率。</em></p>
+<p>我们评估了搜索质量（召回率）和搜索时间（加速和访问数据点的百分比）之间的权衡。要访问的数据点的数量（$N$）以及其他参数，如树的数量（Annoy）和搜索队列大小（HNSW、KGraph和DPG），都经过调优，以实现不同搜索时间（即加速比）的各种召回率。图8展示了8个数据集上的算法的加速，召回率从0到1不等。它进一步展示了DPG在高召回率和较难数据集上的优越搜索性能（图8(a)-(d)）。HNSW、KGraph和的综合性能也很有竞争力，其次是FLANN。图8(h)中数据点聚类后，DPG和KGraph的性能均低于HNSW、bother、FLANN和OPQ。</p>
+<p><img src="http://image.rexking6.top/img/clip1552204410.png" alt=""></p>
+<p><em>图8. 不同数据集上的加速比与召回率。</em></p>
+<p>在图9中，我们根据访问的数据点的百分比来评估算法的召回率，即计算其到数据空间中的查询的距离。由于基于邻域的方法的搜索从随机入口点开始，然后逐渐接近搜索结果，而其他算法从最有希望的候选点开始搜索，这些方法的搜索质量在初始阶段被FLANN甚至OPQ所超越。然而，当访问更多的数据点时，它们的召回率比其他算法上升得更快。由于在HNSW中使用了层次结构，HNSW可以更快地接近结果。</p>
+<p><img src="http://image.rexking6.top/img/clip1552204453.png" alt=""></p>
+<p><em>图9. 召回率vs访问的数据点的百分比。</em></p>
+<h3 id="用不同的-K-搜索"><a href="#用不同的-K-搜索" class="headerlink" title="用不同的 $K$ 搜索"></a>用不同的 $K$ 搜索</h3><p>我们用不同的 $K$ 来评估0.8的召回率。如图12所示，DPG和HNSW几乎具有 $K$ 在1到100之间的最佳搜索性能，其次是KGraph和Annoy。 在不同的 $K$ 中可以观察到类似的排名。</p>
+<p><img src="http://image.rexking6.top/img/clip1552205215.png" alt=""></p>
+<p><em>图12. 使用不同的 $K$ 0.8的召回率的加速比。</em></p>
+<h3 id="索引大小和构建时间"><a href="#索引大小和构建时间" class="headerlink" title="索引大小和构建时间"></a>索引大小和构建时间</h3><p>除了搜索性能外，我们还对20个数据集上的7种算法的索引大小和构建时间进行了评估。图10报告索引大小（不包括数据点）与数据大小的比例。除Annoy外，所有算法的索引大小均小于相应的数据大小。</p>
+<p>DPG、KGraph、HNSW和SRS的索引大小与维度无关，因为基于邻域的方法（DPG、KGraph和HNSW）和SRS分别为每个数据点保留固定数量的邻居id和投影。因此，它们对高维数据（如Trevi）的比例相对较小。总体而言，OPQ和SRS的索引规模最小，在大多数数据集中不到5%，其次是HNSW、DPG、KGraph和FLANN。结果表明，在20多个数据集上，由于FLANN可以选择三种可能的索引结构，所以索引大小的排名变化较大。为了获得良好的搜索质量，Annoy需要维护相当数量的树，因此具有最大的索引大小。</p>
+<p><img src="http://image.rexking6.top/img/clip1552205438.png" alt=""></p>
+<p><em>图10. 索引大小与数据大小之比（%）。</em></p>
+<p>图11报告了20个数据集上算法的索引构建时间。由于其简单性，SRS具有最佳的总体性能。其次是Annoy。由于子码字（如Trevi）的计算，OPQ的构建时间与维数有关。HNSW、KGraph和DPG具有相似的构建时间。与KGraph相比，DPG没有花费大量额外的时间进行图的多样化。不过，它们仍然可以在一小时内为20个数据集中的16个建立索引。</p>
+<p><img src="http://image.rexking6.top/img/clip1552205483.png" alt=""></p>
+<p><em>图11. 索引构建时间（秒）。</em></p>
+<h3 id="可伸缩性评估"><a href="#可伸缩性评估" class="headerlink" title="可伸缩性评估"></a>可伸缩性评估</h3><p>在图13中，我们根据数据点（$n$）和维数（$d$）的增长，从搜索时间、索引大小和索引构建时间三个方面考察了算法的可伸缩性，将目标召回率设置为0.8，分别对 $n$ 和 $d$ 进行评估。特别是BANN的部署，数据点的数量从1M增加到10M。按照惯例，我们使用随机数据Rand来评估维度（从50到800）的影响。为了更好地说明算法的可伸缩性,我们报告算法的增长率与 $n$ 和 $d$ 的增加。例如，$n = 4M$ 时DPG的索引大小除以 $n = 1M$ 时DPG的索引大小，得到索引大小增长率。</p>
+<p>随着数据点（$n$）数量的增加，DPG、KGraph、HNSW和Annoy的可伸缩性最好，而SRS的可伸缩性最差。另一方面，OPQ在索引大小和构建时间上的可伸缩性最好，其次是FLANN。我们注意到，FLANN的性能相当不稳定，主要是因为它在 $n$ 为6M和10M时选择FLANN-KD，而在其他情况时选择FLANN-HKM。</p>
+<p>在维数增长方面，FLANN整体性能最差，仅在 $d\ge 100$ 时进行蛮力线性扫描。正如所料，DPG、KGraph、HNSW和SRS的索引大小与 $d$ 无关，因此它们的索引大小具有最佳的可伸缩性。有意思的是，SRS具有最佳的搜索可伸缩性，其速度甚至在 $d \ge 2000$ 时超过了DPG。这可能要归功于其理论上较差的性能保证。注意，我们没有在图13(d)中报告KGraph的性能，因为它总是被线性扫描算法超越。这说明KGraph易受高维性的影响，因此证明了DPG的重要性，DPG能够更好地实现对高维性增长的搜索扩展性。</p>
+<p><img src="http://image.rexking6.top/img/clip1552206383.png" alt=""></p>
+<p><em>图13. 可伸缩性vs数据大小（$n$）和维数（$d$）。</em></p>
+<h3 id="更难的查询工作负载"><a href="#更难的查询工作负载" class="headerlink" title="更难的查询工作负载"></a>更难的查询工作负载</h3><p>当查询工作负载的分布变得与数据集的分布不同时，我们评估算法性能。我们通过在随机方向上以固定长度 $δ$ 扰动默认查询来控制越来越不同的查询工作量的生成。对于Sift上的默认查询，通过越来越大的 $δ$ ，我们获得其RC值从4.5（无扰动）变为1.2的查询工作负载。直观地说，RC值越小的查询就越困难，因为数据集中随机点的距离和NN点的距离变得越来越难以区分。图14显示了以RC值为特征的较难查询工作负载的召回率约为0.8的算法的加速比。所有算法的加速比随着RC值的增加而减小。 HNSW在简单查询方面表现最佳，其次是DPG，KGraph，Annoy和FLANN。尽管如此，DPG受影响最小，并且在最难设置的情况下仍可实现超过100倍的加速（召回率至少为0.8）。这证明了DPG针对不同查询工作负载的鲁棒性。</p>
+<p><img src="http://image.rexking6.top/img/clip1552207795.png" alt=""></p>
+<p><em>图14. 具有不同RC值的查询（Sift），(a)召回率0.8时的加速比。</em></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>表6从搜索性能、索引大小、索引构建时间和可伸缩性等方面对七种算法的性能进行了排序。我们还指出，SRS是唯一一个在理论上能够保证搜索质量的方法，并且可以很容易地对搜索质量和搜索时间的参数进行调整。Annoy的调整也很简单，只需改变树的数量。优化FLANN的参数是一件非常复杂的事情。因此，作者开发了自动配置算法来处理这个问题。</p>
+<p><img src="http://image.rexking6.top/img/clip1552207995.png" alt=""></p>
+<p><em>表6. 不同准则下算法的排序</em>。</p>
+<p>根据我们的综合评估，以下是给用户的一些建议。</p>
+<ul>
+<li><p>当有足够的计算资源（内存和cpu）来构建离线索引，并且有足够的内存来保存生成的索引时，DPG和HNSW在数据集的鲁棒性、结果质量、搜索时间和搜索可扩展性等方面具有优异的搜索性能，是ANNS在高维数据上的最佳选择。</p>
+<p>由于其出色的搜索性能和对数据集的健壮性，我们还推荐使用Annoy。此外，Annoy的一个很好的特性是，与基于接近图的方法相比，它可以更好地权衡搜索性能和索引大小/构建时间。这是因为，可以在不显著影响搜索性能的情况下减少树的数量。</p>
+<p>注意，除了少数数据集（例如四个较难数据集和Yout）外，KGraph还提供了总体上优秀的性能。我们建议使用Annoy而不是KGraph，因为DPG是KGraph的改进版本，具有更好的性能，并且在DPG和KGraph性能都不好的少数情况下（例如Yout和Gauss），Annoy的性能最好。</p>
+</li>
+<li><p>为了处理具有中等计算资源的大规模数据集（例如，10亿个数据点），OPQ和SRS由于其小的索引大小和构造时间而是良好的候选者。 值得一提的是，SRS可以轻松处理数据点更新并具有理论上的保证，这与其他五种算法不同。</p>
+</li>
+</ul>
+<h1 id="进一步分析"><a href="#进一步分析" class="headerlink" title="进一步分析"></a>进一步分析</h1><p>在本节中，我们分析了我们评估中最具竞争力的算法，按类别分组，以了解它们的优缺点。</p>
+<h2 id="基于空间划分的方法"><a href="#基于空间划分的方法" class="headerlink" title="基于空间划分的方法"></a>基于空间划分的方法</h2><p>综合实验表明，在基于空间划分的方法中，Annoy、FLANN和OPQ的性能最好。注意，FLANN在大多数数据集中选择了FLANN-HKM。因此，这三种算法都是基于k均值空间划分的。</p>
+<p>我们认为k均值式空间划分有效性的关键因素是大量的聚类，通常是 $Θ(n)$。 注意，我们不能直接用 $k =Θ(n)$ 应用k均值，因为(i) k均值的索引构造时间复杂度与 $k$ 成线性关系，以及(ii) 识别查询所在分区的时间复杂度需要 $Θ(n)$ 时间。OPQ和FLANN-HKM/Annoy分别通过使用子空间分区和递归的思想间接实现了这一目标。</p>
+<p>我们进行实验以了解哪种想法更有效。我们考虑实现具有大致相同数量的分区的k均值式空间分区的目标。具体来说，我们考虑以下选择：(i) 直接使用k均值与 $k = 18611$；(ii) 使用具有2个子空间的OPQ，每个子空间具有256个聚类。有效分区的数量（即非空分区）也是18611；(iii) 分别使用具有分支因子 $L = 2$ 和 $L = 42$ 的FLANN-HKM。我们还修改了停止条件，以便生成的树分别具有 $18000$ 和 $17898$ 个分区。图15(a)报告了对Audio的上述选择的召回率与所访问的数据点的百分比。分区按其中心到查询的距离排序。我们可以看到基于OPQ的分区具有最差的性能，其次是（修改的）FLANN-HKM，$L=42$，然后是 $L=2$。k均值具有最佳性能，尽管后三者之间的性能差异不大。因此，我们的分析表明，基于分层k均值的分区是迄今为止最有前景的方向。</p>
+<p>我们的第二个分析是调查我们是否可以通过使用多个分层k均值树来进一步提高搜索性能。请注意，Annoy已经使用了多个树，并且它在大多数数据集上明显优于FLANN-HKM中的单个分层k均值树。尝试以类似的方式提高FLANN-HKM的性能是很自然的。我们建立了一个实验来构建多个FLANN-HKM树。为了构建不同的树，我们对输入数据点的一组随机样本执行k均值聚类。图15(b) 显示了我们使用多达50棵树的最终加速比与召回率。我们可以看到，在Audio上为FLANN-HKM应用多个树是不划算的，主要是因为获得的树仍然彼此相似，因此多个树的优点不能抵消额外的索引和搜索开销。请注意，Annoy不会遇到此问题，因为2均值分区，样本数量和迭代次数有限，自然会提供不同的分区。</p>
+<p><img src="http://image.rexking6.top/img/clip1552229336.png" alt=""></p>
+<p><em>图15. 基于空间划分的方法分析。</em></p>
+<h2 id="基于邻域的方法-2"><a href="#基于邻域的方法-2" class="headerlink" title="基于邻域的方法"></a>基于邻域的方法</h2><p>我们的第一个分析是理解为什么KGraph、DPG和HNSW在大多数数据集中工作得很好（特别是获得很高的召回率）。我们的初步分析表明，这是因为(i) 查询的kNN点通常在邻域图中紧密相连；(ii) 大多数点都与查询的至少一个kNN点紧密相连；(ii) 表示搜索算法随机选取的 $p$ 个入口点中有一个能够到达kNN个入口点中的一个的经验概率较高，(i) 保证大部分kNN个入口点能够返回。通过良好连接，我们的意思是有很多路径从一个入口点到一个kNN点，因此很有可能其中一个路径上的山足够低，因此搜索算法不会陷入局部极小值。</p>
+<p>我们还研究了为什么KGraph在一些数据集上不能很好地工作，以及为什么DPG和HNSW工作得更好。KGraph不能在Yout和Gauss上工作，主要是因为这两个数据集都有许多分离良好的聚类。因此，KGraph的索引有许多断开连接的部分。因此，除非它的搜索算法使用的入口点与查询结果位于同一个聚类中，否则KGraph几乎不可能找到任何邻近点。另一方面，主要由于DPG中的多样化步骤和反向边的使用，使得来自不同聚类的边连接数据点存在，从而导致召回效果大大提高。同样，在HNSW中，这些边也很好地连接在一起。</p>
+<p>例如，我们执行实验，我们使用查询的NN作为Yout上搜索的入口点。 然后，KGraph实现了100％的召回率。 此外，我们绘制了数据点的最小跳数（minHops）的分布，以使KGraph和DPG的索引在Yout和Gist上到达查询的任何kNN点，如图16所示。我们可以观察到</p>
+<ul>
+<li>对于KGraph，有很大比例的数据点在Yout（60.38％）上无法达到任何kNN点（即与跳跃相对应的那些点），而Gist上的百分比较低（0.04％）。</li>
+<li>DPG的跳数 $\infty$ 百分比要低得多（Yout为1.28%，Gist为0.005%）。</li>
+<li>在这两个数据集上，HNSW没有 $∞$ 跳数。</li>
+<li>与KGraph相比，DPG和HNSW具有更多的小minHops点，这使得到达kNN点更容易。此外，在Yout上，HNSW在三种算法上具有最多的小minHops点，性能较好，如图8(g)所示。</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1552230056.png" alt=""></p>
+<p><em>图16. KGraph和DPG的minHops分布</em>。</p>
+<h2 id="与以前的基准进行比较"><a href="#与以前的基准进行比较" class="headerlink" title="与以前的基准进行比较"></a>与以前的基准进行比较</h2><p>我们已经验证了我们的评估所得的性能结果与之前的评估结果基本吻合，并且我们可以很好地解释其中的大部分差异。</p>
+<p><strong>与ann-benchmark的结果进行比较。</strong></p>
+<p>虽然两种评估方法的曲线形状相似，但最佳方法的相对排名不同。这主要是因为我们在方法的实现中关闭了所有特定于硬件的优化。具体来说，我们在KGraph中禁用了使用SIMD和多线程的距离计算，在中禁用了-ffast-math编译器选项，在FLANN中禁用了多线程，在 NonMetricSpaceLib 中实现的方法中禁用了SIMD、多线程、预取技术和-Ofast编译器选项的距离计算，即SW，NAPP，VP树和HNSW。此外，我们还禁用了HNSW中使用的优化搜索实现。我们确认，当这些优化被打开时，结果更像ann-benchmark。</p>
+<p>禁用这些特定于硬件的优化可以让我们更深入地了解算法的实际功能。事实上，优化可以很容易地添加到所有算法的实现中。</p>
+<p><strong>KGraph和SW。</strong></p>
+<p>KGraph在ann benchmark研究[8]中排名非常低，这可能是由于测试中的一个错误。</p>
+<p><strong>Annoy。</strong></p>
+<p>我们注意到最新版本的Annoy（基于随机分层的2均值树）的性能明显优于其早期版本（基于多个启发式RP树），这可能会影响先前的评估结果。</p>
+<h1 id="结论和未来的工作"><a href="#结论和未来的工作" class="headerlink" title="结论和未来的工作"></a>结论和未来的工作</h1><p>NNS是一个具有重要理论价值和赋予各种应用能力的基本问题。 人们普遍认为，在线性大小索引的次线性时间内，没有实际有竞争力的算法来回答精确的NN查询。 一个自然的问题是，我们是否可以通过建立大小为 $O(n)$ 的索引并通过访问最多 $αn$ 个数据点，以鲁棒的方式凭经验返回大多数kNN点的算法，其中 $α$ 是一个小常数（例如1％）。</p>
+<p>在本文中，我们综合评估了不同研究领域和从业者提出的许多最先进的算法。我们分析了它们的表现，并提出了切实可行的建议。</p>
+<p>由于各种限制，本文的研究显然受到限制。 在我们未来的工作中，我们将(i) 使用更大的数据集（例如100M +点）；(ii) 考虑高维稀疏数据；(iii) 使用更完整的方法（包括详尽的方法）来调整算法；(iv) 考虑其他距离指标，如[34]。</p>
+<p>最后，我们对高维实际数据的理解仍然非常不足。 这表现在许多启发式中，没有合理的理由，但在真实数据集中工作得很好。 我们希望这项研究能够为整个社区提出更多需要创新解决方案的问题。</p>
+<h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><ol>
+<li>L. Amsaleg, O. Chelly, T. Furon, S. Girard, M. E. Houle, K. Kawarabayashi, and M. Nett. Estimating local intrinsic dimensionality. In SIGKDD, 2015.</li>
+<li>A. Andoni, P. Indyk, T. Laarhoven, I. P. Razenshteyn, and L. Schmidt. Practical and optimal LSH for angular distance. CoRR, abs/1509.02897, 2015.</li>
+<li>A. Andoni and I. Razenshteyn. Optimal data-dependent hashing for approximate near neighbors. In STOC, 2015.</li>
+<li>F. Andr´e, A. Kermarrec, and N. L. Scouarnec. Cache locality is not enough: High-performance nearest neighbor search with product quantization fast scan. PVLDB, 9(4):288–299, 2015.</li>
+<li>K. Aoyama, K. Saito, H. Sawada, and N. Ueda. Fast approximate similarity search based on degree-reduced neighborhood graphs. In SIGKDD, 2011.</li>
+<li>A. Babenko and V. S. Lempitsky. The inverted multi-index. In CVPR, pages 3069–3076, 2012.</li>
+<li>E. Bernhardsson. Annoy at github <a target="_blank" rel="noopener" href="https://github.com/spotify/annoy">https://github.com/spotify/annoy</a>, 2015.</li>
+<li>E. Bernhardsson. Benchmarking nearest neighbors <a target="_blank" rel="noopener" href="https://github.com/erikbern/ann-benchmarks">https://github.com/erikbern/ann-benchmarks</a>, 2016.</li>
+<li>A. Beygelzimer, S. Kakade, and J. Langford. Cover trees for nearest neighbor. In ICML, pages 97–104, 2006.</li>
+<li>L. Boytsov and B. Naidan. Learning to prune in metric and non-metric spaces. In NIPS, 2013.</li>
+<li>S. Brin. Near neighbor search in large metric spaces. In VLDB, pages 574–584, 1995.</li>
+<li>R. Caruana, N. Karampatziakis, and A. Yessenalina. An empirical evaluation of supervised learning in high dimensions. In ICML, pages 96–103, 2008.</li>
+<li>S. Dasgupta and Y. Freund. Random projection trees and low dimensional manifolds. In STOC, 2008.</li>
+<li>M. Datar, N. Immorlica, P. Indyk, and V. S. Mirrokni. Locality-sensitive hashing scheme based on p-stable distributions. In SoCG, 2004.</li>
+<li>W. Dong. Kgraph. <a target="_blank" rel="noopener" href="http://www.kgraph.org">http://www.kgraph.org</a>, 2014.</li>
+<li>W. Dong, M. Charikar, and K. Li. Efficient k-nearest neighbor graph construction for generic similarity measures. In WWW, 2011.</li>
+<li>K. Fukunaga and P. M. Narendra. A branch and bound algorithms for computing k-nearest neighbors. IEEE Trans. Computers, 24(7):750–753, 1975. hierachical k-means tree.</li>
+<li>J. Gan, J. Feng, Q. Fang, and W. Ng. Locality-sensitive hashing scheme based on dynamic collision counting. In SIGMOD, 2012.</li>
+<li>J. Gao, H. V. Jagadish, B. C. Ooi, and S. Wang. Selective hashing: Closing the gap between radius search and k-nn search. In SIGKDD, 2015.</li>
+<li>T. Ge, K. He, Q. Ke, and J. Sun. Optimized product quantization. IEEE Trans. Pattern Anal. Mach. Intell., 36(4):744–755, 2014.</li>
+<li>R. M. Gray and D. L. Neuhoff. Quantization. IEEE Transactions on Information Theory, 44(6):2325–2383, 1998.</li>
+<li>J. He, S. Kumar, and S. Chang. On the difficulty of nearest neighbor search. In ICML, 2012.</li>
+<li>M. E. Houle and M. Nett. Rank-based similarity search: Reducing the dimensional dependence. IEEE TPAMI, 37(1):136–150, 2015.</li>
+<li>M. E. Houle and J. Sakuma. Fast approximate similarity search in extremely high-dimensional datasets. In ICDE, pages 619–630, 2005.</li>
+<li>Q. Huang, J. Feng, Y. Zhang, Q. Fang, and W. Ng. Query-aware locality-sensitive hashing for approximate nearest neighbor search. PVLDB, 9(1):1–12, 2015.</li>
+<li>P. Indyk and R. Motwani. Approximate nearest neighbors: Towards removing the curse of dimensionality. In STOC, 1998.</li>
+<li>H. J´egou, M. Douze, and C. Schmid. Product quantization for nearest neighbor search. IEEE Trans. Pattern Anal. Mach. Intell., 33(1):117–128, 2011.</li>
+<li>Q. Jiang and W. Li. Scalable graph hashing with feature transformation. In IJCAI, pages 2248–2254, 2015.</li>
+<li>C.-C. Kuo, F. Glover, and K. S. Dhir. Analyzing and modeling the maximum diversity problem by zero-one programming*. Decision Sciences, 24(6):1171–1185, 1993.</li>
+<li>W. Liu, J. Wang, S. Kumar, and S. Chang. Hashing with graphs. In ICML, pages 1–8, 2011.</li>
+<li>Y. Malkov, A. Ponomarenko, A. Logvinov, and V. Krylov. Approximate nearest neighbor algorithm based on navigable small world graphs. Inf. Syst., 45:61–68, 2014.</li>
+<li>Y. A. Malkov and D. A. Yashunin. Efficient and robust approximate nearest neighbor search using hierarchical navigable small world graphs. CoRR, 2016.</li>
+<li>M. Muja and D. G. Lowe. Scalable nearest neighbor algorithms for high dimensional data. IEEE Trans. Pattern Anal. Mach. Intell., 36(11):2227–2240, 2014.</li>
+<li>B. Naidan, L. Boytsov, and E. Nyberg. Permutation search methods are efficient, yet faster search is possible. PVLDB, 8(12):1618–1629, 2015.</li>
+<li>Y. Park, M. J. Cafarella, and B. Mozafari. Neighbor-sensitive hashing. PVLDB, 9(3):144–155, 2015.</li>
+<li>M. Radovanovic, A. Nanopoulos, and M. Ivanovic. Hubs in space: Popular nearest neighbors in high-dimensional data. Journal of Machine Learning Research, 11:2487–2531, 2010.</li>
+<li>G. Schindler, M. A. Brown, and R. Szeliski. City-scale location recognition. In CVPR, 2007.</li>
+<li>C. Silpa-Anan and R. I. Hartley. Optimised kd-trees for fast image descriptor matching. In CVPR, 2008.</li>
+<li>Y. Sun, W. Wang, J. Qin, Y. Zhang, and X. Lin. SRS: solving c-approximate nearest neighbor queries in high dimensional euclidean space with a tiny index. PVLDB, 8(1):1–12, 2014.</li>
+<li>Y. Sun, W. Wang, Y. Zhang, and W. Li. Nearest neighbor search benchmark <a target="_blank" rel="noopener" href="https://github.com/DBWangGroupUNSW/nns_benchmark">https://github.com/DBWangGroupUNSW/nns_benchmark</a>, 2016.</li>
+<li>J. Wang, W. Liu, S. Kumar, and S. Chang. Learning to hash for indexing big data - A survey. Proceedings of the IEEE, 104(1):34–57, 2016.</li>
+<li>J. Wang, H. T. Shen, J. Song, and J. Ji. Hashing for similarity search: A survey. CoRR, abs/1408.2927, 2014.</li>
+<li>R. Weber, H.-J. Schek, and S. Blott. A quantitative analysis and performance study for similarity-search methods in high-dimensional spaces. In A. Gupta, O. Shmueli, and J. Widom, editors, VLDB, 1998.</li>
+<li>P. N. Yianilos. Data structures and algorithms for nearest neighbor search in general metric spaces. In SODA, pages 311–321, 1993.</li>
+<li>J. Zhai, Y. Lou, and J. Gehrke. Atlas: a probabilistic algorithm for high dimensional similarity search. In SIGMOD, 2011.</li>
+</ol>
+<h1 id="附录A-参数设置"><a href="#附录A-参数设置" class="headerlink" title="附录A 参数设置"></a>附录A 参数设置</h1><p>在本节中，我们仔细调整所有算法，以便在合理的索引空间和构造时间开销的情况下实现良好的搜索性能。 默认情况下，除非特别提及，否则我们使用经验证的数据点的数量（即计算到查询的确切距离），表示为 $N$，以实现搜索质量和搜索速度之间的折衷。</p>
+<h2 id="SRS-1"><a href="#SRS-1" class="headerlink" title="SRS"></a>SRS</h2><p>我们在两个版本中测试SRS：外部存储版本和内部存储版本。在本文中，我们没有使用早期终止测试，而是在搜索已经访问了足够多的点时停止搜索。同时，将近似比 $c$ 设置为4，外部存储版本的页面大小为4096。为了公平起见，所有与数据无关的方法的成功概率都设置为 $1/2 - 1/e$。因此，SRS算法有两个参数 $T’$（查询处理中访问的最大数据点数量）和 $m$（投影空间维数）。我们改变了访问数据点的数量，从而在一定 $m$ 下调整搜索质量和搜索速度之间的平衡。</p>
+<p><strong>外部存储版本</strong></p>
+<p>图17显示了不同投影维下搜索性能的变化。随着投影维数 $m$ 的增加，SRS可以获得更好的性能。</p>
+<p><img src="http://image.rexking6.top/img/clip1552265481.png" alt=""></p>
+<p><em>图17. 不同的 $m$ 下IO加速比vs召回率（外部存储SRS）。</em></p>
+<p><strong>内部存储版本</strong></p>
+<p>对于内部存储版本，我们使用蛮力时间和搜索时间的比值来比较加速。从图18中可以看出，随着 $m$ 值的增加，高召回率可以得到更高的加速比，而搜索速度在要求相对适中的召回率时更快。考虑到各个方面，$m$ 从8到10的值提供了一个很好的权衡。</p>
+<p><img src="http://image.rexking6.top/img/clip1552265792.png" alt=""></p>
+<p><em>图18. 不同的 $m$ 下加速比vs召回率（内部存储SRS）。</em></p>
+<h2 id="QALSH-1"><a href="#QALSH-1" class="headerlink" title="QALSH"></a>QALSH</h2><p>因为QALSH没有发布内部存储版本的源代码，所以我们只测试了外部存储版本的性能。我们使用QALSH的默认设置并调优 $c$ 值（近似比）以获得不同的搜索性能。</p>
+<p><img src="http://image.rexking6.top/img/clip1552265846.png" alt=""></p>
+<p><em>图19. QALSH的IO加速比vs召回率。</em></p>
+<h2 id="可扩展图哈希"><a href="#可扩展图哈希" class="headerlink" title="可扩展图哈希"></a>可扩展图哈希</h2><p>在SGH中，我们使用作者推荐的默认设置。在核特征构造中，采用高斯核函数，以300个随机采样点为核基。因此，我们比较了不同哈希码长度 $b$ 的搜索精度。对于大多数数据集，与较大的哈希码相比，$b = 8$ 总是获得最差的搜索性能，并且可以使用128位实现最佳加速。</p>
+<p><img src="http://image.rexking6.top/img/clip1552266086.png" alt=""></p>
+<p><em>图20. 不同的 $b$ 下加速比vs召回率（SGH）。</em></p>
+<h2 id="锚图哈希"><a href="#锚图哈希" class="headerlink" title="锚图哈希"></a>锚图哈希</h2><p>为了运行1-AGH和2-AGH，我们必须确定三个参数：$m$（锚的数量）、$s$（每个点需要考虑最近的锚的数量）和哈希码长度 $b$。我们关注 $m=300, s=5$。</p>
+<p>以下是1-AGH和2-AGH的比较。 我们首先展示具有不同长度哈希码的单层AGH和双层AGH的搜索性能。 对于大多数数据集，似乎使用更长的哈希码可以获得更高的性能。因此，我们只比较了 $b = 64$ 和 $b = 128$ 在AGH层上的性能。我们可以观察到，对于大多数数据集，2-AGH比1-AGH提供了更好的性能。</p>
+<p><img src="http://image.rexking6.top/img/clip1552267325.png" alt=""></p>
+<p><em>图21. 不同的 $b$ 下加速比vs召回率（AGH）。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1552268669.png" alt=""></p>
+<p><em>图22. 1-AGH和2-AGH的加速比vs召回率。</em></p>
+<h2 id="近邻敏感哈希-1"><a href="#近邻敏感哈希-1" class="headerlink" title="近邻敏感哈希"></a>近邻敏感哈希</h2><p>我们将数据轴数 $m$ 设置为 $4b$，其中 $b$ 是哈希码的长度，并使用k-means++来生成如作者所描述的数据轴。$η$ 的值设定为从数据轴到其最近数据轴的平均距离的1.9倍。 我们调整 $b$ 的值以获得最佳性能。</p>
+<p><img src="http://image.rexking6.top/img/clip1552268751.png" alt=""></p>
+<p><em>图23. 不同的 $b$ 下加速比vs召回率（NSH）。</em></p>
+<h2 id="NAPP-1"><a href="#NAPP-1" class="headerlink" title="NAPP"></a>NAPP</h2><p>调整NAPP涉及选择三个参数：$PP$（数据轴的总数），$P_i$（索引数据轴的数量）和 $P_s$（具有查询的共享数据轴的数量）。根据[34]中的实验，$PP$ 在500和2000之间的值提供了良好的权衡。较大值的 $PP$ 将需要很长的构建时间。我们将 $PP$ 的值从500调整到2000。作者还建议 $P_i$ 的值为32。我们将改变 $P_s$ 以获得不同的搜索性能。</p>
+<p><img src="http://image.rexking6.top/img/clip1552268902.png" alt=""></p>
+<p><em>图24. 不同的 $m$ 下加速比vs召回率（NAPP）。</em></p>
+<h2 id="选择性哈希-1"><a href="#选择性哈希-1" class="headerlink" title="选择性哈希"></a>选择性哈希</h2><p>实验使用作者提供的默认参数设置执行。每个表的桶总数为9973。半径 $\mathcal G$ 的数量被设置为20。我们改变检索点的数量 $T$ 和近似比 $c$，以得到不同的召回率。</p>
+<p><img src="http://image.rexking6.top/img/clip1552269270.png" alt=""></p>
+<p><em>图25. 不同的 $c$ 下加速比vs召回率（SH）。</em></p>
+<h2 id="OPQ"><a href="#OPQ" class="headerlink" title="OPQ"></a>OPQ</h2><p>使用具有 $M$ 个子空间和 $k$ 个子码字的优化乘积量化来构建倒排多索引。 使用由自然顺序初始化的非参数解优化乘积量化。 使用 $M = 2$ 生成OPQ并且评估最多 $T$ 个数据点以获得不同的搜索权衡。 对于大多数数据集，$k = 10$ 将获得良好的性能，而 $k = 8$ 对于具有小数据点的数据集将更好。</p>
+<p><img src="http://image.rexking6.top/img/clip1552269528.png" alt=""></p>
+<p><em>图26. 不同的 $k$ 下加速比vs召回率（OPQ）。</em></p>
+<h2 id="VP树-1"><a href="#VP树-1" class="headerlink" title="VP树"></a>VP树</h2><p>在<code>NonMetricSpaceLibrary</code>，VP树使用一个简单的多项式修剪工具来生成最优参数 $\alpha_{left}$ 和 $\alpha_{right}$。我们使用自动调优过程，通过给定输入参数目标（即预期的召回率）和 $b$（叶节点中的最大数据点数量）来产生不同的搜索性能。</p>
+<p><img src="http://image.rexking6.top/img/clip1552301997.png" alt=""></p>
+<p><em>图26. 不同的 $b$ 下加速比vs召回率（VP树）。</em></p>
+<h2 id="Annoy-1"><a href="#Annoy-1" class="headerlink" title="Annoy"></a>Annoy</h2><p>Annoy只涉及一个参数：树的数量 $f$。 表7和8显示了索引大小和构造时间复杂度与 $f$ 呈线性关系。使用多个Annoy树可以显着提高搜索性能，而对于大多数数据集，当 $f$ 大于50时，增长率会缓慢变化。综合考虑搜索性能和索引性能，我们为所有数据集构建了50棵树。</p>
+<p><img src="http://image.rexking6.top/img/clip1552302186.png" alt=""></p>
+<p><em>表7. 使用不同树的构建时间。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1552302263.png" alt=""></p>
+<p><em>表8. 使用不同树的索引大小。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1552302299.png" alt=""></p>
+<p><em>图28. 不同的 $f​$ 下加速比vs召回率（Annoy）。</em></p>
+<h2 id="HKMeans"><a href="#HKMeans" class="headerlink" title="HKMeans"></a>HKMeans</h2><p>我们在k均值聚类中随机选择初始化中心。 根据Flann源代码的建议，我们应用迭代次数 $iter$ 和分支大小 $b$ 的不同组合来生成召回率和加速比的权衡。</p>
+<p><img src="http://image.rexking6.top/img/clip1552302517.png" alt=""></p>
+<p><em>图29. 不同的 $iter$ 下加速比vs召回率（Flann-HKM）。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1552302766.png" alt=""></p>
+<p><em>图30. 不同的 $b$ 下加速比vs召回率（Flann-HKM）。</em></p>
+<h2 id="KD树"><a href="#KD树" class="headerlink" title="KD树"></a>KD树</h2><p>除了参数 $t$ 是随机kd树的数量外，我们使用源代码提供的默认设置。随着树的数量的增加，搜索性能会得到提高。而当 $t$ 大于8时，加速比并不明显增加。</p>
+<p><img src="http://image.rexking6.top/img/clip1552302572.png" alt=""></p>
+<p><em>图31. 不同的 $t​$ 下加速比vs召回率（Flann-KD）。</em></p>
+<h2 id="Flann"><a href="#Flann" class="headerlink" title="Flann"></a>Flann</h2><p>Flann将成本定义为搜索时间、树构建时间和树内存开销的组合。</p>
+<p>我们使用默认搜索精度（90％）和权衡因子 $wb$ 和 $wm$ 的几种组合。 对于构建时间权重 $wb$，我们使用了三个不同的可能值：0代表我们不关心树构建时间的情况，1代表树构建时间和搜索时间具有相同重要性的情况和0.01代表我们主要关心搜索时间的情况，但我们也想避免较长的构建时间。 类似地，对于不考虑存储使用的情况，存储器权重选择为0；对于主要考虑存储使用的情况，存储器权重选择为0；1表示介于这两种情况之间。</p>
+<p>当我们更多地关注存储使用的大小时，搜索速度非常低，几乎下降到线性扫描的速度。对于具有中等数据大小的数据集或具有足够内存的系统，$wm$ 为0将提供良好的搜索性能。由于 $wb$ 再较大和较小之间的搜索性能差距较大，本文选取0.01作为 $wb​$ 的值。</p>
+<p><img src="http://image.rexking6.top/img/clip1552303296.png" alt=""></p>
+<p><em>图32. 不同的 $wm​$ 下加速比vs召回率（Flann）。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1552303365.png" alt=""></p>
+<p><em>图33. 不同的 $wb​$ 下加速比vs召回率（Flann）。</em></p>
+<h2 id="Small-World-1"><a href="#Small-World-1" class="headerlink" title="Small World"></a>Small World</h2><p>Small World涉及到参数 $NN$（在索引构造过程中找到最接近查询的近邻点）。$S$（搜索过程中使用的进入数）是一个搜索参数，我们对 $S$ 值进行调优，以获得搜索速度和质量之间的权衡。构造算法计算量大，搜索时间与 $NN$ 的值基本成线性关系。图34显示了不同 $NN$ 的加速效果。$NN$ 比较小时对低召回率率有较好的搜索性能，而对高召回率有较差的搜索性能。对于大多数数据集，当 $NN$ 值为10或20时，该算法可以提供良好的搜索折衷。</p>
+<p><img src="http://image.rexking6.top/img/clip1552303422.png" alt=""></p>
+<p><em>图34. 不同的 $NN​$ 下加速比vs召回率（SW）。</em></p>
+<h2 id="Hierarchical-Navigable-Small-World-1"><a href="#Hierarchical-Navigable-Small-World-1" class="headerlink" title="Hierarchical Navigable Small World"></a>Hierarchical Navigable Small World</h2><p>在索引复杂度和搜索性能之间进行权衡时，主要采用两个参数：$M$ 表示索引阶段某些层中潜在邻居的大小，$efConstruction$ 用于控制索引过程中邻居的质量。我们使用 $efConstruction$ 的默认值，它被设置为200。$efSearch$ 是一个类似于 $efConstruction$ 的参数，用于控制搜索质量。我们改变了 $efSearch$ 的值，以便在搜索速度和质量之间进行权衡。图35显示了不同 $M$ 的搜索性能。与 $SW$ 相似，较小的 $M$ 值对于低召回率的搜索性能很好，但是对于高召回率的搜索性能下降。我们将 $M = 10$ 设为默认值。</p>
+<p><img src="http://image.rexking6.top/img/clip1552303495.png" alt=""></p>
+<p><em>图35. 不同的 $M​$ 下加速比vs召回率（HNSW）。</em></p>
+<h2 id="Rank-Cover-Tree-1"><a href="#Rank-Cover-Tree-1" class="headerlink" title="Rank Cover Tree"></a>Rank Cover Tree</h2><p>在RCT中，有参数：$B$（$1/B$ 是从较低级别采样的采样率，可以确定树的高度 $h$），$p$（每个节点的父级的最大数量）和覆盖参数 $ω$。 根据作者的建议，我们选择 $h = 4$ 来建立排名覆盖树。</p>
+<p><img src="http://image.rexking6.top/img/clip1552303661.png" alt=""></p>
+<p><em>图36. 加速比vs召回率（RCT）。</em></p>
+<h2 id="KGraph-1"><a href="#KGraph-1" class="headerlink" title="KGraph"></a>KGraph</h2><p>KNN图包括三个参数：$IK$（与每个顶点连接的最相似的对象的数量），采样率 $ρ$，终止阈值 $ζ$ 和 $P$（开始搜索的初始项数量）。$ζ$ 的含义是提前终止可以容忍的召回率损失。我们使用默认终止阈值 $0.002$。据作者报道，召回率增长缓慢超过 $ρ= 0.5$。 在这里，我们研究 $IK$ 和 $ρ$ 对性能的影响。 从图37中，我们发现大多数数据集需要 $K&gt; 40$。</p>
+<p><img src="http://image.rexking6.top/img/clip1552303730.png" alt=""></p>
+<p><em>图37. 不同的 $L$ 下加速比vs召回率（KGraph）。</em></p>
+<h2 id="DPG"><a href="#DPG" class="headerlink" title="DPG"></a>DPG</h2><p>DPG的参数调整类似于KGraph的参数调整。 在实验中，除了我们使用 $κ= K/2 = 20$ 之外，DPG与KGraph具有相同的设置，因此在最坏的情况下DPG的索引大小与KGraph的索引大小相同。</p>
+<p>图38示出了使用基于计数的多样化（即DPG_C）与使用基于角度相似性的多样化（即DPG_O）类似的搜索性能。</p>
+<p><img src="http://image.rexking6.top/img/clip1552303817.png" alt=""></p>
+<p><em>图38. 基于计数的DPG和基于角度的DPG之间的加速比vs召回率。</em></p>
+<p>图39显示了基于计数的DPG和基于角度的DPG多样化时间的比较。与DPG_O相比，DPG_C花费的时间更少。</p>
+<p><img src="http://image.rexking6.top/img/clip1552303895.png" alt=""></p>
+<p><em>图39. DPG_C和DPG_O之间的多样化时间。</em></p>
+<h2 id="默认设置"><a href="#默认设置" class="headerlink" title="默认设置"></a>默认设置</h2><p>下面是8.5第二轮评估中算法的关键参数的默认设置。</p>
+<ul>
+<li><strong>SRS。</strong>投影数（$m$）设置为8。</li>
+<li><strong>OPQ。</strong>子空间的数量为2，每个子空间可以有210个码字（即聚类中心)。</li>
+<li><strong>Annoy。</strong>Annoy树的数量 $m$ 被设置为50。</li>
+<li><strong>FLANN。</strong>我们让算法调整它自己的参数。</li>
+<li><strong>HNSW。</strong>每个点的连接数 $M$ 被设置为10。</li>
+<li><strong>KGraph。</strong>默认情况下，我们使用 $K = 40$ 作为KNN 图索引。</li>
+<li><strong>DPG。</strong>我们使用 $κ= K/2 = 20$，DPG的索引大小和KGraph在最坏的情况下一样。</li>
+</ul>
+<h1 id="附录B-第二轮评审补充"><a href="#附录B-第二轮评审补充" class="headerlink" title="附录B 第二轮评审补充"></a>附录B 第二轮评审补充</h1><p>图40和41显示了剩余数据集的搜索质量（召回率）和搜索时间（加速比和要访问的数据点的百分比）之间的权衡（一些已在8.5中显示）。</p>
+<p><img src="http://image.rexking6.top/img/clip1552303988.png" alt=""></p>
+<p><em>图40. 加速比vs召回率。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1552304056.png" alt=""></p>
+<p><em>图41. 召回率vs访问的数据点的百分比。</em></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\24\Bag-of-visual-word视觉词袋\" rel="bookmark">Bag-of-visual word视觉词袋</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\10\12\Fisher-Kernel-Fisher-Vector\" rel="bookmark">Fisher Kernel&Fisher Vector</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\28\Geometric-Verification几何验证\" rel="bookmark">Geometric Verification几何验证</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2019/03/08/%E3%80%8AApproximate-Nearest-Neighbor-Search-on-High-Dimensional-Data-%E2%80%94-Experiments-Analyses-and-Improvement-v1-0-%E3%80%8B%E7%AC%94%E8%AE%B0/" title="《Approximate Nearest Neighbor Search on High Dimensional Data — Experiments, Analyses, and Improvement (v1.0)》笔记">https://blog.rexking6.top/2019/03/08/《Approximate-Nearest-Neighbor-Search-on-High-Dimensional-Data-—-Experiments-Analyses-and-Improvement-v1-0-》笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%9B%BE%E5%83%8F%E6%A3%80%E7%B4%A2/" rel="tag"># 图像检索</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/03/03/%E3%80%8ADetecting-Spacecraf-Anomalies-Using-LSTMs-and-Nonparametric-Dynamic-Thresholding%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="prev" title="《Detecting Spacecraf Anomalies Using LSTMs and Nonparametric Dynamic Thresholding》笔记">
+      <i class="fa fa-chevron-left"></i> 《Detecting Spacecraf Anomalies Using LSTMs and Nonparametric Dynamic Thresholding》笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/03/14/%E3%80%8AParticular-object-retrieval-with-integral-max-pooling-of-CNN-activations%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="next" title="《Particular object retrieval with integral max-pooling of CNN activations》笔记">
+      《Particular object retrieval with integral max-pooling of CNN activations》笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">2.</span> <span class="nav-text">引言</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%9C%BA"><span class="nav-number">2.1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B4%A1%E7%8C%AE"><span class="nav-number">2.2.</span> <span class="nav-text">贡献</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">3.</span> <span class="nav-text">背景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E5%AE%9A%E4%B9%89"><span class="nav-number">3.1.</span> <span class="nav-text">问题定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%82%E7%94%A8%E8%8C%83%E5%9B%B4"><span class="nav-number">3.2.</span> <span class="nav-text">适用范围</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8ELSH%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">基于LSH的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SRS"><span class="nav-number">4.1.</span> <span class="nav-text">SRS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#QALSH"><span class="nav-number">4.2.</span> <span class="nav-text">QALSH</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E7%BC%96%E7%A0%81%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">基于编码的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%9A-%E5%9B%BE%E5%93%88%E5%B8%8C"><span class="nav-number">5.1.</span> <span class="nav-text">锚 图哈希</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E4%BC%B8%E7%BC%A9%E7%9A%84%E5%9B%BE%E5%93%88%E5%B8%8C"><span class="nav-number">5.2.</span> <span class="nav-text">可伸缩的图哈希</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%91%E9%82%BB%E6%95%8F%E6%84%9F%E5%93%88%E5%B8%8C"><span class="nav-number">5.3.</span> <span class="nav-text">近邻敏感哈希</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NAPP"><span class="nav-number">5.4.</span> <span class="nav-text">NAPP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E6%80%A7%E5%93%88%E5%B8%8C"><span class="nav-number">5.5.</span> <span class="nav-text">选择性哈希</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E4%B9%98%E7%A7%AF%E9%87%8F%E5%8C%96%EF%BC%88OPQ%EF%BC%89"><span class="nav-number">5.6.</span> <span class="nav-text">优化乘积量化（OPQ）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E6%A0%91%E7%9A%84%E7%A9%BA%E9%97%B4%E5%88%92%E5%88%86%E6%96%B9%E6%B3%95"><span class="nav-number">6.</span> <span class="nav-text">基于树的空间划分方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#FLANN"><span class="nav-number">6.1.</span> <span class="nav-text">FLANN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Annoy"><span class="nav-number">6.2.</span> <span class="nav-text">Annoy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VP%E6%A0%91"><span class="nav-number">6.3.</span> <span class="nav-text">VP树</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E9%82%BB%E5%9F%9F%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">7.</span> <span class="nav-text">基于邻域的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#KGraph"><span class="nav-number">7.1.</span> <span class="nav-text">KGraph</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Small-World"><span class="nav-number">7.2.</span> <span class="nav-text">Small World</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hierarchical-Navigable-Small-World"><span class="nav-number">7.3.</span> <span class="nav-text">Hierarchical Navigable Small World</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rank-Cover-Tree"><span class="nav-number">7.4.</span> <span class="nav-text">Rank Cover Tree</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Diversified-Proximity-Graph"><span class="nav-number">8.</span> <span class="nav-text">Diversified Proximity Graph</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%9C%BA-1"><span class="nav-number">8.1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E6%A0%B7%E5%8C%96%E9%82%BB%E8%BF%91%E5%9B%BE"><span class="nav-number">8.2.</span> <span class="nav-text">多样化邻近图</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C"><span class="nav-number">9.</span> <span class="nav-text">实验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="nav-number">9.1.</span> <span class="nav-text">实验设置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E8%AF%84%E4%BC%B0"><span class="nav-number">9.1.1.</span> <span class="nav-text">算法评估</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86%E5%92%8C%E6%9F%A5%E8%AF%A2%E5%B7%A5%E4%BD%9C%E8%B4%9F%E8%BD%BD"><span class="nav-number">9.1.2.</span> <span class="nav-text">数据集和查询工作负载</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87"><span class="nav-number">9.2.</span> <span class="nav-text">评价指标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E8%B0%83%E6%95%B4"><span class="nav-number">9.3.</span> <span class="nav-text">参数调整</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AF%8F%E4%B8%AA%E5%88%86%E7%B1%BB%E4%B8%AD%E7%9A%84%E6%AF%94%E8%BE%83"><span class="nav-number">9.4.</span> <span class="nav-text">每个分类中的比较</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8ELSH%E7%9A%84%E6%96%B9%E6%B3%95-1"><span class="nav-number">9.4.1.</span> <span class="nav-text">基于LSH的方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E7%BC%96%E7%A0%81%E7%9A%84%E6%96%B9%E6%B3%95-1"><span class="nav-number">9.4.2.</span> <span class="nav-text">基于编码的方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E6%A0%91%E7%9A%84%E7%A9%BA%E9%97%B4%E5%88%92%E5%88%86%E6%96%B9%E6%B3%95-1"><span class="nav-number">9.4.3.</span> <span class="nav-text">基于树的空间划分方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E9%82%BB%E5%9F%9F%E7%9A%84%E6%96%B9%E6%B3%95-1"><span class="nav-number">9.4.4.</span> <span class="nav-text">基于邻域的方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E8%BD%AE%E8%AF%84%E4%BC%B0"><span class="nav-number">9.5.</span> <span class="nav-text">第二轮评估</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%90%9C%E7%B4%A2%E8%B4%A8%E9%87%8F%E5%92%8C%E6%97%B6%E9%97%B4"><span class="nav-number">9.5.1.</span> <span class="nav-text">搜索质量和时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E4%B8%8D%E5%90%8C%E7%9A%84-K-%E6%90%9C%E7%B4%A2"><span class="nav-number">9.5.2.</span> <span class="nav-text">用不同的 $K$ 搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E5%A4%A7%E5%B0%8F%E5%92%8C%E6%9E%84%E5%BB%BA%E6%97%B6%E9%97%B4"><span class="nav-number">9.5.3.</span> <span class="nav-text">索引大小和构建时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E4%BC%B8%E7%BC%A9%E6%80%A7%E8%AF%84%E4%BC%B0"><span class="nav-number">9.5.4.</span> <span class="nav-text">可伸缩性评估</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E9%9A%BE%E7%9A%84%E6%9F%A5%E8%AF%A2%E5%B7%A5%E4%BD%9C%E8%B4%9F%E8%BD%BD"><span class="nav-number">9.5.5.</span> <span class="nav-text">更难的查询工作负载</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">9.6.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9B%E4%B8%80%E6%AD%A5%E5%88%86%E6%9E%90"><span class="nav-number">10.</span> <span class="nav-text">进一步分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E7%A9%BA%E9%97%B4%E5%88%92%E5%88%86%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">10.1.</span> <span class="nav-text">基于空间划分的方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E9%82%BB%E5%9F%9F%E7%9A%84%E6%96%B9%E6%B3%95-2"><span class="nav-number">10.2.</span> <span class="nav-text">基于邻域的方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8E%E4%BB%A5%E5%89%8D%E7%9A%84%E5%9F%BA%E5%87%86%E8%BF%9B%E8%A1%8C%E6%AF%94%E8%BE%83"><span class="nav-number">10.3.</span> <span class="nav-text">与以前的基准进行比较</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E5%92%8C%E6%9C%AA%E6%9D%A5%E7%9A%84%E5%B7%A5%E4%BD%9C"><span class="nav-number">11.</span> <span class="nav-text">结论和未来的工作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">12.</span> <span class="nav-text">引用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%99%84%E5%BD%95A-%E5%8F%82%E6%95%B0%E8%AE%BE%E7%BD%AE"><span class="nav-number">13.</span> <span class="nav-text">附录A 参数设置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SRS-1"><span class="nav-number">13.1.</span> <span class="nav-text">SRS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#QALSH-1"><span class="nav-number">13.2.</span> <span class="nav-text">QALSH</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E6%89%A9%E5%B1%95%E5%9B%BE%E5%93%88%E5%B8%8C"><span class="nav-number">13.3.</span> <span class="nav-text">可扩展图哈希</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%9A%E5%9B%BE%E5%93%88%E5%B8%8C"><span class="nav-number">13.4.</span> <span class="nav-text">锚图哈希</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%91%E9%82%BB%E6%95%8F%E6%84%9F%E5%93%88%E5%B8%8C-1"><span class="nav-number">13.5.</span> <span class="nav-text">近邻敏感哈希</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NAPP-1"><span class="nav-number">13.6.</span> <span class="nav-text">NAPP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E6%80%A7%E5%93%88%E5%B8%8C-1"><span class="nav-number">13.7.</span> <span class="nav-text">选择性哈希</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OPQ"><span class="nav-number">13.8.</span> <span class="nav-text">OPQ</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VP%E6%A0%91-1"><span class="nav-number">13.9.</span> <span class="nav-text">VP树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Annoy-1"><span class="nav-number">13.10.</span> <span class="nav-text">Annoy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HKMeans"><span class="nav-number">13.11.</span> <span class="nav-text">HKMeans</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#KD%E6%A0%91"><span class="nav-number">13.12.</span> <span class="nav-text">KD树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flann"><span class="nav-number">13.13.</span> <span class="nav-text">Flann</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Small-World-1"><span class="nav-number">13.14.</span> <span class="nav-text">Small World</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hierarchical-Navigable-Small-World-1"><span class="nav-number">13.15.</span> <span class="nav-text">Hierarchical Navigable Small World</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rank-Cover-Tree-1"><span class="nav-number">13.16.</span> <span class="nav-text">Rank Cover Tree</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#KGraph-1"><span class="nav-number">13.17.</span> <span class="nav-text">KGraph</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DPG"><span class="nav-number">13.18.</span> <span class="nav-text">DPG</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%BB%98%E8%AE%A4%E8%AE%BE%E7%BD%AE"><span class="nav-number">13.19.</span> <span class="nav-text">默认设置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%99%84%E5%BD%95B-%E7%AC%AC%E4%BA%8C%E8%BD%AE%E8%AF%84%E5%AE%A1%E8%A1%A5%E5%85%85"><span class="nav-number">14.</span> <span class="nav-text">附录B 第二轮评审补充</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

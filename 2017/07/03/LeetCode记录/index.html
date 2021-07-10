@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeetCode记录">
+<meta property="og:url" content="https://blog.rexking6.top/2017/07/03/LeetCode%E8%AE%B0%E5%BD%95/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-07-03T00:04:00.000Z">
+<meta property="article:modified_time" content="2019-03-06T09:18:02.351Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="笔试面试">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.rexking6.top/2017/07/03/LeetCode%E8%AE%B0%E5%BD%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>LeetCode记录 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2017/07/03/LeetCode%E8%AE%B0%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LeetCode记录
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-07-03 08:04:00" itemprop="dateCreated datePublished" datetime="2017-07-03T08:04:00+08:00">2017-07-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 17:18:02" itemprop="dateModified" datetime="2019-03-06T17:18:02+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AF%95%E9%9D%A2%E8%AF%95/" itemprop="url" rel="index"><span itemprop="name">笔试面试</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2017/07/03/LeetCode%E8%AE%B0%E5%BD%95/" class="post-meta-item leancloud_visitors" data-flag-title="LeetCode记录" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>23k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>21 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Shell"><a href="#Shell" class="headerlink" title="Shell"></a>Shell</h1><h2 id="195-Tenth-Line"><a href="#195-Tenth-Line" class="headerlink" title="195. Tenth Line"></a>195. Tenth Line</h2><p>How would you print just the 10th line of a file?<br>For example, assume that <code>file.txt</code> has the following content:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Line 1</span><br><span class="line">Line 2</span><br><span class="line">Line 3</span><br><span class="line">Line 4</span><br><span class="line">Line 5</span><br><span class="line">Line 6</span><br><span class="line">Line 7</span><br><span class="line">Line 8</span><br><span class="line">Line 9</span><br><span class="line">Line 10</span><br></pre></td></tr></table></figure><br>Your script should output the tenth line, which is:</p>
+<pre><code>Line 10
+</code></pre><h3 id="Solutions"><a href="#Solutions" class="headerlink" title="Solutions"></a>Solutions</h3><h4 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h4><pre><code>sed -n &#39;10p&#39; file.txt
+</code></pre><h4 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h4><pre><code>awk &#39;FNR==10&#39; file.txt
+</code></pre><h4 id="tail"><a href="#tail" class="headerlink" title="tail"></a>tail</h4><pre><code>tail -n+10 file.txt|head -1
+</code></pre><h4 id="head"><a href="#head" class="headerlink" title="head"></a>head</h4><pre><code>head -n+10 file.txt|tail -1
+</code></pre><h4 id="手动"><a href="#手动" class="headerlink" title="手动"></a>手动</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">cnt=0</span><br><span class="line">while read line &amp;&amp; [ $cnt -le 10 ]; do</span><br><span class="line">  let &#x27;cnt = cnt + 1&#x27;</span><br><span class="line">  if [ $cnt -eq 10 ]; then</span><br><span class="line">    echo $line</span><br><span class="line">    exit 0</span><br><span class="line">  fi</span><br><span class="line">done &lt; file.txt</span><br></pre></td></tr></table></figure>
+<h2 id="193-Valid-Phone-Numbers"><a href="#193-Valid-Phone-Numbers" class="headerlink" title="193. Valid Phone Numbers"></a>193. Valid Phone Numbers</h2><p>Given a text file <code>file.txt</code> that contains list of phone numbers (one per line), write a one liner bash script to print all valid phone numbers.</p>
+<p>You may assume that a valid phone number must appear in one of the following two formats: <code>(xxx) xxx-xxxx</code> or <code>xxx-xxx-xxxx</code>. (<code>x</code> means a digit)</p>
+<p>You may also assume each line in the text file must not contain leading or trailing white spaces.</p>
+<p>For example, assume that <code>file.txt</code> has the following content:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">987-123-4567</span><br><span class="line">123 456 7890</span><br><span class="line">(123) 456-7890</span><br></pre></td></tr></table></figure>
+<p>Your script should output the following valid phone numbers:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">987-123-4567</span><br><span class="line">(123) 456-7890</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solutions-1"><a href="#Solutions-1" class="headerlink" title="Solutions"></a>Solutions</h3><p>一开始写的时候只注意到了EREs不能用\d、\w，然后就老老实实地换成了[[:digit:]]：</p>
+<pre><code>egrep &quot;(^\([[:digit:]]&#123;3&#125;\)[[:space:]]|^[[:digit:]]&#123;3&#125;\-)[[:digit:]]&#123;3&#125;\-[[:digit:]]&#123;4&#125;$&quot; file.txt
+</code></pre><p>之后看别人提交才发现加”-P”就可以换成PREs，就可以用\d、\w，这是别人的提交：</p>
+<pre><code>grep -P &#39;^(\d&#123;3&#125;-|\(\d&#123;3&#125;\) )\d&#123;3&#125;-\d&#123;4&#125;$&#39; file.txt
+</code></pre><h2 id="192-Word-Frequency"><a href="#192-Word-Frequency" class="headerlink" title="192. Word Frequency"></a>192. Word Frequency</h2><p>Write a bash script to calculate the frequency of each word in a text file <code>words.txt</code>.</p>
+<p>For simplicity sake, you may assume:</p>
+<ul>
+<li><code>words.txt</code> contains only lowercase characters and space <code>&#39; &#39;</code> characters.</li>
+<li>Each word must consist of lowercase characters only.</li>
+<li>Words are separated by one or more whitespace characters.<br>For example, assume that <code>words.txt</code> has the following content:<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">the day is sunny the the</span><br><span class="line">the sunny is is</span><br></pre></td></tr></table></figure>
+Your script should output the following, sorted by descending frequency:<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">the 4</span><br><span class="line">is 3</span><br><span class="line">sunny 2</span><br><span class="line">day 1</span><br></pre></td></tr></table></figure>
+Note:<br>Don’t worry about handling ties, it is guaranteed that each word’s frequency count is unique.<h3 id="Solutions-2"><a href="#Solutions-2" class="headerlink" title="Solutions"></a>Solutions</h3><code>cat words.txt | tr &#39; &#39; &#39;\n&#39; | tr -s &#39;\n&#39;| sort | uniq -c | sort -r | awk &#39;&#123;print $2,$1&#125;&#39;</code><br>不难，切成一行一个单词，然后排序计数，再排序就好了。</li>
+</ul>
+<h2 id="194-Transpose-File"><a href="#194-Transpose-File" class="headerlink" title="194. Transpose File"></a>194. Transpose File</h2><p>Given a text file <code>file.txt</code>, transpose its content.</p>
+<p>You may assume that each row has the same number of columns and each field is separated by the <code>&#39; &#39;</code> character.</p>
+<p>For example, if <code>file.txt</code> has the following content:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">name age</span><br><span class="line">alice 21</span><br><span class="line">ryan 30</span><br></pre></td></tr></table></figure><br>Output the following:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">name alice ryan</span><br><span class="line">age 21 30</span><br></pre></td></tr></table></figure><br>要用到awk的高级用法，一脸懵逼，答案是网上的：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">awk &#x27;</span><br><span class="line">&#123; </span><br><span class="line">    for (i = 1; i &lt;= NF; i++)  &#123;</span><br><span class="line">        a[NR, i] = $i</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">NF &gt; p &#123; p = NF &#125;</span><br><span class="line">END &#123;    </span><br><span class="line">    for (j = 1; j &lt;= p; j++) &#123;</span><br><span class="line">        str = a[1, j]</span><br><span class="line">        for (i = 2; i &lt;= NR; i++)&#123;</span><br><span class="line">            str = str &quot; &quot; a[i, j]</span><br><span class="line">        &#125;</span><br><span class="line">        print str</span><br><span class="line">    &#125;</span><br><span class="line">&#125;&#x27; file.txt</span><br></pre></td></tr></table></figure></p>
+<h1 id="Database"><a href="#Database" class="headerlink" title="Database"></a>Database</h1><h2 id="595-Big-Countries"><a href="#595-Big-Countries" class="headerlink" title="595. Big Countries"></a>595. Big Countries</h2><p>There is a table <code>World</code><br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+-----------------+------------+------------+--------------+---------------+</span><br><span class="line">| name            | continent  | area       | population   | gdp           |</span><br><span class="line">+-----------------+------------+------------+--------------+---------------+</span><br><span class="line">| Afghanistan     | Asia       | 652230     | 25500100     | 20343000      |</span><br><span class="line">| Albania         | Europe     | 28748      | 2831741      | 12960000      |</span><br><span class="line">| Algeria         | Africa     | 2381741    | 37100000     | 188681000     |</span><br><span class="line">| Andorra         | Europe     | 468        | 78115        | 3712000       |</span><br><span class="line">| Angola          | Africa     | 1246700    | 20609294     | 100990000     |</span><br><span class="line">+-----------------+------------+------------+--------------+---------------+</span><br></pre></td></tr></table></figure><br>A country is big if it has an area of bigger than 3 million square km or a population of more than 25 million.</p>
+<p>Write a SQL solution to output big countries’ name, population and area.</p>
+<p>For example, according to the above table, we should output:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+--------------+-------------+--------------+</span><br><span class="line">| name         | population  | area         |</span><br><span class="line">+--------------+-------------+--------------+</span><br><span class="line">| Afghanistan  | 25500100    | 652230       |</span><br><span class="line">| Algeria      | 37100000    | 2381741      |</span><br><span class="line">+--------------+-------------+--------------+</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solutions-3"><a href="#Solutions-3" class="headerlink" title="Solutions"></a>Solutions</h3><p><code>SELECT name,population,area FROM World WHERE population&gt;25000000 OR area&gt;3000000;</code><br>很容易，注意million是百万。</p>
+<h2 id="627-Swap-Salary"><a href="#627-Swap-Salary" class="headerlink" title="627. Swap Salary"></a>627. Swap Salary</h2><p>Given a table <code>salary</code>, such as the one below, that has m=male and f=female values. Swap all f and m values (i.e., change all f values to m and vice versa) with a single update query and no intermediate temp table.</p>
+<p>For example:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">| id | name | sex | salary |</span><br><span class="line">|----|------|-----|--------|</span><br><span class="line">| 1  | A    | m   | 2500   |</span><br><span class="line">| 2  | B    | f   | 1500   |</span><br><span class="line">| 3  | C    | m   | 5500   |</span><br><span class="line">| 4  | D    | f   | 500    |</span><br></pre></td></tr></table></figure><br>After running your query, the above salary table should have the following rows:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">| id | name | sex | salary |</span><br><span class="line">|----|------|-----|--------|</span><br><span class="line">| 1  | A    | f   | 2500   |</span><br><span class="line">| 2  | B    | m   | 1500   |</span><br><span class="line">| 3  | C    | f   | 5500   |</span><br><span class="line">| 4  | D    | m   | 500    |</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solutions-4"><a href="#Solutions-4" class="headerlink" title="Solutions"></a>Solutions</h3><p>sql还是学得太基础了，我自己用的很蠢的方法：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">UPDATE salary SET sex=&#x27;s&#x27; WHERE sex=&#x27;f&#x27;;</span><br><span class="line">UPDATE salary SET sex=&#x27;f&#x27; WHERE sex=&#x27;m&#x27;;</span><br><span class="line">UPDATE salary SET sex=&#x27;m&#x27; WHERE sex=&#x27;s&#x27;;</span><br></pre></td></tr></table></figure><br>看了别人的答案才知道SQL有<code>case when then else end</code>用法：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">--简单Case函数</span><br><span class="line">CASE sex</span><br><span class="line">         WHEN &#x27;1&#x27; THEN &#x27;男&#x27;</span><br><span class="line">         WHEN &#x27;2&#x27; THEN &#x27;女&#x27;</span><br><span class="line">ELSE &#x27;其他&#x27; END</span><br><span class="line">--Case搜索函数</span><br><span class="line">CASE WHEN sex = &#x27;1&#x27; THEN &#x27;男&#x27;</span><br><span class="line">         WHEN sex = &#x27;2&#x27; THEN &#x27;女&#x27;</span><br><span class="line">ELSE &#x27;其他&#x27; END</span><br></pre></td></tr></table></figure><br>所有这题用上来就是：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">update salary</span><br><span class="line">    set sex=(</span><br><span class="line">        case when sex = &#x27;f&#x27; then &#x27;m&#x27;</span><br><span class="line">				when sex = &#x27;m&#x27; then &#x27;f&#x27;</span><br><span class="line">				else sex</span><br><span class="line">    end</span><br><span class="line">    )</span><br></pre></td></tr></table></figure></p>
+<h2 id="620-Not-Boring-Movies"><a href="#620-Not-Boring-Movies" class="headerlink" title="620. Not Boring Movies"></a>620. Not Boring Movies</h2><p>X city opened a new cinema, many people would like to go to this cinema. The cinema also gives out a poster indicating the movies’ ratings and descriptions.</p>
+<p>Please write a SQL query to output movies with an odd numbered ID and a description that is not ‘boring’. Order the result by rating.</p>
+<p>For example, table <code>cinema</code>:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+---------+-----------+--------------+-----------+</span><br><span class="line">|   id    | movie     |  description |  rating   |</span><br><span class="line">+---------+-----------+--------------+-----------+</span><br><span class="line">|   1     | War       |   great 3D   |   8.9     |</span><br><span class="line">|   2     | Science   |   fiction    |   8.5     |</span><br><span class="line">|   3     | irish     |   boring     |   6.2     |</span><br><span class="line">|   4     | Ice song  |   Fantacy    |   8.6     |</span><br><span class="line">|   5     | House card|   Interesting|   9.1     |</span><br><span class="line">+---------+-----------+--------------+-----------+</span><br></pre></td></tr></table></figure><br>For the example above, the output should be:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+---------+-----------+--------------+-----------+</span><br><span class="line">|   id    | movie     |  description |  rating   |</span><br><span class="line">+---------+-----------+--------------+-----------+</span><br><span class="line">|   5     | House card|   Interesting|   9.1     |</span><br><span class="line">|   1     | War       |   great 3D   |   8.9     |</span><br><span class="line">+---------+-----------+--------------+-----------+</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solutions-5"><a href="#Solutions-5" class="headerlink" title="Solutions"></a>Solutions</h3><p><code>SELECT * FROM cinema WHERE id%2=1 AND description!=&#39;boring&#39; ORDER BY rating DESC;</code></p>
+<h2 id="182-Duplicate-Emails"><a href="#182-Duplicate-Emails" class="headerlink" title="182. Duplicate Emails"></a>182. Duplicate Emails</h2><p>Write a SQL query to find all duplicate emails in a table named <code>Person</code>.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">+----+---------+</span><br><span class="line">| Id | Email   |</span><br><span class="line">+----+---------+</span><br><span class="line">| 1  | a@b.com |</span><br><span class="line">| 2  | c@d.com |</span><br><span class="line">| 3  | a@b.com |</span><br><span class="line">+----+---------+</span><br></pre></td></tr></table></figure><br>For example, your query should return the following for the above table:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">+---------+</span><br><span class="line">| Email   |</span><br><span class="line">+---------+</span><br><span class="line">| a@b.com |</span><br><span class="line">+---------+</span><br></pre></td></tr></table></figure><br>Note: All emails are in lowercase.</p>
+<h3 id="Solutions-6"><a href="#Solutions-6" class="headerlink" title="Solutions"></a>Solutions</h3><p>这题有点搞不懂，一开始是想过<code>GROUP BY</code>的，但是<code>GROUP BY</code>的结果貌似是多个子表的，我以为结果是要一张表的，所以一开始思路就奔着整表和去重表求差集再去重的。然后又因为MySQL没有差集和交集的操作，又陷入<code>LEFT JOIN</code>的坑中。</p>
+<p>看了下解答才知道用<code>GROUP BY</code>：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SELECT Email</span><br><span class="line">FROM Person</span><br><span class="line">GROUP BY Email</span><br><span class="line">HAVING COUNT(Email) &gt; 1;</span><br></pre></td></tr></table></figure></p>
+<h2 id="175-Combine-Two-Tables"><a href="#175-Combine-Two-Tables" class="headerlink" title="175. Combine Two Tables"></a>175. Combine Two Tables</h2><p>Table: <code>Person</code><br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+-------------+---------+</span><br><span class="line">| Column Name | Type    |</span><br><span class="line">+-------------+---------+</span><br><span class="line">| PersonId    | int     |</span><br><span class="line">| FirstName   | varchar |</span><br><span class="line">| LastName    | varchar |</span><br><span class="line">+-------------+---------+</span><br><span class="line">PersonId is the primary key column for this table.</span><br></pre></td></tr></table></figure><br>Table: <code>Address</code><br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+-------------+---------+</span><br><span class="line">| Column Name | Type    |</span><br><span class="line">+-------------+---------+</span><br><span class="line">| AddressId   | int     |</span><br><span class="line">| PersonId    | int     |</span><br><span class="line">| City        | varchar |</span><br><span class="line">| State       | varchar |</span><br><span class="line">+-------------+---------+</span><br><span class="line">AddressId is the primary key column for this table.</span><br></pre></td></tr></table></figure><br>Write a SQL query for a report that provides the following information for each person in the Person table, regardless if there is an address for each of those people:<br><code>FirstName, LastName, City, State</code></p>
+<h3 id="Solutions-7"><a href="#Solutions-7" class="headerlink" title="Solutions"></a>Solutions</h3><p>因为是由<code>Person</code>找<code>Address</code>的，所以允许<code>Address</code>为空，用<code>LEFT JOIN</code>：<br><code>SELECT FirstName, LastName, City, State FROM Person LEFT JOIN Address ON Person.PersonId=Address.PersonId;</code></p>
+<h2 id="181-Employees-Earning-More-Than-Their-Managers"><a href="#181-Employees-Earning-More-Than-Their-Managers" class="headerlink" title="181. Employees Earning More Than Their Managers"></a>181. Employees Earning More Than Their Managers</h2><p>The <code>Employee</code> table holds all employees including their managers. Every employee has an Id, and there is also a column for the manager Id.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+----+-------+--------+-----------+</span><br><span class="line">| Id | Name  | Salary | ManagerId |</span><br><span class="line">+----+-------+--------+-----------+</span><br><span class="line">| 1  | Joe   | 70000  | 3         |</span><br><span class="line">| 2  | Henry | 80000  | 4         |</span><br><span class="line">| 3  | Sam   | 60000  | NULL      |</span><br><span class="line">| 4  | Max   | 90000  | NULL      |</span><br><span class="line">+----+-------+--------+-----------+</span><br></pre></td></tr></table></figure><br>Given the <code>Employee</code> table, write a SQL query that finds out employees who earn more than their managers. For the above table, Joe is the only employee who earns more than his manager.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">+----------+</span><br><span class="line">| Employee |</span><br><span class="line">+----------+</span><br><span class="line">| Joe      |</span><br><span class="line">+----------+</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solutions-8"><a href="#Solutions-8" class="headerlink" title="Solutions"></a>Solutions</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">SELECT</span><br><span class="line">    a.Name AS &#x27;Employee&#x27;</span><br><span class="line">FROM</span><br><span class="line">    Employee AS a,</span><br><span class="line">    Employee AS b</span><br><span class="line">WHERE</span><br><span class="line">    a.ManagerId = b.Id</span><br><span class="line">    AND</span><br><span class="line">    a.Salary &gt; b.Salary</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+<h2 id="601-Human-Traffic-of-Stadium"><a href="#601-Human-Traffic-of-Stadium" class="headerlink" title="601. Human Traffic of Stadium"></a>601. Human Traffic of Stadium</h2><p>X city built a new stadium, each day many people visit it and the stats are saved as these columns: id, date, people</p>
+<p>Please write a query to display the records which have 3 or more consecutive rows and the amount of people more than 100(inclusive).</p>
+<p>For example, the table <code>stadium</code>:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">+------+------------+-----------+</span><br><span class="line">| id   | date       | people    |</span><br><span class="line">+------+------------+-----------+</span><br><span class="line">| 1    | 2017-01-01 | 10        |</span><br><span class="line">| 2    | 2017-01-02 | 109       |</span><br><span class="line">| 3    | 2017-01-03 | 150       |</span><br><span class="line">| 4    | 2017-01-04 | 99        |</span><br><span class="line">| 5    | 2017-01-05 | 145       |</span><br><span class="line">| 6    | 2017-01-06 | 1455      |</span><br><span class="line">| 7    | 2017-01-07 | 199       |</span><br><span class="line">| 8    | 2017-01-08 | 188       |</span><br><span class="line">+------+------------+-----------+</span><br></pre></td></tr></table></figure><br>For the sample data above, the output is:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+------+------------+-----------+</span><br><span class="line">| id   | date       | people    |</span><br><span class="line">+------+------------+-----------+</span><br><span class="line">| 5    | 2017-01-05 | 145       |</span><br><span class="line">| 6    | 2017-01-06 | 1455      |</span><br><span class="line">| 7    | 2017-01-07 | 199       |</span><br><span class="line">| 8    | 2017-01-08 | 188       |</span><br><span class="line">+------+------------+-----------+</span><br></pre></td></tr></table></figure><br>Note:<br>Each day only have one row record, and the dates are increasing with id increasing.</p>
+<h3 id="Solutions-9"><a href="#Solutions-9" class="headerlink" title="Solutions"></a>Solutions</h3><p>看到题目很懵逼，看到别人的解答，才知道思路：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">select distinct t1.*</span><br><span class="line">from stadium t1, stadium t2, stadium t3</span><br><span class="line">where t1.people &gt;= 100 and t2.people &gt;= 100 and t3.people &gt;= 100</span><br><span class="line">and</span><br><span class="line">(</span><br><span class="line">      (t1.id - t2.id = 1 and t1.id - t3.id = 2 and t2.id - t3.id =1)  -- t1, t2, t3</span><br><span class="line">    or</span><br><span class="line">    (t2.id - t1.id = 1 and t2.id - t3.id = 2 and t1.id - t3.id =1) -- t2, t1, t3</span><br><span class="line">    or</span><br><span class="line">    (t3.id - t2.id = 1 and t2.id - t1.id =1 and t3.id - t1.id = 2) -- t3, t2, t1</span><br><span class="line">)</span><br><span class="line">order by t1.id</span><br><span class="line">;</span><br></pre></td></tr></table></figure><br>子查询难做，考虑先得到所有情况之后后再筛选情况，分解出来就是：</p>
+<ol>
+<li>所有组合先筛选出3天都超过100人的；</li>
+<li>再通过id来判断是否连续，存在3种连续情况。</li>
+</ol>
+<h2 id="183-Customers-Who-Never-Order"><a href="#183-Customers-Who-Never-Order" class="headerlink" title="183. Customers Who Never Order"></a>183. Customers Who Never Order</h2><p>Suppose that a website contains two tables, the <code>Customers</code> table and the <code>Orders</code> table. Write a SQL query to find all customers who never order anything.</p>
+<p>Table: <code>Customers</code>.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+----+-------+</span><br><span class="line">| Id | Name  |</span><br><span class="line">+----+-------+</span><br><span class="line">| 1  | Joe   |</span><br><span class="line">| 2  | Henry |</span><br><span class="line">| 3  | Sam   |</span><br><span class="line">| 4  | Max   |</span><br><span class="line">+----+-------+</span><br></pre></td></tr></table></figure><br>Table: <code>Orders</code>.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+----+------------+</span><br><span class="line">| Id | CustomerId |</span><br><span class="line">+----+------------+</span><br><span class="line">| 1  | 3          |</span><br><span class="line">| 2  | 1          |</span><br><span class="line">+----+------------+</span><br></pre></td></tr></table></figure><br>Using the above tables as example, return the following:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+-----------+</span><br><span class="line">| Customers |</span><br><span class="line">+-----------+</span><br><span class="line">| Henry     |</span><br><span class="line">| Max       |</span><br><span class="line">+-----------+</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solutions-10"><a href="#Solutions-10" class="headerlink" title="Solutions"></a>Solutions</h3><p>不难，用<code>in</code>：<br><code>SELECT name AS &#39;Customers&#39; FROM Customers WHERE Customers.Id not in (SELECT CustomerId FROM Orders);</code></p>
+<h2 id="197-Rising-Temperature"><a href="#197-Rising-Temperature" class="headerlink" title="197. Rising Temperature"></a>197. Rising Temperature</h2><p>Given a <code>Weather</code> table, write a SQL query to find all dates’ Ids with higher temperature compared to its previous (yesterday’s) dates.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+---------+------------+------------------+</span><br><span class="line">| Id(INT) | Date(DATE) | Temperature(INT) |</span><br><span class="line">+---------+------------+------------------+</span><br><span class="line">|       1 | 2015-01-01 |               10 |</span><br><span class="line">|       2 | 2015-01-02 |               25 |</span><br><span class="line">|       3 | 2015-01-03 |               20 |</span><br><span class="line">|       4 | 2015-01-04 |               30 |</span><br><span class="line">+---------+------------+------------------+</span><br></pre></td></tr></table></figure><br>For example, return the following Ids for the above Weather table:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+----+</span><br><span class="line">| Id |</span><br><span class="line">+----+</span><br><span class="line">|  2 |</span><br><span class="line">|  4 |</span><br><span class="line">+----+</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h3><p>这题跟上面一道求连续3天100以上的题目类似，之后有些不一样的地方是，题目没有说明<code>Date</code>是连续递增的，也即是说不能用Id来确定第二天。另外<code>Date</code>的相减不能直接相减，用<code>DATEDIFF()</code>：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT a2.Id FROM Weather as a1, Weather as a2 WHERE a2.Temperature&gt;a1.Temperature and DATEDIFF(a2.Date, a1.Date)=1;</span><br></pre></td></tr></table></figure></p>
+<h2 id="178-Rank-Scores"><a href="#178-Rank-Scores" class="headerlink" title="178. Rank Scores"></a>178. Rank Scores</h2><p>Write a SQL query to rank scores. If there is a tie between two scores, both should have the same ranking. Note that after a tie, the next ranking number should be the next consecutive integer value. In other words, there should be no “holes” between ranks.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">+----+-------+</span><br><span class="line">| Id | Score |</span><br><span class="line">+----+-------+</span><br><span class="line">| 1  | 3.50  |</span><br><span class="line">| 2  | 3.65  |</span><br><span class="line">| 3  | 4.00  |</span><br><span class="line">| 4  | 3.85  |</span><br><span class="line">| 5  | 4.00  |</span><br><span class="line">| 6  | 3.65  |</span><br><span class="line">+----+-------+</span><br></pre></td></tr></table></figure><br>For example, given the above <code>Scores</code> table, your query should generate the following report (order by highest score):<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">+-------+------+</span><br><span class="line">| Score | Rank |</span><br><span class="line">+-------+------+</span><br><span class="line">| 4.00  | 1    |</span><br><span class="line">| 4.00  | 1    |</span><br><span class="line">| 3.85  | 2    |</span><br><span class="line">| 3.65  | 3    |</span><br><span class="line">| 3.65  | 3    |</span><br><span class="line">| 3.50  | 4    |</span><br><span class="line">+-------+------+</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solutions-11"><a href="#Solutions-11" class="headerlink" title="Solutions"></a>Solutions</h3><p>题目很难，查了下大佬们的博客，大致有两种方法：</p>
+<ol>
+<li><p>用自定义变量：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SELECT Score,Rank FROM   </span><br><span class="line">(SELECT Score,  </span><br><span class="line">@Rank := IF(@prevScore = Score,@Rank,@Rank+1) AS Rank,  </span><br><span class="line">@prevScore := Score FROM Scores  </span><br><span class="line">ORDER BY Score DESC) s,   </span><br><span class="line">(SELECT @Rank := 0, @prevScore := NULL) r;  </span><br></pre></td></tr></table></figure>
+<p>然后用<code>IF</code>定义<code>Rank</code>的规则，但是我看不懂，转载自<a target="_blank" rel="noopener" href="http://blog.csdn.net/kevin_zhai/article/details/52153547">【leetcode Database】178. Rank Scores</a>。</p>
+</li>
+<li><p>计数大于等于自己的个数有多少：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">SELECT Score, (  </span><br><span class="line">  SELECT COUNT(*)   </span><br><span class="line">  FROM (  </span><br><span class="line">    SELECT DISTINCT Score S   </span><br><span class="line">    FROM Scores  </span><br><span class="line">  ) AS Tmp  </span><br><span class="line">  WHERE S &gt;= Score  </span><br><span class="line">) AS Rank  </span><br><span class="line">FROM Scores  </span><br><span class="line">ORDER BY Score DESC;  </span><br></pre></td></tr></table></figure>
+<p>膜拜这位大佬，这方法太巧妙了，转载自<a target="_blank" rel="noopener" href="http://blog.csdn.net/travel_1/article/details/51589706">leetcode 178. Rank Scores</a></p>
+</li>
+</ol>
+<h2 id="180-Consecutive-Numbers"><a href="#180-Consecutive-Numbers" class="headerlink" title="180. Consecutive Numbers"></a>180. Consecutive Numbers</h2><p>Write a SQL query to find all numbers that appear at least three times consecutively.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">+----+-----+</span><br><span class="line">| Id | Num |</span><br><span class="line">+----+-----+</span><br><span class="line">| 1  |  1  |</span><br><span class="line">| 2  |  1  |</span><br><span class="line">| 3  |  1  |</span><br><span class="line">| 4  |  2  |</span><br><span class="line">| 5  |  1  |</span><br><span class="line">| 6  |  2  |</span><br><span class="line">| 7  |  2  |</span><br><span class="line">+----+-----+</span><br></pre></td></tr></table></figure><br>For example, given the above <code>Logs</code> table, <code>1</code> is the only number that appears consecutively for at least three times.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">+-----------------+</span><br><span class="line">| ConsecutiveNums |</span><br><span class="line">+-----------------+</span><br><span class="line">| 1               |</span><br><span class="line">+-----------------+</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solutions-12"><a href="#Solutions-12" class="headerlink" title="Solutions"></a>Solutions</h3><p>有了之前的套路，这种题照着做就好了：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SELECT DISTINCT l1.Num AS ConsecutiveNums </span><br><span class="line">    FROM Logs AS l1, Logs AS l2, Logs AS l3 </span><br><span class="line">    WHERE l1.Num=l2.Num </span><br><span class="line">        AND l2.Num=l3.Num </span><br><span class="line">        AND l3.Id-l2.Id=1 </span><br><span class="line">        AND l2.Id-l1.Id=1;</span><br></pre></td></tr></table></figure></p>
+<h2 id="596-Classes-More-Than-5-Students"><a href="#596-Classes-More-Than-5-Students" class="headerlink" title="596. Classes More Than 5 Students"></a>596. Classes More Than 5 Students</h2><p>There is a table <code>courses</code> with columns: student and class</p>
+<p>Please list out all classes which have more than or equal to 5 students.</p>
+<p>For example, the table:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">+---------+------------+</span><br><span class="line">| student | class      |</span><br><span class="line">+---------+------------+</span><br><span class="line">| A       | Math       |</span><br><span class="line">| B       | English    |</span><br><span class="line">| C       | Math       |</span><br><span class="line">| D       | Biology    |</span><br><span class="line">| E       | Math       |</span><br><span class="line">| F       | Computer   |</span><br><span class="line">| G       | Math       |</span><br><span class="line">| H       | Math       |</span><br><span class="line">| I       | Math       |</span><br><span class="line">+---------+------------+</span><br></pre></td></tr></table></figure><br>Should output:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">+---------+</span><br><span class="line">| class   |</span><br><span class="line">+---------+</span><br><span class="line">| Math    |</span><br><span class="line">+---------+</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solutions-13"><a href="#Solutions-13" class="headerlink" title="Solutions"></a>Solutions</h3><p>不难，注意row有可能重复的，去下重：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">SELECT class </span><br><span class="line">FROM (</span><br><span class="line">    SELECT DISTINCT * </span><br><span class="line">    FROM courses</span><br><span class="line">    ) Dc </span><br><span class="line">    GROUP BY class </span><br><span class="line">    HAVING count(*)&gt;=5;</span><br></pre></td></tr></table></figure></p>
+<h2 id="196-Delete-Duplicate-Emails"><a href="#196-Delete-Duplicate-Emails" class="headerlink" title="196. Delete Duplicate Emails"></a>196. Delete Duplicate Emails</h2><p>Write a SQL query to delete all duplicate email entries in a table named <code>Person</code>, keeping only unique emails based on its smallest Id.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+----+------------------+</span><br><span class="line">| Id | Email            |</span><br><span class="line">+----+------------------+</span><br><span class="line">| 1  | john@example.com |</span><br><span class="line">| 2  | bob@example.com  |</span><br><span class="line">| 3  | john@example.com |</span><br><span class="line">+----+------------------+</span><br><span class="line">Id is the primary key column for this table.</span><br></pre></td></tr></table></figure><br>For example, after running your query, the above <code>Person</code> table should have the following rows:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+----+------------------+</span><br><span class="line">| Id | Email            |</span><br><span class="line">+----+------------------+</span><br><span class="line">| 1  | john@example.com |</span><br><span class="line">| 2  | bob@example.com  |</span><br><span class="line">+----+------------------+</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solutions-14"><a href="#Solutions-14" class="headerlink" title="Solutions"></a>Solutions</h3><p>题目不难，一开始往着<code>GROUP BY</code>之后取<code>Id</code>的最小值就好。之后才注意题目要求的是，经过运行语句之后，<code>Person</code>表的样子，所以默认应该是读取<code>Person</code>表，所以这里应该用DML：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DELETE p1 FROM Person p1,</span><br><span class="line">    Person p2</span><br><span class="line">WHERE</span><br><span class="line">    p1.Email = p2.Email AND p1.Id &gt; p2.Id</span><br></pre></td></tr></table></figure></p>
+<h2 id="176-Second-Highest-Salary"><a href="#176-Second-Highest-Salary" class="headerlink" title="176. Second Highest Salary"></a>176. Second Highest Salary</h2><p>Write a SQL query to get the second highest salary from the <code>Employee</code> table.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">+----+--------+</span><br><span class="line">| Id | Salary |</span><br><span class="line">+----+--------+</span><br><span class="line">| 1  | 100    |</span><br><span class="line">| 2  | 200    |</span><br><span class="line">| 3  | 300    |</span><br><span class="line">+----+--------+</span><br></pre></td></tr></table></figure><br>For example, given the above Employee table, the query should return <code>200</code> as the second highest salary. If there is no second highest salary, then the query should return <code>null</code>.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">+---------------------+</span><br><span class="line">| SecondHighestSalary |</span><br><span class="line">+---------------------+</span><br><span class="line">| 200                 |</span><br><span class="line">+---------------------+</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solutions-15"><a href="#Solutions-15" class="headerlink" title="Solutions"></a>Solutions</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">SELECT</span><br><span class="line">    IFNULL(</span><br><span class="line">      (SELECT DISTINCT Salary</span><br><span class="line">       FROM Employee</span><br><span class="line">       ORDER BY Salary DESC</span><br><span class="line">        LIMIT 1 OFFSET 1),</span><br><span class="line">    NULL) AS SecondHighestSalary</span><br></pre></td></tr></table></figure>
+<p>一开始是想按之前算名次的方法算的，但是绕不过来，就看解答了，原来还有<code>OFFSET</code>这个东西。<code>OFFSET</code>是跳过n行，<code>LIMIT</code>是提取n行。然后再用<code>IFNULL()</code>给没有时加<code>NULL</code>。</p>
+<h2 id="184-Department-Highest-Salary"><a href="#184-Department-Highest-Salary" class="headerlink" title="184. Department Highest Salary"></a>184. Department Highest Salary</h2><p>The <code>Employee</code> table holds all employees. Every employee has an Id, a salary, and there is also a column for the department Id.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+----+-------+--------+--------------+</span><br><span class="line">| Id | Name  | Salary | DepartmentId |</span><br><span class="line">+----+-------+--------+--------------+</span><br><span class="line">| 1  | Joe   | 70000  | 1            |</span><br><span class="line">| 2  | Henry | 80000  | 2            |</span><br><span class="line">| 3  | Sam   | 60000  | 2            |</span><br><span class="line">| 4  | Max   | 90000  | 1            |</span><br><span class="line">+----+-------+--------+--------------+</span><br></pre></td></tr></table></figure><br>The <code>Department</code> table holds all departments of the company.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+----+----------+</span><br><span class="line">| Id | Name     |</span><br><span class="line">+----+----------+</span><br><span class="line">| 1  | IT       |</span><br><span class="line">| 2  | Sales    |</span><br><span class="line">+----+----------+</span><br></pre></td></tr></table></figure><br>Write a SQL query to find employees who have the highest salary in each of the departments. For the above tables, Max has the highest salary in the IT department and Henry has the highest salary in the Sales department.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+------------+----------+--------+</span><br><span class="line">| Department | Employee | Salary |</span><br><span class="line">+------------+----------+--------+</span><br><span class="line">| IT         | Max      | 90000  |</span><br><span class="line">| Sales      | Henry    | 80000  |</span><br><span class="line">+------------+----------+--------+</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solutions-16"><a href="#Solutions-16" class="headerlink" title="Solutions"></a>Solutions</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">SELECT</span><br><span class="line">    Department.name AS &#x27;Department&#x27;,</span><br><span class="line">    Employee.name AS &#x27;Employee&#x27;,</span><br><span class="line">    Salary</span><br><span class="line">FROM</span><br><span class="line">    Employee</span><br><span class="line">        JOIN</span><br><span class="line">    Department ON Employee.DepartmentId = Department.Id</span><br><span class="line">WHERE</span><br><span class="line">    (Employee.DepartmentId , Salary) IN</span><br><span class="line">    (   SELECT</span><br><span class="line">            DepartmentId, MAX(Salary)</span><br><span class="line">        FROM</span><br><span class="line">            Employee</span><br><span class="line">        GROUP BY DepartmentId</span><br><span class="line">    )</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+<h2 id="177-Nth-Highest-Salary"><a href="#177-Nth-Highest-Salary" class="headerlink" title="177. Nth Highest Salary"></a>177. Nth Highest Salary</h2><p>Write a SQL query to get the nth highest salary from the <code>Employee</code> table.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">+----+--------+</span><br><span class="line">| Id | Salary |</span><br><span class="line">+----+--------+</span><br><span class="line">| 1  | 100    |</span><br><span class="line">| 2  | 200    |</span><br><span class="line">| 3  | 300    |</span><br><span class="line">+----+--------+</span><br></pre></td></tr></table></figure><br>For example, given the above Employee table, the nth highest salary where n = 2 is <code>200</code>. If there is no nth highest salary, then the query should return <code>null</code>.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">+------------------------+</span><br><span class="line">| getNthHighestSalary(2) |</span><br><span class="line">+------------------------+</span><br><span class="line">| 200                    |</span><br><span class="line">+------------------------+</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solutions-17"><a href="#Solutions-17" class="headerlink" title="Solutions"></a>Solutions</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT</span><br><span class="line">BEGIN</span><br><span class="line">  SET N = N - 1;</span><br><span class="line">  RETURN (</span><br><span class="line">    SELECT CASE </span><br><span class="line">    WHEN COUNT(Salary) &gt;= 1 THEN (</span><br><span class="line">      SELECT DISTINCT Salary </span><br><span class="line">      FROM Employee</span><br><span class="line">      ORDER BY Salary DESC </span><br><span class="line">      LIMIT N, 1) </span><br><span class="line">    ELSE NULL</span><br><span class="line">    END AS NthSalary</span><br><span class="line">    FROM Employee</span><br><span class="line">  );</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+<h2 id="185-Department-Top-Three-Salaries"><a href="#185-Department-Top-Three-Salaries" class="headerlink" title="185. Department Top Three Salaries"></a>185. Department Top Three Salaries</h2><p>The <code>Employee</code> table holds all employees. Every employee has an Id, and there is also a column for the department Id.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">+----+-------+--------+--------------+</span><br><span class="line">| Id | Name  | Salary | DepartmentId |</span><br><span class="line">+----+-------+--------+--------------+</span><br><span class="line">| 1  | Joe   | 70000  | 1            |</span><br><span class="line">| 2  | Henry | 80000  | 2            |</span><br><span class="line">| 3  | Sam   | 60000  | 2            |</span><br><span class="line">| 4  | Max   | 90000  | 1            |</span><br><span class="line">| 5  | Janet | 69000  | 1            |</span><br><span class="line">| 6  | Randy | 85000  | 1            |</span><br><span class="line">+----+-------+--------+--------------+</span><br></pre></td></tr></table></figure><br>The <code>Department</code> table holds all departments of the company.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+----+----------+</span><br><span class="line">| Id | Name     |</span><br><span class="line">+----+----------+</span><br><span class="line">| 1  | IT       |</span><br><span class="line">| 2  | Sales    |</span><br><span class="line">+----+----------+</span><br></pre></td></tr></table></figure><br>Write a SQL query to find employees who earn the top three salaries in each of the department. For the above tables, your SQL query should return the following rows.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+------------+----------+--------+</span><br><span class="line">| Department | Employee | Salary |</span><br><span class="line">+------------+----------+--------+</span><br><span class="line">| IT         | Max      | 90000  |</span><br><span class="line">| IT         | Randy    | 85000  |</span><br><span class="line">| IT         | Joe      | 70000  |</span><br><span class="line">| Sales      | Henry    | 80000  |</span><br><span class="line">| Sales      | Sam      | 60000  |</span><br><span class="line">+------------+----------+--------+</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solutions-18"><a href="#Solutions-18" class="headerlink" title="Solutions"></a>Solutions</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">SELECT</span><br><span class="line">    d.Name AS &#x27;Department&#x27;, e1.Name AS &#x27;Employee&#x27;, e1.Salary</span><br><span class="line">FROM</span><br><span class="line">    Employee e1</span><br><span class="line">        JOIN</span><br><span class="line">    Department d ON e1.DepartmentId = d.Id</span><br><span class="line">WHERE</span><br><span class="line">    3 &gt; (SELECT</span><br><span class="line">            COUNT(DISTINCT e2.Salary)</span><br><span class="line">        FROM</span><br><span class="line">            Employee e2</span><br><span class="line">        WHERE</span><br><span class="line">            e2.Salary &gt; e1.Salary</span><br><span class="line">                AND e1.DepartmentId = e2.DepartmentId</span><br><span class="line">        )</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+<h2 id="262-Trips-and-Users"><a href="#262-Trips-and-Users" class="headerlink" title="262. Trips and Users"></a>262. Trips and Users</h2><p>The <code>Trips</code> table holds all taxi trips. Each trip has a unique Id, while Client_Id and Driver_Id are both foreign keys to the Users_Id at the <code>Users</code> table. Status is an ENUM type of (‘completed’, ‘cancelled_by_driver’, ‘cancelled_by_client’).<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">+----+-----------+-----------+---------+--------------------+----------+</span><br><span class="line">| Id | Client_Id | Driver_Id | City_Id |        Status      |Request_at|</span><br><span class="line">+----+-----------+-----------+---------+--------------------+----------+</span><br><span class="line">| 1  |     1     |    10     |    1    |     completed      |2013-10-01|</span><br><span class="line">| 2  |     2     |    11     |    1    | cancelled_by_driver|2013-10-01|</span><br><span class="line">| 3  |     3     |    12     |    6    |     completed      |2013-10-01|</span><br><span class="line">| 4  |     4     |    13     |    6    | cancelled_by_client|2013-10-01|</span><br><span class="line">| 5  |     1     |    10     |    1    |     completed      |2013-10-02|</span><br><span class="line">| 6  |     2     |    11     |    6    |     completed      |2013-10-02|</span><br><span class="line">| 7  |     3     |    12     |    6    |     completed      |2013-10-02|</span><br><span class="line">| 8  |     2     |    12     |    12   |     completed      |2013-10-03|</span><br><span class="line">| 9  |     3     |    10     |    12   |     completed      |2013-10-03| </span><br><span class="line">| 10 |     4     |    13     |    12   | cancelled_by_driver|2013-10-03|</span><br><span class="line">+----+-----------+-----------+---------+--------------------+----------+</span><br></pre></td></tr></table></figure><br>The <code>Users</code> table holds all users. Each user has an unique Users_Id, and Role is an ENUM type of (‘client’, ‘driver’, ‘partner’).<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">+----------+--------+--------+</span><br><span class="line">| Users_Id | Banned |  Role  |</span><br><span class="line">+----------+--------+--------+</span><br><span class="line">|    1     |   No   | client |</span><br><span class="line">|    2     |   Yes  | client |</span><br><span class="line">|    3     |   No   | client |</span><br><span class="line">|    4     |   No   | client |</span><br><span class="line">|    10    |   No   | driver |</span><br><span class="line">|    11    |   No   | driver |</span><br><span class="line">|    12    |   No   | driver |</span><br><span class="line">|    13    |   No   | driver |</span><br><span class="line">+----------+--------+--------+</span><br></pre></td></tr></table></figure><br>Write a SQL query to find the cancellation rate of requests made by unbanned clients between Oct 1, 2013 and Oct 3, 2013. For the above tables, your SQL query should return the following rows with the cancellation rate being rounded to two decimal places.<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">+------------+-------------------+</span><br><span class="line">|     Day    | Cancellation Rate |</span><br><span class="line">+------------+-------------------+</span><br><span class="line">| 2013-10-01 |       0.33        |</span><br><span class="line">| 2013-10-02 |       0.00        |</span><br><span class="line">| 2013-10-03 |       0.50        |</span><br><span class="line">+------------+-------------------+</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solutions-19"><a href="#Solutions-19" class="headerlink" title="Solutions"></a>Solutions</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SELECT t.Request_at AS &#x27;Day&#x27;, </span><br><span class="line">ROUND(SUM(IF(t.Status = &#x27;completed&#x27;, 0, 1)) / COUNT(*), 2) AS &#x27;Cancellation Rate&#x27; </span><br><span class="line">FROM Trips t INNER JOIN Users u ON t.Client_Id = u.Users_Id </span><br><span class="line">WHERE t.Request_at BETWEEN &#x27;2013-10-01&#x27; AND &#x27;2013-10-03&#x27; </span><br><span class="line">AND u.Banned = &#x27;No&#x27; AND u.Role = &#x27;client&#x27; </span><br><span class="line">GROUP BY t.Request_at ORDER BY t.Request_at;</span><br></pre></td></tr></table></figure>
+<h1 id="Algorithms"><a href="#Algorithms" class="headerlink" title="Algorithms"></a>Algorithms</h1><h2 id="535-Encode-and-Decode-TinyURL"><a href="#535-Encode-and-Decode-TinyURL" class="headerlink" title="535. Encode and Decode TinyURL"></a>535. Encode and Decode TinyURL</h2><p>TinyURL is a URL shortening service where you enter a URL such as <code>https://leetcode.com/problems/design-tinyurl</code> and it returns a short URL such as <code>http://tinyurl.com/4e9iAk</code>.</p>
+<p>Design the <code>encode</code> and <code>decode</code> methods for the TinyURL service. There is no restriction on how your encode/decode algorithm should work. You just need to ensure that a URL can be encoded to a tiny URL and the tiny URL can be decoded to the original URL.</p>
+<h3 id="Solutions-20"><a href="#Solutions-20" class="headerlink" title="Solutions"></a>Solutions</h3><p>这个题目要求是将长url转化成短url，还要求编码和解码。长到短的编码是容易的，短到长的解码我记得是不大可能的，压缩算法好像可以，也针对的是稀疏矩阵。所以寻找的短url和长url之间的关系要么是容易的，要么是记录下来，hash。接下来的参考了<a target="_blank" rel="noopener" href="https://discuss.leetcode.com/topic/81637/two-solutions-and-thoughts">LeetCode一个高票讨论</a>，我只是负责转化理解一下。<br>首先是容易的对应关系就是存为数组，根据数组的长度来转化短url。<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">class Codec:</span><br><span class="line"></span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.urls = []</span><br><span class="line"></span><br><span class="line">    def encode(self, longUrl):</span><br><span class="line">        self.urls.append(longUrl)</span><br><span class="line">        return &#x27;http://tinyurl.com/&#x27; + str(len(self.urls) - 1)</span><br><span class="line"></span><br><span class="line">    def decode(self, shortUrl):</span><br><span class="line">        return self.urls[int(shortUrl.split(&#x27;/&#x27;)[-1])]</span><br></pre></td></tr></table></figure><br>作者说这样有几个缺点：</p>
+<ol>
+<li>当重复的长url再度查找时，将会浪费新的短url和存储空间</li>
+<li>别人能够知道总共有多少个url</li>
+<li>别人也可能重复发送同一个长url来得到他们想要的短url</li>
+<li>短url只由数字组成，数量很有限，（另外一个我觉得限制住的是int转换时的数值限制）</li>
+</ol>
+<p>所以研究了下题目给的短url<code>http://tinyurl.com/KtLa2U</code>，总共6位，由数字大小字母组成，所以总共有(10+26*2)<sup>6</sup>=56,800,235,584，然后每次随机选择一个6位长的短url，我自己觉得用hash算法可能更好，不确定。建立两个字典，双向对应，一个是解码，一个是判断是否之前出现过。<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">class Codec:</span><br><span class="line"></span><br><span class="line">    alphabet = string.ascii_letters + &#x27;0123456789&#x27;</span><br><span class="line"></span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.url2code = &#123;&#125;</span><br><span class="line">        self.code2url = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    def encode(self, longUrl):</span><br><span class="line">        while longUrl not in self.url2code:</span><br><span class="line">            code = &#x27;&#x27;.join(random.choice(Codec.alphabet) for _ in range(6))</span><br><span class="line">            if code not in self.code2url:</span><br><span class="line">                self.code2url[code] = longUrl</span><br><span class="line">                self.url2code[longUrl] = code</span><br><span class="line">        return &#x27;http://tinyurl.com/&#x27; + self.url2code[longUrl]</span><br><span class="line"></span><br><span class="line">    def decode(self, shortUrl):</span><br><span class="line">        return self.code2url[shortUrl[-6:]]</span><br></pre></td></tr></table></figure></p>
+<p>话说到这里，LeetCode对于这道题的判定是不严格的。因为题目也没有要求说一定要6位长，所以………………空算法也能直接过。</p>
+<h2 id="461-Hamming-Distance"><a href="#461-Hamming-Distance" class="headerlink" title="461. Hamming Distance"></a>461. Hamming Distance</h2><p>The Hamming distance between two integers is the number of positions at which the corresponding bits are different.</p>
+<p>Given two integers <code>x</code> and <code>y</code>, calculate the Hamming distance.</p>
+<p>Note:<br>0 ≤ <code>x</code>, <code>y</code> &lt; 2<sup>31</sup>.</p>
+<p>Example:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Input: x = 1, y = 4</span><br><span class="line"></span><br><span class="line">Output: 2</span><br><span class="line"></span><br><span class="line">Explanation:</span><br><span class="line">1   (0 0 0 1)</span><br><span class="line">4   (0 1 0 0)</span><br><span class="line">       ?   ?</span><br><span class="line"></span><br><span class="line">The above arrows point to positions where the corresponding bits are different.</span><br></pre></td></tr></table></figure></p>
+<h3 id="Solutions-21"><a href="#Solutions-21" class="headerlink" title="Solutions"></a>Solutions</h3><p><code>c++</code><br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    int hammingDistance(int x, int y) &#123;</span><br><span class="line">        int res = x ^ y;</span><br><span class="line">        int count = 0;</span><br><span class="line">        for(int i = 0; i &lt; 32;i++)</span><br><span class="line">        &#123;</span><br><span class="line">            if((res&amp;1)!=0)</span><br><span class="line">                count++;</span><br><span class="line">            res &gt;&gt;= 1;</span><br><span class="line">        &#125;</span><br><span class="line">        return count;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><br>尝试着用c++做，先用异或，1和0为1，0和0为1，1和1为1。之后为了判断最后一个位是否是1，是1的话计数，和1取并操作，当最后一位为1时，结果为1，计数。之后右移一位，判断下一位。最后返回结果。</p>
+<h2 id="617-Merge-Two-Binary-Trees"><a href="#617-Merge-Two-Binary-Trees" class="headerlink" title="617. Merge Two Binary Trees"></a>617. Merge Two Binary Trees</h2><p>Given two binary trees and imagine that when you put one of them to cover the other, some nodes of the two trees are overlapped while the others are not.</p>
+<p>You need to merge them into a new binary tree. The merge rule is that if two nodes overlap, then sum node values up as the new value of the merged node. Otherwise, the NOT null node will be used as the node of new tree.</p>
+<p>Example 1:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Input: </span><br><span class="line">	Tree 1                     Tree 2                  </span><br><span class="line">          1                         2                             </span><br><span class="line">         / \                       / \                            </span><br><span class="line">        3   2                     1   3                        </span><br><span class="line">       /                           \   \                      </span><br><span class="line">      5                             4   7                  </span><br><span class="line">Output: </span><br><span class="line">Merged tree:</span><br><span class="line">	     3</span><br><span class="line">	    / \</span><br><span class="line">	   4   5</span><br><span class="line">	  / \   \ </span><br><span class="line">	 5   4   7</span><br></pre></td></tr></table></figure><br>Note: The merging process must start from the root nodes of both trees.</p>
+<h3 id="Solutions-22"><a href="#Solutions-22" class="headerlink" title="Solutions"></a>Solutions</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * Definition for a binary tree node.</span><br><span class="line"> * struct TreeNode &#123;</span><br><span class="line"> *     int val;</span><br><span class="line"> *     TreeNode *left;</span><br><span class="line"> *     TreeNode *right;</span><br><span class="line"> *     TreeNode(int x) : val(x), left(NULL), right(NULL) &#123;&#125;</span><br><span class="line"> * &#125;;</span><br><span class="line"> */</span><br><span class="line">class Solution &#123;</span><br><span class="line">public:</span><br><span class="line">    TreeNode* mergeTrees(TreeNode* t1, TreeNode* t2) &#123;</span><br><span class="line">        if(t1==NULL &amp;&amp; t2==NULL)</span><br><span class="line">            return NULL;</span><br><span class="line">        else if(t1==NULL &amp;&amp; t2!=NULL)</span><br><span class="line">            return t2;</span><br><span class="line">        else if(t2==NULL &amp;&amp; t1!=NULL)</span><br><span class="line">            return t1;</span><br><span class="line">        else</span><br><span class="line">        &#123;</span><br><span class="line">            t1-&gt;val+=t2-&gt;val;</span><br><span class="line">            t1-&gt;left = mergeTrees(t1-&gt;left, t2-&gt;left);</span><br><span class="line">            t1-&gt;right = mergeTrees(t1-&gt;right, t2-&gt;right);</span><br><span class="line">            return t1;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>判断一下各自为不为空的情况，迭代下去即可。</p>
+<h2 id="561-Array-Partition-I"><a href="#561-Array-Partition-I" class="headerlink" title="561. Array Partition I"></a>561. Array Partition I</h2><p>Given an array of 2n integers, your task is to group these integers into n pairs of integer, say (a<sub>1</sub>, b<sub>1</sub>), (a<sub>2</sub>, b<sub>2</sub>), …, (a<sub>n</sub>, b<sub>n</sub>) which makes sum of min(ai, bi) for all i from 1 to n as large as possible.</p>
+<p>Example 1:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Input: [1,4,3,2]</span><br><span class="line"></span><br><span class="line">Output: 4</span><br><span class="line">Explanation: n is 2, and the maximum sum of pairs is 4 = min(1, 2) + min(3, 4).</span><br></pre></td></tr></table></figure><br>Note:</p>
+<ol>
+<li>n is a positive integer, which is in the range of [1, 10000].</li>
+<li>All the integers in the array will be in the range of [-10000, 10000].</li>
+</ol>
+<h3 id="Solutions-23"><a href="#Solutions-23" class="headerlink" title="Solutions"></a>Solutions</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">class Solution(object):</span><br><span class="line">    def arrayPairSum(self, nums):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        :type nums: List[int]</span><br><span class="line">        :rtype: int</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        nums.sort()</span><br><span class="line">        sum=0</span><br><span class="line">        for i in range(0,len(nums),2):</span><br><span class="line">            sum+=nums[i]</span><br><span class="line">        return sum</span><br></pre></td></tr></table></figure>
+<p>排列后按顺序每两个取小求和</p>
+<h2 id="537-Complex-Number-Multiplication"><a href="#537-Complex-Number-Multiplication" class="headerlink" title="537. Complex Number Multiplication"></a>537. Complex Number Multiplication</h2><p>Given two strings representing two complex numbers.</p>
+<p>You need to return a string representing their multiplication. Note i<sup>2</sup> = -1 according to the definition.</p>
+<p>Example 1:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Input: &quot;1+1i&quot;, &quot;1+1i&quot;</span><br><span class="line">Output: &quot;0+2i&quot;</span><br><span class="line">Explanation: (1 + i) * (1 + i) = 1 + i2 + 2 * i = 2i, and you need convert it to the form of 0+2i.</span><br></pre></td></tr></table></figure><br>Example 2:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Input: &quot;1+-1i&quot;, &quot;1+-1i&quot;</span><br><span class="line">Output: &quot;0+-2i&quot;</span><br><span class="line">Explanation: (1 - i) * (1 - i) = 1 + i2 - 2 * i = -2i, and you need convert it to the form of 0+-2i.</span><br></pre></td></tr></table></figure><br>Note:</p>
+<ol>
+<li>The input strings will not have extra blank.</li>
+<li>The input strings will be given in the form of a+bi, where the integer a and b will both belong to the range of [-100, 100]. And the output should be also in this form.</li>
+</ol>
+<h3 id="Solutions-24"><a href="#Solutions-24" class="headerlink" title="Solutions"></a>Solutions</h3><p>一开始觉得挺难的，后来发现<code>-</code>是作为符号，运算都写<code>+</code>。另外<code>-1</code>还表示为<code>+-1</code>，这就好办了。分割字符串最后拼接就好了。<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">class Solution(object):</span><br><span class="line">    def complexNumberMultiply(self, a, b):</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        :type a: str</span><br><span class="line">        :type b: str</span><br><span class="line">        :rtype: str</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        a1=int(a.split(&#x27;+&#x27;)[0])</span><br><span class="line">        a2=int(a.split(&#x27;+&#x27;)[1].strip(&#x27;i&#x27;))</span><br><span class="line">        b1=int(b.split(&#x27;+&#x27;)[0])</span><br><span class="line">        b2=int(b.split(&#x27;+&#x27;)[1].strip(&#x27;i&#x27;))</span><br><span class="line">        c1=a1*b1-a2*b2</span><br><span class="line">        c2=a1*b2+a2*b1</span><br><span class="line">        return str(c1)+&#x27;+&#x27;+str(c2)+&#x27;i&#x27;</span><br></pre></td></tr></table></figure><br>这道题要是用c++做，切割字符串这点可能就要蛋疼许久。<br>leetcode的提交好像没看到c++的，然后百度了下，好像还是没有，那我也就心安了。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\09\13\Django知识点\" rel="bookmark">Django知识点</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\09\05\Linux知识点\" rel="bookmark">Linux知识点</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\09\02\Redis知识点\" rel="bookmark">Redis知识点</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2017/07/03/LeetCode%E8%AE%B0%E5%BD%95/" title="LeetCode记录">https://blog.rexking6.top/2017/07/03/LeetCode记录/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AF%95%E9%9D%A2%E8%AF%95/" rel="tag"># 笔试面试</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/04/05/%E5%BD%93%E4%BD%A0%E5%9C%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E5%9C%B0%E5%9D%80%E6%A0%8F%E8%BE%93%E5%85%A5%E4%B8%80%E4%B8%AAURL%E5%90%8E%E5%9B%9E%E8%BD%A6%EF%BC%8C%E5%B0%86%E4%BC%9A%E5%8F%91%E7%94%9F%E7%9A%84%E4%BA%8B%E6%83%85%EF%BC%9F/" rel="prev" title="当你在浏览器地址栏输入一个URL后回车，将会发生的事情？">
+      <i class="fa fa-chevron-left"></i> 当你在浏览器地址栏输入一个URL后回车，将会发生的事情？
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/07/10/Python%E4%B9%8Bwith/" rel="next" title="Python之with">
+      Python之with <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Shell"><span class="nav-number">1.</span> <span class="nav-text">Shell</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#195-Tenth-Line"><span class="nav-number">1.1.</span> <span class="nav-text">195. Tenth Line</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions"><span class="nav-number">1.1.1.</span> <span class="nav-text">Solutions</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sed"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">sed</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#awk"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">awk</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tail"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">tail</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#head"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">head</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%8B%E5%8A%A8"><span class="nav-number">1.1.1.5.</span> <span class="nav-text">手动</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#193-Valid-Phone-Numbers"><span class="nav-number">1.2.</span> <span class="nav-text">193. Valid Phone Numbers</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#192-Word-Frequency"><span class="nav-number">1.3.</span> <span class="nav-text">192. Word Frequency</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-2"><span class="nav-number">1.3.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#194-Transpose-File"><span class="nav-number">1.4.</span> <span class="nav-text">194. Transpose File</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Database"><span class="nav-number">2.</span> <span class="nav-text">Database</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#595-Big-Countries"><span class="nav-number">2.1.</span> <span class="nav-text">595. Big Countries</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-3"><span class="nav-number">2.1.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#627-Swap-Salary"><span class="nav-number">2.2.</span> <span class="nav-text">627. Swap Salary</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-4"><span class="nav-number">2.2.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#620-Not-Boring-Movies"><span class="nav-number">2.3.</span> <span class="nav-text">620. Not Boring Movies</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-5"><span class="nav-number">2.3.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#182-Duplicate-Emails"><span class="nav-number">2.4.</span> <span class="nav-text">182. Duplicate Emails</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-6"><span class="nav-number">2.4.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#175-Combine-Two-Tables"><span class="nav-number">2.5.</span> <span class="nav-text">175. Combine Two Tables</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-7"><span class="nav-number">2.5.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#181-Employees-Earning-More-Than-Their-Managers"><span class="nav-number">2.6.</span> <span class="nav-text">181. Employees Earning More Than Their Managers</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-8"><span class="nav-number">2.6.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#601-Human-Traffic-of-Stadium"><span class="nav-number">2.7.</span> <span class="nav-text">601. Human Traffic of Stadium</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-9"><span class="nav-number">2.7.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#183-Customers-Who-Never-Order"><span class="nav-number">2.8.</span> <span class="nav-text">183. Customers Who Never Order</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-10"><span class="nav-number">2.8.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#197-Rising-Temperature"><span class="nav-number">2.9.</span> <span class="nav-text">197. Rising Temperature</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution"><span class="nav-number">2.9.1.</span> <span class="nav-text">Solution</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#178-Rank-Scores"><span class="nav-number">2.10.</span> <span class="nav-text">178. Rank Scores</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-11"><span class="nav-number">2.10.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#180-Consecutive-Numbers"><span class="nav-number">2.11.</span> <span class="nav-text">180. Consecutive Numbers</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-12"><span class="nav-number">2.11.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#596-Classes-More-Than-5-Students"><span class="nav-number">2.12.</span> <span class="nav-text">596. Classes More Than 5 Students</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-13"><span class="nav-number">2.12.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#196-Delete-Duplicate-Emails"><span class="nav-number">2.13.</span> <span class="nav-text">196. Delete Duplicate Emails</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-14"><span class="nav-number">2.13.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#176-Second-Highest-Salary"><span class="nav-number">2.14.</span> <span class="nav-text">176. Second Highest Salary</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-15"><span class="nav-number">2.14.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#184-Department-Highest-Salary"><span class="nav-number">2.15.</span> <span class="nav-text">184. Department Highest Salary</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-16"><span class="nav-number">2.15.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#177-Nth-Highest-Salary"><span class="nav-number">2.16.</span> <span class="nav-text">177. Nth Highest Salary</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-17"><span class="nav-number">2.16.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#185-Department-Top-Three-Salaries"><span class="nav-number">2.17.</span> <span class="nav-text">185. Department Top Three Salaries</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-18"><span class="nav-number">2.17.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#262-Trips-and-Users"><span class="nav-number">2.18.</span> <span class="nav-text">262. Trips and Users</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-19"><span class="nav-number">2.18.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Algorithms"><span class="nav-number">3.</span> <span class="nav-text">Algorithms</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#535-Encode-and-Decode-TinyURL"><span class="nav-number">3.1.</span> <span class="nav-text">535. Encode and Decode TinyURL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-20"><span class="nav-number">3.1.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#461-Hamming-Distance"><span class="nav-number">3.2.</span> <span class="nav-text">461. Hamming Distance</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-21"><span class="nav-number">3.2.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#617-Merge-Two-Binary-Trees"><span class="nav-number">3.3.</span> <span class="nav-text">617. Merge Two Binary Trees</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-22"><span class="nav-number">3.3.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#561-Array-Partition-I"><span class="nav-number">3.4.</span> <span class="nav-text">561. Array Partition I</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-23"><span class="nav-number">3.4.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#537-Complex-Number-Multiplication"><span class="nav-number">3.5.</span> <span class="nav-text">537. Complex Number Multiplication</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Solutions-24"><span class="nav-number">3.5.1.</span> <span class="nav-text">Solutions</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

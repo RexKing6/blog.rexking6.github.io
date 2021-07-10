@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Learning Deep Features for Discriminative Localization》笔记">
+<meta property="og:url" content="https://blog.rexking6.top/2018/07/08/%E3%80%8ALearning-Deep-Features-for-Discriminative-Localization%E3%80%8B%E7%AC%94%E8%AE%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531024194.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531055549.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531055677.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531101115.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531136241.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531136575.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531136625.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531136681.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531140165.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531140627.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531140889.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531143026.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531144094.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531144337.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531144455.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531144610.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531145347.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531149412.png">
+<meta property="article:published_time" content="2018-07-08T04:16:50.000Z">
+<meta property="article:modified_time" content="2019-03-06T10:20:46.987Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="语义分割">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1531024194.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/07/08/%E3%80%8ALearning-Deep-Features-for-Discriminative-Localization%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《Learning Deep Features for Discriminative Localization》笔记 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/07/08/%E3%80%8ALearning-Deep-Features-for-Discriminative-Localization%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Learning Deep Features for Discriminative Localization》笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-07-08 12:16:50" itemprop="dateCreated datePublished" datetime="2018-07-08T12:16:50+08:00">2018-07-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 18:20:46" itemprop="dateModified" datetime="2019-03-06T18:20:46+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2/" itemprop="url" rel="index"><span itemprop="name">语义分割</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/07/08/%E3%80%8ALearning-Deep-Features-for-Discriminative-Localization%E3%80%8B%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="《Learning Deep Features for Discriminative Localization》笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>15k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>14 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>在这项工作中，我们重新审视了[13]中提出的全局平均池化层，并阐明了它如何明确地使卷积神经网络具有显着的定位能力，尽管在图像级标签上进行了训练。虽然该方法之前被提出作为正则化训练的一种手段，但我们发现它实际上构建了一个可应用于各种任务的通用可定位的深度表示。尽管全局平均池化层明显地简单，但我们能够在ILSVRC 2014上实现对象对位的 top-5 误差为37.1％，这非常接近全监督的CNN方法所实现的 top-5 误差的34.2％。</p>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>Zhou等人 [33] 最近的研究表明，尽管没有提供物体的位置进行监督，但各层卷积神经网络（CNN）的卷积单元实际上表现为物体探测器。 尽管具有在卷积层中定位对象的这种显着能力，但是当使用全连接层进行分类时，这种能力会丢失。 最近，人们提出了一些流行的全卷积神经网络，如网络中的网络（NIN）[13]和GoogLeNet [24]，以避免使用全连接层来最小化参数数量，同时保持高性能。</p>
+<p>为了实现这一点，[13]使用全局平均池化层作为结构正则化项，防止在训练期间过度拟合。 在我们的实验中，我们发现这个全局平均池化层的优势不仅仅是作为一个正规化项 - 事实上，通过稍微调整，网络可以保留其卓越的定位能力，直到最后一层。这种调整可以轻松识别单个前向通道中的判别图像区域，适用于各种任务，甚至是那些最初未经过网络训练的任务。如图1(a)所示，受过对象分类训练的CNN成功地能够将用于行动分类的判别区域定位为人类本身交互的对象而不是人类本身。</p>
+<p><img src="http://image.rexking6.top/img/clip1531024194.png" alt=""><br>图1.全局平均池化层的简单修改与我们的类激活映射（CAM）技术相结合，允许经过分类训练的CNN对图像进行分类并在单个前向通道中定位特定于类的图像区域，例如用于刷牙的牙刷和用于砍伐树木的电锯。</p>
+<p>尽管我们的方法明显简单，但对于ILSVRC基准测试中的弱监督对象定位[20]，我们的最佳网络实现了 top-5 测试误差的37.1％，这非常接近全监督所实现的AlexNet [10] 的 top-5 测试误差34.2％。此外，我们证明了我们方法中深层特征的可定位性可以很容易地转移到其他识别数据集，以进行通用分类，定位和概念发现。</p>
+<h1 id="相关研究"><a href="#相关研究" class="headerlink" title="相关研究"></a>相关研究</h1><p>卷积神经网络（CNNs）在各种视觉识别任务中取得了令人印象深刻的表现[10,34,8]。 最近的研究表明，尽管受过图像级标签的培训，但CNN具有显着的定位对象的能力[1,16,2,15]。 在这项工作中，我们表明，使用正确的架构，我们可以表明这种能力不仅仅是定位对象，而可以开始准确识别图像的哪些区域被用于鉴别。 在这里，我们讨论与本文最相关的两个研究方面：弱监督对象定位和可视化CNN的内部表示。</p>
+<p><strong>弱监督对象定位</strong><br>最近有许多研究使用CNN探索弱监督对象定位[1,16,2,15]。 Bergamo等人[1]提出了一种自我学习对象定位技术，该技术涉及掩蔽图像区域以识别引起最大激活的区域以便定位对象。Cinbis等人 [2] 将多实例学习与CNN特征相结合，以定位对象。Oquab等人 [15] 提出了一种传递中间层图像表示的方法，并表明可以通过评估多个重叠patch上CNN的输出来实现一些对象定位。然而，作者实际上并没有评估定位能力。 另一方面，虽然这些方法产生了有希望的结果，但它们没有经过端到端的训练，需要网络的多次正向传播来定位对象，这使得它们难以扩展到真实世界的数据集。我们的方法是端到端训练的，可以在一次正向传播中定位对象。</p>
+<p>与我们最相似的方法是基于Oquab等人 [16] 的全局最大池化的工作。 它们不是使用全局平均池化，而是应用全局最大池化来定位对象上的点。 然而，它们的定位仅限于位于物体边界的点而不是确定物体的完整范围。 我们认为，虽然和全局最大池化函数非常相似，但使用平均池化会促进网络识别对象的完整范围的定位。 这背后的基本直觉是，当网络识别对象的所有鉴别区域与最大池化相比时，平均池化的损失函数更有益。 这将在 3.2节 中进行更详细的解释和实验验证。此外，与 [16] 不同，我们证明了这种定位能力是通用的，甚至可以用于网络未经过训练的问题。</p>
+<p>我们使用类激活映射来引用为每个图像生成的加权激活映射，如第2节所述。我们想强调的是，虽然全局平均池化不是我们在此提出的新技术，但据我们所知，应用它的观察得到的准确的判别定位对我们的工作来说是独一无二的。 我们相信这种技术的简单性使其便于迁移，并且可以应用于各种计算机视觉任务，以实现快速和准确的定位。</p>
+<p><strong>可视化CNN</strong><br>最近有许多作品[29,14,4,33]可视化CNN学习的内部表示，试图更好地理解它们的属性。 Zeiler等人 [29] 使用反卷积网络来可视化激活每个单元的模式。 Zhou等人 [33] 表明CNN在训练识别场景时学习物体探测器，并证明同一网络可以在单个正向传播中执行场景识别和物体定位。这两个研究都只分析了卷积层，忽略了全连接层，从而绘制了完整故事的不完整画面。 通过移除全连接层并保留大部分性能，我们能够从头到尾了解我们的网络。</p>
+<p>Mahendran等人 [14] 和Dosovitskiy等人 [4] 通过倒置不同层的深层特征来分析CNN的视觉编码。 虽然这些方法可以倒置全连接层，但它们只显示深层表示中保留的信息，而不突出显示此信息的相对重要性。与 [14] 和 [4] 不同，我们的方法可以准确地突出图像的哪些区域对于鉴别是重要的。 总的来说，我们的方法提供了CNN灵魂的另一瞥。</p>
+<h1 id="类激活映射"><a href="#类激活映射" class="headerlink" title="类激活映射"></a>类激活映射</h1><p>在本节中，我们将介绍使用CNN中的全局平均池化层（GAP）生成类激活映射（CAM）的过程。特定类别的类激活映射表示CNN用于识别该类别的鉴别图像区域（例如图3）。生成这些图的过程如图2所示。</p>
+<p><img src="http://image.rexking6.top/img/clip1531055549.png" alt=""><br>图2.类激活映射：将预测的类分数映射回先前的卷积层以生成类激活映射（CAM）。 CAM突出了类特定的鉴别区域。</p>
+<p><img src="http://image.rexking6.top/img/clip1531055677.png" alt=""><br>图3.来自ILSVRC的四个类的CAM [20]。这些图突出了用于图像分类的鉴别图像区域，例如，布雷猎犬和母鸡的动物头部，杠铃中的杠铃片，以及钟楼中的钟。</p>
+<p>我们使用类似于Network in Network [13]和GoogLeNet [24]的网络架构 - 网络主要由卷积层组成，就在最终输出层之前（在分类的情况下为softmax），我们在卷积特征映射上执行全局平均池化，并将它们用作生成所需输出（分类或其他）的全连接层的特征。鉴于这种简单的连接结构，我们可以通过将输出层的权重投影回卷积特征映射来识别图像区域的重要性，这种技术称为类激活映射。</p>
+<p>如图2所示，全局平均池化层输出了最后一个卷积层上每个单元的特征图的空间平均值。 这些值的加权和用于生成最终输出。 类似地，我们计算最后一个卷积层的特征映射的加权和，以获得我们的类激活映射。 我们在下面更正式地描述了softmax的情况。 相同的技术可以应用于回归和其他损失函数。</p>
+<p>对于给定图像，让$f_k(x,y)$表示表示空间位置$(x,y)$处的最后卷积层中单元$k$的激活值。然后，对于单元$k$，执行全局平均池化的结果$F^k$为$\sum_{x,y}f_k(x,y)$。因此，对于给定的类$c$，softmax的输入 $S_c$为$\sum_k w_k^cF_k$，其中$w_k^c$是对应于单元$k$的类$c$的权重。实质上，$w_k^c$表示$F_k$对$c$类的重要性。最后，对于$c$类，softmax的输出，$P_c$由$\frac{exp(S_c)}{\sum_c exp(S_c)}$给出。在这里我们忽略偏差项：我们明确地将softmax的输入偏差设置为0，因为它对分类性能几乎没有影响。</p>
+<p>通过将$F_k=\sum_{x,y}f_k(x,y)$插入到类分数 $S_c$ 中，我们得到：</p>
+<script type="math/tex; mode=display">\begin{align*}
+S_c &= \sum_kw_k^c \sum_{x,y}f_k(x,y) \\
+&= \sum_{x,y} \sum_kw_k^c f_k(x,y)
+\end{align*}</script><p>我们将$M_c$定义为类$c$的类激活映射，其中每个空间元素由下式给出：</p>
+<script type="math/tex; mode=display">M_c(x,y)=\sum_kw_k^cf_k(x,y)</script><p>因此，$S_c=\sum_{x,y}M_c(x,y)$。因此，$M_c(x,y)$直接表示在空间网格$(x,y)$处的激活值，导致图像分类为$c$类。</p>
+<p>直观地，基于先前的研究 [33,29] ，我们期望每个单元在其感知领域内被一些视觉图案激活。因此，$f_k$是该视觉图案存在的映射。 类激活映射仅仅是在不同空间位置处存在这些视觉图案的加权线性和。 通过简单地将类激活映射上采样到输入图像的大小，我们可以识别与特定类别最相关的图像区域。</p>
+<p>在图3中，我们使用上述方法示出了CAM输出的一些例子。 我们可以看到各种类别的图像的鉴别区域被突出显示。 在图4中，我们突出显示了当使用不同的类c生成映射时单个图像的CAM的差异。 我们观察到，即使对于给定图像，不同类别的鉴别区域也是不同的。 这表明我们的方法按预期工作。 我们在前面的部分中定量地证明了这一点。</p>
+<p><img src="http://image.rexking6.top/img/clip1531101115.png" alt=""><br>图4.从给定图像的前5个预测类别生成的CAM的示例，其中真实标签为圆顶。预测的类及其分数显示在每个类激活图上方。我们观察到突出显示的区域在预测的类别中变化，例如，圆顶激活上部圆形部分，而宫殿激活建筑物的下部平坦部分。</p>
+<p><strong>全球平均池化（GAP）与全球最大池化（GMP）</strong><br>鉴于先前有关使用GMP进行弱监督对象定位的工作[16]，我们认为强调GAP和GMP之间的直观差异非常重要。 我们认为，与GMP相比，GAP损失促使网络确定对象的范围，GMP鼓励其仅识别一个鉴别性部分。 这是因为，当进行平均池化时，可以通过找到对象的所有鉴别部分来最大化该值，因为所有低激活值都减少了特定区域的输出。 另一方面，对于GMP，除了最具鉴别性的图像区域之外的所有图像区域的低分数不会影响分数，因为它只是执行最大值。 我们在第3节中的ILSVRC数据集上进行实验验证。 虽然GMP实现了与GAP类似的分类性能，但GAP在定位方面优于GMP。</p>
+<h1 id="弱监督对象定位"><a href="#弱监督对象定位" class="headerlink" title="弱监督对象定位"></a>弱监督对象定位</h1><p>在本节中，我们评估了CAM在ILSVRC 2014基准数据集上训练时的定位能力 [20] 。我们首先描述实验设置和3.1小节中使用的各种CNN。然后，在3.2小节我们验证在学习定位时我们的方法不会对分类性能产生负面影响，并提供有关弱监督对象定位的详细结果。</p>
+<h2 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h2><p>对于我们的实验，我们评估了在以下流行的CNN上使用CAM的效果：AlexNet [10]，VGGnet [23] 和GoogLeNet [24]。 通常，对于这些网络中的每一个，我们在最终输出之前移除全连接层，并用GAP替换它们，然后用全连接的softmax层替换它们。</p>
+<p>我们发现，当GAP之前的最后一个卷积层具有更高的空间分辨率时，网络的定位能力得到改善，我们称之为映射分辨率。为此，我们从一些网络中删除了几个卷积层。具体来说，我们做了以下修改：对于AlexNet，我们删除了conv5之后的层（即pool5到prob），导致映射分辨率为13×13。对于VGGnet，我们删除了conv5-3之后的层（即pool5到prob），导致映射分辨率为14×14。对于GoogLeNet，我们删除了inception4e之后的层（即pool4到prob），导致映射分辨率为14×14。对于上述每个网络，我们添加了一个卷积核大小为3×3，步幅为1，填充为1，带有1024个单元的卷积层，然后是一个GAP层和一个softmax层。 然后，这些网络中的每一个都在ILSVRC [20]的1.3M训练图像上进行微调，用于1000路对象分类，分别产生我们的最终网络AlexNet-GAP，VGGnet-GAP和GoogLeNet-GAP。</p>
+<p>对于分类，我们将我们的方法与原始的AlexNet [10]，VGGnet [23]和GoogLeNet [24]进行比较，并提供网络中的网络（NIN）[13]的结果。 对于定位，我们与原始GoogLeNet3，NIN进行比较，它们使用反向传播[22]而不是CAM。此外，为了将平均池化与最大池化进行比较，我们还提供了使用全局最大池（GoogLeNet-GMP）训练的GoogLeNet的结果。 </p>
+<p>我们使用与ILSVRC相同的评判指标（top-1，top-5）进行分类和定位，以评估我们的网络。 对于分类，我们在ILSVRC验证集上评估，并且我们在验证集上和测试集上进行定位评估。</p>
+<h2 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h2><p>我们首先报告对象分类的结果，以证明我们的方法不会显着损害分类性能。 然后我们证明了我们的方法在弱监督对象定位中是有效的。</p>
+<p><strong>分类</strong><br>表1总结了原始网络和我们的GAP网络的分类性能。 我们发现，在大多数情况下，从各种网络中删除附加层时，性能下降幅度为1-2％。 我们观察到AlexNet受到全连接层移除的影响最大。 为了补偿，我们在GAP之前添加了两个卷积层，从而产生了AlexNet<em>-GAP网络。 我们发现AlexNet</em>-GAP的表现与AlexNet相当。 因此，总的来说，我们发现分类性能在很大程度上保留了我们的GAP网络。 此外，我们观察到GoogLeNet-GAP和GoogLeNet-GMP在分类方面具有相似的性能，如预期的那样。 请注意，为了在定位上实现高性能，网络在分类上表现良好非常重要，因为它涉及准确地识别对象类别和边界框位置。</p>
+<p><img src="http://image.rexking6.top/img/clip1531136241.png" alt=""><br>表1. ILSVRC验证集的分类错误。</p>
+<p><strong>定位</strong><br>为了进行定位，我们需要生成边界框及其关联的对象类别。 要从CAM生成边界框，我们使用简单的阈值技术来分割热力图。 我们首先分割其值大于CAM最大值20％的区域。 然后我们采用覆盖分割图中最大连通分量的边界框。 我们为前5个预测类中的每一个执行此操作得到前5个定位评估指标。图6(a)显示了使用该技术生成的一些示例边界框。ILSVRC验证集上的定位性能显示在表2中，示例输出在图5中。</p>
+<p><img src="http://image.rexking6.top/img/clip1531136575.png" alt=""><br>表2. ILSVRC验证集的定位错误。 Backprop指的是使用[22]进行定位而不是CAM。</p>
+<p><img src="http://image.rexking6.top/img/clip1531136625.png" alt=""><br>图5.来自CNN-GAP的类激活映射和来自反向传播方法的类特定显着性映射。</p>
+<p><img src="http://image.rexking6.top/img/clip1531136681.png" alt=""><br>图6. a) GoogleNet-GAP的定位示例。 b) GooleNet-GAP的定位（上面两个）和使用AlexNet的反向传播（下面两个）的比较。 真实框为绿色，类激活图中预测的边界框为红色。</p>
+<p>我们观察到，我们的GAP网络优于所有基准方法，GoogLeNet-GAP在 top-5 上实现了43％的最低定位误差。 鉴于该网络未在单个带注释的边界框上进行训练，这一点非常值得注意。 我们观察到我们的CAM方法明显优于[22]的反向传播方法（参见图6(b)，用于比较输出）。 此外，我们观察到GoogLeNet-GAP在定位方面明显优于GoogLeNet，尽管这会在分类方面相反。 我们认为GoogLeNet（7×7）的低映射分辨率阻碍它获得准确的定位。 最后，我们观察到GoogLeNet-GAP的合理范围优于GoogLeNet-GMP，说明平均池化超过最大池化的重要性，以确定对象的范围。</p>
+<p>为了进一步将我们的方法与现有的弱监督[22]和全监督[24,21,24] CNN方法进行比较，我们评估了GoogLeNet-GAP在ILSVRC测试集上的性能。 我们在这里遵循稍微不同的边界框选择策略：我们从第一个和第二个预测类的类激活图中选择两个边界框（一个紧，一个松），从第三个预测类中选择一个松边界框。 我们发现这种启发式方法有助于提高验证集的性能。 性能总结在表3中。</p>
+<p>具有启发式的GoogLeNet-GAP在弱监督设置中实现了 top-5 错误率37.1％，这在全监督的设置中令人惊讶地接近AlexNet的 top-5 错误率（34.2％）。 虽然令人印象深刻，但在将全监督的网络与相同的架构（即弱监督的GoogLeNet-GAP与全监督的GoogLeNet）进行比较时，我们仍有很长的路要走。</p>
+<p><img src="http://image.rexking6.top/img/clip1531140165.png" alt=""><br>表3.各种弱监督和全监督方法的ILSVRC测试集的定位误差。</p>
+<h1 id="通用定位的深层特征"><a href="#通用定位的深层特征" class="headerlink" title="通用定位的深层特征"></a>通用定位的深层特征</h1><p>来自CNN的更高层的响应（例如，来自AlexNet的fc6，fc7）已经被证明是非常有效的通用特征，在各种图像数据集上具有最先进的性能 [3,19,34] 。在这里，我们展示了我们的GAP CNN学习的特征也可以作为通用特征很好地运行，并且额外地，识别了用于分类的鉴别图像区域，尽管没有针对那些特定任务进行训练。为了获得类似于原始softmax层的权重，我们简单地在GAP层的输出上训练线性SVM [5]。</p>
+<p>首先，我们比较了我们的方法和一些基准在以下场景和对象分类基准上的表现：SUN397 [27]，MIT Indoor67 [18]，Scene15 [11]，SUN属性[17]，Caltech101 [6]，Caltech256 [ 9]，Stanford Action40 [28]和UIUC Event8 [12]。实验设置与[34]中的相同。在表5中，我们将来自最佳网络GoogLeNet-GAP的功能与来自AlexNet的fc7功能和来自GoogLeNet的平均池化层进行比较。</p>
+<p><img src="http://image.rexking6.top/img/clip1531140627.png" alt=""><br>表5.针对不同深度特征的代表性场景和对象数据集的分类准确性。</p>
+<p>正如预期的那样，GoogLeNet-GAP和GoogLeNet明显优于AlexNet。 此外，我们观察到GoogLeNet-GAP和GoogLeNet的表现相似，尽管前者具有较少的卷积层。 总的来说，我们发现GoogLeNet-GAP功能与最先进的视觉功能相比具有竞争力。</p>
+<p>更重要的是，我们想要探索使用我们的CAM技术与GoogLeNet-GAP生成的定位映射是否即使在这种情况下也能提供信息。 图8显示了各种数据集的一些示例映射。 我们观察到，最具鉴别性的区域往往会在所有数据集中突出显示。 总的来说，我们的方法可以为通用任务生成可定位的深层功能。</p>
+<p>在4.1中，我们进行了对鸟类的细粒度识别，并演示我们如何评估通用定位能力并使用它来进一步提高性能。 在4.2中我们演示了GoogLeNet-GAP如何用于从图像中识别通用视觉模式。</p>
+<p><img src="http://image.rexking6.top/img/clip1531140889.png" alt=""><br>图8.使用GoogLeNet-GAP深层特征（已经过训练识别对象）的一般鉴别定位。我们展示了从4个数据集中各选取3个类别的各自两张图像，并在它们下面显示它们的类激活映射。 我们观察到图像的鉴别区域经常被突出显示，例如，在Stanford Action40中，拖把被定位用于清洁地板，而对于烹饪，平底锅和碗被定位并且可以在其他数据集中进行类似的观察。 这展示了我们深层功能的通用定位能力。</p>
+<h2 id="细粒度识别"><a href="#细粒度识别" class="headerlink" title="细粒度识别"></a>细粒度识别</h2><p>在本节中，我们将通用的可定位深度特征应用于识别CUB-200-2011 [26]数据集中的200种鸟类。该数据集包含11,788个图像，其中5,994个图像用于训练，5,794个用于测试。我们选择此数据集，因为它还包含边界框注释，允许我们评估我们的定位能力。表4总结了结果。</p>
+<p><img src="http://image.rexking6.top/img/clip1531143026.png" alt=""><br>表4. CUB200数据集上的细粒度分类性能。 GoogLeNet-GAP可以成功地定位重要的图像喙，提高分类性能。</p>
+<p>我们发现GoogLeNet-GAP与现有方法的性能相当，使用完整图像时的准确率达到63.0％，而且没有任何边界框注释用于训练和测试。使用边界框注释时，此准确度增加到70.5％。现在，鉴于我们网络的定位能力，我们可以使用类似于3.2小节的方法（即阈值处理）。首先识别训练集和测试集中的鸟类边界框。然后，我们使用GoogLeNet-GAP从边界框内的喙中再次提取特征，以进行训练和测试。我们发现这大幅提高到了67.8％的性能。这种定位能力对于细粒度识别尤其重要，因为类别之间的区别是微小的，并且具有更集中的图像喙能得到更好的区分。</p>
+<p>此外，我们发现GoogLeNet-GAP能够在0.5％IoU标准下准确定位 41.0％ 图像中的鸟，相比于偶然性能只有5.5%。 在图7中，我们展示了一些例子的可视化。这进一步验证了我们方法的定位能力。</p>
+<h2 id="模式发现"><a href="#模式发现" class="headerlink" title="模式发现"></a>模式发现</h2><p>在本节中，我们将探讨我们的技术是否可以识别超出对象的图像中的常见元素或模式，例如文本或高级概念。给定一组包含共同概念的图像，我们想要确定我们的网络认为哪些区域是重要的，以及这是否与输入模式相对应。我们遵循与以前类似的方法：我们在GoogLeNet-GAP网络的GAP层上训练线性SVM，并应用CAM技术来识别重要区域。我们使用我们的深层功能进行了三次模式发现实验结果总结如下。请注意，在这种情况下，我们没有分割训练集和测试集 - 我们只是使用CNN进行视觉模式发现。</p>
+<p><strong>在场景中发现信息对象</strong><br>我们从SUN数据集 [27] 中获取包含至少200个完全标注图像的10个场景类别，从而产生总共4675个完全标注的图像。我们为每个场景类别训练一对多线性SVM，并使用线性SVM的权重计算CAM。在图9中，我们绘制了预测场景类别的CAM，并且列出了两个场景类别中最常与高CAM激活区域重叠的前6个对象。我们观察到高激活区域经常对应于指示特定场景类别的对象。</p>
+<p><img src="http://image.rexking6.top/img/clip1531144094.png" alt=""><br>图9.两个场景类别的信息对象。对于餐厅和浴室类别，我们显示原始图像的示例（顶部），以及该场景类别中具有相应出现频率的6个最常见对象的列表。在底部：CAM和最常与高激活区域重叠的6个对象的列表。</p>
+<p><strong>弱标签图像中的概念定位</strong><br>使用 [32] 中的 Hard-negative 挖掘算法，我们学习概念检测器并应用我们的CAM技术来定位图像中的概念。为了训练短语的概念检测器，正面集包括在其文本标题中包含短语的图像，而负面集由在其文本标题中没有任何相关单词的随机选择的图像组成。在图10中，我们可视化两个概念检测器的排名最高的图像和CAM。请注意，CAM会对概念的信息区域进行定位，即使这些短语比典型的对象名称更抽象。</p>
+<p><img src="http://image.rexking6.top/img/clip1531144337.png" alt=""><br>图10.从弱标签图像中学习的概念的信息区域。 尽管相当抽象，但我们的GoogLeNet-GAP网络对这些概念进行了充分的定位。</p>
+<p><strong>弱监督文本检测器</strong><br>我们使用350个Google StreetView图像训练弱监督文本检测器，其中包含来自SVT数据集[25]的文本作为正面集，并将来自SUN数据集[27]中的室外场景图像的随机采样图像作为负面集。 如图11所示，我们的方法在不使用边界框注释的情况下准确地突出显示文本。</p>
+<p><img src="http://image.rexking6.top/img/clip1531144455.png" alt=""><br>图11.学习弱监督文本检测器。 即使我们的网络没有使用文本或任何边界框注释进行训练，也可以在图像上准确地检测到文本。</p>
+<p><strong>解释性视觉问题回答</strong><br>我们在[35]中提出的基准中使用我们的方法和可定位的深度特征来进行视觉问题回答。 在Open-Ended的测试标准上，它的总体准确度为55.89％。 如图12所示，我们的方法突出显示与预测答案相关的图像区域。</p>
+<p><img src="http://image.rexking6.top/img/clip1531144610.png" alt=""><br>图12.视觉问题回答中预测答案类的突出显示图像区域的示例。</p>
+<h1 id="可视化特定类的单元"><a href="#可视化特定类的单元" class="headerlink" title="可视化特定类的单元"></a>可视化特定类的单元</h1><p>Zhou等人 [33] 已经证明，CNN各层的卷积单元充当视觉概念检测器，将纹理或材料等低级概念识别为对象或场景等高级概念。进入网络后，这些单元变得越来越具有鉴别性。然而，考虑到许多网络中的全连接层，可能难以识别不同单元对于识别不同类别的重要性。在这里，使用GAP和排名的softmax权重，我们可以直接可视化对给定类最具鉴别力的单位。在这里，我们将它们称为CNN的特定于类的单元。</p>
+<p>图13显示了在用于对象识别的ILSVRC数据集（顶部）和用于场景识别的Places Database（底部）上训练的AlexNet*-GAP的类特定单元。我们遵循与 [33] 类似的程序来估计感受野并分割最终卷积层中每个单元的顶部激活映射。然后我们简单地使用softmax权重来对给定类的单元进行排名。从图中我们可以识别对分类最具鉴别力的对象部分以及哪些单元检测这些部分。例如，检测狗的头和狗的身体的单元对湖地梗犬很重要；检测沙发，桌子和壁炉的单元对客厅很重要。 因此，我们可以推断CNN实际上学习了一个词袋，其中每个单词都是一个具有鉴别力的类特定单元。 这些特定于类的单元的组合引导CNN对每个图像进行分类。</p>
+<p><img src="http://image.rexking6.top/img/clip1531145347.png" alt=""><br>图13.分别在ImageNet（顶部）和Places（底部）上训练的AlexNet* -GAP的类特定单元的可视化。为每个数据集显示三个选定类的前3个单元。每行显示由该单元的感受区域分割的置信度最高的图像。例如，检测黑板，椅子和桌子的单元对于训练用于场景识别的网络的教室分类是重要的。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>在这项工作中，我们提出了一种称为类激活映射（CAM）的通用技术，用于具有全局平均池化的CNN。 这使得经过分类训练的CNN能够学习执行对象定位，而无需使用任何边界框注释。 类激活图允许我们在任何给定图像上可视化预测的类分数，突出显示由CNN检测到的鉴别对象部分。 我们在ILSVRC基准测试中评估我们对弱监督对象定位的方法，证明我们的全局平均池化CNN可以执行准确的对象定位。 此外，我们证明CAM优化技术推广到其他视觉识别任务，即我们的方法产生通用的可定位的深度特征，可以帮助其他研究人员理解CNN用于其任务的鉴别性的基础。</p>
+<h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><p>[1] A. Bergamo, L. Bazzani, D. Anguelov, and L. Torresani. Self-taught object localization with deep networks. arXiv preprint arXiv:1409.3964, 2014.<br>[2] R. G. Cinbis, J. Verbeek, and C. Schmid. Weakly supervised object localization with multi-fold multiple instance learning. IEEE Trans. on Pattern Analysis and Machine Intelligence, 2015.<br>[3] J. Donahue, Y. Jia, O. Vinyals, J. Hoffman, N. Zhang, E. Tzeng, and T. Darrell. Decaf: A deep convolutional activation feature for generic visual recognition. International Conference on Machine Learning, 2014.<br>[4] A. Dosovitskiy and T. Brox. Inverting convolutional networks with convolutional networks. arXiv preprint arXiv:1506.02753, 2015.<br>[5] R.-E. Fan, K.-W. Chang, C.-J. Hsieh, X.-R. Wang, and C.-J. Lin. Liblinear: A library for large linear classification. The Journal of Machine Learning Research, 2008.<br>[6] L. Fei-Fei, R. Fergus, and P. Perona. Learning generative visual models from few training examples: An incremental bayesian approach tested on 101 object categories. Computer Vision and Image Understanding, 2007.<br>[7] E. Gavves, B. Fernando, C. G. Snoek, A. W. Smeulders, and T. Tuytelaars. Local alignments for fine-grained categorization. Int’l Journal of Computer Vision, 2014.<br>[8] R. Girshick, J. Donahue, T. Darrell, and J. Malik. Rich feature hierarchies for accurate object detection and semantic segmentation. Proc. CVPR, 2014.<br>[9] G. Griffin, A. Holub, and P. Perona. Caltech-256 object category dataset. 2007.<br>[10] A. Krizhevsky, I. Sutskever, and G. E. Hinton. Imagenet classification with deep convolutional neural networks. In Advances in Neural Information Processing Systems, 2012.<br>[11] S. Lazebnik, C. Schmid, and J. Ponce. Beyond bags of features: Spatial pyramid matching for recognizing natural scene categories. Proc. CVPR, 2006.<br>[12] L.-J. Li and L. Fei-Fei. What, where and who? classifying events by scene and object recognition. Proc. ICCV, 2007.<br>[13] M. Lin, Q. Chen, and S. Yan. Network in network. International Conference on Learning Representations, 2014.<br>[14] A. Mahendran and A. Vedaldi. Understanding deep image representations by inverting them. Proc. CVPR, 2015.<br>[15] M. Oquab, L. Bottou, I. Laptev, and J. Sivic. Learning and transferring mid-level image representations using convolutional neural networks. Proc. CVPR, 2014.<br>[16] M. Oquab, L. Bottou, I. Laptev, and J. Sivic. Is object localization for free? weakly-supervised learning with convolutional neural networks. Proc. CVPR, 2015.<br>[17] G. Patterson and J. Hays. Sun attribute database: Discovering, annotating, and recognizing scene attributes. Proc. CVPR, 2012.<br>[18] A. Quattoni and A. Torralba. Recognizing indoor scenes. Proc. CVPR, 2009.<br>[19] A. S. Razavian, H. Azizpour, J. Sullivan, and S. Carlsson. Cnn features off-the-shelf: an astounding baseline for recognition. arXiv preprint arXiv:1403.6382, 2014.<br>[20] O. Russakovsky, J. Deng, H. Su, J. Krause, S. Satheesh, S. Ma, Z. Huang, A. Karpathy, A. Khosla, M. Bernstein, A. C. Berg, and L. Fei-Fei. Imagenet large scale visual recognition challenge. In Int’l Journal of Computer Vision, 2015.<br>[21] P. Sermanet, D. Eigen, X. Zhang, M. Mathieu, R. Fergus, and Y. LeCun. Overfeat: Integrated recognition, localization and detection using convolutional networks. arXiv preprint arXiv:1312.6229, 2013.<br>[22] K. Simonyan, A. Vedaldi, and A. Zisserman. Deep inside convolutional networks: Visualising image classification models and saliency maps. International Conference on Learning Representations Workshop, 2014.<br>[23] K. Simonyan and A. Zisserman. Very deep convolutional networks for large-scale image recognition. International Conference on Learning Representations, 2015.<br>[24] C. Szegedy, W. Liu, Y. Jia, P. Sermanet, S. Reed, D. Anguelov, D. Erhan, V. Vanhoucke, and A. Rabinovich. Going deeper with convolutions. arXiv preprint arXiv:1409.4842, 2014.<br>[25] K. Wang, B. Babenko, and S. Belongie. End-to-end scene text recognition. Proc. ICCV, 2011.<br>[26] P. Welinder, S. Branson, T. Mita, C. Wah, F. Schroff, S. Belongie, and P. Perona. Caltech-UCSD Birds 200. Technical report, California Institute of Technology, 2010.<br>[27] J. Xiao, J. Hays, K. A. Ehinger, A. Oliva, and A. Torralba. Sun database: Large-scale scene recognition from abbey to zoo. Proc. CVPR, 2010.<br>[28] B. Yao, X. Jiang, A. Khosla, A. L. Lin, L. Guibas, and L. FeiFei. Human action recognition by learning bases of action attributes and parts. Proc. ICCV, 2011.<br>[29] M. D. Zeiler and R. Fergus. Visualizing and understanding convolutional networks. Proc. ECCV, 2014.<br>[30] N. Zhang, J. Donahue, R. Girshick, and T. Darrell. Partbased r-cnns for fine-grained category detection. Proc. ECCV, 2014.<br>[31] N. Zhang, R. Farrell, F. Iandola, and T. Darrell. Deformable part descriptors for fine-grained recognition and attribute prediction. Proc. ICCV, 2013.<br>[32] B. Zhou, V. Jagadeesh, and R. Piramuthu. Conceptlearner: Discovering visual concepts from weakly labeled image collections. Proc. CVPR, 2015.<br>[33] B. Zhou, A. Khosla, A. Lapedriza, A. Oliva, and A. Torralba. Object detectors emerge in deep scene cnns. International Conference on Learning Representations, 2015.<br>[34] B. Zhou, A. Lapedriza, J. Xiao, A. Torralba, and A. Oliva. Learning deep features for scene recognition using places database. In Advances in Neural Information Processing Systems, 2014.<br>[35] B. Zhou, Y. Tian, S. Sukhbaatar, A. Szlam, and R. Fergus. Simple baseline for visual question answering. arXiv preprint arXiv:1512.02167, 2015.</p>
+<h1 id="自己的看法"><a href="#自己的看法" class="headerlink" title="自己的看法"></a>自己的看法</h1><p>有一个不懂的地方：文中说的单元$k$是什么东西？是最后一层卷积层中第$k$个信道吗？可是到了最后一层卷积层，信道不是应该和类的个数相对应吗？这样后面的权重$w$才能够加权和。</p>
+<p>之后重新看了下文章和一些博客，明白了</p>
+<p><img src="http://image.rexking6.top/img/clip1531149412.png" alt=""></p>
+<p>原来$k$和$c$是在GAP之后接的softmax层，这里用的。</p>
+<p>然后还是要感叹一下本文，写得太妙了，简直了，首先是对深度学习这个黑箱子有了有力的理论证明，然后是没有对计算机视觉各个领域都有了解的话做不出后面那么多领域的实验，强有力地说明本文工作的牛逼之处。前面实验结果的对比也从各个方面论证了本文工作的正确性。</p>
+<p>但是本文的图编号有些乱，看的时候晕晕的，都是图太多了也没办法，无可厚非。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\05\CAM-Learning-Deep-Features-for-Discriminative-Localization-阅读笔记\" rel="bookmark">CAM-Learning Deep Features for Discriminative Localization 阅读笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\05\Visualizing-and-Understanding-Convolutional-Networks-阅读笔记\" rel="bookmark">Visualizing and Understanding Convolutional Networks 阅读笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\21\《Transferable-Semi-supervised-Semantic-Segmentation》笔记\" rel="bookmark">《Transferable Semi-supervised Semantic Segmentation》笔记</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/07/08/%E3%80%8ALearning-Deep-Features-for-Discriminative-Localization%E3%80%8B%E7%AC%94%E8%AE%B0/" title="《Learning Deep Features for Discriminative Localization》笔记">https://blog.rexking6.top/2018/07/08/《Learning-Deep-Features-for-Discriminative-Localization》笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2/" rel="tag"># 语义分割</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/07/06/%E3%80%8AObject-Region-Mining-with-Adversarial-Erasing-A-Simple-Classification-to-Semantic-Segmentation-Approach%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="prev" title="《Object Region Mining with Adversarial Erasing: A Simple Classification to Semantic Segmentation Approach》笔记">
+      <i class="fa fa-chevron-left"></i> 《Object Region Mining with Adversarial Erasing: A Simple Classification to Semantic Segmentation Approach》笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/10/%E3%80%8AGrad-CAM-Visual-Explanations-from-Deep-Networks-via-Gradient-based-Localization%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="next" title="《Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization》笔记">
+      《Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization》笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">2.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E7%A0%94%E7%A9%B6"><span class="nav-number">3.</span> <span class="nav-text">相关研究</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B1%BB%E6%BF%80%E6%B4%BB%E6%98%A0%E5%B0%84"><span class="nav-number">4.</span> <span class="nav-text">类激活映射</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%B1%E7%9B%91%E7%9D%A3%E5%AF%B9%E8%B1%A1%E5%AE%9A%E4%BD%8D"><span class="nav-number">5.</span> <span class="nav-text">弱监督对象定位</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE"><span class="nav-number">5.1.</span> <span class="nav-text">设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C"><span class="nav-number">5.2.</span> <span class="nav-text">结果</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%80%9A%E7%94%A8%E5%AE%9A%E4%BD%8D%E7%9A%84%E6%B7%B1%E5%B1%82%E7%89%B9%E5%BE%81"><span class="nav-number">6.</span> <span class="nav-text">通用定位的深层特征</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%86%E7%B2%92%E5%BA%A6%E8%AF%86%E5%88%AB"><span class="nav-number">6.1.</span> <span class="nav-text">细粒度识别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E5%8F%91%E7%8E%B0"><span class="nav-number">6.2.</span> <span class="nav-text">模式发现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%AF%E8%A7%86%E5%8C%96%E7%89%B9%E5%AE%9A%E7%B1%BB%E7%9A%84%E5%8D%95%E5%85%83"><span class="nav-number">7.</span> <span class="nav-text">可视化特定类的单元</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">8.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-number">9.</span> <span class="nav-text">References</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%87%AA%E5%B7%B1%E7%9A%84%E7%9C%8B%E6%B3%95"><span class="nav-number">10.</span> <span class="nav-text">自己的看法</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

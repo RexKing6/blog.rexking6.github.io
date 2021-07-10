@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统知识点">
+<meta property="og:url" content="https://blog.rexking6.top/2017/09/13/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9F%A5%E8%AF%86%E7%82%B9/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/11521956238.png">
+<meta property="article:published_time" content="2017-09-13T02:43:50.000Z">
+<meta property="article:modified_time" content="2018-10-22T06:42:36.664Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="笔试面试">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/11521956238.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2017/09/13/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9F%A5%E8%AF%86%E7%82%B9/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>操作系统知识点 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2017/09/13/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9F%A5%E8%AF%86%E7%82%B9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          操作系统知识点
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-09-13 10:43:50" itemprop="dateCreated datePublished" datetime="2017-09-13T10:43:50+08:00">2017-09-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2018-10-22 14:42:36" itemprop="dateModified" datetime="2018-10-22T14:42:36+08:00">2018-10-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AF%95%E9%9D%A2%E8%AF%95/" itemprop="url" rel="index"><span itemprop="name">笔试面试</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2017/09/13/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9F%A5%E8%AF%86%E7%82%B9/" class="post-meta-item leancloud_visitors" data-flag-title="操作系统知识点" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>8.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h1><p>进程（Process）是计算机中的程序关于某数据集合上的一次运行活动，是系统进行资源分配和资源调度的一个独立单位，由程序代码和相关数据还有进程控制块组成。</p>
+<p>进程控制块：标识符、状态、优先级、程序计数器、内存指针、上下文数据、I/O状态信息、记账信息。</p>
+<p>五态：新建态、就绪态、运行态、等待态、退出态。</p>
+<p>进程创建：</p>
+<ol>
+<li>分配唯一进程标识符</li>
+<li>分配空间</li>
+<li>初始化进程控制块</li>
+<li>设置正确的连接</li>
+<li>创建或扩充其他数据结构</li>
+</ol>
+<p>用户态-&gt;内核态依靠中断机制：</p>
+<ol>
+<li><p>中断<br> 1.时钟中断<br> 2.I/O中断<br> 3.内存失效</p>
+</li>
+<li><p>陷阱(异常或错误)</p>
+</li>
+<li>系统调用(显式请求)</li>
+</ol>
+<h1 id="进程间通信"><a href="#进程间通信" class="headerlink" title="进程间通信"></a>进程间通信</h1><p>同一台机器的进程间通信：管道、消息队列、共享内存、信号量<br>不同机器的进程间通信：套接字</p>
+<ol>
+<li><p>管道<br>无名管道 在内核中，只能用于父子进程或者兄弟进程间通信。<br>有名管道，以FIFO的文件形式在文件系统中，可以用于任意两个进程。</p>
+</li>
+<li><p>消息队列<br>一个在系统内核中用来保存消息的队列，在系统内核中是以消息链表的形式出现。<br>与管道相比，优点：1. 消息队列可以独立发送和接收进程而存在，消除了管道打开和关闭可能产生的困难；2. 可以同时通过发送消息以避免命名管道的同步和堵塞问题；3. 接收程序可以通过消息类型有选择地接收数据，而不是像管道只能默认地接收。<br>事实上，消息队列正在被淘汰，可以流管道和套接口来取代。</p>
+</li>
+<li><p>共享内存<br>是允许两个不相关的进程访问同一个逻辑内存。<br>常安排在同一段物理内存中，效率最快。<br>但是共享内存并未提供同步机制，需要用其他的机制来同步对共享内存的访问。</p>
+</li>
+<li><p>信号量<br>可以解决共享内存的同步问题。<br>守护进程P347<br>进程间通信P352</p>
+</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ipcs</span><br><span class="line">报告系统的消息队列、信号量、共享内存等</span><br><span class="line">-a 列出本用户所有相关的ipcs参数</span><br><span class="line">-q 列出进程中的消息队列</span><br><span class="line">-s 列出所有的信号量</span><br><span class="line">-m 列出所有的共享内存信息</span><br><span class="line">-l 列出系统的限额</span><br><span class="line">-t 列出最后的访问时间</span><br><span class="line">-u 列出当前的使用情况</span><br></pre></td></tr></table></figure>
+<h1 id="进程状态"><a href="#进程状态" class="headerlink" title="进程状态"></a>进程状态</h1><ul>
+<li>孤儿进程，是指一个父进程退出后，而它的一个或多个子进程还在运行，那么那些子进程将成为孤儿进程。孤儿进程将被init进程(进程号为1)所收养，并由init进程收养，并由init进程对它们完成状态收集工作。</li>
+<li><p>僵尸进程，是指一个进程使用fork创建子进程，如果子进程退出，而父进程并没有调用wait或waitpid获取子进程的状态信息，那么子进程的进程描述符仍然保存在系统中。<br>区别：孤儿进程是父进程已退出，而子进程未退出；僵尸进程是父进程未退出，而子进程已退出。</p>
+</li>
+<li><p>守护进程是脱离于终端并且在后台运行的进程</p>
+</li>
+</ul>
+<p>创建一个简单的守护进程的步骤：</p>
+<ol>
+<li>创建子进程，父进程退出</li>
+<li>在子进程中创建新会话</li>
+<li>改变当前目录为根目录</li>
+<li>重设文件权限掩码</li>
+<li>关闭文件描述符</li>
+</ol>
+<h1 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h1><p>线程是进程的一个实体，是CPU调度和分配的基本单位。</p>
+<p>线程有：</p>
+<ol>
+<li>线程执行状态</li>
+<li>线程上下文</li>
+<li>执行栈</li>
+<li>局部变量的静态存储空间</li>
+<li>与进程内的其他线程共享的对进程的内存和资源的访问。</li>
+</ol>
+<p>优点：</p>
+<ol>
+<li>易于调度</li>
+<li>提高并发性。通过线程可以方便有效地实现并发。</li>
+<li>开销小。创建线程比创建进程要快。所需要的开销也更小。</li>
+<li>有利于发挥多处理器的功能。通过创建多线程，每个线程都在一个处理器上运行，从而实现应用程序的并行，使每个处理器都得到充分运行。</li>
+</ol>
+<p>与进程区别：</p>
+<ol>
+<li>一个线程必定属于也只能属于一个进程；而一个进程可以拥有多个线程并且至少拥有一个线程。</li>
+<li>属于一个进程的所有进程共享该线程的所有资源。包括打开的文件、创建的Socket等。不同的进程互相独立。</li>
+<li>线程又被称为轻量级进程。进程有进程控制块，线程也有线程控制块。但线程控制块比进程控制块小得多。线程间切换代价小，进程间切换代价大。</li>
+<li>进程是程序的一次执行，线程可以理解为程序中一段程序片段的执行。</li>
+<li>每个进程都有独立的内存空间，而线程共享其所属进程的内存空间。</li>
+</ol>
+<p>线程状态：<br>就绪态、运行态、阻塞态</p>
+<h1 id="内核线程和用户线程"><a href="#内核线程和用户线程" class="headerlink" title="内核线程和用户线程"></a>内核线程和用户线程</h1><p>用户线程优点：</p>
+<ol>
+<li>可以在不支持线程的操作系统中实现。</li>
+<li>创建和销毁线程、线程切换等线程管理的代价比内核线程少得多。</li>
+<li>允许每个进程定制自己的调度算法，线程管理比较灵活。</li>
+<li>线程能够利用的表空间和堆栈空间比内核级线程多。</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>同一进程中只能同时有一个线程在运行，如果有一个线程使用了系统调用而阻塞，那么整个进程都会被挂起。</li>
+<li>页面失效也会产生类似的问题。</li>
+</ol>
+<h1 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h1><h2 id="多线程同步"><a href="#多线程同步" class="headerlink" title="多线程同步"></a>多线程同步</h2><ol>
+<li><p>互斥锁<br>互斥锁是一个特殊的变量，它有锁上和打开两个状态。互斥锁一般被设置成全局变量。打开的互斥锁可以由某个线程获得，获得后只有该线程有权打开这个互斥锁。</p>
+</li>
+<li><p>条件变量<br>条件变量通过允许线程堵塞和等待另一个线程发送信号的方法弥补互斥锁的不足，常与互斥锁一起使用。使用时，条件变量被用来堵塞一个线程，当条件不满足时，线程往往解开相应的互斥锁并等待条件发生变化。一旦其他的某个线程改变了条件变量，它将通知相应的条件变量唤醒一个或多个正被此条件变量阻塞的线程，这些线程将重新锁定互斥锁并重新测试条件是否满足。</p>
+</li>
+<li><p>读写锁<br>存在两种操作，一种是独占性的，写操作；一种是共享性，读操作。<br>读写锁最适用于对数据结构的读操作次数多于写操作次数的场合。<br>一般有两种策略：<br>(1. 强读者同步：总是给读者更高的优先权，只要写者当前没有写操作，读者就可以获得访问权限。<br>(2. 强写者同步：总是给写者更高的优先权，读者只能等到所有正在等待的或者正在执行的写者结束以后才能执行。<br>航班订票系统一般用强读者策略，图书馆系统一般用强写者策略。<br>读写锁机制是由POSIX提供的。</p>
+</li>
+<li><p>信号量<br>区别：互斥锁只允许一个线程进入临界区 信号量允许多个线程同时进去临界区</p>
+</li>
+</ol>
+<h2 id="多线程重入"><a href="#多线程重入" class="headerlink" title="多线程重入"></a>多线程重入</h2><p>同步方式是为了解决“函数不可重入”的问题。“可重入函数”，是指可以由多于一个任务并发使用，而不必担心数据错误的函数。</p>
+<h1 id="内存管理的方式"><a href="#内存管理的方式" class="headerlink" title="内存管理的方式"></a>内存管理的方式</h1><ol>
+<li>块式管理</li>
+</ol>
+<p>把主存分为一大块一大块的，当所需的程序片断不在主存时就分配一块主存空间，把程序片断load入主存，就算所需的程序片断只有几个字节也只能把这一块分配给它。这样会造成很大的浪费，平均浪费了50%的内存空间，但是易于管理。</p>
+<ol>
+<li>页式管理</li>
+</ol>
+<p>把主存分为一页一页的，每一页的空间要比一块一块的空间小很多，显然这种方法的空间利用率要比块式管理高很多。</p>
+<ol>
+<li>段式管理</li>
+</ol>
+<p>把主存分为一段一段的，每一段的空间又要比一页一页的空间小很多，这种方法在空间利用率上又比页式管理高很多，但是也有另外一个缺点。一个程序片断可能会被分为几十段，这样很多时间就会被浪费在计算每一段的物理地址上。</p>
+<ol>
+<li>段页式管理</li>
+</ol>
+<p>结合了段式管理和页式管理的优点。把主存先分成若干段，每个段又分成若干页。段页式管理每取一数据，要访问3次内存。</p>
+<h1 id="分段和分页的区别"><a href="#分段和分页的区别" class="headerlink" title="分段和分页的区别"></a>分段和分页的区别</h1><p>页是信息的物理单位，分页是为了实现离散分配方式，以削减内存的外零头，提高内存的利用率；或者说，分页仅仅是由于系统管理的需要，而不是用户的需要。<br>段是信息的逻辑单位，它含有一组其意义相对完整的信息。分段的目的是为了能更好地满足用户的需要。页的大小固定且有系统确定，把逻辑地址划分为页号和页内地址两部分，是由机器硬件实现的，因而一个系统只能有一种大小的页面。段的长度却不固定，决定于用户所编写的程序，通常由编辑程序在对源程序进行编辑时，根据信息的性质来划分。<br>分页的作业地址空间是一维的，即单一的线性空间，程序员只需利用一个记忆符，即可表示一地址。分段的作业地址空间是二维的，程序员在标识一个地址时，既需给出段名，又需给出段内地址。</p>
+<h1 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h1><p> 虚拟内存简称虚存，是计算机系统内存管理的一种技术。它是相对于物理内存而言，可以理解为“假的”内存。它使得应用程序认为它拥有连续可用的内存（一个连续完整的地址空间），允许程序员编写并运行比实际系统拥有的内存大得多的程序，这使得许多大型软件项目能够在具有有限内存资源的系统上实现。而实际上，它通常被分割成多个物理内存碎片，还有部分暂时存储在外部磁盘存储器上，在需要时进行数据交换。虚存比实存有以下好处：</p>
+<ol>
+<li>扩大地址空间。无论段式虚存，还是页式虚存，或是段页式虚存，寻址空间都比实存大。</li>
+<li>内存保护。每个进程运行在各自的虚拟内存地址空间，互相不能干扰对方。另外，虚存还对特定的内存地址提高写保护，可以防止代码或数据被恶意篡改。</li>
+<li>公平分配内存。采用了虚存之后，每个进程都相当于有同样大小的虚存空间。</li>
+<li>当进程需要通信时，可采用虚存共享的方式实现。</li>
+</ol>
+<p>不过，使用虚存也是有代价的，主要表现在以下几个方面：</p>
+<ol>
+<li>虚存的管理需要建立很多数据结构，这些数据结构要占用额外的内存。</li>
+<li>虚拟地址到物理地址的转换，增加了指令的执行时间。</li>
+<li>页面的换入换出需要磁盘I/O，这是很耗时间的。</li>
+<li>如果一页中只有一部分数据，会浪费内存。</li>
+</ol>
+<h1 id="内存碎片、内碎片和外碎片"><a href="#内存碎片、内碎片和外碎片" class="headerlink" title="内存碎片、内碎片和外碎片"></a>内存碎片、内碎片和外碎片</h1><ul>
+<li>内存碎片是由于多次进行内存分配造成的，当进行内存分配时，内存格式一般为：（用户使用段）（空白段）（用户使用段），当空白段很小的时候可能不能提供给用户足够需要的空间，可能夹在中间的空白段的大小为5，而用户需要的内存大小6，这样会产生很多的间隙造成使用效率的下降，这些很小的空隙叫碎片。</li>
+<li>内碎片：分配给程序的存储空间没有用完，有一部分是程序不使用，但其他程序也没法用的空间。内碎片是处于区域内部或页面内部的存储块，占有这些区域或页面的进程并不使用这个存储块，而在进程占有这块存储块时，系统无法利用它，直到进程释放它，或进程结束时，系统才有可能利用这个存储块。</li>
+<li>由于空间太小，小到无法给任何程序分配（不属于任何进程）的存储空间是外碎片。外部碎片是出于任何已分配区域或页面外部的空闲存储块，这些存储块的总和可以满足当前申请的长度要求，但是由于它们的地址不连续或其他原因，使得系统无法满足当前申请。</li>
+<li>内碎片和外碎片是一对矛盾体，一种特定的内存分配算法，很难同时解决好内碎片和外碎片的问题，只能根据应用特点进行取舍。</li>
+</ul>
+<h1 id="虚拟地址、逻辑地址、线性地址、物理地址的区别"><a href="#虚拟地址、逻辑地址、线性地址、物理地址的区别" class="headerlink" title="虚拟地址、逻辑地址、线性地址、物理地址的区别"></a>虚拟地址、逻辑地址、线性地址、物理地址的区别</h1><ul>
+<li>虚拟地址是指由程序产生的由段选择符和段内偏移地址组成的地址。这两部分组成的地址并没有直接访问物理内存，而是要通过分段地址的变换处理后才会对应到相应的物理内存地址。</li>
+<li>逻辑地址指由程序产生的段内偏移地址。有时直接把逻辑地址当成虚拟地址，两者并没有明确的界限。</li>
+<li>线性地址是指虚拟地址到物理地址变换之间的中间层，是处理器可寻址的内存空间（线性地址空间）中的地址。程序代码会产生逻辑地址，或者说是段中的偏移地址，加上相应段基址就生成了一个线性地址。如果启用了分页机制，那么线性地址可以再经过变换产生物理地址。若是没有采用分页机制，那么线性地址就是物理地址。</li>
+<li>物理地址是指现在CPU外部地址总线上的寻址物理内存的地址信号，是地址变换的最终结果。</li>
+<li>虚拟地址到物理地址的转化方法是与体系结构相关的，一般有分段与分页两种方式。内存管理单元负责从虚拟地址到物理地址的转化。逻辑地址是段标识+段内偏移量的形式，MMU通过查询段表，可以把逻辑地址转化为线性地址。如果CPU没有开启分页功能，那么线性地址就是物理地址：；如果CPU开启了分页功能，MMU还需要查询页表来将线性地址转化为物理地址：逻辑地址（段表）-&gt;线性地址（页表）-&gt;物理地址。</li>
+<li>映射是一种多对一的关系，即不同的逻辑地址可以映射到同一个线性地址上；不同的线性地址也可以映射到同一个物理地址上。而且，同一个线性地址在发生换页以后，也可能被重新装载到另外一个物理地址上，所以这种多对一的映射关系也会随时间发生变化。</li>
+</ul>
+<h1 id="进程调度算法"><a href="#进程调度算法" class="headerlink" title="进程调度算法"></a>进程调度算法</h1><ol>
+<li>先来先服务(FCFS, First Come First Serve)</li>
+<li>短作业优先(SJF, Shortest Job First)</li>
+<li>最高优先权调度(Priority Scheduling)</li>
+<li>时间片轮转(RR, Round Robin)</li>
+<li>多级反馈队列调度(multilevel feedback queue scheduling)</li>
+</ol>
+<p>常见的调度算法总结:<a target="_blank" rel="noopener" href="http://www.jianshu.com/p/6edf8174c1eb">http://www.jianshu.com/p/6edf8174c1eb</a></p>
+<p>实时调度算法:</p>
+<ol>
+<li>最早截至时间优先 EDF</li>
+<li>最低松弛度优先 LLF</li>
+</ol>
+<h1 id="Cache替换算法"><a href="#Cache替换算法" class="headerlink" title="Cache替换算法"></a>Cache替换算法</h1><ol>
+<li>随机算法（RAND）。随机算法就是用随机数发生器产生一个要替换的块号，将该块替换出去，此算法简单，易于实现，但命中率较低。</li>
+<li>先进先出（FIFO）算法。是将最先进入Cache的信息块替换出去。比较容易实现，系统开销小，其缺点是可能会把一些需要经常使用的程序块（如循环程序）也作为最早进入Cache的块替换掉，而且没有根据访存的局部性原理，故不能提高Cache的命中率。</li>
+<li>近期最少使用（LRU）算法。是将近期最少使用的Cache中的信息块替换出去。虽然比较好地反映了程序局部性规律，但是这种替换方法需要随时记录Cache中各块的使用情况。实现起来比较复杂，系统开销较大。实现有：计数器法、寄存器栈法及硬件逻辑比较对法。</li>
+<li>最优替换算法（OPT算法）。理想，实现不现实，用来评价。</li>
+<li>近期最少使用算法（LFU算法）。选择近期最少访问的页面作为被替换的页面。既充分利用了主存中页面调度情况的历史信息，又正确反映了程序的局部性。但是，实现非常困难，要为每个页面设置一个很长的计数器。</li>
+</ol>
+<h1 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h1><h2 id="原因"><a href="#原因" class="headerlink" title="原因:"></a>原因:</h2><ol>
+<li>竞争资源</li>
+<li>程序推进顺序不当</li>
+</ol>
+<h2 id="必要条件"><a href="#必要条件" class="headerlink" title="必要条件:"></a>必要条件:</h2><ol>
+<li>互斥条件</li>
+<li>请求和保持条件</li>
+<li>不剥夺条件</li>
+<li>环路等待条件</li>
+</ol>
+<h2 id="处理死锁基本方法"><a href="#处理死锁基本方法" class="headerlink" title="处理死锁基本方法:"></a>处理死锁基本方法:</h2><ol>
+<li>预防死锁(摒弃除1以外的条件)</li>
+<li>避免死锁(银行家算法)</li>
+<li>检测死锁(资源分配图)</li>
+<li>解除死锁<br> 1.剥夺资源<br> 2.撤销进程</li>
+</ol>
+<p>死锁概念处理策略详细介绍:<a target="_blank" rel="noopener" href="https://wizardforcel.gitbooks.io/wangdaokaoyan-os/content/10.html">https://wizardforcel.gitbooks.io/wangdaokaoyan-os/content/10.html</a></p>
+<h1 id="边沿触发和水平触发"><a href="#边沿触发和水平触发" class="headerlink" title="边沿触发和水平触发"></a>边沿触发和水平触发</h1><p>边缘触发是指每当状态变化时发生一个 io 事件，条件触发是只要满足条件就发生一个 io 事件</p>
+<h1 id="并发与并行"><a href="#并发与并行" class="headerlink" title="并发与并行"></a>并发与并行</h1><p>并发和并行从宏观上来讲都是同时处理多路请求的概念。但并发和并行又有区别，并行是指两个或者多个事件在同一时刻发生；而并发是指两个或多个事件在同一时间间隔内发生。<br>在操作系统中，并发是指一个时间段中有几个程序都处于已启动运行到运行完毕之间，且这几个程序都是在同一个处理机上运行，但任一个时刻点上只有一个程序在处理机上运行。</p>
+<h1 id="程序编译与链接"><a href="#程序编译与链接" class="headerlink" title="程序编译与链接"></a>程序编译与链接</h1><p>推荐: <a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2014/11/compiler.html">http://www.ruanyifeng.com/blog/2014/11/compiler.html</a></p>
+<p>Bulid过程可以分解为4个步骤:预处理(Prepressing), 编译(Compilation)、汇编(Assembly)、链接(Linking)</p>
+<p>以c语言为例:</p>
+<h2 id="1-预处理"><a href="#1-预处理" class="headerlink" title="1 预处理"></a>1 预处理</h2><p>预编译过程主要处理那些源文件中的以“#”开始的预编译指令，主要处理规则有：</p>
+<ol>
+<li>将所有的“#define”删除，并展开所用的宏定义</li>
+<li>处理所有条件预编译指令，比如“#if”、“#ifdef”、 “#elif”、“#endif”</li>
+<li>处理“#include”预编译指令，将被包含的文件插入到该编译指令的位置，注：此过程是递归进行的</li>
+<li>删除所有注释</li>
+<li>添加行号和文件名标识，以便于编译时编译器产生调试用的行号信息以及用于编译时产生编译错误或警告时可显示行号</li>
+<li>保留所有的#pragma编译器指令。</li>
+</ol>
+<h2 id="2-编译"><a href="#2-编译" class="headerlink" title="2 编译"></a>2 编译</h2><p>编译过程就是把预处理完的文件进行一系列的词法分析、语法分析、语义分析及优化后生成相应的汇编代码文件。这个过程是整个程序构建的核心部分。</p>
+<h2 id="3-汇编"><a href="#3-汇编" class="headerlink" title="3 汇编"></a>3 汇编</h2><p>汇编器是将汇编代码转化成机器可以执行的指令，每一条汇编语句几乎都是一条机器指令。经过编译、链接、汇编输出的文件成为目标文件(Object File)</p>
+<h2 id="4-链接"><a href="#4-链接" class="headerlink" title="4 链接"></a>4 链接</h2><p>链接的主要内容就是把各个模块之间相互引用的部分处理好，使各个模块可以正确的拼接。 链接的主要过程包块 地址和空间的分配（Address and Storage Allocation）、符号决议(Symbol Resolution)和重定位(Relocation)等步骤。</p>
+<h1 id="库函数与系统调用的区别"><a href="#库函数与系统调用的区别" class="headerlink" title="库函数与系统调用的区别"></a>库函数与系统调用的区别</h1><p>库函数调用是语言或应用程序的一部分，它是高层的，完全运行在用户空间，为程序员提供调用真正的在幕后完成实际事务的系统调用接口。而系统函数是内核提供给应用程序的接口，属于系统的一部分。函数库调用是语言或应用程序的一部分，而系统调用是操作系统的一部分。</p>
+<p><img src="http://image.rexking6.top/img/11521956238.png" alt=""></p>
+<p>库函数调用通常比行内展开的代码慢，因为它需要付出函数调用的开销。但系统调用比库函数调用还要慢很多，因为它需要把上下文环境切换到内核模式。</p>
+<h1 id="静态链接和动态链接的区别"><a href="#静态链接和动态链接的区别" class="headerlink" title="静态链接和动态链接的区别"></a>静态链接和动态链接的区别</h1><ul>
+<li>静态链接是指把要调用的函数或者过程直接链接到可执行文件中，成为可执行文件的一部分。换句话说，函数和过程的代码就在程序的exe文件中，该文件包含了运行时所需的全部代码。静态链接的缺点是当多个程序都调用相同函数时，内存中就会存在这个函数的多个拷贝，这样就浪费了内存资源。</li>
+<li>动态链接是相对于静态链接而言的，动态链接所调用的函数代码并没有被拷贝到应用程序的可执行文件中去，而是仅仅在其中加入了所调用函数的描述信息（往往是一些重定位信息）。仅当应用程序被装入内存开始运行时，在操作系统的管理下，才在应用程序与相应的动态链接库（dynamic link library，dll）之间建立链接关系。当要执行所调用dll中的函数时，根据链接产生的重定位信息，操作系统才转去执行dll中相应的函数代码。</li>
+<li>静态链接的执行程序能够在其它同类操作系统的机器上直接运行，而动态链接的执行程序则不可以。</li>
+</ul>
+<h1 id="静态链接库与动态链接库有什么区别"><a href="#静态链接库与动态链接库有什么区别" class="headerlink" title="静态链接库与动态链接库有什么区别"></a>静态链接库与动态链接库有什么区别</h1><ul>
+<li>静态链接库就是使用的.lib文件，库中的代码最后需要链接到可执行文件中去，所以静态链接的可执行文件一般比较大一些。</li>
+<li>动态链接库是一个包含可有多个程序同时使用的代码和数据的库，它包含函数和数据的模块的集合。程序文件（如.exe文件或.dll文件）在运行时加载这些模块（也即所需的模块映射到调用进程的地址空间）。</li>
+<li>静态链接库和动态链接库的相同点是它们都实现了代码的共享。不同点是静态链接库.lib中的代码被包含在调用的.exe文件中，该.lib中不能再包含其他动态链接库或者静态链接库了。而动态链接库.dll可以被调用的.exe动态地“引用”和“卸载”，该.dll中可以包含其他动态链接库或者静态链接库。</li>
+</ul>
+<h1 id="用户态和核心态的区别"><a href="#用户态和核心态的区别" class="headerlink" title="用户态和核心态的区别"></a>用户态和核心态的区别</h1><p>核心态与用户态是操作系统的两种运行级别，它用于区分不同程序的不同权利。核心态就是用户资源多的状态，或者说访问资源多的状态，也称之为特权态。相对来说，用户态就是非特权态，在此种状态下访问的资源将受到限制。如果一个程序运行在特权态，则该程序就可以访问计算机的任何资源，即它的资源访问权限不受限制。如果一个程序运行在用户态，则其资源需求将受到各种限制。<br>核心态下CPU可执行任何指令，在用户态下CPU只能执行非特权指令。当CPU处于核心态时，可以随意进入用户态；而当CPU处于用户态时，用户从用户态切换到核心只有在系统调用和中断两种情况下发生。一般程序一开始都是运行于用户态，当程序需要使用系统资源时，就必须通过调用软中断进入核心态。<br>和心态和用户态各有优势：运行在核心态的程序可以访问的资源多，但可靠性、安全性要求高，维护管理都较复杂；用户态程序访问的资源受限，但可靠性、安全性要求低，自然编写维护起来都较简单。一个程序到底应该运行在核心态还是用户态其对资源和效率的需求。</p>
+<h1 id="用户栈与内核栈的区别"><a href="#用户栈与内核栈的区别" class="headerlink" title="用户栈与内核栈的区别"></a>用户栈与内核栈的区别</h1><p>内核在创建进程的时候，在创建task_struct的同时，会为进程创建相应的堆栈。每个进程会有两个栈，一个用户栈；一个内核栈，存在于内核空间。当进程在用户空间运行时，CPU堆栈指针寄存器里面的内容是用户堆栈地址，使用用户栈；当进程在内核空间时，CPU堆栈指针寄存器里面的内容是内核栈空间地址，使用内核栈。<br>当进程因为中断或者系统调用而陷入内核态时，进程所使用的堆栈也要从用户栈转到内核栈。进程陷入内核态后，先把用户态堆栈的地址保存在内核栈之中，然后设置堆栈指针寄存器的内容为内核栈的地址，这样就完成了用户栈向内核栈的转换；当进程从内核态恢复到用户态之后时，在内核态之后的最后将保存在内核栈里面的用户栈的地址恢复到堆栈指针寄存器即可。这样就实现了内核栈和用户栈的互转。<br>那么，知道从内核转到用户态时用户栈的地址是在陷入内核的时候保存在内核栈里面的，但是在陷入内核的时候，如何知道内核栈的地址？关键在进程从用户态转到内核态的时候，进程的内核栈总是空的。这是因为当进程在用户态运行时，使用的是用户栈，当进程陷入到内核态时，内核栈保存进程在内核态运行的相关信息，但是一旦进程返回到用户态后，内核栈中保存的信息无效，会全部恢复，因此每次进程从用户态陷入内核的时候得到的内核栈都是空的，所以在进程陷入内核的时候，直接把内核栈的栈顶地址给堆栈指针寄存器就可以了。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\09\13\Django知识点\" rel="bookmark">Django知识点</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\09\05\Linux知识点\" rel="bookmark">Linux知识点</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\09\02\Redis知识点\" rel="bookmark">Redis知识点</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2017/09/13/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9F%A5%E8%AF%86%E7%82%B9/" title="操作系统知识点">https://blog.rexking6.top/2017/09/13/操作系统知识点/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AF%95%E9%9D%A2%E8%AF%95/" rel="tag"># 笔试面试</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/09/12/%E7%BC%96%E7%A8%8B%E4%B9%8B%E7%BE%8E%E8%AE%B0%E5%BD%95/" rel="prev" title="编程之美记录">
+      <i class="fa fa-chevron-left"></i> 编程之美记录
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/09/13/Django%E7%9F%A5%E8%AF%86%E7%82%B9/" rel="next" title="Django知识点">
+      Django知识点 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">进程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1"><span class="nav-number">2.</span> <span class="nav-text">进程间通信</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%8A%B6%E6%80%81"><span class="nav-number">3.</span> <span class="nav-text">进程状态</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">线程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B%E5%92%8C%E7%94%A8%E6%88%B7%E7%BA%BF%E7%A8%8B"><span class="nav-number">5.</span> <span class="nav-text">内核线程和用户线程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B"><span class="nav-number">6.</span> <span class="nav-text">多线程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5"><span class="nav-number">6.1.</span> <span class="nav-text">多线程同步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E9%87%8D%E5%85%A5"><span class="nav-number">6.2.</span> <span class="nav-text">多线程重入</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="nav-number">7.</span> <span class="nav-text">内存管理的方式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%AE%B5%E5%92%8C%E5%88%86%E9%A1%B5%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">8.</span> <span class="nav-text">分段和分页的区别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98"><span class="nav-number">9.</span> <span class="nav-text">虚拟内存</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E7%A2%8E%E7%89%87%E3%80%81%E5%86%85%E7%A2%8E%E7%89%87%E5%92%8C%E5%A4%96%E7%A2%8E%E7%89%87"><span class="nav-number">10.</span> <span class="nav-text">内存碎片、内碎片和外碎片</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E5%9C%B0%E5%9D%80%E3%80%81%E9%80%BB%E8%BE%91%E5%9C%B0%E5%9D%80%E3%80%81%E7%BA%BF%E6%80%A7%E5%9C%B0%E5%9D%80%E3%80%81%E7%89%A9%E7%90%86%E5%9C%B0%E5%9D%80%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">11.</span> <span class="nav-text">虚拟地址、逻辑地址、线性地址、物理地址的区别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95"><span class="nav-number">12.</span> <span class="nav-text">进程调度算法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Cache%E6%9B%BF%E6%8D%A2%E7%AE%97%E6%B3%95"><span class="nav-number">13.</span> <span class="nav-text">Cache替换算法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%BB%E9%94%81"><span class="nav-number">14.</span> <span class="nav-text">死锁</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0"><span class="nav-number">14.1.</span> <span class="nav-text">原因:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%85%E8%A6%81%E6%9D%A1%E4%BB%B6"><span class="nav-number">14.2.</span> <span class="nav-text">必要条件:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E6%AD%BB%E9%94%81%E5%9F%BA%E6%9C%AC%E6%96%B9%E6%B3%95"><span class="nav-number">14.3.</span> <span class="nav-text">处理死锁基本方法:</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BE%B9%E6%B2%BF%E8%A7%A6%E5%8F%91%E5%92%8C%E6%B0%B4%E5%B9%B3%E8%A7%A6%E5%8F%91"><span class="nav-number">15.</span> <span class="nav-text">边沿触发和水平触发</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91%E4%B8%8E%E5%B9%B6%E8%A1%8C"><span class="nav-number">16.</span> <span class="nav-text">并发与并行</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E9%93%BE%E6%8E%A5"><span class="nav-number">17.</span> <span class="nav-text">程序编译与链接</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E9%A2%84%E5%A4%84%E7%90%86"><span class="nav-number">17.1.</span> <span class="nav-text">1 预处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E7%BC%96%E8%AF%91"><span class="nav-number">17.2.</span> <span class="nav-text">2 编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%B1%87%E7%BC%96"><span class="nav-number">17.3.</span> <span class="nav-text">3 汇编</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E9%93%BE%E6%8E%A5"><span class="nav-number">17.4.</span> <span class="nav-text">4 链接</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%93%E5%87%BD%E6%95%B0%E4%B8%8E%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">18.</span> <span class="nav-text">库函数与系统调用的区别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%92%8C%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">19.</span> <span class="nav-text">静态链接和动态链接的区别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E4%B8%8E%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB"><span class="nav-number">20.</span> <span class="nav-text">静态链接库与动态链接库有什么区别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E6%80%81%E5%92%8C%E6%A0%B8%E5%BF%83%E6%80%81%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">21.</span> <span class="nav-text">用户态和核心态的区别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E6%A0%88%E4%B8%8E%E5%86%85%E6%A0%B8%E6%A0%88%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">22.</span> <span class="nav-text">用户栈与内核栈的区别</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

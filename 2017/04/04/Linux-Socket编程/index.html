@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux Socket编程">
+<meta property="og:url" content="https://blog.rexking6.top/2017/04/04/Linux-Socket%E7%BC%96%E7%A8%8B/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/socket_0.png">
+<meta property="og:image" content="http://image.rexking6.top/img/socket_1.png">
+<meta property="article:published_time" content="2017-04-04T06:02:27.000Z">
+<meta property="article:modified_time" content="2019-03-06T09:17:31.961Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="计算机网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/socket_0.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2017/04/04/Linux-Socket%E7%BC%96%E7%A8%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux Socket编程 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2017/04/04/Linux-Socket%E7%BC%96%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux Socket编程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-04-04 14:02:27" itemprop="dateCreated datePublished" datetime="2017-04-04T14:02:27+08:00">2017-04-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 17:17:31" itemprop="dateModified" datetime="2019-03-06T17:17:31+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2017/04/04/Linux-Socket%E7%BC%96%E7%A8%8B/" class="post-meta-item leancloud_visitors" data-flag-title="Linux Socket编程" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>10k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>9 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>本文转载<a target="_blank" rel="noopener" href="http://www.cnblogs.com/skynet/">Linux Socket编程（不限Linux）</a>，作者：吴秦，写得很好，又具体又全面，有例子，看完很有收获，就转了过来。</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>“一切皆Socket！”</p>
+<p>话虽些许夸张，但是事实也是，现在的网络编程几乎都是用的socket。</p>
+<p>——有感于实际编程和开源项目研究。</p>
+<p>我们深谙信息交流的价值，那网络中进程之间如何通信，如我们每天打开浏览器浏览网页时，浏览器的进程怎么与web服务器通信的？当你用QQ聊天时，QQ进程怎么与服务器或你好友所在的QQ进程通信？这些都得靠socket？那什么是socket？socket的类型有哪些？还有socket的基本函数，这些都是本文想介绍的。本文的主要内容如下：</p>
+<ul>
+<li>网络中进程之间如何通信？</li>
+<li>Socket是什么？</li>
+<li>socket的基本操作</li>
+<li><ul>
+<li>socket()函数</li>
+</ul>
+</li>
+<li><ul>
+<li>bind()函数</li>
+</ul>
+</li>
+<li><ul>
+<li>listen()、connect()函数</li>
+</ul>
+</li>
+<li><ul>
+<li>accept()函数</li>
+</ul>
+</li>
+<li><ul>
+<li>read()、write()函数等</li>
+</ul>
+</li>
+<li><ul>
+<li>close()函数</li>
+</ul>
+</li>
+<li>socket中TCP的三次握手建立连接详解</li>
+<li>socket中TCP的四次握手释放连接详解</li>
+<li>一个例子（实践一下）</li>
+</ul>
+<h2 id="网络中进程之间如何通信？"><a href="#网络中进程之间如何通信？" class="headerlink" title="网络中进程之间如何通信？"></a>网络中进程之间如何通信？</h2><p>本地的进程间通信（IPC）有很多种方式，但可以总结为下面4类：</p>
+<ul>
+<li>消息传递（管道、FIFO、消息队列）</li>
+<li>同步（互斥量、条件变量、读写锁、文件和写记录锁、信号量）</li>
+<li>共享内存（匿名的和具名的）</li>
+<li>远程过程调用（Solaris门和Sun RPC）</li>
+</ul>
+<p>但这些都不是本文的主题！我们要讨论的是网络中进程之间如何通信？首要解决的问题是如何唯一标识一个进程，否则通信无从谈起！在本地可以通过进程PID来唯一标识一个进程，但是在网络中这是行不通的。其实TCP/IP协议族已经帮我们解决了这个问题，<strong>网络层的ip地址</strong>可以唯一标识网络中的主机，而<strong>传输层的协议+端口</strong>可以唯一标识主机中的应用程序（进程）。这样利用三元组（<strong>ip地址，协议，端口</strong>）就可以标识网络的进程了，网络中的进程通信就可以利用这个标志与其它进程进行交互。</p>
+<p>使用TCP/IP协议的应用程序通常采用应用编程接口：UNIX  BSD的套接字（socket）和UNIX System V的TLI（已经被淘汰），来实现网络进程之间的通信。就目前而言，几乎所有的应用程序都是采用socket，而现在又是网络时代，网络中进程通信是无处不在，这就是我为什么说“一切皆socket”。</p>
+<h2 id="什么是Socket？"><a href="#什么是Socket？" class="headerlink" title="什么是Socket？"></a>什么是Socket？</h2><p>上面我们已经知道网络中的进程是通过socket来通信的，那什么是socket呢？socket起源于Unix，而Unix/Linux基本哲学之一就是“一切皆文件”，都可以用“打开open –&gt; 读写write/read –&gt; 关闭close”模式来操作。我的理解就是Socket就是该模式的一个实现，socket即是一种特殊的文件，一些socket函数就是对其进行的操作（读/写IO、打开、关闭），这些函数我们在后面进行介绍。</p>
+<blockquote>
+<p><strong>socket一词的起源</strong>：在组网领域的首次使用是在1970年2月12日发布的文献IETF RFC33中发现的，撰写者为Stephen Carr、Steve Crocker和Vint Cerf。根据美国计算机历史博物馆的记载，Croker写道：“命名空间的元素都可称为套接字接口。一个套接字接口构成一个连接的一端，而一个连接可完全由一对套接字接口规定。”计算机历史博物馆补充道：“这比BSD的套接字接口定义早了大约12年。”</p>
+</blockquote>
+<h2 id="socket的基本操作"><a href="#socket的基本操作" class="headerlink" title="socket的基本操作"></a>socket的基本操作</h2><p>既然socket是<code>open—write/read—close</code>模式的一种实现，那么socket就提供了这些操作对应的函数接口。下面以TCP为例，介绍几个基本的socket接口函数。</p>
+<h3 id="socket-函数"><a href="#socket-函数" class="headerlink" title="socket()函数"></a>socket()函数</h3><pre><code>int socket(int domain, int type, int protocol);
+</code></pre><p>socket函数对应于普通文件的打开操作。普通文件的打开操作返回一个文件描述字，而<code>socket()</code>用于创建一个socket描述符（socket descriptor），它唯一标识一个socket。这个socket描述字跟文件描述字一样，后续的操作都有用到它，把它作为参数，通过它来进行一些读写操作。</p>
+<p>正如可以给<code>fopen()</code>的传入不同参数值，以打开不同的文件。创建socket的时候，也可以指定不同的参数创建不同的socket描述符，socket函数的三个参数分别为：</p>
+<p><code>domain</code>：即协议域，又称为协议族（family）。常用的协议族有<code>AF_INET</code>、<code>AF_INET6</code>、<code>AF_LOCAL</code>（或称<code>AF_UNIX</code>，Unix域socket）、<code>AF_ROUTE</code>等等。协议族决定了socket的地址类型，在通信中必须采用对应的地址，如<code>AF_INET</code>决定了要用ipv4地址（32位的）与端口号（16位的）的组合、<code>AF_UNIX</code>决定了要用一个绝对路径名作为地址。<br><code>type</code>：指定socket类型。常用的socket类型有：<br><code>SOCK_STREAM</code>、<code>SOCK_DGRAM</code>、<code>SOCK_RAW</code>、<code>SOCK_PACKET</code>、<code>SOCK_SEQPACKET</code>等等。<br><code>protocol</code>：顾名思义，就是指定协议。常用的协议有：<br><code>IPPROTO_TCP</code>、<code>IPPTOTO_UDP</code>、<code>IPPROTO_SCTP</code>、<code>IPPROTO_TIPC</code>等，它们分别对应TCP传输协议、UDP传输协议、STCP传输协议、TIPC传输协议。<br>注意：并不是上面的type和protocol可以随意组合的，如<code>SOCK_STREAM</code>不可以跟<code>IPPROTO_UDP</code>组合。当<code>protocol</code>为0时，会自动选择type类型对应的默认协议。</p>
+<p>当我们调用<code>socket()</code>创建一个socket时，返回的socket描述字它存在于协议族<code>(address family, AF_XXX)</code>空间中，但没有一个具体的地址。如果想要给它赋值一个地址，就必须调用<code>bind()</code>函数，否则就当调用<code>connect()</code>、<code>listen()</code>时系统会自动随机分配一个端口。</p>
+<h3 id="bind-函数"><a href="#bind-函数" class="headerlink" title="bind()函数"></a>bind()函数</h3><p>正如上面所说bind()函数把一个地址族中的特定地址赋给socket。例如对应<code>AF_INET</code>、<code>AF_INET6</code>就是把一个ipv4或ipv6地址和端口号组合赋给socket。</p>
+<pre><code>int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+</code></pre><p>函数的三个参数分别为：<br><code>sockfd</code>：即socket描述字，它是通过<code>socket()</code>函数创建了唯一标识一个socket。<code>bind()</code>函数就是将给这个描述字绑定一个名字。<br><code>addr</code>：一个<code>const struct sockaddr *</code>指针，指向要绑定给<code>sockfd</code>的协议地址。这个地址结构根据地址创建socket时的地址协议族的不同而不同，如ipv4对应的是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">struct sockaddr_in &#123;</span><br><span class="line">    sa_family_t    sin_family; /* address family: AF_INET */</span><br><span class="line">    in_port_t      sin_port;   /* port in network byte order */</span><br><span class="line">    struct in_addr sin_addr;   /* internet address */</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">/* Internet address. */</span><br><span class="line">struct in_addr &#123;</span><br><span class="line">    uint32_t       s_addr;     /* address in network byte order */</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>ipv6对应的是： </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">struct sockaddr_in6 &#123; </span><br><span class="line">    sa_family_t     sin6_family;   /* AF_INET6 */ </span><br><span class="line">    in_port_t       sin6_port;     /* port number */ </span><br><span class="line">    uint32_t        sin6_flowinfo; /* IPv6 flow information */ </span><br><span class="line">    struct in6_addr sin6_addr;     /* IPv6 address */ </span><br><span class="line">    uint32_t        sin6_scope_id; /* Scope ID (new in 2.4) */ </span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">struct in6_addr &#123; </span><br><span class="line">    unsigned char   s6_addr[16];   /* IPv6 address */ </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>Unix域对应的是： </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#define UNIX_PATH_MAX    108</span><br><span class="line"></span><br><span class="line">struct sockaddr_un &#123; </span><br><span class="line">    sa_family_t sun_family;               /* AF_UNIX */ </span><br><span class="line">    char        sun_path[UNIX_PATH_MAX];  /* pathname */ </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><code>addrlen</code>：对应的是地址的长度。</p>
+<p>通常服务器在启动的时候都会绑定一个众所周知的地址（如ip地址+端口号），用于提供服务，客户端就可以通过它来接连服务器；而客户端就不用指定，有系统自动分配一个端口号和自身的ip地址组合。这就是为什么通常服务器端在listen之前会调用<code>bind()</code>，而客户端就不会调用，而是在<code>connect()</code>时由系统随机生成一个。</p>
+<blockquote>
+<p><strong>网络字节序与主机字节序</strong>：<br><strong>主机字节序</strong>就是我们平常说的大端和小端模式：不同的CPU有不同的字节序类型，这些字节序是指整数在内存中保存的顺序，这个叫做主机序。引用标准的Big-Endian和Little-Endian的定义如下：<br>1.Little-Endian就是低位字节排放在内存的低地址端，高位字节排放在内存的高地址端。<br>2.Big-Endian就是高位字节排放在内存的低地址端，低位字节排放在内存的高地址端。<br><strong>网络字节序</strong>：4个字节的32 bit值以下面的次序传输：首先是0～7bit，其次8～15bit，然后16～23bit，最后是24~31bit。这种传输次序称作大端字节序。由于TCP/IP首部中所有的二进制整数在网络中传输时都要求以这种次序，因此它又称作网络字节序。字节序，顾名思义字节的顺序，就是大于一个字节类型的数据在内存中的存放顺序，一个字节的数据没有顺序的问题了。</p>
+</blockquote>
+<p>所以：在将一个地址绑定到socket的时候，请先将主机字节序转换成为网络字节序，而不要假定主机字节序跟网络字节序一样使用的是Big-Endian。由于这个问题曾引发过血案！公司项目代码中由于存在这个问题，导致了很多莫名其妙的问题，所以请谨记对主机字节序不要做任何假定，务必将其转化为网络字节序再赋给socket。</p>
+<h3 id="listen-、connect-函数"><a href="#listen-、connect-函数" class="headerlink" title="listen()、connect()函数"></a>listen()、connect()函数</h3><p>如果作为一个服务器，在调用<code>socket()</code>、<code>bind()</code>之后就会调用<code>listen()</code>来监听这个socket，如果客户端这时调用<code>connect()</code>发出连接请求，服务器端就会接收到这个请求。</p>
+<pre><code>int listen(int sockfd, int backlog);
+int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+</code></pre><p>listen函数的第一个参数即为要监听的socket描述字，第二个参数为相应socket可以排队的最大连接个数。<code>socket()</code>函数创建的socket默认是一个主动类型的，<code>listen()</code>函数将socket变为被动类型的，等待客户的连接请求。</p>
+<p><code>connect()</code>函数的第一个参数即为客户端的socket描述字，第二参数为服务器的socket地址，第三个参数为socket地址的长度。客户端通过调用connect函数来建立与TCP服务器的连接。</p>
+<h3 id="accept-函数"><a href="#accept-函数" class="headerlink" title="accept()函数"></a>accept()函数</h3><p>TCP服务器端依次调用<code>socket()</code>、<code>bind()</code>、<code>listen()</code>之后，就会监听指定的socket地址了。TCP客户端依次调用<code>socket()</code>、<code>connect()</code>之后就向TCP服务器发送了一个连接请求。TCP服务器监听到这个请求之后，就会调用<code>accept()</code>函数去接收请求，这样连接就建立好了。之后就可以开始网络I/O操作了，即类同于普通文件的读写I/O操作。</p>
+<pre><code>int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+</code></pre><p><code>accept()</code>函数的第一个参数为服务器的socket描述字，第二个参数为指向<code>struct sockaddr *</code>的指针，用于返回客户端的协议地址，第三个参数为协议地址的长度。如果accpet成功，那么其返回值是由内核自动生成的一个全新的描述字，代表与返回客户的TCP连接。</p>
+<p>注意：accept的第一个参数为服务器的socket描述字，是服务器开始调用<code>socket()</code>函数生成的，称为监听socket描述字；而<code>accept()</code>函数返回的是已连接的socket描述字。一个服务器通常通常仅仅只创建一个监听socket描述字，它在该服务器的生命周期内一直存在。内核为每个由服务器进程接受的客户连接创建了一个已连接socket描述字，当服务器完成了对某个客户的服务，相应的已连接socket描述字就被关闭。</p>
+<h3 id="read-、write-等函数"><a href="#read-、write-等函数" class="headerlink" title="read()、write()等函数"></a>read()、write()等函数</h3><p>万事具备只欠东风，至此服务器与客户已经建立好连接了。可以调用网络I/O进行读写操作了，即实现了网络中不同进程之间的通信，网络I/O操作有下面几组：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">read()/write()</span><br><span class="line">recv()/send()</span><br><span class="line">readv()/writev()</span><br><span class="line">recvmsg()/sendmsg()</span><br><span class="line">recvfrom()/sendto()</span><br></pre></td></tr></table></figure>
+<p>我推荐使用<code>recvmsg()/sendmsg()</code>函数，这两个函数是最通用的I/O函数，实际上可以把上面的其它函数都替换成这两个函数。它们的声明如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">ssize_t read(int fd, void *buf, size_t count);</span><br><span class="line">ssize_t write(int fd, const void *buf, size_t count);</span><br><span class="line"></span><br><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;sys/socket.h&gt;</span><br><span class="line"></span><br><span class="line">ssize_t send(int sockfd, const void *buf, size_t len, int flags);</span><br><span class="line">ssize_t recv(int sockfd, void *buf, size_t len, int flags);</span><br><span class="line"></span><br><span class="line">ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,</span><br><span class="line">			  const struct sockaddr *dest_addr, socklen_t addrlen);</span><br><span class="line">ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,</span><br><span class="line">				struct sockaddr *src_addr, socklen_t *addrlen);</span><br><span class="line"></span><br><span class="line">ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags);</span><br><span class="line">ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags);</span><br></pre></td></tr></table></figure>
+<p><code>read()</code>函数是负责从fd中读取内容，当读成功时，<code>read()</code>返回实际所读的字节数，如果返回的值是0表示已经读到文件的结束了，小于0表示出现了错误。如果错误为<code>EINTR</code>说明读是由中断引起的，如果是<code>ECONNREST</code>表示网络连接出了问题。</p>
+<p><code>write()</code>函数将buf中的n bytes字节内容写入文件描述符fd，成功时返回写的字节数。失败时返回-1，并设置<code>errno</code>变量。 在网络程序中，当我们向套接字文件描述符写时有两种可能：</p>
+<ul>
+<li>write的返回值大于0，表示写了部分或者是全部的数据。</li>
+<li>返回的值小于0，此时出现了错误。我们要根据错误类型来处理。如果错误为EINTR表示在写的时候出现了中断错误。如果为EPIPE表示网络连接出现了问题(对方已经关闭了连接)。</li>
+</ul>
+<p>其它的我就不一一介绍这几对I/O函数了，具体参见man文档或者baidu、google，下面的例子中将使用到<code>send()/recv()</code>。</p>
+<h3 id="close-函数"><a href="#close-函数" class="headerlink" title="close()函数"></a>close()函数</h3><p>在服务器与客户端建立连接之后，会进行一些读写操作，完成了读写操作就要关闭相应的socket描述字，好比操作完打开的文件要调用<code>fclose()</code>关闭打开的文件。</p>
+<pre><code>#include &lt;unistd.h&gt;
+int close(int fd);
+</code></pre><p>close一个TCP socket的缺省行为时把该socket标记为以关闭，然后立即返回到调用进程。该描述字不能再由调用进程使用，也就是说不能再作为<code>read()</code>或<code>write()</code>的第一个参数。</p>
+<p>注意：close操作只是使相应socket描述字的引用计数-1，只有当引用计数为0的时候，才会触发TCP客户端向服务器发送终止连接请求。</p>
+<h2 id="socket中TCP的三次握手建立连接详解"><a href="#socket中TCP的三次握手建立连接详解" class="headerlink" title="socket中TCP的三次握手建立连接详解"></a>socket中TCP的三次握手建立连接详解</h2><p>我们知道tcp建立连接要进行“三次握手”，即交换三个分组。大致流程如下：</p>
+<ul>
+<li>客户端向服务器发送一个SYN J</li>
+<li>服务器向客户端响应一个SYN K，并对SYN J进行确认ACK J+1</li>
+<li>客户端再想服务器发一个确认ACK K+1</li>
+</ul>
+<p>只有做完了三次握手，但是这个三次握手发生在socket的那几个函数中呢？请看下图：</p>
+<p><img src="http://image.rexking6.top/img/socket_0.png" alt=""></p>
+<p>从图中可以看出，当客户端调用<code>connect()</code>时，触发了连接请求，向服务器发送了SYN J包，这时<code>connect()</code>进入阻塞状态；服务器监听到连接请求，即收到SYN J包，调用<code>accept()</code>函数接收请求向客户端发送SYN K ，ACK J+1，这时<code>accept()</code>进入阻塞状态；客户端收到服务器的SYN K ，ACK J+1之后，这时<code>connect()</code>返回，并对SYN K进行确认；服务器收到ACK K+1时，<code>0accept()</code>返回，至此三次握手完毕，连接建立。</p>
+<p>总结：客户端的<code>connect()</code>在三次握手的第二次返回，而服务器端的<code>accept()</code>在三次握手的第三次返回。</p>
+<h2 id="socket中TCP的四次握手释放连接详解"><a href="#socket中TCP的四次握手释放连接详解" class="headerlink" title="socket中TCP的四次握手释放连接详解"></a>socket中TCP的四次握手释放连接详解</h2><p>上面介绍了socket中TCP的三次握手建立过程，及其涉及的<code>socket()</code>函数。现在我们介绍socket中的四次握手释放连接的过程，请看下图：</p>
+<p><img src="http://image.rexking6.top/img/socket_1.png" alt=""></p>
+<p>图示过程如下：</p>
+<ul>
+<li>某个应用进程首先调用close主动关闭连接，这时TCP发送一个FIN M；</li>
+<li>另一端接收到FIN M之后，执行被动关闭，对这个FIN进行确认。它的接收也作为文件结束符传递给应用进程，因为FIN的接收意味着应用进程在相应的连接上再也接收不到额外数据；</li>
+<li>一段时间之后，接收到文件结束符的应用进程调用close关闭它的socket。这导致它的TCP也发送一个FIN N；</li>
+<li>接收到这个FIN的源发送端TCP对它进行确认。</li>
+</ul>
+<p>这样每个方向上都有一个FIN和ACK。</p>
+<h2 id="一个例子（实践一下）"><a href="#一个例子（实践一下）" class="headerlink" title="一个例子（实践一下）"></a>一个例子（实践一下）</h2><p>说了这么多了，动手实践一下。下面编写一个简单的服务器、客户端（使用TCP）——服务器端一直监听本机的6666号端口，如果收到连接请求，将接收请求并接收客户端发来的消息；客户端与服务器端建立连接并发送一条消息。</p>
+<p>服务器端代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;stdio.h&gt;</span><br><span class="line">#include&lt;stdlib.h&gt;</span><br><span class="line">#include&lt;string.h&gt;</span><br><span class="line">#include&lt;errno.h&gt;</span><br><span class="line">#include&lt;sys/types.h&gt;</span><br><span class="line">#include&lt;sys/socket.h&gt;</span><br><span class="line">#include&lt;netinet/in.h&gt;</span><br><span class="line"></span><br><span class="line">#define MAXLINE 4096</span><br><span class="line"></span><br><span class="line">int main(int argc, char** argv)</span><br><span class="line">&#123;</span><br><span class="line">    int    listenfd, connfd;</span><br><span class="line">    struct sockaddr_in     servaddr;</span><br><span class="line">    char    buff[4096];</span><br><span class="line">    int     n;</span><br><span class="line"></span><br><span class="line">    if( (listenfd = socket(AF_INET, SOCK_STREAM, 0)) == -1 )&#123;</span><br><span class="line">    printf(&quot;create socket error: %s(errno: %d)\n&quot;,strerror(errno),errno);</span><br><span class="line">    exit(0);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    memset(&amp;servaddr, 0, sizeof(servaddr));</span><br><span class="line">    servaddr.sin_family = AF_INET;</span><br><span class="line">    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);</span><br><span class="line">    servaddr.sin_port = htons(6666);</span><br><span class="line"></span><br><span class="line">    if( bind(listenfd, (struct sockaddr*)&amp;servaddr, sizeof(servaddr)) == -1)&#123;</span><br><span class="line">    printf(&quot;bind socket error: %s(errno: %d)\n&quot;,strerror(errno),errno);</span><br><span class="line">    exit(0);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if( listen(listenfd, 10) == -1)&#123;</span><br><span class="line">    printf(&quot;listen socket error: %s(errno: %d)\n&quot;,strerror(errno),errno);</span><br><span class="line">    exit(0);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    printf(&quot;=====waiting for client&#x27;s request======\n&quot;);</span><br><span class="line">    while(1)&#123;</span><br><span class="line">    if( (connfd = accept(listenfd, (struct sockaddr*)NULL, NULL)) == -1)&#123;</span><br><span class="line">        printf(&quot;accept socket error: %s(errno: %d)&quot;,strerror(errno),errno);</span><br><span class="line">        continue;</span><br><span class="line">    &#125;</span><br><span class="line">    n = recv(connfd, buff, MAXLINE, 0);</span><br><span class="line">    buff[n] = &#x27;\0&#x27;;</span><br><span class="line">    printf(&quot;recv msg from client: %s\n&quot;, buff);</span><br><span class="line">    close(connfd);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    close(listenfd);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>客户端代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;stdio.h&gt;</span><br><span class="line">#include&lt;stdlib.h&gt;</span><br><span class="line">#include&lt;string.h&gt;</span><br><span class="line">#include&lt;errno.h&gt;</span><br><span class="line">#include&lt;sys/types.h&gt;</span><br><span class="line">#include&lt;sys/socket.h&gt;</span><br><span class="line">#include&lt;netinet/in.h&gt;</span><br><span class="line"></span><br><span class="line">#define MAXLINE 4096</span><br><span class="line"></span><br><span class="line">int main(int argc, char** argv)</span><br><span class="line">&#123;</span><br><span class="line">    int    sockfd, n;</span><br><span class="line">    char    recvline[4096], sendline[4096];</span><br><span class="line">    struct sockaddr_in    servaddr;</span><br><span class="line"></span><br><span class="line">    if( argc != 2)&#123;</span><br><span class="line">    printf(&quot;usage: ./client &lt;ipaddress&gt;\n&quot;);</span><br><span class="line">    exit(0);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) &lt; 0)&#123;</span><br><span class="line">    printf(&quot;create socket error: %s(errno: %d)\n&quot;, strerror(errno),errno);</span><br><span class="line">    exit(0);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    memset(&amp;servaddr, 0, sizeof(servaddr));</span><br><span class="line">    servaddr.sin_family = AF_INET;</span><br><span class="line">    servaddr.sin_port = htons(6666);</span><br><span class="line">    if( inet_pton(AF_INET, argv[1], &amp;servaddr.sin_addr) &lt;= 0)&#123;</span><br><span class="line">    printf(&quot;inet_pton error for %s\n&quot;,argv[1]);</span><br><span class="line">    exit(0);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if( connect(sockfd, (struct sockaddr*)&amp;servaddr, sizeof(servaddr)) &lt; 0)&#123;</span><br><span class="line">    printf(&quot;connect error: %s(errno: %d)\n&quot;,strerror(errno),errno);</span><br><span class="line">    exit(0);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    printf(&quot;send msg to server: \n&quot;);</span><br><span class="line">    fgets(sendline, 4096, stdin);</span><br><span class="line">    if( send(sockfd, sendline, strlen(sendline), 0) &lt; 0)</span><br><span class="line">    &#123;</span><br><span class="line">    printf(&quot;send msg error: %s(errno: %d)\n&quot;, strerror(errno), errno);</span><br><span class="line">    exit(0);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    close(sockfd);</span><br><span class="line">    exit(0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当然上面的代码很简单，也有很多缺点，这就只是简单的演示socket的基本函数使用。其实不管有多复杂的网络程序，都使用的这些基本函数。上面的服务器使用的是迭代模式的，即只有处理完一个客户端请求才会去处理下一个客户端的请求，这样的服务器处理能力是很弱的，现实中的服务器都需要有并发处理能力。为了需要并发处理，服务器需要<code>fork()</code>一个新的进程或者线程去处理请求等。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文只是介绍了简单的socket编程，更为复杂的需要自己继续深入。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\12\09\IO多路复用\" rel="bookmark">IO多路复用</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\09\05\Linux知识点\" rel="bookmark">Linux知识点</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\04\04\Socks5与VPN在原理上的异同\" rel="bookmark">Socks5与VPN在原理上的异同</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2017/04/04/Linux-Socket%E7%BC%96%E7%A8%8B/" title="Linux Socket编程">https://blog.rexking6.top/2017/04/04/Linux-Socket编程/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag"># 计算机网络</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/04/03/%E6%90%AD%E5%BB%BAShadowsocks%E5%B9%B6%E4%BD%BF%E7%94%A8/" rel="prev" title="搭建Shadowsocks并使用">
+      <i class="fa fa-chevron-left"></i> 搭建Shadowsocks并使用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/04/04/Socks5%E4%B8%8EVPN%E5%9C%A8%E5%8E%9F%E7%90%86%E4%B8%8A%E7%9A%84%E5%BC%82%E5%90%8C/" rel="next" title="Socks5与VPN在原理上的异同">
+      Socks5与VPN在原理上的异同 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">2.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E4%B8%AD%E8%BF%9B%E7%A8%8B%E4%B9%8B%E9%97%B4%E5%A6%82%E4%BD%95%E9%80%9A%E4%BF%A1%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">网络中进程之间如何通信？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFSocket%EF%BC%9F"><span class="nav-number">4.</span> <span class="nav-text">什么是Socket？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#socket%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">5.</span> <span class="nav-text">socket的基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#socket-%E5%87%BD%E6%95%B0"><span class="nav-number">5.1.</span> <span class="nav-text">socket()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bind-%E5%87%BD%E6%95%B0"><span class="nav-number">5.2.</span> <span class="nav-text">bind()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#listen-%E3%80%81connect-%E5%87%BD%E6%95%B0"><span class="nav-number">5.3.</span> <span class="nav-text">listen()、connect()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#accept-%E5%87%BD%E6%95%B0"><span class="nav-number">5.4.</span> <span class="nav-text">accept()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#read-%E3%80%81write-%E7%AD%89%E5%87%BD%E6%95%B0"><span class="nav-number">5.5.</span> <span class="nav-text">read()、write()等函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#close-%E5%87%BD%E6%95%B0"><span class="nav-number">5.6.</span> <span class="nav-text">close()函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#socket%E4%B8%ADTCP%E7%9A%84%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5%E8%AF%A6%E8%A7%A3"><span class="nav-number">6.</span> <span class="nav-text">socket中TCP的三次握手建立连接详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#socket%E4%B8%ADTCP%E7%9A%84%E5%9B%9B%E6%AC%A1%E6%8F%A1%E6%89%8B%E9%87%8A%E6%94%BE%E8%BF%9E%E6%8E%A5%E8%AF%A6%E8%A7%A3"><span class="nav-number">7.</span> <span class="nav-text">socket中TCP的四次握手释放连接详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E4%BE%8B%E5%AD%90%EF%BC%88%E5%AE%9E%E8%B7%B5%E4%B8%80%E4%B8%8B%EF%BC%89"><span class="nav-number">8.</span> <span class="nav-text">一个例子（实践一下）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">9.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

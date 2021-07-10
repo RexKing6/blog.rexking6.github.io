@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《计算智能》（二）概率">
+<meta property="og:url" content="https://blog.rexking6.top/2019/01/06/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%99%BA%E8%83%BD%E3%80%8B%EF%BC%88%E4%BA%8C%EF%BC%89%E6%A6%82%E7%8E%87/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546648930.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1545384494.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1545402621.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546655714.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546656644.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546656605.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546657404.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1545437428.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546648930.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1545459685.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546667898.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546648930.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546671369.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1545804887.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1545896356.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546683362.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1545905214.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546688635.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546683362.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546683362.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546739456.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546742514.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546753934.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546756526.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546758060.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1546760671.png">
+<meta property="article:published_time" content="2019-01-06T08:21:29.000Z">
+<meta property="article:modified_time" content="2019-03-06T10:16:20.443Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="硕士课程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1546648930.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2019/01/06/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%99%BA%E8%83%BD%E3%80%8B%EF%BC%88%E4%BA%8C%EF%BC%89%E6%A6%82%E7%8E%87/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《计算智能》（二）概率 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2019/01/06/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%99%BA%E8%83%BD%E3%80%8B%EF%BC%88%E4%BA%8C%EF%BC%89%E6%A6%82%E7%8E%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《计算智能》（二）概率
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-01-06 16:21:29" itemprop="dateCreated datePublished" datetime="2019-01-06T16:21:29+08:00">2019-01-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 18:16:20" itemprop="dateModified" datetime="2019-03-06T18:16:20+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%A1%95%E5%A3%AB%E8%AF%BE%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">硕士课程</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2019/01/06/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%99%BA%E8%83%BD%E3%80%8B%EF%BC%88%E4%BA%8C%EF%BC%89%E6%A6%82%E7%8E%87/" class="post-meta-item leancloud_visitors" data-flag-title="《计算智能》（二）概率" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>25k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>23 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>《计算智能》的第二部分——概率，因为各种原因，得分成两部分……</p>
+<h1 id="不确定知识与推理"><a href="#不确定知识与推理" class="headerlink" title="不确定知识与推理"></a>不确定知识与推理</h1><h2 id="基本概率符号"><a href="#基本概率符号" class="headerlink" title="基本概率符号"></a>基本概率符号</h2><p>概率理论中变量被称为随机变量，变量的名字以大写字母开头。每个随机变量有一个定义域，当一个随机变量为布尔变量时，其小写字母表示的是True，例如 $x$ 表示 $X=true$。</p>
+<p>当概率 $P$ 表示的是随机变量的分布时，它结果是由一些数组成的向量。</p>
+<p>符号 $P$ 也被用于条件分布$P(X|Y)$ 给出每个可能的 $i$、$j$ 组合下的值 $P(X=x_i|Y=y_j)$。</p>
+<p>对于连续变量，则 $P$ 为概率密度函数。</p>
+<p>除了单个变量的分布外，还需要符号表示多个变量的分布，即为联合概率分布。</p>
+<h2 id="使用完全联合分布进行推理"><a href="#使用完全联合分布进行推理" class="headerlink" title="使用完全联合分布进行推理"></a>使用完全联合分布进行推理</h2><p>柯尔莫哥洛夫公理：</p>
+<script type="math/tex; mode=display">
+P(a \vee b)=P(a)+P(b)-P(a \wedge b)</script><p>边缘化规则（求和消元）：</p>
+<script type="math/tex; mode=display">
+P(Y)=\sum_{z\in Z}P(Y,z)</script><p>条件化规则：</p>
+<script type="math/tex; mode=display">
+P(Y)=\sum_z P(Y|z)P(z)</script><p>通用推理过程：</p>
+<ul>
+<li><p>询问变量 $X$，即查询为 $P(X|e)$</p>
+</li>
+<li><p>证据变量 $E$，即观测变量，其观察值为 $e$</p>
+</li>
+<li>隐变量，即其余的未观测变量 $Y$</li>
+</ul>
+<script type="math/tex; mode=display">
+P(X|e)=\alpha P(X,e) = \alpha \sum_y P(X,e,y)</script><p>贝叶斯规则：</p>
+<script type="math/tex; mode=display">
+P(Y|X)=\frac{P(X|Y)P(Y)}{P(X)}</script><p>带证据变量 $e$ 的贝叶斯规则：</p>
+<script type="math/tex; mode=display">
+P(Y|X,e)=\frac{P(X|Y,e)P(Y|e)}{P(X|e)}</script><p>归一化的贝叶斯规则：</p>
+<script type="math/tex; mode=display">
+P(Y|X)=\alpha P(X|Y)P(Y)</script><p>给定第三个随机变量 $Z$ 之后，两个随机变量 $X$ 和 $Y$ 的条件独立性的一般定义是：</p>
+<script type="math/tex; mode=display">
+P(X,Y|Z)=P(X|Z)P(Y|Z)\\
+P(Z|X,Y)=\alpha P(X|Z)P(Y|Z)P(Z)</script><h1 id="概率推理"><a href="#概率推理" class="headerlink" title="概率推理"></a>概率推理</h1><h2 id="贝叶斯网络"><a href="#贝叶斯网络" class="headerlink" title="贝叶斯网络"></a>贝叶斯网络</h2><p>利用全联合概率分布计算不确定知识的局限性：</p>
+<ol>
+<li>变量数目增多时，域的规模会增大到不可操作的程度。</li>
+<li>为每个原子事件指定概率是很不自然的，而且可能非常困难。</li>
+</ol>
+<p>利用贝叶斯网络以一种自然和有效的方式来捕捉不确定知识。该网络是一个用于条件独立断言的简单的图模型，对全联合分布有紧凑的描述形式。 </p>
+<p>贝叶斯网络，又名：信度网（belief network）、概率网络（probability network）、因果网络（causal network）、知识图（knowledge map）。</p>
+<p>定义：贝叶斯网络是一个有向图，其中每个节点都标注了定量概率信息。 </p>
+<ul>
+<li>一个随机变量集组成网络节点。变量可以是离散的或连续的。 </li>
+<li>一个连接点对的有向边或箭头集合。若存在从节点 $X$ 指向节点 $Y$ 的有向边，则称 $X$ 是 $Y$ 的父节点。</li>
+<li>每个节点 $X_i$ 都有一个条件概率分布：$P(X_i|\text{Parents}(X_i))$ </li>
+<li>一个有向无环图（DAG）</li>
+</ul>
+<p>在简单的例子中，条件概率分布被表示为条件概率表（CPT）。CPT中的每一行包含了每个节点值<br>对于一个条件事件的条件概率。 </p>
+<p><img src="http://image.rexking6.top/img/clip1546648930.png" alt=""></p>
+<h3 id="贝叶斯网络语义"><a href="#贝叶斯网络语义" class="headerlink" title="贝叶斯网络语义"></a>贝叶斯网络语义</h3><p><img src="http://image.rexking6.top/img/clip1545384494.png" alt=""></p>
+<p>两种方式理解贝叶斯网络语义：</p>
+<ol>
+<li>将贝叶斯网络视为对联合分布的表示</li>
+<li>将其视为对条件依赖语句集合的编码</li>
+</ol>
+<p>联合概率分布通过局部条件概率分布定义：</p>
+<script type="math/tex; mode=display">
+P(X_1,...,X_n)=\prod_{i=1}P(X_i|\text{Parents}(X_i))</script><h3 id="紧致性与节点排序"><a href="#紧致性与节点排序" class="headerlink" title="紧致性与节点排序"></a>紧致性与节点排序</h3><p>贝叶斯网络能够对域进行一种完备而冗余的表示，比全联合概率分布紧凑得多。 </p>
+<ul>
+<li>贝叶斯网络是紧致性的</li>
+<li>局部结构化（locally structure，sparse）</li>
+<li>每个组成部分都只与数量有限的其他部分发生直接的相互作用，而不考虑组成部分的总数量。 </li>
+</ul>
+<p>局部结构的复杂度关于变量 $n$ 是线性的，而不是指数增长的。 </p>
+<ul>
+<li>对布尔变量 $X_i$，有 $k$ 个布尔变量的父节点，CPT中就有 $2^k$个数据。 </li>
+<li>若每个变量的父节点不超过 $k$ 个，则该网络需要的数据是 $O(n·2^k) $</li>
+<li>即关于 $n$ 是线性的，而全概率分布的数据量是 $O(2^n)$</li>
+<li>对前面举例的网络,其数据量为 $1+1+4+2+2=10$（vs. $25-1=31$）</li>
+<li>例如，一个有30个节点的网络，每个节点有5个父节点，那么，该网络需要960个数据，而全联合概率需要10亿个。 </li>
+</ul>
+<h3 id="构造贝叶斯网络"><a href="#构造贝叶斯网络" class="headerlink" title="构造贝叶斯网络"></a>构造贝叶斯网络</h3><ol>
+<li><p>选择已排序的节点 $X_1,…,X_n$</p>
+</li>
+<li><p>For i=1 to n</p>
+<ol>
+<li><p>把 $X_i$ 添加到网络</p>
+</li>
+<li><p>从 $X_1,…,X_{i-1}$选择父节点</p>
+<script type="math/tex; mode=display">
+P(X_i|\text{Parents}(X_i))=P(X_i|X_1,...,X_{i-1})</script><p>对父节点的选择能保证：</p>
+<script type="math/tex; mode=display">
+P(X_1,...,X_n)=\prod_{i=1}P(X_i|X_1,...,X_{i-1})=\prod_{i=1}P(X_i|\text{Parents}(X_i))</script></li>
+</ol>
+</li>
+</ol>
+<p>在构造一个局部结构化的域中，</p>
+<ul>
+<li>不仅要求每个变量只受到少数几个其他变量的直接影响</li>
+<li>还要求网络的拓扑结构确实反映了合适的父节点集对该变量的那些直接影响 </li>
+</ul>
+<p>施加直接影响者”将不得不先添加到网络中，因此添加节点的正确次序是首先添加根本原因节点，然后加入受它们直接影响的变量。 </p>
+<h3 id="贝叶斯网络中的条件独立关系"><a href="#贝叶斯网络中的条件独立关系" class="headerlink" title="贝叶斯网络中的条件独立关系"></a>贝叶斯网络中的条件独立关系</h3><ol>
+<li>给定父节点，一个节点与它的非后代节点是条件独立的。Johncall与Burglary和Earthquake是条件独立的。 </li>
+<li>给定一个节点的父节点、子节点以及子节点的父节点——即，给定它的Markov覆盖，该节点与网络中的所有其它节点都是条件独立的。  Burglary与Johncalls及Marycalls是独立的。 </li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1545402621.png" alt=""></p>
+<h2 id="条件分布的有效表达"><a href="#条件分布的有效表达" class="headerlink" title="条件分布的有效表达"></a>条件分布的有效表达</h2><h3 id="不确定关系"><a href="#不确定关系" class="headerlink" title="不确定关系"></a>不确定关系</h3><ul>
+<li>CPT随着父节点个数的增加呈指数增长。 </li>
+<li>在父节点或子节点是连续情况下， CPT规模无限增长 。</li>
+<li>父节点与子节点之间的关系完全任意 </li>
+</ul>
+<p>解决办法：采用符合某种标准模式的规范分布。 在该情况下，完整的概率分布表能够通过确定所使用的模式，并提供少数几个参数来指定。 </p>
+<p>确定性节点的提供。一个确定性节点的取值能够由其父节点的取值完全确定，无不确定性。 这种关系可以是一种逻辑关系，也可以是数值的：例如，父节点是几个经销商销售一种特定型号汽车的价格，子节点是一个喜欢还价的人，最后买这种型号汽车所出的价钱，那么子节点就应该是其全部父节点值的最小值。</p>
+<p>不确定关系可以用“噪声” 逻辑关系来刻画。噪声或关系（noisy-OR）是逻辑或关系的推广。噪声或模型考虑到每个父节点引起子节点为真的能力的不确定性—父节点与子节点之间的因果关系有可能被抑制。</p>
+<p>采用两个假设：</p>
+<ol>
+<li>假设所有可能的原因都列出。如果漏掉一些原因，可以增加一个所谓的遗漏节点来涵盖“各种各样的原因”；</li>
+<li>它假设每个父节点的抑制独立于其它父节点的抑制。  </li>
+</ol>
+<p>例如，Fever（发烧）为真，当且仅当Cold（感冒）、Flu（流感）、或者Malaria（疟疾）为真。这样不确定性是指，父结点与子结点之间的因果关系有可能被抑制，因此病人可能得了感冒却没有发烧的症状。给定上述假设，Fever为假当且仅当所有为真的父结点都被抑制，这种情况的概率等于每个父结点的抑制概率的乘积。假设各抑制概率如下：</p>
+<script type="math/tex; mode=display">
+q_{\text{cold}}=P(\neg fever|cold,\neg flu,\neg malaria)=0.6\\
+q_{\text{flu}}=P(\neg fever|\neg cold,flu,\neg malaria)=0.2\\
+q_{\text{malaria}}=P(\neg fever|\neg cold,\neg flu,malaria)=0.1</script><p>那么，根据这个信息以及噪声或的假设，可以建立完整的条件概率表。通用规则是：</p>
+<script type="math/tex; mode=display">
+P(x_i|parents(X_i))=1-\prod_{\{j:X_j=true\}}q_j</script><p>其中的乘积是CPT表中这一行的设置为真的父结点之上的乘积。即</p>
+<p><img src="http://image.rexking6.top/img/clip1546655714.png" alt=""></p>
+<p>这样，对于其中一个变量依赖于 $k$ 个父节点的噪声逻辑关系，可以用 $O(k)$ 而不是 $O(2^k)$ 个参数来描述其完全条件概率表。</p>
+<h3 id="包含连续变量的贝叶斯网络"><a href="#包含连续变量的贝叶斯网络" class="headerlink" title="包含连续变量的贝叶斯网络"></a>包含连续变量的贝叶斯网络</h3><p>连续变量具有无限个可能取值 ，连续变量具有无限个可能取值。</p>
+<p>解决方法：</p>
+<ol>
+<li>离散化随机变量，会导致精度损失，非常巨大的概率表</li>
+<li>定义标准的概率密度函数族，通过有限个参数进行指定 </li>
+</ol>
+<h3 id="混合贝叶斯网络"><a href="#混合贝叶斯网络" class="headerlink" title="混合贝叶斯网络"></a>混合贝叶斯网络</h3><p>同时包含离散随机变量和连续随机的网络。</p>
+<h4 id="父结点为连续变量"><a href="#父结点为连续变量" class="headerlink" title="父结点为连续变量"></a>父结点为连续变量</h4><ul>
+<li>对于变量 $Cost$，需要指定 $P(Cost|Harvest,Subsidy)$。离散父节点可以通过直接枚举来处理，即分别指定 $P(Cost|Harvest,subsidy)$ 以及 $P(Cost|Harvest,┐subsidy)$。</li>
+<li>指定价格 $c$ 依赖于 $Harvest$ 的连续值 $h$ 是如何分布的，也就是将价格分布的参数指定为 $h$ 的一个函数。最常见的选择是线性高斯分布。 </li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1546656644.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1546656605.png" alt=""></p>
+<p>当离散变量作为连续变量的父节点加入时，网络就定义一个条件高斯分布：给定全部离散变量的任意赋值，所有连续变量的概率分布是一个多元高斯分布（如上）。</p>
+<h4 id="子结点为连续变量"><a href="#子结点为连续变量" class="headerlink" title="子结点为连续变量"></a>子结点为连续变量</h4><p>概率单位分布：基本的决策过程具有一个硬阈值，但阈值的精确位置受到随机高斯噪声的影响。</p>
+<p><img src="http://image.rexking6.top/img/clip1546657404.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1545437428.png" alt=""></p>
+<h2 id="贝叶斯网络中的精确推理"><a href="#贝叶斯网络中的精确推理" class="headerlink" title="贝叶斯网络中的精确推理"></a>贝叶斯网络中的精确推理</h2><h3 id="推理任务"><a href="#推理任务" class="headerlink" title="推理任务"></a>推理任务</h3><p>计算后验边缘概率 $P(X_i|E=e) $</p>
+<h3 id="通过枚举进行推理"><a href="#通过枚举进行推理" class="headerlink" title="通过枚举进行推理"></a>通过枚举进行推理</h3><p>不在查询变量和证据变量中的其他变量，即隐变量，须求和。</p>
+<p><img src="http://image.rexking6.top/img/clip1546648930.png" alt=""></p>
+<p><strong>直接枚举：</strong></p>
+<script type="math/tex; mode=display">
+P(B|j,m)=\alpha \sum_e \sum_a P(B)P(e)P(a|B,e)P(j|a)P(m|a)</script><p>这样对于 $n$ 个布尔变量的网络而言，算法的复杂度为 $O(n·2^n)$。</p>
+<p><strong>改进：</strong></p>
+<script type="math/tex; mode=display">
+\begin{align*}
+P(B|j,m)&=\alpha \sum_e \sum_a P(B)P(e)P(a|B,e)P(j|a)P(m|a)\\
+&=\alpha P(B) \sum_e P(e) \sum_a P(a|B,e) P(j|a) P(m|a)\\
+&=\alpha[<0.001,0.999>\times 0.002 \times <0.95,0.29> \times 0.9 \times 0.7] \\
+&+ <0.001,0.999> \times 0.002 \times <0.05,0.71> \times 0.05 \times 0.01 \\
+&+ <0.001,0.999> \times 0.998 \times <0.94,0.001> \times 0.9 \times 0.7 \\
+&+ <0.001,0.999> \times 0.998 \times <0.06,0.999> \times 0.05 \times 0.01 \\
+&= \alpha <0.001,0.999>(<0.0012,0.004>+<0.5910,0.0011>)\\
+&= \alpha <0.001,0.999><0.5922,0.0015>\\
+&= \alpha <0.0005922, 0.0014985>\\
+&\approx <0.283,0.717>
+\end{align*}</script><p>枚举法效率低下，存在重复计算。对于一个有 $n$ 个布尔变量的网络，该算法的时间复杂度总是 $O(2^n)$。</p>
+<p><img src="http://image.rexking6.top/img/clip1545459685.png" alt=""></p>
+<h3 id="变量消元算法"><a href="#变量消元算法" class="headerlink" title="变量消元算法"></a>变量消元算法</h3><p>从右到左执行求和，存储中间结果（因子）以避免重新计算。</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+P(B|j,m) &=\alpha \underbrace{P(B)}_B \sum_e \underbrace{P(e)}_E \sum_a \underbrace{P(a|B,e)}_A \underbrace{P(j|a)}_J \underbrace{P(m|a)}_M \\
+&= \alpha P(B) \sum_e P(e) \sum_a P(a|B,e) P(j|a) f_M(a)\\
+&= \alpha P(B) \sum_e P(e) \sum_a P(a|B,e) f_J(a) f_M(a)\\
+&= \alpha P(B) \sum_e P(e) \sum_a f_A(a,b,e) f_J(a) f_M(a) \\
+&= \alpha P(B) \sum_e P(e) f_{\overline AJM}(b,e)(\text{sum out } A)\\
+&= \alpha P(B) f_{\overline E \overline A J M }(b)(\text{sum out } E)\\
+&= \alpha f_B(b) \times f_{\overline E \overline A J M}(b)
+\end{align*}</script><p>其中，$f_M(A)=\begin{bmatrix} P(m|a) \\P(m|\neg a) \end{bmatrix}=\begin{bmatrix} 0.7 \\0.01 \end{bmatrix}$，$f_J(A)=\begin{bmatrix} P(j|a) \\P(j|\neg a) \end{bmatrix}=\begin{bmatrix} 0.9 \\0.05 \end{bmatrix}$，$f_A(A,B,E)=[P(a|B,E),P(\neg a|B,E)]=\begin{bmatrix} 0.95 &amp; 0.05 \\0.94 &amp; 0.06 \ 0.29 &amp; 0.71 \ 0.001 &amp; 0.999 \end{bmatrix}$。</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+f_{\overline A JM}(B,E)&=\sum_af_A(a,B,E) \times f_J(a) \times f_M(a) \\
+&=f_A(a,B,E) \times f_J(a) \times f_M(a) + f_A(\neg a,B,E) \times f_J(\neg a) \times f_M(\neg a)\\
+&=\begin{bmatrix} 0.95 \\0.94 \\0.29\\ 0.001 \end{bmatrix} \times 0.7 \times 0.9 + \begin{bmatrix} 0.05 \\0.06 \\0.71\\ 0.999 \end{bmatrix} \times 0.01 \times 0.05 \\
+&=\begin{bmatrix} 0.5985 \\0.5922 \\0.1831\\ 0.0011 \end{bmatrix}
+\end{align*}</script><script type="math/tex; mode=display">
+\begin{align*}
+f_{\overline E \overline AJM}(B)&=f_E(e) \times f_{\overline AJM}(B,e) + f_E(\neg e)\times f_{\neg A JM}(B, \neg e)\\
+&=0.002 \times <0.5985,0.1831>+0.998\times<0.5922,0.0011>\\
+&=<0.5922126,0.001464>
+\end{align*}</script><script type="math/tex; mode=display">
+\begin{align*}
+P(B|j,m) &=\alpha f_B(B)\times f_{\overline E \overline A JM}(B) \\
+&= \alpha <0.001,0.999><0.5922,0.0015>\\
+&= \alpha <0.0005922, 0.0014985>\\
+&\approx <0.283,0.717>
+\end{align*}</script><p>从因子乘积中对一个变量进行求和消元是直接计算。注意的技巧是，任何不依赖于将被求和消元的变量都可以移到求和符号的外面。 </p>
+<script type="math/tex; mode=display">
+\sum_ef_E(e)f_A(A,B,e)f_J(A)f_M(A)=f_J(A)f_M(A)\sum_ef_E(e)f_A(A,B,e)=f_J(A)f_M(A)f_{\overline E,A}(A,B)</script><p>注意直到我们需要将变量从累积乘积中消去前不会进行矩阵乘法。</p>
+<p>考虑另一个查询：$P(JohnCalls|Burglary=true)$。求和式为：</p>
+<script type="math/tex; mode=display">
+P(J|b)=\alpha P(b) \sum_e P(e) \sum_a P(a|b,e)P(J|a)\sum_m P(m|a)</script><p>其中，$\sum_mP(m|a)$等于1，即变量 $M$ 和这个查询无关。可以发现，所有既非查询变量的祖先亦非证据变量的祖先的变量都和查询无关，即可以删除。</p>
+<h3 id="精确推理的复杂度"><a href="#精确推理的复杂度" class="headerlink" title="精确推理的复杂度"></a>精确推理的复杂度</h3><p>对于单连接网络（或者多树）：如果每个节点的父结点数不超过某个常数，则复杂度与网络节点数呈线性关系。</p>
+<p>对于多连接网络：在最坏情况下，具有指数级的时间空间复杂度。</p>
+<p>所以可以通过某些算法将多连接网络转化成单连接网络，如：</p>
+<p><img src="http://image.rexking6.top/img/clip1546667898.png" alt=""></p>
+<p>这类算法称为”聚类算法“，也称为”联合树算法“，也称为”团算法“。</p>
+<h2 id="贝叶斯网络中的近似推理"><a href="#贝叶斯网络中的近似推理" class="headerlink" title="贝叶斯网络中的近似推理"></a>贝叶斯网络中的近似推理</h2><p><strong>精确推理的局限性：</strong>对大规模多连通网络中的精确推理是不可操作的。</p>
+<p><strong>近似推理基本思想：</strong></p>
+<ol>
+<li>从分布 $S$ 中进行 $N$ 个样本的采样</li>
+<li>计算一个逼近的后验概率 $\hat P$</li>
+<li>证明它收敛到真实概率 $P$</li>
+</ol>
+<h3 id="直接采样算法"><a href="#直接采样算法" class="headerlink" title="直接采样算法"></a>直接采样算法</h3><p>任何采样算法中最基本的要素是根据已知概率分布生成样本。 </p>
+<p>直接采样的思想是按照拓扑顺序依次对每个变量进行采样。变量值被采样的概率分布依赖于父结点已得到的赋值。</p>
+<p><img src="http://image.rexking6.top/img/clip1546648930.png" alt=""></p>
+<p>假设顺序为 $[Cloudy,Sprinkler,Rain,WetGrass]$：</p>
+<ol>
+<li>从 $P(Cloudy)=<0.5,0.5>$ 中采样 $Cloudy$，假设返回 $true$。</li>
+<li>从 $P(Sprinkler|Cloudy=true)=<0.8,0.2>$ 中采样 $Sprinkler$ ，假设返回 $false$。</li>
+<li>从 $P(Rain|Cloudy=true) = <0.1,0.9>$中采样 $Rain$，假设返回 $true$。</li>
+<li>从 $P(WetGrass|Sprinkler=false, Rain=true)=<0.9,0.1>$ 中采样 $WetGrass$ ，假设返回 $ true$。</li>
+</ol>
+<p>这样，PRIOR-SAMPLE（先验采样，即直接采样）返回事件 $[true, false, true, true]$。可以发现，生成的样本服从网络所指定的先验联合概率分布。</p>
+<p>令 $S_{PS}(x_1,…,x_n)$为由 Prior-Sample 生成的特定事件的概率。由采样过程得到，</p>
+<script type="math/tex; mode=display">
+S_{PS}(x_1,...,x_n)=\prod_{i=1}^n P(x_i|\text{Parents}(X_i))=P(x_1,...,x_n)</script><p>这个事件的采样概率应该是：</p>
+<script type="math/tex; mode=display">
+S_{PS}(true, false, true, true)=0.5 \times 0.9 \times 0.8 \times 0.9=0.324</script><p>因此，在 $N$ 的大量样本极限下（ $N$ 趋近于无穷大），我们期望有 $32.4\%$ 的样本是这个事件。</p>
+<p>在任何采样方法中，都是通过对实际生成的样本数来计算答案。假设共有 $N$ 个样本，令 $N(x_1,…,x_n)$ 为特定事件 $x_1,…, x_m$ 发生频率，我们期望该频率在极限情况下收敛到根据采样概率得到的它的期望值： </p>
+<script type="math/tex; mode=display">
+\begin{align*}
+\text{lim}_{N\rightarrow \infty} \hat P(x_1,...,x_n)&=\text{lim}_{N\rightarrow \infty}N_{PS}(x_1,...,x_n)/N\\
+& = S_{PS}(x_1,...,x_n)\\
+& = P(x_1,...,x_n)
+\end{align*}</script><p>估计概率在大量样本极限下成为精确值，这样的估计被称为一致估计。 </p>
+<h3 id="拒绝采样算法"><a href="#拒绝采样算法" class="headerlink" title="拒绝采样算法"></a>拒绝采样算法</h3><p>该算法是一种给定一个易于采样的分布，为一个难于采样的分布生成采样样本的通用方法。在其最简单的形式中，它可以用于计算条件概率。 </p>
+<p><strong>计算步骤：</strong></p>
+<ol>
+<li>根据网络指定的先验概率分布生成采样样本</li>
+<li>拒绝所有与证据不匹配的样本</li>
+<li>在剩余样本中对事件 $X=x$ 的出现频繁程度计数从而得到估计概率 $\hat P(X=x|e)$</li>
+</ol>
+<p>拒绝采样能够产生真实概率的一致估计。 </p>
+<script type="math/tex; mode=display">
+\begin{align*}
+\hat P(X|e) &=\alpha N_{PS}(X,e)\\
+&= N_{PS}(X,e)/N_{PS}(e)\\
+&\approx P(X,e)/P(e) \\
+&= P(X|e)
+\end{align*}</script><p>假设我们希望采样100个样本来估计 $P(Rain|Sprinkler=true)$。在我们所生成的这100个样本中，假设有73个满足 $Sprinkler=false$，因此被拒绝，同时有27个满足 $Sprinkler=true$；这27个中8个满足 $Rain=true$，19个满足 $Rain=false$。因此，</p>
+<script type="math/tex; mode=display">
+P(Rain|Sprinkler=true) \approx \text{NORMALIZE}(<8,19>)=<0.296,0.704></script><p>真实的答案是 $<0.3,0.7>$。随着收集的样本的增多，估计值将收敛到真实值。</p>
+<p><strong>局限性：</strong>拒绝了太多的样本。随着证据变量个数的增多，与证据 $e$ 相一致的样本在所有样本中所占的比例呈指数级下降，所以对于复杂问题这种方法是完全不可用的。 </p>
+<h3 id="似然加权算法"><a href="#似然加权算法" class="headerlink" title="似然加权算法"></a>似然加权算法</h3><p>只生成与证据 $e$ 一致的事件，避免拒绝采样算法的低效率。 </p>
+<p><strong>算法描述：</strong>该算法固定证据变量 $E$ 的值，只对证据以外的其余变量 $X$ 和 $Y$ 进行采样。 这保证了采样样本与证据一致。在对查询变量的分布进行计数之前，把根据证据得到的事件的似然作为每个事件的权值，该权值通过每个证据变量在给定其父节点取值下的条件概率的乘积进行度量。 </p>
+<p><img src="http://image.rexking6.top/img/clip1546671369.png" alt=""></p>
+<p>求解查询 $P(Rain|Cloudy=true, WetGrass=true)$，假设变量的拓扑顺序是 $Cloudy$，$Sprinkler$、$Rain$、$WetGrass$。过程是这样的：首先，将权值 $w$ 设为1.0。然后生成一个事件：</p>
+<ol>
+<li>$Cloudy$是一个证据变量，其职位 $true$。因此我们设置<script type="math/tex; mode=display">
+w \leftarrow w \times P(Cloudy=true)=0.5</script></li>
+</ol>
+<ol>
+<li><p>$Sprinkler$ 不是一个证据变量，因此从 $P(Sprinkler|Cloudy=true)=<0.1,0.9>$ 中采样；假设返回 $false$。</p>
+</li>
+<li><p>类似地，从 $P(Rain|Cloudy=true)=<0.8,0.2>$ 中采样；假设返回 $true$。</p>
+</li>
+<li><p>$WetGrass$ 是一个证据变量，其值为 $true$。因此我们设置</p>
+<script type="math/tex; mode=display">
+w \leftarrow w \times P(WetGrass=true|Sprinkler=false, Rain=true)=0.45</script></li>
+</ol>
+<p>这里似然采样返回权值为0.45的事件 $[true, false, true, true]$，它将被计入 $Rain = true$ 中去。</p>
+<p>上述是书上所写的，这里写下自己的理解：似然采样可以看成是，固定住某些变量，即证据变量的直接采样。目标是查询的变量概率，从而对每个事件赋予一定的权值，即概率，说成权值反倒一些不好理解了。按上述所说的，事件 $[t,f,t,t]$ 的权值为0.45，另外还能采样到另外三种事件（总共四种，因为固定了两个证据变量）：事件 $[t,f,f,t]$ 的权值为0、事件 $[t,t,f,t]$ 的权值为 0.45、 事件 $[t,t,t,t]$ 的权值为0.495。查询为，</p>
+<script type="math/tex; mode=display">
+P(Rain|Cloudy=true, WetGrass=true)=\alpha <0.45+0,0.45+0.495> \approx <0.323,0.677></script><h4 id="似然加权分析"><a href="#似然加权分析" class="headerlink" title="似然加权分析"></a>似然加权分析</h4><p>令 $S_{WS}$ 为加权采样的采样分布，证据变量的固定值为 $e$，证据以外的其他变量为 $Z$。给定父节点后，对 $Z$ 中的每个变量进行采样： </p>
+<script type="math/tex; mode=display">
+S_{WS}(z,e)=\prod_{i=1}^l P(z_i|\text{Parents}(Z_i))</script><p>$\text{Parents}(Z_i)$ 可能包含隐变量和证据变量。$S_{WS}$给予证据关注：每个 $Z_i$ 的采样值会受到它的祖先节点中证据的影响，另外，$S_{WS}$ 对证据的考虑要少于对真实的后验概率 $P(z|e)$ 的考虑。 </p>
+<p>似然权值 $w$ 补偿了真实采样分布与期望采样分布之间的差距。对已知事件 $z,e$ 的权值</p>
+<script type="math/tex; mode=display">
+w(z,e)=\prod_{i=1}^m P(e_i|\text{Parents}(E_i))</script><p>加权采样概率为：</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+S_{WS}(z,e)w(z,e) &= \prod_{i=1}^l P(z_i|\text{Parents}(Z_i)) \prod_{i=1}^mP(e_i|\text{Parents}(E_i))\\
+&=P(z,e)
+\end{align*}</script><script type="math/tex; mode=display">
+\begin{align*}
+\hat P(x|e)&=\alpha \sum_y N_{WS}(x,y,e)w(x,y,e)\\
+&\approx \alpha'\sum_y S_{WS}(x,y,e)w(x,y,e) \\
+&= \alpha'\sum_yP(x,y,e)=\alpha'P(x,e)\\
+&=P(x|e)
+\end{align*}</script><p>似然加权回到一致估计，使用了所有的样本，效率比拒绝采样高。 </p>
+<p>局限性：证据变量的个数增加时，它仍然要承受大幅度的性能下降。因为大多数的样本权值都非常低，导致在加权估计中起主导作用的只是那些所占比例很小的、与证据相符合的似然程度不是非常小的样本。 </p>
+<h3 id="Markov链仿真推理"><a href="#Markov链仿真推理" class="headerlink" title="Markov链仿真推理"></a>Markov链仿真推理</h3><p>MCMC：Markov chain Monte Carlo，马尔可夫链蒙特卡洛。</p>
+<p>Gibbs采样，一种特殊形式的MCMC算法，特别适合贝叶斯网络。</p>
+<p><strong>Gibbs算法描述：</strong></p>
+<ol>
+<li><p>该算法总是通过对前一事件进行随机改变而生成每个事件样本</p>
+</li>
+<li><p>可以认为网络处于为每个变量指定了值的一个特定的当前状态，而下一个状态则通过非证据变量 $X_i$ 进行采样来产生，其取决于 $X_i$ 的Markov覆盖中的变量的当前值</p>
+</li>
+<li>在状态空间中的随机走动，但保持证据变量的值固定不变。</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1545804887.png" alt=""></p>
+<p>具体来说，查询 $P(Rain|Sprinkler=T,WetGrass=T)$。证据变量固定为他们的观察值，而隐变量 $Cloudy$ 和 $Rain$ 则随机的初始化：$[T,T,F,T]$。反复执行下面的步骤（对于隐变量和询问变量，即非证据变量，可以以任意顺序）：</p>
+<ol>
+<li>对节点 $Cloudy$ 采样，给定它的 $Markov Blanket$（马尔可夫覆盖）当前值，即根据 $P(Cloudy|Sprinkler=T,Rain=F)$ 采样（父节点、子节点和子节点的父节点）。假设得到采样结果为$Cloudy=false$，即新的状态为 $[F,T,F,T]$。</li>
+<li>对节点 $Rain$ 采样，给定它的 $Markov Blanket$ 当前值，即根据 $P(Rain|Cloudy=F,Sprinkler=T,WetGrass=T)$ 进行采样。假设采样结果为 $Rain=T$。新的当前状态是$[F,T,T,T]$。</li>
+</ol>
+<p>这个过程中所访问的每一个状态都是一个样本，能对查询变量 $Rain$ 的估计做贡献。如果该过程访问了20个 $Rain$ 为真的状态和60个 $Rain$ 为假的状态，则所求查询的解为 $NORMALIZE(<20,60>)=<0.25,0.75>$。</p>
+<h4 id="MCMC工作机理"><a href="#MCMC工作机理" class="headerlink" title="MCMC工作机理"></a>MCMC工作机理</h4><p>基本观点：采样过程最终会进入一种动态平衡。</p>
+<p>该特性来自于特定的转移概率，即过程从一种状态转移到另一种状态的概率，通过被采样变量在给定Markov覆盖下的条件概率分布定义。令 $q(x \rightarrow x’)$ 为过程从状态 $x$ 转移到状态 $x’$ 的概率，该转移概率定义了状态空间上的Markov链，$π_t(x)$ 为时刻 $t$ 处于状态 $x$ 的概率。$π_{t+1}(x’)$ 表示在时刻 $t+1$ 处于状态 $x’$ 的概率。</p>
+<p>给定 $π_t(x)$，我们对算法可能于时刻 $t$ 到达的所有状态，通过对处于该状态的概率与从该状态转移到状态 $x’$ 的概率的乘积求和来计算 $π_{t+1}(x’)$：</p>
+<script type="math/tex; mode=display">
+\pi_{t+1}(x') = \sum_x \pi_t(x)q(x \rightarrow x')</script><p>当 $π_t(x)=π_{t+1}(x’)$ 时，Markov链达到了稳态分布，记为 $π$，即</p>
+<script type="math/tex; mode=display">
+\pi(x') = \sum_x \pi(x)q(x \rightarrow x')</script><p>对稳态分布的理解：从每个状态的期望“流出”等于来自于所有状态的期望“流入”。一个明显满足该关系的方式是任何两个状态之间沿两个方向的期望流量相等，称为细致平衡：</p>
+<script type="math/tex; mode=display">
+\pi(x')q(x' \rightarrow x) = \pi(x)q(x \rightarrow x')</script><p>细致平衡：</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+\sum_x \pi(x)q(x \rightarrow x') &= \sum_x \pi(x')q(x' \rightarrow x) \\
+&=\pi(x')\sum_xq(x' \rightarrow x) \\
+&=\pi(x')
+\end{align*}</script><p>给定Markov覆盖的一个变量独立于其它变量。</p>
+<script type="math/tex; mode=display">
+P(x_i'|\bar x_i,e)=P(x_i'|mb(X_i))</script><p>给定一个变量的概率正比于给定父节点的变量概率与给定各自父节点的每个子节点条件概率的乘积。</p>
+<script type="math/tex; mode=display">
+P(x_i'|mb(X_i))=\alpha P(x_i'|\text{parents}(X_i)) \ast \prod_{Y_j \notin \text{Children}(X_i)}P(y_i|\text{parents}(Y_j))</script><h1 id="关于时间的概率推理"><a href="#关于时间的概率推理" class="headerlink" title="关于时间的概率推理"></a>关于时间的概率推理</h1><h2 id="时间与不确定性"><a href="#时间与不确定性" class="headerlink" title="时间与不确定性"></a>时间与不确定性</h2><p>时间片是一个随机变量的集合，其中一部分是可观察的，一部分是不可观察的。</p>
+<p>假设所观察到的随机变量属于同一个变量子集：</p>
+<ul>
+<li>$X_t$ 为 $t$ 时刻不可观测的状态变量，状态变量从时刻 $t=0$ 开始；</li>
+<li>$E_t$ 为 $t$ 时刻可观测的证据变量，证据变量从时刻 $t=1$ 开始。</li>
+</ul>
+<p>假设时间是离散的，时间间隔依赖于具体问题，</p>
+<script type="math/tex; mode=display">
+X_{a:b}=X_a,X_{a+1},...,X_b</script><p><strong>转移模型</strong></p>
+<p>Markov过程：当前状态只依赖过去有限的已出现状态。最简单的是一阶Markov过程，其中当前状态只依赖于相邻的前一个状态，而与更早的状态无关，即 $P(X_t|X_{0:t-1})=P(X_t|X_{t-1})$，称为转移模型。</p>
+<p><img src="http://image.rexking6.top/img/clip1545896356.png" alt=""></p>
+<p><strong>观察模型</strong></p>
+<p>也称为传感器模型。$P(E_t|X_{0:t},E_{0:t-1})=P(E_t|X_t)$</p>
+<p><strong>初始状态模型</strong></p>
+<script type="math/tex; mode=display">
+P(X_0)</script><p><strong>由上述三个部分能够确定所有变量上完整的联合概率分布：</strong></p>
+<script type="math/tex; mode=display">
+P(X_{0:t},E_{1:t})=P(X_0)\prod_{i=1}^t P(X_i|X_{i-1})P(E_i|X_i)</script><p><img src="http://image.rexking6.top/img/clip1546683362.png" alt=""></p>
+<p>若一阶Markov过程不精确，可通过如下方法弥补：</p>
+<ol>
+<li>提高Markov过程阶数</li>
+<li>扩大状态变量集合。比如，考虑雨季的历史记录，增加变量 $Season_t$，或者 $Temperature_t$，$Humidity_t$，$Pressure_t$。</li>
+</ol>
+<h2 id="时序模型中的推理"><a href="#时序模型中的推理" class="headerlink" title="时序模型中的推理"></a>时序模型中的推理</h2><ol>
+<li><p>滤波：$P(X_t|e_{1:t})$</p>
+<p>滤波的任务是计算信念状态，即给定目前为止的所有证据，计算当前状态的后验概率分布。也称为状态估计。滤波是一个理性Agent为掌握当前状态以便进行理性决策所需要采取的行动。例如，给定目前为止对雨伞携带者的过去的所有观察数据，计算今天下雨的概率。</p>
+</li>
+<li><p>预测：$P(X_{t+k}|e_{1:t})$ 对于 $k&gt;0$</p>
+<p>预测的任务是给定目前为止的所有证据，计算未来状态的后验分布。例如，给定目前为止对雨伞携带者的过去的所有观察数据，计算今天开始三天以后下雨的概率。</p>
+</li>
+<li><p>平滑：$P(X_k|e_{1:t})$ 对于 $0\le k &lt; t$</p>
+<p>平滑的任务是给定目前为止的所有数据，计算过去某一状态的后验概率。例如，给定目前为止对雨伞携带者的过去的所有观察数据，计算上星期三下雨的概率。平滑为该状态提供了一个比当时能得到的结果更好的估计，因为它结合了更多的证据。</p>
+</li>
+<li><p>似然解释：$\text{arg max}_{x_{1:t}}P(x_{1:t}|e_{1:t})$</p>
+<p>给定观察序列，希望找到最可能生成这些观察结果的状态序列。例如，如果前三天每天都出现雨伞，但第四天没出现，那么最可能的解释是前三天下了雨，而第四天没有下。</p>
+</li>
+</ol>
+<p>除了以上推理任务，还有：</p>
+<ul>
+<li>学习：如果还不知道转移模型和传感器模型，则可以从观察中学习。和静态贝叶斯网络一样，动态贝叶斯网络的学习可以作为推理的一个副产品而完成。推理为哪些转移确实发生和哪些状态会产生传感器读数提供了估计，而且这些估计可以用于对模型进行更新。更新过的模型又提供新的估计，这个过程迭代至收敛。整个算法是期望最大化算法的一个特例。</li>
+</ul>
+<p>注意，学习需要的是平滑，而不是滤波，因为平滑提供了对过程状态更好的估计。通过滤波实现的学习可能不会正确地收敛。</p>
+<h3 id="滤波"><a href="#滤波" class="headerlink" title="滤波"></a>滤波</h3><p>一个有用的滤波算法需要维持一个当前状态估计并进行更新，而不是每次更新时回到整个感知历史。否则，更新代价会随着时间推移越来越大。也就是说，存在某个函数 $f$ 满足：</p>
+<script type="math/tex; mode=display">
+P(X_{t+1}|e_{1:t+1})=f(e_{t+1},P(X_t|e_{1:t}))</script><p>该过程称为递归估计。可以看成两部分：</p>
+<ol>
+<li>将当前的状态分布由时刻 $t$ 向前投影到时刻 $t+1$；</li>
+<li>通过新的证据 $e_{t+1}$ 进行更新。</li>
+</ol>
+<p>重排公式：</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+P(X_{t+1}|e_{1:t+1}) &= P(X_{t+1}|e_{1:t},e_{t+1})\ \ \ (证据分解)\\
+& = \alpha P(e_{t+1}|X_{t+1},e_{1:t})P(X_{t+1}|e_{1:t})\ \ \ (使用贝叶斯规则)\\
+&=\alpha P(e_{t+1}|X_{t+1})P(X_{t+1}|e_{1:t})\ \ \ (根据传感器马尔可夫假设)
+\end{align*}</script><p>$P(e_{t+1}|X_{t+1})$可从传感器模型，即观察模型得到。而 $P(X_{t+1}|e_{1:t})$ 可通过将当前状态 $X_t$ 条件化，得到下一个状态的单步预测结果：</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+P(X_{t+1}|e_{1:t+1}) &=\alpha P(e_{t+1}|X_{t+1})\sum_{x_t}P(X_{t+1}|x_t,e_{1:t})P(x_t|e_{1:t})\\
+&=\alpha P(e_{t+1}|X_{t+1})\sum_{x_t}P(X_{t+1}|x_t)P(x_t|e_{1:t})\ \ \ (马尔可夫假设)
+\end{align*}</script><p>得到递归公式。可以认为滤波估计 $P(X_t|e_{1:t})$ 是向前传播的”消息“ $f_{1:t}$，在每次转移时得到修正，并根据每个新的观察进行更新：</p>
+<script type="math/tex; mode=display">
+f_{1:t+1} =\alpha \  \text{FORWARD}(f_{1:t},e_{t+1})</script><p>常数时间，常数空间（与 $t$ 无关）。</p>
+<p><img src="http://image.rexking6.top/img/clip1545905214.png" alt=""></p>
+<p>求 $P(R_2|u_{1:2})$：</p>
+<ol>
+<li><p>第0天，$P(R_0)=<0.5,0.5>$</p>
+</li>
+<li><p>第1天，$P(R_1)=\sum_{r_0}P(r_0)P(R_1|r_0)=0.5 \times \begin{pmatrix} 0.7\ 0.3 \end{pmatrix} +0.5 \times \begin{pmatrix} 0.3 \ 0.7 \end{pmatrix} = \begin{pmatrix} 0.5\ 0.5 \end{pmatrix}$</p>
+<p>   ​              $P(R_1|u_1) = \alpha P(u_1|R_1)P(R_1) =\alpha \begin{pmatrix} 0.9\ 0.2 \end{pmatrix} \times \begin{pmatrix} 0.5\ 0.5 \end{pmatrix} =\alpha \begin{pmatrix} 0.45\ 0.1 \end{pmatrix} = \begin{pmatrix} 0.818\ 0.182 \end{pmatrix}$</p>
+</li>
+<li><p>第2天，$P(R_2|u_1) = \sum_{r_1} P(R_2|r_1)P(r_1|u_1)=0.818 \times \begin{pmatrix} 0.7\ 0.3 \end{pmatrix} + 0.182 \times \begin{pmatrix} 0.3\ 0.7 \end{pmatrix} = \begin{pmatrix} 0.627\ 0.373 \end{pmatrix}$</p>
+<p>   ​              $P(R_2|u_1, u_2) = \alpha P(u_2|R_2) P(R_2|u_1) = \alpha \begin{pmatrix} 0.9\ 0.2 \end{pmatrix}\times \begin{pmatrix} 0.627\ 0.373 \end{pmatrix}= \alpha \begin{pmatrix} 0.5643\ 0.0746 \end{pmatrix}= \begin{pmatrix} 0.883\ 0.117 \end{pmatrix}$</p>
+</li>
+</ol>
+<h3 id="预测"><a href="#预测" class="headerlink" title="预测"></a>预测</h3><p>预测是没有增加新证据的条件下的滤波。</p>
+<script type="math/tex; mode=display">
+P(X_{t+k+1}|e_{1:t})=\sum_{x_{t+k}}P(X_{t+k+1}|x_{t+k})P(x_{t+k}|e_{1:t})\\
+P(X_{t+k}|e_{1:t})=\sum_{x_{t+k-1}}P(X_{t+k}|x_{t+k-1})P(x_{t+k-1}|e_{1:t})\\
+...</script><p>类似上述的滤波操作，只是没有新证据能够修正，就只能一直乘转移矩阵……</p>
+<h3 id="似然"><a href="#似然" class="headerlink" title="似然"></a>似然</h3><p>除了滤波和预测外，还可以利用一种前向递归的方法对证据序列的似然 $P(e_{1:t})$进行计算。这是希望比较可能产生相同证据序列的不同的时序模型，。在这个递归过程中用到一种似然消息 $l_{1:t}(X_t)=P(X_t,e_{1:t})$。不难证明，这个消息的计算与滤波的计算是相同的：</p>
+<script type="math/tex; mode=display">
+l_{1:t+1}=\text{FORWARD}(l_{1:t},e_{t+1})</script><p>计算出 $l_{1:t}$ 之后，通过求和消元消去 $X_t$ 得到实际似然值：</p>
+<script type="math/tex; mode=display">
+L_{1:t}=P(e_{1:t})=\sum_{x_t}l_{1:t}(x_t)</script><p>不太理解，自己的理解是滤波算的是当前证据变量与当前状态变量的条件概率，而似然算的是当前证据变量与当前状态变量的联合概率，在最后一步求和消元后得到的是，产生这 $t$ 个时刻证据变量的概率，用来比较模型？</p>
+<h3 id="平滑"><a href="#平滑" class="headerlink" title="平滑"></a>平滑</h3><p><img src="http://image.rexking6.top/img/clip1546688635.png" alt=""></p>
+<script type="math/tex; mode=display">
+\begin{align*}
+P(X_k|e_{1:t}) &=P(X_k|e_{1:k},e_{k+1:t}) \\
+&= \alpha P(X_k|e_{1:k})P(e_{k+1:t}|X_k,e_{1:t})\ \ \ (使用贝叶斯规则)\\
+&= \alpha P(X_k|e_{1:k})P(e_{k+1:t}|X_k)\ \ \ (使用条件独立性)\\
+&= \alpha f_{1:k}\times b_{k+1:t}
+\end{align*}</script><p>其中，$b_{k+1:t}=P(e_{k+1:t}|X_k)$，可以通过后向的递归过程来计算：</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+P(e_{k+1:t}|X_k)&=\sum_{x_{k+1}}P(e_{k+1:t}|X_k,x_{k+1})P(x_{k+1}|x_k)\ \ \ (将 X_{k+1} 条件化)\\
+&=\sum_{x_{k+1}}P(e_{k+1:t}|x_{k+1})P(x_{k+1}|X_k)\ \ \ (根据条件独立性)\\
+&=\sum_{x_{k+1}}P(e_{k+1},e_{k+2:t}|x_{k+1})P(x_{k+1}|X_k) \\
+&=\sum_{x_{k+1}}P(e_{k+1}|x_{k+1})P(e_{k+2:t}|x_{k+1})P(x_{k+1}|X_k)
+\end{align*}</script><p>求和式的三个因子中，第一个为观察模型，第三个为转移模型，第二个为递归调用，使用后向的”消息“表示有</p>
+<script type="math/tex; mode=display">
+b_{k+1:t}=\text{BACKWARD}(b_{k+2:t},e_{k+1})</script><p>和前向递归相同，后向递归中每次更新所需要的时间与空间都是常量，因此与 $t$ 无关。该后向阶段的初始值为 $b_{t+1:t}=P(e_{t+1:t}|X_t)=P(1|X_t)$，其中的 $1$ 表示由1组成的向量。因为 $e_{t+1:t}$ 是一个空序列，观察到它的概率等于1。</p>
+<p><img src="http://image.rexking6.top/img/clip1546683362.png" alt=""></p>
+<p>给定第1天和第2天都观察到雨伞，要计算 $k=1$ 时下雨概率的平滑估计。由：</p>
+<script type="math/tex; mode=display">
+P(R_1|u_1,u_2)=\alpha P(R_1|u_1)P(u_2|R_1)</script><p>第一项由前向滤波得到为 $<0.818, 0.182>$。而第二项后向递归为：</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+P(u_2|R_1)&=\sum_{r_2}P(u_2|r_2)P(1|r_2)P(r_2|R_1)\\
+&=(0.9 \times 1 \times <0.7,0.3>)+(0.2 \times 1 \times <0.3,0.7>)\\
+&=<0.69,0.41>
+\end{align*}</script><p>将其代入公式，发现第1天下雨的平滑估计为：</p>
+<script type="math/tex; mode=display">
+P(R_1|u_1,u_2)=\alpha<0.818,0.182> \times <0.69,0.41>\approx  <0.883,0.117></script><p>如果我们想平滑整个序列，一个显然的方法就是对每个要平滑的时间步运行一次完整的平滑过程。这导致时间复杂度为 $O(t^2)​$。用类似上一节的方法记录已计算的结果，能够降低到 $O(t)​$。即记录对整个序列进行前向滤波的结果。然后从时刻 $t​$ 到 $1​$ 运行后向递归，在每个步骤 $k​$，根据已经计算出来的后向消息 $b_{k+1:t}​$ 和所存储的前向消息 $f_{1:k}​$，计算平滑估计。这个算法称为前向-后向算法。</p>
+<p><strong>前向-后向算法局限性：</strong></p>
+<ol>
+<li>对于状态空间规模庞大而序列很长的应用，算法的空间复杂度可能会过高。</li>
+<li>不适合于联机环境下的计算，在联机环境下算法必须在新证据不断追加到序列末尾的同时，为以前的时间片计算平滑估计。</li>
+</ol>
+<h3 id="最大似然解释"><a href="#最大似然解释" class="headerlink" title="最大似然解释"></a>最大似然解释</h3><p>给定观察序列，希望找到最可能生成这些观察结果的状态序列。</p>
+<p><img src="http://image.rexking6.top/img/clip1546683362.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1546739456.png" alt=""></p>
+<p>假设 $[true, true, false, true, true]$ 是警卫观察到的前5天的雨伞序列。解释这个序列的最可能的天气序列是什么？</p>
+<p>Viterbi算法：所有时间步上的联合概率。</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+&\text{max}_{x_1,...,x_t}P(x_1,...,x_t,X_{t+1}|e_{1:t+1})\\
+&=\alpha P(e_{t+1}|X_{t+1})\text{max}_{x_t}(P(X_{t+1}|x_t)\text{max}_{x_1...x_{t-1}}P(x_1,...,x_{t-1},x_t|e_{1:t}))
+\end{align*}</script><p>与滤波相比：</p>
+<ol>
+<li><p>前向消息 $f_{1:t}=P(X_t|e_{1:t})$ 被如下消息代替，</p>
+<script type="math/tex; mode=display">
+m_{1:t}=\text{max}_{x_1,..,x_{t-1}}P(x_1,...,x_{t-1},X_t|e_{1:t})</script><p>即到达每个状态 $x_t$ 的最可能路径的概率；</p>
+</li>
+<li><p>$x_t$ 之上的求和被 $x_t$ 之上的极大值所代替。</p>
+</li>
+</ol>
+<p>上述例子解法：</p>
+<p><img src="http://image.rexking6.top/img/clip1546742514.png" alt=""></p>
+<ol>
+<li><p>第1天，$m_1=\text{max}_{x_0}P(x_0,X_1|e_1)$，因为 $u_1=true$，</p>
+<p>$P(R_1)=\sum_{r_0}P(r_0)P(R_1|r_0)=0.5 \times \begin{pmatrix} 0.7\ 0.3 \end{pmatrix} +0.5 \times \begin{pmatrix} 0.3 \ 0.7 \end{pmatrix} = \begin{pmatrix} 0.5\ 0.5 \end{pmatrix}$</p>
+<p>$P(R_1|u_1) = \alpha P(u_1|R_1)P(R_1) =\alpha \begin{pmatrix} 0.9\ 0.2 \end{pmatrix} \times \begin{pmatrix} 0.5\ 0.5 \end{pmatrix} =\alpha \begin{pmatrix} 0.45\ 0.1 \end{pmatrix} = \begin{pmatrix} \textbf{0.8182}\ \textbf{0.1818} \end{pmatrix}$</p>
+</li>
+<li><p>第2天，根据上述公式计算，即$\text{max}_{r_1}(r_1,R_2|u_{1:2})=\alpha P(u_2|R_2)\text{max}_{r_2}(P(R_2|r_1)\text{max}_{r_1}P(r_1,r_2|u_{1:2}))$，因为 $u_2=true$，</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+&r_1=t,\ \ \ \ \begin{pmatrix} 0.9\\ 0.2\end{pmatrix}\times\begin{pmatrix} 0.7\\ 0.3\end{pmatrix}\times 0.8182 = \begin{pmatrix} \textbf{0.5155}\\ \textbf{0.0491}\end{pmatrix}\\
+&r_1=f,\ \ \ \ \begin{pmatrix} 0.9\\ 0.2\end{pmatrix}\times\begin{pmatrix} 0.3\\ 0.7\end{pmatrix}\times 0.1818 = \begin{pmatrix} 0.0327\\0.0255 \end{pmatrix}
+\end{align*}</script></li>
+</ol>
+<ol>
+<li>第3天，同上，因为 $u_3=false$，<script type="math/tex; mode=display">
+\begin{align*}
+&r_2=t,\ \ \ \ \begin{pmatrix} 0.1\\ 0.8\end{pmatrix}\times\begin{pmatrix} 0.7\\ 0.3\end{pmatrix}\times 0.5155 = \begin{pmatrix} \textbf{0.0361}\\ \textbf{0.1237}\end{pmatrix}\\
+&r_2=f,\ \ \ \ \begin{pmatrix} 0.1\\ 0.8\end{pmatrix}\times\begin{pmatrix} 0.3\\ 0.7\end{pmatrix}\times 0.1818 = \begin{pmatrix} 0.0055\\0.1018 \end{pmatrix}
+\end{align*}</script></li>
+</ol>
+<ol>
+<li>第4天，同上，因为 $u_4=true$，<script type="math/tex; mode=display">
+\begin{align*}
+&r_3=t,\ \ \ \ \begin{pmatrix} 0.9\\ 0.2\end{pmatrix}\times\begin{pmatrix} 0.7\\ 0.3\end{pmatrix}\times 0.0361 = \begin{pmatrix} 0.0227\\ 0.0022\end{pmatrix}\\
+&r_3=f,\ \ \ \ \begin{pmatrix} 0.9\\ 0.2\end{pmatrix}\times\begin{pmatrix} 0.3\\ 0.7\end{pmatrix}\times 0.1237 = \begin{pmatrix} \textbf{0.0334}\\\textbf{0.0173} \end{pmatrix}
+\end{align*}</script></li>
+</ol>
+<ol>
+<li>第5天，同上，因为 $u_5=true$，<script type="math/tex; mode=display">
+\begin{align*}
+&r_4=t,\ \ \ \ \begin{pmatrix} 0.9\\ 0.2\end{pmatrix}\times\begin{pmatrix} 0.7\\ 0.3\end{pmatrix}\times 0.0334 = \begin{pmatrix} \textbf{0.0210}\\ 0.0020\end{pmatrix}\\
+&r_4=f,\ \ \ \ \begin{pmatrix} 0.9\\ 0.2\end{pmatrix}\times\begin{pmatrix} 0.3\\ 0.7\end{pmatrix}\times 0.0173 = \begin{pmatrix} 0.0047\\\textbf{0.0024} \end{pmatrix}
+\end{align*}</script></li>
+</ol>
+<h2 id="隐马尔可夫模型"><a href="#隐马尔可夫模型" class="headerlink" title="隐马尔可夫模型"></a>隐马尔可夫模型</h2><p>简称HMM。</p>
+<h3 id="简化的矩阵算法"><a href="#简化的矩阵算法" class="headerlink" title="简化的矩阵算法"></a>简化的矩阵算法</h3><p>设状态变量 $X_t$ 的值用整数 $1,…,S$ 表示，其实 $S$ 表示可能状态的数目。转移模型 $P(X_t|X_{t-1})$ 成为一个 $S \times S$ 的矩阵 $T$，其中：</p>
+<script type="math/tex; mode=display">
+T_{ij}=P(X_t=j|X_{t-1}=i)</script><p>例如，雨伞世界的转移矩阵是：</p>
+<script type="math/tex; mode=display">
+T=P(X_t|X_{t-1})=\begin{pmatrix} 0.7 & 0.3\\ 0.3 & 0.7\end{pmatrix}</script><p>传感器模型，即观察模型，也类似。$e_t$ 是已知的，为每个状态指定这个状态使 $e_t$ 出现的概率是多少。将这些值放入一个 $S \times S$ 的矩阵 $O_t$ 中，它的第 $i$ 个对角元素是 $P(e_t|X_t=i)$，其他元素是0。例如，$U_1=true$ 时，$O_1=\begin{pmatrix} 0.9&amp;0\ 0&amp;0.2\end{pmatrix}$；$U_3=false$ 时，$O_3=\begin{pmatrix} 0.1 &amp; 0\\0 &amp; 0.8\end{pmatrix}$。</p>
+<p>前向公式变为：</p>
+<script type="math/tex; mode=display">
+f_{1:t+1}=\alpha O_{t+1}T^Tf_{1:t}</script><p>后向公式变为：</p>
+<script type="math/tex; mode=display">
+b_{k+1:t}=TO_{k+1}b_{k+2:t}</script><p>时间复杂度为 $O(S^2·t)$，空间复杂度为 $O(S·t)$。</p>
+<h3 id="前向-后向算法的简单变形"><a href="#前向-后向算法的简单变形" class="headerlink" title="前向-后向算法的简单变形"></a>前向-后向算法的简单变形</h3><p>使算法能够在常数空间内执行平滑，而与序列长度无关。</p>
+<p>将上述前向公式，向后传递，</p>
+<script type="math/tex; mode=display">
+f_{1:t}=\alpha'(T^T)^{-1}O_{t+1}^{-1}f_{1:t+1}</script><p>修改后的平滑算法首先执行标准的前向过程以计算 $f_{t:t}$ （抛弃所有中间结果），然后对 $b$ 和 $f$ 同时执行后向过程，用它们来计算每一时间步的平滑估计。</p>
+<p>不过这个算法有两个显著的限制：</p>
+<ol>
+<li><p>要求转移矩阵必须是可逆的；</p>
+</li>
+<li><p>要求传感器模型没有零元素，也就是说，在每个状态下每个观察值都是可能的。</p>
+</li>
+</ol>
+<h3 id="有固定延迟的联机平滑"><a href="#有固定延迟的联机平滑" class="headerlink" title="有固定延迟的联机平滑"></a>有固定延迟的联机平滑</h3><p>联机平滑存在一种高效的递归算法——即一种时间复杂度与延迟长度无关的算法。假设延迟为 $d$；要对时间片 $t-d$ 进行平滑，其中 $t$ 表示当前时间。根据平滑公式，需要为时间片 $t-d$ 计算，</p>
+<script type="math/tex; mode=display">
+\alpha f_{1:t-d} \times b_{t-d+1:t}</script><p>然后，当有了新的观察后，需要为时间片 $t-d+1$ 计算，</p>
+<script type="math/tex; mode=display">
+\alpha f_{1:t-d+1} \times b_{t-d+2:t+1}</script><p>目标是通过增量方式实现这种计算。首先，由滤波公式，由 $f_{1:t-d}$ 计算 $f_{1:t-d+1}$ 。</p>
+<p>因为在旧的后向消息 $b_{t-d+1:t}$ 和新的后向消息 $b_{t-d+2:t+1}$ 之间并不存在简单关系。所以考查旧的后向消息 $b_{t-d+1:t}$ 和序列前端的后向消息 $b_{t+1:t}$ 之间的关系。将矩阵形式的后向公式应用 $d$ 次：</p>
+<script type="math/tex; mode=display">
+b_{t-d+1:t}=(\prod_{i=t-d+1}^tTO_i)b_{t+1:t}=B_{t-d+1:t}1</script><p>其中矩阵 $B_{t-d+1:t}$ 为 $T$ 和 $O$ 矩阵序列的乘积。 $B$ 类似“变换算子”，它将后来的后向消息变换成早先的后向消息。类似地，</p>
+<script type="math/tex; mode=display">
+b_{t-d+2:t+1}=(\prod_{i=t-d+2}^{t+1}TO_i)b_{t+2:t+1}=B_{t-d+2:t+1}1</script><p>可以发现，新旧矩阵 $B$ 之间的关系：</p>
+<script type="math/tex; mode=display">
+B_{t-d+2:t+1}=O_{t-d+1}^{-1}T^{-1}B_{t-d+1:t}TO_{t+1}</script><p>这个公式提供了对 $B$ 矩阵的增量式更新，并进而计算新的后向消息 $b_{t-d+1:t+1}$。</p>
+<h2 id="Kalman滤波"><a href="#Kalman滤波" class="headerlink" title="Kalman滤波"></a>Kalman滤波</h2><p>隐马尔可夫模型针对的是离散变量；卡尔曼滤波针对的是连续变量。</p>
+<p>小鸟的飞行可以用每个时间点的6个连续变量来描述，3个变量用于位置 $(X_t,Y_t,Z_t)$，3个变量用于速度 $(\dot X_t, \dot Y_t, \dot Z_t)$。之后使用线性高斯分布来表示转移模型和传感器模型。这意味着下一个状态 $X_{t+1}$ 必须是当前状态 $X_t$ 的线性函数，再加上某个高斯噪声。例如，考虑小鸟的 $X$ 坐标，暂时先忽略其他坐标。令观测之间的间隔为 $\Delta$，并假设在观测间隔里速度不变；那么位置更新由 $X_{t+\Delta}=X_t+\dot X \Delta$ 给出。增加高斯噪声（解释风向的变化等）后，得到一个线性高斯转移模型：</p>
+<script type="math/tex; mode=display">
+P(X_{t+\Delta}=x_{t+\Delta}|X_t=x_t,\dot X_t=\dot x_t)=N(x_t+\dot x_t\Delta,\sigma^2)(x_{t+\Delta})</script><p><img src="http://image.rexking6.top/img/clip1546753934.png" alt=""></p>
+<h3 id="更新高斯分布"><a href="#更新高斯分布" class="headerlink" title="更新高斯分布"></a>更新高斯分布</h3><p><strong>滤波：</strong></p>
+<ol>
+<li><p>如果当前分布 $P(X_t|e_{1:t})$ 是高斯分布，并且转移模型 $P(X_{t+1}|x_t)$ 是线性高斯的，那么由</p>
+<script type="math/tex; mode=display">
+P(X_{t+1}|e_{1:t})=\int_{X_t}P(X_{t+1}|x_t)P(x_t|e_{1:t})dx_t</script><p>给出的单步预测分布也是高斯分布。自己理解：从离散扩展到连续，即从求和扩展到积分。</p>
+</li>
+<li><p>如果预测分布 $P(X_{t+1}|e_{1:t})$ 是高斯分布，传感器模型 $P(e_{t+1}|X_{t+1})$ 是线性高斯的，那么条件化新证据后，更新后的分布</p>
+<script type="math/tex; mode=display">
+P(X_{t+1}|e_{1:t+1})=\alpha P(e_{t+1}|X_{t+1})P(X_{t+1}|e_{1:t})</script><p>也是高斯分布。</p>
+</li>
+</ol>
+<p>因此，卡尔曼滤波的FORWARD算子选取一个高斯前向消息，该消息由均值 $\mu_t$ 和协方差矩阵 $\Sigma_t$ 确定；并产生一个新的多元高斯前向消息 $f_{1:t+1}$，该消息由均值 $\mu_{t+1}$ 和协方差矩阵 $\Sigma_{t+1}$ 确定。</p>
+<p>序列七点为高斯先验概率，</p>
+<script type="math/tex; mode=display">
+f_{1:0}=P(X_0)=N(\mu_0,\Sigma_0)</script><h3 id="简单的一维实例"><a href="#简单的一维实例" class="headerlink" title="简单的一维实例"></a>简单的一维实例</h3><p>（并不简单。）</p>
+<p>假设其先验分布为具有方差 $\sigma_0^2$ 的高斯分布：</p>
+<script type="math/tex; mode=display">
+P(x_0)=\alpha e^{-\frac{1}{2}(\frac{(x_0-\mu_0)^2}{\sigma_0^2})}</script><p>转移模型在当前状态中增加了一个具有常数方差 $\sigma_x^2$ 的高斯扰动：</p>
+<script type="math/tex; mode=display">
+P(x_{t+1}|x_t)=\alpha e^{-\frac{1}{2}(\frac{(x_{t+1}-x_t)^2}{\sigma_x^2})}</script><p>假设传感器模型具有方差为 $\sigma_z^2$ 的高斯噪声：</p>
+<script type="math/tex; mode=display">
+P(z_t|x_t)=\alpha e^{-\frac{1}{2}(\frac{(z_t-x_t)^2}{\sigma_z^2})}</script><p>现在，已知先验分布 $P(X_0)$，可以使用上述的滤波第一步计算单步预测分布：</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+P(x_1) &= \int_{-\infty}^\infty P(x_1|x_0)P(x_0)dx_0\\
+&=\alpha \int_{-\infty}^\infty e^{-\frac{1}{2}(\frac{(x_1-x_0)^2}{\sigma_x^2})} e^{-\frac{1}{2}(\frac{(x_0-\mu_0)^2}{\sigma_0^2})}dx_0\\
+&=\alpha \int_{-\infty}^\infty e^{-\frac{1}{2}(\frac{\sigma_0^2(x_1-x_0)^2+\sigma_x^2(x_0-\mu_0)^2}{\sigma_0^2 \sigma_x^2})}
+\end{align*}</script><p>通过配方法将任何二次多项式 $ax_0^2+bx_0+c$ 改写为平方项 $a(x_0-\frac{-b}{2a})^2$ 与独立于 $x_)$ 的余项 $c-\frac{b^2}{4a}$ 之和。余项部分可以从积分中移出，于是得到：</p>
+<script type="math/tex; mode=display">
+P(x_1)=\alpha e^{-\frac{1}{2}(c-\frac{b^2}{4a})}\int_{-\infty}^\infty e^{-\frac{1}{2}(a(x_0-\frac{-b}{2a})^2)}dx_0</script><p>现在积分部分就是一个全区间上的高斯分布积分，也就是1.只剩下了二次多项式中的余项。注意到这个预想是关于 $x_1$ 的二次多项式；化简后，</p>
+<script type="math/tex; mode=display">
+P(x_1)=\alpha e^{-\frac{1}{2}(\frac{(x_1-\mu_0)^2}{\sigma_0^2+\sigma_x^2})}</script><p>也就是说，单步预测分布是一个具有相同均值 $\mu_0$ 的高斯分布，而其方差等于原来方差 $\sigma_0^2$ 与转移方差 $\sigma_x^2$ 的和。</p>
+<p>之后是第二步，即 $z_1$ 条件化，</p>
+<script type="math/tex; mode=display">
+P(x_1|z_1)=\alpha P(z_1|x_1)P(x_1)=\alpha e^{-\frac{1}{2}(\frac{(z_1-x_1)^2}{\sigma_z^2})} e^{-\frac{1}{2}(\frac{(x_1-\mu_0)^2}{\sigma_0^2+\sigma_x^2})}</script><p>再一次合并指数，并配方，得到，</p>
+<script type="math/tex; mode=display">
+P(x_1|z_1)=\alpha e^{-\frac{1}{2}(\frac{(x_1-\frac{(\sigma_0^2+\sigma_x^2)z_1+\sigma_z^2\mu_0}{\sigma_0^2+\sigma_x^2+\sigma_z^2})^2}{(\sigma_0^2+\sigma_x^2)\sigma_z^2/(\sigma_0^2+\sigma_x^2+\sigma_z^2)})}</script><p>由此得到了状态变量的一个新的高斯分布。可以发现，新的均值和标准差可以由原来的均值和标准差按照下面的公式计算得到：</p>
+<script type="math/tex; mode=display">
+\mu_{t+1}=\frac{(\sigma_t^2+\sigma_x^2)z_1+\sigma_z^2\mu_t}{\sigma_t^2+\sigma_x^2+\sigma_z^2}\\
+\sigma_{t+1}^2=\frac{(\sigma_t^2+\sigma_x^2)\sigma_z^2}{\sigma_t^2+\sigma_x^2+\sigma_z^2}</script><p><img src="http://image.rexking6.top/img/clip1546756526.png" alt=""></p>
+<ol>
+<li>可以把新均值 $\mu_{t+1}$ 解释为新观察 $z_{t+1}$ 和旧均值 $\mu_t$ 的一个简单的加权平均。如果观察不可靠，那么 $\sigma_z^2$ 很大，则更关注旧均值；如果旧均值不可靠（即 $\sigma_t^2$ 很大），或者这个过程高度不可预测（$\sigma_x^2$ 很大），则更关注观察值。</li>
+<li>注意到对方差 $\sigma_{t+1}^2$ 的更新是独立于观察的。因此可以在事先计算出方差值的序列</li>
+<li>方差值的序列很快收敛到一个固定的值，这个值只与 $\sigma_x^2$ 和 $\sigma_z^2$ 有关，简化后续计算。</li>
+</ol>
+<h3 id="一般情况"><a href="#一般情况" class="headerlink" title="一般情况"></a>一般情况</h3><p>(想吐。)</p>
+<p>完整的多元高斯分布具有如下形式：</p>
+<script type="math/tex; mode=display">
+N(\mu,\Sigma)(x)=\alpha e^{-\frac{1}{2}((x-\mu)\Sigma^{-1}(x-\mu))}</script><p>首先用卡尔曼滤波定义一般的时序模型。转移模型和传感器模型都允许一个附加高斯噪声的线性变换的线性变换，因此有：</p>
+<script type="math/tex; mode=display">
+P(x_{t+1}|x_t)=N(Fx_t,\Sigma_x)(x_{t+1})\\
+P(z_t|x_t)=N(Hx_t,\Sigma_z)(z_t)</script><p>其中 $F$ 和 $\Sigma_x$是描述线性转移模型和转移噪声协方差的矩阵，而 $H$ 和 $\Sigma_z$ 是传感器模型的相应矩阵。现在的均值与协方差的更新公式为：</p>
+<script type="math/tex; mode=display">
+\mu_{t+1}=F\mu_t+K_{t+1}(z_{t+1}-HF\mu_t)\\
+\Sigma_{t+1}=(I-K_{t+1}H)(F\Sigma_tF^T+\Sigma_x)</script><p>其中 $K_{t+1}=(F\Sigma_tF^T+\Sigma_x)H^T(H(F\Sigma_tF^T+\Sigma_x)H^T+\Sigma_z)^{-1}$ 被称为卡尔曼增益矩阵。</p>
+<h3 id="扩展的卡尔曼滤波器"><a href="#扩展的卡尔曼滤波器" class="headerlink" title="扩展的卡尔曼滤波器"></a>扩展的卡尔曼滤波器</h3><p>卡尔曼滤波器所做的假设是相当强的，线性高斯的转移模型和传感器模型。扩展的卡尔曼滤波器试图克服被建模的系统中的非线性。在一个系统中，如果转移模型不能描述为状态向量的矩阵乘法，这个系统就是非线性的。扩展卡尔曼滤波器的工作机理是将在 $x_t=\mu_t$ 的区域中的状态 $x_t$ （$\mu_t$ 是当前状态分布的均值）当作局部线性的，在此基础上对系统进行建模。这对于光滑的、表现良好的系统效果非常好，并且允许追踪者保持和更新一个高斯状态分布（是真实后验概率分布的合理近似）。</p>
+<p>对于系统“不平滑”或者“表现不良”的情况，标准的解决办法是采用切换的卡尔曼滤波器。</p>
+<p><img src="http://image.rexking6.top/img/clip1546758060.png" alt=""></p>
+<h2 id="动态贝叶斯网络"><a href="#动态贝叶斯网络" class="headerlink" title="动态贝叶斯网络"></a>动态贝叶斯网络</h2><p>雨伞网络以及卡尔曼滤波器网络都是动态贝叶斯网络的一些例子。</p>
+<p>总的来说，动态贝叶斯网络中的每个时间片可以具有任意数量的状态变量 $X_t$ 与证据变量 $E_t$。为了简化，假设变量与有向边从一个时间片到另一个时间片是精确复制的，并且假设动态贝叶斯网络表示的是一个一阶马尔可夫过程，所以每个变量的父结点或者在该变量本身所在那个时间片中，或者在与之相邻的上一个时间片中。</p>
+<h3 id="精确推理"><a href="#精确推理" class="headerlink" title="精确推理"></a>精确推理</h3><p>每次更新所需要的时间空间复杂度是状态变量个数的指数级，最大因子规模 $O(d^{n+1})$，更新代价 $O(d^{n+2})$。</p>
+<h3 id="近似推理"><a href="#近似推理" class="headerlink" title="近似推理"></a>近似推理</h3><ol>
+<li>使用样本本身作为当前状态分布的近似表示</li>
+<li>将采样集合集中集中于状态空间的高概率区域</li>
+</ol>
+<h5 id="粒子滤波"><a href="#粒子滤波" class="headerlink" title="粒子滤波"></a>粒子滤波</h5><p>粒子滤波算法的工作机理如下：首先，从先验分布 $P(X_0)$ 中采样得到 $N$ 个初始状体样本构成的总体。然后为每个时间步重复下面的更新循环：</p>
+<ol>
+<li>对于每个样本，通过转移模型 $P(X_{t+1}|x_t)$，在给定样本的当前状态值 $x_t$ 条件下，对下一个状态值 $x_{t+1}$ 进行采样，使得该样本前向传播。</li>
+<li>对于每个样本，用它赋予新证据的似然值 $P(e_{t+1}|x_{t+1})$ 作为权值。</li>
+<li>对总体样本进行重新采样已生成一个新的 $N$ 样本总体。每个新样本是从当前的总体中选取的；某个特定样本被选中的概率与其权值成正比。新样本是没有被赋权值的。</li>
+</ol>
+<p><strong>例子：</strong></p>
+<p><img src="http://image.rexking6.top/img/clip1546760671.png" alt=""></p>
+<ol>
+<li>在时刻 $t$ ，8个样本指示 $Rain$（下面），2个样本指示 $\neg Rain$（不下雨）。通过转移模型对下一个状态进行采样，每个样本都向前传递。在时刻 $t+1$，6个样本指示 $Rain$，4个样本只是 $\neg Rain$。</li>
+<li>在时刻 $t+1$ 观察到 $\neg Umbrella$。根据每个样本与这个观察的似然程度给样本赋予权值，图中用圆圈的大小表示。</li>
+<li>得到一个10样本的新集合，结果有2个样本指示 $Rain$，8个样本指示$\neg Rain$。</li>
+</ol>
+<p><strong>证明：</strong></p>
+<p>假设样本总体开始于在时间 $t$ 的前向消息 $f_{1:t}=P(X_t|e_{1:t})$ 的正确表示。用 $N(x_t|e_{1:t})$ 表示处理完观察 $e_{1:t}$ 之后具有状态 $x_t$ 的样本个数，因此对于足够大的 $N$，有</p>
+<script type="math/tex; mode=display">
+N(x_t|e_{1:t})/N=P(x_t|e_{1:t})</script><p>现在，在给定时刻 $t$ 的样本的条件下，通过在时刻 $t+1$ 对状态变量进行采样而将每个样本向前传播。从每个 $x_t$ 到达 $x_{t+1}$ 的样本个数等于转移概率乘以 $x_t$ 的总量；因此到达状态 $x_{t+1}$ 的总样本数是</p>
+<script type="math/tex; mode=display">
+N(x_{t+1}|e_{1:t})=\sum_{x_t}P(x_{t+1}|x_t)N(x_t|e_{1:t})</script><p>现在根据每个样本对于时刻 $t+1$ 的证据的似然为其赋权值。处于状态 $x_{t+1}$ 的样本得到权值 $P(e_{t+1}|x_{t+1})$。因此在观察到证据 $e_{t+1}$ 后处于状态 $x_{t+1}$ 的样本总权值是</p>
+<script type="math/tex; mode=display">
+W(x_{t+1}|e_{1:t+1})=P(e_{t+1}|x_{t+1})N(x_{t+1}|e_{1:t})</script><p>现在考虑重采样步骤。既然每一个样本都以与其权值成正比的概率被复制，重采样后处于状态 $x_{t+1}$ 的样本数与重新采样前状态 $x_{t+1}$ 中的总权值成正比：</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+N(x_{t+1}|e_{1:t+1})/N&=\alpha W(x_{t+1}|e_{1:t+1})\\
+&= \alpha P(e_{t+1}|x_{t+1})N(x_{t+1}|e_{1:t})\\
+&= \alpha P(e_{t+1}|x_[t+1])\sum_{x_t}P(x_{t+1}|x_t)N(x_t|e_{1:t})\\
+&=\alpha NP(e_{t+1}|x_{t+1})\sum_{x_t}P(x_{t+1}|x_t)P(x_t|e_{1:t})\ \ \ 根据样本数足够大时近似概率\\
+&= \alpha'P(e_{t+1}|x_{t+1})\sum_{x_t}P(x_{t+1}|x_t)P(x_t|e_{1:t})\\  
+&=P(x_{t+1}|e_{1:t+1})
+\end{align*}</script><p>因此，经过一轮更新循环后的样本总体正确地表示了时刻  $t+1$ 的前向消息。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\10\29\《多媒体技术》\" rel="bookmark">《多媒体技术》</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\27\《视频分析前沿》一\" rel="bookmark">《视频分析前沿》一</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\22\《计算机视觉》\" rel="bookmark">《计算机视觉》</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2019/01/06/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%99%BA%E8%83%BD%E3%80%8B%EF%BC%88%E4%BA%8C%EF%BC%89%E6%A6%82%E7%8E%87/" title="《计算智能》（二）概率">https://blog.rexking6.top/2019/01/06/《计算智能》（二）概率/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%A1%95%E5%A3%AB%E8%AF%BE%E7%A8%8B/" rel="tag"># 硕士课程</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/12/29/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E3%80%81ARIMA%E5%8F%8A%E5%85%B6%E8%A1%8D%E7%94%9F/" rel="prev" title="时间序列、ARIMA及其衍生">
+      <i class="fa fa-chevron-left"></i> 时间序列、ARIMA及其衍生
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/01/12/Facebook-%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B%E7%AE%97%E6%B3%95-Prophet-%E7%9A%84%E7%A0%94%E7%A9%B6/" rel="next" title="Facebook 时间序列预测算法 Prophet 的研究">
+      Facebook 时间序列预测算法 Prophet 的研究 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%8D%E7%A1%AE%E5%AE%9A%E7%9F%A5%E8%AF%86%E4%B8%8E%E6%8E%A8%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">不确定知识与推理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E7%8E%87%E7%AC%A6%E5%8F%B7"><span class="nav-number">2.1.</span> <span class="nav-text">基本概率符号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%AE%8C%E5%85%A8%E8%81%94%E5%90%88%E5%88%86%E5%B8%83%E8%BF%9B%E8%A1%8C%E6%8E%A8%E7%90%86"><span class="nav-number">2.2.</span> <span class="nav-text">使用完全联合分布进行推理</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A6%82%E7%8E%87%E6%8E%A8%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">概率推理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E7%BB%9C"><span class="nav-number">3.1.</span> <span class="nav-text">贝叶斯网络</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E7%BB%9C%E8%AF%AD%E4%B9%89"><span class="nav-number">3.1.1.</span> <span class="nav-text">贝叶斯网络语义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A7%E8%87%B4%E6%80%A7%E4%B8%8E%E8%8A%82%E7%82%B9%E6%8E%92%E5%BA%8F"><span class="nav-number">3.1.2.</span> <span class="nav-text">紧致性与节点排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E7%BB%9C"><span class="nav-number">3.1.3.</span> <span class="nav-text">构造贝叶斯网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E7%BB%9C%E4%B8%AD%E7%9A%84%E6%9D%A1%E4%BB%B6%E7%8B%AC%E7%AB%8B%E5%85%B3%E7%B3%BB"><span class="nav-number">3.1.4.</span> <span class="nav-text">贝叶斯网络中的条件独立关系</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E5%88%86%E5%B8%83%E7%9A%84%E6%9C%89%E6%95%88%E8%A1%A8%E8%BE%BE"><span class="nav-number">3.2.</span> <span class="nav-text">条件分布的有效表达</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E7%A1%AE%E5%AE%9A%E5%85%B3%E7%B3%BB"><span class="nav-number">3.2.1.</span> <span class="nav-text">不确定关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%85%E5%90%AB%E8%BF%9E%E7%BB%AD%E5%8F%98%E9%87%8F%E7%9A%84%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E7%BB%9C"><span class="nav-number">3.2.2.</span> <span class="nav-text">包含连续变量的贝叶斯网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B7%E5%90%88%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E7%BB%9C"><span class="nav-number">3.2.3.</span> <span class="nav-text">混合贝叶斯网络</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%88%B6%E7%BB%93%E7%82%B9%E4%B8%BA%E8%BF%9E%E7%BB%AD%E5%8F%98%E9%87%8F"><span class="nav-number">3.2.3.1.</span> <span class="nav-text">父结点为连续变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%90%E7%BB%93%E7%82%B9%E4%B8%BA%E8%BF%9E%E7%BB%AD%E5%8F%98%E9%87%8F"><span class="nav-number">3.2.3.2.</span> <span class="nav-text">子结点为连续变量</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E7%BB%9C%E4%B8%AD%E7%9A%84%E7%B2%BE%E7%A1%AE%E6%8E%A8%E7%90%86"><span class="nav-number">3.3.</span> <span class="nav-text">贝叶斯网络中的精确推理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A8%E7%90%86%E4%BB%BB%E5%8A%A1"><span class="nav-number">3.3.1.</span> <span class="nav-text">推理任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E8%BF%87%E6%9E%9A%E4%B8%BE%E8%BF%9B%E8%A1%8C%E6%8E%A8%E7%90%86"><span class="nav-number">3.3.2.</span> <span class="nav-text">通过枚举进行推理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E6%B6%88%E5%85%83%E7%AE%97%E6%B3%95"><span class="nav-number">3.3.3.</span> <span class="nav-text">变量消元算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B2%BE%E7%A1%AE%E6%8E%A8%E7%90%86%E7%9A%84%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="nav-number">3.3.4.</span> <span class="nav-text">精确推理的复杂度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E7%BB%9C%E4%B8%AD%E7%9A%84%E8%BF%91%E4%BC%BC%E6%8E%A8%E7%90%86"><span class="nav-number">3.4.</span> <span class="nav-text">贝叶斯网络中的近似推理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B4%E6%8E%A5%E9%87%87%E6%A0%B7%E7%AE%97%E6%B3%95"><span class="nav-number">3.4.1.</span> <span class="nav-text">直接采样算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%92%E7%BB%9D%E9%87%87%E6%A0%B7%E7%AE%97%E6%B3%95"><span class="nav-number">3.4.2.</span> <span class="nav-text">拒绝采样算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%BC%E7%84%B6%E5%8A%A0%E6%9D%83%E7%AE%97%E6%B3%95"><span class="nav-number">3.4.3.</span> <span class="nav-text">似然加权算法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%BC%E7%84%B6%E5%8A%A0%E6%9D%83%E5%88%86%E6%9E%90"><span class="nav-number">3.4.3.1.</span> <span class="nav-text">似然加权分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Markov%E9%93%BE%E4%BB%BF%E7%9C%9F%E6%8E%A8%E7%90%86"><span class="nav-number">3.4.4.</span> <span class="nav-text">Markov链仿真推理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#MCMC%E5%B7%A5%E4%BD%9C%E6%9C%BA%E7%90%86"><span class="nav-number">3.4.4.1.</span> <span class="nav-text">MCMC工作机理</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E6%97%B6%E9%97%B4%E7%9A%84%E6%A6%82%E7%8E%87%E6%8E%A8%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">关于时间的概率推理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E4%B8%8E%E4%B8%8D%E7%A1%AE%E5%AE%9A%E6%80%A7"><span class="nav-number">4.1.</span> <span class="nav-text">时间与不确定性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%B6%E5%BA%8F%E6%A8%A1%E5%9E%8B%E4%B8%AD%E7%9A%84%E6%8E%A8%E7%90%86"><span class="nav-number">4.2.</span> <span class="nav-text">时序模型中的推理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BB%A4%E6%B3%A2"><span class="nav-number">4.2.1.</span> <span class="nav-text">滤波</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E6%B5%8B"><span class="nav-number">4.2.2.</span> <span class="nav-text">预测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%BC%E7%84%B6"><span class="nav-number">4.2.3.</span> <span class="nav-text">似然</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B3%E6%BB%91"><span class="nav-number">4.2.4.</span> <span class="nav-text">平滑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E5%A4%A7%E4%BC%BC%E7%84%B6%E8%A7%A3%E9%87%8A"><span class="nav-number">4.2.5.</span> <span class="nav-text">最大似然解释</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%90%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E6%A8%A1%E5%9E%8B"><span class="nav-number">4.3.</span> <span class="nav-text">隐马尔可夫模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8C%96%E7%9A%84%E7%9F%A9%E9%98%B5%E7%AE%97%E6%B3%95"><span class="nav-number">4.3.1.</span> <span class="nav-text">简化的矩阵算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E5%90%91-%E5%90%8E%E5%90%91%E7%AE%97%E6%B3%95%E7%9A%84%E7%AE%80%E5%8D%95%E5%8F%98%E5%BD%A2"><span class="nav-number">4.3.2.</span> <span class="nav-text">前向-后向算法的简单变形</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%89%E5%9B%BA%E5%AE%9A%E5%BB%B6%E8%BF%9F%E7%9A%84%E8%81%94%E6%9C%BA%E5%B9%B3%E6%BB%91"><span class="nav-number">4.3.3.</span> <span class="nav-text">有固定延迟的联机平滑</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kalman%E6%BB%A4%E6%B3%A2"><span class="nav-number">4.4.</span> <span class="nav-text">Kalman滤波</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E9%AB%98%E6%96%AF%E5%88%86%E5%B8%83"><span class="nav-number">4.4.1.</span> <span class="nav-text">更新高斯分布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E7%9A%84%E4%B8%80%E7%BB%B4%E5%AE%9E%E4%BE%8B"><span class="nav-number">4.4.2.</span> <span class="nav-text">简单的一维实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E8%88%AC%E6%83%85%E5%86%B5"><span class="nav-number">4.4.3.</span> <span class="nav-text">一般情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%A9%E5%B1%95%E7%9A%84%E5%8D%A1%E5%B0%94%E6%9B%BC%E6%BB%A4%E6%B3%A2%E5%99%A8"><span class="nav-number">4.4.4.</span> <span class="nav-text">扩展的卡尔曼滤波器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E7%BB%9C"><span class="nav-number">4.5.</span> <span class="nav-text">动态贝叶斯网络</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B2%BE%E7%A1%AE%E6%8E%A8%E7%90%86"><span class="nav-number">4.5.1.</span> <span class="nav-text">精确推理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%91%E4%BC%BC%E6%8E%A8%E7%90%86"><span class="nav-number">4.5.2.</span> <span class="nav-text">近似推理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%B2%92%E5%AD%90%E6%BB%A4%E6%B3%A2"><span class="nav-number">4.5.2.0.1.</span> <span class="nav-text">粒子滤波</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Python网络数据采集》记录">
+<meta property="og:url" content="https://blog.rexking6.top/2017/07/14/%E3%80%8APython%E7%BD%91%E7%BB%9C%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E3%80%8B%E8%AE%B0%E5%BD%95/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/1.jpg">
+<meta property="article:published_time" content="2017-07-13T23:02:54.000Z">
+<meta property="article:modified_time" content="2019-03-06T10:18:13.092Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="爬虫">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/1.jpg">
+
+<link rel="canonical" href="https://blog.rexking6.top/2017/07/14/%E3%80%8APython%E7%BD%91%E7%BB%9C%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E3%80%8B%E8%AE%B0%E5%BD%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《Python网络数据采集》记录 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2017/07/14/%E3%80%8APython%E7%BD%91%E7%BB%9C%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E3%80%8B%E8%AE%B0%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Python网络数据采集》记录
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-07-14 07:02:54" itemprop="dateCreated datePublished" datetime="2017-07-14T07:02:54+08:00">2017-07-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 18:18:13" itemprop="dateModified" datetime="2019-03-06T18:18:13+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%88%AC%E8%99%AB/" itemprop="url" rel="index"><span itemprop="name">爬虫</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2017/07/14/%E3%80%8APython%E7%BD%91%E7%BB%9C%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E3%80%8B%E8%AE%B0%E5%BD%95/" class="post-meta-item leancloud_visitors" data-flag-title="《Python网络数据采集》记录" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>4.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p><img src="http://image.rexking6.top/img/1.jpg" alt=""></p>
+<p>最近读了这本书，做些记录。本书用的是Python3，我习惯用2，有些地方不能用2再用3。有些章节对我作用不大，或者只是一个较粗略的介绍，会略过不记。</p>
+<h2 id="创建爬虫"><a href="#创建爬虫" class="headerlink" title="创建爬虫"></a>创建爬虫</h2><h3 id="解析HTML"><a href="#解析HTML" class="headerlink" title="解析HTML"></a>解析HTML</h3><h4 id="urllib与urllib2"><a href="#urllib与urllib2" class="headerlink" title="urllib与urllib2"></a>urllib与urllib2</h4><p>在很多地方看到urllib和urllib2互用urlopen，但实际上urllib2是urllib的进一步封装，在很多地方也有区别：</p>
+<ul>
+<li>urllib2可以接受一个Request类的实例来设置URL请求的headers，urllib仅可以接受URL。这意味着，你不可以通过urllib模块伪装你的User Agent字符串等（伪装浏览器）。</li>
+<li>urllib提供urlencode方法用来GET查询字符串的产生，而urllib2没有。这是为何urllib常和urllib2一起使用的原因。</li>
+<li>urllib2模块比较优势的地方是urlliburllib2.urlopen可以接受Request对象作为参数，从而可以控制HTTP Request的header部。</li>
+<li>但是urllib.urlretrieve函数以及urllib.quote等一系列quote和unquote功能没有被加入urllib2中，因此有时也需要urllib的辅助。</li>
+</ul>
+<h4 id="BeautifulSoup"><a href="#BeautifulSoup" class="headerlink" title="BeautifulSoup"></a>BeautifulSoup</h4><p><code>bs0bj = BeautifulSoup(html.read())</code>获得一个BS对象后，可以</p>
+<ul>
+<li><p>通过结点访问，如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">bs0bj.h1</span><br><span class="line">bs0bj.html.body.h1</span><br><span class="line">bs0bj.body.h1</span><br><span class="line"></span><br><span class="line">获取属性：</span><br><span class="line">bs0bj.h1.attrs[&quot;src&quot;]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过tag的属性</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bs0bj.findAll(&quot;table&quot;)[4].findAll(&quot;tr&quot;)[2].find(&quot;td&quot;)</span><br><span class="line">bs0bj.findAll(&quot;span&quot;, &#123;&quot;class&quot;: &quot;green&quot;&#125;).get_text()</span><br></pre></td></tr></table></figure>
+<p>findAll与find</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">findAll(tag, attributes, recursive, text, limit, keywords)</span><br><span class="line">find(tag, attributes, recursive, text, keywords)</span><br><span class="line">recursive若为True，则不论层数查找；若为False，则查找一级标签</span><br><span class="line">text用文本内容匹配</span><br><span class="line">limit为查找前n个结果</span><br><span class="line"></span><br><span class="line">keyword的功能有些冗余，下面两行代码完全一样：</span><br><span class="line">bs0bj.findAll(class_=&quot;text&quot;)</span><br><span class="line">bs0bj.findAll(&quot;&quot;, &#123;&quot;class&quot;: &quot;text&quot;&#125;)</span><br><span class="line"></span><br><span class="line">结合正则表达式re：</span><br><span class="line">bs0bj.findAll(&quot;img&quot;, &#123;&quot;src&quot;: re.compile(&quot;\.\.\/img\/gifts\/img.*\.jpg&quot;)&#125;)</span><br><span class="line"></span><br><span class="line">结合Lambda表达式：</span><br><span class="line">bs0bj.findAll(lambda tag: len(tag.attrs) == 2)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过导航树</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.children（一级标签）</span><br><span class="line">.descendants（所有后代）</span><br><span class="line">.next_sibling（同级之后单个标签）</span><br><span class="line">.next_siblings（同级之后所有标签）</span><br><span class="line">.previous_sibling（同级之前单个标签）</span><br><span class="line">.previous_siblings（同级之后所有标签）</span><br><span class="line">.parent（父标签）</span><br><span class="line">.parents（父标签）</span><br></pre></td></tr></table></figure>
+<h4 id="递归爬取（示例）"><a href="#递归爬取（示例）" class="headerlink" title="递归爬取（示例）"></a>递归爬取（示例）</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">from urllib.request import urlopen</span><br><span class="line">from bs4 import BeautifulSoup</span><br><span class="line">import re</span><br><span class="line"></span><br><span class="line">pages = set()</span><br><span class="line">def getLinks(pageUrl):</span><br><span class="line">global pages</span><br><span class="line">html = urlopen(&quot;http://en.wikipedia.org&quot;+pageUrl)</span><br><span class="line">bs0bj = BeautifulSoup(html)</span><br><span class="line">for link in bs0bj.findAll(&quot;a&quot;, href=re.compile(&quot;^(/wiki/)&quot;)):</span><br><span class="line">	if &#x27;href&#x27; in link.attrs:</span><br><span class="line">		if link.attrs[&#x27;href&#x27;] not in pages:</span><br><span class="line">			# 我们遇到了新页面</span><br><span class="line">			newPage = link.attrs[&#x27;href&#x27;]</span><br><span class="line">			print(newPage)</span><br><span class="line">			pages.add(newPage)</span><br><span class="line">			getLinks(newPage)</span><br><span class="line"></span><br><span class="line">getLinks(&quot;&quot;)</span><br></pre></td></tr></table></figure>
+<h3 id="存储数据"><a href="#存储数据" class="headerlink" title="存储数据"></a>存储数据</h3></li>
+</ul>
+<h4 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h4><p><code>urllib.urlretrieve(url, path)</code>将url下载到本地path下</p>
+<h4 id="CSV"><a href="#CSV" class="headerlink" title="CSV"></a>CSV</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import csv</span><br><span class="line">csvFile = open(&quot;../files/test.csv&quot;, &#x27;w+&#x27;)</span><br><span class="line">try:</span><br><span class="line">	writer = csv.writer(csvFile)</span><br><span class="line">	writer.writerow((&#x27;number&#x27;, &#x27;number plus 2&#x27;, &#x27;number times 2&#x27;))</span><br><span class="line">	for i in range(10):</span><br><span class="line">		writer.writerow((i, i+2, i*2))</span><br><span class="line">finally:</span><br><span class="line">	csvFile.close()</span><br></pre></td></tr></table></figure>
+<h4 id="MySQL"><a href="#MySQL" class="headerlink" title="MySQL"></a>MySQL</h4><ul>
+<li><p>通过创建cursor来填充操作数据库的字符串</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">conn = _mysql.connect()</span><br><span class="line">cur = conn.cursor()</span><br><span class="line">cur.execute(SQL)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过query()</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">db = _mysql.connect()</span><br><span class="line">db.query(SQL)</span><br></pre></td></tr></table></figure>
+<p><code>db.query()</code>是没有游标<code>cursor</code>时，用来直接执行SQL语句，该类主要逻辑就是，将参数填入SQL语句格式中作为字符串形式的SQL语句，之后用<code>query()</code>执行语句。</p>
+<h3 id="读取文档"><a href="#读取文档" class="headerlink" title="读取文档"></a>读取文档</h3></li>
+</ul>
+<h4 id="纯文本"><a href="#纯文本" class="headerlink" title="纯文本"></a>纯文本</h4><p><code>str</code>: <code>str(text, &#39;uf8-8&#39;)</code>使用uf8-8编码<br><code>bytes</code>: 先用<code>bytes()</code>将<code>bytes</code>转化成<code>str</code><br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">content = bytes(content, &quot;UTF-8&quot;)</span><br><span class="line">content = content.decode(&quot;UTF-8&quot;)</span><br></pre></td></tr></table></figure></p>
+<h4 id="CSV-1"><a href="#CSV-1" class="headerlink" title="CSV"></a>CSV</h4><p>比较方便的做法是从网上直接把文件读成一个字符串，然后转换成一个StringIO对象，使它具有文件的属性。<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">from urllib import urlopen</span><br><span class="line">from io import StringIO</span><br><span class="line">import csv</span><br><span class="line">data = urlopen(&quot;http://pythonscraping.com/files/MontyPythonAlbums.csv&quot;).read().decode(&#x27;ascii&#x27;, &#x27;ignore&#x27;)</span><br><span class="line">dataFile = StringIO(data)</span><br><span class="line">csvReader = csv.reader(dataFile)</span><br><span class="line"># csvReader = csv.DictReader(dataFile)</span><br><span class="line"></span><br><span class="line">for row in csvReader:</span><br><span class="line">	print(row)</span><br></pre></td></tr></table></figure></p>
+<h2 id="高级数据采集"><a href="#高级数据采集" class="headerlink" title="高级数据采集"></a>高级数据采集</h2><h3 id="数据清洗"><a href="#数据清洗" class="headerlink" title="数据清洗"></a>数据清洗</h3><p><code>re.sub(查找字符串, 替换字符串, 文本)</code>或<code>str.replace(查找字符串, 替换字符串)</code>（不支持正则）</p>
+<h3 id="自然语言处理"><a href="#自然语言处理" class="headerlink" title="自然语言处理"></a>自然语言处理</h3><ul>
+<li><p>n-gram模型<br>将文本滚动分割出n个单词作为一组，计算所有组的频率，选取出包含该组词汇的句子。</p>
+</li>
+<li><p>马尔可夫模型<br>后一单词出现的频率只与前一个单词有关，每一个单词构造一个字典，计算所有频次。选取起始词，构造随机数，在该词字典中选中后一单词，以此类推。</p>
+</li>
+<li><p>nltk语言包</p>
+<h3 id="穿越网页表单与登录窗口进行采集"><a href="#穿越网页表单与登录窗口进行采集" class="headerlink" title="穿越网页表单与登录窗口进行采集"></a>穿越网页表单与登录窗口进行采集</h3></li>
+<li><p>使用Requests库进行POST请求</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line"></span><br><span class="line">params = &#123;&#x27;firstname&#x27;: &#x27;Ryan&#x27;, &#x27;lastname&#x27;: &#x27;Mitchell&#x27;&#125;</span><br><span class="line">r = requests.post(&quot;http://pythonscraping.com/files/processing.php&quot;, data=params)</span><br><span class="line">print r.text</span><br></pre></td></tr></table></figure>
+<p>单选按钮、复选框和其他输入一样，只要获取字段和值即可。</p>
+</li>
+</ul>
+<p>上传文件：将<code>open(path)</code>对象作为字段的值</p>
+<ul>
+<li><p>进行cookie</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line"></span><br><span class="line">session = requests.Session()</span><br><span class="line"></span><br><span class="line">params = &#123;&#x27;username&#x27;: &#x27;username&#x27;, &#x27;password&#x27;: &#x27;password&#x27;&#125;</span><br><span class="line">s = session.pos(&quot;http://pythonscraping.com/pages/cookies/welcome.php&quot;, params)</span><br><span class="line">print(s.cookies.get_dict())</span><br><span class="line">s = session.get(&quot;http://pythonscraping.com/pages/cookies/profile.php&quot;)</span><br><span class="line">print(s.text)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>进行接入认证</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">from requests.auth import AuthBase</span><br><span class="line">from requests.auth import HTTPBasicAuth</span><br><span class="line"></span><br><span class="line">auth = HTTPBasicAuth(&#x27;ryan&#x27;, &#x27;password&#x27;)</span><br><span class="line">r = requests.post(url=&quot;http://pythonscraping.com/pages/auth/login.php&quot;, auth=auth)</span><br><span class="line">print(r.text)</span><br></pre></td></tr></table></figure>
+<h3 id="采集JavaScript"><a href="#采集JavaScript" class="headerlink" title="采集JavaScript"></a>采集JavaScript</h3><p>通过Selenium绑定PhantomJS访问网页，执行JavaScript</p>
+<h3 id="图像识别与文字处理"><a href="#图像识别与文字处理" class="headerlink" title="图像识别与文字处理"></a>图像识别与文字处理</h3><p>通过Tesseract训练验证码</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\07\20\Scrapy结合IPProxyPool实现代理的一些坑\" rel="bookmark">Scrapy结合IPProxyPool实现代理的一些坑</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\08\11\urllib-quote对url的编码\" rel="bookmark">urllib.quote对url的编码</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\07\14\url的井号\" rel="bookmark">url的井号</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2017/07/14/%E3%80%8APython%E7%BD%91%E7%BB%9C%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E3%80%8B%E8%AE%B0%E5%BD%95/" title="《Python网络数据采集》记录">https://blog.rexking6.top/2017/07/14/《Python网络数据采集》记录/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%88%AC%E8%99%AB/" rel="tag"># 爬虫</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/07/10/Python%E4%B9%8Blogging/" rel="prev" title="Python之logging">
+      <i class="fa fa-chevron-left"></i> Python之logging
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/07/14/url%E7%9A%84%E4%BA%95%E5%8F%B7/" rel="next" title="url的井号">
+      url的井号 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E7%88%AC%E8%99%AB"><span class="nav-number">2.</span> <span class="nav-text">创建爬虫</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E6%9E%90HTML"><span class="nav-number">2.1.</span> <span class="nav-text">解析HTML</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#urllib%E4%B8%8Eurllib2"><span class="nav-number">2.1.1.</span> <span class="nav-text">urllib与urllib2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#BeautifulSoup"><span class="nav-number">2.1.2.</span> <span class="nav-text">BeautifulSoup</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%92%E5%BD%92%E7%88%AC%E5%8F%96%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">2.1.3.</span> <span class="nav-text">递归爬取（示例）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E6%95%B0%E6%8D%AE"><span class="nav-number">2.2.</span> <span class="nav-text">存储数据</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD"><span class="nav-number">2.2.1.</span> <span class="nav-text">下载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CSV"><span class="nav-number">2.2.2.</span> <span class="nav-text">CSV</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MySQL"><span class="nav-number">2.2.3.</span> <span class="nav-text">MySQL</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%BB%E5%8F%96%E6%96%87%E6%A1%A3"><span class="nav-number">2.3.</span> <span class="nav-text">读取文档</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BA%AF%E6%96%87%E6%9C%AC"><span class="nav-number">2.3.1.</span> <span class="nav-text">纯文本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CSV-1"><span class="nav-number">2.3.2.</span> <span class="nav-text">CSV</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E7%BA%A7%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86"><span class="nav-number">3.</span> <span class="nav-text">高级数据采集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%B8%85%E6%B4%97"><span class="nav-number">3.1.</span> <span class="nav-text">数据清洗</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86"><span class="nav-number">3.2.</span> <span class="nav-text">自然语言处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A9%BF%E8%B6%8A%E7%BD%91%E9%A1%B5%E8%A1%A8%E5%8D%95%E4%B8%8E%E7%99%BB%E5%BD%95%E7%AA%97%E5%8F%A3%E8%BF%9B%E8%A1%8C%E9%87%87%E9%9B%86"><span class="nav-number">3.3.</span> <span class="nav-text">穿越网页表单与登录窗口进行采集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%87%E9%9B%86JavaScript"><span class="nav-number">3.4.</span> <span class="nav-text">采集JavaScript</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E8%AF%86%E5%88%AB%E4%B8%8E%E6%96%87%E5%AD%97%E5%A4%84%E7%90%86"><span class="nav-number">3.5.</span> <span class="nav-text">图像识别与文字处理</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

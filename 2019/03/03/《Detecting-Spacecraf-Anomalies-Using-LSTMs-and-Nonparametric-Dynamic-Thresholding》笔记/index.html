@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Detecting Spacecraf Anomalies Using LSTMs and Nonparametric Dynamic Thresholding》笔记">
+<meta property="og:url" content="https://blog.rexking6.top/2019/03/03/%E3%80%8ADetecting-Spacecraf-Anomalies-Using-LSTMs-and-Nonparametric-Dynamic-Thresholding%E3%80%8B%E7%AC%94%E8%AE%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1551664418.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1551751427.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1551664666.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1551765603.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1551765905.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1551770933.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1551771620.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1551771657.png">
+<meta property="article:published_time" content="2019-03-03T11:06:07.000Z">
+<meta property="article:modified_time" content="2019-03-06T10:21:16.950Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="AIOps">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1551664418.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2019/03/03/%E3%80%8ADetecting-Spacecraf-Anomalies-Using-LSTMs-and-Nonparametric-Dynamic-Thresholding%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《Detecting Spacecraf Anomalies Using LSTMs and Nonparametric Dynamic Thresholding》笔记 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2019/03/03/%E3%80%8ADetecting-Spacecraf-Anomalies-Using-LSTMs-and-Nonparametric-Dynamic-Thresholding%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Detecting Spacecraf Anomalies Using LSTMs and Nonparametric Dynamic Thresholding》笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-03-03 19:06:07" itemprop="dateCreated datePublished" datetime="2019-03-03T19:06:07+08:00">2019-03-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 18:21:16" itemprop="dateModified" datetime="2019-03-06T18:21:16+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AIOps/" itemprop="url" rel="index"><span itemprop="name">AIOps</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2019/03/03/%E3%80%8ADetecting-Spacecraf-Anomalies-Using-LSTMs-and-Nonparametric-Dynamic-Thresholding%E3%80%8B%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="《Detecting Spacecraf Anomalies Using LSTMs and Nonparametric Dynamic Thresholding》笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>19k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>17 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>非参数动态阈值用于异常检测，KDD18。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1802.04431.pdf">Detecting Spacecraft Anomalies Using LSTMs and Nonparametric Dynamic Thresholding</a></li>
+</ul>
+<h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>随着航天器发回越来越多的遥测数据，需要改进的异常探测系统，以减轻作业工程师的监测负担和减少作业风险。目前的航天器监测系统只针对异常类型的一个子集，由于涉及规模和复杂性的挑战，常常需要昂贵的专家知识来开发和维护。我们证明了长短期记忆网络（LSTMs，一种递归神经网络RNN）在克服这些问题上的有效性，它使用专家标记的遥感异常数据，这些数据来自SMAP卫星和火星科学实验室（MSL）的好奇号探测器。我们还提出了一种互补的无监督和非参数异常阈值化方法，该方法是在SMAP异常检测系统的试点实施过程中开发的，并提供了假阳性减缓策略以及在开发过程中获得的其他关键改进和经验教训。</p>
+<h1 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h1><p>异常检测，神经网络，RNNs，LSTMs，航空航天，时间序列，预测。</p>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>航天器是非常复杂和昂贵的机器，具有数以千计的遥测通道，详细描述温度、辐射、功率、仪表和计算活动等方面。鉴于这些通道的复杂性和费用，监测它们是航天器作业的一个重要和必要组成部分。在探测和响应潜在危险失败可能导致航天器全部或部分损失的场景中，异常探测是提醒操作工程师注意意外行为的关键工具。</p>
+<p>目前航天器遥测的异常探测方法主要包括分级警报，指示值何时偏离预定的限制，手动分析可视化和汇总通道统计数据。专家系统和最近邻的方法也已用于少数航天器[13]。这些方法有明确的局限性，需要广泛的专家知识和人力资本来保护和更新正常范围并对遥测进行持续分析。基于统计，基于限制或基于密度的方法也容易遗漏在限制范围内发生的异常或以时间元素[9]为特征的异常。</p>
+<p>随着计算和存储能力的改进导致遥测数据量的增加，这些问题将进一步加剧。NISAR是一颗即将发射的合成孔径雷达（SAR）卫星，每天将产生大约85tb的数据，代表着地球科学卫星的数据率呈指数增长[1]。任务的复杂性和压缩的任务时间框架也要求改进异常检测解决方案。例如，由于高辐射，“木卫二”着陆器的主体将在“木卫二”表面停留大约20至40天，在“木卫二”的地面作业期间需要进行严密监测。更准确和可扩展的异常检测方法将有助于分配与此类任务有关的有限工程资源。</p>
+<p>多变量时间序列数据异常检测的核心问题也适用于航天器遥测。由于缺乏标记异常，必须使用非监督或半监督方法。现实世界的系统通常是非平稳的，并且依赖于当前环境。被监视的数据通常是异构的、有噪声的和高维的。在使用异常检测作为诊断工具的场景中，需要一定程度的可解释性。在不了解航天器本质的情况下，识别航天器上存在的潜在问题，对工程师来说价值有限。最后，必须根据给定的场景在假阳性和假阴性的最小化之间找到适当的平衡。</p>
+<p><strong>贡献</strong>：在本文中，我们调整和扩展各个领域的方法，以减轻和平衡上述问题。这项工作是通过航天器异常检测的角度来进行的，但一般适用于对多变量时间序列数据进行异常检测的许多其他应用。具体地说，我们描述了如何使用长短期记忆（LSTM）递归神经网络（RNNs）来实现高预测性能，同时保持整个系统的可解释性。模型一旦产生了预测，我们就提供了一种非参数、动态和无监督的阈值化方法来评估残差。这种方法自动设置了阈值来检测具有不同行为和值范围的数据流，解决了多样性、非平稳性和噪声问题。详细介绍了利用用户反馈和历史异常数据提高系统性能的方法。</p>
+<p>然后，我们使用真实的、专家标记的数据，为火星科学实验室（MSL）的漫航者（rover）、好奇号（Curiosity）和SMAP卫星提供实验结果。任务人员利用这些报告处理影响航天器的意外事件，并在发射后作业期间使航天器处于潜在危险中。最后，我们强调通过SMAP任务系统的早期实现识别出的关键里程碑、改进和观察结果，并提供更广泛的研究团体使用的方法和数据的开源版本。</p>
+<h1 id="背景及相关工作"><a href="#背景及相关工作" class="headerlink" title="背景及相关工作"></a>背景及相关工作</h1><p>异常检测研究的广度和深度提供了许多异常类型的缺陷，但是对于时间序列数据，考虑三类异常是有用的：点异常、上下文异常和集合异常[9]。点异常是位于值的低密度区域内的单值，集合异常是指一个值序列是异常的，而不是单独的任何一个值，上下文异常是不位于低密度区域内但相对于局部值是异常的单值。我们使用这些特性来帮助比较异常检测方法，并进一步从SMAP和MSL中研究航天器异常。</p>
+<p>跨应用领域、数据类型和异常类型的实用程序确保了对各种异常检测方法的研究[9,16]。异常检测的简单形式包括使用预先确定的阈值和原始数据值来检测异常的超限值（OOL）方法。作为OOL方法的潜在改进，大量其他异常检测技术已经被引入和探索，例如基于集群的方法[15,24,28]、最近邻方法[3,6,23,25]、专家系统方法[7,34,36,43]和降维方法[14,39,45]等。这些方法代表了对OOL方法的一般改进，并且已经被证明在各种用例中是有效的，但是每种方法在参数指定、可解释性、可通用性或计算费用方面都有自己的缺点[9,16]（参见[9]中的异常检测方法综述）。最近，RNNs在各种序列对序列的学习基准上展示了最先进的性能，并在各种领域[38]中显示了有效性。在下面的章节中，我们将讨论航空航天应用中现有方法的缺点，并展示RNNs帮助应对这些挑战的能力。</p>
+<h2 id="航天异常探测"><a href="#航天异常探测" class="headerlink" title="航天异常探测"></a>航天异常探测</h2><p>前一节提到的许多异常探测方法已经应用于航天器。专家系统已经在许多航天器中使用[7,11,36,43]，特别是与Hayabusa、Nozomi和Geotail任务[34]一起使用的ISACS-DOC（智能卫星控制软件DOCtor）。基于最近邻的方法已多次用于探测航天飞机和国际空间站[3,23]以及XMM-Newton卫星[32]上的异常。感应监测系统（IMS）也被NASA在航天飞机和国际空间站上使用，它采用从业者选择的聚类技术来检测异常，异常观测落在定义明确的聚类之外[23,24]。ELMER，即使用误差松弛的包络学习和监测，试图周期性地使用神经网络估计新的OOL边界，旨在减少假阳率，提高深空一号飞船[4]上OOL异常检测任务的性能。</p>
+<p>应用于航天器的各种先前的异常检测方法表明，它们的使用范围很广，但超限方法（OOL）仍然是航空航天工业中使用最广泛的异常检测形式[29,32,45]。尽管OOL方法有其局限性，但由于计算成本低、适用性广且直接，且易于理解在更复杂的异常检测方法中可能不存在的因素，因此OOL方法仍然很受欢迎。NASA的Orca和IMS工具使用最近邻和聚类方法，成功地检测到STS-115任务评估室（MER）工程师识别的所有异常（高召回率），但也将许多非异常事件识别为异常（低精度），这需要额外的工作来减轻过度的假阳率[23]。IMS作为一种基于聚类的方法，将先验数据的表示限制为4个粗略的统计特征：平均值、标准差、最大值和最小值，并且需要对时间窗口[32]进行仔细的参数化。ELMER作为一种神经网络，由于机载内存和计算资源的限制，仅用于深空一号上的10个温度传感器[40]。值得注意的是，这些方法都只利用了先前遥测值的数据。</p>
+<p>对于其他考虑到前几种办法的任务来说，潜在的好处往往不足以超过其局限性和认识到的危险。 这部分归因于航天器的高度复杂性和其运行的保守性，但这些方法尚未证明结果和普遍性足以证明广泛采用的合理性。 由于这些因素，OOL方法仍然得到广泛应用，但随着数据量的增长和RNN方法在类似领域和应用中的显着改进，这种方法有望发生变化。</p>
+<h2 id="使用LSTMs进行异常检测"><a href="#使用LSTMs进行异常检测" class="headerlink" title="使用LSTMs进行异常检测"></a>使用LSTMs进行异常检测</h2><p>最近深度学习，计算能力和神经网络架构的进步已经导致各种问题的性能突破，包括序列到序列学习任务[18,19,42]。直到最近，以前在航空航天领域涉及大量高维数据的应用都被迫使用对时间信息建模能力较差的方法。具体而言，LSTM和相关的RNN在有效处理和优先考虑对未来预测有价值的历史信息方面具有显着的飞跃。与密集深度神经网络（DNN）和早期RNN相比，LSTM已经被证明可以提高维持长期依赖性记忆的能力，这是因为引入了一个加权自循环，这种自循环可以让他们忘记和累积过去的信息[17,30,37]。它们处理高复杂性、时序或序列数据的能力确保了它们在自然语言处理(NLP)、文本分类、语音识别和时间序列预测等领域的广泛应用[30,37,46,47]。</p>
+<p>LSTMs的固有特性使其成为涉及时间序列、非线性数据流的异常检测任务的理想选择。LSTMs能够学习过去数据值与当前数据值之间的关系，并以学习的权值的形式表示该关系[5,21]。当对正常数据进行训练时，LSTMs可以捕获并建模系统[5]的正常行为，为从业者提供正常情况下的系统行为模型。它们还可以处理多变量时间序列数据，而无需降低维数[33]或特定应用[44]的领域知识，从而可以跨不同类型的航天器和应用程序域进行泛化。此外，已经证明LSTM方法可以模拟复杂的非线性特征相互作用[35]，这些相互作用通常存在于多变量时间序列数据流中，并且无需指定在异常检测任务中考虑数据值的时间窗口由于跨时间使用共享参数[17,30]。</p>
+<p>这些优势促使LSTM网络在最近的几个异常检测任务中得到应用[5,10,30,31,33,44]，其中LSTM模型拟合正常数据，并且使用一组检测规则将模型预测与实际数据流值进行比较，以便检测异常[5,30,31]。</p>
+<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p>以下方法构成了一种无监督异常检测方法的核心组件，该方法使用LSTMs通过学习常规命令和遥测序列来预测大容量遥测数据。然后使用一种新的无监督阈值法自动评估成百上千种不同的遥测数据流，并确定由此产生的预测误差是否代表航天器异常。最后，概述了减少假阳性异常的策略，这是在生产系统中开发用户信任和改进效用的关键因素。</p>
+<h2 id="利用LSTMs进行遥测值预测"><a href="#利用LSTMs进行遥测值预测" class="headerlink" title="利用LSTMs进行遥测值预测"></a>利用LSTMs进行遥测值预测</h2><p><strong>单通道模型。</strong>为每个遥测通道创建一个单独的模型，并使用每个模型预测该通道的值。LSTM很难准确地预测 $m$ 维输出，当 $m$ 很大时，从而排除了将所有遥测流输入到一个或几个模型中的可能性。对每个通道进行独立建模还允许跟踪到通道级别，低级异常稍后可以聚合到各种分组和最终的子系统中。这使得对航天器异常模式的细粒度观察成为可能，否则这些异常模式将会丢失。如果要训练系统在没有这种可跟踪性的情况下探测子系统级别的异常，操作工程师仍然需要检查整个子系统中的许多通道和警报，以确定问题的根源。</p>
+<p>每个通道维护单个模型还有助于更精细地控制系统。 早期停止可用于限制对验证错误减少的模型和通道的训练[8]。 当出现问题（例如由于过载导致的高方差预测）时，可以逐个信道地处理这些问题，而不会影响整个系统。</p>
+<p><strong>通道的预测值。</strong>考虑一个时间序列 $X=\{\textbf{x}^{(1)}, \textbf{x}^{(2)},…,\textbf{x}^{(n)}\}$，其中时间序列中的每一步 $\textbf{x}^{(t)} \in R^m$ 为 $m$ 维向量 $\{x_1^{(t)},x_2^{(t)},…,x_m^{(t)}\}$，其元素对应于输入变量[30]。对于每个点 $\textbf{x}^{(t)}$，序列长度 $l_s$ 决定输入模型进行预测的点的数量。预测长度 $l_p$ 决定预测的步长，其中预测的维数 $d$ 为 $1\le d\le m$。由于我们的目标是预测单个通道的遥测值，因此我们考虑 $d = 1$ 的情况。我们还使用 $l_p=1$ 来限制每个步骤 $t$ 的预测数量，并减少处理时间。因此，每一步生成 $t$ 的单个标量预测值 $\hat y^{(t)}$ 为实际的遥测值（参见图1）。在 $l_p&gt;1$ 的情况下或 $d&gt;1$，高斯参数可用于在单个步骤 $t$ [30]表示预测值的矩阵。</p>
+<p><img src="http://image.rexking6.top/img/clip1551664418.png" alt=""></p>
+<p><em>图1. 每个时间步长 $t$ 预测所用输入矩阵的可视化表示。将当前预测误差与过去预测误差进行比较，以确定其是否异常。</em></p>
+<p>在我们的遥测预测场景中，输入到LSTM中的 $\textbf{x}^{(t)}​$ 包括给定信道的先验遥测值和发送到航天器的编码命令信息。具体地说，发出命令的模块和发送或接收命令的模块的组合是一个 one-hot 编码的模块，并插入到每个步骤 $t​$ 中（参见图3）。</p>
+<h2 id="动态误差阈值"><a href="#动态误差阈值" class="headerlink" title="动态误差阈值"></a>动态误差阈值</h2><p>对其期望值随环境因素和命令序列的变化而变化的数千个遥测信道进行自动化监测，需要一种快速、通用和无监督的方法来确定预测值是否异常。一种常见的方法是对过去平滑误差的分布做出高斯假设，因为这允许快速比较新误差和先前误差的紧凑表示[2,41]。然而，当参数假设被违反时，这种方法常常会出现问题，正如我们在4.3节中所演示的那样，我们提供了一种方法，可以在不做此类假设的情况下有效地标识极值。基于距离的方法在这方面是类似的，但它们通常涉及高计算成本，例如需要将每个点与 $k$ 个相邻点集进行比较的方法[15,26]。此外，这些方法更加通用，并且关注在正常值范围内发生的异常。只有异常高或低平滑的预测误差才是令人感兴趣的，误差阈值化在某种意义上是初始异常检测问题的简化版。</p>
+<p><strong>误差和平滑。</strong>每一步 $t$ 产生一个预测值 $\hat y^{(t)}$，计算预测误差为 $e^{(t)}=|y^{(t)}-\hat y^{(t)}|$，其中 $y^{(t)}=x_i^{(t+1)}$，其中 $i$ 对应于真实遥测值的维数（见图1），将每一个 $e^{(t)}$ 附加到一个一维误差向量上，</p>
+<script type="math/tex; mode=display">
+\textbf{e} = [e^{(t-h)},...,e^{(t-l_s)},...,e^{(t-1)},e^{(t)}]</script><p>其中 $h​$ 是用于评估当前误差的历史误差值的数量。然后对这组误差集 $\bf e​$ 进行平滑以抑制基于LSTM的预测中经常出现的误差峰值，值的突然变化通常不会得到完美的预测，即使在正常的行为下[41]，也会导致误差值的急剧峰值。我们使用指数加权平均（EWMA）来产生平滑误差 $\textbf{e}_s = [e_s^{(t-h)},…,e_s^{(t-ls)},…,e_s^{(t-1)},e_s^{(t)}]​$ [22]。为了评估这些值是否为正常值，我们为其平滑预测误差设置了一个阈值，将阈值以上的平滑预测误差对应的值分类为异常。</p>
+<p><strong>阈值计算和异常评分。</strong>在这个阶段，有时可以通过使用标记样本的监督方法来学习适当的异常阈值，但是通常情况下，没有足够的标记数据，这在我们的情景中也是如此[9]。我们提出了一种无监督的方法，它可以在低开销和不使用标记数据或误差统计假设的情况下实现高性能。阈值 $ϵ$ 从集合中选择：</p>
+<script type="math/tex; mode=display">
+\pmb{\epsilon}=\mu(\textbf{e}_s)+\textbf{z}\sigma(\textbf{e}_s)</script><p>其中 $ϵ$ 取决于：</p>
+<script type="math/tex; mode=display">
+ϵ=\text{arg max}(\pmb{\epsilon})=\frac{\Delta \mu(\textbf{e}_s)/\mu(\textbf{e}_s)+\Delta \sigma(\textbf{e}_s)/\sigma(\textbf{e}_s)}{|\textbf{e}_a|+|\textbf{E}_{seq}|^2}</script><p>其中：</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+&\Delta\mu(\textbf{e}_s)=\mu(\textbf{e}_s)-\mu(\{e_s\in\textbf{e}_s|e_s<ϵ\})\\
+&\Delta\sigma(\textbf{e}_s)=\sigma(\textbf{e}_s)-\sigma(\{e_s\in\textbf{e}_s|e_s<ϵ\})\\
+&\textbf{e}_a=\{e_s\in\textbf{e}_s|e_s>ϵ\}\\
+&\textbf{E}_{seq}=\text{continuous sequences of }e_a \in \textbf{e}_a
+\end{align*}</script><p>使用 $z\in\bf z$ 来确定 “评估 $ε$ 的值”，其中 $\textbf{z}$ 是表示高于 $\mu(\textbf{e}_s)$ 的标准差的数量的有序正值集。 $\bf z$ 的值取决于上下文，但根据我们的实验结果，我们发现 $2$ 到 $10$ 之间的范围可以很好地工作。$z$ 小于 $2$ 的值通常导致过多的假阳率。 一旦确定了 $\text{arg max}(\pmb ϵ)$，每个得到的平滑错误序列 $\textbf{e}_{seq}\in \textbf{E}_{seq}$ 都会得到一个异常分数 $s$，表示异常的严重程度：</p>
+<script type="math/tex; mode=display">
+s^{(i)}=\frac{\text{max}(\textbf{e}_{seq}^{(i)})-\text{arg max}(\pmb ϵ)}{\mu(\textbf{e}_s)+\sigma(\textbf{e}_s)}</script><p>简单地说，一个阈值被发现，如果去掉超过它的所有值，平滑误差 $\textbf{e}_s$ 的均值和标准差会下降最大的百分比。该函数还惩罚具有大量异常值（$|\textbf{e}_a|$）和序列（$|\textbf{E}_{seq}|​$）以防止过度贪心的行为。然后根据每个异常误差序列到所选阈值的距离，给出其平滑误差最大值的归一化分数。</p>
+<h2 id="减少误报（假阳性）"><a href="#减少误报（假阳性）" class="headerlink" title="减少误报（假阳性）"></a>减少误报（假阳性）</h2><p><strong>修剪异常。</strong>基于预测的异常检测方法的精度在很大程度上取决于用于设置阈值和判断当前预测误差的历史数据量（$h$）。在大规模情况下，在实时场景中查询和处理历史数据变得非常昂贵，历史记录的缺乏可能导致假阳性，而由于评估历史数据的上下文比较窄，假阳性只能被视为异常。此外，在处理大量数据时，较低的假阳率仍然会让负责评估潜在异常事件的人类评审员不知所措。</p>
+<p>为了减少误报、限制内存和计算成本，我们引入了一个剪接过程，其中创建了一个新的集合 $\textbf{e}_{max}$，其中包含按降序排序的所有 $\textbf{e}_{seq}$的 $\text{max}(\textbf{e}_{seq})$。我们还在 $\textbf{e}_{max}$ 的末尾添加了非异常 $\text{max}(\{e_s \in \textbf{e}_s\in\textbf{E}_{seq}|e_s\in \textbf{e}_a\})$ 的最大平滑误差。</p>
+<p>然后以增量的方式逐步执行序列，计算每一步的减少百分比 $d^{(i)}=(e_{max}^{(i-1)}-e_{max}^{(i)})/e_{max}^{(i-1)}$，其中 $i\in\{1, 2,…,(|\textbf{E}_{seq}| + 1)\}$。如果在某个步骤 $i$ 中，$d^{(i)}$ 超过了最小百分比降幅 $p$，则所有 $e_{max}^{(j)} \in \textbf{e}_{max}|j&lt;i$ 及其对应的异常序列均为异常。如果 $d^{(i)}$ 没有满足最小减少量 $p$，对于所有后续误差 $d^{(i)},d^{(i+1)},…,d^{(i+|\textbf{E}_{seq}|+1)}$，这些平滑的误差序列将被重新分类为正常误差。这种修剪有助于确保异常序列不是流中常规噪声的结果，并且通过阈值处理来初始识别异常值序列。将评估限制在少数潜在异常序列中的最大错误，要比不进行阈值化就需要进行大量的值对值比较更有效。</p>
+<p><strong>学习历史数据。</strong>一旦收集到少量异常历史记录或标记数据，就可以使用第二种策略来限制假阳率。基于相似度 $s$ 异常通常不会在同一通道内频繁重复出现的假设，我们可以设置最小分数 $s_{min}$，以便在 $s &lt; s_{min}$ 时将未来的异常重新分类为正常。最低分数只适用于系统产生异常率超过某一比率的数据通道，并为所有这些通道单独设置 $s_{min}$。可以使用通道的先验异常得分来设置适当的 $s_{min}$，具体取决于在精确度和召回率之间的期望平衡。</p>
+<p>此外，如果异常检测系统有一种机制，用户可以通过该机制为异常提供标签，那么这些标签还可以用于为给定流设置 $s_{min}$。例如，如果一个流或通道有多个合并的假阳性异常，那么 $s_{min}$ 可以设置在这些假阳性异常分数的上界附近。这两种方法都在提高系统早期实现的精确度方面发挥了重要作用，因为它们有助于解释航天器的正常行为，这些行为并不常见，但会定期发生。</p>
+<p><img src="http://image.rexking6.top/img/clip1551751427.png" alt=""></p>
+<p><em>图2. 展示异常修剪过程的例子。在这种情况下，$\textbf{e}_{max} =[0.01396, 0.01072, 0.00994]$，最小下降百分比 $p=0.1$。从异常2到异常1的下降幅度为 $d^{(1)}=0.23&gt;p$，该序列保留为异常分类。从异常1到下一个最高平滑误差（$e_s=0.0099$）的下降幅度为 $d^{(2)} = .07 &lt; p​$，因此这个序列被重新分类为正常序列。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1551664666.png" alt=""></p>
+<p><em>图3. 展示了包含上下文异常的遥测流的命令信息编码，该异常不太可能使用基于限制或距离的方法识别。使用已编码的命令信息和信道的先前遥测值，将生成下一个时间步骤的预测，并产生误差。在这个例子中，一步预测和实际遥测值非常接近，如顶部时间序列所示。利用3.2节中详细介绍的非参数阈值化方法设置误差阈值，得到标记异常区域内的两个预测异常序列，一个为假阳性，一个为真阳性。假阳性表明需要对3.3节中描述的序列进行修剪，如果该序列相对接近阈值以下的值，则将该序列重新分类为正常序列（参见图2）。</em></p>
+<h1 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h1><p>对于包括SMAP和MSL在内的许多航天器，目前的异常检测系统难以评估。警报的精确度和召回率是无法捕获的，遥测评估通常是手工进行的。幸运的是，可以在前面提到的ISA报告中发现遥测异常的迹象。在specifc遥测通道的ISAs清单中详细描述的所有事件和异常的一个子集，通过挖掘SMAP和MSL的ISA报告，我们能够收集到一组与涉及不同子系统和通道类型的实际航天器问题相对应的遥测异常。</p>
+<p>对单个ISA中讨论的所有遥测通道进行了审查，以确保相关的遥测数据中存在明显的异常，并为每个通道手工标记特定的异常时间范围。如果多个异常序列和通道彼此非常相似，则实验只保留一个异常序列和通道，以创建一个多样化和平衡的集合。</p>
+<p>我们将异常分为两类：点异常和上下文异常，以区分可能由适当设置的警报或忽略时间信息的基于距离的方法（点异常）识别的异常和需要更复杂的方法（如LSTMs或分层时间记忆（HTM）方法）来检测（上下文异常）[2]的异常。这个特征是从前面提到的三个类别中改编而来的：点异常、上下文异常、集合异常[9]。由于上下文异常和集合异常都需要时间上下文，并且比较难以检测，因此它们都被合并到下一节介绍的上下文类别中。</p>
+<p>除了评估第3节中方法的性能外，我们还将我们的误差阈值方法的预测后性能与最近Numenta异常基准（NAB）的性能最好的算法中使用的参数无监督方法进行了比较[2,27]。</p>
+<p>没有将基于LSTM的方法与其他预测模型进行比较，因为基础预测性能的飞跃更有可能来自于为模型提供越来越多的基于命令的特性。随着基于预测的异常检测方法和相关研究的增多[30,31]，我们越来越重视预测后误差评估方法，这些方法受到的关注相对较少，但却对我们的结果产生了显著的影响。</p>
+<h2 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h2><p>对于包含一个或多个在时间 $t_a$ 发生的主要异常的异常序列的每个唯一数据流，我们评估从 $t_s=t_a-3d$ 到 $t_f=t_a+2d$ 的周围时间帧中的所有遥测值，其中 $d$ 是天。 使用从 $t_{s_{train}}=t_s-2d$ 到 $t_{f_{train}}=t_s$ 的值和命令数据为每个唯一流训练模型。如果在这些时间范围内没有足够的数据，则包括额外的天数。5天的异常周期被选择来平衡两个目标：更深入地了解精确性和合理的计算成本。预测异常区域也略微扩大，便于将扩展后重叠或相接的邻近区域的异常区域合并为一个区域，以解释多个异常区域代表一个事件的情况。</p>
+<p>根据系统识别出的最后一组预测异常序列，对每个标记的遥测值异常序列 $x_a\in\textbf{x}_a$ 按照以下规则进行评估：</p>
+<ol>
+<li><p>以下情况记为真阳性：</p>
+<script type="math/tex; mode=display">
+|e_a^{(t)}\in e_{seq} \in \textbf{e}_{seq}:x_i^{(t)}\in x_a |>0</script><p>对于任意 $x_a\in\textbf{x}_a$。换句话说，如果预测异常序列的任何部分属于任何真实标记序列，则为真阳性结果。即使多个预测序列的某些部分落在一个标记序列中，也只记录一个真阳性。</p>
+</li>
+<li><p>如果没有预测的序列与阳性标记的序列重叠，则记录标记序列的假阴性。</p>
+</li>
+<li>对于所有没有重叠标记异常区域的预测序列，将记录假阳性。</li>
+</ol>
+<p>为简单起见，我们不会根据异常检测的早期程度或误报区域与标记区域[27]之间的距离来进行评分调整。</p>
+<p><strong>批次处理。</strong>遥测值被聚合到一分钟窗口中，并按照SMAP和我们当前系统实现的下行计划，以70分钟为一组进行评估。每70分钟批处理的值使用 $h=2100$ 计算，其中 $h$ 是用于计算错误阈值和计算当前批处理的先前值的数量。该系统还非常适合在适用时以实时流方式处理值。</p>
+<h2 id="模型参数和评估"><a href="#模型参数和评估" class="headerlink" title="模型参数和评估"></a>模型参数和评估</h2><p>实验中所有模型使用相同的架构和参数：</p>
+<p><img src="http://image.rexking6.top/img/clip1551765603.png" alt=""></p>
+<p>每个模型都是浅层的，只有两个隐藏层，每个层有80个单元。我们发现这种架构提供了足够的能力来很好地预测单个通道，而增加额外的能力在增加模型大小和训练时间的同时几乎没有提供任何预测效益。所有通道不一定都需要这么大的容量，未来的改进可能包括根据通道复杂性自动选择适当的模型容量。类似地，序列长度 $l_s = 250$ 提供了性能和训练时间之间的平衡。SMAP和MSL在输入维度上的差异来自于每个任务都有不同的命令模块集。在模型训练期间，早期停止用于防止过拟合，所以并不是所有的模型都经过了完整的35次迭代的训练。</p>
+<p>生成预测后，使用第3.2节中详述的方法计算平滑误差的异常阈值，其中 $z=\{2.5,3.0,3.5,…,10.0\}$，并且后续异常之间的最小百分比差 $p = 0.13$。$p$ 参数是控制精度和召回的重要杠杆，当标签可用时可以推断出适当的值。 在我们的设置中，实现了 $0.05 &lt;p &lt;0.20$ 的合理结果（参见图4）。</p>
+<p><img src="http://image.rexking6.top/img/clip1551765905.png" alt=""></p>
+<p><em>图4. 参数化方法与本文方法（标记为非参数）在不同参数设置下的总体精度和召回结果对比图。</em></p>
+<p><strong>与参数阈值法的比较。</strong>利用原始的LSTM预测误差，我们还利用参数误差评估方法生成异常，该方法与Numenta异常基准[27]中最精确的模型相协调。方法在每个步骤 $t$ 递增地处理原始错误，将历史错误的窗口 $W$ 建模为正态分布，并且在每个步骤 $t$ 更新平均值 $\mu_W$ 和方差 $\sigma_W^2$。我们设置 $W$ 长度为 $l_w=h=2100$ 并对两种方法使用相同的预测误差集。 然后计算预测误差长度 $l_{short}$ 的短期平均值 $\mu_s$，并且具有与3.2节中的EWMA平滑相似的平滑效果。 然后使用尾部概率 $Q$ 来确定异常L的可能性：</p>
+<script type="math/tex; mode=display">
+L=1-Q(\frac{\mu_s-\mu_W}{\sigma_W^2})</script><p>如果 $L\ge1-\epsilon_{norm}$ 值被分类为异常。 在下一节中，使用 $l_{short} = 10$ 和 $\epsilon_{norm}= \{0.01,0.0001\}$ 生成的结果与3.2节中的方法进行比较。 还测试了修剪（详见3.3节）对此方法的影响。</p>
+<h2 id="结果和讨论"><a href="#结果和讨论" class="headerlink" title="结果和讨论"></a>结果和讨论</h2><p>如表2所示，基于LSTM的预测结合修剪的非参数阈值化方法得到 $F_{0.5}$ 的最佳结果。在预测方面，LSTM模型单步预测遥测值的平均归一化绝对误差为5.9%。</p>
+<p><img src="http://image.rexking6.top/img/clip1551770933.png" alt=""></p>
+<p><em>表2. 使用LSTM预测和各种误差阈值方法对每个航天器的结果。</em></p>
+<p>参数被调优以平衡精度和召回进行实验，但是在当前的实现中，由于所显示的精度结果与系统的实际实现相比过于乐观，所以在调优参数时对精度的权重更大。实验中有一个隐含的假设，即异常每5天发生一次，其中5天是包含异常的每个流处理的总天数。该实验还不包括对给定时间窗口中未出现异常行为的所有流进行处理，这将进一步增加假阳性的数量。通过使用3.3节最后概述的方法设置最小异常分数，可以抵消实现的系统中精度下降的影响。</p>
+<p><strong>阈值比较。</strong>提出了没有修剪的非参数方法的结果，以证明修剪在减轻假阳性中的重要性。 修剪过程大致类似于修剪决策树，因为它有助于减少旨在提高性能的贪婪方法。 在这种情况下，修剪只会使整体召回率降低4.8个百分点（84.8％至80.0％），同时将整体精确度提高38.6个百分点（48.9％至87.5％）。 根据LSTM模型产生的预测，在没有修剪的情况下实现的84.8％召回是召回上限的近似值。 如果预测很差并且导致平滑错误不包含信号，那么阈值处理方法将无效。</p>
+<p>高斯尾部方法使用不同的参数设置导致较低的精度和召回水平。剪枝极大地提高了精确度，但代价很高，导致 $F_{0.5}$ 的分数仍然远低于使用剪枝的非参数方法所获得的分数。导致该方法性能降低的一个因素是在平滑误差中违反高斯假设。 使用D Agostino和Pearson的正态性检验[12]，我们使用 $α= 0.005$ 的阈值拒绝所有平滑误差集的正态性的零假设。使用高斯参数时丢失的错误信息会导致次优阈值，从而对精度和召回产生负面影响，并且无法通过修剪来纠正（参见图4和表2）。</p>
+<p><strong>不同异常类型的性能。</strong>上下文异常的高比例（41%）为使用LSTM和基于预测的方法而不是忽略时间信息的方法提供了进一步的理由。只有一小部分上下文异常，即异常遥测值恰好落在低密度区域的异常，理论上可以使用基于极限或基于密度的方法检测到。乐观地说，这建立了接近最佳结果的最大可能的召回，避免了与这些方法的广泛比较。不足为奇的是，上下文异常的召回率较低，但是基于LSTM的方法能够识别大部分异常。</p>
+<p><strong>不同航天器的性能。</strong>SMAP和MSL是非常不同的任务，在异常检测方面代表不同程度的困难。 与MSL相比，SMAP航天器的操作是常规的，并且通过较少的训练和较少的数据可以更容易地预测得到的遥测。 MSL以不同的规律性执行更多种类的行为，其中一些行为是在有限训练数据中不存在的流动站活动期间产生的。 这解释了MSL ISA的较低精度和召回性能，并且平均LSTM预测误差之间的差异也很明显——SMAP的遥测预测平均误差为5.5%，而MSL为6.8%（见表3）。</p>
+<p><img src="http://image.rexking6.top/img/clip1551771620.png" alt=""></p>
+<p><em>表3. 遥测预测误差。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1551771657.png" alt=""></p>
+<p><em>表4. 使用非参数阈值和修剪的LSTM预测对不同异常类型的召回率。</em></p>
+<h1 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h1><p>本文介绍的方法已经实施到SMAP运营工程师目前正在试用的系统中。 随着数据从航天器下传，并且模型每三天训练一次并提前停止，因此近乎实时地监视700多个通道。 自2017年10月初次部署以来，我们已经成功识别出几个混淆的异常现象。然而，成为遥测审查过程的核心组成部分的一个主要障碍是目前的假阳率。 对操作工程师提出了很高的要求，他们对改变有效程序犹豫不决。 采用新技术和新系统意味着浪费宝贵时间和注意力的风险增加。 甚至一些假阳的调查也可以阻止用户，因此，每天处理100多万遥测值以实现高精度是采用该技术的必要条件。</p>
+<p><strong>未来的工作。</strong>在当前实现中，航天器命令信息仅在模块级进行了一次热编码，没有关于命令本身性质的信息传递给模型。试点部署和实验结果是确定大规模自动遥测监测系统可行的关键里程碑。 未来的工作将集中在改进遥测预测上，主要是通过改进的特征工程。围绕命令活动和诸如事件记录之类的其他信息源的更多细粒度信息可能是必要的，以准确地预测没有例行操作的任务的遥测数据。对于这些任务，必须自动识别和选择与计划活动类似的时期的训练数据，而不是简单地对最近的活动进行训练。准确的预测对于这种方法至关重要，并且可以将系统扩展到MSL等任务，同时还可以满足提高精度的需求。上述两项改进是未来工作的关键领域，对于监测动态和复杂的航天器而言通常是有益的。我们还计划继续重新调整我们减轻第3.3节中描述的假阳的方法，并改进接口，以便于对系统发现的异常进行审查，调查和专家标记。</p>
+<p>最后，我们尚未解决的问题的另一个关键方面是遥测通道中固有的相互作用和依赖性。这部分是通过可视化界面解决的，但是对通道异常之间的相关性的更数学和自动化的视图将提供对复杂系统行为和异常的重要洞察。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>本文提出并解决了航天器运行中面临的一个重要且日益严峻的挑战，即现代异常探测方法对航天器运行的巨大帮助。我们展示了LSTM在预测航天器遥测方面的可行性，同时解决了许多异常探测场景中固有的可解释性、规模、精度和复杂性等关键挑战。我们还提出了一种新的动态阈值方法，它不依赖于稀缺的标签或错误的参数假设。在我们寻求扩大各种航天器的能力和实施各种系统时，还确定了需要改进和进一步评价的关键领域。最后，我们公开了一组大型的真实世界的、专家标记的异常航天器遥测数据，并提供了本文方法的开源实现。</p>
+<h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><ul>
+<li>[1] 2018. Getting Ready for NISAR-and for Managing Big Data using the Commercial Cloud | Earthdata. <a target="_blank" rel="noopener" href="https://earthdata.nasa.gov/getting-ready-for-nisar">https://earthdata.nasa.gov/getting-ready-for-nisar</a></li>
+<li>[2] Subutai Ahmad, Alexander Lavin, Scott Purdy, and Zuha Agha. 2017. Unsupervised real-time anomaly detection for streaming data. Neurocomputing 262 (2017), 134–147.</li>
+<li>[3] Stephen D. Bay and Mark Schwabacher. 2003. Mining Distance-based Outliers in Near Linear Time with Randomization and a Simple Pruning Rule. In Proceedings of the Ninth ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (KDD ’03). ACM, New York, NY, USA, 29–38. <a target="_blank" rel="noopener" href="https://doi.org/10.1145/956750.956758">https://doi.org/10.1145/956750.956758</a></li>
+<li>[4] D. Bernard, R. Doyle, E. Riedel, N. Rouquette, J. Wyatt, M. Lowry, and P. Nayak. 1999. Autonomy and software technology on NASA’s Deep Space One. IEEE Intelligent Systems 14, 3 (may 1999), 10–15. <a target="_blank" rel="noopener" href="https://doi.org/10.1109/5254.769876">https://doi.org/10.1109/5254.769876</a></li>
+<li>[5] Loic Bontemps, Van Loi Cao, James McDermott, and Nhien-An Le-Khac. 2017. Collective Anomaly Detection based on Long Short Term Memory Recurrent Neural Network. arXiv:arXiv:1703.09752</li>
+<li>[6] Markus Breunig, Hans-Peter Kriegel, Raymond T. Ng, and JÃűrg Sander. 2000. LOF: Identifying Density-Based Local Outliers. In PROCEEDINGS OF THE 2000 ACM SIGMOD INTERNATIONAL CONFERENCE ON MANAGEMENT OF DATA. ACM, 93–104.</li>
+<li>[7] Chang C., Nallo W., Rastogi R., Beugless D., Mickey F., and Shoop A. 1992. Satellite diagnostic system: An expert system for intelsat satellite operations. In Proceedings of the IVth European Aerospace Conference (EAC). 321–327.</li>
+<li>[8] Rich Caruana, Steve Lawrence, and C Lee Giles. 2001. Overftting in neural nets: Backpropagation, conjugate gradient, and early stopping. In Advances in neural information processing systems. 402–408.</li>
+<li>[9] Varun Chandola, Arindam Banerjee, and Vipin Kumar. 2009. Anomaly Detection: A Survey. ACM Comput. Surv. 41, 3, Article 15 (jul 2009), 58 pages. <a target="_blank" rel="noopener" href="https://doi.org/10.1145/1541880.1541882">https://doi.org/10.1145/1541880.1541882</a></li>
+<li>[10] Sucheta Chauhan and Lovekesh Vig. 2015. Anomaly detection in ECG time signals via deep long short-term memory networks. In 2015 IEEE International Conference on Data Science and Advanced Analytics (DSAA). IEEE. <a target="_blank" rel="noopener" href="https://doi.org/10.1109/dsaa.2015.7344872">https://doi.org/10.1109/dsaa.2015.7344872</a></li>
+<li>[11] F. Ciceri and L. Marradi. 1994. Event diagnosis and recovery in real-time on board autonomous mission control. In Ada in Europe. Springer Berlin Heidelberg, 288–301. <a target="_blank" rel="noopener" href="https://doi.org/10.1007/3-540-58822-1_107">https://doi.org/10.1007/3-540-58822-1_107</a></li>
+<li>[12] RALPH D’AGOSTINO and Egon S Pearson. 1973. Tests for departure from normality. Empirical results for the distributions of b 2 andâĹŽ b. Biometrika 60, 3 (1973), 613–622.</li>
+<li>[13] Sylvain Fuertes, Gilles Picart, Jean-Yves Tourneret, Lotf Chaari, André Ferrari, and Cédric Richard. 2016. Improving Spacecraft Health Monitoring with Automatic Anomaly Detection Techniques. In 14th International Conference on Space Operations (SpaceOps 2016). pp–1.</li>
+<li>[14] Ryohei Fujimaki, Takehisa Yairi, and Kazuo Machida. 2005. An Approach to Spacecraft Anomaly Detection Problem Using Kernel Feature Space. In Proceedings of the Eleventh ACM SIGKDD International Conference on Knowledge Discovery in Data Mining (KDD ’05). ACM, New York, NY, USA, 401–410. <a target="_blank" rel="noopener" href="https://doi.org/10.1145/1081870.1081917">https://doi.org/10.1145/1081870.1081917</a></li>
+<li>[15] Yu Gao, Tianshe Yang, Minqiang Xu, and Nan Xing. 2012. An Unsupervised Anomaly Detection Approach for Spacecraft Based on Normal Behavior Clustering. In 2012 Fifth International Conference on Intelligent Computation Technology and Automation. IEEE. <a target="_blank" rel="noopener" href="https://doi.org/10.1109/icicta.2012.126">https://doi.org/10.1109/icicta.2012.126</a></li>
+<li>[16] Markus Goldstein and Seiichi Uchida. 2016. A Comparative Evaluation of Unsupervised Anomaly Detection Algorithms for Multivariate Data. PLOS ONE 11, 4 (apr 2016), e0152173. <a target="_blank" rel="noopener" href="https://doi.org/10.1371/journal.pone.0152173">https://doi.org/10.1371/journal.pone.0152173</a></li>
+<li>[17] Ian Goodfellow, Yoshua Bengio, Aaron Courville, and Yoshua Bengio. 2016. Deep learning. Vol. 1. MIT press Cambridge.</li>
+<li>[18] Alex Graves. 2012. Supervised Sequence Labelling with Recurrent Neural Networks. Springer Berlin Heidelberg. <a target="_blank" rel="noopener" href="https://doi.org/10.1007/978-3-642-24797-2">https://doi.org/10.1007/978-3-642-24797-2</a></li>
+<li>[19] Alex Graves, Abdel rahman Mohamed, and Geoﬀrey Hinton. 2013. Speech Recognition with Deep Recurrent Neural Networks. arXiv:arXiv:1303.5778</li>
+<li>[20] KP Hand, AE Murray, JB Garvin, WB Brinckerhoﬀ, BC Christner, KS Edgett, BL Ehlmann, C German, AG Hayes, TM Hoehler, et al. 2017. Report of the Europa Lander Science Defnition Team. Posted February (2017).</li>
+<li>[21] Sepp Hochreiter and Jürgen Schmidhuber. 1997. Long Short-Term Memory. Neural Comput. 9, 8 (nov 1997), 1735–1780. <a target="_blank" rel="noopener" href="https://doi.org/10.1162/neco.1997.9.8.1735">https://doi.org/10.1162/neco.1997.9.8.1735</a></li>
+<li>[22] J Stuart Hunter et al. 1986. The exponentially weighted moving average. J.Quality Technol. 18, 4 (1986), 203–210.</li>
+<li>[23] David Iverson. 2008. Data Mining Applications for Space Mission Operations System Health Monitoring. In SpaceOps 2008 Conference. American Institute of Aeronautics and Astronautics. <a target="_blank" rel="noopener" href="https://doi.org/10.2514/6.2008-3212">https://doi.org/10.2514/6.2008-3212</a></li>
+<li>[24] David L. Iverson. 2004. Inductive system health monitoring. In In Proceedings of The 2004 International Conference on Artifcial Intelligence (IC-AI04), Las Vegas. CSREA Press.</li>
+<li>[25] Hans-Peter Kriegel, Peer Kröger, Erich Schubert, and Arthur Zimek. 2009. LoOP: Local Outlier Probabilities. In Proceedings of the 18th ACM Conference on Information and Knowledge Management (CIKM ’09). ACM, New York, NY, USA, 1649–1652. <a target="_blank" rel="noopener" href="https://doi.org/10.1145/1645953.1646195">https://doi.org/10.1145/1645953.1646195</a></li>
+<li>[26] Hans-Peter Kriegel, Peer Kröger, Erich Schubert, and Arthur Zimek. 2009. LoOP: local outlier probabilities. In Proceedings of the 18th ACM conference on Information and knowledge management. ACM, 1649–1652.</li>
+<li>[27] Alexander Lavin and Subutai Ahmad. 2015. Evaluating Real-Time Anomaly Detection Algorithms–The Numenta Anomaly Benchmark. In Machine Learning and Applications (ICMLA), 2015 IEEE 14th International Conference on. IEEE, 38–44.</li>
+<li>[28] Ke Li, Yalei Wu, Shimin Song, Yi sun, Jun Wang, and Yang Li. 2016. A novel method for spacecraft electrical fault detection based on FCM clustering and WPSVM classifcation with PCA feature extraction. Proceedings of the Institution of Mechanical Engineers, Part G: Journal of Aerospace Engineering 231, 1 (aug 2016), 98–108. <a target="_blank" rel="noopener" href="https://doi.org/10.1177/0954410016638874">https://doi.org/10.1177/0954410016638874</a></li>
+<li>[29] Quan Li, XingShe Zhou, Peng Lin, and Shaomin Li. 2010. Anomaly detection and fault Diagnosis technology of spacecraft based on telemetry-mining. In 2010 3rd International Symposium on Systems and Control in Aeronautics and Astronautics. IEEE. <a target="_blank" rel="noopener" href="https://doi.org/10.1109/isscaa.2010.5633180">https://doi.org/10.1109/isscaa.2010.5633180</a></li>
+<li>[30] Pankaj Malhotra, Vig Lovekesh, Gautam Shroﬀ, and Puneet Argarwal. 2015. Long Short Term Memory Networks for Anomaly Detection in Time Series. In In Proceedings of the European Symposium on Artifcial Neural Networks (ESANN), Computational Intelligence and Machine Learning.</li>
+<li>[31] Pankaj Malhotra, Anusha Ramakrishnan, Gaurangi Anand, Lovekesh Vig, Puneet Agarwal, and Gautam Shroﬀ. 2016. LSTM-based Encoder-Decoder for Multisensor Anomaly Detection. CoRR abs/1607.00148 (2016).</li>
+<li>[32] Jose MartÃŋnez-Heras and Alessandro Donati. 2014. Enhanced Telemetry Monitoring with Novelty Detection. 35 (12 2014), 37–46.</li>
+<li>[33] Anvardh Nanduri and Lance Sherry. 2016. Anomaly detection in aircraft data using Recurrent Neural Networks (RNN). 2016 Integrated Communications Navigation and Surveillance (ICNS) (2016), 5C2–1–5C2–8.</li>
+<li>[34] Naomi Nishigori and Fujitsu Limited. 2001. Fully Automatic and Operator-less Anomaly Detecting Ground Support System For Mars Probe “NOZOMI”. In In Proceedings of the 6th International Symposium on Artifcial Intelligence and Robotics and Automation in Space (i-SAIRAS).</li>
+<li>[35] Olalekan Ogunmolu, Xuejun Gu, Steve Jiang, and Nicholas Gans. 2016. Nonlinear Systems Identifcation Using Deep Dynamic Neural Networks. arXiv:arXiv:1610.01439</li>
+<li>[36] M. Rolincikm, Lauriente M., Koons H., and D. Gorney. 1992. An expert system for diagnosing environmentally induced spacecraft anomalies. Technical Report. NASA. Lyndon B. Johnson Space Center, Fifth Annual Workshop on Space Operations Applications and Research (SOAR 1991).</li>
+<li>[37] HaÅ§im Sak, Andrew Senior, and FranÃğoise Beaufays. 2014. Long Short-Term Memory Based Recurrent Neural Network Architectures for Large Vocabulary Speech Recognition. arXiv:arXiv:1402.1128</li>
+<li>[38] Jürgen Schmidhuber. 2015. Deep learning in neural networks: An overview. Neural Networks 61 (jan 2015), 85–117. <a target="_blank" rel="noopener" href="https://doi.org/10.1016/j.neunet.2014.09.003">https://doi.org/10.1016/j.neunet.2014.09.003</a></li>
+<li>[39] Bernhard Schölkopf, Alexander Smola, and Klaus-Robert Müller. 1998. Nonlinear Component Analysis As a Kernel Eigenvalue Problem. Neural Comput. 10, 5 (July 1998), 1299–1319. <a target="_blank" rel="noopener" href="https://doi.org/10.1162/089976698300017467">https://doi.org/10.1162/089976698300017467</a></li>
+<li>[40] R. Sherwood, A. Schlutsmeyer, M. Sue, and E.J. Wyatt. [n. d.]. Lessons from implementation of beacon spacecraft operations on Deep Space One. In 2000 IEEE Aerospace Conference. Proceedings (Cat. No.00TH8484). IEEE. <a target="_blank" rel="noopener" href="https://doi.org/10.1109/aero.2000.878245">https://doi.org/10.1109/aero.2000.878245</a></li>
+<li>[41] Dominique T. Shipmon, Jason M. Gurevitch, Paolo M. Piselli, and Stephen T. Edwards. 2017. Time Series Anomaly Detection; Detection of anomalous drops with limited features and sparse examples in noisy highly periodic data. arXiv:arXiv:1708.03665</li>
+<li>[42] Ilya Sutskever, Oriol Vinyals, and Quoc V. Le. 2014. Sequence to Sequence Learning with Neural Networks. arXiv:arXiv:1409.3215</li>
+<li>[43] Donald P. Tallo, John Durkin, and Edward J. Petrik. 1992. Intelligent fault isolation and diagnosis for communication satellite systems. Telematics and Informatics 9, 3-4 (jun 1992), 173–190. <a target="_blank" rel="noopener" href="https://doi.org/10.1016/s0736-5853(05)80035-8">https://doi.org/10.1016/s0736-5853(05)80035-8</a></li>
+<li>[44] Adrian Taylor, Sylvain Leblanc, and Nathalie Japkowicz. 2016. Anomaly Detection in Automobile Control Network Data with Long Short-Term Memory Networks. In 2016 IEEE International Conference on Data Science and Advanced Analytics (DSAA). IEEE. <a target="_blank" rel="noopener" href="https://doi.org/10.1109/dsaa.2016.20">https://doi.org/10.1109/dsaa.2016.20</a></li>
+<li>[45] Yoshinobu Kawahara Takehisa Yairi. [n. d.]. Telemetry-mining: A Machine Learning Approach to Anomaly Detection and Fault Diagnosis for Space Systems. In 2nd IEEE International Conference on Space Mission Challenges for Information Technology. IEEE. <a target="_blank" rel="noopener" href="https://doi.org/10.1109/smc-it.2006.79">https://doi.org/10.1109/smc-it.2006.79</a></li>
+<li>[46] Tom Young, Devamanyu Hazarika, Soujanya Poria, and Erik Cambria. 2017. Recent Trends in Deep Learning Based Natural Language Processing. arXiv:arXiv:1708.02709</li>
+<li>[47] Peng Zhou, Zhenyu Qi, Suncong Zheng, Jiaming Xu, Hongyun Bao, and Bo Xu. 2016. Text Classifcation Improved by Integrating Bidirectional LSTM with Two-dimensional Max Pooling. arXiv:arXiv:1611.06639</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\04\10\AIOps资料\" rel="bookmark">AIOps资料</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\02\17\《Time-series-Extreme-Event-Forecasting-with-Neural-Networks-at-Uber》笔记\" rel="bookmark">《Time-series Extreme Event Forecasting with Neural Networks at Uber》笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2020\12\29\时间序列分解\" rel="bookmark">时间序列分解</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2019/03/03/%E3%80%8ADetecting-Spacecraf-Anomalies-Using-LSTMs-and-Nonparametric-Dynamic-Thresholding%E3%80%8B%E7%AC%94%E8%AE%B0/" title="《Detecting Spacecraf Anomalies Using LSTMs and Nonparametric Dynamic Thresholding》笔记">https://blog.rexking6.top/2019/03/03/《Detecting-Spacecraf-Anomalies-Using-LSTMs-and-Nonparametric-Dynamic-Thresholding》笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AIOps/" rel="tag"># AIOps</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/02/28/%E3%80%8A%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E3%80%8B/" rel="prev" title="《机器学习》">
+      <i class="fa fa-chevron-left"></i> 《机器学习》
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/03/08/%E3%80%8AApproximate-Nearest-Neighbor-Search-on-High-Dimensional-Data-%E2%80%94-Experiments-Analyses-and-Improvement-v1-0-%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="next" title="《Approximate Nearest Neighbor Search on High Dimensional Data — Experiments, Analyses, and Improvement (v1.0)》笔记">
+      《Approximate Nearest Neighbor Search on High Dimensional Data — Experiments, Analyses, and Improvement (v1.0)》笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E8%AF%8D"><span class="nav-number">3.</span> <span class="nav-text">关键词</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">4.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E5%8F%8A%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">5.</span> <span class="nav-text">背景及相关工作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%88%AA%E5%A4%A9%E5%BC%82%E5%B8%B8%E6%8E%A2%E6%B5%8B"><span class="nav-number">5.1.</span> <span class="nav-text">航天异常探测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8LSTMs%E8%BF%9B%E8%A1%8C%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B"><span class="nav-number">5.2.</span> <span class="nav-text">使用LSTMs进行异常检测</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%B9%E6%B3%95"><span class="nav-number">6.</span> <span class="nav-text">方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A9%E7%94%A8LSTMs%E8%BF%9B%E8%A1%8C%E9%81%A5%E6%B5%8B%E5%80%BC%E9%A2%84%E6%B5%8B"><span class="nav-number">6.1.</span> <span class="nav-text">利用LSTMs进行遥测值预测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E8%AF%AF%E5%B7%AE%E9%98%88%E5%80%BC"><span class="nav-number">6.2.</span> <span class="nav-text">动态误差阈值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%8F%E5%B0%91%E8%AF%AF%E6%8A%A5%EF%BC%88%E5%81%87%E9%98%B3%E6%80%A7%EF%BC%89"><span class="nav-number">6.3.</span> <span class="nav-text">减少误报（假阳性）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C"><span class="nav-number">7.</span> <span class="nav-text">实验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE"><span class="nav-number">7.1.</span> <span class="nav-text">设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E5%8F%82%E6%95%B0%E5%92%8C%E8%AF%84%E4%BC%B0"><span class="nav-number">7.2.</span> <span class="nav-text">模型参数和评估</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C%E5%92%8C%E8%AE%A8%E8%AE%BA"><span class="nav-number">7.3.</span> <span class="nav-text">结果和讨论</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2"><span class="nav-number">8.</span> <span class="nav-text">部署</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">9.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">10.</span> <span class="nav-text">引用</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

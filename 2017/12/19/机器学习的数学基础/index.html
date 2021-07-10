@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习的数学基础">
+<meta property="og:url" content="https://blog.rexking6.top/2017/12/19/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9A%84%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1513672928.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1513673017.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1513673060.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1513754959.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1513755310.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1513755377.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1513752442.png">
+<meta property="article:published_time" content="2017-12-19T09:01:17.000Z">
+<meta property="article:modified_time" content="2020-04-05T04:12:29.692Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1513672928.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2017/12/19/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9A%84%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>机器学习的数学基础 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2017/12/19/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9A%84%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          机器学习的数学基础
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-12-19 17:01:17" itemprop="dateCreated datePublished" datetime="2017-12-19T17:01:17+08:00">2017-12-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-05 12:12:29" itemprop="dateModified" datetime="2020-04-05T12:12:29+08:00">2020-04-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2017/12/19/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9A%84%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/" class="post-meta-item leancloud_visitors" data-flag-title="机器学习的数学基础" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>10k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>9 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>来源：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/av15673238/">https://www.bilibili.com/video/av15673238/</a></p>
+<h1 id="机器学习概述"><a href="#机器学习概述" class="headerlink" title="机器学习概述"></a>机器学习概述</h1><p><img src="http://image.rexking6.top/img/clip1513672928.png" alt=""><br>该图说明了编程能力、数学统计知识和专业知识之间的关系。</p>
+<ol>
+<li>大多数人刚入门的人都是编程能力和数学统计知识相结合的，这样被称为“机器学习（Machine Learning）”，大致指的是机器学习里的典型算法和典型模型；</li>
+<li>而传统的学术研究者一般都是数学统计知识和专业知识相结合；</li>
+<li>编程能力和专业知识相结合，被称为“危险区域”，有待商榷，但是没有什么典型的例子；</li>
+<li>三者结合为数据科学家，即可以将机器学习的理论知识应用到工业中，有实际的领域和方向应用，发挥作用。</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1513673017.png" alt=""></p>
+<p>该图展示的是机器学习算法里主要的三大分类。</p>
+<p><img src="http://image.rexking6.top/img/clip1513673060.png" alt=""></p>
+<p>该图展示的是机器学习的主要算法。按列分为监督学习和无监督学习，根据样本是否拥有标签判断；按行分为离散和连续，根据样本的属性值判断。</p>
+<h1 id="微积分"><a href="#微积分" class="headerlink" title="微积分"></a>微积分</h1><h2 id="夹逼定理"><a href="#夹逼定理" class="headerlink" title="夹逼定理"></a>夹逼定理</h2><p>当$x \in  U(x_0,r)$时，有$g(x)\leq f(x)\leq h(x)$成立，并且$\lim_{x\to x_0}g(x)=A$，$\lim_{x\to x_0}h(x)=A$，那么</p>
+<script type="math/tex; mode=display">\lim_{x\to x_0}f(x)=A</script><h2 id="方向导数"><a href="#方向导数" class="headerlink" title="方向导数"></a>方向导数</h2><p>如果函数$z=f(x,y)$在点$P(x,y)$是可微分的，那么，函数在该点沿任一方向$L$的方向导数都存在，且有：</p>
+<script type="math/tex; mode=display">\frac{\partial f}{\partial l} = \frac{\partial f}{\partial x}cos\phi+\frac{\partial f}{\partial y}sin\phi</script><p>其中，$\phi$为x轴到方向$L$的转角。</p>
+<h2 id="梯度"><a href="#梯度" class="headerlink" title="梯度"></a>梯度</h2><p>设函数$z=f(x,y)$在平面区域$D$内具有一阶连续偏导数，则对于每一个点$P(x,y) \in D$，向量</p>
+<script type="math/tex; mode=display">(\frac{\partial f}{\partial x},\frac{\partial f}{\partial y})</script><p>为函数$z=f(x,y)$在点$P$的梯度，记做$gradf(x,y)$。梯度的方向是函数在该点上升最快的方向，相反方向为该点下降最快的方向。</p>
+<h1 id="概率论"><a href="#概率论" class="headerlink" title="概率论"></a>概率论</h1><h2 id="概率公式"><a href="#概率公式" class="headerlink" title="概率公式"></a>概率公式</h2><p>条件概率：$P(A|B) = \frac{P(AB)}{P(B)}$<br>全概率公式：$P(A) = \sum_i P(A|B_i)P(B_i)$<br>贝叶斯(Bayes)公式：​<br>$P(B_i|A) = \frac{P(A|B_i)P(B_i)}{\sum_j P(A|B_j)P(B_j)}$</p>
+<h2 id="概率与统计"><a href="#概率与统计" class="headerlink" title="概率与统计"></a>概率与统计</h2><p>大二的时候上“概率论与数理统计”，一学期上完，一脸懵逼，搞不清楚这门课到底讲的什么。<br>B站这门课看到这里恍然大悟，一张图说明：</p>
+<ul>
+<li>概率：根据是否已知整体进行区分</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1513754959.png" alt=""></p>
+<ul>
+<li>统计：统计问题是概率问题的逆向工程</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1513755310.png" alt=""></p>
+<ul>
+<li>两者结合：监督学习</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1513755377.png" alt=""></p>
+<p>简单地说，由已知样本去估计全体，再由全体去预测未知样本。</p>
+<h2 id="统计量"><a href="#统计量" class="headerlink" title="统计量"></a>统计量</h2><h3 id="期望"><a href="#期望" class="headerlink" title="期望"></a>期望</h3><ul>
+<li>离散型：$E(X)=\sum_i x_ip_i$</li>
+<li>连续型：$E(X)=\int_{-\infty}^{\infty}xf(x)dx$</li>
+</ul>
+<h3 id="方差"><a href="#方差" class="headerlink" title="方差"></a>方差</h3><ul>
+<li>定义：$Var(X)=E\{[X-E(X)]^2\}=E(X^2)-E^2(X)$</li>
+<li><p>性质：<br>$Var(c)=0$<br>$Var(X+c)=Var(X)$<br>$Var(kX)=k^2Var(X)$</p>
+</li>
+<li><p>X和Y独立：$Var(X+Y)=Var(X)+Var(Y)$</p>
+</li>
+</ul>
+<h3 id="协方差"><a href="#协方差" class="headerlink" title="协方差"></a>协方差</h3><ul>
+<li>定义：$Cov(X,Y)=E\{[X-E(X)][Y-E(Y)]\}$</li>
+<li>性质：<br>$Cov(X,Y)=Cov(Y,X)$<br>$Cov(aX+b,cY+d)=acCov(Y,X)$<br>$Cov(X_1+X_2,Y)=Cov(X_1,Y)+Cov(X_2,Y)$<br>$Cov(X,Y)=E(XY)-E(X)E(Y)$</li>
+</ul>
+<p>协方差表示的是两个向量之间的线性关系，无法处理非线性关系。</p>
+<h3 id="相关系数"><a href="#相关系数" class="headerlink" title="相关系数"></a>相关系数</h3><script type="math/tex; mode=display">\frac{Cov(X,Y)}{\sqrt{(Var(X)Var(Y)}}</script><h2 id="先验分布与后验分布"><a href="#先验分布与后验分布" class="headerlink" title="先验分布与后验分布"></a>先验分布与后验分布</h2><p><a target="_blank" rel="noopener" href="http://blog.sina.com.cn/s/blog_b9a335010102vfdf.html">http://blog.sina.com.cn/s/blog_b9a335010102vfdf.html</a></p>
+<h2 id="矩"><a href="#矩" class="headerlink" title="矩"></a>矩</h2><p>$X$是一个随机变量对于任何正整数$n$，定义</p>
+<script type="math/tex; mode=display">E(X^n)=\int p(x)x^ndx</script><p>当$n=1$时，$E(X)$为随机变量的期望</p>
+<p>当$n=2$时，$E(X^2)-E(X)^2$为随机变量的方差</p>
+<p>特征函数，$E(e^{itX})=\sum_{n=0}^\infty \frac{E(X^n)}{n!}(it)^n$</p>
+<p>样本k阶矩：$\alpha_k(X)=\frac{1}{n}\sum_{i=1}^nX_i^k,m_k(X)=\frac{1}{n}\sum_{i=1}^n(X_i-\overline X)^k$</p>
+<p>总体k阶矩：$\alpha_k(X)=E(X^k),\mu_k(X)=E((X-E(X))^k)$</p>
+<p>矩可以描述随机变量的一些特征，期望是$X$“中心”位置的一种描述，方差可以描述$X$的分散程度，特征函数可以全面描述概率分布。</p>
+<h2 id="大数定律"><a href="#大数定律" class="headerlink" title="大数定律"></a>大数定律</h2><p>$X$是随机变量，$\mu$是$X$的期望，$\sigma$是$X$的方差。$\{X_k\}_{k=1}^\infty$是服从X的独立同分布随机变量，那么$\bar X_n=\frac{\sum_{k=1}^nX_k}{n}$依概率收敛于$\mu$。也就是说对于任何$\epsilon&gt;0$有</p>
+<script type="math/tex; mode=display">lim_{n\rightarrow\infty}P(|\bar X_n-\mu|>\epsilon)=0</script><h2 id="中心极限定理"><a href="#中心极限定理" class="headerlink" title="中心极限定理"></a>中心极限定理</h2><p>$X$是随机变量，$\phi(X)$是$X$的特征函数。$\{X_k\}_{k=1}^\infty$是服从$X$的独立同分布随机变量，那么</p>
+<script type="math/tex; mode=display">Z_n=\frac{\sqrt{n}}{\sigma}(\bar X_n-\mu)</script><p>依分布收敛于正态分布$N(0,1)$。<br>也就是说对于任何$\epsilon&gt;0$有</p>
+<script type="math/tex; mode=display">lim_{n\rightarrow\infty}P(Z_n< z)=\Phi(z),\forall z</script><p>其中$\Phi$是标准正态分布的分布函数。</p>
+<h2 id="参数估计问题"><a href="#参数估计问题" class="headerlink" title="参数估计问题"></a>参数估计问题</h2><p>已知一个随机变量的分布函数$Xf_\theta(x)$，其中$\theta=(\theta_1,…,\theta_k)$为未知参数。</p>
+<p>样本$X_1,…,X_n$</p>
+<p>利用样本对参数$\theta$做出估计，或者估计$\theta$的某个函数$g(\theta)$</p>
+<p>点估计：用样本的一个函数$T(X_1,…X_n)$去估计$g(\theta)$</p>
+<p>区间估计：用一个区间去估计$g(\theta)$</p>
+<h3 id="点估计"><a href="#点估计" class="headerlink" title="点估计"></a>点估计</h3><h4 id="矩估计"><a href="#矩估计" class="headerlink" title="矩估计"></a>矩估计</h4><p>基本原理：大数定律</p>
+<hr>
+<p>e.x.(两点分布的参数估计)<br>$X$服从两点分布取值为$\{-1,1\}$，$P(-1)=1-\theta$，$P(1)=\theta$。现在独立重复实验$n$次，得到样本$X_1,…,X_n$。请利用矩估计来估计参数$\theta$。<br>首先考虑哪一个矩可以用来估计参数$\theta$。对于两点分布来说</p>
+<script type="math/tex; mode=display">E(X)=(1-\theta)·(-1)+\theta·1=2\theta-1</script><script type="math/tex; mode=display">E(X^2)=(1-\theta)·1+\theta·1=1</script><p>我们看到一阶矩$E(X)$与$\theta$有简单直接的关系$\theta=\frac{1+E(X)}{2}$<br>所以我们使用一阶样本矩估计。得到一个参数估计量$\hat{\theta}=\frac{1+\bar X}{2}$</p>
+<h4 id="极大似然估计"><a href="#极大似然估计" class="headerlink" title="极大似然估计"></a>极大似然估计</h4><p>给定随机变量的分布与未知参数，利用观测到的样本计算似然函数，选择最大化似然函数的参数作为参数估计量。<br>基本原理：最大化似然函数</p>
+<blockquote>
+<p>假设样本$\{X_1,···,X_n\}$服从概率密度函数$f_θ(x)$. 其中$θ=(θ_1,···,θ_k)$是未知参数. 当固定$x$的时候, $f_θ(x)$就是$θ$的函数, 我们把这个函数称为似然函数, 记为$L_x(θ)$ 或 $L(θ)$. 假设$x=(x_1,···,x_n)$是样本的观测值. 那么整个样本的似然函数就是</p>
+<script type="math/tex; mode=display">L_x(θ)=\prod_{i=1}^nL_{x_i}(θ)</script><p>$这是一个关于θ的函数, 选取使得L_x(θ)最大化的(\hat θ)作为θ的估计量.$</p>
+</blockquote>
+<p>最大化似然函数θ, 相当于最大化似然函数的对数, $lx(θ) = ln(Lx(θ))$. 一般我们求解似然函数或者对数似然函数的驻点方程</p>
+<script type="math/tex; mode=display">\frac{dl(θ)}{dθ}=0, (或者\frac{dL(θ)}{dθ}=0)</script><p>然后判断整个驻点是否最大点. (求驻点可以用牛顿法, 或者梯度法等等)</p>
+<hr>
+<p>e.x.(正态分布的参数估计)</p>
+<p>$X$服从参数为$θ=(\mu,σ)$的正态分布, 独立重复实验$n$次得到样本$X_1,···,X_n$. 请利用极大似然估计来估计参数$θ$。</p>
+<script type="math/tex; mode=display">L(\mu,σ)=\prod_{i=1}^n\frac1{\sqrt {2π}σ}exp(−\frac{(x-\mu)^2}{2σ^2})</script><script type="math/tex; mode=display">l(\mu,σ)=C-\frac{1}{2σ^2}\sum_{i=1}^n(x_i-\mu)^2-\frac{n}{2}ln(σ^2)</script><p>所以似然方程为$\frac{\partial l}{\partial σ}=\frac{\partial l}{\partial \mu}=0$, 也就是</p>
+<script type="math/tex; mode=display">a=\frac{1}{n}\sum_{i=1}^nx_i</script><script type="math/tex; mode=display">σ^2=\frac{1}{n}\sum_{i=1}^nx_i</script><p>因此得到极大似然估计量​</p>
+<script type="math/tex; mode=display">\hat a=\overline X</script><script type="math/tex; mode=display">\hat σ^2=\frac{1}{n}\sum_{i=1}^n(x_i-\overline X)^2</script><h4 id="点估计的评判准则"><a href="#点估计的评判准则" class="headerlink" title="点估计的评判准则"></a>点估计的评判准则</h4><ul>
+<li>相合性(consistency)：当样本数量趋于无穷时，估计量收敛于参数真实值。</li>
+<li>无偏性(bias)：对于有限的样本，估计量所符合的分布之期望等于参数真实值。</li>
+<li>有效性(efficiency)：估计值所满足的分布方差越小越好。</li>
+<li>渐进正态性(asymptotic normality)：当样本趋于无穷时，去中心化去量纲化的估计量符合标准正态分布。</li>
+</ul>
+<h3 id="区间估计：置信区间"><a href="#区间估计：置信区间" class="headerlink" title="区间估计：置信区间"></a>区间估计：置信区间</h3><p>置信区间可以认为是点估计的一个扩展。分为如下扩展：</p>
+<ol>
+<li>找到一个点估计$T$</li>
+<li>找出一个$T$与$θ$的函数满足某一个已知的分布$F$</li>
+<li>利用这个已知的分布$F$的$\frac{α}{2}$分位数，来求出参数的置信区间</li>
+</ol>
+<p>如果这个分布$F$很难找到，那么还有一种近似的方法：</p>
+<ol>
+<li>找到一个点估计$T$</li>
+<li>利用渐进正态的性质，发现$T$在$n$很大的时候满足某种正态分布</li>
+<li>利用这个已知的正态分布的$\frac{α}{2}$分位数，来求出参数的置信区间</li>
+</ol>
+<h1 id="矩阵"><a href="#矩阵" class="headerlink" title="矩阵"></a>矩阵</h1><p>摘自周志华老师《机器学习》的附录。</p>
+<h2 id="基本演算"><a href="#基本演算" class="headerlink" title="基本演算"></a>基本演算</h2><h3 id="转置与逆"><a href="#转置与逆" class="headerlink" title="转置与逆"></a>转置与逆</h3><script type="math/tex; mode=display">(A+B)^T=A^T+B^T</script><script type="math/tex; mode=display">(AB)^T=B^TA^T</script><script type="math/tex; mode=display">(A^T)^{-1}=(A^{-1})^T</script><script type="math/tex; mode=display">(AB)^{-1}=B^{-1}A^{-1}</script><h3 id="迹"><a href="#迹" class="headerlink" title="迹"></a>迹</h3><p>对于$n$阶方阵A，它的迹(trace)是主对角线上的元素之和，即$tr(A)=\sum_{i=1}^nA_{ii}。迹有如下性质：$</p>
+<script type="math/tex; mode=display">tr(A^T)=tr(A)</script><script type="math/tex; mode=display">tr(A+B)=tr(A)+tr(B)</script><script type="math/tex; mode=display">tr(AB)=tr(BA)</script><script type="math/tex; mode=display">tr(ABC)=tr(BCA)=tr(CAB)</script><h3 id="行列式"><a href="#行列式" class="headerlink" title="行列式"></a>行列式</h3><script type="math/tex; mode=display">det(cA)=c^ndet(A)</script><script type="math/tex; mode=display">det(A^T)=det(A)</script><script type="math/tex; mode=display">det(AB)=det(A)det(B)</script><script type="math/tex; mode=display">det(A^{-1})=det(A)^{-1}</script><script type="math/tex; mode=display">det(A^n)=det(A)^n</script><h3 id="Frobenius范数"><a href="#Frobenius范数" class="headerlink" title="Frobenius范数"></a>Frobenius范数</h3><script type="math/tex; mode=display">||A||_F=(tr(A^TA))^{1/2}=(\sum_{i=1}^m\sum_{j=1}^nA_{ij}^2)^{1/2}</script><h2 id="导数"><a href="#导数" class="headerlink" title="导数"></a>导数</h2><p>向量$a$相对于标量$x$的导数(derivative)，以及$x$相对于$a$的导数都是向量，其第$i$个分量分别为</p>
+<script type="math/tex; mode=display">(\frac{\partial a}{\partial x})_i=(\frac{\partial a_i}{\partial x})</script><script type="math/tex; mode=display">(\frac{\partial x}{\partial a})_i=(\frac{\partial x}{\partial a_i})</script><p>类似的，矩阵$A$对于标量$x$的导数，以及$x$对于$A$的导数都是矩阵，其第$i$行第$j$列上的元素分别为</p>
+<script type="math/tex; mode=display">(\frac{\partial A}{\partial x})_{ij}=\frac{\partial A_{ij}}{\partial x}</script><script type="math/tex; mode=display">(\frac{\partial x}{\partial A})_{ij}=\frac{\partial x}{\partial A_{ij}}</script><p>对于函数$f(x)$，假定其对向量的元素可导，则$f(x)$关于$x$的一阶导数是一个向量，其第$i$个分量为</p>
+<script type="math/tex; mode=display">(\nabla f(x))_i=\frac {\partial f(x)}{\partial x_i}</script><p>$f(x)$关于$x$的二阶导数是称为海森矩阵(Hessian matrix)的一个方阵，其第$i$行第$j$列上的元素为</p>
+<script type="math/tex; mode=display">(\nabla ^2f(x))_{ij}=\frac{\partial ^2f(x)}{\partial x_i \partial x_j}</script><p>向量和矩阵的导数满足乘法法则(product rule)</p>
+<script type="math/tex; mode=display">\frac{\partial x^Ta}{\partial x}=\frac{\partial a^Tx}{\partial x}=a</script><script type="math/tex; mode=display">\frac{\partial AB}{\partial x}=\frac{\partial A}{\partial x}B+A\frac{\partial B}{\partial x}</script><p>由$A^{-1}A=I$和上式，逆矩阵的导数可表示为</p>
+<script type="math/tex; mode=display">\frac{\partial A^{-1}}{\partial x}=-A^{-1}\frac{\partial A}{\partial x}A^{-1}</script><p>另外地，</p>
+<script type="math/tex; mode=display">\frac{\partial Ax}{\partial x}=A^T</script><script type="math/tex; mode=display">\frac{\partial x^TA}{\partial x}=A</script><script type="math/tex; mode=display">\frac{\partial x^Tx}{\partial x}=2x</script><script type="math/tex; mode=display">\frac{\partial x^TAx}{\partial x}=Ax+A^Tx=2AX</script><p>(后半部分的条件是A对称)</p>
+<p>若求导的标量是矩阵$A$的元素，则有</p>
+<script type="math/tex; mode=display">\frac{\partial tr(AB)}{\partial A_{ij}}=B_{ji}</script><script type="math/tex; mode=display">\frac{\partial tr(AB)}{\partial A}=B^T</script><script type="math/tex; mode=display">\frac{\partial tr(A^TB)}{\partial A}=B</script><script type="math/tex; mode=display">\frac{\partial tr(A)}{\partial A}=I</script><script type="math/tex; mode=display">\frac{\partial tr(ABA^T)}{\partial A}=A(B+B^T)</script><script type="math/tex; mode=display">\frac{\partial ||A||_F^2}{\partial A}=\frac{\partial tr(AA^T)}{\partial A}=2A</script><script type="math/tex; mode=display">\nabla_A trAB = B^T</script><script type="math/tex; mode=display">\nabla_{A^T}f(A)=(\nabla_Af(A))^T</script><script type="math/tex; mode=display">\nabla_AtrABA^TC=CAB+C^TAB^T</script><script type="math/tex; mode=display">\nabla_A|A| = |A|(A^{-1})^T</script><p>链式法则(chain rule)是计算复杂导数时的重要工具。简单地说，若函数$f$是$g$和$h$的复合，即$f(x)=g(h(x))$，则有</p>
+<script type="math/tex; mode=display">\frac{\partial f(x)}{\partial x}=\frac{\partial g(h(x))}{\partial h(x)}·\frac{\partial h(x)}{\partial x}</script><p>例如在计算下式时，将$Ax-b$看作一个整体可简化计算：</p>
+<script type="math/tex; mode=display">\begin{align*}
+\frac{\partial}{\partial x}(Ax-b)^TW(Ax-b) &=\frac{\partial (Ax-b)}{\partial x}·2W(Ax-b) \\
+&=2AW(Ax-b)
+\end{align*}</script><h2 id="奇异值分解"><a href="#奇异值分解" class="headerlink" title="奇异值分解"></a>奇异值分解</h2><p>任意实矩阵$A \in \mathbb {R}^{m×n}$都可分解为</p>
+<script type="math/tex; mode=display">A=U\Sigma V^T</script><p>其中，$U \in \mathbb {R}^{m×m}$是满足$U^TU=I$的$m$阶酉矩阵(unitary matrix)；$V \in \mathbb {R}^{n×n}$是满足$V^TV=I$的$n$阶酉矩阵；$\Sigma \in \mathbb {R}^{m×n}$是$m×n$的矩阵，其中$(\Sigma)_{ii}=\sigma_i$且其他位置的元素均为$0$，$\sigma_i$为非负实数且满足$\sigma_1 \geq \sigma_2 \geq … \geq0$。</p>
+<h1 id="线性代数"><a href="#线性代数" class="headerlink" title="线性代数"></a>线性代数</h1><h2 id="线性映射与矩阵"><a href="#线性映射与矩阵" class="headerlink" title="线性映射与矩阵"></a>线性映射与矩阵</h2><ul>
+<li><p>矩阵时线性映射在特定基下的一种定量描述</p>
+<script type="math/tex; mode=display">T(\alpha)=\beta·A_{\alpha,\beta}(T)</script></li>
+<li><p>基变换下的矩阵变换公式的推导方法</p>
+<script type="math/tex; mode=display">Q·A_{\tilde \alpha,\tilde \beta}(T)·P^{-1}=A_{\alpha,\beta}(T)</script></li>
+</ul>
+<h3 id="自身映射"><a href="#自身映射" class="headerlink" title="自身映射"></a>自身映射</h3><p>实数平面$\mathbb {R}^2$到自身的映射：</p>
+<ul>
+<li>拉伸T：$[\begin{matrix}x_1\\x_2\end{matrix}]=[\begin{matrix}1/2 &amp; 0 \\0 &amp; 2\end{matrix}][\begin{matrix}x_1\\x_2\end{matrix}]$</li>
+<li>反转T：$[\begin{matrix}x_1\\x_2\end{matrix}]=[\begin{matrix}1 &amp; 0 \\0 &amp; -1\end{matrix}][\begin{matrix}x_1\\x_2\end{matrix}]$</li>
+<li>旋转T：$[\begin{matrix}x_1\\x_2\end{matrix}]=[\begin{matrix}cos(\pi/6) &amp; -sin(\pi/6) \\sin(\pi/6) &amp; cos(\pi/6)\end{matrix}][\begin{matrix}x_1\\x_2\end{matrix}]$</li>
+</ul>
+<h2 id="相似矩阵"><a href="#相似矩阵" class="headerlink" title="相似矩阵"></a>相似矩阵</h2><p>如果两个方阵$A$和$\tilde A$满足$\tilde A=P^{−1}AP$，那么这两个方阵就互为相似矩阵。相似矩阵的几何意义是同一个线性变换在不同的基下的表达形式。</p>
+<h3 id="相似变换下不变的性质"><a href="#相似变换下不变的性质" class="headerlink" title="相似变换下不变的性质"></a>相似变换下不变的性质</h3><ul>
+<li><p>行列式(det)</p>
+<script type="math/tex; mode=display">\begin{align*}
+det(P^{-1}AP) &=det(P^{-1})det(A)det(P) \\
+&=det(P^{-1})det(P)det(A) \\
+&=det(A)
+\end{align*}</script></li>
+<li><p>迹(trace)</p>
+<script type="math/tex; mode=display">tr(AB)=tr(BA)</script><script type="math/tex; mode=display">\begin{align*}
+tr(P^{-1}AP) &= tr(APP^{-1}) \\
+                  &=tr(A·I) \\
+                  &=tr(A)
+\end{align*}</script></li>
+<li><p>秩(rank)</p>
+</li>
+<li><p>特征值：特征方程$det(A-\lambda)I)=0$的根。<br>如果$det(A-\lambda I)=0$，那么$det(P^{-1}(A-\lambda I)P)=0$，于是$det(P^{-1}AP-\lambda I)=0$。</p>
+</li>
+</ul>
+<h2 id="相合变换"><a href="#相合变换" class="headerlink" title="相合变换"></a>相合变换</h2><p>如果两个对称方阵$A$和$\tilde A$满足，$\tilde A=P^TAP$。 那么这两个方阵就互为相合矩阵。相合矩阵的几何意义是同一个内积结构在不同积下的表示形式。</p>
+<h2 id="正交相似变换"><a href="#正交相似变换" class="headerlink" title="正交相似变换"></a>正交相似变换</h2><p>正交相似变换同时满足相似与相合变换的条件，也就是说它同时保持了矩阵的相似与相合不变量。</p>
+<ul>
+<li>如果两个对称方阵$A$和$\tilde A$满足，$\tilde A=P^TAP$. 而且$P$是正交矩阵: $P^T=P^{-1}$. 那么这$A$与$\tilde A$就互为正交相似。</li>
+<li>任何一个对称矩阵$A$都可以正交相似于一个对角矩阵$D$。即，总存在一个正交矩阵$P$使得，$A=P^TDP$。</li>
+</ul>
+<h3 id="SVD"><a href="#SVD" class="headerlink" title="SVD"></a>SVD</h3><ul>
+<li><p>长方矩阵的奇异值分解(SVD)<br>对于任何一个矩阵$B_{m×n}$, 存在正交矩阵$P_{m×m},Q_{n×n}$. 使得</p>
+<script type="math/tex; mode=display">B=PDQ</script><p>其实$D_{m×n}$是一个只有对角元素不为零的矩阵.</p>
+</li>
+</ul>
+<h1 id="优化与凸优化"><a href="#优化与凸优化" class="headerlink" title="优化与凸优化"></a>优化与凸优化</h1><h2 id="优化问题"><a href="#优化问题" class="headerlink" title="优化问题"></a>优化问题</h2><p> 优化问题的一般形式<br> 最小化：$f_0(x)$，<br> 条件：$f_i(x) \leq b_i,i=1,…,m$，<br> 其中$f_0(x)$为目标函数，条件里的不等式是限制条件。</p>
+<h2 id="凸优化问题"><a href="#凸优化问题" class="headerlink" title="凸优化问题"></a>凸优化问题</h2><p> 一个优化问题如果满足如下条件则为凸优化问题</p>
+<ul>
+<li><p>凸优化问题的条件，$f_0,f_1,…,f_m$都是凸函数.</p>
+</li>
+<li><p>凸优化问题的特点，局部最优等价于全局最优.​</p>
+</li>
+</ul>
+<h3 id="凸集合定义"><a href="#凸集合定义" class="headerlink" title="凸集合定义"></a>凸集合定义</h3><p>如果一个集合$Ω$中任何两个点之间的线段上任何一个点还属于$Ω$, 那么 $Ω$ 就是一个凸集合。$i.e.$</p>
+<script type="math/tex; mode=display">λx_1 + (1 − λ)x_2 \in Ω, \forall x_1,x_2 \in Ω,λ \in (0,1)</script><h3 id="凸函数定义"><a href="#凸函数定义" class="headerlink" title="凸函数定义"></a>凸函数定义</h3><p>如果一个函数 $f$ 定义域$Ω$ 是凸集，而且对于任何两点. 以及两点之间线段上任意一个点都有</p>
+<script type="math/tex; mode=display">f(λx_1 + (1 − λ)x_2) ≤ λf(x_1) + (1 − λ)f(x_2)</script><script type="math/tex; mode=display">\forall x_1,x_2 \in Ω,λ \in (0,1)</script><p><img src="http://image.rexking6.top/img/clip1513752442.png" alt=""></p>
+<h3 id="凸函数的判定"><a href="#凸函数的判定" class="headerlink" title="凸函数的判定"></a>凸函数的判定</h3><p>定理：$f(x)$在区间$[a,b]$上连续，在$(a,b)$内二阶可导，那么：<br>若$f’’(x) &gt; 0$，则$f(x)$是凸的；<br>若$f’’(x) &lt; 0$，则$f(x)$是凹的。<br>即：一元二阶可微的函数在区间上是凸的，当且仅当它的二阶导数是非负的。</p>
+<h3 id="函数的上境图"><a href="#函数的上境图" class="headerlink" title="函数的上境图"></a>函数的上境图</h3><p>假设 $f$ 是一个定义在 $Ω$ 上的函数，区域$\{(x,y):y≥f(x),\forall x \in Ω\}$就是$f$的上境图。上境图就是函数图像上方的部分区域。</p>
+<h3 id="凸集合与凸函数"><a href="#凸集合与凸函数" class="headerlink" title="凸集合与凸函数"></a>凸集合与凸函数</h3><p>一个函数是凸函数当且仅当 $f$ 的上境图是凸集合。</p>
+<h3 id="凸组合"><a href="#凸组合" class="headerlink" title="凸组合"></a>凸组合</h3><p>对于任何n个点$\{x_i\}_{i=1}^n$，以及权重系数$\{\omega_i\}_{i=1}^n$。若权重系数非负$\omega_i ≤ 0$ 而且$\sum_{i=1}^n\omega_i = 1$，则线性组合</p>
+<script type="math/tex; mode=display">S =\sum_{i=1}^n\omega_ix_i</script><p>为一个凸组合。凸组合的物理意义可以理解成 $n$ 个重量为 $\omega_i$ 的点的整体重心。</p>
+<h3 id="集合的凸包"><a href="#集合的凸包" class="headerlink" title="集合的凸包"></a>集合的凸包</h3><p>$n$个点$\{x_i\}_{i=1}^n$的全部凸组合就构成$\{x_i\}_{i=1}^n$的凸包。</p>
+<h3 id="函数的凸闭包"><a href="#函数的凸闭包" class="headerlink" title="函数的凸闭包"></a>函数的凸闭包</h3><p>如果$C$是函数$f$的上境图，$\overline C$是$C$的凸包，那么以$\overline C$为上境图的函数称为$f$的凸闭包。</p>
+<h3 id="集合的凸包的性质"><a href="#集合的凸包的性质" class="headerlink" title="集合的凸包的性质"></a>集合的凸包的性质</h3><p>若$\overline C$是$C$的凸包，那么</p>
+<ul>
+<li>$C \subset \overline C$</li>
+<li>$C$的支撑平面也是$\overline C$的支撑平面，反之亦然</li>
+</ul>
+<h3 id="函数的凸闭包的性质"><a href="#函数的凸闭包的性质" class="headerlink" title="函数的凸闭包的性质"></a>函数的凸闭包的性质</h3><p>若$g$是$f$的凸闭包，那么</p>
+<ul>
+<li>$g \leq f$</li>
+<li>$inf\{g\}=inf \{f\}$</li>
+</ul>
+<h3 id="凸集合性质"><a href="#凸集合性质" class="headerlink" title="凸集合性质"></a>凸集合性质</h3><ul>
+<li>假设 $Ω$ 是一个凸集合，那么 $Ω$ 任何子集的凸包仍包含于 $Ω$。</li>
+<li>任意多个凸集合的交集仍是凸集合。</li>
+</ul>
+<h3 id="凸函数性质：琴生-Jensen-不等式"><a href="#凸函数性质：琴生-Jensen-不等式" class="headerlink" title="凸函数性质：琴生 (Jensen) 不等式"></a>凸函数性质：琴生 (Jensen) 不等式</h3><p>如果 $f : Ω \rightarrow \mathbb {R}$ 是一个凸函数, 则对于任何 $\{x_i \in Ω\}_{i=1}^n$, 以及凸组合$\sum_{i=1}^n \omega_ix_i$都有</p>
+<script type="math/tex; mode=display">\sum_{i=1}^n\omega_if(x_i) ≥ f(\sum_{i=1}^n\omega_ix_i)</script><h3 id="凸函数性质"><a href="#凸函数性质" class="headerlink" title="凸函数性质"></a>凸函数性质</h3><ul>
+<li>任意多个凸函数的逐点上确界仍是凸函数。​</li>
+<li>固定一个凸函数的若干个变量，所得的函数仍然是凸函数。​</li>
+<li>凸函数的 sublevel set 都是凸集合。​</li>
+</ul>
+<h3 id="凸集分离定理"><a href="#凸集分离定理" class="headerlink" title="凸集分离定理"></a>凸集分离定理</h3><p>若$C,D$分别为$\mathbb {R}^n $中的两个不交的非空凸集合,i.e.$C \cap D = ∅$,则一定存在向量$ a \in \mathbb {R}^n $以及实数 $b \in \mathbb {R}$ 使得任何</p>
+<p>$x_C \in C, x_D \in D$ 有 $a^Tx_C ≤ b $以及 $a^Tx_D ≥ b.$</p>
+<p>定理中不等式的几何意义在于$C,D$ 分别位于超平面 $a^Tx=b$ 的两边.</p>
+<h2 id="共轭函数"><a href="#共轭函数" class="headerlink" title="共轭函数"></a>共轭函数</h2><p>如果$f:\mathbb {R}^n \rightarrow \mathbb {R}$是一个函数，那么$f$的共轭函数</p>
+<script type="math/tex; mode=display">f^*(y)=sup_{x\in domf}(y^Tx-f(x))</script><p>其中$f^x(y)$的定义域是使得等式右边有上界的那些$y$.</p>
+<h3 id="共轭函数的基本性质"><a href="#共轭函数的基本性质" class="headerlink" title="共轭函数的基本性质"></a>共轭函数的基本性质</h3><ul>
+<li>共轭函数$f^-$是一个凸函数</li>
+<li>如果$g$是$f$的凸闭包，那么$g^-=f^-$</li>
+<li>对一般的函数$f$,$ f^{—} \leq f$</li>
+<li>如果$f$是一个凸函数, 那么$f^{—}=f$</li>
+</ul>
+<h3 id="共轭函数的进一步性质"><a href="#共轭函数的进一步性质" class="headerlink" title="共轭函数的进一步性质"></a>共轭函数的进一步性质</h3><ul>
+<li>$f(x)+f^-(y) \geq x^Ty$</li>
+<li>如果$f$是凸函数而且可微，那么</li>
+<li>$f^x(y)=x^T\nabla f(x^-)-f(x^-)，其中x^-满足\nabla f(x^-)=y$</li>
+<li>如果$g(x)=f(Ax+b)$，则$g^-(y)=f^-(A^{-T}y)-b^TA^{-T}y$</li>
+<li>如果$f(u,v)=f_1(u)+f_2(v)$，那么$f^-(w,z)=f_1^-(w)+f_2^-(z)$</li>
+</ul>
+<h2 id="对偶函数"><a href="#对偶函数" class="headerlink" title="对偶函数"></a>对偶函数</h2><p>对偶函数为原问题提供下界。</p>
+<h2 id="Karush-Kuhn-Tucker-KKT-条件"><a href="#Karush-Kuhn-Tucker-KKT-条件" class="headerlink" title="Karush-Kuhn-Tucker(KKT)条件"></a>Karush-Kuhn-Tucker(KKT)条件</h2><p>m个等式约束和n个不等式约束</p>
+<script type="math/tex; mode=display">min_x f(x)</script><script type="math/tex; mode=display">s.t. h_i(x)=0 (i=1,...,m),</script><script type="math/tex; mode=display">g_j(x) \leq 0(j=1,...,n).</script><p>引入拉格朗日乘子$\lambda=(\lambda_1,\lambda_2,…,\lambda_m)^T和\mu=(\mu_1,\mu_2,…,\mu_n)^T$, 相应的拉格朗日函数为</p>
+<script type="math/tex; mode=display">L(x,\lambda,\mu)=f(x)+\sum_{i=1}^m\lambda_ih_i(x)+\sum_{i=1}^n\mu_jg_j(x)</script><p>KKT条件为</p>
+<script type="math/tex; mode=display">g_j(x) \leq 0;</script><script type="math/tex; mode=display">\mu_j \geq 0;</script><script type="math/tex; mode=display">\mu_jg_j(x)=0.</script><h1 id="递推式时间复杂度"><a href="#递推式时间复杂度" class="headerlink" title="递推式时间复杂度"></a>递推式时间复杂度</h1><script type="math/tex; mode=display">T(n)=aT(\frac{n}{b})+O(n^d)</script><script type="math/tex; mode=display">T(n)=\left\{
+\begin{aligned}
+& O(n^{log_ba}),d<log_ba \\
+& O(n^dlog\space n) ,d=log_ba\\
+& O(n^d),d>log_ba
+\end{aligned}
+\right.</script>
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\03\21\Fisher线性判别\" rel="bookmark">Fisher线性判别</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\02\13\cs229中文笔记-一二\" rel="bookmark">cs229中文笔记(一二)</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\02\18\cs229中文笔记-七\" rel="bookmark">cs229中文笔记(七)</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2017/12/19/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9A%84%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/" title="机器学习的数学基础">https://blog.rexking6.top/2017/12/19/机器学习的数学基础/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/12/09/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/" rel="prev" title="IO多路复用">
+      <i class="fa fa-chevron-left"></i> IO多路复用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/12/19/hexo%E6%94%B9%E7%94%A8%E5%9B%BE%E5%BA%8A%E3%80%81%E6%B7%BB%E5%8A%A0MathJax%E7%AD%89%E5%8A%9F%E8%83%BD/" rel="next" title="hexo改用图床、添加MathJax等功能">
+      hexo改用图床、添加MathJax等功能 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">机器学习概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BE%AE%E7%A7%AF%E5%88%86"><span class="nav-number">2.</span> <span class="nav-text">微积分</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%B9%E9%80%BC%E5%AE%9A%E7%90%86"><span class="nav-number">2.1.</span> <span class="nav-text">夹逼定理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E5%90%91%E5%AF%BC%E6%95%B0"><span class="nav-number">2.2.</span> <span class="nav-text">方向导数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A2%AF%E5%BA%A6"><span class="nav-number">2.3.</span> <span class="nav-text">梯度</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A6%82%E7%8E%87%E8%AE%BA"><span class="nav-number">3.</span> <span class="nav-text">概率论</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E7%8E%87%E5%85%AC%E5%BC%8F"><span class="nav-number">3.1.</span> <span class="nav-text">概率公式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E7%8E%87%E4%B8%8E%E7%BB%9F%E8%AE%A1"><span class="nav-number">3.2.</span> <span class="nav-text">概率与统计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%9F%E8%AE%A1%E9%87%8F"><span class="nav-number">3.3.</span> <span class="nav-text">统计量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%9F%E6%9C%9B"><span class="nav-number">3.3.1.</span> <span class="nav-text">期望</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E5%B7%AE"><span class="nav-number">3.3.2.</span> <span class="nav-text">方差</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%8F%E6%96%B9%E5%B7%AE"><span class="nav-number">3.3.3.</span> <span class="nav-text">协方差</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E7%B3%BB%E6%95%B0"><span class="nav-number">3.3.4.</span> <span class="nav-text">相关系数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E9%AA%8C%E5%88%86%E5%B8%83%E4%B8%8E%E5%90%8E%E9%AA%8C%E5%88%86%E5%B8%83"><span class="nav-number">3.4.</span> <span class="nav-text">先验分布与后验分布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9F%A9"><span class="nav-number">3.5.</span> <span class="nav-text">矩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%A7%E6%95%B0%E5%AE%9A%E5%BE%8B"><span class="nav-number">3.6.</span> <span class="nav-text">大数定律</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%AD%E5%BF%83%E6%9E%81%E9%99%90%E5%AE%9A%E7%90%86"><span class="nav-number">3.7.</span> <span class="nav-text">中心极限定理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E4%BC%B0%E8%AE%A1%E9%97%AE%E9%A2%98"><span class="nav-number">3.8.</span> <span class="nav-text">参数估计问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%82%B9%E4%BC%B0%E8%AE%A1"><span class="nav-number">3.8.1.</span> <span class="nav-text">点估计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9F%A9%E4%BC%B0%E8%AE%A1"><span class="nav-number">3.8.1.1.</span> <span class="nav-text">矩估计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9E%81%E5%A4%A7%E4%BC%BC%E7%84%B6%E4%BC%B0%E8%AE%A1"><span class="nav-number">3.8.1.2.</span> <span class="nav-text">极大似然估计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%82%B9%E4%BC%B0%E8%AE%A1%E7%9A%84%E8%AF%84%E5%88%A4%E5%87%86%E5%88%99"><span class="nav-number">3.8.1.3.</span> <span class="nav-text">点估计的评判准则</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%BA%E9%97%B4%E4%BC%B0%E8%AE%A1%EF%BC%9A%E7%BD%AE%E4%BF%A1%E5%8C%BA%E9%97%B4"><span class="nav-number">3.8.2.</span> <span class="nav-text">区间估计：置信区间</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9F%A9%E9%98%B5"><span class="nav-number">4.</span> <span class="nav-text">矩阵</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%BC%94%E7%AE%97"><span class="nav-number">4.1.</span> <span class="nav-text">基本演算</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AC%E7%BD%AE%E4%B8%8E%E9%80%86"><span class="nav-number">4.1.1.</span> <span class="nav-text">转置与逆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%B9"><span class="nav-number">4.1.2.</span> <span class="nav-text">迹</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%8C%E5%88%97%E5%BC%8F"><span class="nav-number">4.1.3.</span> <span class="nav-text">行列式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Frobenius%E8%8C%83%E6%95%B0"><span class="nav-number">4.1.4.</span> <span class="nav-text">Frobenius范数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%BC%E6%95%B0"><span class="nav-number">4.2.</span> <span class="nav-text">导数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3"><span class="nav-number">4.3.</span> <span class="nav-text">奇异值分解</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0"><span class="nav-number">5.</span> <span class="nav-text">线性代数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E6%80%A7%E6%98%A0%E5%B0%84%E4%B8%8E%E7%9F%A9%E9%98%B5"><span class="nav-number">5.1.</span> <span class="nav-text">线性映射与矩阵</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E8%BA%AB%E6%98%A0%E5%B0%84"><span class="nav-number">5.1.1.</span> <span class="nav-text">自身映射</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E4%BC%BC%E7%9F%A9%E9%98%B5"><span class="nav-number">5.2.</span> <span class="nav-text">相似矩阵</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E4%BC%BC%E5%8F%98%E6%8D%A2%E4%B8%8B%E4%B8%8D%E5%8F%98%E7%9A%84%E6%80%A7%E8%B4%A8"><span class="nav-number">5.2.1.</span> <span class="nav-text">相似变换下不变的性质</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%90%88%E5%8F%98%E6%8D%A2"><span class="nav-number">5.3.</span> <span class="nav-text">相合变换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E4%BA%A4%E7%9B%B8%E4%BC%BC%E5%8F%98%E6%8D%A2"><span class="nav-number">5.4.</span> <span class="nav-text">正交相似变换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SVD"><span class="nav-number">5.4.1.</span> <span class="nav-text">SVD</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E4%B8%8E%E5%87%B8%E4%BC%98%E5%8C%96"><span class="nav-number">6.</span> <span class="nav-text">优化与凸优化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E9%97%AE%E9%A2%98"><span class="nav-number">6.1.</span> <span class="nav-text">优化问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%B8%E4%BC%98%E5%8C%96%E9%97%AE%E9%A2%98"><span class="nav-number">6.2.</span> <span class="nav-text">凸优化问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%B8%E9%9B%86%E5%90%88%E5%AE%9A%E4%B9%89"><span class="nav-number">6.2.1.</span> <span class="nav-text">凸集合定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%B8%E5%87%BD%E6%95%B0%E5%AE%9A%E4%B9%89"><span class="nav-number">6.2.2.</span> <span class="nav-text">凸函数定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%B8%E5%87%BD%E6%95%B0%E7%9A%84%E5%88%A4%E5%AE%9A"><span class="nav-number">6.2.3.</span> <span class="nav-text">凸函数的判定</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%9A%84%E4%B8%8A%E5%A2%83%E5%9B%BE"><span class="nav-number">6.2.4.</span> <span class="nav-text">函数的上境图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%B8%E9%9B%86%E5%90%88%E4%B8%8E%E5%87%B8%E5%87%BD%E6%95%B0"><span class="nav-number">6.2.5.</span> <span class="nav-text">凸集合与凸函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%B8%E7%BB%84%E5%90%88"><span class="nav-number">6.2.6.</span> <span class="nav-text">凸组合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%86%E5%90%88%E7%9A%84%E5%87%B8%E5%8C%85"><span class="nav-number">6.2.7.</span> <span class="nav-text">集合的凸包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%9A%84%E5%87%B8%E9%97%AD%E5%8C%85"><span class="nav-number">6.2.8.</span> <span class="nav-text">函数的凸闭包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%86%E5%90%88%E7%9A%84%E5%87%B8%E5%8C%85%E7%9A%84%E6%80%A7%E8%B4%A8"><span class="nav-number">6.2.9.</span> <span class="nav-text">集合的凸包的性质</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%9A%84%E5%87%B8%E9%97%AD%E5%8C%85%E7%9A%84%E6%80%A7%E8%B4%A8"><span class="nav-number">6.2.10.</span> <span class="nav-text">函数的凸闭包的性质</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%B8%E9%9B%86%E5%90%88%E6%80%A7%E8%B4%A8"><span class="nav-number">6.2.11.</span> <span class="nav-text">凸集合性质</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%B8%E5%87%BD%E6%95%B0%E6%80%A7%E8%B4%A8%EF%BC%9A%E7%90%B4%E7%94%9F-Jensen-%E4%B8%8D%E7%AD%89%E5%BC%8F"><span class="nav-number">6.2.12.</span> <span class="nav-text">凸函数性质：琴生 (Jensen) 不等式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%B8%E5%87%BD%E6%95%B0%E6%80%A7%E8%B4%A8"><span class="nav-number">6.2.13.</span> <span class="nav-text">凸函数性质</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%B8%E9%9B%86%E5%88%86%E7%A6%BB%E5%AE%9A%E7%90%86"><span class="nav-number">6.2.14.</span> <span class="nav-text">凸集分离定理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B1%E8%BD%AD%E5%87%BD%E6%95%B0"><span class="nav-number">6.3.</span> <span class="nav-text">共轭函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B1%E8%BD%AD%E5%87%BD%E6%95%B0%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%A7%E8%B4%A8"><span class="nav-number">6.3.1.</span> <span class="nav-text">共轭函数的基本性质</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B1%E8%BD%AD%E5%87%BD%E6%95%B0%E7%9A%84%E8%BF%9B%E4%B8%80%E6%AD%A5%E6%80%A7%E8%B4%A8"><span class="nav-number">6.3.2.</span> <span class="nav-text">共轭函数的进一步性质</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E5%81%B6%E5%87%BD%E6%95%B0"><span class="nav-number">6.4.</span> <span class="nav-text">对偶函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Karush-Kuhn-Tucker-KKT-%E6%9D%A1%E4%BB%B6"><span class="nav-number">6.5.</span> <span class="nav-text">Karush-Kuhn-Tucker(KKT)条件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%80%92%E6%8E%A8%E5%BC%8F%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="nav-number">7.</span> <span class="nav-text">递推式时间复杂度</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

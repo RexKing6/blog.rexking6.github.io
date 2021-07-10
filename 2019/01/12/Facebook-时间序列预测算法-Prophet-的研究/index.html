@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Facebook 时间序列预测算法 Prophet 的研究">
+<meta property="og:url" content="https://blog.rexking6.top/2019/01/12/Facebook-%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B%E7%AE%97%E6%B3%95-Prophet-%E7%9A%84%E7%A0%94%E7%A9%B6/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547273742.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547273810.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547273844.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547273850.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547274646.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547275754.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547278205.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547278927.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547278993.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547279003.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547279031.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547279521.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547279737.png">
+<meta property="article:published_time" content="2019-01-12T04:57:12.000Z">
+<meta property="article:modified_time" content="2021-07-06T01:03:55.546Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="AIOps">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1547273742.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2019/01/12/Facebook-%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B%E7%AE%97%E6%B3%95-Prophet-%E7%9A%84%E7%A0%94%E7%A9%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Facebook 时间序列预测算法 Prophet 的研究 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2019/01/12/Facebook-%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B%E7%AE%97%E6%B3%95-Prophet-%E7%9A%84%E7%A0%94%E7%A9%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Facebook 时间序列预测算法 Prophet 的研究
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-01-12 12:57:12" itemprop="dateCreated datePublished" datetime="2019-01-12T12:57:12+08:00">2019-01-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-06 09:03:55" itemprop="dateModified" datetime="2021-07-06T09:03:55+08:00">2021-07-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AIOps/" itemprop="url" rel="index"><span itemprop="name">AIOps</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2019/01/12/Facebook-%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B%E7%AE%97%E6%B3%95-Prophet-%E7%9A%84%E7%A0%94%E7%A9%B6/" class="post-meta-item leancloud_visitors" data-flag-title="Facebook 时间序列预测算法 Prophet 的研究" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>3.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>AIOps会用到Prophet，过一下，纯粹转载：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://zr9558.com/2018/11/30/timeseriespredictionfbprophet/">FACEBOOK 时间序列预测算法 PROPHET 的研究</a></li>
+</ul>
+<h1 id="Prophet简介"><a href="#Prophet简介" class="headerlink" title="Prophet简介"></a>Prophet简介</h1><p>Facebook 去年开源了一个时间序列预测的算法，叫做 <strong>fbprophet</strong>，它的官方网址与基本介绍来自于以下几个网站：</p>
+<ol>
+<li>Github：<a target="_blank" rel="noopener" href="https://github.com/facebook/prophet">https://github.com/facebook/prophet</a></li>
+<li>官方网址：<a target="_blank" rel="noopener" href="https://facebook.github.io/prophet/">https://facebook.github.io/prophet/</a></li>
+<li>论文名字与网址：Forecasting at scale，<a target="_blank" rel="noopener" href="https://peerj.com/preprints/3190/">https://peerj.com/preprints/3190/</a></li>
+</ol>
+<p>从官网的介绍来看，Facebook 所提供的 prophet 算法不仅可以处理时间序列存在一些异常值的情况，也可以处理部分缺失值的情形，还能够几乎全自动地预测时间序列未来的走势。从论文上的描述来看，这个 prophet 算法是基于时间序列分解和机器学习的拟合来做的，其中在拟合模型的时候使用了 pyStan 这个开源工具，因此能够在较快的时间内得到需要预测的结果。除此之外，为了方便统计学家，机器学习从业者等人群的使用，prophet 同时提供了 R 语言和 Python 语言的接口。从整体的介绍来看，如果是一般的商业分析或者数据分析的需求，都可以尝试使用这个开源算法来预测未来时间序列的走势。</p>
+<h1 id="Prophet的算法原理"><a href="#Prophet的算法原理" class="headerlink" title="Prophet的算法原理"></a>Prophet的算法原理</h1><h2 id="Prophet数据的输入和输出"><a href="#Prophet数据的输入和输出" class="headerlink" title="Prophet数据的输入和输出"></a>Prophet数据的输入和输出</h2><p><img src="http://image.rexking6.top/img/clip1547273742.png" alt=""></p>
+<p>首先让我们来看一个常见的时间序列场景，黑色表示原始的时间序列离散点，深蓝色的线表示使用时间序列来拟合所得到的取值，而浅蓝色的线表示时间序列的一个置信区间，也就是所谓的合理的上界和下界。prophet 所做的事情就是：</p>
+<ol>
+<li>输入已知的时间序列的时间戳和相应的值；</li>
+<li>输入需要预测的时间序列的长度；</li>
+<li>输出未来的时间序列走势。</li>
+<li>输出结果可以提供必要的统计指标，包括拟合曲线，上界和下界等。</li>
+</ol>
+<p>就一般情况而言，时间序列的离线存储格式为时间戳和值这种格式，更多的话可以提供时间序列的 ID，标签等内容。因此，离线存储的时间序列通常都是以下的形式。其中 date 指的是具体的时间戳，category 指的是某条特定的时间序列 id，value 指的是在 date 下这个 category 时间序列的取值，label 指的是人工标记的标签（<code>&#39;0&#39;</code> 表示异常，<code>&#39;1&#39;</code> 表示正常，<code>&#39;unknow&#39;</code>表示没有标记或者人工判断不清）。</p>
+<p><img src="http://image.rexking6.top/img/clip1547273810.png" alt=""></p>
+<p>而 fbprophet 所需要的时间序列也是这种格式的，根据官网的描述，只要用 csv 文件存储两列即可，第一列的名字是 <code>&#39;ds&#39;</code>, 第二列的名称是 <code>&#39;y&#39;</code>。第一列表示时间序列的时间戳，第二列表示时间序列的取值。通过 prophet 的计算，可以计算出 yhat，yhat_lower，yhat_upper，分别表示时间序列的预测值，预测值的下界，预测值的上界。两份表格如下面的两幅图表示。</p>
+<p><img src="http://image.rexking6.top/img/clip1547273844.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1547273850.png" alt=""></p>
+<h2 id="Prophet的算法实现"><a href="#Prophet的算法实现" class="headerlink" title="Prophet的算法实现"></a>Prophet的算法实现</h2><p>在时间序列分析领域，有一种常见的分析方法叫做时间序列的分解（Decomposition of Time Series），它把时间序列 $y_{t}$ 分成几个部分，分别是季节项 $S_{t}$，趋势项 $T_{t}$，剩余项 $R_{t}$。也就是说对所有的 $t\geq 0$，都有</p>
+<script type="math/tex; mode=display">
+y_{t} = S_{t} + T_{t} + R_{t}.</script><p>除了加法的形式，还有乘法的形式，也就是：</p>
+<script type="math/tex; mode=display">
+y_{t} = S_{t} \times T_{t} \times R_{t}.</script><p>以上式子等价于 $\ln y_{t} = \ln S_{t} + \ln T_{t} + \ln R_{t}$。所以，有的时候在预测模型的时候，会先取对数，然后再进行时间序列的分解，就能得到乘法的形式。在 fbprophet 算法中，作者们基于这种方法进行了必要的改进和优化。</p>
+<p>一般来说，在实际生活和生产环节中，除了季节项，趋势项，剩余项之外，通常还有节假日的效应。所以，在 prophet 算法里面，作者同时考虑了以上四项，也就是：</p>
+<script type="math/tex; mode=display">
+y(t) = g(t) + s(t) + h(t) + \epsilon_{t}.</script><p>其中 $g(t)$ 表示趋势项，它表示时间序列在非周期上面的变化趋势；$s(t)$ 表示周期项，或者称为季节项，一般来说是以周或者年为单位；$h(t)$ 表示节假日项，表示在当天是否存在节假日；$\epsilon_{t}$ 表示误差项或者称为剩余项。Prophet 算法就是通过拟合这几项，然后最后把它们累加起来就得到了时间序列的预测值。</p>
+<h3 id="趋势项模型-g-t"><a href="#趋势项模型-g-t" class="headerlink" title="趋势项模型$g(t)$"></a>趋势项模型$g(t)$</h3><p>在 Prophet 算法里面，趋势项有两个重要的函数，一个是基于逻辑回归函数（logistic function）的，另一个是基于分段线性函数（piecewise linear function）的。</p>
+<h4 id="逻辑回归函数"><a href="#逻辑回归函数" class="headerlink" title="逻辑回归函数"></a>逻辑回归函数</h4><p>首先，我们来介绍一下基于逻辑回归的趋势项是怎么做的。</p>
+<p>如果回顾逻辑回归函数的话，一般都会想起这样的形式：$\sigma(x) = 1/(1+e^{-x})$  ，它的导数是 $\sigma’(x) = \sigma(x) \cdot(1-\sigma(x))$ ，并且 $\lim_{x\rightarrow +\infty} \sigma(x) = 1$，$\lim_{x\rightarrow -\infty} \sigma(x) = 0$ 。如果增加一些参数的话，那么逻辑回归就可以改写成：</p>
+<script type="math/tex; mode=display">
+f(x) = C / (1 + e^{-k(x-m)})</script><p>这里的 $C$ 称为曲线的最大渐近值，$k$ 表示曲线的增长率，$m$ 表示曲线的中点。当 $C=1, k = 1, m =0$ 时，恰好就是大家常见的 sigmoid 函数的形式。从 sigmoid 的函数表达式来看，它满足以下的微分方程：$y’=y(1-y)$。</p>
+<p>那么，如果使用分离变量法来求解微分方程 $y’=y(1-y)$ 就可以得到：</p>
+<script type="math/tex; mode=display">
+\frac{y'}{y} + \frac{y'}{1-y} = 1 \Rightarrow \ln\frac{y}{1-y} = 1 \Rightarrow y = 1/(1+K e^{-x})</script><p>但是在现实环境中，函数 $f(x) = C / (1+e^{-k(x-m)})$ 的三个参数 $C, k, m$ 不可能都是常数，而很有可能是随着时间的迁移而变化的，因此，在 Prophet 里面，作者考虑把这三个参数全部换成了随着时间而变化的函数，也就是 $C = C(t), k = k(t), m = m(t)$。</p>
+<p>除此之外，在现实的时间序列中，曲线的走势肯定不会一直保持不变，在某些特定的时候或者有着某种潜在的周期曲线会发生变化，这种时候，就有学者会去研究变点检测，也就是所谓 change point detection。例如下面的这幅图的 $t_{1}^{<em>}, t_{2}^{</em>}$ 就是时间序列的两个变点。</p>
+<p><img src="http://image.rexking6.top/img/clip1547274646.png" alt=""></p>
+<p>在 Prophet 里面，是需要设置变点的位置的，而每一段的趋势和走势也是会根据变点的情况而改变的。</p>
+<p>在程序里面有两种方法，一种是通过人工指定的方式指定变点的位置；另外一种是通过算法来自动选择。在默认的函数里面，Prophet 会选择 <code>n_changepoints</code> = 25 个变点，然后设置变点的范围是前 80%（changepoint_range），也就是在时间序列的前 80% 的区间内会设置变点。通过 <code>forecaster.py</code> 里面的 <code>set_changepoints</code> 函数可以知道，首先要看一些边界条件是否合理，例如时间序列的点数是否少于 <code>n_changepoints</code> 等内容；其次如果边界条件符合，那变点的位置就是均匀分布的，这一点可以通过 <code>np.linspace</code> 这个函数看出来。</p>
+<p>下面假设已经放置了 $S$ 个变点了，并且变点的位置是在时间戳 $s_{j}, 1\leq j\leq S$ 上，那么在这些时间戳上，我们就需要给出增长率的变化，也就是在时间戳 $s_{j}$ 上发生的 change in rate。可以假设有这样一个向量：$\boldsymbol{\delta}\in\mathbb{R}^{S}$ 。其中，$\delta_{j}$ 表示在时间戳 $s_{j}$ 上的增长率的变化量。如果一开始的增长率我们使用 $k$ 来代替的话，那么在时间戳 $t$ 上的增长率就是 $k + \sum_{j:t&gt;s_{j}} \delta_{j}$，通过一个指示函数 $\mathbf{a}(t)\in \{0,1\}^{S}$ 就是</p>
+<script type="math/tex; mode=display">
+a_{j}(t) = \begin{cases} 1, \text{ if } t\geq s_{j},\\ 0, \text{ otherwise.} \end{cases}</script><p>那么在时间戳 $t$ 上面的增长率就是 $k + \mathbf{a}^{T}\boldsymbol{\delta}$ 。一旦变化量 $k$ 确定了，另外一个参数 $m$ 也要随之确定。在这里需要把线段的边界处理好，因此通过数学计算可以得到：</p>
+<script type="math/tex; mode=display">
+\gamma_{j} = \bigg(s_{j} - m - \sum_{\ell <j} \gamma_{\ell} \bigg) \cdot \bigg( 1- \frac{k + \sum_{\ell < j} \delta_{\ell}}{k + \sum_{\ell\leq j}\delta_{\ell}} \bigg).</script><p>所以，分段的逻辑回归增长模型就是：</p>
+<script type="math/tex; mode=display">
+g(t) = \frac{C(t)}{1+exp(-(k+\boldsymbol{a}(t)^{t}\boldsymbol{\delta}) \cdot (t - (m+\boldsymbol{a}(t)^{T}\boldsymbol{\gamma})},</script><p>其中，</p>
+<script type="math/tex; mode=display">
+\boldsymbol{a}(t) = (a_{1}(t),\cdots,a_{S}(t))^{T},  \boldsymbol{\delta} = (\delta_{1},\cdots,\delta_{S})^{T}, \boldsymbol{\gamma} = (\gamma_{1},\cdots,\gamma_{S})^{T}.</script><p>在逻辑回归函数里面，有一个参数是需要提前设置的，那就是 <code>Capacity</code>，也就是所谓的 $C(t)$，在使用 Prophet 的 <code>growth = &#39;logistic&#39;</code> 的时候，需要提前设置好 $C(t)$ 的取值才行。</p>
+<h4 id="分段线性函数"><a href="#分段线性函数" class="headerlink" title="分段线性函数"></a>分段线性函数</h4><p>再次，我们来介绍一下基于分段线性函数的趋势项是怎么做的。众所周知，线性函数指的是 $y=kx+b$，而分段线性函数指的是在每一个子区间上，函数都是线性函数，但是在整段区间上，函数并不完全是线性的。正如下图所示，分段线性函数就是一个折线的形状。</p>
+<p><img src="http://image.rexking6.top/img/clip1547275754.png" alt=""></p>
+<p>因此，基于分段线性函数的模型形如：</p>
+<script type="math/tex; mode=display">
+g(t)=(k+\boldsymbol{a}(t)\boldsymbol{\delta})\cdot t+(m+\boldsymbol{a}(t)^{T}\boldsymbol{\gamma}),</script><p>其中 $k$ 表示增长率（growth rate），$\boldsymbol{\delta}$  表示增长率的变化量，$m$ 表示 offset parameter。而这两种方法（分段线性函数与逻辑回归函数）最大的区别就是 $\boldsymbol{\gamma}$  的设置不一样，在分段线性函数中，$\boldsymbol{\gamma}=(\gamma_{1},\cdots,\gamma_{S})^{T}$，$\gamma_{j}=-s_{j}\delta_{j}$。注意：这与之前逻辑回归函数中的设置是不一样的。</p>
+<p>在 prophet 的源代码中，<code>forecast.py</code> 这个函数里面包含了最关键的步骤，其中 <code>piecewise_logistic</code> 函数表示了前面所说的基于逻辑回归的增长函数，它的输入包含了 <code>cap</code> 这个指标，因此需要用户事先指定 <code>capacity</code>。而在 <code>piecewise_linear</code> 这个函数中，是不需要 <code>capacity</code> 这个指标的，因此 <code>m = Prophet()</code> 这个函数默认的使用 <code>growth = &#39;linear&#39;</code> 这个增长函数，也可以写作 <code>m = Prophet(growth = &#39;linear&#39;)</code>；如果想用 <code>growth = &#39;logistic&#39;</code>，就要这样写：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">m = Prophet(growth=<span class="string">&#x27;logistic&#x27;</span>)</span><br><span class="line">df[<span class="string">&#x27;cap&#x27;</span>] = <span class="number">6</span></span><br><span class="line">m.fit(df)</span><br><span class="line">future = m.make_future_dataframe(periods=prediction_length, freq=<span class="string">&#x27;min&#x27;</span>)</span><br><span class="line">future[<span class="string">&#x27;cap&#x27;</span>] = <span class="number">6</span></span><br></pre></td></tr></table></figure>
+<h4 id="变点的选择（Changepoint-Selection）"><a href="#变点的选择（Changepoint-Selection）" class="headerlink" title="变点的选择（Changepoint Selection）"></a>变点的选择（Changepoint Selection）</h4><p>在介绍变点之前，先要介绍一下 Laplace 分布，它的概率密度函数为：</p>
+<script type="math/tex; mode=display">
+f(x|\mu, b) = \text{exp}\bigg(-|x-\mu|/b\bigg)/2b,</script><p>其中 $\mu$ 表示位置参数，$b&gt;0$ 表示尺度参数。Laplace 分布与正态分布有一定的差异。</p>
+<p>在 Prophet 算法中，是需要给出变点的位置，个数，以及增长的变化率的。因此，有三个比较重要的指标，那就是</p>
+<ol>
+<li><code>changepoint_range</code></li>
+<li><code>n_changepoint</code></li>
+<li><code>changepoint_prior_scale</code></li>
+</ol>
+<p><code>changepoint_range</code> 指的是百分比，需要在前 <code>changepoint_range</code> 那么长的时间序列中设置变点，在默认的函数中是 <code>changepoint_range = 0.8</code>。<code>n_changepoint</code> 表示变点的个数，在默认的函数中是 <code>n_changepoint = 25</code>。<code>changepoint_prior_scale</code> 表示变点增长率的分布情况，在论文中， $\delta_{j} \sim Laplace(0,\tau)$，这里的 $\tau$ 就是 <code>change_point_scale</code>。</p>
+<p>在整个开源框架里面，在默认的场景下，变点的选择是基于时间序列的前 80% 的历史数据，然后通过等分的方法找到 25 个变点（change points），而变点的增长率是满足 Laplace 分布 $\delta_{j} \sim Laplace (0,0.05)$ 的。因此，当 $\tau$ 趋近于零的时候，$\delta_{j}$ 也是趋向于零的，此时的增长函数将变成全段的逻辑回归函数或者线性函数。这一点从 $g(t)$ 的定义可以轻易地看出。</p>
+<h4 id="对未来的预估（Trend-Forecast-Uncertainty）"><a href="#对未来的预估（Trend-Forecast-Uncertainty）" class="headerlink" title="对未来的预估（Trend Forecast Uncertainty）"></a>对未来的预估（Trend Forecast Uncertainty）</h4><p>从历史上长度为 $T$ 的数据中，我们可以选择出 $S$ 个变点，它们所对应的增长率的变化量是 $\delta_{j} \sim Laplace(0,\tau)$。此时我们需要预测未来，因此也需要设置相应的变点的位置，从代码中看，在 <code>forecaster.py</code> 的 <code>sample_predictive_trend</code> 函数中，通过 Poisson 分布等概率分布方法找到新增的 <code>changepoint_ts_new</code> 的位置，然后与 <code>changepoint_t</code> 拼接在一起就得到了整段序列的 <code>changepoint_ts</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">changepoint_ts_new = <span class="number">1</span> + np.random.rand(n_changes) * (T - <span class="number">1</span>)</span><br><span class="line">changepoint_ts = np.concatenate((self.changepoints_t, changepoint_ts_new))</span><br></pre></td></tr></table></figure>
+<p>第一行代码的 1 保证了 <code>changepoint_ts_new</code> 里面的元素都大于 <code>change_ts</code> 里面的元素。除了变点的位置之外，也需要考虑 $\delta$ 的情况。这里令 $\lambda = \sum_{j=1}^{S}|\delta_{j}|/S$，于是新的增长率的变化量就是按照下面的规则来选择的：当 $j&gt;T$ 时，</p>
+<script type="math/tex; mode=display">
+\delta_{j}=\begin{cases} 0,  &&\text{with probability } (T-S)/T \\ \sim Laplace(0,\lambda),  &&\text{with probability } S/T \end{cases}</script><h3 id="季节性趋势"><a href="#季节性趋势" class="headerlink" title="季节性趋势"></a>季节性趋势</h3><p>几乎所有的时间序列预测模型都会考虑这个因素，因为时间序列通常会随着天，周，月，年等季节性的变化而呈现季节性的变化，也称为周期性的变化。对于周期函数而言，大家能够马上联想到的就是正弦余弦函数。而在数学分析中，区间内的周期性函数是可以通过正弦和余弦的函数来表示的：假设 $f(x)$ 是以 $2\pi$ 为周期的函数，那么它的傅立叶级数就是 $a_{0} + \sum_{n=1}^{\infty}(a_{n}\cos(nx) + b_{n}\sin(nx))$。</p>
+<p>在论文中，作者使用傅立叶级数来模拟时间序列的周期性。假设 $P$ 表示时间序列的周期，$P = 365.25$ 表示以年为周期，$P = 7$ 表示以周为周期。它的傅立叶级数的形式都是：</p>
+<script type="math/tex; mode=display">
+s(t) = \sum_{n=1}^{N}\bigg( a_{n}\cos\bigg(\frac{2\pi n t}{P}\bigg) + b_{n}\sin\bigg(\frac{2\pi n t}{P}\bigg)\bigg)</script><p>就作者的经验而言，对于以年为周期的序列（$P = 365.25$）而言，$N = 10$；对于以周为周期的序列（$P = 7$）而言，$N = 3$。这里的参数可以形成列向量：</p>
+<script type="math/tex; mode=display">
+\boldsymbol{\beta} = (a_{1},b_{1},\cdots,a_{N},b_{N})^{T}</script><p>当 $N = 10$ 时，</p>
+<script type="math/tex; mode=display">
+X(t) = \bigg[\cos(\frac{2\pi(1)t}{365.25}),\cdots,\sin(\frac{2\pi(10)t}{365.25})\bigg]</script><p>当 $N = 3$ 时，</p>
+<script type="math/tex; mode=display">
+X(t) = \bigg[\cos(\frac{2\pi(1)t}{7}),\cdots,\sin(\frac{2\pi(3)t}{7})\bigg]</script><p>因此，时间序列的季节项就是：$s(t) = X(t) \boldsymbol{\beta}$ ，而 $\boldsymbol{\beta}$ 的初始化是 $\boldsymbol{\beta} \sim Normal(0,\sigma^{2})$。这里的 $\sigma$ 是通过 <code>seasonality_prior_scale</code> 来控制的，也就是说 $\sigma=$ <code>seasonality_prior_scale</code>。这个值越大，表示季节的效应越明显；这个值越小，表示季节的效应越不明显。同时，在代码里面，<code>seasonality_mode</code> 也对应着两种模式，分别是加法和乘法，默认是加法的形式。在开源代码中，$X(t)$ 函数是通过傅立叶序列来构建的。</p>
+<h3 id="节假日效应（holidays-and-events）"><a href="#节假日效应（holidays-and-events）" class="headerlink" title="节假日效应（holidays and events）"></a>节假日效应（holidays and events）</h3><p>在现实环境中，除了周末，同样有很多节假日，而且不同的国家有着不同的假期。在 Prophet 里面，通过维基百科里面对各个国家的节假日的描述，<code>hdays.py</code> 收集了各个国家的特殊节假日。除了节假日之外，用户还可以根据自身的情况来设置必要的假期，例如 The Super Bowl，双十一等。</p>
+<p><img src="http://image.rexking6.top/img/clip1547278205.png" alt=""></p>
+<p>由于每个节假日对时间序列的影响程度不一样，例如春节，国庆节则是七天的假期，对于劳动节等假期来说则假日较短。因此，不同的节假日可以看成相互独立的模型，并且可以为不同的节假日设置不同的前后窗口值，表示该节假日会影响前后一段时间的时间序列。用数学语言来说，对与第 $i$ 个节假日来说，$D_{i}$ 表示该节假日的前后一段时间。为了表示节假日效应，我们需要一个相应的指示函数（indicator function），同时需要一个参数 $\kappa_{i}$ 来表示节假日的影响范围。假设我们有 $L$ 个节假日，那么</p>
+<script type="math/tex; mode=display">
+h(t)=Z(t) \boldsymbol{\kappa}=\sum_{i=1}^{L} \kappa_{i}\cdot 1_{ \{t\in D_{i} \}},</script><p>其中 $Z(t)=(1_{ \{t\in D_{1} \}},\cdots,1_{ \{t\in D_{L} \}})$ 和 $\boldsymbol{\kappa}=(\kappa_{1},\cdots,\kappa_{L})^{T}$。</p>
+<p>其中 $\boldsymbol{\kappa}\sim Normal(0,v^{2})$ 并且该正态分布是受到 $v =$ <code>holidays_prior_scale</code> 这个指标影响的。默认值是 10，当值越大时，表示节假日对模型的影响越大；当值越小时，表示节假日对模型的效果越小。用户可以根据自己的情况自行调整。</p>
+<h3 id="模型拟合（Model-Fitting）"><a href="#模型拟合（Model-Fitting）" class="headerlink" title="模型拟合（Model Fitting）"></a>模型拟合（Model Fitting）</h3><p>按照以上的解释，我们的时间序列已经可以通过增长项，季节项，节假日项来构建了，即</p>
+<script type="math/tex; mode=display">
+y(t)=g(t)+s(t)+h(t)+\epsilon</script><p>下一步我们只需要拟合函数就可以了，在 Prophet 里面，作者使用了 pyStan 这个开源工具中的 L-BFGS 方法来进行函数的拟合。具体可以参考 <code>forecast.py</code> 里面的 <code>stan_init</code> 函数。</p>
+<h2 id="Prophet-中可以设置的参数"><a href="#Prophet-中可以设置的参数" class="headerlink" title="Prophet 中可以设置的参数"></a>Prophet 中可以设置的参数</h2><p>在 Prophet 中，用户一般可以设置以下四种参数：</p>
+<ol>
+<li><code>Capacity</code>：在增量函数是逻辑回归函数的时候，需要设置的容量值。</li>
+<li><code>Change Points</code>：可以通过 <code>n_changepoints</code> 和 <code>changepoint_range</code> 来进行等距的变点设置，也可以通过人工设置的方式来指定时间序列的变点。</li>
+<li>季节性和节假日：可以根据实际的业务需求来指定相应的节假日。</li>
+<li>光滑参数：$\tau=$ <code>changepoint_prior_scale</code> 可以用来控制趋势的灵活度，$\sigma=$ <code>seasonality_prior_scale</code> 用来控制季节项的灵活度，$v=$ <code>holidays prior scale</code> 用来控制节假日的灵活度。</li>
+</ol>
+<p>如果不想设置的话，使用 Prophet 默认的参数即可。</p>
+<h1 id="Prophet-的实际使用"><a href="#Prophet-的实际使用" class="headerlink" title="Prophet 的实际使用"></a>Prophet 的实际使用</h1><h2 id="Prophet-的简单使用"><a href="#Prophet-的简单使用" class="headerlink" title="Prophet 的简单使用"></a>Prophet 的简单使用</h2><p>因为 Prophet 所需要的两列名称是 <code>&#39;ds&#39;</code> 和 <code>&#39;y&#39;</code>，其中，<code>&#39;ds&#39;</code> 表示时间戳，<code>&#39;y&#39;</code> 表示时间序列的值，因此通常来说都需要修改 <code>pd.dataframe</code> 的列名字。如果原来的两列名字是 <code>&#39;timestamp&#39;</code> 和 <code>&#39;value&#39;</code> 的话，只需要这样写：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df = df.rename(columns=&#123;<span class="string">&#x27;timestamp&#x27;</span>:<span class="string">&#x27;ds&#x27;</span>, <span class="string">&#x27;value&#x27;</span>:<span class="string">&#x27;y&#x27;</span>&#125;)</span><br></pre></td></tr></table></figure>
+<p>如果 <code>&#39;timestamp&#39;</code> 是使用 <code>unixtime</code> 来记录的，需要修改成 <code>YYYY-MM-DD hh:mm:ss</code> 的形式：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df[<span class="string">&#x27;ds&#x27;</span>] = pd.to_datetime(df[<span class="string">&#x27;ds&#x27;</span>],unit=<span class="string">&#x27;s&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>在一般情况下，时间序列需要进行归一化的操作，而 <code>pd.dataframe</code> 的归一化操作也十分简单：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df[<span class="string">&#x27;y&#x27;</span>] = (df[<span class="string">&#x27;y&#x27;</span>] - df[<span class="string">&#x27;y&#x27;</span>].mean()) / (df[<span class="string">&#x27;y&#x27;</span>].std())</span><br></pre></td></tr></table></figure>
+<p>然后就可以初始化模型，然后拟合模型，并且进行时间序列的预测了。</p>
+<ul>
+<li><p>初始化模型：<code>m = Prophet()</code></p>
+</li>
+<li><p>拟合模型：<code>m.fit(df)</code></p>
+</li>
+<li><p>计算预测值：<code>periods</code> 表示需要预测的点数，<code>freq</code> 表示时间序列的频率。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">future = m.make_future_dataframe(periods=<span class="number">30</span>, freq=<span class="string">&#x27;min&#x27;</span>)</span><br><span class="line">future.tail()</span><br><span class="line">forecast = m.predict(future)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>而 <code>freq</code> 指的是 <code>pd.dataframe</code> 里面的一个指标，<code>&#39;min&#39;</code> 表示按分钟来收集的时间序列。具体参见文档：<a target="_blank" rel="noopener" href="http://pandas.pydata.org/pandas-docs/stable/timeseries.html#offset-aliases。">http://pandas.pydata.org/pandas-docs/stable/timeseries.html#offset-aliases。</a></p>
+<p><img src="http://image.rexking6.top/img/clip1547278927.png" alt=""></p>
+<p>在进行了预测操作之后，通常都希望把时间序列的预测趋势画出来：</p>
+<ul>
+<li><p>画出预测图：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">m.plot(forecast)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>画出时间序列的分量：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">m.plot_components(forecast)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1547278993.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1547279003.png" alt=""></p>
+<p>如果要画出更详细的指标，例如中间线，上下界，那么可以这样写：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">x1 = forecast[<span class="string">&#x27;ds&#x27;</span>]</span><br><span class="line">y1 = forecast[<span class="string">&#x27;yhat&#x27;</span>]</span><br><span class="line">y2 = forecast[<span class="string">&#x27;yhat_lower&#x27;</span>]</span><br><span class="line">y3 = forecast[<span class="string">&#x27;yhat_upper&#x27;</span>]</span><br><span class="line">plt.plot(x1,y1)</span><br><span class="line">plt.plot(x1,y2)</span><br><span class="line">plt.plot(x1,y3)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<p><img src="http://image.rexking6.top/img/clip1547279031.png" alt=""></p>
+<p>其实 Prophet 预测的结果都放在了变量 forecast 里面，打印结果的话可以这样写：第一行是打印所有时间戳的预测结果，第二行是打印最后五个时间戳的预测结果。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(forecast[[<span class="string">&#x27;ds&#x27;</span>, <span class="string">&#x27;yhat&#x27;</span>, <span class="string">&#x27;yhat_lower&#x27;</span>, <span class="string">&#x27;yhat_upper&#x27;</span>]])</span><br><span class="line"><span class="built_in">print</span>(forecast[[<span class="string">&#x27;ds&#x27;</span>, <span class="string">&#x27;yhat&#x27;</span>, <span class="string">&#x27;yhat_lower&#x27;</span>, <span class="string">&#x27;yhat_upper&#x27;</span>]].tail())</span><br></pre></td></tr></table></figure>
+<h2 id="Prophet-的参数设置"><a href="#Prophet-的参数设置" class="headerlink" title="Prophet 的参数设置"></a>Prophet 的参数设置</h2><p>Prophet 的默认参数可以在 <code>forecaster.py</code> 中看到：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params"></span></span></span><br><span class="line"><span class="params"><span class="function">    self,</span></span></span><br><span class="line"><span class="params"><span class="function">    growth=<span class="string">&#x27;linear&#x27;</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    changepoints=<span class="literal">None</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    n_changepoints=<span class="number">25</span>, </span></span></span><br><span class="line"><span class="params"><span class="function">    changepoint_range=<span class="number">0.8</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    yearly_seasonality=<span class="string">&#x27;auto&#x27;</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    weekly_seasonality=<span class="string">&#x27;auto&#x27;</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    daily_seasonality=<span class="string">&#x27;auto&#x27;</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    holidays=<span class="literal">None</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    seasonality_mode=<span class="string">&#x27;additive&#x27;</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    seasonality_prior_scale=<span class="number">10.0</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    holidays_prior_scale=<span class="number">10.0</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    changepoint_prior_scale=<span class="number">0.05</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    mcmc_samples=<span class="number">0</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    interval_width=<span class="number">0.80</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">    uncertainty_samples=<span class="number">1000</span>,</span></span></span><br><span class="line"><span class="params"><span class="function"></span>):</span></span><br></pre></td></tr></table></figure>
+<h2 id="增长函数的设置"><a href="#增长函数的设置" class="headerlink" title="增长函数的设置"></a>增长函数的设置</h2><p>在 Prophet 里面，有两个增长函数，分别是分段线性函数（linear）和逻辑回归函数（logistic）。而 <code>m = Prophet()</code> 默认使用的是分段线性函数（linear），并且如果要是用逻辑回归函数的时候，需要设置 <code>capacity</code> 的值，i.e. <code>df[‘cap’] = 100</code>，否则会出错。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">m = Prophet()</span><br><span class="line">m = Prophet(growth=<span class="string">&#x27;linear&#x27;</span>)</span><br><span class="line">m = Prophet(growth=<span class="string">&#x27;logistic&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="变点的设置"><a href="#变点的设置" class="headerlink" title="变点的设置"></a>变点的设置</h2><p>在 Prophet 里面，变点默认的选择方法是前 80% 的点中等距选择 25 个点作为变点，也可以通过以下方法来自行设置变点，甚至可以人为设置某些点。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">m = Prophet(n_changepoints=<span class="number">25</span>)</span><br><span class="line">m = Prophet(changepoint_range=<span class="number">0.8</span>)</span><br><span class="line">m = Prophet(changepoint_prior_scale=<span class="number">0.05</span>)</span><br><span class="line">m = Prophet(changepoints=[<span class="string">&#x27;2014-01-01&#x27;</span>])</span><br></pre></td></tr></table></figure>
+<p>而变点的作图可以使用：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> fbprophet.plot <span class="keyword">import</span> add_changepoints_to_plot</span><br><span class="line">fig = m.plot(forecast)</span><br><span class="line">a = add_changepoints_to_plot(fig.gca(), m, forecast)</span><br></pre></td></tr></table></figure>
+<p><img src="http://image.rexking6.top/img/clip1547279521.png" alt=""></p>
+<h2 id="周期性的设置"><a href="#周期性的设置" class="headerlink" title="周期性的设置"></a>周期性的设置</h2><p>通常来说，可以在 Prophet 里面设置周期性，无论是按月还是周其实都是可以设置的，例如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">m = Prophet(weekly_seasonality=<span class="literal">False</span>)</span><br><span class="line">m.add_seasonality(name=<span class="string">&#x27;monthly&#x27;</span>, period=<span class="number">30.5</span>, fourier_order=<span class="number">5</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">m = Prophet(weekly_seasonality=<span class="literal">True</span>)</span><br><span class="line">m.add_seasonality(name=<span class="string">&#x27;weekly&#x27;</span>, period=<span class="number">7</span>, fourier_order=<span class="number">3</span>, prior_scale=<span class="number">0.1</span>)</span><br></pre></td></tr></table></figure>
+<p><img src="http://image.rexking6.top/img/clip1547279737.png" alt=""></p>
+<h2 id="节假日的设置"><a href="#节假日的设置" class="headerlink" title="节假日的设置"></a>节假日的设置</h2><p>有的时候，由于双十一或者一些特殊节假日，我们可以设置某些天数是节假日，并且设置它的前后影响范围，也就是 <code>lower_window</code> 和 <code>upper_window</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">playoffs = pd.DataFrame(&#123;</span><br><span class="line">  <span class="string">&#x27;holiday&#x27;</span>: <span class="string">&#x27;playoff&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;ds&#x27;</span>: pd.to_datetime([<span class="string">&#x27;2008-01-13&#x27;</span>, <span class="string">&#x27;2009-01-03&#x27;</span>, <span class="string">&#x27;2010-01-16&#x27;</span>,</span><br><span class="line">                        <span class="string">&#x27;2010-01-24&#x27;</span>, <span class="string">&#x27;2010-02-07&#x27;</span>, <span class="string">&#x27;2011-01-08&#x27;</span>,</span><br><span class="line">                        <span class="string">&#x27;2013-01-12&#x27;</span>, <span class="string">&#x27;2014-01-12&#x27;</span>, <span class="string">&#x27;2014-01-19&#x27;</span>,</span><br><span class="line">                        <span class="string">&#x27;2014-02-02&#x27;</span>, <span class="string">&#x27;2015-01-11&#x27;</span>, <span class="string">&#x27;2016-01-17&#x27;</span>,</span><br><span class="line">                        <span class="string">&#x27;2016-01-24&#x27;</span>, <span class="string">&#x27;2016-02-07&#x27;</span>]),</span><br><span class="line">  <span class="string">&#x27;lower_window&#x27;</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">&#x27;upper_window&#x27;</span>: <span class="number">1</span>,</span><br><span class="line">&#125;)</span><br><span class="line">superbowls = pd.DataFrame(&#123;</span><br><span class="line">  <span class="string">&#x27;holiday&#x27;</span>: <span class="string">&#x27;superbowl&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;ds&#x27;</span>: pd.to_datetime([<span class="string">&#x27;2010-02-07&#x27;</span>, <span class="string">&#x27;2014-02-02&#x27;</span>, <span class="string">&#x27;2016-02-07&#x27;</span>]),</span><br><span class="line">  <span class="string">&#x27;lower_window&#x27;</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">&#x27;upper_window&#x27;</span>: <span class="number">1</span>,</span><br><span class="line">&#125;)</span><br><span class="line">holidays = pd.concat((playoffs, superbowls))</span><br><span class="line"></span><br><span class="line">m = Prophet(holidays=holidays, holidays_prior_scale=<span class="number">10.0</span>)</span><br></pre></td></tr></table></figure>
+<h1 id="结束语"><a href="#结束语" class="headerlink" title="结束语"></a>结束语</h1><p>对于商业分析等领域的时间序列，Prophet 可以进行很好的拟合和预测，但是对于一些周期性或者趋势性不是很强的时间序列，用 Prophet 可能就不合适了。但是，Prophet 提供了一种时序预测的方法，在用户不是很懂时间序列的前提下都可以使用这个工具得到一个能接受的结果。具体是否用 Prophet 则需要根据具体的时间序列来确定。</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ol>
+<li><a target="_blank" rel="noopener" href="https://otexts.org/fpp2/components.html">https://otexts.org/fpp2/components.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Decomposition_of_time_series">https://en.wikipedia.org/wiki/Decomposition_of_time_series</a></li>
+<li>A review of change point detection methods, CTruong, L. Oudre, N.Vayatis</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/facebook/prophet">https://github.com/facebook/prophet</a></li>
+<li><a target="_blank" rel="noopener" href="https://facebook.github.io/prophet/">https://facebook.github.io/prophet/</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\04\10\AIOps资料\" rel="bookmark">AIOps资料</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\02\17\《Time-series-Extreme-Event-Forecasting-with-Neural-Networks-at-Uber》笔记\" rel="bookmark">《Time-series Extreme Event Forecasting with Neural Networks at Uber》笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2020\12\29\时间序列分解\" rel="bookmark">时间序列分解</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2019/01/12/Facebook-%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B%E7%AE%97%E6%B3%95-Prophet-%E7%9A%84%E7%A0%94%E7%A9%B6/" title="Facebook 时间序列预测算法 Prophet 的研究">https://blog.rexking6.top/2019/01/12/Facebook-时间序列预测算法-Prophet-的研究/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AIOps/" rel="tag"># AIOps</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/01/06/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%99%BA%E8%83%BD%E3%80%8B%EF%BC%88%E4%BA%8C%EF%BC%89%E6%A6%82%E7%8E%87/" rel="prev" title="《计算智能》（二）概率">
+      <i class="fa fa-chevron-left"></i> 《计算智能》（二）概率
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/01/27/CMake-%E5%85%A5%E9%97%A8%E5%AE%9E%E6%88%98/" rel="next" title="CMake 入门实战">
+      CMake 入门实战 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Prophet%E7%AE%80%E4%BB%8B"><span class="nav-number">2.</span> <span class="nav-text">Prophet简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Prophet%E7%9A%84%E7%AE%97%E6%B3%95%E5%8E%9F%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">Prophet的算法原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Prophet%E6%95%B0%E6%8D%AE%E7%9A%84%E8%BE%93%E5%85%A5%E5%92%8C%E8%BE%93%E5%87%BA"><span class="nav-number">3.1.</span> <span class="nav-text">Prophet数据的输入和输出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Prophet%E7%9A%84%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.2.</span> <span class="nav-text">Prophet的算法实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B6%8B%E5%8A%BF%E9%A1%B9%E6%A8%A1%E5%9E%8B-g-t"><span class="nav-number">3.2.1.</span> <span class="nav-text">趋势项模型$g(t)$</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%BB%E8%BE%91%E5%9B%9E%E5%BD%92%E5%87%BD%E6%95%B0"><span class="nav-number">3.2.1.1.</span> <span class="nav-text">逻辑回归函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%86%E6%AE%B5%E7%BA%BF%E6%80%A7%E5%87%BD%E6%95%B0"><span class="nav-number">3.2.1.2.</span> <span class="nav-text">分段线性函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%98%E7%82%B9%E7%9A%84%E9%80%89%E6%8B%A9%EF%BC%88Changepoint-Selection%EF%BC%89"><span class="nav-number">3.2.1.3.</span> <span class="nav-text">变点的选择（Changepoint Selection）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E6%9C%AA%E6%9D%A5%E7%9A%84%E9%A2%84%E4%BC%B0%EF%BC%88Trend-Forecast-Uncertainty%EF%BC%89"><span class="nav-number">3.2.1.4.</span> <span class="nav-text">对未来的预估（Trend Forecast Uncertainty）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%A3%E8%8A%82%E6%80%A7%E8%B6%8B%E5%8A%BF"><span class="nav-number">3.2.2.</span> <span class="nav-text">季节性趋势</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8A%82%E5%81%87%E6%97%A5%E6%95%88%E5%BA%94%EF%BC%88holidays-and-events%EF%BC%89"><span class="nav-number">3.2.3.</span> <span class="nav-text">节假日效应（holidays and events）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E6%8B%9F%E5%90%88%EF%BC%88Model-Fitting%EF%BC%89"><span class="nav-number">3.2.4.</span> <span class="nav-text">模型拟合（Model Fitting）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Prophet-%E4%B8%AD%E5%8F%AF%E4%BB%A5%E8%AE%BE%E7%BD%AE%E7%9A%84%E5%8F%82%E6%95%B0"><span class="nav-number">3.3.</span> <span class="nav-text">Prophet 中可以设置的参数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Prophet-%E7%9A%84%E5%AE%9E%E9%99%85%E4%BD%BF%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">Prophet 的实际使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Prophet-%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8"><span class="nav-number">4.1.</span> <span class="nav-text">Prophet 的简单使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Prophet-%E7%9A%84%E5%8F%82%E6%95%B0%E8%AE%BE%E7%BD%AE"><span class="nav-number">4.2.</span> <span class="nav-text">Prophet 的参数设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A2%9E%E9%95%BF%E5%87%BD%E6%95%B0%E7%9A%84%E8%AE%BE%E7%BD%AE"><span class="nav-number">4.3.</span> <span class="nav-text">增长函数的设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E7%82%B9%E7%9A%84%E8%AE%BE%E7%BD%AE"><span class="nav-number">4.4.</span> <span class="nav-text">变点的设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%A8%E6%9C%9F%E6%80%A7%E7%9A%84%E8%AE%BE%E7%BD%AE"><span class="nav-number">4.5.</span> <span class="nav-text">周期性的设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8A%82%E5%81%87%E6%97%A5%E7%9A%84%E8%AE%BE%E7%BD%AE"><span class="nav-number">4.6.</span> <span class="nav-text">节假日的设置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E6%9D%9F%E8%AF%AD"><span class="nav-number">5.</span> <span class="nav-text">结束语</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">6.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

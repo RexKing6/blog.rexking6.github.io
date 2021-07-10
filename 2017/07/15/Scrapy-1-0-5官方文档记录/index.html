@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scrapy 1.0.5官方文档">
+<meta property="og:url" content="https://blog.rexking6.top/2017/07/15/Scrapy-1-0-5%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AE%B0%E5%BD%95/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-07-15T05:37:16.000Z">
+<meta property="article:modified_time" content="2019-03-06T09:15:25.901Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="爬虫">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.rexking6.top/2017/07/15/Scrapy-1-0-5%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AE%B0%E5%BD%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Scrapy 1.0.5官方文档 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2017/07/15/Scrapy-1-0-5%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AE%B0%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Scrapy 1.0.5官方文档
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-07-15 13:37:16" itemprop="dateCreated datePublished" datetime="2017-07-15T13:37:16+08:00">2017-07-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 17:15:25" itemprop="dateModified" datetime="2019-03-06T17:15:25+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%88%AC%E8%99%AB/" itemprop="url" rel="index"><span itemprop="name">爬虫</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2017/07/15/Scrapy-1-0-5%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AE%B0%E5%BD%95/" class="post-meta-item leancloud_visitors" data-flag-title="Scrapy 1.0.5官方文档" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>42k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>38 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>最近在ofashion的爬虫组实习，用的scrapy，重新阅读了下官方文档，作了些记录。</p>
+<h1 id="初始"><a href="#初始" class="headerlink" title="初始"></a>初始</h1><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p><code>pip install scrapy</code></p>
+<h2 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h2><p>在开始爬取之前，您必须创建一个新的Scrapy项目。 进入您打算存储代码的目录中，运行下列命令:<br><code>scrapy startproject tutorial</code><br>该命令将会创建包含下列内容的<code>tutorial</code>目录:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">tutorial/</span><br><span class="line">    scrapy.cfg</span><br><span class="line"></span><br><span class="line">    tutorial/</span><br><span class="line">        __init__.py</span><br><span class="line"></span><br><span class="line">        items.py</span><br><span class="line"></span><br><span class="line">        pipelines.py</span><br><span class="line"></span><br><span class="line">        settings.py</span><br><span class="line"></span><br><span class="line">        spiders/</span><br><span class="line">            __init__.py</span><br><span class="line">            ...</span><br></pre></td></tr></table></figure></p>
+<h2 id="Item"><a href="#Item" class="headerlink" title="Item"></a>Item</h2><p><em>Item</em> 是保存爬取到的数据的容器；其使用方法和python字典类似。虽然您也可以在Scrapy中直接使用dict，但是 Item 提供了额外保护机制来避免拼写错误导致的未定义字段错误。 另外也可以与<em>Item Loaders</em> 一起使用，一种帮助用户方便地填充项目的机制</p>
+<p>创建一个<code>scrapy.Item</code>类， 并且定义类型为<code>scrapy.Field</code>的类属性来定义一个Item。编辑<code>tutorial</code>目录中的<code>items.py</code>文件:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">import scrapy</span><br><span class="line"></span><br><span class="line">class DmozItem(scrapy.Item):</span><br><span class="line">    title = scrapy.Field()</span><br><span class="line">    link = scrapy.Field()</span><br><span class="line">    desc = scrapy.Field()</span><br></pre></td></tr></table></figure></p>
+<h2 id="编写第一个爬虫-Spider"><a href="#编写第一个爬虫-Spider" class="headerlink" title="编写第一个爬虫(Spider)"></a>编写第一个爬虫(Spider)</h2><p>Spider是用户编写用于从单个网站(或者一些网站)爬取数据的类。</p>
+<p>其包含了一个用于下载的初始URL，如何跟进网页中的链接以及如何分析页面中的内容， 提取生成 item 的方法。</p>
+<p>为了创建一个Spider，您必须继承<code>scrapy.Spider</code>类， 且定义一些属性:</p>
+<ul>
+<li><code>name</code>: 用于区别Spider。 该名字必须是唯一的，您不可以为不同的Spider设定相同的名字。</li>
+<li><code>start_urls</code>: 包含了Spider在启动时进行爬取的url列表。 因此，第一个被获取到的页面将是其中之一。 后续的URL则从初始的URL获取到的数据中提取。</li>
+<li><code>parse()</code> 是spider的一个方法。 被调用时，每个初始URL完成下载后生成的 <code>Response</code> 对象将会作为唯一的参数传递给该函数。 该方法负责解析返回的数据(response data)，提取数据(生成item)以及生成需要进一步处理的URL的 <code>Request</code> 对象。<br>以下为我们的第一个Spider代码，保存在 <code>tutorial/spiders</code> 目录下的 <code>dmoz_spider.py</code> 文件中:<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">import scrapy</span><br><span class="line"></span><br><span class="line">class DmozSpider(scrapy.Spider):</span><br><span class="line">    name = &quot;dmoz&quot;</span><br><span class="line">    allowed_domains = [&quot;dmoz.org&quot;]</span><br><span class="line">    start_urls = [</span><br><span class="line">        &quot;http://www.dmoz.org/Computers/Programming/Languages/Python/Books/&quot;,</span><br><span class="line">        &quot;http://www.dmoz.org/Computers/Programming/Languages/Python/Resources/&quot;</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line">    def parse(self, response):</span><br><span class="line">        filename = response.url.split(&quot;/&quot;)[-2] + &#x27;.html&#x27;</span><br><span class="line">        with open(filename, &#x27;wb&#x27;) as f:</span><br><span class="line">            f.write(response.body)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="爬取"><a href="#爬取" class="headerlink" title="爬取"></a>爬取</h2><p>进入项目的根目录，执行下列命令启动spider:<br><code>scrapy crawl dmoz</code></p>
+<p>Scrapy为Spider的 <code>start_urls</code> 属性中的每个URL创建了 <code>scrapy.Request</code> 对象，并将 <code>parse</code> 方法作为回调函数(callback)赋值给了Request。</p>
+<p>Request对象经过调度，执行生成 <code>scrapy.http.Response</code> 对象并送回给spider <code>parse()</code> 方法。</p>
+<h2 id="提取Item"><a href="#提取Item" class="headerlink" title="提取Item"></a>提取Item</h2><p>从网页中提取数据有很多方法。Scrapy使用了一种基于 XPath 和 CSS 表达式机制: Scrapy Selectors 。</p>
+<p>这里给出XPath表达式的例子及对应的含义:</p>
+<ul>
+<li><code>/html/head/title</code>: 选择HTML文档中 <code>&lt;head&gt;</code> 标签内的 <code>&lt;title&gt;</code> 元素</li>
+<li><code>/html/head/title/text()</code>: 选择上面提到的 <code>&lt;title&gt;</code> 元素的文字</li>
+<li><code>//td</code>: 选择所有的 <code>&lt;td&gt;</code> 元素</li>
+<li><code>//div[@class=&quot;mine&quot;]</code>: 选择所有具有 <code>class=&quot;mine&quot;</code> 属性的 <code>div</code> 元素</li>
+</ul>
+<p>Selector有四个基本的方法</p>
+<ul>
+<li><code>xpath()</code>: 传入xpath表达式，返回该表达式所对应的所有节点的selector list列表</li>
+<li><code>css()</code>: 传入CSS表达式，返回该表达式所对应的所有节点的selector list列表</li>
+<li><code>extract()</code>: 序列化该节点为unicode字符串并返回list</li>
+<li><code>re()</code>: 根据传入的正则表达式对数据进行提取，返回unicode字符串list列表。</li>
+</ul>
+<h2 id="scrapy-shell"><a href="#scrapy-shell" class="headerlink" title="scrapy shell"></a>scrapy shell</h2><p>进入项目的根目录，执行下列命令来启动shell:<br><code>scrapy shell &quot;http://www.dmoz.org/Computers/Programming/Languages/Python/Books/&quot;</code><br>进入shell，将得到一个<code>response</code>变量，并且拥有<code>selector</code>属性。</p>
+<h2 id="追踪链接-Following-links"><a href="#追踪链接-Following-links" class="headerlink" title="追踪链接(Following links)"></a>追踪链接(Following links)</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">import scrapy</span><br><span class="line"></span><br><span class="line">from tutorial.items import DmozItem</span><br><span class="line"></span><br><span class="line">class DmozSpider(scrapy.Spider):</span><br><span class="line">    name = &quot;dmoz&quot;</span><br><span class="line">    allowed_domains = [&quot;dmoz.org&quot;]</span><br><span class="line">    start_urls = [</span><br><span class="line">        &quot;http://www.dmoz.org/Computers/Programming/Languages/Python/&quot;,</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line">    def parse(self, response):</span><br><span class="line">        for href in response.css(&quot;ul.directory.dir-col &gt; li &gt; a::attr(&#x27;href&#x27;)&quot;):</span><br><span class="line">            url = response.urljoin(response.url, href.extract())</span><br><span class="line">            yield scrapy.Request(url, callback=self.parse_dir_contents)</span><br><span class="line"></span><br><span class="line">    def parse_dir_contents(self, response):</span><br><span class="line">        for sel in response.xpath(&#x27;//ul/li&#x27;):</span><br><span class="line">            item = DmozItem()</span><br><span class="line">            item[&#x27;title&#x27;] = sel.xpath(&#x27;a/text()&#x27;).extract()</span><br><span class="line">            item[&#x27;link&#x27;] = sel.xpath(&#x27;a/@href&#x27;).extract()</span><br><span class="line">            item[&#x27;desc&#x27;] = sel.xpath(&#x27;text()&#x27;).extract()</span><br><span class="line">            yield item</span><br></pre></td></tr></table></figure>
+<p>现在， <code>parse()</code> 仅仅从页面中提取我们感兴趣的链接，使用 <code>response.urljoin</code> 方法构造一个绝对路径的URL(页面上的链接都是相对路径的)， 产生(yield)一个请求， 该请求使用 <code>parse_dir_contents()</code> 方法作为回调函数, 用于最终产生我们想要的数据.。</p>
+<p>这里展现的即是Scrapy的追踪链接的机制: 当您在回调函数中yield一个Request后, Scrapy将会调度,发送该请求,并且在该请求完成时,调用所注册的回调函数。</p>
+<h2 id="保存爬取到的数据"><a href="#保存爬取到的数据" class="headerlink" title="保存爬取到的数据"></a>保存爬取到的数据</h2><p>最简单存储爬取的数据的方式是使用 Feed exports:<br><code>scrapy crawl dmoz -o items.json</code><br>该命令将采用 JSON 格式对爬取的数据进行序列化，生成 <code>items.json</code> 文件。</p>
+<p> 如果需要对爬取到的item做更多更为复杂的操作，您可以编写 Item Pipeline 。 类似于我们在创建项目时对Item做的，用于您编写自己的 <code>tutorial/pipelines.py</code> 也被创建。 不过如果您仅仅想要保存item，您不需要实现任何的pipeline。</p>
+<h1 id="命令行工具-Command-line-tools"><a href="#命令行工具-Command-line-tools" class="headerlink" title="命令行工具(Command line tools)"></a>命令行工具(Command line tools)</h1><p>Scrapy是通过 <code>scrapy</code> 命令行工具进行控制的。 这里我们称之为 “Scrapy tool” 以用来和子命令进行区分。 对于子命令，我们称为 “command” 或者 “Scrapy commands”。</p>
+<h2 id="调整设置"><a href="#调整设置" class="headerlink" title="调整设置"></a>调整设置</h2><p>Scrapy将会在以下路径中寻找记录了配置参数的 <code>scrapy.cfg</code> 文件, 该文件以ini的方式记录:</p>
+<ol>
+<li>/etc/scrapy.cfg 或 c:\scrapy\scrapy.cfg (系统层面)</li>
+<li>~/.config/scrapy.cfg ($XDG_CONFIG_HOME) 及 ~/.scrapy.cfg ($HOME) 作为全局(用户层面)设置, 以及</li>
+<li>在scrapy项目根路径下的 scrapy.cfg (参考之后的章节)</li>
+</ol>
+<p>从这些文件中读取到的设置按照以下的顺序合并: 用户定义的值具有比系统级别的默认值更高的优先级, 而项目定义的设置则会覆盖其他.</p>
+<p>Scrapy也会读取并通过环境变量来设置. 目前支持的有:</p>
+<ul>
+<li><code>SCRAPY_SETTINGS_MODULE</code> (查看 指定设定(Designating the settings))</li>
+<li><code>SCRAPY_PROJECT</code></li>
+</ul>
+<p><code>scrapy.cfg</code> 存放的目录被认为是 项目的根目录 。该文件中包含python模块名的字段定义了项目的设置。例如:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[settings]</span><br><span class="line">default = myproject.settings</span><br></pre></td></tr></table></figure></p>
+<h2 id="可用的工具命令-tool-commands"><a href="#可用的工具命令-tool-commands" class="headerlink" title="可用的工具命令(tool commands)"></a>可用的工具命令(tool commands)</h2><p>该章节提供了可用的内置命令的列表。每个命令都提供了描述以及一些使用例子。</p>
+<p>有些命令在项目里运行时的效果有些许区别。 以fetch命令为例，如果被爬取的url与某个特定spider相关联， 则该命令将会使用spider的动作(spider-overridden behaviours)。 (比如spider指定的 <code>user_agent</code>)。 该表现是有意而为之的。一般来说， fetch 命令就是用来测试检查spider是如何下载页面。</p>
+<p>您总是可以通过运行命令来获取关于每个命令的详细内容:<br><code>scrapy &lt;command&gt; -h</code><br>您也可以查看所有可用的命令:<br><code>scrapy -h</code><br>Scrapy提供了两种类型的命令。一种必须在Scrapy项目中运行(针对项目(Project-specific)的命令)，另外一种则不需要(全局命令)。全局命令在项目中运行时的表现可能会与在非项目中运行有些许差别(因为可能会使用项目的设定)。</p>
+<p>全局命令:</p>
+<ul>
+<li><code>startproject</code></li>
+<li><code>settings</code></li>
+<li><code>runspider</code></li>
+<li><code>shell</code></li>
+<li><code>fetch</code></li>
+<li><code>view</code></li>
+<li><code>version</code></li>
+</ul>
+<p>项目(Project-only)命令:</p>
+<ul>
+<li><code>crawl</code></li>
+<li><code>check</code></li>
+<li><code>list</code></li>
+<li><code>parse</code></li>
+<li><code>genspider</code></li>
+<li><code>bench</code></li>
+</ul>
+<h3 id="startproject"><a href="#startproject" class="headerlink" title="startproject"></a>startproject</h3><ul>
+<li>语法: <code>scrapy startproject &lt;project_name&gt;</code></li>
+<li>是否需要项目: no<br>在 <code>project_name</code> 文件夹下创建一个名为 <code>project_name</code> 的Scrapy项目。</li>
+</ul>
+<p>例子:<br><code>$ scrapy startproject myproject</code></p>
+<h3 id="genspider"><a href="#genspider" class="headerlink" title="genspider"></a>genspider</h3><ul>
+<li>语法: <code>scrapy genspider [-t template] &lt;name&gt; &lt;domain&gt;</code></li>
+<li>是否需要项目: yes<br>在当前项目中创建spider。</li>
+</ul>
+<p>这仅仅是创建spider的一种快捷方法。该方法可以使用提前定义好的模板来生成spider。您也可以自己创建spider的源码文件。</p>
+<p>例子:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">$ scrapy genspider -l</span><br><span class="line">Available templates:</span><br><span class="line">  basic</span><br><span class="line">  crawl</span><br><span class="line">  csvfeed</span><br><span class="line">  xmlfeed</span><br><span class="line"></span><br><span class="line">$ scrapy genspider -d basic</span><br><span class="line">import scrapy</span><br><span class="line"></span><br><span class="line">class $classname(scrapy.Spider):</span><br><span class="line">    name = &quot;$name&quot;</span><br><span class="line">    allowed_domains = [&quot;$domain&quot;]</span><br><span class="line">    start_urls = (</span><br><span class="line">        &#x27;http://www.$domain/&#x27;,</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    def parse(self, response):</span><br><span class="line">        pass</span><br><span class="line"></span><br><span class="line">$ scrapy genspider -t basic example example.com</span><br><span class="line">Created spider &#x27;example&#x27; using template &#x27;basic&#x27; in module:</span><br><span class="line">  mybot.spiders.example</span><br></pre></td></tr></table></figure></p>
+<h3 id="crawl"><a href="#crawl" class="headerlink" title="crawl"></a>crawl</h3><ul>
+<li>语法: <code>scrapy crawl &lt;spider&gt;</code></li>
+<li>是否需要项目: yes<br>使用spider进行爬取。</li>
+</ul>
+<p>例子:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ scrapy crawl myspider</span><br><span class="line">[ ... myspider starts crawling ... ]</span><br></pre></td></tr></table></figure></p>
+<h3 id="check"><a href="#check" class="headerlink" title="check"></a>check</h3><ul>
+<li>语法: <code>scrapy check [-l] &lt;spider&gt;</code></li>
+<li>是否需要项目: yes<br>运行contract检查。</li>
+</ul>
+<p>例子:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ scrapy check -l</span><br><span class="line">first_spider</span><br><span class="line">  * parse</span><br><span class="line">  * parse_item</span><br><span class="line">second_spider</span><br><span class="line">  * parse</span><br><span class="line">  * parse_item</span><br><span class="line"></span><br><span class="line">$ scrapy check</span><br><span class="line">[FAILED] first_spider:parse_item</span><br><span class="line">&gt;&gt;&gt; &#x27;RetailPricex&#x27; field is missing</span><br><span class="line"></span><br><span class="line">[FAILED] first_spider:parse</span><br><span class="line">&gt;&gt;&gt; Returned 92 requests, expected 0..4</span><br></pre></td></tr></table></figure></p>
+<h3 id="list"><a href="#list" class="headerlink" title="list"></a>list</h3><ul>
+<li>语法: <code>scrapy list</code></li>
+<li>是否需要项目: yes<br>列出当前项目中所有可用的spider。每行输出一个spider。</li>
+</ul>
+<p>使用例子:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ scrapy list</span><br><span class="line">spider1</span><br><span class="line">spider2</span><br></pre></td></tr></table></figure></p>
+<h3 id="fetch"><a href="#fetch" class="headerlink" title="fetch"></a>fetch</h3><ul>
+<li>语法: <code>scrapy fetch &lt;url&gt;</code></li>
+<li>是否需要项目: no<br>使用Scrapy下载器(downloader)下载给定的URL，并将获取到的内容送到标准输出。</li>
+</ul>
+<p>该命令以spider下载页面的方式获取页面。例如，如果spider有 <code>USER_AGENT</code> 属性修改了 User Agent，该命令将会使用该属性。</p>
+<p>因此，您可以使用该命令来查看spider如何获取某个特定页面。</p>
+<p>该命令如果非项目中运行则会使用默认Scrapy downloader设定。</p>
+<p>例子:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ scrapy fetch --nolog http://www.example.com/some/page.html</span><br><span class="line">[ ... html content here ... ]</span><br><span class="line"></span><br><span class="line">$ scrapy fetch --nolog --headers http://www.example.com/</span><br><span class="line">&#123;&#x27;Accept-Ranges&#x27;: [&#x27;bytes&#x27;],</span><br><span class="line"> &#x27;Age&#x27;: [&#x27;1263   &#x27;],</span><br><span class="line"> &#x27;Connection&#x27;: [&#x27;close     &#x27;],</span><br><span class="line"> &#x27;Content-Length&#x27;: [&#x27;596&#x27;],</span><br><span class="line"> &#x27;Content-Type&#x27;: [&#x27;text/html; charset=UTF-8&#x27;],</span><br><span class="line"> &#x27;Date&#x27;: [&#x27;Wed, 18 Aug 2010 23:59:46 GMT&#x27;],</span><br><span class="line"> &#x27;Etag&#x27;: [&#x27;&quot;573c1-254-48c9c87349680&quot;&#x27;],</span><br><span class="line"> &#x27;Last-Modified&#x27;: [&#x27;Fri, 30 Jul 2010 15:30:18 GMT&#x27;],</span><br><span class="line"> &#x27;Server&#x27;: [&#x27;Apache/2.2.3 (CentOS)&#x27;]&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="view"><a href="#view" class="headerlink" title="view"></a>view</h3><ul>
+<li>语法: <code>scrapy view &lt;url&gt;</code></li>
+<li>是否需要项目: no<br>在浏览器中打开给定的URL，并以Scrapy spider获取到的形式展现。 有些时候spider获取到的页面和普通用户看到的并不相同。 因此该命令可以用来检查spider所获取到的页面，并确认这是您所期望的。</li>
+</ul>
+<p>例子:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ scrapy view http://www.example.com/some/page.html</span><br><span class="line">[ ... browser starts ... ]</span><br></pre></td></tr></table></figure></p>
+<h3 id="shell"><a href="#shell" class="headerlink" title="shell"></a>shell</h3><ul>
+<li>语法: <code>scrapy shell [url]</code></li>
+<li>是否需要项目: no<br>以给定的URL(如果给出)或者空(没有给出URL)启动Scrapy shell。</li>
+</ul>
+<p>例子:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ scrapy shell http://www.example.com/some/page.html</span><br><span class="line">[ ... scrapy shell starts ... ]</span><br></pre></td></tr></table></figure></p>
+<h3 id="parse"><a href="#parse" class="headerlink" title="parse"></a>parse</h3><ul>
+<li>语法: <code>scrapy parse &lt;url&gt; [options]</code></li>
+<li>是否需要项目: yes<br>获取给定的URL并使用相应的spider分析处理。如果您提供 <code>--callback</code> 选项，则使用spider的该方法处理，否则使用 <code>parse</code> 。</li>
+</ul>
+<p>支持的选项:</p>
+<ul>
+<li><code>--spider=SPIDER</code>: 跳过自动检测spider并强制使用特定的spider</li>
+<li><code>--a NAME=VALUE</code>: 设置spider的参数(可能被重复)</li>
+<li><code>--callback</code> or <code>-c</code>: spider中用于解析返回(response)的回调函数</li>
+<li><code>--pipelines</code>: 在pipeline中处理item</li>
+<li><code>--rules</code> or <code>-r</code>: 使用 CrawlSpider 规则来发现用来解析返回(response)的回调函数</li>
+<li><code>--noitems</code>: 不显示爬取到的item</li>
+<li><code>--nolinks</code>: 不显示提取到的链接</li>
+<li><code>--nocolour</code>: 避免使用pygments对输出着色</li>
+<li><code>--depth</code> or <code>-d</code>: 指定跟进链接请求的层次数(默认: 1)</li>
+<li><code>--verbose</code> or <code>-v</code>: 显示每个请求的详细信息<br>例子:<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ scrapy parse http://www.example.com/ -c parse_item</span><br><span class="line">[ ... scrapy log lines crawling example.com spider ... ]</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt; STATUS DEPTH LEVEL 1 &lt;&lt;&lt;</span><br><span class="line"># Scraped Items  ------------------------------------------------------------</span><br><span class="line">[&#123;&#x27;name&#x27;: u&#x27;Example item&#x27;,</span><br><span class="line"> &#x27;category&#x27;: u&#x27;Furniture&#x27;,</span><br><span class="line"> &#x27;length&#x27;: u&#x27;12 cm&#x27;&#125;]</span><br><span class="line"></span><br><span class="line"># Requests  -----------------------------------------------------------------</span><br><span class="line">[]</span><br></pre></td></tr></table></figure>
+<h3 id="settings"><a href="#settings" class="headerlink" title="settings"></a>settings</h3></li>
+<li>语法: <code>scrapy settings [options]</code></li>
+<li>是否需要项目: no</li>
+</ul>
+<p>获取Scrapy的设定</p>
+<p>在项目中运行时，该命令将会输出项目的设定值，否则输出Scrapy默认设定。</p>
+<p>例子:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ scrapy settings --get BOT_NAME</span><br><span class="line">scrapybot</span><br><span class="line">$ scrapy settings --get DOWNLOAD_DELAY</span><br><span class="line">0</span><br></pre></td></tr></table></figure></p>
+<h3 id="runspider"><a href="#runspider" class="headerlink" title="runspider"></a>runspider</h3><ul>
+<li>语法: <code>scrapy runspider &lt;spider_file.py&gt;</code></li>
+<li>是否需要项目: no<br>在未创建项目的情况下，运行一个编写在Python文件中的spider。</li>
+</ul>
+<p>例子:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ scrapy runspider myspider.py</span><br><span class="line">[ ... spider starts crawling ... ]</span><br></pre></td></tr></table></figure></p>
+<h3 id="version"><a href="#version" class="headerlink" title="version"></a>version</h3><ul>
+<li>语法: <code>scrapy version [-v]</code></li>
+<li>是否需要项目: no</li>
+</ul>
+<p>输出Scrapy版本。配合 <code>-v</code> 运行时，该命令同时输出Python, Twisted以及平台的信息，方便bug提交。</p>
+<h3 id="bench"><a href="#bench" class="headerlink" title="bench"></a>bench</h3><p>0.17 新版功能.</p>
+<ul>
+<li>语法: <code>scrapy bench</code></li>
+<li>是否需要项目: no<br>运行benchmark测试。</li>
+</ul>
+<h2 id="Spiders"><a href="#Spiders" class="headerlink" title="Spiders"></a>Spiders</h2><p>对spider来说，爬取的循环类似下文:</p>
+<ol>
+<li><p>以初始的URL初始化Request，并设置回调函数。 当该request下载完毕并返回时，将生成response，并作为参数传给该回调函数。<br>spider中初始的request是通过调用 <code>start_requests()</code> 来获取的。 <code>start_requests()</code> 读取 <code>start_urls</code> 中的URL， 并以 <code>parse</code> 为回调函数生成 <code>Request</code> 。</p>
+</li>
+<li><p>在回调函数内分析返回的(网页)内容，返回 <code>Item</code> 对象、dict、 <code>Request</code> 或者一个包括三者的可迭代容器。 返回的Request对象之后会经过Scrapy处理，下载相应的内容，并调用设置的callback函数(函数可相同)。</p>
+</li>
+<li>在回调函数内，您可以使用 选择器(Selectors) (您也可以使用BeautifulSoup, lxml 或者您想用的任何解析器) 来分析网页内容，并根据分析的数据生成item。</li>
+<li>最后，由spider返回的item将被存到数据库(由某些 Item Pipeline 处理)或使用 Feed exports 存入到文件中。</li>
+</ol>
+<p>虽然该循环对任何类型的spider都(多少)适用，但Scrapy仍然为了不同的需求提供了多种默认spider。 之后将讨论这些spider。</p>
+<h3 id="scrapy-Spider"><a href="#scrapy-Spider" class="headerlink" title="scrapy.Spider"></a>scrapy.Spider</h3><h4 id="class-scrapy-spiders-Spider"><a href="#class-scrapy-spiders-Spider" class="headerlink" title="class scrapy.spiders.Spider"></a><code>class scrapy.spiders.Spider</code></h4><p>Spider是最简单的spider。每个其他的spider必须继承自该类(包括Scrapy自带的其他spider以及您自己编写的spider)。 Spider并没有提供什么特殊的功能。 其仅仅提供了 <code>start_requests()</code> 的默认实现，读取并请求spider属性中的 <code>start_urls</code>, 并根据返回的结果(resulting responses)调用spider的 <code>parse</code> 方法。</p>
+<p><code>name</code><br>定义spider名字的字符串(string)。spider的名字定义了Scrapy如何定位(并初始化)spider，所以其必须是唯一的。 不过您可以生成多个相同的spider实例(instance)，这没有任何限制。 name是spider最重要的属性，而且是必须的。</p>
+<p>如果该spider爬取单个网站(single domain)，一个常见的做法是以该网站(domain)(加或不加 后缀 )来命名spider。 例如，如果spider爬取 mywebsite.com ，该spider通常会被命名为 mywebsite 。</p>
+<p><code>allowed_domains</code><br>可选。包含了spider允许爬取的域名(domain)列表(list)。 当 <code>OffsiteMiddleware</code> 启用时， 域名不在列表中的URL不会被跟进。</p>
+<p><code>start_urls</code><br>URL列表。当没有制定特定的URL时，spider将从该列表中开始进行爬取。 因此，第一个被获取到的页面的URL将是该列表之一。 后续的URL将会从获取到的数据中提取。</p>
+<p><code>custom_settings</code><br>该设置是一个dict.当启动spider时,该设置将会覆盖项目级的设置. 由于设置必须在初始化(instantiation)前被更新,所以该属性必须定义为class属性.</p>
+<p><code>crawler</code><br>该属性在初始化class后,由类方法 <code>from_crawler()</code> 设置, 并且链接了本spider实例对应的 <code>Crawler</code> 对象.</p>
+<p>Crawler包含了很多项目中的组件,作为单一的入口点 (例如插件,中间件,信号管理器等)</p>
+<p><code>start_requests()</code><br>该方法必须返回一个可迭代对象(iterable)。该对象包含了spider用于爬取的第一个Request。</p>
+<p>当spider启动爬取并且未制定URL时，该方法被调用。 当指定了URL时，<code>make_requests_from_url()</code> 将被调用来创建Request对象。 该方法仅仅会被Scrapy调用一次，因此您可以将其实现为生成器。</p>
+<p>该方法的默认实现是使用 <code>start_urls</code> 的url生成Request。</p>
+<p>如果您想要修改最初爬取某个网站的Request对象，您可以重写(override)该方法。 例如，如果您需要在启动时以POST登录某个网站，你可以这么写:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">class MySpider(scrapy.Spider):</span><br><span class="line">    name = &#x27;myspider&#x27;</span><br><span class="line"></span><br><span class="line">    def start_requests(self):</span><br><span class="line">        return [scrapy.FormRequest(&quot;http://www.example.com/login&quot;,</span><br><span class="line">                                   formdata=&#123;&#x27;user&#x27;: &#x27;john&#x27;, &#x27;pass&#x27;: &#x27;secret&#x27;&#125;,</span><br><span class="line">                                   callback=self.logged_in)]</span><br><span class="line"></span><br><span class="line">    def logged_in(self, response):</span><br><span class="line">        # here you would extract links to follow and return Requests for</span><br><span class="line">        # each of them, with another callback</span><br><span class="line">        pass</span><br></pre></td></tr></table></figure>
+<p>在单个回调函数中返回多个Request以及Item的例子:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">import scrapy</span><br><span class="line"></span><br><span class="line">class MySpider(scrapy.Spider):</span><br><span class="line">    name = &#x27;example.com&#x27;</span><br><span class="line">    allowed_domains = [&#x27;example.com&#x27;]</span><br><span class="line">    start_urls = [</span><br><span class="line">        &#x27;http://www.example.com/1.html&#x27;,</span><br><span class="line">        &#x27;http://www.example.com/2.html&#x27;,</span><br><span class="line">        &#x27;http://www.example.com/3.html&#x27;,</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line">    def parse(self, response):</span><br><span class="line">        sel = scrapy.Selector(response)</span><br><span class="line">        for h3 in response.xpath(&#x27;//h3&#x27;).extract():</span><br><span class="line">            yield &#123;&quot;title&quot;: h3&#125;</span><br><span class="line"></span><br><span class="line">        for url in response.xpath(&#x27;//a/@href&#x27;).extract():</span><br><span class="line">            yield scrapy.Request(url, callback=self.parse)</span><br></pre></td></tr></table></figure><br>除了 <code>start_urls</code> ，你也可以直接使用 <code>start_requests()</code> ; 您也可以使用 Items 来给予数据更多的结构性(give data more structure):<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">import scrapy</span><br><span class="line">from myproject.items import MyItem</span><br><span class="line"></span><br><span class="line">class MySpider(scrapy.Spider):</span><br><span class="line">    name = &#x27;example.com&#x27;</span><br><span class="line">    allowed_domains = [&#x27;example.com&#x27;]</span><br><span class="line"></span><br><span class="line">    def start_requests(self):</span><br><span class="line">        yield scrapy.Request(&#x27;http://www.example.com/1.html&#x27;, self.parse)</span><br><span class="line">        yield scrapy.Request(&#x27;http://www.example.com/2.html&#x27;, self.parse)</span><br><span class="line">        yield scrapy.Request(&#x27;http://www.example.com/3.html&#x27;, self.parse)</span><br><span class="line"></span><br><span class="line">    def parse(self, response):</span><br><span class="line">        for h3 in response.xpath(&#x27;//h3&#x27;).extract():</span><br><span class="line">            yield MyItem(title=h3)</span><br><span class="line"></span><br><span class="line">        for url in response.xpath(&#x27;//a/@href&#x27;).extract():</span><br><span class="line">            yield scrapy.Request(url, callback=self.parse)</span><br></pre></td></tr></table></figure></p>
+<h3 id="CrawlSpider"><a href="#CrawlSpider" class="headerlink" title="CrawlSpider"></a>CrawlSpider</h3><h4 id="class-scrapy-spiders-CrawlSpider"><a href="#class-scrapy-spiders-CrawlSpider" class="headerlink" title="class scrapy.spiders.CrawlSpider"></a><code>class scrapy.spiders.CrawlSpider</code></h4><p>爬取一般网站常用的spider。其定义了一些规则(rule)来提供跟进link的方便的机制。 也许该spider并不是完全适合您的特定网站或项目，但其对很多情况都使用。 因此您可以以其为起点，根据需求修改部分方法。当然您也可以实现自己的spider。</p>
+<p>除了从Spider继承过来的(您必须提供的)属性外，其提供了一个新的属性:</p>
+<p><code>rules</code><br>一个包含一个(或多个) <code>Rule</code> 对象的集合(list)。 每个 <code>Rule</code> 对爬取网站的动作定义了特定表现。 Rule对象在下边会介绍。 如果多个rule匹配了相同的链接，则根据他们在本属性中被定义的顺序，第一个会被使用。</p>
+<p>该spider也提供了一个可复写(overrideable)的方法:</p>
+<p><code>parse_start_url(response)</code><br>当start_url的请求返回时，该方法被调用。 该方法分析最初的返回值并必须返回一个 <code>Item</code> 对象或者 一个 <code>Request</code> 对象或者 一个可迭代的包含二者对象。</p>
+<h3 id="爬取规则-Crawling-rules"><a href="#爬取规则-Crawling-rules" class="headerlink" title="爬取规则(Crawling rules)"></a>爬取规则(Crawling rules)</h3><h4 id="class-scrapy-spiders-Rule-link-extractor-callback-None-cb-kwargs-None-follow-None-process-links-None-process-request-None"><a href="#class-scrapy-spiders-Rule-link-extractor-callback-None-cb-kwargs-None-follow-None-process-links-None-process-request-None" class="headerlink" title="class scrapy.spiders.Rule(link_extractor, callback=None, cb_kwargs=None, follow=None, process_links=None, process_request=None)"></a><code>class scrapy.spiders.Rule(link_extractor, callback=None, cb_kwargs=None, follow=None, process_links=None, process_request=None)</code></h4><p><code>link_extractor</code> 是一个 Link Extractor 对象。 其定义了如何从爬取到的页面提取链接。</p>
+<p><code>callback</code> 是一个callable或string(该spider中同名的函数将会被调用)。 从link_extractor中每获取到链接时将会调用该函数。该回调函数接受一个response作为其第一个参数， 并返回一个包含 <code>Item</code> 以及(或) <code>Request</code> 对象(或者这两者的子类)的列表(list)。</p>
+<p>警告：当编写爬虫规则时，请避免使用 <code>parse</code> 作为回调函数。 由于 <code>CrawlSpider</code> 使用 <code>parse</code> 方法来实现其逻辑，如果 您覆盖了 <code>parse</code> 方法，crawl spider 将会运行失败。</p>
+<p><code>cb_kwargs</code> 包含传递给回调函数的参数(keyword argument)的字典。</p>
+<p><code>follow</code> 是一个布尔(boolean)值，指定了根据该规则从response提取的链接是否需要跟进。 如果 <code>callback</code> 为None， <code>follow</code> 默认设置为 <code>True</code> ，否则默认为 <code>False</code> 。</p>
+<p><code>process_links</code> 是一个callable或string(该spider中同名的函数将会被调用)。 从link_extractor中获取到链接列表时将会调用该函数。该方法主要用来过滤。</p>
+<p><code>process_request</code> 是一个callable或string(该spider中同名的函数将会被调用)。 该规则提取到每个request时都会调用该函数。该函数必须返回一个request或者None。 (用来过滤request)</p>
+<h4 id="CrawlSpider样例"><a href="#CrawlSpider样例" class="headerlink" title="CrawlSpider样例"></a>CrawlSpider样例</h4><p>接下来给出配合rule使用CrawlSpider的例子:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">import scrapy</span><br><span class="line">from scrapy.spiders import CrawlSpider, Rule</span><br><span class="line">from scrapy.linkextractors import LinkExtractor</span><br><span class="line"></span><br><span class="line">class MySpider(CrawlSpider):</span><br><span class="line">    name = &#x27;example.com&#x27;</span><br><span class="line">    allowed_domains = [&#x27;example.com&#x27;]</span><br><span class="line">    start_urls = [&#x27;http://www.example.com&#x27;]</span><br><span class="line"></span><br><span class="line">    rules = (</span><br><span class="line">        # 提取匹配 &#x27;category.php&#x27; (但不匹配 &#x27;subsection.php&#x27;) 的链接并跟进链接(没有callback意味着follow默认为True)</span><br><span class="line">        Rule(LinkExtractor(allow=(&#x27;category\.php&#x27;, ), deny=(&#x27;subsection\.php&#x27;, ))),</span><br><span class="line"></span><br><span class="line">        # 提取匹配 &#x27;item.php&#x27; 的链接并使用spider的parse_item方法进行分析</span><br><span class="line">        Rule(LinkExtractor(allow=(&#x27;item\.php&#x27;, )), callback=&#x27;parse_item&#x27;),</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    def parse_item(self, response):</span><br><span class="line">        self.logger.info(&#x27;Hi, this is an item page! %s&#x27;, response.url)</span><br><span class="line"></span><br><span class="line">        item = scrapy.Item()</span><br><span class="line">        item[&#x27;id&#x27;] = response.xpath(&#x27;//td[@id=&quot;item_id&quot;]/text()&#x27;).re(r&#x27;ID: (\d+)&#x27;)</span><br><span class="line">        item[&#x27;name&#x27;] = response.xpath(&#x27;//td[@id=&quot;item_name&quot;]/text()&#x27;).extract()</span><br><span class="line">        item[&#x27;description&#x27;] = response.xpath(&#x27;//td[@id=&quot;item_description&quot;]/text()&#x27;).extract()</span><br><span class="line">        return item</span><br></pre></td></tr></table></figure><br>该spider将从example.com的首页开始爬取，获取category以及item的链接并对后者使用 <code>parse_item</code> 方法。 当item获得返回(response)时，将使用XPath处理HTML并生成一些数据填入 <code>Item</code> 中。</p>
+<h1 id="选择器-Selectors"><a href="#选择器-Selectors" class="headerlink" title="选择器(Selectors)"></a>选择器(Selectors)</h1><h2 id="构造选择器-selectors"><a href="#构造选择器-selectors" class="headerlink" title="构造选择器(selectors)"></a>构造选择器(selectors)</h2><p>Scrapy selector是以 文字(text) 或 <code>TextResponse</code> 构造的 <code>Selector</code> 实例。 其根据输入的类型自动选择最优的分析方法(XML vs HTML):<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; from scrapy.selector import Selector</span><br><span class="line">&gt;&gt;&gt; from scrapy.http import HtmlResponse</span><br></pre></td></tr></table></figure><br>以文字构造:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; body = &#x27;&lt;html&gt;&lt;body&gt;&lt;span&gt;good&lt;/span&gt;&lt;/body&gt;&lt;/html&gt;&#x27;</span><br><span class="line">&gt;&gt;&gt; Selector(text=body).xpath(&#x27;//span/text()&#x27;).extract()</span><br><span class="line">[u&#x27;good&#x27;]</span><br></pre></td></tr></table></figure><br>以response构造:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; response = HtmlResponse(url=&#x27;http://example.com&#x27;, body=body)</span><br><span class="line">&gt;&gt;&gt; Selector(response=response).xpath(&#x27;//span/text()&#x27;).extract()</span><br><span class="line">[u&#x27;good&#x27;]</span><br></pre></td></tr></table></figure><br>为了方便起见，response对象以 .selector 属性提供了一个selector， 您可以随时使用该快捷方法:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; response.selector.xpath(&#x27;//span/text()&#x27;).extract()</span><br><span class="line">[u&#x27;good&#x27;]</span><br></pre></td></tr></table></figure></p>
+<h2 id="使用选择器"><a href="#使用选择器" class="headerlink" title="使用选择器"></a>使用选择器</h2><h3 id="extract"><a href="#extract" class="headerlink" title=".extract()"></a><code>.extract()</code></h3><p>为了提取真实的原文数据，你需要调用 <code>.extract()</code> 方法如下:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; response.xpath(&#x27;//title/text()&#x27;).extract()</span><br><span class="line">[u&#x27;Example website&#x27;]</span><br></pre></td></tr></table></figure><br>如果想要提取到第一个匹配到的元素, 必须调用 <code>.extract_first()</code> selector<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; response.xpath(&#x27;//div[@id=&quot;images&quot;]/a/text()&#x27;).extract_first()</span><br><span class="line">u&#x27;Name: My image 1 &#x27;</span><br></pre></td></tr></table></figure><br>如果没有匹配的元素，则返回 <code>None</code>:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; response.xpath(&#x27;//div/[id=&quot;not-exists&quot;]/text()&#x27;).extract_first() is None</span><br><span class="line">True</span><br></pre></td></tr></table></figure><br>您也可以设置默认的返回值，替代 <code>None</code> :<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; sel.xpath(&#x27;//div/[id=&quot;not-exists&quot;]/text()&#x27;).extract_first(default=&#x27;not-found&#x27;)</span><br><span class="line">&#x27;not-found&#x27;</span><br></pre></td></tr></table></figure><br>注意CSS选择器可以使用CSS3伪元素(pseudo-elements)来选择文字或者属性节点:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; response.css(&#x27;title::text&#x27;).extract()</span><br><span class="line">[u&#x27;Example website&#x27;]</span><br></pre></td></tr></table></figure><br>现在我们将得到根URL(base URL)和一些图片链接:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; response.xpath(&#x27;//base/@href&#x27;).extract()</span><br><span class="line">[u&#x27;http://example.com/&#x27;]</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt; response.css(&#x27;base::attr(href)&#x27;).extract()</span><br><span class="line">[u&#x27;http://example.com/&#x27;]</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt; response.xpath(&#x27;//a[contains(@href, &quot;image&quot;)]/@href&#x27;).extract()</span><br><span class="line">[u&#x27;image1.html&#x27;,</span><br><span class="line"> u&#x27;image2.html&#x27;,</span><br><span class="line"> u&#x27;image3.html&#x27;,</span><br><span class="line"> u&#x27;image4.html&#x27;,</span><br><span class="line"> u&#x27;image5.html&#x27;]</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt; response.css(&#x27;a[href*=image]::attr(href)&#x27;).extract()</span><br><span class="line">[u&#x27;image1.html&#x27;,</span><br><span class="line"> u&#x27;image2.html&#x27;,</span><br><span class="line"> u&#x27;image3.html&#x27;,</span><br><span class="line"> u&#x27;image4.html&#x27;,</span><br><span class="line"> u&#x27;image5.html&#x27;]</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt; response.xpath(&#x27;//a[contains(@href, &quot;image&quot;)]/img/@src&#x27;).extract()</span><br><span class="line">[u&#x27;image1_thumb.jpg&#x27;,</span><br><span class="line"> u&#x27;image2_thumb.jpg&#x27;,</span><br><span class="line"> u&#x27;image3_thumb.jpg&#x27;,</span><br><span class="line"> u&#x27;image4_thumb.jpg&#x27;,</span><br><span class="line"> u&#x27;image5_thumb.jpg&#x27;]</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt; response.css(&#x27;a[href*=image] img::attr(src)&#x27;).extract()</span><br><span class="line">[u&#x27;image1_thumb.jpg&#x27;,</span><br><span class="line"> u&#x27;image2_thumb.jpg&#x27;,</span><br><span class="line"> u&#x27;image3_thumb.jpg&#x27;,</span><br><span class="line"> u&#x27;image4_thumb.jpg&#x27;,</span><br><span class="line"> u&#x27;image5_thumb.jpg&#x27;]</span><br></pre></td></tr></table></figure></p>
+<h3 id="结合正则表达式使用选择器-selectors"><a href="#结合正则表达式使用选择器-selectors" class="headerlink" title="结合正则表达式使用选择器(selectors)"></a>结合正则表达式使用选择器(selectors)</h3><p><code>Selector</code> 也有一个 <code>.re()</code> 方法，用来通过正则表达式来提取数据。然而，不同于使用 <code>.xpath()</code> 或者 <code>.css()</code> 方法, <code>.re()</code> 方法返回unicode字符串的列表。所以你无法构造嵌套式的 <code>.re()</code> 调用。</p>
+<p>下面是一个例子，从上面的 HTML code 中提取图像名字:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; response.xpath(&#x27;//a[contains(@href, &quot;image&quot;)]/text()&#x27;).re(r&#x27;Name:\s*(.*)&#x27;)</span><br><span class="line">[u&#x27;My image 1&#x27;,</span><br><span class="line"> u&#x27;My image 2&#x27;,</span><br><span class="line"> u&#x27;My image 3&#x27;,</span><br><span class="line"> u&#x27;My image 4&#x27;,</span><br><span class="line"> u&#x27;My image 5&#x27;]</span><br></pre></td></tr></table></figure><br>另外还有一个糅合了 <code>.extract_first()</code> 与 <code>.re()</code> 的函数 <code>.re_first()</code> . 使用该函数可以提取第一个匹配到的字符串:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; response.xpath(&#x27;//a[contains(@href, &quot;image&quot;)]/text()&#x27;).re_first(r&#x27;Name:\s*(.*)&#x27;)</span><br><span class="line">u&#x27;My image 1&#x27;</span><br></pre></td></tr></table></figure></p>
+<h3 id="使用相对XPaths"><a href="#使用相对XPaths" class="headerlink" title="使用相对XPaths"></a>使用相对XPaths</h3><p>比较合适的处理方法(注意 <code>.//p</code> XPath的点前缀):<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; for p in divs.xpath(&#x27;.//p&#x27;):  # extracts all &lt;p&gt; inside</span><br><span class="line">...     print p.extract()</span><br></pre></td></tr></table></figure><br>另一种常见的情况将是提取所有直系 <code>&lt;p&gt;</code> 的结果:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; for p in divs.xpath(&#x27;p&#x27;):</span><br><span class="line">...     print p.extract()</span><br></pre></td></tr></table></figure></p>
+<h3 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h3><p>例如在XPath的 <code>starts-with()</code> 或 <code>contains()</code> 无法满足需求时， <code>test()</code> 函数可以非常有用。</p>
+<p>例如在列表中选择有”class”元素且结尾为一个数字的链接:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; from scrapy import Selector</span><br><span class="line">&gt;&gt;&gt; doc = &quot;&quot;&quot;</span><br><span class="line">... &lt;div&gt;</span><br><span class="line">...     &lt;ul&gt;</span><br><span class="line">...         &lt;li class=&quot;item-0&quot;&gt;&lt;a href=&quot;link1.html&quot;&gt;first item&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">...         &lt;li class=&quot;item-1&quot;&gt;&lt;a href=&quot;link2.html&quot;&gt;second item&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">...         &lt;li class=&quot;item-inactive&quot;&gt;&lt;a href=&quot;link3.html&quot;&gt;third item&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">...         &lt;li class=&quot;item-1&quot;&gt;&lt;a href=&quot;link4.html&quot;&gt;fourth item&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">...         &lt;li class=&quot;item-0&quot;&gt;&lt;a href=&quot;link5.html&quot;&gt;fifth item&lt;/a&gt;&lt;/li&gt;</span><br><span class="line">...     &lt;/ul&gt;</span><br><span class="line">... &lt;/div&gt;</span><br><span class="line">... &quot;&quot;&quot;</span><br><span class="line">&gt;&gt;&gt; sel = Selector(text=doc, type=&quot;html&quot;)</span><br><span class="line">&gt;&gt;&gt; sel.xpath(&#x27;//li//@href&#x27;).extract()</span><br><span class="line">[u&#x27;link1.html&#x27;, u&#x27;link2.html&#x27;, u&#x27;link3.html&#x27;, u&#x27;link4.html&#x27;, u&#x27;link5.html&#x27;]</span><br><span class="line">&gt;&gt;&gt; sel.xpath(&#x27;//li[re:test(@class, &quot;item-\d$&quot;)]//@href&#x27;).extract()</span><br><span class="line">[u&#x27;link1.html&#x27;, u&#x27;link2.html&#x27;, u&#x27;link4.html&#x27;, u&#x27;link5.html&#x27;]</span><br></pre></td></tr></table></figure></p>
+<h3 id="集合操作"><a href="#集合操作" class="headerlink" title="集合操作"></a>集合操作</h3><p>集合操作可以方便地用于在提取文字元素前从文档树中去除一些部分。</p>
+<p>例如使用itemscopes组和对应的itemprops来提取微数据(来自<a target="_blank" rel="noopener" href="http://schema.org/Product的样本内容">http://schema.org/Product的样本内容</a>):<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; doc = &quot;&quot;&quot;</span><br><span class="line">... &lt;div itemscope itemtype=&quot;http://schema.org/Product&quot;&gt;</span><br><span class="line">...   &lt;span itemprop=&quot;name&quot;&gt;Kenmore White 17&quot; Microwave&lt;/span&gt;</span><br><span class="line">...   &lt;img src=&quot;kenmore-microwave-17in.jpg&quot; alt=&#x27;Kenmore 17&quot; Microwave&#x27; /&gt;</span><br><span class="line">...   &lt;div itemprop=&quot;aggregateRating&quot;</span><br><span class="line">...     itemscope itemtype=&quot;http://schema.org/AggregateRating&quot;&gt;</span><br><span class="line">...    Rated &lt;span itemprop=&quot;ratingValue&quot;&gt;3.5&lt;/span&gt;/5</span><br><span class="line">...    based on &lt;span itemprop=&quot;reviewCount&quot;&gt;11&lt;/span&gt; customer reviews</span><br><span class="line">...   &lt;/div&gt;</span><br><span class="line">...</span><br><span class="line">...   &lt;div itemprop=&quot;offers&quot; itemscope itemtype=&quot;http://schema.org/Offer&quot;&gt;</span><br><span class="line">...     &lt;span itemprop=&quot;price&quot;&gt;$55.00&lt;/span&gt;</span><br><span class="line">...     &lt;link itemprop=&quot;availability&quot; href=&quot;http://schema.org/InStock&quot; /&gt;In stock</span><br><span class="line">...   &lt;/div&gt;</span><br><span class="line">...</span><br><span class="line">...   Product description:</span><br><span class="line">...   &lt;span itemprop=&quot;description&quot;&gt;0.7 cubic feet countertop microwave.</span><br><span class="line">...   Has six preset cooking categories and convenience features like</span><br><span class="line">...   Add-A-Minute and Child Lock.&lt;/span&gt;</span><br><span class="line">...</span><br><span class="line">...   Customer reviews:</span><br><span class="line">...</span><br><span class="line">...   &lt;div itemprop=&quot;review&quot; itemscope itemtype=&quot;http://schema.org/Review&quot;&gt;</span><br><span class="line">...     &lt;span itemprop=&quot;name&quot;&gt;Not a happy camper&lt;/span&gt; -</span><br><span class="line">...     by &lt;span itemprop=&quot;author&quot;&gt;Ellie&lt;/span&gt;,</span><br><span class="line">...     &lt;meta itemprop=&quot;datePublished&quot; content=&quot;2011-04-01&quot;&gt;April 1, 2011</span><br><span class="line">...     &lt;div itemprop=&quot;reviewRating&quot; itemscope itemtype=&quot;http://schema.org/Rating&quot;&gt;</span><br><span class="line">...       &lt;meta itemprop=&quot;worstRating&quot; content = &quot;1&quot;&gt;</span><br><span class="line">...       &lt;span itemprop=&quot;ratingValue&quot;&gt;1&lt;/span&gt;/</span><br><span class="line">...       &lt;span itemprop=&quot;bestRating&quot;&gt;5&lt;/span&gt;stars</span><br><span class="line">...     &lt;/div&gt;</span><br><span class="line">...     &lt;span itemprop=&quot;description&quot;&gt;The lamp burned out and now I have to replace</span><br><span class="line">...     it. &lt;/span&gt;</span><br><span class="line">...   &lt;/div&gt;</span><br><span class="line">...</span><br><span class="line">...   &lt;div itemprop=&quot;review&quot; itemscope itemtype=&quot;http://schema.org/Review&quot;&gt;</span><br><span class="line">...     &lt;span itemprop=&quot;name&quot;&gt;Value purchase&lt;/span&gt; -</span><br><span class="line">...     by &lt;span itemprop=&quot;author&quot;&gt;Lucas&lt;/span&gt;,</span><br><span class="line">...     &lt;meta itemprop=&quot;datePublished&quot; content=&quot;2011-03-25&quot;&gt;March 25, 2011</span><br><span class="line">...     &lt;div itemprop=&quot;reviewRating&quot; itemscope itemtype=&quot;http://schema.org/Rating&quot;&gt;</span><br><span class="line">...       &lt;meta itemprop=&quot;worstRating&quot; content = &quot;1&quot;/&gt;</span><br><span class="line">...       &lt;span itemprop=&quot;ratingValue&quot;&gt;4&lt;/span&gt;/</span><br><span class="line">...       &lt;span itemprop=&quot;bestRating&quot;&gt;5&lt;/span&gt;stars</span><br><span class="line">...     &lt;/div&gt;</span><br><span class="line">...     &lt;span itemprop=&quot;description&quot;&gt;Great microwave for the price. It is small and</span><br><span class="line">...     fits in my apartment.&lt;/span&gt;</span><br><span class="line">...   &lt;/div&gt;</span><br><span class="line">...   ...</span><br><span class="line">... &lt;/div&gt;</span><br><span class="line">... &quot;&quot;&quot;</span><br><span class="line">&gt;&gt;&gt; sel = Selector(text=doc, type=&quot;html&quot;)</span><br><span class="line">&gt;&gt;&gt; for scope in sel.xpath(&#x27;//div[@itemscope]&#x27;):</span><br><span class="line">...     print &quot;current scope:&quot;, scope.xpath(&#x27;@itemtype&#x27;).extract()</span><br><span class="line">...     props = scope.xpath(&#x27;&#x27;&#x27;</span><br><span class="line">...                 set:difference(./descendant::*/@itemprop,</span><br><span class="line">...                                .//*[@itemscope]/*/@itemprop)&#x27;&#x27;&#x27;)</span><br><span class="line">...     print &quot;    properties:&quot;, props.extract()</span><br><span class="line">...     print</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">current scope: [u&#x27;http://schema.org/Product&#x27;]</span><br><span class="line">    properties: [u&#x27;name&#x27;, u&#x27;aggregateRating&#x27;, u&#x27;offers&#x27;, u&#x27;description&#x27;, u&#x27;review&#x27;, u&#x27;review&#x27;]</span><br><span class="line"></span><br><span class="line">current scope: [u&#x27;http://schema.org/AggregateRating&#x27;]</span><br><span class="line">    properties: [u&#x27;ratingValue&#x27;, u&#x27;reviewCount&#x27;]</span><br><span class="line"></span><br><span class="line">current scope: [u&#x27;http://schema.org/Offer&#x27;]</span><br><span class="line">    properties: [u&#x27;price&#x27;, u&#x27;availability&#x27;]</span><br><span class="line"></span><br><span class="line">current scope: [u&#x27;http://schema.org/Review&#x27;]</span><br><span class="line">    properties: [u&#x27;name&#x27;, u&#x27;author&#x27;, u&#x27;datePublished&#x27;, u&#x27;reviewRating&#x27;, u&#x27;description&#x27;]</span><br><span class="line"></span><br><span class="line">current scope: [u&#x27;http://schema.org/Rating&#x27;]</span><br><span class="line">    properties: [u&#x27;worstRating&#x27;, u&#x27;ratingValue&#x27;, u&#x27;bestRating&#x27;]</span><br><span class="line"></span><br><span class="line">current scope: [u&#x27;http://schema.org/Review&#x27;]</span><br><span class="line">    properties: [u&#x27;name&#x27;, u&#x27;author&#x27;, u&#x27;datePublished&#x27;, u&#x27;reviewRating&#x27;, u&#x27;description&#x27;]</span><br><span class="line"></span><br><span class="line">current scope: [u&#x27;http://schema.org/Rating&#x27;]</span><br><span class="line">    properties: [u&#x27;worstRating&#x27;, u&#x27;ratingValue&#x27;, u&#x27;bestRating&#x27;]</span><br></pre></td></tr></table></figure><br>在这里，我们首先在 <code>itemscope</code> 元素上迭代，对于其中的每一个元素，我们寻找所有的 <code>itemprops</code> 元素，并排除那些本身在另一个 <code>itemscope</code> 内的元素。</p>
+<h3 id="node-1-and-node-1-的不同"><a href="#node-1-and-node-1-的不同" class="headerlink" title="//node[1] and (//node)[1]的不同"></a>//node[1] and (//node)[1]的不同</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; from scrapy import Selector</span><br><span class="line">&gt;&gt;&gt; sel = Selector(text=&quot;&quot;&quot;</span><br><span class="line">....:     &lt;ul class=&quot;list&quot;&gt;</span><br><span class="line">....:         &lt;li&gt;1&lt;/li&gt;</span><br><span class="line">....:         &lt;li&gt;2&lt;/li&gt;</span><br><span class="line">....:         &lt;li&gt;3&lt;/li&gt;</span><br><span class="line">....:     &lt;/ul&gt;</span><br><span class="line">....:     &lt;ul class=&quot;list&quot;&gt;</span><br><span class="line">....:         &lt;li&gt;4&lt;/li&gt;</span><br><span class="line">....:         &lt;li&gt;5&lt;/li&gt;</span><br><span class="line">....:         &lt;li&gt;6&lt;/li&gt;</span><br><span class="line">....:     &lt;/ul&gt;&quot;&quot;&quot;)</span><br><span class="line">&gt;&gt;&gt; xp = lambda x: sel.xpath(x).extract()</span><br></pre></td></tr></table></figure>
+<p>拿了所有一级<code>&lt;li&gt;</code><br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; xp(&quot;//li[1]&quot;)</span><br><span class="line">[u&#x27;&lt;li&gt;1&lt;/li&gt;&#x27;, u&#x27;&lt;li&gt;4&lt;/li&gt;&#x27;]</span><br></pre></td></tr></table></figure><br>拿的第一个一级<code>&lt;li&gt;</code><br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; xp(&quot;(//li)[1]&quot;)</span><br><span class="line">[u&#x27;&lt;li&gt;1&lt;/li&gt;&#x27;]</span><br></pre></td></tr></table></figure></p>
+<h1 id="Item-Loaders"><a href="#Item-Loaders" class="headerlink" title="Item Loaders"></a>Item Loaders</h1><p>自己阅读文档后，认为Item Loaders的作用有些多此一举，select的功能在parse中解析后赋值到item上返回即可。Item Loaders使用后，对于不同的网站格式存储相同的字段格式时，则需要重写Item Loaders类和spider；如果不使用，只需要重写spider即可。个人愚见，请指正。</p>
+<h1 id="Scrapy终端-Scrapy-shell"><a href="#Scrapy终端-Scrapy-shell" class="headerlink" title="Scrapy终端(Scrapy shell)"></a>Scrapy终端(Scrapy shell)</h1><h2 id="可用的快捷命令-shortcut"><a href="#可用的快捷命令-shortcut" class="headerlink" title="可用的快捷命令(shortcut)"></a>可用的快捷命令(shortcut)</h2><ul>
+<li><code>shelp()</code> - 打印可用对象及快捷命令的帮助列表</li>
+<li><code>fetch(request_or_url)</code> - 根据给定的请求(request)或URL获取一个新的response，并更新相关的对象</li>
+<li><code>view(response)</code> - 在本机的浏览器打开给定的response。 其会在response的body中添加一个 <base> tag ，使得外部链接(例如图片及css)能正确显示。 注意，该操作会在本地创建一个临时文件，且该文件不会被自动删除。</li>
+</ul>
+<h2 id="可用的Scrapy对象"><a href="#可用的Scrapy对象" class="headerlink" title="可用的Scrapy对象"></a>可用的Scrapy对象</h2><p>Scrapy终端根据下载的页面会自动创建一些方便使用的对象，例如 <code>Response</code> 对象及 <code>Selector</code> 对象(对HTML及XML内容)。</p>
+<p>这些对象有:</p>
+<ul>
+<li><code>crawler</code> - 当前 <code>Crawler</code> 对象.</li>
+<li><code>spider</code> - 处理URL的spider。 对当前URL没有处理的Spider时则为一个 <code>Spider</code> 对象。</li>
+<li><code>request</code> - 最近获取到的页面的 <code>Request</code> 对象。 您可以使用 <code>replace()</code> 修改该request。或者 使用 <code>fetch</code> 快捷方式来获取新的request。</li>
+<li><code>response</code> - 包含最近获取到的页面的 <code>Response</code> 对象。</li>
+<li><code>sel</code> - 根据最近获取到的response构建的 <code>Selector</code> 对象。</li>
+<li><code>settings</code> - 当前的 Scrapy settings</li>
+</ul>
+<h2 id="在spider中启动shell来查看response"><a href="#在spider中启动shell来查看response" class="headerlink" title="在spider中启动shell来查看response"></a>在spider中启动shell来查看response</h2><p>有时您想在spider的某个位置中查看被处理的response， 以确认您期望的response到达特定位置。</p>
+<p>这可以通过 <code>scrapy.shell.inspect_response</code> 函数来实现。</p>
+<p>以下是如何在spider中调用该函数的例子:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">import scrapy</span><br><span class="line"></span><br><span class="line">class MySpider(scrapy.Spider):</span><br><span class="line">    name = &quot;myspider&quot;</span><br><span class="line">    start_urls = [</span><br><span class="line">        &quot;http://example.com&quot;,</span><br><span class="line">        &quot;http://example.org&quot;,</span><br><span class="line">        &quot;http://example.net&quot;,</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line">    def parse(self, response):</span><br><span class="line">        # We want to inspect one specific response.</span><br><span class="line">        if &quot;.org&quot; in response.url:</span><br><span class="line">            from scrapy.shell import inspect_response</span><br><span class="line">            inspect_response(response, self)</span><br><span class="line"></span><br><span class="line">        # Rest of parsing code.</span><br></pre></td></tr></table></figure><br>这个功能很是方便！<br>最后您可以点击Ctrl-D(Windows下Ctrl-Z)来退出终端，恢复爬取:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; ^D</span><br><span class="line">2014-01-23 17:50:03-0400 [scrapy] DEBUG: Crawled (200) &lt;GET http://example.net&gt; (referer: None)</span><br><span class="line">...</span><br></pre></td></tr></table></figure><br>注意: 由于该终端屏蔽了Scrapy引擎，您在这个终端中不能使用 <code>fetch</code> 快捷命令(shortcut)。 当您离开终端时，spider会从其停下的地方恢复爬取，正如上面显示的那样。</p>
+<h1 id="Item-Pipeline"><a href="#Item-Pipeline" class="headerlink" title="Item Pipeline"></a>Item Pipeline</h1><p>当Item在Spider中被收集之后，它将会被传递到Item Pipeline，一些组件会按照一定的顺序执行对Item的处理。</p>
+<p>每个item pipeline组件(有时称之为“Item Pipeline”)是实现了简单方法的Python类。他们接收到Item并通过它执行一些行为，同时也决定此Item是否继续通过pipeline，或是被丢弃而不再进行处理。</p>
+<p>以下是item pipeline的一些典型应用：</p>
+<ul>
+<li>清理HTML数据</li>
+<li>验证爬取的数据(检查item包含某些字段)</li>
+<li>查重(并丢弃)将爬取结果保存到数据库中</li>
+</ul>
+<h3 id="编写你自己的item-pipeline"><a href="#编写你自己的item-pipeline" class="headerlink" title="编写你自己的item pipeline"></a>编写你自己的item pipeline</h3><p>每个item pipiline组件是一个独立的Python类，同时必须实现以下方法:<br><code>process_item(self, item, spider)</code><br>每个item pipeline组件都需要调用该方法，这个方法必须返回一个具有数据的dict，或是 <code>Item</code> (或任何继承类)对象， 或是抛出 <code>DropItem</code> 异常，被丢弃的item将不会被之后的pipeline组件所处理。</p>
+<p>参数:    </p>
+<ul>
+<li>item (<code>Item</code> 对象或者一个dict) – 被爬取的item</li>
+<li>spider (<code>Spider</code> 对象) – 爬取该item的spider</li>
+</ul>
+<p>此外,他们也可以实现以下方法:</p>
+<p><code>open_spider(self, spider)</code><br>当spider被开启时，这个方法被调用。</p>
+<p>参数:    spider (<code>Spider</code> 对象) – 被开启的spider<br><code>close_spider(self, spider)</code><br>当spider被关闭时，这个方法被调用</p>
+<p>参数:    spider (<code>Spider</code> 对象) – 被关闭的spider</p>
+<h3 id="Item-pipeline-样例"><a href="#Item-pipeline-样例" class="headerlink" title="Item pipeline 样例"></a>Item pipeline 样例</h3><h4 id="验证价格，同时丢弃没有价格的item"><a href="#验证价格，同时丢弃没有价格的item" class="headerlink" title="验证价格，同时丢弃没有价格的item"></a>验证价格，同时丢弃没有价格的item</h4><p>让我们来看一下以下这个假设的pipeline，它为那些不含税(<code>price_excludes_vat</code> 属性)的item调整了 <code>price</code> 属性，同时丢弃了那些没有价格的item:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">from scrapy.exceptions import DropItem</span><br><span class="line"></span><br><span class="line">class PricePipeline(object):</span><br><span class="line"></span><br><span class="line">    vat_factor = 1.15</span><br><span class="line"></span><br><span class="line">    def process_item(self, item, spider):</span><br><span class="line">        if item[&#x27;price&#x27;]:</span><br><span class="line">            if item[&#x27;price_excludes_vat&#x27;]:</span><br><span class="line">                item[&#x27;price&#x27;] = item[&#x27;price&#x27;] * self.vat_factor</span><br><span class="line">            return item</span><br><span class="line">        else:</span><br><span class="line">            raise DropItem(&quot;Missing price in %s&quot; % item)</span><br></pre></td></tr></table></figure></p>
+<h4 id="将item写入JSON文件"><a href="#将item写入JSON文件" class="headerlink" title="将item写入JSON文件"></a>将item写入JSON文件</h4><p>以下pipeline将所有(从所有spider中)爬取到的item，存储到一个独立地 <code>items.jl</code> 文件，每行包含一个序列化为JSON格式的item:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">import json</span><br><span class="line"></span><br><span class="line">class JsonWriterPipeline(object):</span><br><span class="line"></span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.file = open(&#x27;items.jl&#x27;, &#x27;wb&#x27;)</span><br><span class="line"></span><br><span class="line">    def process_item(self, item, spider):</span><br><span class="line">        line = json.dumps(dict(item)) + &quot;\n&quot;</span><br><span class="line">        self.file.write(line)</span><br><span class="line">        return item</span><br></pre></td></tr></table></figure></p>
+<h4 id="将items写入MongoDB"><a href="#将items写入MongoDB" class="headerlink" title="将items写入MongoDB"></a>将items写入MongoDB</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">import pymongo</span><br><span class="line"></span><br><span class="line">class MongoPipeline(object):</span><br><span class="line"></span><br><span class="line">    collection_name = &#x27;scrapy_items&#x27;</span><br><span class="line"></span><br><span class="line">    def __init__(self, mongo_uri, mongo_db):</span><br><span class="line">        self.mongo_uri = mongo_uri</span><br><span class="line">        self.mongo_db = mongo_db</span><br><span class="line"></span><br><span class="line">    @classmethod</span><br><span class="line">    def from_crawler(cls, crawler):</span><br><span class="line">        return cls(</span><br><span class="line">            mongo_uri=crawler.settings.get(&#x27;MONGO_URI&#x27;),</span><br><span class="line">            mongo_db=crawler.settings.get(&#x27;MONGO_DATABASE&#x27;, &#x27;items&#x27;)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    def open_spider(self, spider):</span><br><span class="line">        self.client = pymongo.MongoClient(self.mongo_uri)</span><br><span class="line">        self.db = self.client[self.mongo_db]</span><br><span class="line"></span><br><span class="line">    def close_spider(self, spider):</span><br><span class="line">        self.client.close()</span><br><span class="line"></span><br><span class="line">    def process_item(self, item, spider):</span><br><span class="line">        self.db[self.collection_name].insert(dict(item))</span><br><span class="line">        return item</span><br></pre></td></tr></table></figure>
+<p>MySQL类似</p>
+<h4 id="去重"><a href="#去重" class="headerlink" title="去重"></a>去重</h4><p>一个用于去重的过滤器，丢弃那些已经被处理过的item。让我们假设我们的item有一个唯一的id，但是我们spider返回的多个item中包含有相同的id:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">from scrapy.exceptions import DropItem</span><br><span class="line"></span><br><span class="line">class DuplicatesPipeline(object):</span><br><span class="line"></span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.ids_seen = set()</span><br><span class="line"></span><br><span class="line">    def process_item(self, item, spider):</span><br><span class="line">        if item[&#x27;id&#x27;] in self.ids_seen:</span><br><span class="line">            raise DropItem(&quot;Duplicate item found: %s&quot; % item)</span><br><span class="line">        else:</span><br><span class="line">            self.ids_seen.add(item[&#x27;id&#x27;])</span><br><span class="line">            return item</span><br></pre></td></tr></table></figure></p>
+<h3 id="启用一个Item-Pipeline组件"><a href="#启用一个Item-Pipeline组件" class="headerlink" title="启用一个Item Pipeline组件"></a>启用一个Item Pipeline组件</h3><p>为了启用一个Item Pipeline组件，你必须将它的类添加到 <code>ITEM_PIPELINES</code> 配置，就像下面这个例子:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ITEM_PIPELINES = &#123;</span><br><span class="line">    &#x27;myproject.pipelines.PricePipeline&#x27;: 300,</span><br><span class="line">    &#x27;myproject.pipelines.JsonWriterPipeline&#x27;: 800,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>分配给每个类的整型值，确定了他们运行的顺序，item按数字从低到高的顺序，通过pipeline，通常将这些数字定义在0-1000范围内。</p>
+<h2 id="Feed-exports"><a href="#Feed-exports" class="headerlink" title="Feed exports"></a>Feed exports</h2><p>0.10 新版功能.</p>
+<p>实现爬虫时最经常提到的需求就是能合适的保存爬取到的数据，或者说，生成一个带有爬取数据的”输出文件”(通常叫做”输出feed”)，来供其他系统使用。</p>
+<p>Scrapy自带了Feed输出，并且支持多种序列化格式(serialization format)及存储方式(storage backends)。</p>
+<h3 id="序列化方式-Serialization-formats"><a href="#序列化方式-Serialization-formats" class="headerlink" title="序列化方式(Serialization formats)"></a>序列化方式(Serialization formats)</h3><p>feed输出使用到了 Item exporters 。其自带支持的类型有:</p>
+<ul>
+<li>JSON</li>
+<li>JSON lines</li>
+<li>CSV</li>
+<li>XML<br>您也可以通过 <code>FEED_EXPORTERS</code> 设置扩展支持的属性。</li>
+</ul>
+<h3 id="JSON"><a href="#JSON" class="headerlink" title="JSON"></a>JSON</h3><ul>
+<li>FEED_FORMAT: json</li>
+<li>使用的<code>exporter</code>: <code>JsonItemExporter</code></li>
+<li>大数据量情况下使用JSON请参见 这个警告<h3 id="JSON-lines"><a href="#JSON-lines" class="headerlink" title="JSON lines"></a>JSON lines</h3></li>
+<li><code>FEED_FORMAT</code>: <code>jsonlines</code></li>
+<li>使用的exporter: <code>JsonLinesItemExporter</code><h3 id="CSV"><a href="#CSV" class="headerlink" title="CSV"></a>CSV</h3></li>
+<li><code>FEED_FORMAT</code>: <code>csv</code></li>
+<li>使用的exporter: <code>CsvItemExporter</code><br>指定字段和其顺序<h3 id="XML"><a href="#XML" class="headerlink" title="XML"></a>XML</h3></li>
+<li>·FEED_FORMAT·: ·xml·</li>
+<li>使用的exporter: <code>XmlItemExporter</code><h3 id="Pickle"><a href="#Pickle" class="headerlink" title="Pickle"></a>Pickle</h3></li>
+<li><code>FEED_FORMAT</code>: <code>pickle</code></li>
+<li>使用的exporter: <code>PickleItemExporter</code><h3 id="Marshal"><a href="#Marshal" class="headerlink" title="Marshal"></a>Marshal</h3></li>
+<li><code>FEED_FORMAT</code>: <code>marshal</code></li>
+<li>使用的exporter: <code>MarshalItemExporter</code></li>
+</ul>
+<h2 id="存储-Storages"><a href="#存储-Storages" class="headerlink" title="存储(Storages)"></a>存储(Storages)</h2><p>使用feed输出时您可以通过使用 URI (通过 <code>FEED_URI</code> 设置) 来定义存储端。 feed输出支持URI方式支持的多种存储后端类型。</p>
+<p>自带支持的存储后端有:</p>
+<ul>
+<li>本地文件系统</li>
+<li>FTP</li>
+<li>S3 (需要 boto)</li>
+<li>标准输出<br>有些存储后端会因所需的外部库未安装而不可用。例如，S3只有在 boto 库安装的情况下才可使用。</li>
+</ul>
+<h3 id="存储URI参数"><a href="#存储URI参数" class="headerlink" title="存储URI参数"></a>存储URI参数</h3><p>存储URI也包含参数。当feed被创建时这些参数可以被覆盖:</p>
+<ul>
+<li><code>%(time)s</code> - 当feed被创建时被timestamp覆盖</li>
+<li><code>%(name)s</code> - 被spider的名字覆盖<br>其他命名的参数会被spider同名的属性所覆盖。例如， 当feed被创建时， <code>%(site_id)s</code> 将会被 <code>spider.site_id</code> 属性所覆盖。</li>
+</ul>
+<p>下面用一些例子来说明:</p>
+<ul>
+<li>存储在FTP，每个spider一个目录:</li>
+<li><ul>
+<li><code>ftp://user:password@ftp.example.com/scraping/feeds/%(name)s/%(time)s.json</code></li>
+</ul>
+</li>
+<li>存储在S3，每一个spider一个目录:</li>
+<li><ul>
+<li><code>s3://mybucket/scraping/feeds/%(name)s/%(time)s.json</code><h3 id="存储端-Storage-backends"><a href="#存储端-Storage-backends" class="headerlink" title="存储端(Storage backends)"></a>存储端(Storage backends)</h3><h4 id="本地文件系统"><a href="#本地文件系统" class="headerlink" title="本地文件系统"></a>本地文件系统</h4>将feed存储在本地系统。</li>
+</ul>
+</li>
+<li><p>URI scheme: <code>file</code></p>
+</li>
+<li>URI样例: <code>file:///tmp/export.csv</code></li>
+<li>需要的外部依赖库: none<br>注意: (只有)存储在本地文件系统时，您可以指定一个绝对路径 <code>/tmp/export.csv</code> 并忽略协议(scheme)。不过这仅仅只能在Unix系统中工作。</li>
+</ul>
+<h4 id="FTP"><a href="#FTP" class="headerlink" title="FTP"></a>FTP</h4><p>将feed存储在FTP服务器。</p>
+<ul>
+<li>URI scheme: <code>ftp</code></li>
+<li>URI样例: <code>ftp://user:pass@ftp.example.com/path/to/export.csv</code></li>
+<li><p>需要的外部依赖库: none</p>
+<h4 id="S3"><a href="#S3" class="headerlink" title="S3"></a>S3</h4><p>将feed存储在 Amazon S3 。</p>
+</li>
+<li><p>URI scheme: <code>s3</code></p>
+</li>
+<li>URI样例:</li>
+<li><ul>
+<li><code>s3://mybucket/path/to/export.csv</code></li>
+</ul>
+</li>
+<li><ul>
+<li><code>s3://aws_key:aws_secret@mybucket/path/to/export.csv</code></li>
+</ul>
+</li>
+<li><p>需要的外部依赖库: boto<br>您可以通过在URI中传递user/pass来完成AWS认证，或者也可以通过下列的设置来完成:</p>
+</li>
+<li><p>AWS_ACCESS_KEY_ID</p>
+</li>
+<li>AWS_SECRET_ACCESS_KEY</li>
+</ul>
+<h4 id="标准输出"><a href="#标准输出" class="headerlink" title="标准输出"></a>标准输出</h4><p>feed输出到Scrapy进程的标准输出。</p>
+<ul>
+<li>URI scheme: <code>stdout</code></li>
+<li>URI样例: <code>stdout:</code></li>
+<li>需要的外部依赖库: none</li>
+</ul>
+<h3 id="设定-Settings"><a href="#设定-Settings" class="headerlink" title="设定(Settings)"></a>设定(Settings)</h3><p>这些是配置feed输出的设定:</p>
+<ul>
+<li>FEED_URI (必须)</li>
+<li>FEED_FORMAT</li>
+<li>FEED_STORAGES</li>
+<li>FEED_EXPORTERS</li>
+<li>FEED_STORE_EMPTY</li>
+<li>FEED_EXPORT_FIELDS</li>
+</ul>
+<h4 id="FEED-URI"><a href="#FEED-URI" class="headerlink" title="FEED_URI"></a>FEED_URI</h4><p>Default: <code>None</code></p>
+<p>输出feed的URI。支持的URI协议请参见 存储端(Storage backends) 。</p>
+<p>为了启用feed输出，该设定是必须的。</p>
+<h4 id="FEED-FORMAT"><a href="#FEED-FORMAT" class="headerlink" title="FEED_FORMAT"></a>FEED_FORMAT</h4><p>输出feed的序列化格式。可用的值请参见 序列化方式(Serialization formats) 。</p>
+<h4 id="FEED-EXPORT-FIELDS"><a href="#FEED-EXPORT-FIELDS" class="headerlink" title="FEED_EXPORT_FIELDS"></a>FEED_EXPORT_FIELDS</h4><p>Default: <code>None</code></p>
+<p>可供导出的字段列表，可选。示例:<code>FEED_EXPORT_FIELDS = [&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;]</code>。<br>使用FEED_EXPORT_FIELDS选项来定义要导出的字段和它们的顺序。<br>当FEED_EXPORT_FIELDS为空或没有(默认)时，Scrapy使用了在字典中定义的字段或<code>Item</code>子类。<br>如果导出需要一组固定的字段(这是CSV导出格式的情况)，而FEED_EXPORT_FIELDS是空的或没有，那么Scrapy试图从导出的数据中推断字段名——目前它使用的是第一个项目的字段名。</p>
+<h4 id="FEED-STORE-EMPTY"><a href="#FEED-STORE-EMPTY" class="headerlink" title="FEED_STORE_EMPTY"></a>FEED_STORE_EMPTY</h4><p>Default: <code>False</code></p>
+<p>是否输出空feed(没有item的feed)。</p>
+<h4 id="FEED-STORAGES"><a href="#FEED-STORAGES" class="headerlink" title="FEED_STORAGES"></a>FEED_STORAGES</h4><p>Default:: <code>&#123;&#125;</code></p>
+<p>包含项目支持的额外feed存储端的字典。 字典的键(key)是URI协议(scheme)，值是存储类(storage class)的路径。</p>
+<h4 id="FEED-STORAGES-BASE"><a href="#FEED-STORAGES-BASE" class="headerlink" title="FEED_STORAGES_BASE"></a>FEED_STORAGES_BASE</h4><p>Default:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &#x27;&#x27;: &#x27;scrapy.extensions.feedexport.FileFeedStorage&#x27;,</span><br><span class="line">    &#x27;file&#x27;: &#x27;scrapy.extensions.feedexport.FileFeedStorage&#x27;,</span><br><span class="line">    &#x27;stdout&#x27;: &#x27;scrapy.extensions.feedexport.StdoutFeedStorage&#x27;,</span><br><span class="line">    &#x27;s3&#x27;: &#x27;scrapy.extensions.feedexport.S3FeedStorage&#x27;,</span><br><span class="line">    &#x27;ftp&#x27;: &#x27;scrapy.extensions.feedexport.FTPFeedStorage&#x27;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>包含Scrapy内置支持的feed存储端的字典。</p>
+<h4 id="FEED-EXPORTERS"><a href="#FEED-EXPORTERS" class="headerlink" title="FEED_EXPORTERS"></a>FEED_EXPORTERS</h4><p>Default:: <code>&#123;&#125;</code></p>
+<p>包含项目支持的额外输出器(exporter)的字典。 该字典的键(key)是URI协议(scheme)，值是 Item输出器(exporter) 类的路径。</p>
+<p>FEED_EXPORTERS_BASE<br>Default:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">FEED_EXPORTERS_BASE = &#123;</span><br><span class="line">    &#x27;json&#x27;: &#x27;scrapy.exporters.JsonItemExporter&#x27;,</span><br><span class="line">    &#x27;jsonlines&#x27;: &#x27;scrapy.exporters.JsonLinesItemExporter&#x27;,</span><br><span class="line">    &#x27;csv&#x27;: &#x27;scrapy.exporters.CsvItemExporter&#x27;,</span><br><span class="line">    &#x27;xml&#x27;: &#x27;scrapy.exporters.XmlItemExporter&#x27;,</span><br><span class="line">    &#x27;marshal&#x27;: &#x27;scrapy.exporters.MarshalItemExporter&#x27;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>包含Scrapy内置支持的feed输出器(exporter)的字典。</p>
+<h2 id="Settings"><a href="#Settings" class="headerlink" title="Settings"></a>Settings</h2><p>Scrapy设定(settings)提供了定制Scrapy组件的方法。您可以控制包括核心(core)，插件(extension)，pipeline及spider组件。</p>
+<p>设定为代码提供了提取以key-value映射的配置值的的全局命名空间(namespace)。 设定可以通过下面介绍的多种机制进行设置。</p>
+<p>设定(settings)同时也是选择当前激活的Scrapy项目的方法(如果您有多个的话)。</p>
+<h3 id="指定设定-Designating-the-settings"><a href="#指定设定-Designating-the-settings" class="headerlink" title="指定设定(Designating the settings)"></a>指定设定(Designating the settings)</h3><p>当您使用Scrapy时，您需要声明您所使用的设定。这可以通过使用环境变量: <code>SCRAPY_SETTINGS_MODULE</code> 来完成。</p>
+<p><code>SCRAPY_SETTINGS_MODULE</code> 必须以Python路径语法编写, 如 <code>myproject.settings</code> 。 注意，设定模块应该在 Python import search path 中。</p>
+<h3 id="获取设定值-Populating-the-settings"><a href="#获取设定值-Populating-the-settings" class="headerlink" title="获取设定值(Populating the settings)"></a>获取设定值(Populating the settings)</h3><p>设定可以通过多种方式设置，每个方式具有不同的优先级。 下面以优先级降序的方式给出方式列表:</p>
+<ol>
+<li>命令行选项(Command line Options)(最高优先级)</li>
+<li>每个spider的设定</li>
+<li>项目设定模块(Project settings module)</li>
+<li>命令默认设定模块(Default settings per-command)</li>
+<li>全局默认设定(Default global settings) (最低优先级)<br>这些设定(settings)由scrapy内部很好的进行了处理，不过您仍可以使用API调用来手动处理。</li>
+</ol>
+<p>这些机制将在下面详细介绍。</p>
+<h4 id="命令行选项-Command-line-options"><a href="#命令行选项-Command-line-options" class="headerlink" title="命令行选项(Command line options)"></a>命令行选项(Command line options)</h4><p>命令行传入的参数具有最高的优先级。 您可以使用command line 选项 <code>-s</code> (或 <code>--set</code>) 来覆盖一个(或更多)选项。</p>
+<p>样例:<br><code>scrapy crawl myspider -s LOG_FILE=scrapy.log</code></p>
+<h4 id="每个spider特有设定"><a href="#每个spider特有设定" class="headerlink" title="每个spider特有设定"></a>每个spider特有设定</h4><p>每一个spider自己的设置将会覆盖掉一般的设置</p>
+<h4 id="项目设定模块-Project-settings-module"><a href="#项目设定模块-Project-settings-module" class="headerlink" title="项目设定模块(Project settings module)"></a>项目设定模块(Project settings module)</h4><p>项目设定模块是您Scrapy项目的标准配置文件。 其是获取大多数设定的方法。例如:: <code>myproject.settings</code> 。</p>
+<h4 id="命令默认设定-Default-settings-per-command"><a href="#命令默认设定-Default-settings-per-command" class="headerlink" title="命令默认设定(Default settings per-command)"></a>命令默认设定(Default settings per-command)</h4><p>每个 Scrapy tool 命令拥有其默认设定，并覆盖了全局默认的设定。 这些设定在命令的类的 <code>default_settings</code> 属性中指定。</p>
+<h4 id="默认全局设定-Default-global-settings"><a href="#默认全局设定-Default-global-settings" class="headerlink" title="默认全局设定(Default global settings)"></a>默认全局设定(Default global settings)</h4><p>全局默认设定存储在 <code>scrapy.settings.default_settings</code> 模块， 并在 内置设定参考手册 部分有所记录。</p>
+<h3 id="如何访问设定-How-to-access-settings"><a href="#如何访问设定-How-to-access-settings" class="headerlink" title="如何访问设定(How to access settings)"></a>如何访问设定(How to access settings)</h3><p>设定可以通过Crawler的 <code>scrapy.crawler.Crawler.settings</code> 属性进行访问。其由插件及中间件的 <code>from_crawler</code> 方法所传入:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">class MyExtension(object):</span><br><span class="line"></span><br><span class="line">    @classmethod</span><br><span class="line">    def from_crawler(cls, crawler):</span><br><span class="line">        settings = crawler.settings</span><br><span class="line">        if settings[&#x27;LOG_ENABLED&#x27;]:</span><br><span class="line">            print &quot;log is enabled!&quot;</span><br></pre></td></tr></table></figure><br>另外，设定可以以字典方式进行访问。不过为了避免类型错误， 通常更希望返回需要的格式。 这可以通过 <code>Settings</code> API 提供的方法来实现。</p>
+<h3 id="设定名字的命名规则"><a href="#设定名字的命名规则" class="headerlink" title="设定名字的命名规则"></a>设定名字的命名规则</h3><p>设定的名字以要配置的组件作为前缀。 例如，一个robots.txt插件的合适设定应该为 <code>ROBOTSTXT_ENABLED</code>, <code>ROBOTSTXT_OBEY</code>, <code>ROBOTSTXT_CACHEDIR</code> 等等。</p>
+<h3 id="内置设定参考手册"><a href="#内置设定参考手册" class="headerlink" title="内置设定参考手册"></a>内置设定参考手册</h3><p>这里以字母序给出了所有可用的Scrapy设定及其默认值和应用范围。</p>
+<p>如果给出可用范围，并绑定了特定的组件，则说明了该设定使用的地方。 这种情况下将给出该组件的模块，通常来说是插件、中间件或pipeline。 同时也意味着为了使设定生效，该组件必须被启用。</p>
+<h4 id="AWS-ACCESS-KEY-ID"><a href="#AWS-ACCESS-KEY-ID" class="headerlink" title="AWS_ACCESS_KEY_ID"></a>AWS_ACCESS_KEY_ID</h4><p>默认: <code>None</code></p>
+<p>连接 Amazon Web services 的AWS access key。 S3 feed storage backend 中使用.</p>
+<h4 id="AWS-SECRET-ACCESS-KEY"><a href="#AWS-SECRET-ACCESS-KEY" class="headerlink" title="AWS_SECRET_ACCESS_KEY"></a>AWS_SECRET_ACCESS_KEY</h4><p>默认: <code>None</code></p>
+<p>连接 Amazon Web services 的AWS secret key。 S3 feed storage backend 中使用。</p>
+<h4 id="BOT-NAME"><a href="#BOT-NAME" class="headerlink" title="BOT_NAME"></a>BOT_NAME</h4><p>默认: <code>&#39;scrapybot&#39;</code></p>
+<p>Scrapy项目实现的bot的名字(也未项目名称)。 这将用来构造默认 User-Agent，同时也用来log。</p>
+<p>当您使用 <code>startproject</code> 命令创建项目时其也被自动赋值。</p>
+<h4 id="CONCURRENT-ITEMS"><a href="#CONCURRENT-ITEMS" class="headerlink" title="CONCURRENT_ITEMS"></a>CONCURRENT_ITEMS</h4><p>默认: <code>100</code></p>
+<p>Item Processor(即 Item Pipeline) 同时处理(每个response的)item的最大值。</p>
+<h4 id="CONCURRENT-REQUESTS"><a href="#CONCURRENT-REQUESTS" class="headerlink" title="CONCURRENT_REQUESTS"></a>CONCURRENT_REQUESTS</h4><p>默认: <code>16</code></p>
+<p>Scrapy downloader 并发请求(concurrent requests)的最大值。</p>
+<h4 id="CONCURRENT-REQUESTS-PER-DOMAIN"><a href="#CONCURRENT-REQUESTS-PER-DOMAIN" class="headerlink" title="CONCURRENT_REQUESTS_PER_DOMAIN"></a>CONCURRENT_REQUESTS_PER_DOMAIN</h4><p>默认: <code>8</code></p>
+<p>对单个网站进行并发请求的最大值。</p>
+<h4 id="CONCURRENT-REQUESTS-PER-IP"><a href="#CONCURRENT-REQUESTS-PER-IP" class="headerlink" title="CONCURRENT_REQUESTS_PER_IP"></a>CONCURRENT_REQUESTS_PER_IP</h4><p>默认: <code>0</code></p>
+<p>对单个IP进行并发请求的最大值。如果非0，则忽略 <code>CONCURRENT_REQUESTS_PER_DOMAIN</code> 设定， 使用该设定。 也就是说，并发限制将针对IP，而不是网站。</p>
+<p>该设定也影响 <code>DOWNLOAD_DELAY</code>: 如果 <code>CONCURRENT_REQUESTS_PER_IP</code> 非0，下载延迟应用在IP而不是网站上。</p>
+<h4 id="DEFAULT-ITEM-CLASS"><a href="#DEFAULT-ITEM-CLASS" class="headerlink" title="DEFAULT_ITEM_CLASS"></a>DEFAULT_ITEM_CLASS</h4><p>默认: <code>&#39;scrapy.item.Item&#39;</code></p>
+<p>the Scrapy shell 中实例化item使用的默认类。</p>
+<h4 id="DEFAULT-REQUEST-HEADERS"><a href="#DEFAULT-REQUEST-HEADERS" class="headerlink" title="DEFAULT_REQUEST_HEADERS"></a>DEFAULT_REQUEST_HEADERS</h4><p>默认:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &#x27;Accept&#x27;: &#x27;text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8&#x27;,</span><br><span class="line">    &#x27;Accept-Language&#x27;: &#x27;en&#x27;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>Scrapy HTTP Request使用的默认header。由 <code>DefaultHeadersMiddleware</code> 产生。</p>
+<h4 id="DEPTH-LIMIT"><a href="#DEPTH-LIMIT" class="headerlink" title="DEPTH_LIMIT"></a>DEPTH_LIMIT</h4><p>默认: <code>0</code></p>
+<p>爬取网站最大允许的深度(depth)值。如果为0，则没有限制。</p>
+<h4 id="DEPTH-PRIORITY"><a href="#DEPTH-PRIORITY" class="headerlink" title="DEPTH_PRIORITY"></a>DEPTH_PRIORITY</h4><p>默认: <code>0</code></p>
+<p>整数值。用于根据深度调整request优先级。</p>
+<p>如果为0，则不根据深度进行优先级调整。</p>
+<h4 id="DEPTH-STATS"><a href="#DEPTH-STATS" class="headerlink" title="DEPTH_STATS"></a>DEPTH_STATS</h4><p>默认: <code>True</code></p>
+<p>是否收集最大深度数据。</p>
+<h4 id="DEPTH-STATS-VERBOSE"><a href="#DEPTH-STATS-VERBOSE" class="headerlink" title="DEPTH_STATS_VERBOSE"></a>DEPTH_STATS_VERBOSE</h4><p>默认: <code>False</code></p>
+<p>是否收集详细的深度数据。如果启用，每个深度的请求数将会被收集在数据中。</p>
+<h4 id="DNSCACHE-ENABLED"><a href="#DNSCACHE-ENABLED" class="headerlink" title="DNSCACHE_ENABLED"></a>DNSCACHE_ENABLED</h4><p>默认: <code>True</code></p>
+<p>是否启用DNS内存缓存(DNS in-memory cache)。</p>
+<h4 id="DNSCACHE-SIZE"><a href="#DNSCACHE-SIZE" class="headerlink" title="DNSCACHE_SIZE"></a>DNSCACHE_SIZE</h4><p>Default: <code>10000</code></p>
+<p>DNS内存缓存大小</p>
+<h4 id="DNS-TIMEOUT"><a href="#DNS-TIMEOUT" class="headerlink" title="DNS_TIMEOUT"></a>DNS_TIMEOUT</h4><p>Default: <code>60</code></p>
+<p>DNS查询判断超时的时间长短，支持浮点数</p>
+<h4 id="DOWNLOADER"><a href="#DOWNLOADER" class="headerlink" title="DOWNLOADER"></a>DOWNLOADER</h4><p>默认: <code>&#39;scrapy.core.downloader.Downloader&#39;</code></p>
+<p>用于crawl的downloader.</p>
+<h4 id="DOWNLOADER-MIDDLEWARES"><a href="#DOWNLOADER-MIDDLEWARES" class="headerlink" title="DOWNLOADER_MIDDLEWARES"></a>DOWNLOADER_MIDDLEWARES</h4><p>默认:: <code>&#123;&#125;</code></p>
+<p>保存项目中启用的下载中间件及其顺序的字典。</p>
+<h4 id="DOWNLOADER-MIDDLEWARES-BASE"><a href="#DOWNLOADER-MIDDLEWARES-BASE" class="headerlink" title="DOWNLOADER_MIDDLEWARES_BASE"></a>DOWNLOADER_MIDDLEWARES_BASE</h4><p>默认:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &#x27;scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware&#x27;: 100,</span><br><span class="line">    &#x27;scrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware&#x27;: 300,</span><br><span class="line">    &#x27;scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware&#x27;: 350,</span><br><span class="line">    &#x27;scrapy.downloadermiddlewares.useragent.UserAgentMiddleware&#x27;: 400,</span><br><span class="line">    &#x27;scrapy.downloadermiddlewares.retry.RetryMiddleware&#x27;: 500,</span><br><span class="line">    &#x27;scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware&#x27;: 550,</span><br><span class="line">    &#x27;scrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware&#x27;: 580,</span><br><span class="line">    &#x27;scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware&#x27;: 590,</span><br><span class="line">    &#x27;scrapy.downloadermiddlewares.redirect.RedirectMiddleware&#x27;: 600,</span><br><span class="line">    &#x27;scrapy.downloadermiddlewares.cookies.CookiesMiddleware&#x27;: 700,</span><br><span class="line">    &#x27;scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware&#x27;: 750,</span><br><span class="line">    &#x27;scrapy.downloadermiddlewares.chunked.ChunkedTransferMiddleware&#x27;: 830,</span><br><span class="line">    &#x27;scrapy.downloadermiddlewares.stats.DownloaderStats&#x27;: 850,</span><br><span class="line">    &#x27;scrapy.downloadermiddlewares.httpcache.HttpCacheMiddleware&#x27;: 900,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>包含Scrapy默认启用的下载中间件的字典。 永远不要在项目中修改该设定，而是修改 <code>DOWNLOADER_MIDDLEWARES</code> 。</p>
+<h4 id="DOWNLOADER-STATS"><a href="#DOWNLOADER-STATS" class="headerlink" title="DOWNLOADER_STATS"></a>DOWNLOADER_STATS</h4><p>默认: <code>True</code></p>
+<p>是否收集下载器数据。</p>
+<h4 id="DOWNLOAD-DELAY"><a href="#DOWNLOAD-DELAY" class="headerlink" title="DOWNLOAD_DELAY"></a>DOWNLOAD_DELAY</h4><p>默认: <code>0</code></p>
+<p>下载器在下载同一个网站下一个页面前需要等待的时间。该选项可以用来限制爬取速度， 减轻服务器压力。同时也支持小数:</p>
+<p><code>DOWNLOAD_DELAY = 0.25    # 250 ms of delay</code><br>该设定影响(默认启用的) <code>RANDOMIZE_DOWNLOAD_DELAY</code> 设定。 默认情况下，Scrapy在两个请求间不等待一个固定的值， 而是使用0.5到1.5之间的一个随机值 * <code>DOWNLOAD_DELAY</code> 的结果作为等待间隔。</p>
+<p>当 <code>CONCURRENT_REQUESTS_PER_IP</code> 非0时，延迟针对的是每个ip而不是网站。</p>
+<p>另外您可以通过spider的 <code>download_delay</code> 属性为每个spider设置该设定。</p>
+<h4 id="DOWNLOAD-HANDLERS"><a href="#DOWNLOAD-HANDLERS" class="headerlink" title="DOWNLOAD_HANDLERS"></a>DOWNLOAD_HANDLERS</h4><p>默认: <code>&#123;&#125;</code></p>
+<p>保存项目中启用的下载处理器(request downloader handler)的字典。 例子请查看 DOWNLOAD_HANDLERS_BASE 。</p>
+<h4 id="DOWNLOAD-HANDLERS-BASE"><a href="#DOWNLOAD-HANDLERS-BASE" class="headerlink" title="DOWNLOAD_HANDLERS_BASE"></a>DOWNLOAD_HANDLERS_BASE</h4><p>默认:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &#x27;file&#x27;: &#x27;scrapy.core.downloader.handlers.file.FileDownloadHandler&#x27;,</span><br><span class="line">    &#x27;http&#x27;: &#x27;scrapy.core.downloader.handlers.http.HttpDownloadHandler&#x27;,</span><br><span class="line">    &#x27;https&#x27;: &#x27;scrapy.core.downloader.handlers.http.HttpDownloadHandler&#x27;,</span><br><span class="line">    &#x27;s3&#x27;: &#x27;scrapy.core.downloader.handlers.s3.S3DownloadHandler&#x27;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>保存项目中默认启用的下载处理器(request downloader handler)的字典。 永远不要在项目中修改该设定，而是修改 <code>DOWNLOADER_HANDLERS</code> 。</p>
+<p>如果需要关闭上面的下载处理器，您必须在项目中的 <code>DOWNLOAD_HANDLERS</code> 设定中设置该处理器，并为其赋值为 None 。 例如，关闭文件下载处理器:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">DOWNLOAD_HANDLERS = &#123;</span><br><span class="line">    &#x27;file&#x27;: None,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="DOWNLOAD-TIMEOUT"><a href="#DOWNLOAD-TIMEOUT" class="headerlink" title="DOWNLOAD_TIMEOUT"></a>DOWNLOAD_TIMEOUT</h4><p>默认: <code>180</code></p>
+<p>下载器超时时间(单位: 秒)。</p>
+<h4 id="DOWNLOAD-MAXSIZE"><a href="#DOWNLOAD-MAXSIZE" class="headerlink" title="DOWNLOAD_MAXSIZE"></a>DOWNLOAD_MAXSIZE</h4><p>Default: <em>1073741824</em> (1024MB)</p>
+<p>response的下载大小最大限制，不想设置则置为0</p>
+<h4 id="DOWNLOAD-WARNSIZE"><a href="#DOWNLOAD-WARNSIZE" class="headerlink" title="DOWNLOAD_WARNSIZE"></a>DOWNLOAD_WARNSIZE</h4><p>Default: <em>33554432</em> (32MB)</p>
+<p>The response size (in bytes) that downloader will start to warn.</p>
+<p>If you want to disable it set to 0.</p>
+<h4 id="DUPEFILTER-CLASS"><a href="#DUPEFILTER-CLASS" class="headerlink" title="DUPEFILTER_CLASS"></a>DUPEFILTER_CLASS</h4><p>默认: <code>&#39;scrapy.dupefilters.RFPDupeFilter&#39;</code></p>
+<p>用于检测过滤重复请求的类。</p>
+<p>默认的 (<code>RFPDupeFilter</code>) 过滤器基于 <code>scrapy.utils.request.request_fingerprint</code> 函数生成的请求fingerprint(指纹)。 如果您需要修改检测的方式，您可以继承 <code>RFPDupeFilter</code> 并覆盖其 <code>request_fingerprint</code> 方法。 该方法接收 <code>Request</code> 对象并返回其fingerprint(一个字符串)。</p>
+<h4 id="DUPEFILTER-DEBUG"><a href="#DUPEFILTER-DEBUG" class="headerlink" title="DUPEFILTER_DEBUG"></a>DUPEFILTER_DEBUG</h4><p>默认: <code>False</code></p>
+<p>默认情况下， <code>RFPDupeFilter</code> 只记录第一次重复的请求。 设置 <code>DUPEFILTER_DEBUG</code> 为 <code>True</code> 将会使其记录所有重复的requests。</p>
+<h4 id="EDITOR"><a href="#EDITOR" class="headerlink" title="EDITOR"></a>EDITOR</h4><p>默认: depends on the environment</p>
+<p>执行 <code>edit</code> 命令编辑spider时使用的编辑器。 其默认为 <code>EDITOR</code> 环境变量。如果该变量未设置，其默认为 <code>vi</code> (Unix系统) 或者 IDLE编辑器(Windows)。</p>
+<h4 id="EXTENSIONS"><a href="#EXTENSIONS" class="headerlink" title="EXTENSIONS"></a>EXTENSIONS</h4><p>默认:: <code>&#123;&#125;</code></p>
+<p>保存项目中启用的插件及其顺序的字典。</p>
+<h4 id="EXTENSIONS-BASE"><a href="#EXTENSIONS-BASE" class="headerlink" title="EXTENSIONS_BASE"></a>EXTENSIONS_BASE</h4><p>默认:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &#x27;scrapy.extensions.corestats.CoreStats&#x27;: 0,</span><br><span class="line">    &#x27;scrapy.telnet.TelnetConsole&#x27;: 0,</span><br><span class="line">    &#x27;scrapy.extensions.memusage.MemoryUsage&#x27;: 0,</span><br><span class="line">    &#x27;scrapy.extensions.memdebug.MemoryDebugger&#x27;: 0,</span><br><span class="line">    &#x27;scrapy.extensions.closespider.CloseSpider&#x27;: 0,</span><br><span class="line">    &#x27;scrapy.extensions.feedexport.FeedExporter&#x27;: 0,</span><br><span class="line">    &#x27;scrapy.extensions.logstats.LogStats&#x27;: 0,</span><br><span class="line">    &#x27;scrapy.extensions.spiderstate.SpiderState&#x27;: 0,</span><br><span class="line">    &#x27;scrapy.extensions.throttle.AutoThrottle&#x27;: 0,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>可用的插件列表。需要注意，有些插件需要通过设定来启用。默认情况下， 该设定包含所有稳定(stable)的内置插件。</p>
+<h4 id="ITEM-PIPELINES"><a href="#ITEM-PIPELINES" class="headerlink" title="ITEM_PIPELINES"></a>ITEM_PIPELINES</h4><p>默认: <code>&#123;&#125;</code></p>
+<p>保存项目中启用的pipeline及其顺序的字典。该字典默认为空，值(value)任意。 不过值(value)习惯设定在0-1000范围内。</p>
+<p>为了兼容性，<code>ITEM_PIPELINES</code> 支持列表，不过已经被废弃了。</p>
+<p>样例:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ITEM_PIPELINES = &#123;</span><br><span class="line">    &#x27;mybot.pipelines.validate.ValidateMyItem&#x27;: 300,</span><br><span class="line">    &#x27;mybot.pipelines.validate.StoreMyItem&#x27;: 800,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="ITEM-PIPELINES-BASE"><a href="#ITEM-PIPELINES-BASE" class="headerlink" title="ITEM_PIPELINES_BASE"></a>ITEM_PIPELINES_BASE</h4><p>默认: <code>&#123;&#125;</code></p>
+<p>保存项目中默认启用的pipeline的字典。 永远不要在项目中修改该设定，而是修改 <code>ITEM_PIPELINES</code> 。</p>
+<h4 id="LOG-ENABLED"><a href="#LOG-ENABLED" class="headerlink" title="LOG_ENABLED"></a>LOG_ENABLED</h4><p>默认: <code>True</code></p>
+<p>是否启用logging。</p>
+<h4 id="LOG-ENCODING"><a href="#LOG-ENCODING" class="headerlink" title="LOG_ENCODING"></a>LOG_ENCODING</h4><p>默认: <code>&#39;utf-8&#39;</code></p>
+<p>logging使用的编码。</p>
+<h4 id="LOG-FILE"><a href="#LOG-FILE" class="headerlink" title="LOG_FILE"></a>LOG_FILE</h4><p>默认: <code>None</code></p>
+<p>logging输出的文件名。如果为None，则使用标准错误输出(standard error)。</p>
+<h4 id="LOG-FORMAT"><a href="#LOG-FORMAT" class="headerlink" title="LOG_FORMAT"></a>LOG_FORMAT</h4><p>Default: <code>&#39;%(asctime)s [%(name)s] %(levelname)s: %(message)s&#39;</code></p>
+<p>log的字符串格式</p>
+<h4 id="LOG-DATEFORMAT"><a href="#LOG-DATEFORMAT" class="headerlink" title="LOG_DATEFORMAT"></a>LOG_DATEFORMAT</h4><p>Default: <code>&#39;%Y-%m-%d %H:%M:%S&#39;</code></p>
+<p>log的日期格式</p>
+<h4 id="LOG-LEVEL"><a href="#LOG-LEVEL" class="headerlink" title="LOG_LEVEL"></a>LOG_LEVEL</h4><p>默认: <code>&#39;DEBUG&#39;</code></p>
+<p>log的最低级别。可选的级别有: CRITICAL、 ERROR、WARNING、INFO、DEBUG。</p>
+<h4 id="LOG-STDOUT"><a href="#LOG-STDOUT" class="headerlink" title="LOG_STDOUT"></a>LOG_STDOUT</h4><p>默认: <code>False</code></p>
+<p>如果为 <code>True</code> ，进程所有的标准输出(及错误)将会被重定向到log中。例如， 执行 <code>print &#39;hello&#39;</code> ，其将会在Scrapy log中显示。</p>
+<h4 id="MEMDEBUG-ENABLED"><a href="#MEMDEBUG-ENABLED" class="headerlink" title="MEMDEBUG_ENABLED"></a>MEMDEBUG_ENABLED</h4><p>默认: <code>False</code></p>
+<p>是否启用内存调试(memory debugging)。</p>
+<h4 id="MEMDEBUG-NOTIFY"><a href="#MEMDEBUG-NOTIFY" class="headerlink" title="MEMDEBUG_NOTIFY"></a>MEMDEBUG_NOTIFY</h4><p>默认: <code>[]</code></p>
+<p>如果该设置不为空，当启用内存调试时将会发送一份内存报告到指定的地址；否则该报告将写到log中。</p>
+<p>样例:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MEMDEBUG_NOTIFY = [&#x27;user@example.com&#x27;]</span><br></pre></td></tr></table></figure></p>
+<h4 id="MEMUSAGE-ENABLED"><a href="#MEMUSAGE-ENABLED" class="headerlink" title="MEMUSAGE_ENABLED"></a>MEMUSAGE_ENABLED</h4><p>默认: <code>False</code></p>
+<p>Scope: <code>scrapy.extensions.memusage</code></p>
+<p>是否启用内存使用插件。当Scrapy进程占用的内存超出限制时，该插件将会关闭Scrapy进程， 同时发送email进行通知。</p>
+<h4 id="MEMUSAGE-LIMIT-MB"><a href="#MEMUSAGE-LIMIT-MB" class="headerlink" title="MEMUSAGE_LIMIT_MB"></a>MEMUSAGE_LIMIT_MB</h4><p>默认: <code>0</code></p>
+<p>Scope: <code>scrapy.extensions.memusage</code></p>
+<p>在关闭Scrapy之前所允许的最大内存数(单位: MB)(如果 MEMUSAGE_ENABLED为True)。 如果为0，将不做限制。</p>
+<h4 id="MEMUSAGE-NOTIFY-MAIL"><a href="#MEMUSAGE-NOTIFY-MAIL" class="headerlink" title="MEMUSAGE_NOTIFY_MAIL"></a>MEMUSAGE_NOTIFY_MAIL</h4><p>默认: <code>False</code></p>
+<p>Scope: <code>scrapy.extensions.memusage</code></p>
+<p>达到内存限制时通知的email列表。</p>
+<p>Example:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MEMUSAGE_NOTIFY_MAIL = [&#x27;user@example.com&#x27;]</span><br></pre></td></tr></table></figure></p>
+<h4 id="MEMUSAGE-REPORT"><a href="#MEMUSAGE-REPORT" class="headerlink" title="MEMUSAGE_REPORT"></a>MEMUSAGE_REPORT</h4><p>默认: <code>False</code></p>
+<p>Scope: <code>scrapy.extensions.memusage</code></p>
+<p>每个spider被关闭时是否发送内存使用报告。</p>
+<h4 id="MEMUSAGE-WARNING-MB"><a href="#MEMUSAGE-WARNING-MB" class="headerlink" title="MEMUSAGE_WARNING_MB"></a>MEMUSAGE_WARNING_MB</h4><p>默认: <code>0</code></p>
+<p>Scope: <code>scrapy.extensions.memusage</code></p>
+<p>在发送警告email前所允许的最大内存数(单位: MB)(如果 MEMUSAGE_ENABLED为True)。 如果为0，将不发送警告。</p>
+<h4 id="NEWSPIDER-MODULE"><a href="#NEWSPIDER-MODULE" class="headerlink" title="NEWSPIDER_MODULE"></a>NEWSPIDER_MODULE</h4><p>默认: <code>&#39;&#39;</code></p>
+<p>使用 <code>genspider</code> 命令创建新spider的模块。</p>
+<p>样例:<br><code>NEWSPIDER_MODULE = &#39;mybot.spiders_dev&#39;</code></p>
+<h4 id="RANDOMIZE-DOWNLOAD-DELAY"><a href="#RANDOMIZE-DOWNLOAD-DELAY" class="headerlink" title="RANDOMIZE_DOWNLOAD_DELAY"></a>RANDOMIZE_DOWNLOAD_DELAY</h4><p>默认: ·True·</p>
+<p>如果启用，当从相同的网站获取数据时，Scrapy将会等待一个随机的值 (0.5到1.5之间的一个随机值 * <code>DOWNLOAD_DELAY</code>)。</p>
+<p>该随机值降低了crawler被检测到(接着被block)的机会。某些网站会分析请求， 查找请求之间时间的相似性。</p>
+<p>随机的策略与 wget <code>--random-wait</code> 选项的策略相同。</p>
+<p>若 <code>DOWNLOAD_DELAY</code> 为0(默认值)，该选项将不起作用。</p>
+<h4 id="REDIRECT-MAX-TIMES"><a href="#REDIRECT-MAX-TIMES" class="headerlink" title="REDIRECT_MAX_TIMES"></a>REDIRECT_MAX_TIMES</h4><p>默认: <code>20</code></p>
+<p>定义request允许重定向的最大次数。超过该限制后该request直接返回获取到的结果。 对某些任务我们使用Firefox默认值。</p>
+<h4 id="REDIRECT-MAX-METAREFRESH-DELAY"><a href="#REDIRECT-MAX-METAREFRESH-DELAY" class="headerlink" title="REDIRECT_MAX_METAREFRESH_DELAY"></a>REDIRECT_MAX_METAREFRESH_DELAY</h4><p>默认: <code>100</code></p>
+<p>有些网站使用 meta-refresh 重定向到session超时页面， 因此我们限制自动重定向到最大延迟(秒)。 =&gt;有点不肯定:</p>
+<h4 id="REDIRECT-PRIORITY-ADJUST"><a href="#REDIRECT-PRIORITY-ADJUST" class="headerlink" title="REDIRECT_PRIORITY_ADJUST"></a>REDIRECT_PRIORITY_ADJUST</h4><p>默认: <code>+2</code></p>
+<p>修改重定向请求相对于原始请求的优先级。 负数意味着更多优先级。</p>
+<h4 id="ROBOTSTXT-OBEY"><a href="#ROBOTSTXT-OBEY" class="headerlink" title="ROBOTSTXT_OBEY"></a>ROBOTSTXT_OBEY</h4><p>默认: <code>False</code></p>
+<p>Scope: <code>scrapy.downloadermiddlewares.robotstxt</code></p>
+<p>如果启用，Scrapy将会尊重 robots.txt策略。</p>
+<h4 id="SCHEDULER"><a href="#SCHEDULER" class="headerlink" title="SCHEDULER"></a>SCHEDULER</h4><p>默认: <code>&#39;scrapy.core.scheduler.Scheduler&#39;</code></p>
+<p>用于爬取的调度器。</p>
+<h4 id="SPIDER-CONTRACTS"><a href="#SPIDER-CONTRACTS" class="headerlink" title="SPIDER_CONTRACTS"></a>SPIDER_CONTRACTS</h4><p>默认:: <code>&#123;&#125;</code></p>
+<p>保存项目中启用用于测试spider的scrapy contract及其顺序的字典。</p>
+<h4 id="SPIDER-CONTRACTS-BASE"><a href="#SPIDER-CONTRACTS-BASE" class="headerlink" title="SPIDER_CONTRACTS_BASE"></a>SPIDER_CONTRACTS_BASE</h4><p>默认:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &#x27;scrapy.contracts.default.UrlContract&#x27; : 1,</span><br><span class="line">    &#x27;scrapy.contracts.default.ReturnsContract&#x27;: 2,</span><br><span class="line">    &#x27;scrapy.contracts.default.ScrapesContract&#x27;: 3,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>保存项目中默认启用的scrapy contract的字典。 永远不要在项目中修改该设定，而是修改 <code>SPIDER_CONTRACTS</code> 。</p>
+<h4 id="SPIDER-LOADER-CLASS"><a href="#SPIDER-LOADER-CLASS" class="headerlink" title="SPIDER_LOADER_CLASS"></a>SPIDER_LOADER_CLASS</h4><p>Default: <code>&#39;scrapy.spiderloader.SpiderLoader&#39;</code></p>
+<p>spider读取的模块</p>
+<h4 id="SPIDER-MIDDLEWARES"><a href="#SPIDER-MIDDLEWARES" class="headerlink" title="SPIDER_MIDDLEWARES"></a>SPIDER_MIDDLEWARES</h4><p>默认:: <code>&#123;&#125;</code></p>
+<p>保存项目中启用的下载中间件及其顺序的字典。 </p>
+<h4 id="SPIDER-MIDDLEWARES-BASE"><a href="#SPIDER-MIDDLEWARES-BASE" class="headerlink" title="SPIDER_MIDDLEWARES_BASE"></a>SPIDER_MIDDLEWARES_BASE</h4><p>默认:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &#x27;scrapy.spidermiddlewares.httperror.HttpErrorMiddleware&#x27;: 50,</span><br><span class="line">    &#x27;scrapy.spidermiddlewares.offsite.OffsiteMiddleware&#x27;: 500,</span><br><span class="line">    &#x27;scrapy.spidermiddlewares.referer.RefererMiddleware&#x27;: 700,</span><br><span class="line">    &#x27;scrapy.spidermiddlewares.urllength.UrlLengthMiddleware&#x27;: 800,</span><br><span class="line">    &#x27;scrapy.spidermiddlewares.depth.DepthMiddleware&#x27;: 900,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>保存项目中默认启用的spider中间件的字典。 永远不要在项目中修改该设定，而是修改 <code>SPIDER_MIDDLEWARES</code> 。</p>
+<h4 id="SPIDER-MODULES"><a href="#SPIDER-MODULES" class="headerlink" title="SPIDER_MODULES"></a>SPIDER_MODULES</h4><p>默认: <code>[]</code></p>
+<p>Scrapy搜索spider的模块列表。</p>
+<p>样例:<br><code>SPIDER_MODULES = [&#39;mybot.spiders_prod&#39;, &#39;mybot.spiders_dev&#39;]</code></p>
+<h4 id="STATS-CLASS"><a href="#STATS-CLASS" class="headerlink" title="STATS_CLASS"></a>STATS_CLASS</h4><p>默认: <code>&#39;scrapy.statscollectors.MemoryStatsCollector&#39;</code></p>
+<p>收集数据的类。该类必须实现 状态收集器(Stats Collector) API.</p>
+<h4 id="STATS-DUMP"><a href="#STATS-DUMP" class="headerlink" title="STATS_DUMP"></a>STATS_DUMP</h4><p>默认: <code>True</code></p>
+<p>当spider结束时dump Scrapy状态数据 (到Scrapy log中)。</p>
+<h4 id="STATSMAILER-RCPTS"><a href="#STATSMAILER-RCPTS" class="headerlink" title="STATSMAILER_RCPTS"></a>STATSMAILER_RCPTS</h4><p>默认: <code>[]</code> (空list)</p>
+<p>spider完成爬取后发送Scrapy数据。</p>
+<h4 id="TELNETCONSOLE-ENABLED"><a href="#TELNETCONSOLE-ENABLED" class="headerlink" title="TELNETCONSOLE_ENABLED"></a>TELNETCONSOLE_ENABLED</h4><p>默认: <code>True</code></p>
+<p>表明 telnet 终端 (及其插件)是否启用的布尔值。</p>
+<h4 id="TELNETCONSOLE-PORT"><a href="#TELNETCONSOLE-PORT" class="headerlink" title="TELNETCONSOLE_PORT"></a>TELNETCONSOLE_PORT</h4><p>默认: <code>[6023, 6073]</code></p>
+<p>telnet终端使用的端口范围。如果设置为 <code>None</code> 或 <code>0</code> ， 则使用动态分配的端口。</p>
+<h4 id="TEMPLATES-DIR"><a href="#TEMPLATES-DIR" class="headerlink" title="TEMPLATES_DIR"></a>TEMPLATES_DIR</h4><p>默认: scrapy模块内部的 <code>templates</code></p>
+<p>使用 <code>startproject</code> 命令创建项目时查找模板的目录。</p>
+<h4 id="URLLENGTH-LIMIT"><a href="#URLLENGTH-LIMIT" class="headerlink" title="URLLENGTH_LIMIT"></a>URLLENGTH_LIMIT</h4><p>默认: <code>2083</code></p>
+<p>Scope: <code>spidermiddlewares.urllength</code></p>
+<p>爬取URL的最大长度。</p>
+<h4 id="USER-AGENT"><a href="#USER-AGENT" class="headerlink" title="USER_AGENT"></a>USER_AGENT</h4><p>默认: <code>&quot;Scrapy/VERSION (+http://scrapy.org)&quot;</code></p>
+<p>爬取的默认<code>User-Agent</code>，除非被覆盖。</p>
+<h2 id="后续"><a href="#后续" class="headerlink" title="后续"></a>后续</h2><p>自己只是记录了一些已经用过或者正需要用的东西，因为官方文档到后续的一些扩展，自己认为还是需要用到的时候再去学习，之后再继续记录。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\07\20\Scrapy结合IPProxyPool实现代理的一些坑\" rel="bookmark">Scrapy结合IPProxyPool实现代理的一些坑</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\08\11\urllib-quote对url的编码\" rel="bookmark">urllib.quote对url的编码</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\07\14\url的井号\" rel="bookmark">url的井号</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2017/07/15/Scrapy-1-0-5%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E8%AE%B0%E5%BD%95/" title="Scrapy 1.0.5官方文档">https://blog.rexking6.top/2017/07/15/Scrapy-1-0-5官方文档记录/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%88%AC%E8%99%AB/" rel="tag"># 爬虫</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/07/14/url%E7%9A%84%E4%BA%95%E5%8F%B7/" rel="prev" title="url的井号">
+      <i class="fa fa-chevron-left"></i> url的井号
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/07/20/Scrapy%E7%BB%93%E5%90%88IPProxyPool%E5%AE%9E%E7%8E%B0%E4%BB%A3%E7%90%86%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/" rel="next" title="Scrapy结合IPProxyPool实现代理的一些坑">
+      Scrapy结合IPProxyPool实现代理的一些坑 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B"><span class="nav-number">2.</span> <span class="nav-text">初始</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">2.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E9%A1%B9%E7%9B%AE"><span class="nav-number">2.2.</span> <span class="nav-text">创建项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Item"><span class="nav-number">2.3.</span> <span class="nav-text">Item</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E5%86%99%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%88%AC%E8%99%AB-Spider"><span class="nav-number">2.4.</span> <span class="nav-text">编写第一个爬虫(Spider)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%88%AC%E5%8F%96"><span class="nav-number">2.5.</span> <span class="nav-text">爬取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E5%8F%96Item"><span class="nav-number">2.6.</span> <span class="nav-text">提取Item</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#scrapy-shell"><span class="nav-number">2.7.</span> <span class="nav-text">scrapy shell</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%BD%E8%B8%AA%E9%93%BE%E6%8E%A5-Following-links"><span class="nav-number">2.8.</span> <span class="nav-text">追踪链接(Following links)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%9D%E5%AD%98%E7%88%AC%E5%8F%96%E5%88%B0%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="nav-number">2.9.</span> <span class="nav-text">保存爬取到的数据</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7-Command-line-tools"><span class="nav-number">3.</span> <span class="nav-text">命令行工具(Command line tools)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E6%95%B4%E8%AE%BE%E7%BD%AE"><span class="nav-number">3.1.</span> <span class="nav-text">调整设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E7%94%A8%E7%9A%84%E5%B7%A5%E5%85%B7%E5%91%BD%E4%BB%A4-tool-commands"><span class="nav-number">3.2.</span> <span class="nav-text">可用的工具命令(tool commands)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#startproject"><span class="nav-number">3.2.1.</span> <span class="nav-text">startproject</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#genspider"><span class="nav-number">3.2.2.</span> <span class="nav-text">genspider</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#crawl"><span class="nav-number">3.2.3.</span> <span class="nav-text">crawl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#check"><span class="nav-number">3.2.4.</span> <span class="nav-text">check</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#list"><span class="nav-number">3.2.5.</span> <span class="nav-text">list</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fetch"><span class="nav-number">3.2.6.</span> <span class="nav-text">fetch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#view"><span class="nav-number">3.2.7.</span> <span class="nav-text">view</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shell"><span class="nav-number">3.2.8.</span> <span class="nav-text">shell</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#parse"><span class="nav-number">3.2.9.</span> <span class="nav-text">parse</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#settings"><span class="nav-number">3.2.10.</span> <span class="nav-text">settings</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#runspider"><span class="nav-number">3.2.11.</span> <span class="nav-text">runspider</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#version"><span class="nav-number">3.2.12.</span> <span class="nav-text">version</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bench"><span class="nav-number">3.2.13.</span> <span class="nav-text">bench</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spiders"><span class="nav-number">3.3.</span> <span class="nav-text">Spiders</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#scrapy-Spider"><span class="nav-number">3.3.1.</span> <span class="nav-text">scrapy.Spider</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#class-scrapy-spiders-Spider"><span class="nav-number">3.3.1.1.</span> <span class="nav-text">class scrapy.spiders.Spider</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CrawlSpider"><span class="nav-number">3.3.2.</span> <span class="nav-text">CrawlSpider</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#class-scrapy-spiders-CrawlSpider"><span class="nav-number">3.3.2.1.</span> <span class="nav-text">class scrapy.spiders.CrawlSpider</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%88%AC%E5%8F%96%E8%A7%84%E5%88%99-Crawling-rules"><span class="nav-number">3.3.3.</span> <span class="nav-text">爬取规则(Crawling rules)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#class-scrapy-spiders-Rule-link-extractor-callback-None-cb-kwargs-None-follow-None-process-links-None-process-request-None"><span class="nav-number">3.3.3.1.</span> <span class="nav-text">class scrapy.spiders.Rule(link_extractor, callback&#x3D;None, cb_kwargs&#x3D;None, follow&#x3D;None, process_links&#x3D;None, process_request&#x3D;None)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CrawlSpider%E6%A0%B7%E4%BE%8B"><span class="nav-number">3.3.3.2.</span> <span class="nav-text">CrawlSpider样例</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E5%99%A8-Selectors"><span class="nav-number">4.</span> <span class="nav-text">选择器(Selectors)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E9%80%89%E6%8B%A9%E5%99%A8-selectors"><span class="nav-number">4.1.</span> <span class="nav-text">构造选择器(selectors)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E9%80%89%E6%8B%A9%E5%99%A8"><span class="nav-number">4.2.</span> <span class="nav-text">使用选择器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#extract"><span class="nav-number">4.2.1.</span> <span class="nav-text">.extract()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E5%90%88%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E4%BD%BF%E7%94%A8%E9%80%89%E6%8B%A9%E5%99%A8-selectors"><span class="nav-number">4.2.2.</span> <span class="nav-text">结合正则表达式使用选择器(selectors)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%9B%B8%E5%AF%B9XPaths"><span class="nav-number">4.2.3.</span> <span class="nav-text">使用相对XPaths</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">4.2.4.</span> <span class="nav-text">正则表达式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%86%E5%90%88%E6%93%8D%E4%BD%9C"><span class="nav-number">4.2.5.</span> <span class="nav-text">集合操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#node-1-and-node-1-%E7%9A%84%E4%B8%8D%E5%90%8C"><span class="nav-number">4.2.6.</span> <span class="nav-text">&#x2F;&#x2F;node[1] and (&#x2F;&#x2F;node)[1]的不同</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Item-Loaders"><span class="nav-number">5.</span> <span class="nav-text">Item Loaders</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Scrapy%E7%BB%88%E7%AB%AF-Scrapy-shell"><span class="nav-number">6.</span> <span class="nav-text">Scrapy终端(Scrapy shell)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E7%94%A8%E7%9A%84%E5%BF%AB%E6%8D%B7%E5%91%BD%E4%BB%A4-shortcut"><span class="nav-number">6.1.</span> <span class="nav-text">可用的快捷命令(shortcut)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E7%94%A8%E7%9A%84Scrapy%E5%AF%B9%E8%B1%A1"><span class="nav-number">6.2.</span> <span class="nav-text">可用的Scrapy对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8spider%E4%B8%AD%E5%90%AF%E5%8A%A8shell%E6%9D%A5%E6%9F%A5%E7%9C%8Bresponse"><span class="nav-number">6.3.</span> <span class="nav-text">在spider中启动shell来查看response</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Item-Pipeline"><span class="nav-number">7.</span> <span class="nav-text">Item Pipeline</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E5%86%99%E4%BD%A0%E8%87%AA%E5%B7%B1%E7%9A%84item-pipeline"><span class="nav-number">7.0.1.</span> <span class="nav-text">编写你自己的item pipeline</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Item-pipeline-%E6%A0%B7%E4%BE%8B"><span class="nav-number">7.0.2.</span> <span class="nav-text">Item pipeline 样例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81%E4%BB%B7%E6%A0%BC%EF%BC%8C%E5%90%8C%E6%97%B6%E4%B8%A2%E5%BC%83%E6%B2%A1%E6%9C%89%E4%BB%B7%E6%A0%BC%E7%9A%84item"><span class="nav-number">7.0.2.1.</span> <span class="nav-text">验证价格，同时丢弃没有价格的item</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B0%86item%E5%86%99%E5%85%A5JSON%E6%96%87%E4%BB%B6"><span class="nav-number">7.0.2.2.</span> <span class="nav-text">将item写入JSON文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B0%86items%E5%86%99%E5%85%A5MongoDB"><span class="nav-number">7.0.2.3.</span> <span class="nav-text">将items写入MongoDB</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8E%BB%E9%87%8D"><span class="nav-number">7.0.2.4.</span> <span class="nav-text">去重</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E7%94%A8%E4%B8%80%E4%B8%AAItem-Pipeline%E7%BB%84%E4%BB%B6"><span class="nav-number">7.0.3.</span> <span class="nav-text">启用一个Item Pipeline组件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Feed-exports"><span class="nav-number">7.1.</span> <span class="nav-text">Feed exports</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%8F%E5%88%97%E5%8C%96%E6%96%B9%E5%BC%8F-Serialization-formats"><span class="nav-number">7.1.1.</span> <span class="nav-text">序列化方式(Serialization formats)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JSON"><span class="nav-number">7.1.2.</span> <span class="nav-text">JSON</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JSON-lines"><span class="nav-number">7.1.3.</span> <span class="nav-text">JSON lines</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CSV"><span class="nav-number">7.1.4.</span> <span class="nav-text">CSV</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#XML"><span class="nav-number">7.1.5.</span> <span class="nav-text">XML</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pickle"><span class="nav-number">7.1.6.</span> <span class="nav-text">Pickle</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Marshal"><span class="nav-number">7.1.7.</span> <span class="nav-text">Marshal</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8-Storages"><span class="nav-number">7.2.</span> <span class="nav-text">存储(Storages)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%98%E5%82%A8URI%E5%8F%82%E6%95%B0"><span class="nav-number">7.2.1.</span> <span class="nav-text">存储URI参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E7%AB%AF-Storage-backends"><span class="nav-number">7.2.2.</span> <span class="nav-text">存储端(Storage backends)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="nav-number">7.2.2.1.</span> <span class="nav-text">本地文件系统</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FTP"><span class="nav-number">7.2.2.2.</span> <span class="nav-text">FTP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#S3"><span class="nav-number">7.2.2.3.</span> <span class="nav-text">S3</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%87%E5%87%86%E8%BE%93%E5%87%BA"><span class="nav-number">7.2.2.4.</span> <span class="nav-text">标准输出</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E5%AE%9A-Settings"><span class="nav-number">7.2.3.</span> <span class="nav-text">设定(Settings)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#FEED-URI"><span class="nav-number">7.2.3.1.</span> <span class="nav-text">FEED_URI</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FEED-FORMAT"><span class="nav-number">7.2.3.2.</span> <span class="nav-text">FEED_FORMAT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FEED-EXPORT-FIELDS"><span class="nav-number">7.2.3.3.</span> <span class="nav-text">FEED_EXPORT_FIELDS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FEED-STORE-EMPTY"><span class="nav-number">7.2.3.4.</span> <span class="nav-text">FEED_STORE_EMPTY</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FEED-STORAGES"><span class="nav-number">7.2.3.5.</span> <span class="nav-text">FEED_STORAGES</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FEED-STORAGES-BASE"><span class="nav-number">7.2.3.6.</span> <span class="nav-text">FEED_STORAGES_BASE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FEED-EXPORTERS"><span class="nav-number">7.2.3.7.</span> <span class="nav-text">FEED_EXPORTERS</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Settings"><span class="nav-number">7.3.</span> <span class="nav-text">Settings</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E5%AE%9A%E8%AE%BE%E5%AE%9A-Designating-the-settings"><span class="nav-number">7.3.1.</span> <span class="nav-text">指定设定(Designating the settings)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E8%AE%BE%E5%AE%9A%E5%80%BC-Populating-the-settings"><span class="nav-number">7.3.2.</span> <span class="nav-text">获取设定值(Populating the settings)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E8%A1%8C%E9%80%89%E9%A1%B9-Command-line-options"><span class="nav-number">7.3.2.1.</span> <span class="nav-text">命令行选项(Command line options)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AF%8F%E4%B8%AAspider%E7%89%B9%E6%9C%89%E8%AE%BE%E5%AE%9A"><span class="nav-number">7.3.2.2.</span> <span class="nav-text">每个spider特有设定</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E8%AE%BE%E5%AE%9A%E6%A8%A1%E5%9D%97-Project-settings-module"><span class="nav-number">7.3.2.3.</span> <span class="nav-text">项目设定模块(Project settings module)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E9%BB%98%E8%AE%A4%E8%AE%BE%E5%AE%9A-Default-settings-per-command"><span class="nav-number">7.3.2.4.</span> <span class="nav-text">命令默认设定(Default settings per-command)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%BB%98%E8%AE%A4%E5%85%A8%E5%B1%80%E8%AE%BE%E5%AE%9A-Default-global-settings"><span class="nav-number">7.3.2.5.</span> <span class="nav-text">默认全局设定(Default global settings)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%AE%BF%E9%97%AE%E8%AE%BE%E5%AE%9A-How-to-access-settings"><span class="nav-number">7.3.3.</span> <span class="nav-text">如何访问设定(How to access settings)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E5%AE%9A%E5%90%8D%E5%AD%97%E7%9A%84%E5%91%BD%E5%90%8D%E8%A7%84%E5%88%99"><span class="nav-number">7.3.4.</span> <span class="nav-text">设定名字的命名规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E7%BD%AE%E8%AE%BE%E5%AE%9A%E5%8F%82%E8%80%83%E6%89%8B%E5%86%8C"><span class="nav-number">7.3.5.</span> <span class="nav-text">内置设定参考手册</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#AWS-ACCESS-KEY-ID"><span class="nav-number">7.3.5.1.</span> <span class="nav-text">AWS_ACCESS_KEY_ID</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AWS-SECRET-ACCESS-KEY"><span class="nav-number">7.3.5.2.</span> <span class="nav-text">AWS_SECRET_ACCESS_KEY</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#BOT-NAME"><span class="nav-number">7.3.5.3.</span> <span class="nav-text">BOT_NAME</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CONCURRENT-ITEMS"><span class="nav-number">7.3.5.4.</span> <span class="nav-text">CONCURRENT_ITEMS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CONCURRENT-REQUESTS"><span class="nav-number">7.3.5.5.</span> <span class="nav-text">CONCURRENT_REQUESTS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CONCURRENT-REQUESTS-PER-DOMAIN"><span class="nav-number">7.3.5.6.</span> <span class="nav-text">CONCURRENT_REQUESTS_PER_DOMAIN</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CONCURRENT-REQUESTS-PER-IP"><span class="nav-number">7.3.5.7.</span> <span class="nav-text">CONCURRENT_REQUESTS_PER_IP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DEFAULT-ITEM-CLASS"><span class="nav-number">7.3.5.8.</span> <span class="nav-text">DEFAULT_ITEM_CLASS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DEFAULT-REQUEST-HEADERS"><span class="nav-number">7.3.5.9.</span> <span class="nav-text">DEFAULT_REQUEST_HEADERS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DEPTH-LIMIT"><span class="nav-number">7.3.5.10.</span> <span class="nav-text">DEPTH_LIMIT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DEPTH-PRIORITY"><span class="nav-number">7.3.5.11.</span> <span class="nav-text">DEPTH_PRIORITY</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DEPTH-STATS"><span class="nav-number">7.3.5.12.</span> <span class="nav-text">DEPTH_STATS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DEPTH-STATS-VERBOSE"><span class="nav-number">7.3.5.13.</span> <span class="nav-text">DEPTH_STATS_VERBOSE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DNSCACHE-ENABLED"><span class="nav-number">7.3.5.14.</span> <span class="nav-text">DNSCACHE_ENABLED</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DNSCACHE-SIZE"><span class="nav-number">7.3.5.15.</span> <span class="nav-text">DNSCACHE_SIZE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DNS-TIMEOUT"><span class="nav-number">7.3.5.16.</span> <span class="nav-text">DNS_TIMEOUT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DOWNLOADER"><span class="nav-number">7.3.5.17.</span> <span class="nav-text">DOWNLOADER</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DOWNLOADER-MIDDLEWARES"><span class="nav-number">7.3.5.18.</span> <span class="nav-text">DOWNLOADER_MIDDLEWARES</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DOWNLOADER-MIDDLEWARES-BASE"><span class="nav-number">7.3.5.19.</span> <span class="nav-text">DOWNLOADER_MIDDLEWARES_BASE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DOWNLOADER-STATS"><span class="nav-number">7.3.5.20.</span> <span class="nav-text">DOWNLOADER_STATS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DOWNLOAD-DELAY"><span class="nav-number">7.3.5.21.</span> <span class="nav-text">DOWNLOAD_DELAY</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DOWNLOAD-HANDLERS"><span class="nav-number">7.3.5.22.</span> <span class="nav-text">DOWNLOAD_HANDLERS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DOWNLOAD-HANDLERS-BASE"><span class="nav-number">7.3.5.23.</span> <span class="nav-text">DOWNLOAD_HANDLERS_BASE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DOWNLOAD-TIMEOUT"><span class="nav-number">7.3.5.24.</span> <span class="nav-text">DOWNLOAD_TIMEOUT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DOWNLOAD-MAXSIZE"><span class="nav-number">7.3.5.25.</span> <span class="nav-text">DOWNLOAD_MAXSIZE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DOWNLOAD-WARNSIZE"><span class="nav-number">7.3.5.26.</span> <span class="nav-text">DOWNLOAD_WARNSIZE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DUPEFILTER-CLASS"><span class="nav-number">7.3.5.27.</span> <span class="nav-text">DUPEFILTER_CLASS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DUPEFILTER-DEBUG"><span class="nav-number">7.3.5.28.</span> <span class="nav-text">DUPEFILTER_DEBUG</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#EDITOR"><span class="nav-number">7.3.5.29.</span> <span class="nav-text">EDITOR</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#EXTENSIONS"><span class="nav-number">7.3.5.30.</span> <span class="nav-text">EXTENSIONS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#EXTENSIONS-BASE"><span class="nav-number">7.3.5.31.</span> <span class="nav-text">EXTENSIONS_BASE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ITEM-PIPELINES"><span class="nav-number">7.3.5.32.</span> <span class="nav-text">ITEM_PIPELINES</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ITEM-PIPELINES-BASE"><span class="nav-number">7.3.5.33.</span> <span class="nav-text">ITEM_PIPELINES_BASE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LOG-ENABLED"><span class="nav-number">7.3.5.34.</span> <span class="nav-text">LOG_ENABLED</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LOG-ENCODING"><span class="nav-number">7.3.5.35.</span> <span class="nav-text">LOG_ENCODING</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LOG-FILE"><span class="nav-number">7.3.5.36.</span> <span class="nav-text">LOG_FILE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LOG-FORMAT"><span class="nav-number">7.3.5.37.</span> <span class="nav-text">LOG_FORMAT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LOG-DATEFORMAT"><span class="nav-number">7.3.5.38.</span> <span class="nav-text">LOG_DATEFORMAT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LOG-LEVEL"><span class="nav-number">7.3.5.39.</span> <span class="nav-text">LOG_LEVEL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LOG-STDOUT"><span class="nav-number">7.3.5.40.</span> <span class="nav-text">LOG_STDOUT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MEMDEBUG-ENABLED"><span class="nav-number">7.3.5.41.</span> <span class="nav-text">MEMDEBUG_ENABLED</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MEMDEBUG-NOTIFY"><span class="nav-number">7.3.5.42.</span> <span class="nav-text">MEMDEBUG_NOTIFY</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MEMUSAGE-ENABLED"><span class="nav-number">7.3.5.43.</span> <span class="nav-text">MEMUSAGE_ENABLED</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MEMUSAGE-LIMIT-MB"><span class="nav-number">7.3.5.44.</span> <span class="nav-text">MEMUSAGE_LIMIT_MB</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MEMUSAGE-NOTIFY-MAIL"><span class="nav-number">7.3.5.45.</span> <span class="nav-text">MEMUSAGE_NOTIFY_MAIL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MEMUSAGE-REPORT"><span class="nav-number">7.3.5.46.</span> <span class="nav-text">MEMUSAGE_REPORT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MEMUSAGE-WARNING-MB"><span class="nav-number">7.3.5.47.</span> <span class="nav-text">MEMUSAGE_WARNING_MB</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NEWSPIDER-MODULE"><span class="nav-number">7.3.5.48.</span> <span class="nav-text">NEWSPIDER_MODULE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RANDOMIZE-DOWNLOAD-DELAY"><span class="nav-number">7.3.5.49.</span> <span class="nav-text">RANDOMIZE_DOWNLOAD_DELAY</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#REDIRECT-MAX-TIMES"><span class="nav-number">7.3.5.50.</span> <span class="nav-text">REDIRECT_MAX_TIMES</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#REDIRECT-MAX-METAREFRESH-DELAY"><span class="nav-number">7.3.5.51.</span> <span class="nav-text">REDIRECT_MAX_METAREFRESH_DELAY</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#REDIRECT-PRIORITY-ADJUST"><span class="nav-number">7.3.5.52.</span> <span class="nav-text">REDIRECT_PRIORITY_ADJUST</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ROBOTSTXT-OBEY"><span class="nav-number">7.3.5.53.</span> <span class="nav-text">ROBOTSTXT_OBEY</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SCHEDULER"><span class="nav-number">7.3.5.54.</span> <span class="nav-text">SCHEDULER</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SPIDER-CONTRACTS"><span class="nav-number">7.3.5.55.</span> <span class="nav-text">SPIDER_CONTRACTS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SPIDER-CONTRACTS-BASE"><span class="nav-number">7.3.5.56.</span> <span class="nav-text">SPIDER_CONTRACTS_BASE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SPIDER-LOADER-CLASS"><span class="nav-number">7.3.5.57.</span> <span class="nav-text">SPIDER_LOADER_CLASS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SPIDER-MIDDLEWARES"><span class="nav-number">7.3.5.58.</span> <span class="nav-text">SPIDER_MIDDLEWARES</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SPIDER-MIDDLEWARES-BASE"><span class="nav-number">7.3.5.59.</span> <span class="nav-text">SPIDER_MIDDLEWARES_BASE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SPIDER-MODULES"><span class="nav-number">7.3.5.60.</span> <span class="nav-text">SPIDER_MODULES</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#STATS-CLASS"><span class="nav-number">7.3.5.61.</span> <span class="nav-text">STATS_CLASS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#STATS-DUMP"><span class="nav-number">7.3.5.62.</span> <span class="nav-text">STATS_DUMP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#STATSMAILER-RCPTS"><span class="nav-number">7.3.5.63.</span> <span class="nav-text">STATSMAILER_RCPTS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TELNETCONSOLE-ENABLED"><span class="nav-number">7.3.5.64.</span> <span class="nav-text">TELNETCONSOLE_ENABLED</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TELNETCONSOLE-PORT"><span class="nav-number">7.3.5.65.</span> <span class="nav-text">TELNETCONSOLE_PORT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TEMPLATES-DIR"><span class="nav-number">7.3.5.66.</span> <span class="nav-text">TEMPLATES_DIR</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#URLLENGTH-LIMIT"><span class="nav-number">7.3.5.67.</span> <span class="nav-text">URLLENGTH_LIMIT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#USER-AGENT"><span class="nav-number">7.3.5.68.</span> <span class="nav-text">USER_AGENT</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E7%BB%AD"><span class="nav-number">7.4.</span> <span class="nav-text">后续</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="时间序列分解">
+<meta property="og:url" content="https://blog.rexking6.top/2020/12/29/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E8%A7%A3/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/765608-20160305160907487-76859704.png">
+<meta property="article:published_time" content="2020-12-29T12:01:44.000Z">
+<meta property="article:modified_time" content="2020-12-30T01:08:03.766Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="AIOps">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/765608-20160305160907487-76859704.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2020/12/29/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E8%A7%A3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>时间序列分解 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2020/12/29/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          时间序列分解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-12-29 20:01:44" itemprop="dateCreated datePublished" datetime="2020-12-29T20:01:44+08:00">2020-12-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-30 09:08:03" itemprop="dateModified" datetime="2020-12-30T09:08:03+08:00">2020-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AIOps/" itemprop="url" rel="index"><span itemprop="name">AIOps</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2020/12/29/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E8%A7%A3/" class="post-meta-item leancloud_visitors" data-flag-title="时间序列分解" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>3.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>综合转载于：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_36810398/article/details/93314016">时间序列分解算法－简述</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/runner-ljt/p/5245080.html">时间序列分解-STL分解法</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/88103863">R语言时间序列分析（十）：时间序列的分解</a></li>
+</ul>
+<h1 id="时间序列的成分"><a href="#时间序列的成分" class="headerlink" title="时间序列的成分"></a>时间序列的成分</h1><p>对于一个时间序列 $y(t)$，假设它是加性模型（an additive decomposition），则可以写成</p>
+<script type="math/tex; mode=display">
+y(t)=S(t)+T(t)+R(t)</script><p>其中 $S(t)$、$T(t)$、$R(t)$ 分别是周期成分（seasonal component）、趋势成分（trend-cycle component）、残差成分（remainder component）。</p>
+<p>类似地，一个乘性模型可以写成</p>
+<script type="math/tex; mode=display">
+y(t)=S(t)×T(t)×R(t)</script><p>对于乘性模型，可以取对数（当然是有意义的前提下），将其转化为加性模型。</p>
+<p>引文：</p>
+<blockquote>
+<p>The additive decomposition is the most appropriate if the magnitude of the seasonal fluctuations, or the variation around the trend-cycle, does not vary with the level of the time series. When the variation in the seasonal pattern, or the variation around the trend-cycle, appears to be proportional to the level of the time series, then a multiplicative decomposition is more appropriate. Multiplicative decompositions are common with economic time series.</p>
+</blockquote>
+<p>加性模型的缺点：</p>
+<ol>
+<li><p>分解的时候，趋势性的预测总是缺乏首尾的数值。这一点做滑动平均（moving average）就会有体会，用前 $n$ 个序列的均值来作为 $n+1$ 时刻的趋势预测，那么前面 $n$ 个数值注定都是缺失值，而最后 $n$ 个数值也无法获得；</p>
+</li>
+<li><p>对于骤增和骤降不敏感，显得过于平滑，因此如果有突发的事件也难以进行捕捉；</p>
+</li>
+<li><p>对季节性的预测非常刻板，基本假设中周期性是固定的，如果随着时间改变其周期性波动也发生改变，可加性分解就无法捕捉到。</p>
+</li>
+</ol>
+<h1 id="经典分解法（classical-decomposition）"><a href="#经典分解法（classical-decomposition）" class="headerlink" title="经典分解法（classical decomposition）"></a>经典分解法（classical decomposition）</h1><p>经典的时间序列分界算法，起于1920年，直到1950年之前仍在广泛使用。经典算法步骤相对简单，同时也是很多其他分解算法的基础。经典分解法是假设周期性成分在每个周期内都是相同的（【例如每年的月周期成分都相同】）。</p>
+<p>经典分解法用到移动平均的概念：m-MA（意指m阶移动平均）是指</p>
+<script type="math/tex; mode=display">
+\hat{T}_{t}=\frac{1}{m} \sum_{j=-k}^{k} y_{t+j}</script><p>其中 $m=2k+1$，亦即时刻t的移动平均的值为向前 $k$ 个值和向后 $k$ 个值的均值。</p>
+<h2 id="加性模型分解算法"><a href="#加性模型分解算法" class="headerlink" title="加性模型分解算法"></a>加性模型分解算法</h2><p>步骤：</p>
+<ol>
+<li>如果 $m$ 为偶数，则用2-m-MA（所谓2-m-MA，意思是对序列先进行4-MA，然后对移动平均之后的序列，计算其2-MA。的这样就实现了某种对称性）来计算序列的趋势成分 $T(t)$；如果m为奇数，则用m-MA来计算序列的趋势成分 $T(t)$。</li>
+<li>计算去掉趋势的时间序列 $D(t)=y(t)-T(t)$。</li>
+<li>为了估计周期成分，只需要对同一周期的数据取均值即可。例如对于月度数据，要计算三月的周期性成分，对所有 $D(t)$ 中的三月份的数据进行求均值即可。周期性成分会被调整（加上一个偏置）以使得它们的和为0。对周期性成分复制到 $D(t)$ 的长度，即得到D(t)的所有周期性成分，记作 $S(t)$。</li>
+<li>残差成分 $R(t)=y(t)-T(t)-S(t)$。</li>
+</ol>
+<h2 id="乘性模型分解算法"><a href="#乘性模型分解算法" class="headerlink" title="乘性模型分解算法"></a>乘性模型分解算法</h2><p>乘性模型和加性模型的思想很类似，区别在于把上述加性模型的步骤2改成 $D(t)=y(t)/T(t)$，Step4改成 $R(t)=y(t)/(T(t)*S(t))$。</p>
+<h1 id="X11分解法（X11-decomposition）"><a href="#X11分解法（X11-decomposition）" class="headerlink" title="X11分解法（X11 decomposition）"></a>X11分解法（X11 decomposition）</h1><p>另一个受人欢迎的季度性数据和月度数据的分解算法是 X11分解法，它发明于美国人口普查局和加拿大统计局。</p>
+<p>这方法是基于经典分解法的，但是包括很多其他的步骤和特点来客服经典分解法的一些不足。特别的，所有的数据点的趋势成分都可以得到（经典分解法最开始和最后的部分数据无法计算得到移动平均值），周期成分允许随着时间变化。X11有一些复杂的方法来处理交易日、假期、一些已知的影响因素的影响。它同时处理了加性模型和乘性模型。这个过程是全自动的，而且对于时间序列中的异常值和数据变动很鲁棒。</p>
+<p>X11方法的细节可以参考 <em>Dagum, E. B., &amp; Bianconcini, S. (2016). Seasonal adjustment methods and real time trend-cycle estimation. Springer</em>。R中有现成的程序可以使用。</p>
+<h1 id="SEATS分解（SEATS-decomposition）"><a href="#SEATS分解（SEATS-decomposition）" class="headerlink" title="SEATS分解（SEATS decomposition）"></a>SEATS分解（SEATS decomposition）</h1><p>“SEATS”是指“Seasonal Extraction in ARIMA Time Series”。这个方法是由西班牙银行开发 的，现在被广泛应用在各国的政府部门中。</p>
+<p>SEATS就是从ARIMA模型中提取季节变化因素。它具有一定的限制，就是只能够对季节尺度和月尺度的时间序列进行处理，其他则不行。可以看<a href="https://link.zhihu.com/?target=http%3A//www.seasonal.website/seasonal.html">原始介绍</a>。</p>
+<p>详细的算法过程请参考　<em>Dagum, E. B., &amp; Bianconcini, S. (2016). Seasonal adjustment methods and real time trend-cycle estimation. Springer.</em>　R中的seasonal包中有程序接口可以使用。</p>
+<h1 id="STL分解（STL-decomposition）"><a href="#STL分解（STL-decomposition）" class="headerlink" title="STL分解（STL decomposition）"></a>STL分解（STL decomposition）</h1><p>STL是时间序列分解的一种versatile和鲁棒的方法。它是“Seasonal and Trend decomposition using Loess”的缩写，其中Loess是一种鲁棒的回归算法。STL，也就是对季节因子和趋势因子都进行了局部多项式回归的方法。它比以上提到的所有方法都要优秀，因为：</p>
+<ol>
+<li><p>SEATS和X11只能解决季节和月尺度的时间序列，STL没有任何限制；</p>
+</li>
+<li><p>季节因子可以随时间变化而变化，变化速率可以用户自定义；</p>
+</li>
+<li><p>趋势因子可以用户自定义；</p>
+</li>
+<li><p>对离群值不敏感，不过这样可能会让局部残差变大。</p>
+</li>
+</ol>
+<p>也有缺点，如只能进行可加性分解，无法根据交易日进行调整。不过如果要用可乘性的分解，其实可以先将序列进行对数化运算，然后再做STL，最后再反推回去即可。</p>
+<p>其中LOESS（locally weighted scatterplot smoothing，LOWESS or LOESS）为局部多项式回归拟合，是对两维散点图进行平滑的常用方法，它结合了传统线性回归的简洁性和非线性回归的灵活性。当要估计某个响应变量值时，先从其预测变量附近取一个数据子集，然后对该子集进行线性回归或二次回归，回归时采用加权最小二乘法，即越靠近估计点的值其权重越大，最后利用得到的局部回归模型来估计响应变量的值。用这种方法进行逐点运算得到整条拟合曲线。</p>
+<p>Robust LOESS 为鲁棒局部加权回归，具体算法可以参看博文 <a target="_blank" rel="noopener" href="http://www.cnblogs.com/runner-ljt/p/4563134.html">鲁棒局部加权回归</a> 。STL对异常点具有健壮性，仅能处理加法模式的分解，对于乘法模式需要先转换为加法模式处理最后在逆变换回去。鲁棒局部加权回归法方法的LOESS过程和鲁棒性过程分别在STL的内部环和外部环中嵌套实现．</p>
+<p><img src="http://image.rexking6.top/img/765608-20160305160907487-76859704.png" alt="img"></p>
+<p>详细内容请参考 <em>Cleveland, R. B., Cleveland, W. S., McRae, J. E., &amp; Terpenning, I. J. (1990). STL: A seasonal-trend decomposition procedure based on loess. Journal of Official Statistics, 6(1), 3–33.</em></p>
+<h1 id="时序中趋势成分和周期成分的强度"><a href="#时序中趋势成分和周期成分的强度" class="headerlink" title="时序中趋势成分和周期成分的强度"></a>时序中趋势成分和周期成分的强度</h1><p>时间序列分解可以用来衡量序列中的趋势成分和周期成分的强度。以分解公式</p>
+<script type="math/tex; mode=display">
+y(t)=T(t)+S(t)+R(t)</script><p>为例。</p>
+<script type="math/tex; mode=display">
+F_{T}=\max \left(0,1-\frac{\operatorname{Var}\left(R_{t}\right)}{\operatorname{Var}\left(T_{t}+R_{t}\right)}\right)</script><p>上式中，如果趋势性越强，$\text{Var}(T_t+R_t)$ 会比 $Var(R(t))$ 大得多，因此上式会很大，当然被限制在[0,1]之间。因此可以用上式来衡量趋势的强度。同理，下式可以用来衡量周期的强度，它也在[0,1]之内。</p>
+<script type="math/tex; mode=display">
+F_{S}=\max \left(0,1-\frac{\operatorname{Var}\left(R_{t}\right)}{\operatorname{Var}\left(S_{t}+R_{t}\right)}\right)</script>
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\04\10\AIOps资料\" rel="bookmark">AIOps资料</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\02\17\《Time-series-Extreme-Event-Forecasting-with-Neural-Networks-at-Uber》笔记\" rel="bookmark">《Time-series Extreme Event Forecasting with Neural Networks at Uber》笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2020\12\29\时间序列平滑\" rel="bookmark">时间序列平滑</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2020/12/29/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E8%A7%A3/" title="时间序列分解">https://blog.rexking6.top/2020/12/29/时间序列分解/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AIOps/" rel="tag"># AIOps</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/29/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%B9%B3%E6%BB%91/" rel="prev" title="时间序列平滑">
+      <i class="fa fa-chevron-left"></i> 时间序列平滑
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/01/%E5%88%9B%E4%B8%9A/" rel="next" title="创业">
+      创业 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E7%9A%84%E6%88%90%E5%88%86"><span class="nav-number">2.</span> <span class="nav-text">时间序列的成分</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%8F%E5%85%B8%E5%88%86%E8%A7%A3%E6%B3%95%EF%BC%88classical-decomposition%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">经典分解法（classical decomposition）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E6%80%A7%E6%A8%A1%E5%9E%8B%E5%88%86%E8%A7%A3%E7%AE%97%E6%B3%95"><span class="nav-number">3.1.</span> <span class="nav-text">加性模型分解算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%98%E6%80%A7%E6%A8%A1%E5%9E%8B%E5%88%86%E8%A7%A3%E7%AE%97%E6%B3%95"><span class="nav-number">3.2.</span> <span class="nav-text">乘性模型分解算法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#X11%E5%88%86%E8%A7%A3%E6%B3%95%EF%BC%88X11-decomposition%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">X11分解法（X11 decomposition）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SEATS%E5%88%86%E8%A7%A3%EF%BC%88SEATS-decomposition%EF%BC%89"><span class="nav-number">5.</span> <span class="nav-text">SEATS分解（SEATS decomposition）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#STL%E5%88%86%E8%A7%A3%EF%BC%88STL-decomposition%EF%BC%89"><span class="nav-number">6.</span> <span class="nav-text">STL分解（STL decomposition）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%97%B6%E5%BA%8F%E4%B8%AD%E8%B6%8B%E5%8A%BF%E6%88%90%E5%88%86%E5%92%8C%E5%91%A8%E6%9C%9F%E6%88%90%E5%88%86%E7%9A%84%E5%BC%BA%E5%BA%A6"><span class="nav-number">7.</span> <span class="nav-text">时序中趋势成分和周期成分的强度</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

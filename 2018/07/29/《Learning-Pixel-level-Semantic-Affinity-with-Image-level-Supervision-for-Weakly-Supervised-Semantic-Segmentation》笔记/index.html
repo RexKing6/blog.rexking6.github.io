@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Learning Pixel-level Semantic Affinity with Image-level Supervision for Weakly Supervised Semantic Segmentation》笔记">
+<meta property="og:url" content="https://blog.rexking6.top/2018/07/29/%E3%80%8ALearning-Pixel-level-Semantic-Affinity-with-Image-level-Supervision-for-Weakly-Supervised-Semantic-Segmentation%E3%80%8B%E7%AC%94%E8%AE%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532837346.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532852220.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532863819.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532865637.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532937165.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532937453.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532937929.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532937972.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532938053.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532938315.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532950635.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532950653.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532955926.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532956167.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532957407.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1532957489.png">
+<meta property="article:published_time" content="2018-07-28T16:10:29.000Z">
+<meta property="article:modified_time" content="2019-03-06T10:19:47.700Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="语义分割">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1532837346.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/07/29/%E3%80%8ALearning-Pixel-level-Semantic-Affinity-with-Image-level-Supervision-for-Weakly-Supervised-Semantic-Segmentation%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《Learning Pixel-level Semantic Affinity with Image-level Supervision for Weakly Supervised Semantic Segmentation》笔记 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/07/29/%E3%80%8ALearning-Pixel-level-Semantic-Affinity-with-Image-level-Supervision-for-Weakly-Supervised-Semantic-Segmentation%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Learning Pixel-level Semantic Affinity with Image-level Supervision for Weakly Supervised Semantic Segmentation》笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-07-29 00:10:29" itemprop="dateCreated datePublished" datetime="2018-07-29T00:10:29+08:00">2018-07-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 18:19:47" itemprop="dateModified" datetime="2019-03-06T18:19:47+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2/" itemprop="url" rel="index"><span itemprop="name">语义分割</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/07/29/%E3%80%8ALearning-Pixel-level-Semantic-Affinity-with-Image-level-Supervision-for-Weakly-Supervised-Semantic-Segmentation%E3%80%8B%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="《Learning Pixel-level Semantic Affinity with Image-level Supervision for Weakly Supervised Semantic Segmentation》笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>6.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>用弱监督语义分割的图像级监督学习像素级语义近似</p>
+<p>cvpr18，目前top榜第一。有代码。</p>
+<h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>分割标签的不足是在自然环境中使用语义分割的主要障碍之一。为了解决这个问题，我们提出了一种新颖的框架，可以根据图像级别的标签生成图像的分割标签。在这种弱监督的环境中，已知训练的模型将局部鉴别部分而不是整个对象区域分割。我们的解决方案是将这种定位响应传播到属于同一语义实体的附近区域。为此，我们提出了一种称为AffinityNet的深度神经网络（DNN），它可以预测一对相邻图像坐标之间的语义关联。然后通过AffinityNet预测的相似度随机游走来实现语义传播。更重要的是，用于训练AffinityNet的监督由初始鉴别部分分割给出，其作为分割标注是不完整的，但足以用于学习小图像区域内的语义关联。因此，整个框架仅依赖于图像级类标签，并且不需要任何额外的数据或标注。在PASCAL VOC 2012数据集中，通过我们的方法生成的分割标签学习的DNN优于以前受过相同监督级别训练的模型，甚至比依赖更强监督的模型更具竞争力。</p>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>深度神经网络（DNNs）的最新发展推动了语义分割的显着改进 [2, 3, 4, 19, 22, 25, 32, 39] 。 然而，尽管DNN取得了巨大成功，但我们在不受控制和现实的环境中实现语义分割还有很长的路要走。 其中一个主要障碍是缺乏训练数据。 由于像素级分割标签的标注成本过高，现有数据集通常缺乏标注样本和类别多样性。 这使得传统方法限于在数据集中预定义的小范围的对象类别。</p>
+<p>已经研究了弱监督方法来解决上述问题并允许语义分割模型更具可扩展性。 他们的共同动机是利用像边界框 [6, 12, 28] 和线 [18, 36] 这样的标注，这些标注比像素级标签弱，但在大量视觉数据中很容易获得，或者由于其低标注而易于获得成本。 在用于语义分割的各种类型的弱标注中，图像级类标签已被广泛使用 [11, 14, 17, 26, 29, 30, 37]，因为它们已经在现有的大规模图像数据集中给出（例如，ImageNet [7]）或通过搜索关键字自动标注图像检索结果。 然而，利用图像级标签监督来学习语义分割是一个非常病态的问题，因为这种监督仅指示某个对象类的存在，并且不告知对于学习分割必不可少的对象位置和形状。</p>
+<p>这一系列研究中的方法已经纳入了额外的证据来模拟监督中缺少的位置和形状信息。定位线索的一个流行选择是类激活图（CAM）[40]，它通过追踪隐藏单元对分类DNN输出的贡献来突出显示目标对象的局部鉴别部分。 CAM突出显示的鉴别区域又被用作种子，它们将被传播以覆盖整个对象区域。为了从种子中准确地恢复对象区域，先前的方法利用图像分割 [17, 30] ，视频中的运动 [35] 或两者 [11] ，所有这些都可用于估计对象形状。出于同样的目的，估计了类别不可知的显着区域，并将其与种子结合在一起 [26] 。然而，他们需要额外的数据（即视频）[11, 35]，额外的监督（即对象边界框） [26] ，或者不能利用表示学习的现成技术（即图像分割）在DNNs [11, 17, 30] 。</p>
+<p>在本文中，我们提出了一种简单而有效的方法来补偿物体形状的缺失信息，而无需外部数据或额外的监督。我们框架的关键组件是AffinityNet，它是一个DNN，它将图像作为输入并预测相邻图像坐标对的语义相似。给定一个图像及其CAM，我们首先构建一个邻域图，其中每个像素在一定半径内连接到它的相邻，并通过AffinityNet估计图中连接的对的语义相似度。然后，对于每个类，CAM中的稀疏激活通过图上的随机游走[23]进行扩散：图中边缘的相似度鼓励随机游走将激活传播到附近和语义上相同的区域，并惩罚传播到其他类的区域。这种语义扩散显着地修改了CAM，从而恢复了精细的对象形状。我们将此过程应用于训练图像，以便通过获取与每个像素处修改的CAM的最大激活相关联的类标签来合成其分割标签。生成的分割标签用于训练出用于测试的分割模型。</p>
+<p>剩下的问题是如何在没有额外数据或额外监督的情况下学习AffinityNet。 为此，训练图像的初始CAM被用作监督源。 由于CAM经常遗漏一些对象部分并出现错误，因此它们不完整，作为学习语义分割的监督，其目的是准确地预测整个对象mask。 然而，我们发现它们通常是局部正确的，并提供证据来识别小图像区域内的语义相似度，这是AffinityNet的目标。 为了生成定位语义相似度的可靠标签，我们忽略了CAM上具有相对较低激活分数的区域，以便仅保留高置信对象和背景区域。 然后通过对置信区域上的一对相邻图像坐标进行采样来获得训练样本，并且如果其坐标属于相同类别则其二进制标签为1，否则为0。</p>
+<p>所提出的方法的总体流程如图1所示。首先，计算训练图像的CAM并用于生成语义相似标签，其用作训练AffinityNet的监督。 然后，我们将训练好的AffinityNet应用于每个训练图像，以计算其邻域图的语义相似度矩阵，该矩阵在随机游走中用于修改其CAM并获得合成的分割标签。 最后，生成的分割标签用于训练语义分割DNN，这是将在测试时使用的唯一网络。 我们的贡献是三方面的：</p>
+<ul>
+<li><p>我们提出了一种名为AffinityNet的新型DNN，它可以预测像素级的高级语义相似度，但仅使用图像级类标签进行训练。</p>
+</li>
+<li><p>与大多数以前的弱监督方法不同，我们的方法不依赖于现成的方法，并通过AffinityNet的端到端训练利用表示学习。</p>
+</li>
+<li><p>在PASCAL VOC 2012 [8]中，我们在同等级别的监督下训练的模型中实现了最先进的性能，并且与依赖于更强监督或外部数据的模型相比具有竞争力。 令人惊讶的是，它甚至优于FCN [22]，这是早期众所周知的全监督模型。</p>
+</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1532837346.png" alt=""></p>
+<p>图1.我们的方法的插图。 对象类和背景的显着区域首先由CAMs [40]（第3.1节）定位在训练图像中。 从显着区域，我们采样成对的相邻坐标，并根据它们的类一致性为它们分配二进制标签。 然后使用标记的对来训练AffinityNet（第3.2节）。 经过训练的AffinityNet反过来预测局部图像区域内的语义相似度，这些区域与随机游走相结合以修改CAM（第3.3节）并生成它们的分割标签（第3.4节）。 最后，生成的标注被用作监督以训练语义分割模型。</p>
+<p>本文的其余部分安排如下。 第2节回顾了与我们密切相关的先前方法，第3节详细描述了我们框架的每个步骤。 然后我们在第5节中对公共基准的提出框架进行实证评估，并在第6节中作简要说明进行总结。</p>
+<h1 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h1><p><strong>各类弱监督</strong><br>已经对用于语义分割的弱监督方法进行了广泛研究，以解决数据缺陷问题。 语义分割的弱监督的成功例子包括边界框 [6, 12, 28] ，线 [18, 36] ，点 [1] 等。 然而，这些类型的弱监督在标注过程中仍然需要一定量的人为干预，因此为大量视觉数据标注这些弱标签是昂贵的。</p>
+<p><strong>图像级标签作为弱监督</strong><br>图像级类标签已被广泛用作语义分割的弱监督，因为它们要求最少或不需要人工干预进行标注。 早期的方法试图直接从图像级标签中训练分割模型[28,29]，但是它们的性能并不令人满意，因为标签太粗糙而无法学习分割。 为了解决这个问题，一些先前的方法结合了由鉴别定位技术[27,40]给出的分割种子以及超像素 [11, 17, 30]，分割提议 [30] 和视频中的动作 [11, 35] 等其他证据。它可用于估计物体形状，并通过现成的无监督技术获得。</p>
+<p>我们基于AffinityNet的框架与上述方法相比具有明显的优势。 AffinityNet从数据中学习如何将定位激活传播到整个对象区域，而以前的方法无法获得这样的优势。 与我们的一样，一些方法可以提高分割质量，而无需现成的预处理。 Wei等人[37]建议通过顺序搜索新的和互补的对象区域逐步扩展分割结果。 另一方面，Kolesnikov和Lampert [14] 学习了一种分割模型来逼近应用于CAM给出的分割种子的密集条件随机场（dCRF）[15] 的输出。</p>
+<p><strong>学习像素级相似度</strong><br>我们的工作也与学习像素级预测相似矩阵的方法密切相关 [2, 5, 36] 。具体地，图像的以像素为中心的相似度矩阵由在[2,5]中用分割标签训练的DNN估计。Bertasius等人 [2] 将相似矩阵与随机游走相结合，其作用是细化像dCRF这样的分割模型的输出。 Cheng等人 [5]设计了一个反卷积网络，其中上池化层利用相似度矩阵在上采样期间恢复清晰的边界。上述两种方法都旨在细化像素级中完全监督的分割模型的输出。相反，我们的目标是通过高级语义相似度矩阵从对象部分的粗糙和嘈杂响应中恢复对象形状，并且AffinityNet具有完全不同的体系结构。 Vernaza和Chandraker [36]采用线作为弱监督，并提出同时学习分割网络和随机游走相似度矩阵，以便网络的输出和线的随机游走传播变得相同。我们的方法在以下三个方面与此工作不同。首先，我们的框架使用图像级标签进行训练，这些标签明显弱于[36]中使用的线。其次，在我们的方法中，随机游走可以跳到某个半径内的任何其他位置，但在[36]中，它只允许移动到四个最近的邻居。第三，AffinityNet明确地学习成对语义关联，但[36]中的模型隐含地学习它。</p>
+<p><strong>学习合成标签</strong><br>我们采用不相交的传递途径，首先生成合成标签，并以完全监督的方式训练带有标签的分割模型。 已经研究了这种传递途径用于物体检测[34]以及弱监督设置中的语义分割 [6, 11, 12, 17, 26, 35]。 我们的方法的一个独特之处是AffinityNet，与采用现有优化技术的先前方法（例如，GraphCut，GrabCut和dCRF）和/或上述现成的预处理步骤相比较，端到端的可训练DNN显着提高合成标签的质量。</p>
+<h1 id="我们的框架"><a href="#我们的框架" class="headerlink" title="我们的框架"></a>我们的框架</h1><p>我们的弱监督语义分割方法大致分为两部分：（1）合成给定图像级标签的训练图像的像素级分割标签，以及（2）利用生成的分割标签学习DNN用于语义分割。 整个框架基于三个DNN：网络计算CAM，AffinityNet和分割模型。 前两个用于生成训练图像的分割标签，最后一个是执行实际语义分割的DNN，并且使用合成的分割标注进行训练。 本节的其余部分将详细介绍三种网络的特征及其训练方案。</p>
+<h2 id="计算CAM"><a href="#计算CAM" class="headerlink" title="计算CAM"></a>计算CAM</h2><p>CAM在我们的框架中发挥着重要作用。 与许多其他弱监督方法一样，它们被视为分割种子，它通常突出显示对象的局部显着部分，然后传播以覆盖整个对象区域。 此外，在我们的框架中，他们被用作训练AffinityNet的监督来源。</p>
+<p>我们遵循[40]的方法来计算训练图像的CAM。 该体系结构是典型的分类网络，具有全局平均池化（GAP），后跟全连接层，并且通过具有图像级标签的分类标准进行训练。 给定训练的网络，由$M_c$表示的真实情况类$c$的CAM由下式计算：</p>
+<script type="math/tex; mode=display">M_c(x,y)=\mathbf{w}_c^\top f^{cam}(x,y)</script><p>其中$\mathbf{w}_c$是与类$c$相关联的分类权重，$f^{cam}(x,y)$表示位于GAP之前的特征图上的$(x,y)$处的特征向量。$M_c$进一步归一化，使最大激活值等于1：$M_c(x,y) \rightarrow M_c(x,y)/max_{x,y} M_c(x,y)$。 对于不属于真实类的任何类$c’$，我们忽略$M_{c’}$，使其激活分数为零。 我们还估计了一个背景激活图，由下面给出：</p>
+<script type="math/tex; mode=display">M_{bg}(x,y)=\{1-max_{c \in C}M_c(x,y)\}^{\alpha}</script><p>其中$C$是对象类的集合，$α≥1$表示调整背景置信度分数的超参数。 通过我们的方法获得的CAM的定性示例在图2中可视化。</p>
+<p><img src="http://image.rexking6.top/img/clip1532852220.png" alt=""></p>
+<p>图2. 通过我们的方法获得的CAM的可视化。（a) 输入图像。(b) 对象类的CAM：更明亮意味着更自信的对象区域。(c) 背景视角：较暗意味着更自信的背景区域。</p>
+<h2 id="学习AffinityNet"><a href="#学习AffinityNet" class="headerlink" title="学习AffinityNet"></a>学习AffinityNet</h2><p>AffinityNet旨在预测训练图像上一对相邻坐标之间的类不可知语义关联。 预测的相似度在随机游走中用作转移概率，使得随机游走将CAM的激活得分传播到同一语义实体的附近区域，这显着提高了CAM的质量。</p>
+<p>为了计算效率，AffinityNet被设计用于预测卷积特征映射$f^{aff}$，其中一对特征向量之间的语义相似度根据它们的$L_1$距离来定义。 具体地，特征$i$和$j$之间的语义相似度由$W_{ij}$表示并定义为：</p>
+<script type="math/tex; mode=display">W_{ij}=exp\{-||f^{aff}(x_i,y_i)-f^{aff}(x_j,y_j)||_1\}</script><p>其中$(x_i,y_i)$表示特征映射$f^{aff}$上第$i$个特征的坐标。 以这种方式，可以通过网络的单个前向传递有效地计算给定图像中的大量语义相似度。图3说明了AffinityNet体系结构及其计算方法。训练该体系结构需要用于特征映射坐标对的语义相似标签，即等式(3)中的$W_{ij}$的标签。但是，在我们的设置中，只有图像级标签才能直接使用这些标签。 在本节的剩余部分，我们将介绍如何生成相似标签并使用它们训练AffinityNet。</p>
+<p><img src="http://image.rexking6.top/img/clip1532863819.png" alt=""></p>
+<p>图3. AffinityNet的整体架构。 输出特征映射$f^{aff}$是通过聚合来自骨干网络的多个级别的特征映射来获得的，以便$f^{aff}$可以在各种视野中获取语义信息。具体来说，我们首先将1×1卷积应用于多级特征映射以降低维数，将结果连接为单个特征映射，并再使用1×1卷积来适应目标任务。 第4节描述了该体系结构的更多细节。</p>
+<h3 id="生成语义相似标签"><a href="#生成语义相似标签" class="headerlink" title="生成语义相似标签"></a>生成语义相似标签</h3><p>为了使用图像级标签训练AffinityNet，我们利用训练图像的CAM作为不完整的监督来源。 尽管如图2所示，CAM通常是不准确的，但我们发现通过仔细操作它们，可以获得对语义相似度的可靠监督。</p>
+<p>我们的基本思想是从CAM中识别物体和背景的高置信区域，并仅从这些区域中获取训练样本。 通过这样做，可以可靠地确定一对采样坐标之间的语义等价。 为了估计物体的高置信区域，我们首先通过减小等式(2)中的$α$来放大$M_{bg}$。使背景得分主导CAM中对象的无关紧要的激活得分。 在将dCRF应用于CAM进行细化之后，我们通过收集目标类别得分大于任何其他类别（包括放大背景）的坐标来确定每个对象类的可靠区域。 而且，在相反的设置中（即增加$α$以减弱$M_{bg}$），可以以相同的方式识别高置信的背景区域。 然后，图像中的剩余区域被视为中性。 该过程的结果如图4(a)所示。</p>
+<p><img src="http://image.rexking6.top/img/clip1532865637.png" alt=""></p>
+<p>图4. 生成语义相似标签的概念图。(a) 对象类和背景的高置信区域：桃色为人，绿色为植物，黑色为背景。中性区域采用白色进行颜色编码。(b) 在小半径内采样的坐标对用于训练AffinityNet。如果两个坐标来自同一个类，则为每个对分配标签1，否则标记为0。 当两个坐标中的至少一个属于中性区域时，在训练期间忽略该对。</p>
+<p>现在，可以根据由置信区域确定的类标签将二元相似标签分配给每对坐标。 对于非中性的两个坐标$(x_i,y_i)$和$(x_j,y_j)$，如果它们的类相同，则它们的相似标签$W_{ij}^*$为1，否则为0。此外，如果至少有一个坐标是中性的，我们只是在训练期间忽略该对。该方案如图4(b)所示，使我们能够收集相当大量的成对相似标签，这些标签也足够可靠。</p>
+<h3 id="AffinityNet训练"><a href="#AffinityNet训练" class="headerlink" title="AffinityNet训练"></a>AffinityNet训练</h3><p>通过用等式(3)的预测语义相似度$W_{ij}$近似二进制相似标签$W_{ij}^*$来训练AffinityNet。以渐变下降的方式。特别地，由于以下两个原因，在训练期间考虑仅足够相邻坐标的相似度。首先，由于缺乏上下文，很难预测两个彼此相距太远的坐标之间的语义相似度。 其次，通过仅寻址相邻坐标对，我们可以显着降低计算成本。 因此，训练中使用的坐标对的集合由$\mathcal{P}$表示，由下式给出：</p>
+<script type="math/tex; mode=display">\mathcal {P}=\{(i,j)|d((x_i,y_i),(x_j,y_j))<\gamma, \forall i \neq j\}</script><p>其中$d(·,·)$是欧几里德距离，$γ$是限制所选对之间距离的搜索范围。</p>
+<p>但是，由于类不平衡问题，直接从$\mathcal{P}$学习AffinityNet是不可取的。 我们观察到，在$\mathcal{P}$中，类分布显着偏向于正分布，因为负对仅仅存在对象边界周围采样。 同样在正对的子集中，背景对的数量明显大于对象对的数量，因为背景大于许多图像中的对象区域。 为了解决这个问题，我们将$\mathcal{P}$分为三个子集，并从各个子集中获得总损失。 具体来说，我们首先将$\mathcal{P}$分为正负对的两个子集：</p>
+<script type="math/tex; mode=display">\mathcal{P}^+=\{(i,j)|(i,j)\in \mathcal{P},W_{ij}^*=1\}</script><script type="math/tex; mode=display">\mathcal{P}^-=\{(i,j)|(i,j)\in \mathcal{P},W_{ij}^*=0\}</script><p>并进一步分别将$\mathcal{P}^+$分解为对象和背景的$\mathcal{P}_{fg}^+$和$\mathcal{P}_{bg}^+$。 然后按子集计算交叉熵损失如下：</p>
+<script type="math/tex; mode=display">\mathcal{L}_{fg}^+=-\frac{1}{|\mathcal{P}_{fg}^+|}\sum_{(i,j)\in \mathcal{P}_{fg}^+}log \space W_{ij}</script><script type="math/tex; mode=display">\mathcal{L}_{bg}^+=-\frac{1}{|\mathcal{P}_{bg}^+|}\sum_{(i,j)\in \mathcal{P}_{bg}^+}log \space W_{ij}</script><script type="math/tex; mode=display">\mathcal{L}^-=-\frac{1}{|\mathcal{P}^-|}\sum_{(i,j)\in \mathcal{P}^-}log \space (1-W_{ij})</script><p>最后，训练AffinityNet的损失定义为：</p>
+<script type="math/tex; mode=display">\mathcal {L}= \mathcal{L}_{fg}^++\mathcal{L}_{bg}^++2\mathcal{L}^-</script><p>注意，等式(10)中的损失是不可知类别的。因此，训练好的AffinityNet决定两个相邻坐标之间的类一致性，而不明确地知道它们的类。 这种类别不可知的方案允许AffinityNet学习可以在多个对象类和背景之间共享的更一般的表示，并且显着地扩大每个类的训练样本集。</p>
+<h2 id="使用AffinityNet修改CAM"><a href="#使用AffinityNet修改CAM" class="headerlink" title="使用AffinityNet修改CAM"></a>使用AffinityNet修改CAM</h2><p>经过训练的AffinityNet用于修改训练图像的CAM。 AffinityNet预测的局部语义相似度被转换为转移概率矩阵，这使得随机游走能够识别图像中的语义边界，并鼓励它在这些边界内扩散激活分数。 我们凭经验发现，使用语义转换矩阵的随机游走可以显着提高CAM的质量，从而使我们能够生成准确的分割标签。</p>
+<p>对于输入图像，AffinityNet生成卷积特征图，并且根据等式(3)计算映射中的特征之间的语义相似度。 注意，如在AffinityNet的训练中，在半径$γ$的局部圆内的特征之间计算相似度。 计算出的相似度形成相似度矩阵$W$，其对角元素为1。随机游走的转移概率矩阵$T$从相似度矩阵导出如下：</p>
+<script type="math/tex; mode=display">T=D^{-1}W^{\circ \beta},其中D_{ii}=\sum_j W_{ij}^\beta</script><p>在上面的等式中，超参数$β$具有大于1的值，使得原始相似度矩阵的Hadamard幂 $W^{\circ \beta}$，忽略$W$中的无关紧要的相似度。因此，使用$W^{\circ \beta}$而不是$W$使我们的随机游走传播更加保守。 计算对角矩阵$D$用于$W^{\circ β}$的行方向归一化。</p>
+<p>通过随机游走$T$，通过将$T$乘以CAM来实现语义传播的单个操作。 我们迭代地执行此传播，直到达到预定义的迭代次数。 然后是$M_c^*$，修改后的$c$类CAM由下式给出：</p>
+<script type="math/tex; mode=display">vec(M_c^*)=T^t·vec(M_c) \space \forall c \in C \cup \{bg\}</script><p>其中$vec(·)$表示矩阵的矢量化，$t$是迭代次数。 注意，$t$的值被设置为2的幂，以便等式(12)仅执行矩阵乘法$log_2t + 1$次。</p>
+<h2 id="学习语义分割网络"><a href="#学习语义分割网络" class="headerlink" title="学习语义分割网络"></a>学习语义分割网络</h2><p>然后，修改的训练图像的CAM用于生成图像的分割标签。 由于CAM的尺寸小于其输入图像，我们通过双线性插值将它们上采样到图像的分辨率，并使用dCRF对其进行细化。 然后简单地通过选择与修改的和上采样的CAM中的每个像素处的最大激活分数相关联的类标签来获得训练图像的分割标签。 请注意，因为我们为背景和对象类计算CAM，所以也可以选择背景类。</p>
+<p>通过上述过程获得的分割标签用作监督以训练分割网络。 在我们的方法中可以使用任何完全监督的语义分割模型，因为我们提供训练图像的分割标签。</p>
+<h1 id="网络结构"><a href="#网络结构" class="headerlink" title="网络结构"></a>网络结构</h1><p>在本节中，我们将介绍在我们的框架中采用的DNN架构的详细信息。 请注意，我们的方法可以使用任何现有的DNN实现相同的目的，尽管我们仔细设计以下模型以增强分割性能。</p>
+<h2 id="骨干网络"><a href="#骨干网络" class="headerlink" title="骨干网络"></a>骨干网络</h2><p>我们框架中的三个DNN都建立在相同的骨干网络上。 主干是模型A1 [38]的修改版本，也称为ResNet38，具有38个具有宽通道的卷积层。 为了获得骨干网络，首先去除原始模型的最终GAP和全连接层。 然后将最后三个级别的卷积层替换为具有公共输入步幅1的带孔卷积，并且调整它们的扩张率以使得骨干网络将返回步幅8的特征图。已知带孔卷积通过扩大感受野而不牺牲特征图分辨率来提高分割质量[4]。 我们凭经验观察到它也适用于我们的弱监督模型CAM和AffinityNet，因为它使模型能够恢复精细形状的物体。</p>
+<h2 id="我们框架中DNN的详细信息"><a href="#我们框架中DNN的详细信息" class="headerlink" title="我们框架中DNN的详细信息"></a>我们框架中DNN的详细信息</h2><p><strong>网络计算CAM</strong><br>我们通过在骨干网络顶部按顺序添加以下三层来获得此模型：具有512个通道的3×3卷积层，用于更好地适应目标任务，用于特征映射聚合的全局平均池化层，以及全连接层用于分类。</p>
+<p><strong>AffinityNet</strong><br>该网络被设计用于聚合骨干网络的多级特征映射，以便在计算相似度时利用在各种视野中获取的语义信息。 为此，选择从骨干网络的最后三个级别输出的特征映射。 在聚合之前，对于第一，第二和第三特征图，它们的信道维度分别减少到128，256和512，分别由单个1×1卷积层。 然后将特征映射连接成具有896个通道的单个特征映射。 我们最终在顶部添加了一个1×1卷积层和896个通道用于自适应。</p>
+<p><strong>分割模型</strong><br>我们严格遵循[38]来构建我们的分割网络。 具体来说，我们在骨干网络的顶部放置了两个更复杂的卷积层。 它们具有相同的扩张率12，而第一个通道的数量为512，第二个通道的数量为21。 生成的网络在下一节中称为“Ours-ResNet38”。</p>
+<h1 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h1><p>本节展示了我们的方法在PASCAL VOC 2012分割基准[8]中弱监督语义分割中与当前方法水平的比较的有效性。 对于性能指标，我们采用真实分割和预测分割之间的IoU。</p>
+<h2 id="实验细节"><a href="#实验细节" class="headerlink" title="实验细节"></a>实验细节</h2><p><strong>数据集</strong><br>我们框架中的所有DNN都在PASCAL VOC 2012分割基准上进行了训练和测试，以便与之前的方法进行公平比较。 按照惯例，我们通过采用[9]中提出的分割标注来扩大训练图像集。 因此，总共使用10,582个图像作为训练样本，并保留1,449个图像用于验证样本。</p>
+<p><strong>网络参数优化</strong><br>我们DNN的骨干网络在ImageNet上进行了预训练[7]。 然后，Adam[13]在PASCAL VOC 2012上对整个网络参数进行了微调。 在训练所有三个DNN时，通常使用以下数据增强技术：水平翻转，随机裁剪和颜色抖动[16]。 此外，对于除AffinityNet之外的网络，我们在训练期间随机缩放输入图像，这对于在网络上施加比例不变性是有用的。</p>
+<p><strong>参数设置</strong><br>公式(2)中的$α$默认为16，并分别变为4和24以放大和减弱背景激活值。 我们设置等式(4)中的$γ$为5，等式(11)中的$β$为8。此外，在等式(12)中的$t$固定为256。对于dCRF，我们使用原始代码中给出的默认参数。</p>
+<h2 id="合成分割标签的分析"><a href="#合成分割标签的分析" class="headerlink" title="合成分割标签的分析"></a>合成分割标签的分析</h2><p>我们的标签合成方法的性能在真实分割和生成的分割标签之间以mIoU测量，如表1所示。对于模块研究，我们的方法分为三个部分：CAM，RW（使用AffinityNet随机游走）和dCRF。为了证明所提出的方法的优势，我们还报告了超像素池化网络（SPN）[17]的得分，其将CAM与超像素结合作为用于生成具有图像级标签监督的分割标签的附加线索。如表1所示，即使我们的CAM在生成的分割标签的质量方面优于SPN，而不使用超像素等现成方法。我们相信这是因为各种数据增强技术和更强大的骨干网络以及带孔卷积层。此外，通过随机游走和学习的语义相似度，分割标注的质量得到显着提高，证明了AffinityNet的有效性。最后，dCRF进一步略微提高了标签质量，我们使用最后一个版本作为学习分割网络的监督。</p>
+<p><img src="http://image.rexking6.top/img/clip1532937165.png" alt=""></p>
+<p>表1. mIoU中合成分割标签的准确度，在PASCAL VOC 2012训练集上评估。SPN：超像素池化网络[17]，RW：使用AffinityNet随机游走。</p>
+<p>图5中显示了合成分割标签的例子，其中可以看到AffinityNet的随机游走有效地处理CAM中的错误和缺失区域。 为了说明AffinityNet在此过程中的作用，我们还通过检测特征图$f^{aff}$上的边缘来可视化图像的预测语义相似度，并观察到AffinityNet具有检测语义边界的能力，尽管它是使用图像级标签进行训练的。 由于这样的边界惩罚语义上不同的对象之间的随机游走传播，所以合成的分割标签可以恢复准确的对象形状。</p>
+<p><img src="http://image.rexking6.top/img/clip1532937453.png" alt=""></p>
+<p>图5. PASCAL VOC 2012基准测试中训练图像的合成分割标签的定性示例。(a) 输入图像。(b)真实分割标签。(c) 对象类的CAM。(d) 预测语义相似的可视化。(e) 合成分割注释。</p>
+<h2 id="与以前的研究比较"><a href="#与以前的研究比较" class="headerlink" title="与以前的研究比较"></a>与以前的研究比较</h2><p>我们首先定量地将我们的方法与仅基于图像级类标签的先前方法进行比较。 PASCAL VOC 2012的结果总结在表2和表3中。请注意，我们还评估了使用我们的合成标签（称为“Ours-DeepLab”）进行训练的DeepLab [4]，以便与其骨干为VGG16的其他模型进行公平比较[33] 。我们的两个模型在基准的验证集和测试集上的平均精度方面都优于当前的方法水平[37]，而Ours-ResNet38略好于Ours-DeepLab，这得益于ResNet38更强大的表示。我们的模型也与表4中基于额外训练数据或更强监督的方法进行了比较。它们基本上优于基于相同监督水平的方法，但有额外的数据和标注，如MS-COCO中的分割标签[20]，MSRA Saliency [21]和YouTube视频[31]中使用了不可知类别的边界框。他们还依赖于像线和边界框这样强有力的监督，与之前的方法竞争。令人惊讶的是，Ours-ResNet38甚至优于FCN [22]，这是众所周知的关于全监督语义分割的早期工作。这些结果表明，我们的方法生成的分割标签足够强大，可以替代额外的数据或更强的监督。我们最终将我们的模型与全监督的版本DeepLab [4]和ResNet38 [38]进行比较，这是我们可以实现的上限。具体而言，Ours-DeepLab恢复了86％的界限，而Ours-ResNet38则达到了77％。</p>
+<p><img src="http://image.rexking6.top/img/clip1532937929.png" alt=""></p>
+<p>表2. 与仅基于图像级标签的弱监督方法相比，PASCAL VOC 2012验证集的性能。</p>
+<p><img src="http://image.rexking6.top/img/clip1532937972.png" alt=""></p>
+<p>表3. 与仅基于图像级标签的弱监督方法相比，PASCAL VOC 2012测试集的性能。</p>
+<p><img src="http://image.rexking6.top/img/clip1532938053.png" alt=""></p>
+<p>表4. PASCAL VOC 2012验证集和测试集的性能。监督类型（Sup.）表示：P-实例点，S-线，B-边界框，I-图像级标签和F-分割标签。</p>
+<p>图6显示了Ours-ResNet38的定性结果，并将它们与CrawlSeg [11]的定性结果进行了比较，后者是使用图像级监督的当前最新方法。 我们的方法仅依赖于图像级标签监督，即使CrawlSeg利用额外的视频数据来合成分割标签，也可以产生更准确的结果。</p>
+<p><img src="http://image.rexking6.top/img/clip1532938315.png" alt=""></p>
+<p>图6. PASCAL VOC 2012验证集的定性结果。(a) 输入图像。(b) 真实分割。(c) CrawlSeg [11]获得的结果。(d) 我们的结果-ResNet38。 与CrawlSeg相比，CrawlSeg是基于图像级标签监督的当前最先进的模型，我们的方法更好地捕获更大的对象区域并且更不容易遗漏对象。 我们的结果的对象边界比CrawlSeg的对象边界更平滑，因为我们不将dCRF应用于最终结果。 在补充材料中可以找到更多结果。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>为了减轻语义分割中缺少标注数据问题，我们提出了一种基于AffinityNet的新型框架，仅在给定图像级别标签的情况下生成训练图像的准确分割标签。 我们的方法的有效性已在PASCAL VOC 2012基准测试中得到证明，其中使用我们的方法生成的标签训练的DNN基本上优于先前依赖于相同监督水平的方法水平，并且与那些要求更强监督或额外数据的方法相比具有竞争力。</p>
+<h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><p>[1] A. Bearman, O. Russakovsky, V. Ferrari, and L. Fei-Fei. What’s the Point: Semantic Segmentation with Point Supervision. In Proceedings of the European Conference on Computer Vision (ECCV), pages 549–565, 2016. 2, 7<br>[2] G. Bertasius, L. Torresani, S. X. Yu, and J. Shi. Convolutional random walk networks for semantic image segmentation. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), July 2017. 1, 3<br>[3] L.-C. Chen, G. Papandreou, I. Kokkinos, K. Murphy, and A. L. Yuille. Semantic image segmentation with deep convolutional nets and fully connected CRFs. In Proceedings of the International Conference on Learning Representations (ICLR), 2015. 1, 7<br>[4] L. C. Chen, G. Papandreou, I. Kokkinos, K. Murphy, and A. L. Yuille. Deeplab: Semantic image segmentation with deep convolutional nets, atrous convolution, and fully connected crfs. IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI), PP(99):1–1, 2017. 1, 6, 8<br>[5] Y. Cheng, R. Cai, Z. Li, X. Zhao, and K. Huang. Localitysensitive deconvolution networks with gated fusion for rgb-d indoor semantic segmentation. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), July 2017. 3<br>[6] J. Dai, K. He, and J. Sun. BoxSup: Exploiting bounding boxes to supervise convolutional networks for semantic segmentation. In Proceedings of the IEEE International Conference on Computer Vision (ICCV), pages 1635–1643, 2015. 1, 2, 3, 7<br>[7] J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li, and L. FeiFei. ImageNet: a large-scale hierarchical image database. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 248–255, 2009. 1, 7<br>[8] M. Everingham, L. Van Gool, C. K. Williams, J. Winn, and A. Zisserman. The Pascal Visual Object Classes (VOC) Challenge. International Journal of Computer Vision (IJCV), 88(2):303–338, 2010. 2, 6<br>[9] B. Hariharan, P. Arbelaez, L. Bourdev, S. Maji, and J. Malik. ´ Semantic contours from inverse detectors. In Proceedings of the IEEE International Conference on Computer Vision (ICCV), pages 991–998, 2011. 7<br>[10] S. Hong, J. Oh, B. Han, and H. Lee. Learning transferrable knowledge for semantic segmentation with deep convolutional neural network. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 3204 – 3212, 2016. 7<br>[11] S. Hong, D. Yeo, S. Kwak, H. Lee, and B. Han. Weakly supervised semantic segmentation using web-crawled videos. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 7322–7330, 2017. 1, 3, 7, 8<br>[12] A. Khoreva, R. Benenson, J. Hosang, M. Hein, and B. Schiele. Simple does it: Weakly supervised instance and semantic segmentation. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 876–885, 2017. 1, 2, 3, 7<br>[13] D. P. Kingma and J. Ba. Adam: A method for stochastic optimization. In Proceedings of the International Conference on Learning Representations (ICLR), 2015. 7<br>[14] A. Kolesnikov and C. H. Lampert. Seed, expand and constrain: Three principles for weakly-supervised image segmentation. In Proceedings of the European Conference on Computer Vision (ECCV), pages 695–711, 2016. 1, 3, 7<br>[15] P. Krahenb ¨ uhl and V. Koltun. Efficient inference in fully ¨ connected crfs with gaussian edge potentials. In Proceedings of the Neural Information Processing Systems (NIPS), pages 109–117. 2011. 3<br>[16] A. Krizhevsky, I. Sutskever, and G. E. Hinton. ImageNet classification with deep convolutional neural networks. In Proceedings of the Neural Information Processing Systems (NIPS), 2012. 7<br>[17] S. Kwak, S. Hong, and B. Han. Weakly supervised semantic segmentation using superpixel pooling network. In Proceedings of the AAAI Conference on Artificial Intelligence (AAAI), pages 4111–4117, 2017. 1, 3, 6, 7<br>[18] D. Lin, J. Dai, J. Jia, K. He, and J. Sun. Scribblesup: Scribble-supervised convolutional networks for semantic segmentation. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 3159–3167, 2016. 1, 2, 7<br>[19] G. Lin, C. Shen, A. van dan Hengel, and I. Reid. Efficient piecewise training of deep structured models for semantic segmentation. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 3194 – 3203, 2016. 1<br>[20] T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Dollar, and C. L. Zitnick. Microsoft COCO: com- ´ mon objects in context. In Proceedings of the European Conference on Computer Vision (ECCV), pages 740–755, 2014. 7, 8<br>[21] T. Liu, J. Sun, N. N. Zheng, X. Tang, and H. Y. Shum. Learning to detect a salient object. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 1–8, June 2007. 7, 8<br>[22] J. Long, E. Shelhamer, and T. Darrell. Fully convolutional networks for semantic segmentation. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 3431 – 3440, 2015. 1, 2, 7, 8<br>[23] L. Lovsz. Random walks on graphs: A survey, 1993. 2<br>[24] D. Martin, C. Fowlkes, D. Tal, and J. Malik. A database of human segmented natural images and its application to evaluating segmentation algorithms and measuring ecological statistics. In Proc. 8th Int’l Conf. Computer Vision, volume 2, pages 416–423, July 2001. 7<br>[25] H. Noh, S. Hong, and B. Han. Learning deconvolution network for semantic segmentation. In Proceedings of the IEEE International Conference on Computer Vision (ICCV), pages 1520 – 1528, 2015. 1<br>[26] S. J. Oh, R. Benenson, A. Khoreva, Z. Akata, M. Fritz, and B. Schiele. Exploiting saliency for object segmentation from image level labels. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 4410–4419, 2017. 1, 3, 7<br>[27] M. Oquab, L. Bottou, I. Laptev, and J. Sivic. Learning and transferring mid-level image representations using convolutional neural networks. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR),2014. 3<br>[28] G. Papandreou, L.-C. Chen, K. Murphy, and A. L. Yuille. Weakly-and semi-supervised learning of a DCNN for semantic image segmentation. In Proceedings of the IEEE International Conference on Computer Vision (ICCV), pages 1742 – 1750, 2015. 1, 2, 3, 7<br>[29] D. Pathak, P. Krahenb ¨ uhl, and T. Darrell. Constrained con- ¨ volutional neural networks for weakly supervised segmentation. In Proceedings of the IEEE International Conference on Computer Vision (ICCV), pages 1742 – 1750, 2015. 1, 3, 7<br>[30] P. O. Pinheiro and R. Collobert. From image-level to pixellevel labeling with convolutional networks. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 1713 – 1721, 2015. 1, 3, 7<br>[31] A. Prest, C. Leistner, J. Civera, C. Schmid, and V. Ferrari. Learning object class detectors from weakly annotated video. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 3282 – 3289, 2012. 7, 8<br>[32] G.-J. Qi. Hierarchically gated deep networks for semantic segmentation. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), June 2016. 1<br>[33] K. Simonyan and A. Zisserman. Very deep convolutional networks for large-scale image recognition. In Proceedings of the International Conference on Learning Representations (ICLR), 2015. 8<br>[34] P. Tang, X. Wang, X. Bai, and W. Liu. Multiple instance detection network with online instance classifier refinement. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 3059–3067, July 2017. 3<br>[35] P. Tokmakov, K. Alahari, and C. Schmid. Weakly-supervised semantic segmentation using motion cues. In Proceedings of the European Conference on Computer Vision (ECCV), pages 388–404, 2016. 1, 3, 7<br>[36] P. Vernaza and M. Chandraker. Learning random-walk label propagation for weakly-supervised semantic segmentation. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), July 2017. 1, 2, 3, 7<br>[37] Y. Wei, J. Feng, X. Liang, M.-M. Cheng, Y. Zhao, and S. Yan. Object region mining with adversarial erasing: A simple classification to semantic segmentation approach. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2017. 1, 3, 7, 8<br>[38] Z. Wu, C. Shen, and A. van den Hengel. Wider or deeper: Revisiting the resnet model for visual recognition. arXiv preprint arXiv:1611.10080, 2016. 6, 7, 8, 11<br>[39] S. Zheng, S. Jayasumana, B. Romera-Paredes, V. Vineet, Z. Su, D. Du, C. Huang, and P. Torr. Conditional random fields as recurrent neural networks. In Proceedings of the IEEE International Conference on Computer Vision (ICCV), pages 1529 – 1537, 2015. 1<br>[40] B. Zhou, A. Khosla, A. Lapedriza, A. Oliva, and A. Torralba. Learning deep features for discriminative localization. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 2921 – 2929, 2016. 1, 2, 3</p>
+<h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><p>为简洁起见，本附录提供了常规部分中省略的内容。 A.1和A.2节介绍了提出框架的技术细节。 此外，A.3和A.4节提供了对我们框架定量结果的深入分析。 最后，A.5节给出了更多定性结果。 我们在附录中总结了关于未来工作的简短评论。</p>
+<h2 id="我们网络的结构细节"><a href="#我们网络的结构细节" class="headerlink" title="我们网络的结构细节"></a>我们网络的结构细节</h2><p>本节描述了我们框架中网络的体系结构细节。 首先，骨干网络基于[38]中提出的ResNet38（图7(a)），如图7(b)所示，其最后三层卷积层（L4，L5和L6）被转换为带孔卷积。注意，通过分别使L5和L6的扩张率加倍和四倍，骨干的最后一个卷积特征图的输出步幅变为8，这比ResNet38的输出步幅小4倍，并且依靠特征映射增强了我们网络的性能。</p>
+<p><img src="http://image.rexking6.top/img/clip1532950635.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1532950653.png" alt=""></p>
+<p>图7.详细网络体系结构的图示。</p>
+<p>图7(c)显示了网络计算CAM的体系结构，它是通过在骨干网网络顶部添加以下三层获得的：一个用于自适应的3x3卷积层，全局平均池化层（GAP），用于将最后一个特征图抽象为单个向量，以及用于使用单个分类标准学习整个网络的全连接层（FC）。 请注意，图7(c)中的符号与第3.1节中的符号相同，以便清楚地理解。 此外，我们的方法的分割模型如图7(d)所示。 为了获得这个模型，我们在骨干网络的顶部增加了两个3x3的带孔卷积层，扩张率为12，这使得能够保持特征图的分辨率。 在最后阶段，应用双线性插值以将激活图的分辨率扩大到输入图像的分辨率。 有关AffinityNet的架构，请参阅图3。</p>
+<h2 id="预测的实际细节"><a href="#预测的实际细节" class="headerlink" title="预测的实际细节"></a>预测的实际细节</h2><p>在本节中，我们将介绍一些用于增强分割模型性能的实用细节。 由于分割模型是使用随机翻转和缩放的图像进行训练的，因此我们在测试期间也将相同的抖动方法应用于图像。 具体地，每个测试图像被水平翻转，并且通过5个预定比率重新缩放：1/2，3/4，1，5/4和3/2。因此，我们获得了10个不同版本的测试图像，并将它们提供给分割模型，以相应地获得每个类别10个分数图。 然后通过按像素平均池化来聚合得分图以获得每个类的单个图，并且通过选择与每个像素处的最大相似得分的类标签来获得最终分割输出。 该方法在PASCAL VOC 2012基准值上略微提高了模型的分割性能（mIoU小于2％的提升）。</p>
+<h2 id="超参数影响分析"><a href="#超参数影响分析" class="headerlink" title="超参数影响分析"></a>超参数影响分析</h2><p>我们分析了超参数对合成分割标签质量的影响，图8中总结的结果表明我们的标签合成方法对超参数相当不敏感。 如图8(a)所示，当$β≈2log \space t-8$时，合成标签的质量仅在1.0mIoU内波动。在图8(b)中，我们发现当$α$大于16时，精度饱和。 对于这种稳健性，我们认为只需要很少的努力来调整其他数据集的超参数。</p>
+<p>请注意，论文中给出的参数值不是最佳的。 例如，论文中$α$为16，但事实证明32更好（图8(b)）。发生这种情况是因为在我们的设置中没有给出如图8所示的超参数分析，其中没有给出真实分割标签。 因此，为了调整$α$，$β$和$t$，我们对一小部分训练图像进行采样，并在子集上定性地评估它们的效果。 出于同样的原因，我们使用原始代码中给出的dCRF参数的默认值。</p>
+<p><img src="http://image.rexking6.top/img/clip1532955926.png" alt=""></p>
+<p>图8. CAM + RW针对VOC 2012训练集上的不同超参数值合成的分割标签的准确度（mIoU）。</p>
+<h2 id="学习全监督分割网络的理由"><a href="#学习全监督分割网络的理由" class="headerlink" title="学习全监督分割网络的理由"></a>学习全监督分割网络的理由</h2><p>为了凭经验证明使用合成分割标签学习全监督的分割网络的优势，我们比较了合成分割标签和我们最终模型在VOC 2012验证集上的准确性。</p>
+<p>如表5所示，我们的合成分割标签（由CAM+RW+dCRF表示）达到58.7 mIoU，而最终分割网络达到61.7。它们之间的差距证明了我们学习分割模型的策略是正确的。请注意，在上面的比较中，CAM+RW+dCRF比分割模型获得了不公平的优势，因为它利用真实图像级标签来过滤掉不相关类的CAM（第3.1节）。 如果没有这样的标签，CAM+RW+dCRF的分数将进一步降低。</p>
+<p><img src="http://image.rexking6.top/img/clip1532956167.png" alt=""></p>
+<p>表5. 合成分割标签的准确度和我们在mIoU中的最终模型，根据VOC 2012验证集进行评估。</p>
+<h2 id="我们方法的更加定性的结果"><a href="#我们方法的更加定性的结果" class="headerlink" title="我们方法的更加定性的结果"></a>我们方法的更加定性的结果</h2><p>我们在常规部分中为空间限制省略了更多定性结果。 图9说明了我们的分割标签合成过程，其中包含许多定性示例。 我们的最终模型（即Ours ResNet38）的更多分割结果如图10所示。</p>
+<p><img src="http://image.rexking6.top/img/clip1532957407.png" alt=""></p>
+<p>图9. PASCAL VOC 2012训练图像上合成分割标签的定性示例。</p>
+<p><img src="http://image.rexking6.top/img/clip1532957489.png" alt=""></p>
+<p>图10. PASCAL VOC 2012验证图像的语义分割结果。</p>
+<h2 id="未来的工作"><a href="#未来的工作" class="headerlink" title="未来的工作"></a>未来的工作</h2><p>接下来我们要做的事是在转移学习设置中使用AffinityNet，其中源域为部分对象类提供真实分割标签。 通过利用这些类的额外数据来训练AffinityNet，我们的框架可以在目标域中生成更准确的分割标签，因为AffinityNet可以学习并预测通常适用的类别关联性。 进一步探索的另一个方向是使用AffinityNet进行弱监督的语义边界检测，这已经在实验结果中显示出其潜力。</p>
+<h1 id="自己的看法"><a href="#自己的看法" class="headerlink" title="自己的看法"></a>自己的看法</h1><p>在转移概率矩阵的部分，原理看懂了，但是维数和一些具体的细节还不懂，另外在预测的时候，每个测试图像经过一系列操作获得10个版本的变体，但是在放大的时候不会导致一些像素的丢失吗？到时候看看代码。</p>
+<p>而作者最后提出未来的工作可以朝迁移弱监督语义分割问题进行，因为本文的模型学习到的相似度的方法并没有限定类别的局限性。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\05\CAM-Learning-Deep-Features-for-Discriminative-Localization-阅读笔记\" rel="bookmark">CAM-Learning Deep Features for Discriminative Localization 阅读笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\05\Visualizing-and-Understanding-Convolutional-Networks-阅读笔记\" rel="bookmark">Visualizing and Understanding Convolutional Networks 阅读笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\21\《Transferable-Semi-supervised-Semantic-Segmentation》笔记\" rel="bookmark">《Transferable Semi-supervised Semantic Segmentation》笔记</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/07/29/%E3%80%8ALearning-Pixel-level-Semantic-Affinity-with-Image-level-Supervision-for-Weakly-Supervised-Semantic-Segmentation%E3%80%8B%E7%AC%94%E8%AE%B0/" title="《Learning Pixel-level Semantic Affinity with Image-level Supervision for Weakly Supervised Semantic Segmentation》笔记">https://blog.rexking6.top/2018/07/29/《Learning-Pixel-level-Semantic-Affinity-with-Image-level-Supervision-for-Weakly-Supervised-Semantic-Segmentation》笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2/" rel="tag"># 语义分割</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/07/26/%E3%80%8AWeakly-Supervised-Semantic-Segmentation-Network-with-Deep-Seeded-Region-Growing%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="prev" title="《Weakly-Supervised Semantic Segmentation Network with Deep Seeded Region Growing》笔记">
+      <i class="fa fa-chevron-left"></i> 《Weakly-Supervised Semantic Segmentation Network with Deep Seeded Region Growing》笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/30/%E3%80%8AWeakly-Supervised-Semantic-Segmentation-by-Iteratively-Mining-Common-Object-Features%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="next" title="《Weakly-Supervised Semantic Segmentation by Iteratively Mining Common Object Features》笔记">
+      《Weakly-Supervised Semantic Segmentation by Iteratively Mining Common Object Features》笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">3.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">相关工作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%88%91%E4%BB%AC%E7%9A%84%E6%A1%86%E6%9E%B6"><span class="nav-number">5.</span> <span class="nav-text">我们的框架</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97CAM"><span class="nav-number">5.1.</span> <span class="nav-text">计算CAM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0AffinityNet"><span class="nav-number">5.2.</span> <span class="nav-text">学习AffinityNet</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E8%AF%AD%E4%B9%89%E7%9B%B8%E4%BC%BC%E6%A0%87%E7%AD%BE"><span class="nav-number">5.2.1.</span> <span class="nav-text">生成语义相似标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AffinityNet%E8%AE%AD%E7%BB%83"><span class="nav-number">5.2.2.</span> <span class="nav-text">AffinityNet训练</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8AffinityNet%E4%BF%AE%E6%94%B9CAM"><span class="nav-number">5.3.</span> <span class="nav-text">使用AffinityNet修改CAM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E7%BD%91%E7%BB%9C"><span class="nav-number">5.4.</span> <span class="nav-text">学习语义分割网络</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84"><span class="nav-number">6.</span> <span class="nav-text">网络结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AA%A8%E5%B9%B2%E7%BD%91%E7%BB%9C"><span class="nav-number">6.1.</span> <span class="nav-text">骨干网络</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E4%BB%AC%E6%A1%86%E6%9E%B6%E4%B8%ADDNN%E7%9A%84%E8%AF%A6%E7%BB%86%E4%BF%A1%E6%81%AF"><span class="nav-number">6.2.</span> <span class="nav-text">我们框架中DNN的详细信息</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C"><span class="nav-number">7.</span> <span class="nav-text">实验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%86%E8%8A%82"><span class="nav-number">7.1.</span> <span class="nav-text">实验细节</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%88%E6%88%90%E5%88%86%E5%89%B2%E6%A0%87%E7%AD%BE%E7%9A%84%E5%88%86%E6%9E%90"><span class="nav-number">7.2.</span> <span class="nav-text">合成分割标签的分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8E%E4%BB%A5%E5%89%8D%E7%9A%84%E7%A0%94%E7%A9%B6%E6%AF%94%E8%BE%83"><span class="nav-number">7.3.</span> <span class="nav-text">与以前的研究比较</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">8.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-number">9.</span> <span class="nav-text">References</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%99%84%E5%BD%95"><span class="nav-number">10.</span> <span class="nav-text">附录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E4%BB%AC%E7%BD%91%E7%BB%9C%E7%9A%84%E7%BB%93%E6%9E%84%E7%BB%86%E8%8A%82"><span class="nav-number">10.1.</span> <span class="nav-text">我们网络的结构细节</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E6%B5%8B%E7%9A%84%E5%AE%9E%E9%99%85%E7%BB%86%E8%8A%82"><span class="nav-number">10.2.</span> <span class="nav-text">预测的实际细节</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B6%85%E5%8F%82%E6%95%B0%E5%BD%B1%E5%93%8D%E5%88%86%E6%9E%90"><span class="nav-number">10.3.</span> <span class="nav-text">超参数影响分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E5%85%A8%E7%9B%91%E7%9D%A3%E5%88%86%E5%89%B2%E7%BD%91%E7%BB%9C%E7%9A%84%E7%90%86%E7%94%B1"><span class="nav-number">10.4.</span> <span class="nav-text">学习全监督分割网络的理由</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E4%BB%AC%E6%96%B9%E6%B3%95%E7%9A%84%E6%9B%B4%E5%8A%A0%E5%AE%9A%E6%80%A7%E7%9A%84%E7%BB%93%E6%9E%9C"><span class="nav-number">10.5.</span> <span class="nav-text">我们方法的更加定性的结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AA%E6%9D%A5%E7%9A%84%E5%B7%A5%E4%BD%9C"><span class="nav-number">10.6.</span> <span class="nav-text">未来的工作</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%87%AA%E5%B7%B1%E7%9A%84%E7%9C%8B%E6%B3%95"><span class="nav-number">11.</span> <span class="nav-text">自己的看法</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

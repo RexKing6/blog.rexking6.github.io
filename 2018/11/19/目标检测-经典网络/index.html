@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="目标检测-经典网络">
+<meta property="og:url" content="https://blog.rexking6.top/2018/11/19/%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B-%E7%BB%8F%E5%85%B8%E7%BD%91%E7%BB%9C/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542608385.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542608473.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542608509.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542608923.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542609375.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542609418.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542609463.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542609489.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542609600.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542609680.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542609755.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542612056.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542612587.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542612717.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542613849.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542615096.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542615127.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542616980.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542615909.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542615932.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542616380.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542616429.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542619831.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542619923.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542619942.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542638318.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542638351.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542638391.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542638415.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542638525.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542638669.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542638687.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542611710.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542611754.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542611781.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542611802.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542611850.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542611873.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542611893.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542678495.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542671321.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542672011.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542672039.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542672474.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542672541.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542672613.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542674729.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542675001.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542675239.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542675896.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542675988.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542677689.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542677831.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542677860.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542677880.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542677890.png">
+<meta property="article:published_time" content="2018-11-19T04:49:29.000Z">
+<meta property="article:modified_time" content="2019-03-06T09:07:44.478Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="计算机视觉">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1542608385.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/11/19/%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B-%E7%BB%8F%E5%85%B8%E7%BD%91%E7%BB%9C/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>目标检测-经典网络 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/11/19/%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B-%E7%BB%8F%E5%85%B8%E7%BD%91%E7%BB%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          目标检测-经典网络
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-11-19 12:49:29" itemprop="dateCreated datePublished" datetime="2018-11-19T12:49:29+08:00">2018-11-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 17:07:44" itemprop="dateModified" datetime="2019-03-06T17:07:44+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" itemprop="url" rel="index"><span itemprop="name">计算机视觉</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/11/19/%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B-%E7%BB%8F%E5%85%B8%E7%BD%91%E7%BB%9C/" class="post-meta-item leancloud_visitors" data-flag-title="目标检测-经典网络" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>11k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>10 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>《计算机视觉》课程的论文报告，经典的目标识别和目标检测论文阅读报告。所以本文想把SPP-Net、R-CNN系列、SSD、YOLO系列过一下，其他代表性的方法可能只是出现以下。</p>
+<p>综合转载以下文章：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&amp;mid=2650749003&amp;idx=1&amp;sn=2bd8c165b01b66ecb2cd91a8f5e08075&amp;chksm=871afc35b06d752353cfb426a92258bd0200a861ca452c20591953e464d129ca173061289d63&amp;scene=0#rd">从R-CNN到RFBNet，目标检测架构5年演进全盘点</a></li>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzU4MjQ3MDkwNA==&amp;mid=2247486906&amp;idx=1&amp;sn=0affff4517b05038e5c033c0e9f91f73&amp;chksm=fdb6902dcac1193bd4cd3f7d22bb391f3bf3c809f3b20ba1014017615dccca5db55b8c1398b1&amp;mpshare=1&amp;scene=23&amp;srcid=1012qd45TSP938TbHguKfhXB#rd">目标检测最新进展总结与展望</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1311.2524">R-CNN</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1406.4729">SPPNet</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1504.08083">Fast R-CNN</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1506.01497">Faster R-CNN</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1506.02640">YOLOv1</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1512.02325">SSD</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1612.08242">YOLOv2</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1703.06870">Mask R-CNN</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1804.02767">YOLOv3</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/jiongnima/article/details/79094159">实例分割模型Mask R-CNN详解：从R-CNN，Fast R-CNN，Faster R-CNN再到Mask R-CNN</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/zijin0802034/article/details/77685438">边框回归(Bounding Box Regression)详解</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/u011534057/article/details/51219959">RCNN学习笔记(3):Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition(SPP-net)</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_38056657/article/details/80399727">RoI Pooling Layer</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/dudumiaomiao/p/6560841.html">faster-rcnn原理及相应概念解释</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/guleileo/article/details/80581858">从YOLOv1到YOLOv3，目标检测的进化之路</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/neu_chenguangq/article/details/79057655">[目标检测]SSD：Single Shot MultiBox Detector</a></li>
+</ul>
+<h1 id="总览"><a href="#总览" class="headerlink" title="总览"></a>总览</h1><p><img src="http://image.rexking6.top/img/clip1542608385.png" alt=""></p>
+<p>图：目标检测和目标识别的里程碑。</p>
+<p><img src="http://image.rexking6.top/img/clip1542608473.png" alt=""></p>
+<p>图：一般目标检测的里程碑。</p>
+<p><img src="http://image.rexking6.top/img/clip1542608509.png" alt=""></p>
+<p>图：用于一般目标检测的领先框架的高层面示意图。</p>
+<p>整体而言，过去几年中提出的这些检测器可以分为两大主要类别：</p>
+<ol>
+<li><p>两级式检测框架（Two-Stage），这类检测算法将检测问题划分为两个阶段，第一个阶段首先产生候选区域（Region Proposals），包含目标大概的位置信息，然后第二个阶段对候选区域进行分类和位置精修，这类算法的典型代表有R-CNN，Fast R-CNN，Faster R-CNN等。</p>
+</li>
+<li><p>单级式检测框架（One-Stage），这类检测算法不需要Region Proposal阶段，可以通过一个Stage直接产生物体的类别概率和位置坐标值，比较典型的算法有YOLO、SSD和CornerNet。</p>
+</li>
+</ol>
+<p>目标检测模型的主要性能指标是检测准确度和速度，其中准确度主要考虑物体的定位以及分类准确度。一般情况下，Two-Stage算法在准确度上有优势，而One-Stage算法在速度上有优势。不过，随着研究的发展，两类算法都在两个方面做改进，均能在准确度以及速度上取得较好的结果。</p>
+<h1 id="传统算法概述"><a href="#传统算法概述" class="headerlink" title="传统算法概述"></a>传统算法概述</h1><p>传统目标检测的方法一般分为三个阶段：首先在给定的图像上选择一些候选的区域，然后对这些区域提取特征，最后使用训练的分类器进行分类。</p>
+<ol>
+<li>区域选择：这一步是为了对目标的位置进行定位。由于目标可能出现在图像的任何位置，而且目标的大小、长宽比例也不确定，所以最初采用滑动窗口的策略对整幅图像进行遍历，而且需要设置不同的尺度，不同的长宽比。这种穷举的策略虽然包含了目标所有可能出现的位置，但是缺点也是显而易见的：时间复杂度太高，产生冗余窗口太多，这也严重影响后续特征提取和分类的速度和性能。</li>
+<li>特征提取：由于目标的形态多样性，光照变化多样性，背景多样性等因素使得设计一个鲁棒的特征并不是那么容易。然而提取特征的好坏直接影响到分类的准确性。其中，这个阶段常用的特征有 SIFT、HOG等。</li>
+<li>分类：根据第二步提取到的特征对目标进行分类，分类器主要有SVM，AdaBoost等。</li>
+</ol>
+<h1 id="Two-Stage目标检测算法"><a href="#Two-Stage目标检测算法" class="headerlink" title="Two-Stage目标检测算法"></a>Two-Stage目标检测算法</h1><p>Two-Stage目标检测算法可以看作是进行两次One-Stage检测，第一个Stage初步检测出物体位置，第二个Stage对第一个阶段的结果做进一步的精化，对每一个候选区域进行One-Stage检测。整体流程如下图所示，在Testing的时候输入图片经过卷积神经网络产生第一阶段输出，对输出进行解码处理生成候选区域，然后获取对应候选区域的特征表示（ROIs），然后对ROIs进一步精化产生第二阶段的输出，解码（后处理）生成最终结果，解码生成对应检测框即可；在Training的时候需要将Ground Truth编码成CNN输出对应的格式以便计算对应损失loss。</p>
+<p><img src="http://image.rexking6.top/img/clip1542608923.png" alt=""></p>
+<p>如上图所示，Two-Stage的两个阶段拆开来看均与One-Stage检测算法相似，所以我觉得Two-Stage可以看成是两个One-Stage检测算法的组合，第一个Stage做初步检测，剔除负样本，生成初步位置信息（Region of Interest），第二个Stage再做进一步精化并生成最终检测结果。目前对于Two-Stage算法的主要创新主要集中在如何高效准确地生成Proposals、如何获取更好的ROI features、如何加速Two-Stage检测算法以及如何改进后处理方法，接下来从这几个方面进行阐述。</p>
+<h2 id="如何高效准确地生成Proposals"><a href="#如何高效准确地生成Proposals" class="headerlink" title="如何高效准确地生成Proposals"></a>如何高效准确地生成Proposals</h2><p>如何高效准确地生成Proposals考虑的是Two-Stage检测算法的第一个Stage，获取初步的检测结果，供下一个Stage做进一步精化。接下来我将通过对比R-CNN、Faster R-CNN和FPN来做简要说明。</p>
+<ul>
+<li><p>R-CNN：R-CNN生成Proposals的方法是传统方法Selective Search，主要思路是通过图像中的纹理、边缘、颜色等信息对图像进行自底向上的分割，然后对分割区域进行不同尺度的合并，每个生成的区域即一个候选Proposal，如下图所示。这种方法基于传统特征，速度较慢。</p>
+<p><img src="http://image.rexking6.top/img/clip1542609375.png" alt=""></p>
+</li>
+<li><p>Faster R-CNN：Faster R-CNN使用RPN网络代替了Selective Search方法，大大提高了生成Proposals的速度，具体实现策略同One-Stage检测算法，这里不再做过多赘述。网络示意图如下图所示。</p>
+<p><img src="http://image.rexking6.top/img/clip1542609418.png" alt=""></p>
+</li>
+<li><p>FPN：Faster R-CNN只采用顶层特征做预测，但我们知道低层的特征语义信息比较少，但是目标位置准确;高层的特征语义信息比较丰富，但是目标位置比较粗略。FPN算法把低分辨率、高语义信息的高层特征和高分辨率、低语义信息的低层特征进行自上而下的侧边连接，使得所有尺度下的特征都有丰富的语义信息，然后在不同尺度的特征层上进行预测，使得生成Proposals的效果优于只在顶层进行预测的Faster R-CNN算法。如下图所示。</p>
+<p><img src="http://image.rexking6.top/img/clip1542609463.png" alt=""></p>
+</li>
+<li><p>Cascade R-CNN：类似于Faster R-CNN、FPN等，其Proposal网络对于正样本只设置了一个阈值，只做了一次较为宽松的约束，得到的Proposals结果较为粗糙，当对检测框的定位结果要求更为精确的时候就稍显不足。而Cascade R-CNN在获取Proposals的时候也采用逐步求精的策略，前一步生成的Proposals作为后一步的输入，通过控制正样本的交并比阈值不断提高Proposals的质量，如下图所示。准确来说，Cascade R-CNN应该不能算Two-Stage检测算法，应该是多Stage检测算法，多步求精。</p>
+<p><img src="http://image.rexking6.top/img/clip1542609489.png" alt=""></p>
+</li>
+</ul>
+<h2 id="如何获取更好的ROI-features"><a href="#如何获取更好的ROI-features" class="headerlink" title="如何获取更好的ROI features"></a>如何获取更好的ROI features</h2><p>在获取Proposals之后，如何获取更好的ROI features是Two-Stage检测算法第二个Stage的关键，只有输入比较鲁棒的情况下才能得到较好的输出。对于这个问题主要考虑的有两个方向，其一是如何获取Proposals的features，其二是得到Proposals的features之后如何align到同一个尺度。</p>
+<p>首先对于第一个问题主要有如下几种策略：</p>
+<ul>
+<li><p>R-CNN：在原图裁剪Proposals对应区域，然后align到同一个尺度，分别通过对每一个alignalign 之后的原图区域通过神经网络提取特征；</p>
+</li>
+<li><p>Fast/Faster R-CNN：对原图提取一次特征，将对应Proposals的坐标映射到提取的feature map上提取对应特征；</p>
+</li>
+<li><p>FPN：对原图提取不同尺度的特征，将不同尺度的Proposals映射到不同尺度的feature map上提取对应特征；</p>
+</li>
+<li><p>R-FCN：同样只对原图提取一次特征，主要区别是提取目标特征的同时加上了位置信息（Position-Sensitive），即目标的不同区域的特征维护在不同channels上，对于一个候选目标Proposal，其不同区域区域的特征需要映射到原图特征的不同channels上。如下图所示。</p>
+<p><img src="http://image.rexking6.top/img/clip1542609600.png" alt=""></p>
+</li>
+</ul>
+<p>其次对于第二个问题主要有如下几种策略，分别为ROI Pool、ROI Align、PSROI Pool、PrROI Pool，接下来做简要说明。</p>
+<ul>
+<li>ROI Pool：即对Proposal区域分割固定大小的格子，每个格子做Adaptive的Pooling操作，获取一个值，从而所有Proposal生成同样大小的输出。</li>
+<li>ROI Align：主要解决了ROI Pool的量化误差问题，即浮点数坐标转换成整数坐标产生的误差，主要解决方式即不采用量化方式获取具体坐标，每个格子的值通过采样多个点获得，其中被采样点的值采用双线性插值的方式获得，不需要量化成整数坐标。</li>
+<li>PSROI Pool：即R-FCN采用的Pooling方式，与ROI Pool的唯一区别在于PSROI Pool需要每一个Proposal的不同区域对应到feature map的不同channels进行取值。</li>
+<li>PrROI Pool：即Precise ROI Pooling，其考虑了Proposal对应格子区域的每个值，采用积分的方式进行求解，而ROI Align只Sample对应格子区域的几个值。</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1542609680.png" alt=""></p>
+<h2 id="如何加速Two-Stage检测算法"><a href="#如何加速Two-Stage检测算法" class="headerlink" title="如何加速Two-Stage检测算法"></a>如何加速Two-Stage检测算法</h2><p>Two-Stage检测算法在一般情况下要慢于One-Stage检测算法，然而随着研究的发展，速度上的差别也在逐渐缩小，Two-Stage算法的开销主要有两部分，一个是Proposal的开销，一个是ROI Sub-Network的开销，提高Region Proposal的效率和降低ROI Sub-Network的开销均可以加速Two-Stage检测算法。</p>
+<ul>
+<li>Fast R-CNN vs. Faster R-CNN：Faster R-CNN使用神经网络代替Selective Search，大大提高了Region Proposal的的速度。</li>
+<li>Faster R-CNN vs. Light-Head R-CNN：Light-Head R-CNN使用更小的Sub-Network代替Faster R-CNN较为臃肿的Sub-Network，使得第二阶段的网络更小，大大提高了Two-Stage检测算法的速度。</li>
+</ul>
+<h2 id="如何改进后处理方法"><a href="#如何改进后处理方法" class="headerlink" title="如何改进后处理方法"></a>如何改进后处理方法</h2><p>这里所说的后处理方法仅指NMS相关算法，NMS即非极大值抑制算法，在目标检测，定位等领域是一种被广泛使用的方法，主要目的是为了消除多余的框，找到最佳的物体检测的位置，几乎所有的目标检测方法都用到了这种后处理算法。简要介绍如下几种NMS相关算法，分别为NMS、Soft NMS、Softer NMS、IOU-Guided NMS。</p>
+<p><img src="http://image.rexking6.top/img/clip1542609755.png" alt=""></p>
+<ul>
+<li>Soft NMS：Soft NMS相对于NMS的改进即每次并不是直接排除掉和已选框重叠大于一定阈值的框，而是以一定的策略降低对应框的得分，直到低于某个阈值，从而不至于过多删除拥挤情况下定位正确的框。</li>
+<li>Softer NMS：Softer NMS相对于NMS的改进即每次并不是直接以得分最大的框的坐标作为当前选择框的坐标，而是和得分最大的框重叠大于一定阈值的所有框的坐标进行一定策略的加权平均，所得的新的框作为当前选择的得分最大的框的坐标，从而尽可能准确地定位物体。</li>
+<li>IOU-Guided NMS：即以IOU（交并比）得分作为NMS的排序依据，因为IOU得分直接反应了对应框的定位精确程度，优先考虑定位精度较高的框，防止定位精度较低但是其他得分较高的框被误排序到前面。</li>
+</ul>
+<h2 id="R-CNN"><a href="#R-CNN" class="headerlink" title="R-CNN"></a>R-CNN</h2><p><img src="http://image.rexking6.top/img/clip1542612056.png" alt=""></p>
+<p>首先模型输入为一张图片，然后在图片上提出了约2000个待检测区域，然后这2000个待检测区域一个一个地(串联方式)通过卷积神经网络提取特征，然后这些被提取的特征通过一个支持向量机(SVM)进行分类，得到物体的类别，并通过一个bounding box regression调整目标包围框的大小。</p>
+<p>首先在第一步提取2000个待检测区域的时候，是通过一个2012年提出的方法，叫做<a target="_blank" rel="noopener" href="https://www.researchgate.net/publication/262270555_Selective_Search_for_Object_Recognition">selective search</a>。简单来说就是通过一些传统图像处理方法将图像分成若干块，然后通过一个SVM将属于同一目标的若干块拿出来。selective search的核心是一个SVM。</p>
+<p>然后在第二步进行特征提取的时候，Ross直接借助了当时深度学习的最新成果AlexNet (2012)。那么，该网络是如何训练的呢？是直接在ImageNet上面训练的，也就是说，使用图像分类数据集训练了一个仅仅用于提取特征的网络。</p>
+<p>在第三步进行对目标的时候，使用了一个支持向量机(SVM)，在训练这个支持向量机的时候，结合目标的标签(类别)与包围框的大小进行训练，因此，该支持向量机也是被单独训练的。</p>
+<p>贡献：</p>
+<ol>
+<li>使用了卷积神经网络进行特征提取。</li>
+<li>使用bounding box regression进行目标包围框的修正。</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>耗时的selective search，对一帧图像，需要花费2s。</li>
+<li>耗时的串行式CNN前向传播，对于每一个RoI，都需要经过一个AlexNet提特征，为所有的RoI提特征大约花费47s。</li>
+<li>三个模块是分别训练的，并且在训练的时候，对于存储空间的消耗很大。</li>
+</ol>
+<h3 id="边框回归（Bounding-Box-Regression）"><a href="#边框回归（Bounding-Box-Regression）" class="headerlink" title="边框回归（Bounding Box Regression）"></a>边框回归（Bounding Box Regression）</h3><p>其他都比较好理解，只是Bounding Box回归不太好理解，在这里抠一下细节。</p>
+<h4 id="为什么要边框回归？"><a href="#为什么要边框回归？" class="headerlink" title="为什么要边框回归？"></a>为什么要边框回归？</h4><p><img src="http://image.rexking6.top/img/clip1542612587.png" alt=""></p>
+<p>对于上图，绿色的框表示Ground Truth, 红色的框为Selective Search提取的Region Proposal。那么即便红色的框被分类器识别为飞机，但是由于红色的框定位不准(IoU&lt;0.5)， 那么这张图相当于没有正确的检测出飞机。 如果我们能对红色的框进行微调， 使得经过微调后的窗口跟Ground Truth 更接近， 这样岂不是定位会更准确。 确实，Bounding-box regression 就是用来微调这个窗口的。</p>
+<h4 id="边框回归是什么？"><a href="#边框回归是什么？" class="headerlink" title="边框回归是什么？"></a>边框回归是什么？</h4><p>对于窗口一般使用四维向量$( x, y, w, h)$来表示，分别表示窗口的中心点坐标和宽高。对于下图，红色的框 $P$ 代表原始的Proposal，绿色的框 $G$ 代表目标的 Ground Truth，我们的目标是寻找一种关系使得输入原始的窗口 $P$ 经过映射得到一个跟真实窗口 $G$ 更接近的回归窗口 $\hat G$。</p>
+<p><img src="http://image.rexking6.top/img/clip1542612717.png" alt=""></p>
+<p>边框回归的目的既是：给定$(P_x, P_y, P_w, P_h)$寻找一种映射$f$， 使得$f(P_x, P_y, P_w, P_h) = (\hat{G_x}, \hat{G_y}, \hat{G_w}, \hat{G_h})$并且$(\hat{G_x}, \hat{G_y}, \hat{G_w}, \hat{G_h}) \approx (G_x, G_y, G_w, G_h)$。</p>
+<h4 id="边框回归怎么做的？"><a href="#边框回归怎么做的？" class="headerlink" title="边框回归怎么做的？"></a><strong>边框回归怎么做的？</strong></h4><p>那么经过何种变换才能从窗口 $P$ 变为窗口 $\hat G$呢？ 比较简单的思路就是: 平移+尺度放缩。</p>
+<ol>
+<li>先做平移$(\Delta x, \Delta y)$，$\Delta x = P_w d_x(P)$，$ \Delta y = P_h d_y(P)$，这是R-CNN论文的：</li>
+</ol>
+<script type="math/tex; mode=display">
+\hat G_x = P_w d_x(P) + P_x\\
+\hat G_y= P_h d_y(P) + P_y</script><ol>
+<li>然后再做尺度缩放$(S_w, S_h)$，$S_w = exp(d_w(P))$，$S_h = exp(d_h(P))$，对应论文中：</li>
+</ol>
+<script type="math/tex; mode=display">
+\hat G_w= P_w exp(d_w(P))\\
+\hat G_h= P_h exp(d_h(P))</script><p>边框回归学习就是$d_x(P), d_y(P), d_w(P), d_h(P)$这四个变换。下一步就是设计算法那得到这四个映射。线性回归就是给定输入的特征向量$X$，学习一组参数 $W$, 使得经过线性回归后的值跟真实值 $Y$（Ground Truth）非常接近. 即$Y \approx WX$。 那么 Bounding-box 中我们的输入以及输出分别是什么呢？</p>
+<p><strong>Input:</strong></p>
+<p>$Region Proposal \to P = (P_x, P_y,  P_w, P_h )$，这个是什么？输入就是这四个数值吗？其实真正的输入是这个窗口对应的 CNN 特征，也就是 R-CNN 中的 Pool5 feature（特征向量）。（注：训练阶段输入还包括 Ground Truth， 也就是下边提到的$t_* = (t_x, t_y, t_w, t_h)$）</p>
+<p><strong>Output:</strong></p>
+<p>需要进行的平移变换和尺度缩放$d_x(P), d_y(P), d_w(P), d_h(P)$，或者说是$\Delta x, \Delta y, S_w, S_h$。我们的最终输出不应该是 Ground Truth 吗？ 是的， 但是有了这四个变换我们就可以直接得到 Ground Truth， 这里还有个问题，$P$ 经过$d_x(P), d_y(P), d_w(P), d_h(P)$得到的并不是真实值 $G$， 而是预测值 $\hat G$。的确， 这四个值应该是经过 Ground Truth 和 Proposal 计算得到的真正需要的平移量$(t_x, t_y)$和尺度缩放$(t_w, t_h)$。</p>
+<script type="math/tex; mode=display">
+t_x = (G_x - P_x) / P_w\\
+t_y = (G_y - P_y) / P_h\\
+t_w = \log (G_w / P_w)\\
+t_h = \log(G_h / P_h)</script><p>那么目标函数可以表示为$d_\ast(P) = w_\ast^T\Phi_5(P)$，$\Phi_5(P)$是输入 Proposal 的特征向量，$w_\ast$是要学习的参数（$\ast$表示 $x,y,w,h$，也就是每一个变换对应一个目标函数）$d_<em>(P)$是得到的预测值。 我们要让预测值跟真实值$t_</em> = (t_x, t_y, t_w, t_h)$差距最小， 得到损失函数为：</p>
+<script type="math/tex; mode=display">
+Loss = \sum_i^N(t_\ast^i - \hat w_\ast^T\phi_5(P^i))^2</script><p>函数优化目标为：</p>
+<script type="math/tex; mode=display">
+W_\ast = argmin_{w_\ast} \sum_i^N(t_\ast^i - \hat w_\ast^T\phi_5(P^i))^2 + \lambda || \hat w_\ast||^2</script><p>利用梯度下降法或者最小二乘法就可以得到$w_\ast$。</p>
+<h4 id="为什么宽高尺度会设计这种形式？"><a href="#为什么宽高尺度会设计这种形式？" class="headerlink" title="为什么宽高尺度会设计这种形式？"></a>为什么宽高尺度会设计这种形式？</h4><p>这边重点解释一下为什么设计的$t_x, t_y$为什么除以宽高，为什么$t_w, t_h$会有log形式！</p>
+<p><strong>$x,y$ 坐标除以宽高</strong></p>
+<p>首先CNN具有尺度不变性， 以下图为例：</p>
+<p><img src="http://image.rexking6.top/img/clip1542613849.png" alt=""></p>
+<p>上图的两个人具有不同的尺度，因为他们都是人，我们得到的特征相同。假设我们得到的特征为$\phi_1, \phi_2$，那么一个完好的特征应该具备$\phi_1 = \phi_2$。ok，如果我们直接学习坐标差值，以$x$坐标为例，$x_i, p_i$分别代表第$i$个框的$x$坐标，学习到的映射为$f$，$f(\phi_1) = x_1 - p_1$，同理$f(\phi_2) = x_2 - p_2$。从上图显而易见，$x_1 - p_1 \neq x_2 - p_1$。也就是说同一个$x$对应多个$y$，这明显不满足函数的定义。边框回归学习的是回归函数，然而你的目标却不满足函数定义，当然学习不到什么。</p>
+<p><strong>宽高坐标log形式</strong></p>
+<p>我们想要得到一个放缩的尺度，也就是说这里限制尺度必须大于0。我们学习的$t_w, t_h$怎么保证满足大于0呢？直观的想法就是exp函数，那么反过来推导就是log函数的来源了。</p>
+<h4 id="为什么IoU较大，认为是线性变换？"><a href="#为什么IoU较大，认为是线性变换？" class="headerlink" title="为什么IoU较大，认为是线性变换？"></a>为什么IoU较大，认为是线性变换？</h4><p>当输入的 Proposal 与 Ground Truth 相差较小时(RCNN 设置的是 IoU&gt;0.6)， 可以认为这种变换是一种线性变换， 那么我们就可以用线性回归来建模对窗口进行微调， 否则会导致训练的回归模型不 work（当 Proposal跟 GT 离得较远，就是复杂的非线性问题了，此时用线性回归建模显然不合理）。这里我来解释：</p>
+<p>log函数明显不满足线性函数，但是为什么当Proposal 和Ground Truth相差较小的时候，就可以认为是一种线性变换呢？大家还记得这个公式不？参看高数一。</p>
+<script type="math/tex; mode=display">
+lim_{x=0}log(1+x) = x</script><p>现在回过来看：</p>
+<script type="math/tex; mode=display">
+t_w = \log (G_w / P_w) = log(\frac{G_w + P_w - P_w}{P_w}) = log(1 + \frac{G_w-P_w}{P_w})</script><p>当且仅当$G_w - P_w=0$的时候，才会是线性函数，也就是宽度和高度必须近似相等。</p>
+<p>对于IoU大于指定值这块，我并不认同作者的说法。我个人理解，只保证Region Proposal和Ground Truth的宽高相差不多就能满足回归条件。x,y位置到没有太多限制，这点我们从YOLOv2可以看出，原始的边框回归其实x，y的位置相对来说对很大的。这也是YOLOv2的改进地方。</p>
+<p>贴一下另外一位博主的看法：</p>
+<blockquote>
+<p> 所谓线性变换，也就是exp函数不能存在。也就是$d_w(P)$和$d_h(P)$必须恒等于0。对于Proposal和Ground Truth之间。$d_w(P)$和$d_h(P)$都是需要学习的参数，在训练中这两个的值就是$t_w$和$t_h$，所以需要$d_w$和$d_h$为0，$t_w$和$t_h$也都得是0，也就是$P_w=G_w$，$P_h=G_h$的时候，$log(1)=0$，才为线性变换。</p>
+</blockquote>
+<h2 id="SPP-Net"><a href="#SPP-Net" class="headerlink" title="SPP-Net"></a>SPP-Net</h2><p>CNN网络需要固定尺寸的图像输入，SPPNet将任意大小的图像池化生成固定长度的图像表示，提升R-CNN检测的速度24-102倍。</p>
+<p>固定图像尺寸输入的问题，截取的区域未涵盖整个目标或者缩放带来图像的扭曲。</p>
+<p>事实上，CNN的卷积层不需要固定尺寸的图像，全连接层是需要固定大小输入的，因此提出了SPP层放到卷积层的后面，改进后的网络如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1542615096.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1542615127.png" alt=""></p>
+<p>SPP-Net的思路都挺好理解，实现也很简单，具体可以参考<a target="_blank" rel="noopener" href="https://github.com/RexKing6/SPPNet_Feature">我的github</a>。</p>
+<h2 id="Fast-R-CNN"><a href="#Fast-R-CNN" class="headerlink" title="Fast R-CNN"></a>Fast R-CNN</h2><ol>
+<li><p>输入测试图像；</p>
+</li>
+<li><p>利用selective search算法在图像中从上到下提取2000个左右的建议窗口（Region Proposal）；</p>
+</li>
+<li>将整张图片输入CNN，进行特征提取；</li>
+<li>把建议窗口映射到CNN的最后一层卷积feature map上；</li>
+<li>通过RoI pooling层使每个建议窗口生成固定尺寸的feature map；</li>
+<li>利用Softmax Loss(探测分类概率) 和Smooth L1 Loss(探测边框回归)对分类概率和边框回归(Bounding box regression)联合训练。</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1542616980.png" alt=""></p>
+<p>相比R-CNN，主要两处不同：</p>
+<ol>
+<li>最后一层卷积层后加了一个ROI pooling layer；</li>
+<li>损失函数使用了多任务损失函数（multi-task loss），将边框回归直接加入到CNN网络中训练。</li>
+</ol>
+<p>改进：</p>
+<ol>
+<li>测试时速度慢：R-CNN把一张图像分解成大量的建议框，每个建议框拉伸形成的图像都会单独通过CNN提取特征.实际上这些建议框之间大量重叠，特征值之间完全可以共享，造成了运算能力的浪费。FAST-RCNN将整张图像归一化后直接送入CNN，在最后的卷积层输出的feature map上，加入建议框信息，使得在此之前的CNN运算得以共享。</li>
+<li>训练时速度慢：R-CNN在训练时，是在采用SVM分类之前，把通过CNN提取的特征存储在硬盘上.这种方法造成了训练性能低下，因为在硬盘上大量的读写数据会造成训练速度缓慢。FAST-RCNN在训练时，只需要将一张图像送入网络，每张图像一次性地提取CNN特征和建议区域，训练数据在GPU内存里直接进Loss层，这样候选区域的前几层特征不需要再重复计算且不再需要把大量数据存储在硬盘上。</li>
+<li>训练所需空间大：R-CNN中独立的SVM分类器和回归器需要大量特征作为训练样本，需要大量的硬盘空间.FAST-RCNN把类别判断和位置回归统一用深度网络实现，不再需要额外存储。</li>
+</ol>
+<h3 id="RoI-Pooling-Layer"><a href="#RoI-Pooling-Layer" class="headerlink" title="RoI Pooling Layer"></a>RoI Pooling Layer</h3><p>ROI pooling layer实际上是SPP-NET的一个精简版，SPP-NET对每个proposal使用了不同大小的金字塔映射，而ROI pooling layer只需要下采样到一个7x7的特征图。对于VGG16网络conv5_3有512个特征图，这样所有region proposal对应了一个7x7x512维度的特征向量作为全连接层的输入。RoI Pooling就是实现从原图区域映射到conv5区域最后pooling到固定大小的功能。</p>
+<p><img src="http://image.rexking6.top/img/clip1542615909.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1542615932.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1542616380.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1542616429.png" alt=""></p>
+<h2 id="Faster-R-CNN"><a href="#Faster-R-CNN" class="headerlink" title="Faster R-CNN"></a>Faster R-CNN</h2><p><img src="http://image.rexking6.top/img/clip1542619831.png" alt=""></p>
+<ol>
+<li>输入测试图像；</li>
+<li>将整张图片输入CNN，进行特征提取；</li>
+<li>用RPN生成建议窗口（proposals），每张图片生成300个建议窗口；</li>
+<li>把建议窗口映射到CNN的最后一层卷积feature map上；</li>
+<li>过RoI pooling层使每个RoI生成固定尺寸的feature map；</li>
+<li>利用Softmax Loss（探测分类概率）和Smooth L1 Loss（探测边框回归）对分类概率和边框回归（Bounding box regression）联合训练。</li>
+</ol>
+<p><strong>相比FAST-RCNN，主要两处不同：</strong></p>
+<ol>
+<li>使用RPN（Region Proposal Network）代替原来的Selective Search方法产生建议窗口；</li>
+<li>产生建议窗口的CNN和目标检测的CNN共享。</li>
+</ol>
+<p>使得建议框数目从原有的约2000个减少为300个，且建议框的质量也有本质的提高。</p>
+<h3 id="Region-Proposal-Network（RPN）"><a href="#Region-Proposal-Network（RPN）" class="headerlink" title="Region Proposal Network（RPN）"></a>Region Proposal Network（RPN）</h3><p><img src="http://image.rexking6.top/img/clip1542619923.png" alt=""></p>
+<p>简单地说，RPN依靠一个在共享特征图上滑动的窗口，为每个位置生成9种预先设置好长宽比与面积的目标框（文中叫做anchor）。这9种初始anchor包含三种面积（128×128，256×256，512×512），每种面积又包含三种长宽比（1:1，1:2，2:1）。示意图如下所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1542619942.png" alt=""></p>
+<p>由于共享特征图的大小约为40×60，RPN生成的初始anchor的总数约为20000个（40×60×9）。对于生成的anchor，RPN要做的事情有两个，第一个是判断anchor到底是前景还是背景，意思就是判断这个anchor到底有没有覆盖目标，第二个是为属于前景的anchor进行第一次坐标修正。对于前一个问题，Faster R-CNN的做法是使用SoftmaxLoss直接训练，在训练的时候排除掉了超越图像边界的anchor；对于后一个问题，采用SmoothL1Loss进行训练。那么，RPN怎么实现呢？这个问题通过RPN的本质很好求解，RPN的本质是一个树状结构，树干是一个3×3的卷积层，树枝是两个1×1的卷积层，第一个1×1的卷积层解决了前后景的输出，第二个1×1的卷积层解决了边框修正的输出。</p>
+<p>对于RPN输出的特征图中的每一个点，一个1×1的卷积层输出了18个值，因为是每一个点对应9个anchor，每个anchor有一个前景分数和一个背景分数，所以9×2=18。另一个1×1的卷积层输出了36个值，因为是每一个点对应9个anchor，每个anchor对应了4个修正坐标的值，所以9×4=36。那么，要得到这些值，RPN网络需要训练。在训练的时候，就需要对应的标签。那么，如何判定一个anchor是前景还是背景呢？文中做出了如下定义：如果一个anchor与ground truth的IoU在0.7以上，那这个anchor就算前景(positive)。类似地，如果这个anchor与ground truth的IoU在0.3以下，那么这个anchor就算背景(negative)。在作者进行RPN网络训练的时候，只使用了上述两类anchor，与ground truth的IoU介于0.3和0.7的anchor没有使用。在训练anchor属于前景与背景的时候，是在一张图中，随机抽取了128个前景anchor与128个背景anchor。</p>
+<p>在上一段中描述了前景与背景分类的训练方法，本段描述anchor边框修正的训练方法。边框修正主要由4个值完成，$t_x,t_y,t_h,t_w$。这四个值的意思是修正后的框在anchor的$x$和$y$方向上做出平移（由$t_x$和$t_y$决定），并且长宽各自放大一定的倍数（由$t_h$和$t_y​$决定）。那么，如何训练网络参数得到这四个值呢？Fast R-CNN给出了答案，采用Smooth L1 Loss进行训练，具体可以描述为：</p>
+<script type="math/tex; mode=display">
+L_{loc}(t^u,v)=\sum_{i\in\{x,y,w,h\}}\text{smooth}_{L_1}(t_i^u-v_i),\ \ \ \ \ \ \text{smooth}_{L_1}=\left\{
+\begin{aligned}
+0.5x^2 &&\text{if } \ |x|<1 \\
+|x|-0.5 && \text{otherwise}
+\end{aligned}
+\right.</script><p>到这里有个问题，就是不是对于所有的anchor，都需要进行anchor包围框修正的参数训练，只是对positive的anchors有这一步。因此，在训练RPN的时候，只有对128个随机抽取的positive anchors有这一步训练。因此，训练RPN的损失函数可以写成：</p>
+<script type="math/tex; mode=display">
+L(\{p_i\},\{t_i\})=\frac{1}{N_{cls}}\sum_iL_{cls}(p_i,p_i^\ast)+\lambda\frac{1}{N_{reg}}\sum_ip_i^\ast L_{reg}(t_i,t_i^\ast)</script><p>在这里$L_{reg}$就是上面的$L_{loc}$，$λ$被设置为10，$N_{cls}$为256，$N_{reg}$为2400。这样设置的话，RPN的两部分loss值能保持平衡。</p>
+<p>在RoI Pooling Layer之后，就是Fast R-CNN的分类器和RoI边框修正训练。分类器主要是分这个提取的RoI具体是什么类别(人，车，马等等)，一共C+1类(包含一类背景)。RoI边框修正和RPN中的anchor边框修正原理一样，同样也是SmoothL1 Loss，值得注意的是，RoI边框修正也是对于非背景的RoI进行修正，对于类别标签为背景的RoI，则不进行RoI边框修正的参数训练。对于分类器和RoI边框修正的训练，可以公式描述如下：</p>
+<script type="math/tex; mode=display">
+L(p,u,t^u,v)=L_{cls}(p,u)+\lambda[u\ge 1]L_{loc}(t^u,v)</script><p>上式中$u\ge 1$表示RoI边框修正是对于非背景的RoI而言的，实验中，上式的$λ$取1。</p>
+<p>在训练分类器和RoI边框修正时，步骤如下所示：</p>
+<ol>
+<li>首先通过RPN生成约20000个anchor（40×60×9）。</li>
+<li>对20000个anchor进行第一次边框修正，得到修订边框后的proposal。</li>
+<li>对超过图像边界的proposal的边进行clip，使得该proposal不超过图像范围。</li>
+<li>忽略掉长或者宽太小的proposal。</li>
+<li>将所有proposal按照前景分数从高到低排序，选取前12000个proposal。</li>
+<li>使用阈值为0.7的NMS算法排除掉重叠的proposal。</li>
+<li>针对上一步剩下的proposal,选取前2000个proposal进行分类和第二次边框修正。</li>
+</ol>
+<p>总的来说，Faster R-CNN的loss分两大块，第一大块是训练RPN的loss（包含一个Softmax Loss和Smooth L1 Loss），第二大块是训练Fast R-CNN中分类器的loss（包含一个Softmax Loss和Smooth L1 Loss），Faster R-CNN的总的loss函数描述如下：</p>
+<script type="math/tex; mode=display">
+L_{final}=L(\{p_i\},\{t_i\})+L(p,u,t^u,v)</script><p>然后，对于Faster R-CNN的训练方式有三种，可以被描述如下：</p>
+<ol>
+<li><p>RPN和Fast R-CNN交替训练，这种方式也是作者采用的方式。</p>
+</li>
+<li><p>近似联合RPN和Fast R-CNN的训练，在训练时忽略掉了RoI边框修正的误差，也就是说只对anchor做了边框修订，这也是为什么叫”近似联合”的原因。</p>
+</li>
+<li><p>联合RPN和Fast R-CNN的训练。</p>
+</li>
+</ol>
+<p>对于作者采用的交替训练的方式，步骤如下：</p>
+<ol>
+<li><p>使用在ImageNet上预训练的模型初始化共享卷积层并训练RPN。</p>
+</li>
+<li><p>使用上一步得到的RPN参数生成RoI proposal。再使用ImageNet上预训练的模型初始化共享卷积层，训练Fast R-CNN部分（分类器和RoI边框修订）。</p>
+</li>
+<li><p>将训练后的共享卷积层参数固定，同时将Fast R-CNN的参数固定，训练RPN。（从这一步开始，共享卷积层的参数真正被两大块网络共享）</p>
+</li>
+<li><p>同样将共享卷积层参数固定，并将RPN的参数固定，训练Fast R-CNN部分。</p>
+</li>
+</ol>
+<p>Faster R-CNN的测试流程和训练流程挺相似，描述如下：</p>
+<ol>
+<li><p>首先通过RPN生成约20000个anchor（40×60×9）通过RPN。</p>
+</li>
+<li><p>对20000个anchor进行第一次边框修正，得到修订边框后的proposal。</p>
+</li>
+<li><p>对超过图像边界的proposal的边进行clip，使得该proposal不超过图像范围。</p>
+</li>
+<li><p>忽略掉长或者宽太小的proposal。</p>
+</li>
+<li><p>将所有proposal按照前景分数从高到低排序，选取前6000个proposal。</p>
+</li>
+<li>使用阈值为0.7的NMS算法排除掉重叠的proposal。</li>
+<li>针对上一步剩下的proposal,选取前300个proposal进行分类和第二次边框修正。</li>
+</ol>
+<h2 id="Mask-R-CNN"><a href="#Mask-R-CNN" class="headerlink" title="Mask R-CNN"></a>Mask R-CNN</h2><p>先看看RoI Pooling出了什么问题：</p>
+<ul>
+<li>问题1：从输入图上的RoI到特征图上的RoI feature，RoI Pooling是直接通过四舍五入取整得到的结果。</li>
+</ul>
+<p>这一点可以在代码中印证：</p>
+<p><img src="http://image.rexking6.top/img/clip1542638318.png" alt=""></p>
+<p>可以看到直接用round取的值，这样会带来什么坏处呢？就是RoI Pooling过后的得到的输出可能和原图像上的RoI对不上，如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1542638351.png" alt=""></p>
+<p>右图中蓝色部分表示包含了轿车主体的的信息的方格，RoI Pooling Layer的四舍五入取整操作导致其进行了偏移。</p>
+<ul>
+<li>问题2：再将每个RoI对应的特征转化为固定大小的维度时，又采用了取整操作。在这里举例讲解一下RoI Pooling的操作：</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1542638391.png" alt=""></p>
+<p>在从RoI得到对应的特征图时，进行了问题1描述的取整，在得到特征图后，如何得到一个6×6的全连接层的输入呢？RoI Pooling这样做：将RoI对应的特征图分成6×6块，然后直接从每块中找到最大值。在上图中的例子中，比如原图上的的RoI大小是280×480，得到对应的特征图是18×30。将特征图分成6块，每块大小是3×5，然后在每一块中分别选择最大值放入6×6的对应区域中。在将特征图分块的时候，又用到了取整，这点同样可以在代码中得到佐证：</p>
+<p><img src="http://image.rexking6.top/img/clip1542638415.png" alt=""></p>
+<p>这种取整操作（在Mask R-CNN中被称为quantization）对RoI分类影响不大，可是对逐像素的预测目标是有害的，因为对每个RoI取得的特征并没有与RoI对齐。因此，Mask R-CNN对RoI Pooling做了改进并提出了RoI Align。</p>
+<p>RoI Align的主要创新点是，针对问题1，不再进行取整操作。针对问题2，使用双线性插值来更精确地找到每个块对应的特征。总的来说，RoI Align的作用主要就是剔除了RoI Pooling的取整操作，并且使得为每个RoI取得的特征能够更好地对齐原图上的RoI区域。</p>
+<p>下图阐述了Mask R-CNN的Mask branch：</p>
+<p><img src="http://image.rexking6.top/img/clip1542638525.png" alt=""></p>
+<p>在Mask R-CNN中的RoI Align之后有一个”head”部分，主要作用是将RoI Align的输出维度扩大，这样在预测Mask时会更加精确。在Mask Branch的训练环节，作者没有采用FCN式的SoftmaxLoss，反而是输出了K个Mask预测图（为每一个类都输出一张），并采用average binary cross-entropy loss训练，当然在训练Mask branch的时候，输出的K个特征图中，也只是对应ground truth类别的那一个特征图对Mask loss有贡献。</p>
+<p>Mask R-CNN的训练损失函数可以描述为：</p>
+<script type="math/tex; mode=display">
+L_{final}=L(\{p_i\},\{t_i\})+(L_{cls}+L_{box}+L_{mask})</script><p>在上式中，$L_{box}$和$L_{mask}$都是对positive RoI才会起作用的。</p>
+<p>在Mask R-CNN中，相较于Faster R-CNN还有些略微的调整，比如positive RoI被定义成了与Ground truth的IoU大于0.5的（Faster R-CNN中是0.7）。太过于细节的东西本篇博文不再赘述，详情参见Mask R-CNN中的Implementation Details。</p>
+<p>到这里再将Mask R-CNN和FCIS做个比较，首先两者的相同点是均继承了Faster R-CNN的RPN部分。不同点是对于FCIS，预测mask和分类是共享的参数。而Mask R-CNN则是各玩各的，两个任务各自有各自的可训练参数。对于这一点，Mask R-CNN论文里还专门作了比较，显示对于预测mask和分类如果使用共享的特征图对于某些重叠目标可能会出现问题。</p>
+<p><img src="http://image.rexking6.top/img/clip1542638669.png" alt=""></p>
+<p>Mask R-CNN的实验取得了很好的效果，达到甚至超过了state-of-the-art的水平。不过训练代价也是相当大的，需要8块GPU联合训练。</p>
+<p><img src="http://image.rexking6.top/img/clip1542638687.png" alt=""></p>
+<p>Mask R-CNN的实验非常详细，还做了很多对比实验，比如说改换网络深度，在训练mask branch时的误差种类，将RoI Align同RoI Pooling和RoI Warping进行比较，改变预测mask的方式(FCN和全连接层)等，详情请参见Mask R-CNN的实验部分。</p>
+<h1 id="One-Stage目标检测算法"><a href="#One-Stage目标检测算法" class="headerlink" title="One-Stage目标检测算法"></a>One-Stage目标检测算法</h1><p>One-Stage目标检测算法可以在一个stage直接产生物体的类别概率和位置坐标值，相比于Two-Stage的目标检测算法不需要Region Proposal阶段，整体流程较为简单。如下图所示，在Testing的时候输入图片通过CNN网络产生输出，解码（后处理）生成对应检测框即可；在Training的时候需要将Ground Truth编码成CNN输出对应的格式以便计算对应损失loss。</p>
+<p><img src="http://image.rexking6.top/img/clip1542611710.png" alt=""></p>
+<p>目前对于One-Stage算法的主要创新主要集中在如何设计CNN结构、如何构建网络目标以及如何设计损失函数上，接下来我将从这几个方面进行阐述。</p>
+<h2 id="如何设计CNN结构"><a href="#如何设计CNN结构" class="headerlink" title="如何设计CNN结构"></a>如何设计CNN结构</h2><p>设计CNN网络结构主要有两个方向，分别为追求精度和追求速度。最简单的一种实现方式就是替换Backbone网络结构，即使用不同的基础网络结构对图像提取特征。举例来说，ResNet101的表征能力要强于MobileNet，然而MobileNet的计算量要远远低于ResNet101，如果将ResNet101替换为MobileNet，那么检测网络在精度应该会有一定的损失，但是在速度上会有一定提升；如果将MobileNet替换为ResNet101，那么检测网络在速度上会有一定的损失，但是在精度上会有一定的提升。当然这只是一种相对简单的改进CNN网络结构的方式，实际上在改进CNN结构的时候需要很多的学术积累和经验，通过几篇SSD相关论文做一下简要分析。</p>
+<ul>
+<li><p>SSD：SSD检测算法的网络结构如下图所示，其中Backbone为VGG网络，使用不同阶段不同分辨率的feature map进行预测。</p>
+<p><img src="http://image.rexking6.top/img/clip1542611754.png" alt=""></p>
+</li>
+<li><p>DSSD：DSSD检测算法的网络结构如下图所示，DSSD也是使用不同阶段不同分辨率的feature maps进行预测，在不考虑Backbone网络结构差别的情况下，可以发现DSSD相比于SSD多了一系列的后续上采样操作，SSD是使用下采样过程中的feature maps进行预测，而DSSD是使用上采样过程中的feature maps进行预测。显而易见的是，SSD用于检测的feature maps位于网络的较低层，表征能力较弱，而DSSD用于检测的feature maps位于网络的较高层，表征能力较强，同时DSSD在反卷积的过程中通过Skip-Connection引入了较低层的feature maps，实现了一定程度的特征融合。所以DSSD的效果要优于SSD检测算法。</p>
+<p><img src="http://image.rexking6.top/img/clip1542611781.png" alt=""></p>
+</li>
+</ul>
+<ul>
+<li><p>FSSD：FSSD检测算法的网络结构如下图所示，同样，FSSD也是使用不同阶段不同分辨率的feature maps进行预测，相比于SSD，FSSD多了一个特征融合处理，将网络较低层的特征引入到网络的较高层，在检测的时候能够同时考虑不同尺度的信息，使得检测更加准确。</p>
+<p><img src="http://image.rexking6.top/img/clip1542611802.png" alt=""></p>
+</li>
+</ul>
+<h2 id="如何构建回归目标"><a href="#如何构建回归目标" class="headerlink" title="如何构建回归目标"></a>如何构建回归目标</h2><p>如何构建网络回归目标即如何区分正负样本使其与卷积神经网络的输出相对应，最简单直接的方法是直接回归物体的相关信息（类别和坐标），稍微复杂一些，在回归坐标时可以回归物体坐标相对于anchor的偏移量等等。对于One-Stage检测方法主要有如下三种典型的回归目标构建方式，其中代表方法分别为YOLO系列算法、SSD系列算法以及CornerNet目标检测算法。</p>
+<ul>
+<li><p>YOLO系列算法：如下图所示，其中左图取自YOLOv1[8]，右图取自YOLOv2[9]，需要说明的是YOLOv1相比于YOLOv2在坐标回归的时候没有anchor的概念。YOLO系列算法在构建回归目标时一个主要的区别就是如果将图像划分成SxS的格子，每个格子只负责目标中心点落入该格子的物体的检测，如果没有任何目标的中心点落入该格子，则为负样本。</p>
+<p><img src="http://image.rexking6.top/img/clip1542611850.png" alt=""></p>
+</li>
+</ul>
+<ul>
+<li><p>SSD系列算法：如下图所示，SSD系列检测算法在确定正负样本的时候通过交并比大小进行区分，当某一个Ground Truth的目标框与anchor的交并比最大且对应的交并比大于某一个阈值的时候，对应anchor即负责检测该Ground Truth，即每一个anchor最多负责一个物体的检测，同一个物体可能被多个anchor同时检测。</p>
+<p><img src="http://image.rexking6.top/img/clip1542611873.png" alt=""></p>
+</li>
+<li><p>CornerNet：如下图所示，CornerNet检测算法巧妙的将检测框转换成了关键点，即一个目标框可以由两个点（左上角和右下角）来表示，那么对于一个目标物体在预测的时候就可以直接预测两个类别的关键点，然后对关键点进行组合即可生成对应的目标框。</p>
+<p><img src="http://image.rexking6.top/img/clip1542611893.png" alt=""></p>
+</li>
+</ul>
+<h2 id="如何设计损失函数"><a href="#如何设计损失函数" class="headerlink" title="如何设计损失函数"></a>如何设计损失函数</h2><p>目标检测算法主要分为两个子任务，分别为物体分类和物体定位。损失主要包括分类损失（Cls Loss）和定位损失（Loc Loss），常见的损失组合主要有如下两种Cls Loss + Loc Loss（SSD系列算法）、Cls Loss + Obj Loss + Loc Loss （YOLO系列算法），其中YOLO系列算法相比于SSD系列算法多了Object Loss，即判断对应区域是否为物体的损失。除此之外，One-Stage目标检测算法的正负样本不均衡的问题比较严重，对于设计损失函数还会有一些针对创新。</p>
+<ul>
+<li>Hard Negative Mining：即对于大量的负样本只挑取其中适当比例的损失较大的负样本来计算损失，其余损失较小的负样本忽略不计，防止负样本过多干扰网络学习；</li>
+<li>Focal Loss：由于大多数都是简单易分的负样本（属于背景的样本），使得训练过程不能充分学习到属于那些有类别样本的信息；其次简单易分的负样本太多，可能掩盖了其他有类别样本的作用。Focal Loss希望那些hard examples对损失的贡献变大，使网络更倾向于从这些样本上学习。</li>
+</ul>
+<h2 id="YOLO"><a href="#YOLO" class="headerlink" title="YOLO"></a>YOLO</h2><p>YOLO 的核心思想就是利用整张图作为网络的输入，直接在输出层回归 bounding box（边界框） 的位置及其所属的类别。</p>
+<p>将一幅图像分成 SxS 个网格（grid cell），如果某个 object 的中心落在这个网格中，则这个网格就负责预测这个 object。</p>
+<p><img src="http://image.rexking6.top/img/clip1542678495.png" alt=""></p>
+<p>每个网格要预测 B 个 bounding box，每个 bounding box 除了要回归自身的位置之外，还要附带预测一个 confidence 值。这个 confidence 代表了所预测的 box 中含有 object 的置信度和这个 box 预测的有多准这两重信息，其值是这样计算的：  </p>
+<script type="math/tex; mode=display">
+\text{Pr(Object)}\ast \text{IOU}_{\text{pred}}^{\text{truth}}</script><p>其中如果有 object 落在一个 grid cell 里，第一项取 1，否则取 0。 第二项是预测的 bounding box 和实际的 groundtruth 之间的 IoU 值。</p>
+<p>每个 bounding box 要预测 $(x, y, w, h)$ 和 confidence 共5个值，每个网格还要预测一个类别信息，记为 C 类。则 SxS个 网格，每个网格要预测 B 个 bounding box 还要预测 C 个 categories。输出就是 S x S x (5*B+C) 的一个 tensor。</p>
+<p>注意：class 信息是针对每个网格的，confidence 信息是针对每个 bounding box 的。</p>
+<p>举例说明: 在 PASCAL VOC 中，图像输入为 448x448，取 S=7，B=2，一共有20 个类别（C=20），则输出就是 7x7x30 的一个 tensor。</p>
+<p>整个网络结构如下图所示： </p>
+<p><img src="http://image.rexking6.top/img/clip1542671321.png" alt=""></p>
+<p>在 test 的时候，每个网格预测的 class 信息和 bounding box 预测的 confidence信息相乘，就得到每个 bounding box 的 class-specific confidence score:</p>
+<script type="math/tex; mode=display">
+\text{Pr}(\text{Class}_i|\text{Object})\ast\text{Pr(Object)}\ast\text{IOU}_{\text{pred}}^\text{truth}=\text{Pr}(\text{Class}_i)\ast\text{IOU}_{\text{pred}}^\text{truth}</script><p>等式左边第一项就是每个网格预测的类别信息，第二、三项就是每个 bounding box 预测的 confidence。这个乘积即 encode 了预测的 box 属于某一类的概率，也有该 box 准确度的信息。</p>
+<p>得到每个 box 的 class-specific confidence score 以后，设置阈值，滤掉得分低的 boxes，对保留的 boxes 进行 NMS 处理，就得到最终的检测结果。</p>
+<h3 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h3><p>每个 grid 有 30 维，这 30 维中，8 维是回归 box 的坐标，2 维是 box的 confidence，还有 20 维是类别。 </p>
+<p>其中坐标的 x, y 用对应网格的 offset 归一化到 0-1 之间，w, h 用图像的 width 和 height 归一化到 0-1 之间。</p>
+<p>在实现中，最主要的就是怎么设计损失函数，让这个三个方面得到很好的平衡。作者简单粗暴的全部采用了 sum-squared error loss 来做这件事。</p>
+<p>这种做法存在以下几个问题： </p>
+<ul>
+<li><p>8维的 localization error 和20维的 classification error 同等重要显然是不合理的； </p>
+</li>
+<li><p>如果一个网格中没有 object（一幅图中这种网格很多），那么就会将这些网格中的 box 的 confidence push 到 0，相比于较少的有 object 的网格，这种做法是 overpowering 的，这会导致网络不稳定甚至发散。</p>
+</li>
+</ul>
+<p>解决办法：</p>
+<ul>
+<li>更重视8维的坐标预测，给这些损失前面赋予更大的 loss weight, 记为在 pascal VOC 训练中取 5。</li>
+<li>对没有 object 的 box 的 confidence loss，赋予小的 loss weight，记为在 pascal VOC 训练中取 0.5。</li>
+<li>有 object 的 box 的 confidence loss 和类别的 loss 的 loss weight 正常取 1。</li>
+<li>对不同大小的 box 预测中，相比于大 box 预测偏一点，小 box 预测偏一点肯定更不能被忍受的。而 sum-square error loss 中对同样的偏移 loss 是一样。</li>
+<li>为了缓和这个问题，作者用了一个比较取巧的办法，就是将 box 的 width 和 height 取平方根代替原本的 height 和 width。这个参考下面的图很容易理解，小box 的横轴值较小，发生偏移时，反应到y轴上相比大 box 要大。（也是个近似逼近方式）</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1542672011.png" alt=""></p>
+<p>一个网格预测多个 box，希望的是每个 box predictor 专门负责预测某个 object。具体做法就是看当前预测的 box 与 ground truth box 中哪个 IoU 大，就负责哪个。这种做法称作 box predictor 的 specialization。</p>
+<h3 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h3><p>最后整个的损失函数如下所示： </p>
+<p><img src="http://image.rexking6.top/img/clip1542672039.png" alt=""></p>
+<p>训练的时候：输入$N$个图像，每个图像包含$M$个object，每个object包含4个坐标$(x,y,w,h)$和1个label。然后通过网络得到7*7*30大小的三维矩阵。每个1*30的向量前5个元素表示第一个bounding box的4个坐标和1个confidence，第6到10元素表示第二个bounding box的4个坐标和1个confidence。最后20个表示这个grid cell所属类别。注意这30个都是预测的结果。然后就可以计算损失函数的第一、二 、五行。至于第二三行，confidence可以根据ground truth和预测的bounding box计算出的IOU和是否有object的0,1值相乘得到。真实的confidence是0或1值，即有object则为1，没有object则为0。 这样就能计算出loss function的值了。</p>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li><p>YOLO 方法模型训练依赖于物体识别标注数据，因此，对于非常规的物体形状或比例，YOLO 的检测效果并不理想。</p>
+</li>
+<li><p>YOLO 采用了多个下采样层，网络学到的物体特征并不精细，因此也会影响检测效果。</p>
+</li>
+<li><p>YOLO 的损失函数中，大物体 IOU 误差和小物体 IOU 误差对网络训练中 loss 贡献值接近（虽然采用求平方根方式，但没有根本解决问题）。因此，对于小物体，小的 IOU 误差也会对网络优化过程造成很大的影响，从而降低了物体检测的定位准确性。</p>
+</li>
+<li><p>由于输出层为全连接层，因此在检测时，YOLO 训练模型只支持与训练图像相同的输入分辨率。</p>
+</li>
+<li><p>虽然每个格子可以预测 B 个 bounding box，但是最终只选择只选择 IOU 最高的 bounding box 作为物体检测输出，即每个格子最多只预测出一个物体。当物体占画面比例较小，如图像中包含畜群或鸟群时，每个格子包含多个物体，但却只能检测出其中一个。这是 YOLO 方法的一个缺陷。</p>
+</li>
+</ul>
+<h2 id="SSD"><a href="#SSD" class="headerlink" title="SSD"></a>SSD</h2><h3 id="网络结构"><a href="#网络结构" class="headerlink" title="网络结构"></a>网络结构</h3><p>SSD网络主体设计的思想是特征分层提取，并依次进行边框回归和分类。因为不同层次的特征图能代表不同层次的语义信息，低层次的特征图能代表低层语义信息(含有更多的细节)，能提高语义分割质量，适合小尺度目标的学习。高层次的特征图能代表高层语义信息，能光滑分割结果，适合对大尺度的目标进行深入学习。所以作者提出的SSD的网络理论上能适合不同尺度的目标检测。</p>
+<p>所以SSD网络中分为了6个stage，每个stage能学习到一个特征图，然后进行边框回归和分类。SSD网络以VGG16的前5层卷积网络作为第1个stage，然后将VGG16中的fc6和fc7两个全连接层转化为两个卷积层Conv6和Conv7作为网络的第2、第3个stage。接着在此基础上，SSD网络继续增加了Conv8、Conv9、Conv10和Conv11四层网络，用来提取更高层次的语义信息。如下图3.1所示就是SSD的网络结构。在每个stage操作中，网络包含了多个卷积层操作，每个卷积层操作基本上都是小卷积。</p>
+<p><img src="http://image.rexking6.top/img/clip1542672474.png" alt=""></p>
+<p>骨干网络：SSD前面的骨干网络选用的VGG16的基础网络结构，如上图所示，虚线框内的是VGG16的前5层网络。然后后面的Conv6和Conv7是将VGG16的后两层全连接层网络(fc6, fc7)转换而来。</p>
+<p>另外：在此基础上，SSD网络继续增加了Conv8和Conv9、Conv10和Conv11四层网络。图中所示，立方体的长高表示特征图的大小，厚度表示是channel。</p>
+<h3 id="设计要点"><a href="#设计要点" class="headerlink" title="设计要点"></a>设计要点</h3><h4 id="Default-Boxes生成"><a href="#Default-Boxes生成" class="headerlink" title="Default Boxes生成"></a>Default Boxes生成</h4><p>在目标检测网络设计中，Default Boxes生成都是重中之重，也许直接决定了网络能针对的任务以及检测的性能。在SSD中，作者充分的吸取了Faster R-CNN中的Anchors机制，在每个Stage中根据Feature Map的大小，按照固定的Scale和Radio生成Default Boxes。这里为了方便阐述，选取了Conv9的Feature Map，输出大小为5x5。SSD网络中作者设置Conv9的每个点默认生成6个box，如下图所示。因此在这一层上，共生成了5x5x6=150个boxes。</p>
+<p><img src="http://image.rexking6.top/img/clip1542672541.png" alt=""></p>
+<h4 id="特征向量生成"><a href="#特征向量生成" class="headerlink" title="特征向量生成"></a>特征向量生成</h4><p>在每张特征图上得到许多Default Box后还需要生成相应的特征向量，用来进行边框回归和分类。对于边框回归，只需要4维向量即可，分别代表边框缩放尺度（坐标轴两个方向）和平移向量（坐标轴两个方向）。对于分类，SSD网络采取为每个类别进行打分的策略，也就是说对于每个Default Box，SSD网络会计算出相应的每个类别的分数。假设数据集类别数为c，加上背景，那么总的类别数就是c+1类。SSD网络采用了c+1维向量来分别代表该Default Box对于每个类别所得到的分数。这里，假设是VOC数据集，那么每个Default Box将生成一个20 + 1 + 4 = 25维的特征向量。同样，以Conv9输出特征图5x5为例。</p>
+<p><img src="http://image.rexking6.top/img/clip1542672613.png" alt=""></p>
+<h4 id="新增卷积网络"><a href="#新增卷积网络" class="headerlink" title="新增卷积网络"></a>新增卷积网络</h4><p>SSD网络在VGG基础上新增加了几个卷积网络（如网络结构中所述）。SSD网络总共增加了Conv8、Conv9、Conv10和Conv11四个卷积网络层。新增的这些网络都是通过一些小的卷积核操作。引用论文所说，这些小的卷积核操作是SSD网络性能优秀的核心。下面本报告将简单的阐述一下作者对于卷积网络的简单配置。</p>
+<ul>
+<li><p>卷积核配置</p>
+<p>假设Feature Map通道数为P，SSD网络中每个Stage的卷积核大小统一为3*3*P。其中padding和stride都为1。保证卷积后的Feature Map和卷积前是一样大小。</p>
+</li>
+<li><p>卷积滤波器 </p>
+<p>每个Feature Map上mxn个大小的特征点对应$k$个Default Boxes，假设类别数+背景=$c$，最终通过卷积滤波器得到$c+4$维特征向量。那么一个Feature Map上的每个点就需要使用$k\times(c+4)$个这样的滤波器。</p>
+</li>
+</ul>
+<h4 id="联合损失函数"><a href="#联合损失函数" class="headerlink" title="联合损失函数"></a>联合损失函数</h4><p>SSD网络对于每个Stage输出的特征图都进行边框回归和分类操作。SSD网络中作者设计了一个联合损失函数。</p>
+<script type="math/tex; mode=display">
+L(x,c,l,g)=\frac{1}{N}(L_{conf}(x,c)+\alpha(x,l,g))</script><p>其中：</p>
+<ul>
+<li>$L_{conf}$代表的是分类误差，采用的是多分类的softmax loss。</li>
+<li>$L_{cls}$达标的是回归误差，采用的是Smooth L1 Loss。</li>
+<li>$\alpha$取1。</li>
+</ul>
+<h3 id="训练策略"><a href="#训练策略" class="headerlink" title="训练策略"></a>训练策略</h3><p>训练SSD和基于region proposal方法的最大区别就是：SSD需要精确的将ground truth映射到输出结果上。这样才能提高检测的准确率。文中主要采取了以下几个技巧来提高检测的准确度。</p>
+<ul>
+<li>匹配策略</li>
+<li>Default boxes生成器</li>
+<li>Hard Negative Mining</li>
+<li>Data Augmentation</li>
+</ul>
+<h4 id="匹配策略"><a href="#匹配策略" class="headerlink" title="匹配策略"></a>匹配策略</h4><p>这里的匹配是指的ground truth和Default box的匹配。这里采取的方法与 Faster R-CNN中的方法类似。主要是分为两步：第一步是根据最大的overlap将ground truth和default box进行匹配(根据ground truth找到default box中IOU最大的作为正样本)，第二步是将default boxes与overlap大于某个阈值(目标检测中通常选取0.5，Faster R-CNN中选取的是0.7)的ground truth进行匹配。</p>
+<h4 id="Default-Boxes生成器"><a href="#Default-Boxes生成器" class="headerlink" title="Default Boxes生成器"></a>Default Boxes生成器</h4><p>为了处理不同尺度的目标，SSD采用了不同层次的Feature Map来模拟学习。所以每个Stage的Default Boxes生成需要不同的尺度（Scale）和比例（Ratio）。</p>
+<ul>
+<li><p>Scale</p>
+<p>假设使用$m$个不同层的Feature Map来做预测，最底层的Scale值为$S_{min}=0.2$，最高层为$S_{max}=0.95$。其他层通过下面的计算公式进行计算。</p>
+<script type="math/tex; mode=display">
+S_k=S_{min}+\frac{S_{max}-S_{min}}{m-1}(k-1),\ \ k\in[1,m]</script></li>
+<li><p>Ratio</p>
+<p>使用不同的ratio值$a_r\in\{1,2,\frac{1}{2},3,\frac{1}{2}\}$计算default box的宽度和高度。$w_k^a=s_k\sqrt{a_r},h_k^a=\frac{s_k}{\sqrt{a_r}}$，另外对于$ratio=1$的情况，scale为$s_k’=\sqrt{s_ks_{k+1}}$，所以总共有6种不同的Default Box。</p>
+</li>
+</ul>
+<h4 id="Hard-Negative-Mining"><a href="#Hard-Negative-Mining" class="headerlink" title="Hard Negative Mining"></a>Hard Negative Mining</h4><p>经过匹配策略会得到大量的负样本，只有少量的正样本。这样导致了正负样本不平衡，经过试验表明，正负样本的不均衡是导致检测正确率低下的一个重要原因。所以在训练过程中采用了Hard Negative Mining的策略，根据Confidence Loss对所有的box进行排序，使得正负样本的比例控制在1:3之内，经过作者实验，这样做能提高4%左右的准确度。</p>
+<h4 id="Data-Augmentation"><a href="#Data-Augmentation" class="headerlink" title="Data Augmentation"></a>Data Augmentation</h4><p>为了模型更加鲁棒，需要使用不同尺度目标的输入，作者对数据进行了增强处理。</p>
+<ul>
+<li>使用整张图像作为输入。</li>
+<li>使用IOU和目标物体为0.1、0.3、0.5、0.7和0.9的patch，这些patch在原图的大小的[0.1, 1]之间，相应的宽高比在[1/2, 2]之间。</li>
+<li>随即采取一个patch</li>
+</ul>
+<h2 id="YOLOv2"><a href="#YOLOv2" class="headerlink" title="YOLOv2"></a>YOLOv2</h2><p>目前的检测数据集（Detection Datasets）有很多限制，分类标签的信息太少，图片的数量小于分类数据集（Classiﬁcation Datasets），而且检测数据集的成本太高，使其无法当作分类数据集进行使用。而现在的分类数据集却有着大量的图片和十分丰富分类信息。</p>
+<p>文章提出了一种新的训练方法–联合训练算法。这种算法可以把这两种的数据集混合到一起。使用一种分层的观点对物体进行分类，用巨量的分类数据集数据来扩充检测数据集，从而把两种不同的数据集混合起来。</p>
+<p>联合训练算法的基本思路就是：同时在检测数据集和分类数据集上训练物体检测器（Object Detectors ），用监测数据集的数据学习物体的准确位置，用分类数据集的数据来增加分类的类别量、提升鲁棒性。</p>
+<p>YOLO9000 就是使用联合训练算法训练出来的，他拥有 9000 类的分类信息，这些分类信息学习自ImageNet分类数据集，而物体位置检测则学习自 COCO 检测数据集。</p>
+<h3 id="更准"><a href="#更准" class="headerlink" title="更准"></a>更准</h3><p>YOLO 一代有很多缺点，作者希望改进的方向是改善 recall，提升定位的准确度，同时保持分类的准确度。 </p>
+<p>目前计算机视觉的趋势是更大更深的网络，更好的性能表现通常依赖于训练更大的网络或者把多种模型综合到一起。但是 YOLO v2 则着力于简化网络。具体的改进见下表：</p>
+<p><img src="http://image.rexking6.top/img/clip1542674729.png" alt=""></p>
+<h4 id="Batch-Normalization"><a href="#Batch-Normalization" class="headerlink" title="Batch Normalization"></a>Batch Normalization</h4><p>使用 Batch Normalization 对网络进行优化，让网络提高了收敛性，同时还消除了对其他形式的正则化（regularization）的依赖。通过对 YOLO 的每一个卷积层增加 Batch Normalization，最终使得 mAP 提高了 2%，同时还使模型正则化。使用 Batch Normalization 可以从模型中去掉 Dropout，而不会产生过拟合。</p>
+<h4 id="High-resolution-classifier"><a href="#High-resolution-classifier" class="headerlink" title="High resolution classifier"></a>High resolution classifier</h4><p>目前业界标准的检测方法，都要先把分类器（classiﬁer）放在ImageNet上进行预训练。从 Alexnet 开始，大多数的分类器都运行在小于 256*256 的图片上。而现在 YOLO 从 224*224 增加到了 448*448，这就意味着网络需要适应新的输入分辨率。</p>
+<p>为了适应新的分辨率，YOLO v2 的分类网络以 448*448 的分辨率先在 ImageNet上进行微调，微调 10 个 epochs，让网络有时间调整滤波器（filters），好让其能更好的运行在新分辨率上，还需要调优用于检测的 Resulting Network。最终通过使用高分辨率，mAP 提升了 4%。</p>
+<h4 id="Convolution-with-anchor-boxes"><a href="#Convolution-with-anchor-boxes" class="headerlink" title="Convolution with anchor boxes"></a>Convolution with anchor boxes</h4><p>YOLO 一代包含有全连接层，从而能直接预测 Bounding Boxes 的坐标值。  Faster R-CNN 的方法只用卷积层与 Region Proposal Network 来预测 Anchor Box 偏移值与置信度，而不是直接预测坐标值。作者发现通过预测偏移量而不是坐标值能够简化问题，让神经网络学习起来更容易。</p>
+<p>所以最终 YOLO 去掉了全连接层，使用 Anchor Boxes 来预测 Bounding Boxes。作者去掉了网络中一个池化层，这让卷积层的输出能有更高的分辨率。收缩网络让其运行在 416*416 而不是 448*448。由于图片中的物体都倾向于出现在图片的中心位置，特别是那种比较大的物体，所以有一个单独位于物体中心的位置用于预测这些物体。YOLO 的卷积层采用 32 这个值来下采样图片，所以通过选择 416*416 用作输入尺寸最终能输出一个 13*13 的特征图。 使用 Anchor Box 会让精确度稍微下降，但用了它能让 YOLO 能预测出大于一千个框，同时 recall 达到88%，mAP 达到 69.2%。</p>
+<h4 id="Dimension-clusters"><a href="#Dimension-clusters" class="headerlink" title="Dimension clusters"></a>Dimension clusters</h4><p>之前 Anchor Box 的尺寸是手动选择的，所以尺寸还有优化的余地。 为了优化，在训练集的 Bounding Boxes 上跑一下 k-means聚类，来找到一个比较好的值。</p>
+<p>如果我们用标准的欧式距离的 k-means，尺寸大的框比小框产生更多的错误。因为我们的目的是提高 IOU 分数，这依赖于 Box 的大小，所以距离度量的使用：</p>
+<script type="math/tex; mode=display">
+d(\text{box},\text{centroid})=1-\text{IOU(box,centroid)}</script><p>通过分析实验结果，左图：在模型复杂性与 high recall 之间权衡之后，选择聚类分类数 K=5。右图：是聚类的中心，大多数是高瘦的 Box。</p>
+<p><img src="http://image.rexking6.top/img/clip1542675001.png" alt=""></p>
+<h4 id="Direct-location-prediction"><a href="#Direct-location-prediction" class="headerlink" title="Direct location prediction"></a>Direct location prediction</h4><p>用 Anchor Box 的方法，会让 model 变得不稳定，尤其是在最开始的几次迭代的时候。大多数不稳定因素产生自预测 Box 的$(x,y)$位置的时候。按照之前 YOLO的方法，网络不会预测偏移量，而是根据 YOLO 中的网格单元的位置来预测坐标，这就让 Ground Truth 的值介于 0 到 1 之间。而为了让网络的结果能落在这一范围内，网络使用一个 Logistic Activation 来对于网络预测结果进行限制，让结果介于 0 到 1 之间。 网络在每一个网格单元中预测出 5 个 Bounding Boxes，每个 Bounding Boxes 有五个坐标值 $t_x,t_y,t_w,t_h,t_0$，他们的关系见下图。假设一个网格单元对于图片左上角的偏移量是 $c_x,c_y$，Bounding Boxes Prior 的宽度和高度是 $p_w,p_h$，那么预测的结果见下图右面的公式：</p>
+<p><img src="http://image.rexking6.top/img/clip1542675239.png" alt=""></p>
+<p>因为使用了限制让数值变得参数化，也让网络更容易学习、更稳定。Dimension clusters和Direct location prediction，使 YOLO 比其他使用 Anchor Box 的版本提高了近5％。</p>
+<h4 id="Fine-Grained-Features"><a href="#Fine-Grained-Features" class="headerlink" title="Fine-Grained Features"></a>Fine-Grained Features</h4><p>YOLO 修改后的特征图大小为 13*13，这个尺寸对检测图片中尺寸大物体来说足够了，同时使用这种细粒度的特征对定位小物体的位置可能也有好处。Faster-RCNN、SSD 都使用不同尺寸的特征图来取得不同范围的分辨率，而 YOLO 采取了不同的方法，YOLO 加上了一个 Passthrough Layer 来取得之前的某个 26*26 分辨率的层的特征。这个 Passthrough layer 能够把高分辨率特征与低分辨率特征联系在一起，联系起来的方法是把相邻的特征堆积在不同的 Channel 之中，这一方法类似与 Resnet 的 Identity Mapping，从而把 26*26*512 变成 13*13*2048。YOLO 中的检测器位于扩展后（expanded ）的特征图的上方，所以他能取得细粒度的特征信息，这提升了 YOLO 1% 的性能。</p>
+<h4 id="Multi-Scale-Training"><a href="#Multi-Scale-Training" class="headerlink" title="Multi-Scale Training"></a>Multi-Scale Training</h4><p>作者希望 YOLOv2 能健壮地运行于不同尺寸的图片之上，所以把这一想法用于训练模型中。 </p>
+<p>区别于之前的补全图片的尺寸的方法，YOLOv2 每迭代几次都会改变网络参数。每 10 个 Batch，网络会随机地选择一个新的图片尺寸，由于使用了下采样参数是  32，所以不同的尺寸大小也选择为 32 的倍数 {320，352…..608}，最小 320*320，最大 608*608，网络会自动改变尺寸，并继续训练的过程。</p>
+<p>这一政策让网络在不同的输入尺寸上都能达到一个很好的预测效果，同一网络能在不同分辨率上进行检测。当输入图片尺寸比较小的时候跑的比较快，输入图片尺寸比较大的时候精度高，所以你可以在 YOLOv2 的速度和精度上进行权衡。</p>
+<h3 id="更快"><a href="#更快" class="headerlink" title="更快"></a>更快</h3><p>YOLO 使用的是 GoogLeNet 架构，比 VGG-16 快，YOLO 完成一次前向过程只用 85.2 亿次运算，而 VGG-16 要 306.9 亿次，但是 YOLO 精度稍低于 VGG-16。</p>
+<h4 id="Draknet19"><a href="#Draknet19" class="headerlink" title="Draknet19"></a>Draknet19</h4><p>YOLO v2 基于一个新的分类模型，有点类似于 VGG。YOLO v2 使用 3*3 的 filter，每次池化之后都增加一倍 Channels 的数量。YOLO v2 使用全局平均池化，使用 Batch Normilazation 来让训练更稳定，加速收敛，使模型规范化。</p>
+<p>最终的模型，Darknet19，有 19 个卷积层和 5 个 maxpooling 层，处理一张图片只需要 55.8 亿次运算，在 ImageNet 上达到 72.9% top-1 精确度，91.2% top-5 精确度。</p>
+<h4 id="Training-for-classiﬁcation"><a href="#Training-for-classiﬁcation" class="headerlink" title="Training for classiﬁcation"></a>Training for classiﬁcation</h4><p>在训练时，把整个网络在更大的448*448分辨率上Fine Turnning 10个 epoches，初始学习率设置为0.001，这种网络达到达到76.5%top-1精确度，93.3%top-5精确度。</p>
+<h3 id="更强"><a href="#更强" class="headerlink" title="更强"></a>更强</h3><p>在训练的过程中，当网络遇到一个来自检测数据集的图片与标记信息，那么就把这些数据用完整的 YOLO v2 loss 功能反向传播这个图片。当网络遇到一个来自分类数据集的图片和分类标记信息，只用整个结构中分类部分的 loss 功能反向传播这个图片。</p>
+<p>但是检测数据集只有粗粒度的标记信息，像“猫“、“ 狗”之类，而分类数据集的标签信息则更细粒度，更丰富，比如狗这一类就包括”哈士奇“”牛头梗“”金毛狗“等等。所以如果想同时在监测数据集与分类数据集上进行训练，那么就要用一种一致性的方法融合这些标签信息。</p>
+<p>再者，用于分类的方法，大多是用 softmax layer 方法，softmax 意味着分类的类别之间要互相独立的。而盲目地混合数据集训练，就会出现比如：检测数据集的分类信息中”狗“这一分类，在分类数据集合中，就会有的不同种类的狗：“哈士奇”、“牛头梗”、“金毛”这些分类，这两种数据集之间的分类信息不相互独立。所以使用一种多标签的模型来混合数据集，假设一个图片可以有多个分类信息，并假定分类信息必须是相互独立的规则可以被忽略。</p>
+<h4 id="Hierarchical-classification"><a href="#Hierarchical-classification" class="headerlink" title="Hierarchical classification"></a>Hierarchical classification</h4><p>WordNet 的结构是一个直接图表（directed graph），而不是树型结构。因为语言是复杂的，狗这个词既属于‘犬科’又属于‘家畜’两类，而‘犬科’和‘家畜’两类在 WordNet 中则是同义词，所以不能用树形结构。</p>
+<p>作者希望根据 ImageNet 中包含的概念来建立一个分层树，为了建立这个分层树，首先检查 ImagenNet 中出现的名词，再在 WordNet 中找到这些名词，再找到这些名词到达他们根节点的路径（在这里设为所有的根节点为实体对象（physical object）。在 WordNet 中，大多数同义词只有一个路径，所以首先把这条路径中的词全部都加到分层树中。接着迭代地检查剩下的名词，并尽可能少的把他们添加到分层树上，添加的原则是取最短路径加入到树中。</p>
+<p>为了计算某一结点的绝对概率，只需要对这一结点到根节点的整条路径的所有概率进行相乘。所以比如你想知道一个图片是否是 Norfolk terrier 的概率，则进行如下计算：</p>
+<p><img src="http://image.rexking6.top/img/clip1542675896.png" alt=""></p>
+<p>为了验证这一个方法，在 WordTree 上训练 Darknet19 的模型，使用 1000 类的 ImageNet 进行训练，为了建立 WordtTree 1K，把所有中间词汇加入到 WordTree 上，把标签空间从 1000 扩大到了 1369。在训练过程中，如果有一个图片的标签是“Norfolk terrier”，那么这个图片还会获得”狗“（dog）以及“哺乳动物”（mammal）等标签。总之现在一张图片是多标记的，标记之间不需要相互独立。</p>
+<p>如下图所示，之前的 ImageNet 分类是使用一个大 softmax 进行分类。而现在，WordTree 只需要对同一概念下的同义词进行 softmax 分类。 </p>
+<p>使用相同的训练参数，这种分层结构的Darknet19达到71.9% top-1 精度和90.4% top-5 精确度，精度只有微小的下降。 </p>
+<p>这种方法的好处：在对未知或者新的物体进行分类时，性能降低的很优雅（gracefully）。比如看到一个狗的照片，但不知道是哪种种类的狗，那么就高置信度（confidence）预测是”狗“，而其他狗的种类的同义词如”哈士奇“、”牛头梗“、”金毛“等这些则低置信度。</p>
+<p><img src="http://image.rexking6.top/img/clip1542675988.png" alt=""></p>
+<h4 id="Datasets-combination-with-wordtree"><a href="#Datasets-combination-with-wordtree" class="headerlink" title="Datasets combination with wordtree"></a><strong>Datasets combination with wordtree</strong></h4><p>用 WordTree 把数据集合中的类别映射到分层树中的同义词上，例如上图6，WordTree 混合 ImageNet 与 COCO。</p>
+<h4 id="Joint-classification-and-detection"><a href="#Joint-classification-and-detection" class="headerlink" title="Joint classification and detection"></a>Joint classification and detection</h4><p>作者的目的是：训练一个 Extremely Large Scale 检测器。所以训练的时候使用 WordTree 混合了 COCO 检测数据集与 ImageNet 中的 Top9000 类，混合后的数据集对应的 WordTree 有 9418 个类。另一方面，由于 ImageNet 数据集太大了，作者为了平衡一下两个数据集之间的数据量，通过过采样（oversampling） COCO 数据集中的数据，使 COCO 数据集与 ImageNet 数据集之间的数据量比例达到 1：4。</p>
+<p>YOLO9000 的训练基于 YOLO v2 的构架，但是使用 3 priors 而不是 5 来限制输出的大小。当网络遇到检测数据集中的图片时则正常地反方向传播，当遇到分类数据集图片的时候，只使用分类的 loss 功能进行反向传播。同时作者假设 IOU 最少为 0.3。最后根据这些假设进行反向传播。</p>
+<p>使用联合训练法，YOLO9000 使用 COCO 检测数据集学习检测图片中的物体的位置，使用 ImageNet 分类数据集学习如何对大量的类别中进行分类。 </p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>YOLO 9000 的网络结构允许实时地检测超过9000种物体分类，这归功于它能同时优化检测与分类功能。使用 WordTree 来混合来自不同的资源的训练数据，并使用联合优化技术同时在 ImageNet 和 COCO 数据集上进行训练，YOLO9000 进一步缩小了监测数据集与识别数据集之间的大小代沟。</p>
+<h2 id="YOLOv3"><a href="#YOLOv3" class="headerlink" title="YOLOv3"></a>YOLOv3</h2><p>YOLOv3 在 Pascal Titan X 上处理 608x608 图像速度可以达到 20FPS，在 COCO test-dev 上 mAP@0.5 达到 57.9%，与RetinaNet（FocalLoss论文所提出的单阶段网络）的结果相近，并且速度快 4 倍.</p>
+<p>YOLO v3 的模型比之前的模型复杂了不少，可以通过改变模型结构的大小来权衡速度与精度。速度对比如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1542677689.png" alt=""></p>
+<p>YOLOv3 在实现相同准确度下要显著地比其它检测方法快。时间都是在采用 M40 或 Titan X 等相同 GPU 下测量的。</p>
+<p>简而言之，YOLOv3 的先验检测（Prior detection）系统将分类器或定位器重新用于执行检测任务。他们将模型应用于图像的多个位置和尺度。而那些评分较高的区域就可以视为检测结果。此外，相对于其它目标检测方法，我们使用了完全不同的方法。我们将一个单神经网络应用于整张图像，该网络将图像划分为不同的区域，因而预测每一块区域的边界框和概率，这些边界框会通过预测的概率加权。我们的模型相比于基于分类器的系统有一些优势。它在测试时会查看整个图像，所以它的预测利用了图像中的全局信息。与需要数千张单一目标图像的 R-CNN 不同，它通过单一网络评估进行预测。这令 YOLOv3 非常快，一般它比 R-CNN 快 1000 倍、比 Fast R-CNN 快 100 倍。</p>
+<p>改进之处：</p>
+<ol>
+<li><p>多尺度预测 （类FPN）</p>
+</li>
+<li><p>更好的基础分类网络（类ResNet）和分类器 darknet-53，见下图</p>
+</li>
+<li><p>分类器-类别预测：</p>
+<p>YOLOv3 不使用 Softmax 对每个框进行分类，主要考虑因素有：</p>
+<ol>
+<li>Softmax 使得每个框分配一个类别（得分最高的一个），而对于 Open Images这种数据集，目标可能有重叠的类别标签，因此 Softmax不适用于多标签分类。</li>
+<li>Softmax 可被独立的多个 logistic 分类器替代，且准确率不会下降。 </li>
+<li>分类损失采用 binary cross-entropy loss。</li>
+</ol>
+</li>
+</ol>
+<h3 id="多尺度预测"><a href="#多尺度预测" class="headerlink" title="多尺度预测"></a>多尺度预测</h3><p>每种尺度预测 3 个 box, anchor 的设计方式仍然使用聚类，得到9个聚类中心，将其按照大小均分给 3 个尺度。</p>
+<ul>
+<li>尺度1: 在基础网络之后添加一些卷积层再输出box信息。</li>
+<li>尺度2: 从尺度1中的倒数第二层的卷积层上采样(x2)再与最后一个 16x16 大小的特征图相加，再次通过多个卷积后输出 box 信息，相比尺度1变大两倍。</li>
+<li>尺度3: 与尺度2类似，使用了 32x32 大小的特征图。</li>
+</ul>
+<h3 id="基础网络-Darknet-53"><a href="#基础网络-Darknet-53" class="headerlink" title="基础网络 Darknet-53"></a>基础网络 Darknet-53</h3><p><img src="http://image.rexking6.top/img/clip1542677831.png" alt=""></p>
+<p>darknet-53 与 ResNet-101 或 ResNet-152 准确率接近，但速度更快，对比如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1542677860.png" alt=""></p>
+<p>检测结构如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1542677880.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1542677890.png" alt=""></p>
+<p>YOLOv3 在 mAP@0.5 及小目标 APs 上具有不错的结果，但随着 IOU的增大，性能下降，说明 YOLOv3 不能很好地与 ground truth 切合。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\24\SURF特征详解\" rel="bookmark">SURF特征详解</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\11\23\《Unknown-Identity-Rejection-Loss-Utilizing-Unlabeled-Data-for-Face-Recognition》笔记\" rel="bookmark">《Unknown Identity Rejection Loss: Utilizing Unlabeled Data for Face Recognition》笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\10\06\背景检测\" rel="bookmark">背景检测</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/11/19/%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B-%E7%BB%8F%E5%85%B8%E7%BD%91%E7%BB%9C/" title="目标检测-经典网络">https://blog.rexking6.top/2018/11/19/目标检测-经典网络/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/11/05/%E5%9F%BA%E4%BA%8E%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E7%9A%84%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="prev" title="基于时间序列的异常检测">
+      <i class="fa fa-chevron-left"></i> 基于时间序列的异常检测
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/12/20/JupyterLab%E6%8F%92%E4%BB%B6/" rel="next" title="JupyterLab插件">
+      JupyterLab插件 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E8%A7%88"><span class="nav-number">2.</span> <span class="nav-text">总览</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BC%A0%E7%BB%9F%E7%AE%97%E6%B3%95%E6%A6%82%E8%BF%B0"><span class="nav-number">3.</span> <span class="nav-text">传统算法概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Two-Stage%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B%E7%AE%97%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">Two-Stage目标检测算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E9%AB%98%E6%95%88%E5%87%86%E7%A1%AE%E5%9C%B0%E7%94%9F%E6%88%90Proposals"><span class="nav-number">4.1.</span> <span class="nav-text">如何高效准确地生成Proposals</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%8E%B7%E5%8F%96%E6%9B%B4%E5%A5%BD%E7%9A%84ROI-features"><span class="nav-number">4.2.</span> <span class="nav-text">如何获取更好的ROI features</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%8A%A0%E9%80%9FTwo-Stage%E6%A3%80%E6%B5%8B%E7%AE%97%E6%B3%95"><span class="nav-number">4.3.</span> <span class="nav-text">如何加速Two-Stage检测算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E6%94%B9%E8%BF%9B%E5%90%8E%E5%A4%84%E7%90%86%E6%96%B9%E6%B3%95"><span class="nav-number">4.4.</span> <span class="nav-text">如何改进后处理方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#R-CNN"><span class="nav-number">4.5.</span> <span class="nav-text">R-CNN</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%B9%E6%A1%86%E5%9B%9E%E5%BD%92%EF%BC%88Bounding-Box-Regression%EF%BC%89"><span class="nav-number">4.5.1.</span> <span class="nav-text">边框回归（Bounding Box Regression）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E8%BE%B9%E6%A1%86%E5%9B%9E%E5%BD%92%EF%BC%9F"><span class="nav-number">4.5.1.1.</span> <span class="nav-text">为什么要边框回归？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BE%B9%E6%A1%86%E5%9B%9E%E5%BD%92%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">4.5.1.2.</span> <span class="nav-text">边框回归是什么？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BE%B9%E6%A1%86%E5%9B%9E%E5%BD%92%E6%80%8E%E4%B9%88%E5%81%9A%E7%9A%84%EF%BC%9F"><span class="nav-number">4.5.1.3.</span> <span class="nav-text">边框回归怎么做的？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%AE%BD%E9%AB%98%E5%B0%BA%E5%BA%A6%E4%BC%9A%E8%AE%BE%E8%AE%A1%E8%BF%99%E7%A7%8D%E5%BD%A2%E5%BC%8F%EF%BC%9F"><span class="nav-number">4.5.1.4.</span> <span class="nav-text">为什么宽高尺度会设计这种形式？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88IoU%E8%BE%83%E5%A4%A7%EF%BC%8C%E8%AE%A4%E4%B8%BA%E6%98%AF%E7%BA%BF%E6%80%A7%E5%8F%98%E6%8D%A2%EF%BC%9F"><span class="nav-number">4.5.1.5.</span> <span class="nav-text">为什么IoU较大，认为是线性变换？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SPP-Net"><span class="nav-number">4.6.</span> <span class="nav-text">SPP-Net</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Fast-R-CNN"><span class="nav-number">4.7.</span> <span class="nav-text">Fast R-CNN</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RoI-Pooling-Layer"><span class="nav-number">4.7.1.</span> <span class="nav-text">RoI Pooling Layer</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Faster-R-CNN"><span class="nav-number">4.8.</span> <span class="nav-text">Faster R-CNN</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Region-Proposal-Network%EF%BC%88RPN%EF%BC%89"><span class="nav-number">4.8.1.</span> <span class="nav-text">Region Proposal Network（RPN）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mask-R-CNN"><span class="nav-number">4.9.</span> <span class="nav-text">Mask R-CNN</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#One-Stage%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B%E7%AE%97%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">One-Stage目标检测算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1CNN%E7%BB%93%E6%9E%84"><span class="nav-number">5.1.</span> <span class="nav-text">如何设计CNN结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E6%9E%84%E5%BB%BA%E5%9B%9E%E5%BD%92%E7%9B%AE%E6%A0%87"><span class="nav-number">5.2.</span> <span class="nav-text">如何构建回归目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="nav-number">5.3.</span> <span class="nav-text">如何设计损失函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YOLO"><span class="nav-number">5.4.</span> <span class="nav-text">YOLO</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%86%E8%8A%82"><span class="nav-number">5.4.1.</span> <span class="nav-text">细节</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="nav-number">5.4.2.</span> <span class="nav-text">损失函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E7%82%B9"><span class="nav-number">5.4.3.</span> <span class="nav-text">缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSD"><span class="nav-number">5.5.</span> <span class="nav-text">SSD</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84"><span class="nav-number">5.5.1.</span> <span class="nav-text">网络结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E8%A6%81%E7%82%B9"><span class="nav-number">5.5.2.</span> <span class="nav-text">设计要点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Default-Boxes%E7%94%9F%E6%88%90"><span class="nav-number">5.5.2.1.</span> <span class="nav-text">Default Boxes生成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E5%BE%81%E5%90%91%E9%87%8F%E7%94%9F%E6%88%90"><span class="nav-number">5.5.2.2.</span> <span class="nav-text">特征向量生成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B0%E5%A2%9E%E5%8D%B7%E7%A7%AF%E7%BD%91%E7%BB%9C"><span class="nav-number">5.5.2.3.</span> <span class="nav-text">新增卷积网络</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%81%94%E5%90%88%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="nav-number">5.5.2.4.</span> <span class="nav-text">联合损失函数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E7%AD%96%E7%95%A5"><span class="nav-number">5.5.3.</span> <span class="nav-text">训练策略</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E7%AD%96%E7%95%A5"><span class="nav-number">5.5.3.1.</span> <span class="nav-text">匹配策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Default-Boxes%E7%94%9F%E6%88%90%E5%99%A8"><span class="nav-number">5.5.3.2.</span> <span class="nav-text">Default Boxes生成器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Hard-Negative-Mining"><span class="nav-number">5.5.3.3.</span> <span class="nav-text">Hard Negative Mining</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Data-Augmentation"><span class="nav-number">5.5.3.4.</span> <span class="nav-text">Data Augmentation</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YOLOv2"><span class="nav-number">5.6.</span> <span class="nav-text">YOLOv2</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E5%87%86"><span class="nav-number">5.6.1.</span> <span class="nav-text">更准</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Batch-Normalization"><span class="nav-number">5.6.1.1.</span> <span class="nav-text">Batch Normalization</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#High-resolution-classifier"><span class="nav-number">5.6.1.2.</span> <span class="nav-text">High resolution classifier</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Convolution-with-anchor-boxes"><span class="nav-number">5.6.1.3.</span> <span class="nav-text">Convolution with anchor boxes</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Dimension-clusters"><span class="nav-number">5.6.1.4.</span> <span class="nav-text">Dimension clusters</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Direct-location-prediction"><span class="nav-number">5.6.1.5.</span> <span class="nav-text">Direct location prediction</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Fine-Grained-Features"><span class="nav-number">5.6.1.6.</span> <span class="nav-text">Fine-Grained Features</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Multi-Scale-Training"><span class="nav-number">5.6.1.7.</span> <span class="nav-text">Multi-Scale Training</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E5%BF%AB"><span class="nav-number">5.6.2.</span> <span class="nav-text">更快</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Draknet19"><span class="nav-number">5.6.2.1.</span> <span class="nav-text">Draknet19</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Training-for-classi%EF%AC%81cation"><span class="nav-number">5.6.2.2.</span> <span class="nav-text">Training for classiﬁcation</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E5%BC%BA"><span class="nav-number">5.6.3.</span> <span class="nav-text">更强</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Hierarchical-classification"><span class="nav-number">5.6.3.1.</span> <span class="nav-text">Hierarchical classification</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Datasets-combination-with-wordtree"><span class="nav-number">5.6.3.2.</span> <span class="nav-text">Datasets combination with wordtree</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Joint-classification-and-detection"><span class="nav-number">5.6.3.3.</span> <span class="nav-text">Joint classification and detection</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.6.4.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YOLOv3"><span class="nav-number">5.7.</span> <span class="nav-text">YOLOv3</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E5%B0%BA%E5%BA%A6%E9%A2%84%E6%B5%8B"><span class="nav-number">5.7.1.</span> <span class="nav-text">多尺度预测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E7%BD%91%E7%BB%9C-Darknet-53"><span class="nav-number">5.7.2.</span> <span class="nav-text">基础网络 Darknet-53</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

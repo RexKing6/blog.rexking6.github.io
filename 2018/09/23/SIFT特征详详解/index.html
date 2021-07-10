@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SIFT特征详详解">
+<meta property="og:url" content="https://blog.rexking6.top/2018/09/23/SIFT%E7%89%B9%E5%BE%81%E8%AF%A6%E8%AF%A6%E8%A7%A3/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537606168.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537606198.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537606207.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537606214.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537606220.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537606793.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537612753.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537612765.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537612803.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541665512.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537616009.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537615957.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537615980.png">
+<meta property="article:published_time" content="2018-09-23T12:01:44.000Z">
+<meta property="article:modified_time" content="2021-07-09T14:30:09.430Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="计算机视觉">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1537606168.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/09/23/SIFT%E7%89%B9%E5%BE%81%E8%AF%A6%E8%AF%A6%E8%A7%A3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SIFT特征详详解 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/09/23/SIFT%E7%89%B9%E5%BE%81%E8%AF%A6%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SIFT特征详详解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-09-23 20:01:44" itemprop="dateCreated datePublished" datetime="2018-09-23T20:01:44+08:00">2018-09-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-09 22:30:09" itemprop="dateModified" datetime="2021-07-09T22:30:09+08:00">2021-07-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" itemprop="url" rel="index"><span itemprop="name">计算机视觉</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/09/23/SIFT%E7%89%B9%E5%BE%81%E8%AF%A6%E8%AF%A6%E8%A7%A3/" class="post-meta-item leancloud_visitors" data-flag-title="SIFT特征详详解" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>11k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>10 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>打好基础。<br>本文综合转载以下文章：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wangguchangqing/p/4853263.html">SIFT特征详解</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/chezhai/article/details/66044054">SIFT</a></li>
+<li><a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E9%AB%98%E6%96%AF%E6%A8%A1%E7%B3%8A/10885810?fr=aladdin">高斯模糊</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.cnblogs.com/herenzhiming/articles/5276106.html">高斯函数以及在图像处理中的应用总结</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/u014484247/article/details/45507105">SIFT中的“高斯拉普拉斯算子”和“高斯差分算子”</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/touch_dream/article/details/62237018">LOG高斯-拉普拉斯算子</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/abcjennifer/article/details/7639681">SIFT特征提取分析</a></li>
+</ul>
+<h1 id="SIFT概述"><a href="#SIFT概述" class="headerlink" title="SIFT概述"></a>SIFT概述</h1><p>SIFT的全称是Scale Invariant Feature Transform，尺度不变特征变换，由加拿大教授David G.Lowe提出的。SIFT特征对旋转、尺度缩放、亮度变化等保持不变性，是一种非常稳定的局部特征。</p>
+<h2 id="SIFT算法具有的特点"><a href="#SIFT算法具有的特点" class="headerlink" title="SIFT算法具有的特点"></a>SIFT算法具有的特点</h2><ol>
+<li>图像的局部特征，对旋转、尺度缩放、亮度变化保持不变，对视角变化、仿射变换、噪声也保持一定程度的稳定性。</li>
+<li>独特性好，信息量丰富，适用于海量特征库进行快速、准确的匹配。</li>
+<li>多量性，即使是很少几个物体也可以产生大量的SIFT特征</li>
+<li>高速性，经优化的SIFT匹配算法甚至可以达到实时性</li>
+<li>扩招性，可以很方便的与其他的特征向量进行联合。</li>
+</ol>
+<h2 id="SIFT特征检测的步骤"><a href="#SIFT特征检测的步骤" class="headerlink" title="SIFT特征检测的步骤"></a>SIFT特征检测的步骤</h2><ol>
+<li><strong>尺度空间的极值检测</strong> 搜索所有尺度空间上的图像，通过高斯微分函数来识别潜在的对尺度和选择不变的兴趣点。</li>
+<li><strong>特征点定位</strong> 在每个候选的位置上，通过一个拟合精细模型来确定位置尺度，关键点的选取依据他们的稳定程度。</li>
+<li><strong>特征方向赋值</strong> 基于图像局部的梯度方向，分配给每个关键点位置一个或多个方向，后续的所有操作都是对于关键点的方向、尺度和位置进行变换，从而提供这些特征的不变性。</li>
+<li><strong>特征点描述</strong> 在每个特征点周围的邻域内，在选定的尺度上测量图像的局部梯度，这些梯度被变换成一种表示，这种表示允许比较大的局部形状的变形和光照变换。</li>
+</ol>
+<h1 id="尺度空间"><a href="#尺度空间" class="headerlink" title="尺度空间"></a>尺度空间</h1><p>尺度空间(scale space)思想最早是由Iijima于1962年提出的，后经witkin和Koenderink等人的推广逐渐得到关注，在计算机视觉领域使用广泛。</p>
+<p>尺度空间理论的基本思想是：在图像信息处理模型中引入一个被视为尺度的参数，通过连续变化尺度参数获得多尺度下的尺度空间表示序列，对这些序列进行尺度空间主轮廓的提取，并以该主轮廓作为一种特征向量，实现边缘、角点检测和不同分辨率上的特征提取等。</p>
+<p>在一定的范围内，无论物体是大还是小，人眼都可以分辨出来。然而计算机要有相同的能力却不是那么的容易，在未知的场景中，计算机视觉并不能提供物体的尺度大小，其中的一种方法是把物体不同尺度下的图像都提供给机器，让机器能够对物体在不同的尺度下有一个统一的认知。在建立统一认知的过程中，要考虑的就是在图像在不同的尺度下都存在的特征点。</p>
+<h2 id="多分辨率图像金字塔"><a href="#多分辨率图像金字塔" class="headerlink" title="多分辨率图像金字塔"></a>多分辨率图像金字塔</h2><p>在早期图像的多尺度通常使用图像金字塔表示形式。图像金字塔是同一图像在不同的分辨率下得到的一组结果，其生成过程一般包括两个步骤：</p>
+<ol>
+<li>对原始图像进行平滑</li>
+<li>对处理后的图像进行降采样（通常是水平、垂直方向的1/2）<br> 降采样后得到一系列不断尺寸缩小的图像。显然，一个传统的金字塔中，每一层的图像是其上一层图像长、高的各一半。多分辨率的图像金字塔虽然生成简单，但其本质是降采样，图像的局部特征则难以保持，也就是无法保持特征的尺度不变性。</li>
+</ol>
+<h2 id="高斯尺度空间"><a href="#高斯尺度空间" class="headerlink" title="高斯尺度空间"></a>高斯尺度空间</h2><p>在进入高斯尺度空间之前，我们需要了解一下用来构造该空间的高斯函数和高斯模糊。</p>
+<h3 id="高斯函数与高斯模糊"><a href="#高斯函数与高斯模糊" class="headerlink" title="高斯函数与高斯模糊"></a>高斯函数与高斯模糊</h3><p>高斯在$N$维空间的分布函数为：</p>
+<script type="math/tex; mode=display">G(r)=\frac{1}{\sqrt {2 \pi \sigma^2}^N}e^{-r^2/(2\sigma^2)}</script><p>在二维空间的分布函数为：</p>
+<script type="math/tex; mode=display">G(u,v)=\frac{1}{2 \pi \sigma^2}e^{-(u^2+v^2)/(2\sigma^2)}</script><p>其中$r$是模糊半径，$σ$是正态分布的标准偏差。在二维空间中，这个公式生成的曲面的等高线是从中心开始呈正态分布的同心圆。分布不为零的像素组成的卷积矩阵与原始图像做变换。每个像素的值都是周围相邻像素值的加权平均。</p>
+<p>如果使用简单平均，显然不是很合理，因为图像都是连续的，越靠近的点关系越密切，越远离的点关系越疏远。因此，加权平均更合理，距离越近的点权重越大，距离越远的点权重越小。</p>
+<p>实际应用中，在计算高斯函数的离散近似时，在大概3$σ$距离之外的像素都可以看作不起作用，这些像素的计算也就可以忽略。通常，图像处理程序只需要计算$(6\sigma+1)×(6\sigma+1)$的矩阵就可以保证相关像素影响。对于边界上的点，通常采用复制周围的点到另一面再进行加权平均运算。</p>
+<p>对一幅图像进行多次连续高斯模糊的效果与一次更大的高斯模糊可以产生同样的效果，大的高斯模糊的半径是所用多个高斯模糊半径平方和的平方根。例如，使用半径分别为6和8的两次高斯模糊变换得到的效果等同于一次半径为10的高斯模糊效果，$\sqrt{6×6+8×8}=10$。根据这个关系，使用多个连续较小的高斯模糊处理不会比单个高斯较大处理时间要少。</p>
+<p>为了计算权重矩阵，需要设定$σ$的值。假定$σ=1.5$，则模糊半径为1的权重矩阵如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1537606168.png" alt=""></p>
+<p>这9个点的权重总和等于0.4787147，如果只计算这9个点的加权平均，还必须让它们的权重之和等于1，因此上面9个值还要分别除以0.4787147，得到最终的权重矩阵。</p>
+<p><img src="http://image.rexking6.top/img/clip1537606198.png" alt=""></p>
+<p>有了权重矩阵，就可以计算高斯模糊的值了。假设现有9个像素点，灰度值（0-255）如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1537606207.png" alt=""></p>
+<p>每个点乘以自己的权重值：</p>
+<p><img src="http://image.rexking6.top/img/clip1537606214.png" alt=""></p>
+<p>得到</p>
+<p><img src="http://image.rexking6.top/img/clip1537606220.png" alt=""></p>
+<p>将这9个值加起来，就是中心点的高斯模糊的值。对所有点重复这个过程，就得到了高斯模糊后的图像。如果原图是彩色图片，可以对RGB三个通道分别做高斯模糊。</p>
+<h2 id="高斯尺度空间-1"><a href="#高斯尺度空间-1" class="headerlink" title="高斯尺度空间"></a>高斯尺度空间</h2><p>使用高斯模糊，我们能对图像在分辨率不变的情况下进行不同程度的模糊效果，形成高斯尺度空间。</p>
+<script type="math/tex; mode=display">L(x,y, \sigma)=G(x,y,\sigma)×I(x,y)</script><p>其中，$G(x,y,\sigma)$是高斯核函数。</p>
+<script type="math/tex; mode=display">G(x,y,\sigma)=\frac{1}{2 \pi \sigma^2}e^{\frac{x^2+y^2}{2\sigma^2}}</script><p>$σ$称为尺度空间因子，它是高斯正态分布的标准差，反映了图像被模糊的程度，其值越大图像越模糊，对应的尺度也就越大。$L(x,y,\sigma)$代表着图像的高斯尺度空间。</p>
+<h2 id="高斯金字塔：双空间结合"><a href="#高斯金字塔：双空间结合" class="headerlink" title="高斯金字塔：双空间结合"></a>高斯金字塔：双空间结合</h2><p><img src="http://image.rexking6.top/img/clip1537606793.png" alt=""></p>
+<p>为了让尺度体现其连续性，高斯金字塔在简单降采样的基础上加上了高斯滤波。如图所示，将图像金字塔每层的一张图像使用不同参数做高斯模糊，使得金字塔的每层含有多张高斯模糊图像，将金字塔每层多张图像合称为一组(Octave)，金字塔每层只有一组图像，组数和金字塔层数相等，每组含有多张(也叫层Interval)图像。另外，降采样时，高斯金字塔上一组图像的初始图像(底层图像)是由前一组图像的倒数第三张图像隔点采样得到的。</p>
+<p>注：由于组内的多张图像按层次叠放，因此组内的多张图像也称做多层，为避免与金字塔层的概念混淆，本文以下内容中，若不特别说明是金字塔层数，层一般指组内各层图像。</p>
+<h2 id="高斯差分金字塔"><a href="#高斯差分金字塔" class="headerlink" title="高斯差分金字塔"></a>高斯差分金字塔</h2><p>2002年Mikolajczyk在详细的实验比较中发现尺度归一化的高斯拉普拉斯函数$\nabla^2 G$（称为LoG）的极大值和极小值同其它的特征提取函数，例如：梯度，Hessian或Harris角特征比较，能够产生最稳定的图像特征。</p>
+<p>而Lindeberg早在1994年就发现高斯差分函数（Difference of Gaussian ，简称DOG算子）与尺度归一化的高斯拉普拉斯函数非常近似。</p>
+<p>朝着这个公式努力：$\sigma \nabla^2 G = \frac{\partial G}{\partial \sigma} \approx \frac{G(x,y,k\sigma)-G(x,y,\sigma)}{k\sigma-\sigma}$</p>
+<p>首先求解$\nabla^2 G = \frac{\partial}{\partial x^2}G_\sigma(x,y)+\frac{\partial}{\partial y^2}G_\sigma(x,y)$</p>
+<p>$\frac{\partial}{\partial x}G_\sigma(x,y)=\frac{\partial}{\partial x}e^{-(x^2+y^2)/2\sigma^2}=-\frac{x}{\sigma^2}e^{-(x^2+y^2)/2\sigma^2}$</p>
+<p>和</p>
+<p>$\frac{\partial^2}{\partial x^2}G_\sigma(x,y)=\frac{x^2}{\sigma^4}e^{-(x^2+y^2)/2\sigma^2}=\frac{x^2-\sigma^2}{\sigma^4}e^{-(x^2+y^2)/2\sigma^2}$</p>
+<p>$y$的情况也类似，</p>
+<p>$\frac{\partial^2}{\partial y^2}G_\sigma(x,y)=\frac{y^2}{\sigma^4}e^{-(x^2+y^2)/2\sigma^2}=\frac{y^2-\sigma^2}{\sigma^4}e^{-(x^2+y^2)/2\sigma^2}$</p>
+<p>即，</p>
+<p>$\nabla^2G=\frac{1}{2 \pi \sigma^2}e^{-\frac{x^2+y^2}{2\sigma^2}}(\frac{x^2+y^2-2\sigma^2}{\sigma^4})$</p>
+<p>求解$\frac{\partial G}{\partial \sigma}=\frac{1}{2 \pi \sigma^2}e^{-\frac{x^2+y^2}{2\sigma^2}}(\frac{x^2+y^2-2\sigma^2}{\sigma^3})$</p>
+<p>由此可以得到，$\sigma \nabla^2G=\frac{\partial G}{\partial \sigma}$，而$\frac{G(x,y,k\sigma)-G(x,y,\sigma)}{k\sigma - \sigma}$可以看作在$\sigma$处的微分。</p>
+<p>由此可以得到，</p>
+<script type="math/tex; mode=display">\begin{align}
+D(x,y,\sigma)&=[G(x,y,k\sigma)-G(x,y,\sigma)]×I(x,y) \\
+&=L(x,y,k\sigma)-L(x,y,\sigma)
+\end{align}</script><p>其中，$L(x,y,\sigma)$是图像的高斯尺度空间。</p>
+<p>使用高斯金字塔每组中相邻上下两层图像相减，得到高斯差分图像，如图所示，进行极值检测。</p>
+<p><img src="http://image.rexking6.top/img/clip1537612753.png" alt=""></p>
+<p>易知，高斯金字塔有多组，每组又有多层。一组中的多个层之间的尺度是不一样的（也就是使用的高斯参数$\sigma$是不同的），相邻两层之间的尺度相差一个比例因子$k$。。如果每组有$S$层，则$k=2^{\frac{1}{S}}$。这是因为上一组图像的最底层图像是由下一组中尺度为$2\sigma$的图像进行因子为$2$的降采样得到的（高斯金字塔先从底层建立），当相乘了$s$次时，将会成为下一次的比例因子$2k$。</p>
+<p>高斯金字塔的组数一般是</p>
+<script type="math/tex; mode=display">o = [\log _2min(m,n)] - a</script><p>$o$表示高斯金字塔的层数，$m$，$n$分别是图像的行和列。减去的系数$a$可以$0-\log_2min(m,n)$之间的任意值，和具体需要的金字塔的顶层图像的大小有关。</p>
+<p>高斯模糊参数$σ$（尺度空间），可由下面关系式得到</p>
+<script type="math/tex; mode=display">\sigma(o,s) = \sigma_0 \cdot 2^{\frac{o + s}{S}}</script><p>其中$o$为所在的组，$s$为所在的层，$\sigma_0$为初始的尺度，$S$为每组的层数。</p>
+<p>在Lowe的算法实现中$σ_0=1.6$,$o_{min}=−1$,$S=3$,$o_{min}=−1$就是首先将原图像的长和宽各扩展一倍。</p>
+<h2 id="高斯金字塔构建示例"><a href="#高斯金字塔构建示例" class="headerlink" title="高斯金字塔构建示例"></a>高斯金字塔构建示例</h2><p>以一个$512×512$的图像$I$为例，构建高斯金字塔步骤：(从$0$开始计数）</p>
+<ol>
+<li>金字塔的组数，$log_2512=9$，减去因子$3$，构建的金字塔的组数为$6$。取每组的层数为$3$。</li>
+<li>构建第$0$组，将图像的宽和高都增加一倍，变成$1024×1024$（$I_0$）。第$0$层$I_0×G(x,y,σ_0)$，第1层$I_0×G(x,y,kσ_0)$，第2层$I_0×G(x,y,k^2σ_0)$</li>
+<li>构建第1组，对$I_0$降采样变成$512×512$（$I_1$）。第0层$I_1×G(x,y,2σ_0)$，第1层$I_1×G(x,y,2kσ_0)$……$I1×G(x,y,2k^2σ_0)$</li>
+<li>⋮</li>
+<li>构建第$o$组，第$s$层$I_o×G(x,y,2^ok^sσ_0)$</li>
+</ol>
+<h1 id="DoG空间极值检测"><a href="#DoG空间极值检测" class="headerlink" title="DoG空间极值检测"></a>DoG空间极值检测</h1><p>为了寻找尺度空间的极值点，每个像素点要和其图像域（同一尺度空间）和尺度域（相邻的尺度空间）的所有相邻点进行比较，当其大于（或者小于）所有相邻点时，改点就是极值点。如图所示，中间的检测点要和其所在图像的$3×3$邻域$8$个像素点，以及其相邻的上下两层的$3×3$领域$18$个像素点，共$26$个像素点进行比较。<br>从上面的描述中可以知道，每组图像的第一层和最后一层是无法进行比较取得极值的。为了满足尺度变换的连续性，在每一组图像的顶层继续使用高斯模糊生成$3$幅图像，高斯金字塔每组有$S+3$层图像，DoG金字塔的每组有$S+2$组图像。</p>
+<p><img src="http://image.rexking6.top/img/clip1537612765.png" alt=""></p>
+<h2 id="尺度变化的连续性"><a href="#尺度变化的连续性" class="headerlink" title="尺度变化的连续性"></a>尺度变化的连续性</h2><p>设$S=3$，也就是每组有$3$层，则$k=2^{\frac{1}{S}}=2^{\frac{1}{3}}$，也就是有高斯金字塔每组有$(S−1)3$层图像，DoG金字塔每组有$(S-2)2$层图像。在DoG金字塔的第一组有两层尺度分别是$σ$,$kσ$，第二组有两层的尺度分别是$2σ$,$2kσ$，由于只有两项是无法比较取得极值的（只有左右两边都有值才能有极值）。由于无法比较取得极值，那么我们就需要继续对每组的图像进行高斯模糊，使得尺度形成$σ$,$kσ$,$k^2σ$,$k^3σ$,$k^4σ$，这样就可以选择中间的三项$kσ$,$k^2σ$,$k^3σ$。对应的下一组由上一组降采样得到的三项是$2kσ$,$2k^2σ$,$2k^3σ$，其首项$2kσ=2⋅2^{\frac{1}{3}}σ=2^{\frac{4}{3}}σ$，刚好与上一组的最后一项$k^3σ=2^{\frac{3}{3}}σ$的尺度连续起来。</p>
+<p><img src="http://image.rexking6.top/img/clip1537612803.png" alt=""></p>
+<h1 id="删除不好的极值点（特征点）"><a href="#删除不好的极值点（特征点）" class="headerlink" title="删除不好的极值点（特征点）"></a>删除不好的极值点（特征点）</h1><p>通过比较检测得到的DoG的局部极值点实在离散的空间搜索得到的，由于离散空间是对连续空间采样得到的结果，因此在离散空间找到的极值点不一定是真正意义上的极值点，因此要设法将不满足条件的点剔除掉。可以通过尺度空间DoG函数进行曲线拟合寻找极值点，这一步的本质是去掉DoG局部曲率非常不对称的点。<br>要剔除掉的不符合要求的点主要有两种：</p>
+<ol>
+<li>低对比度的特征点</li>
+<li>不稳定的边缘响应点</li>
+</ol>
+<h2 id="剔除低对比度的特征点"><a href="#剔除低对比度的特征点" class="headerlink" title="剔除低对比度的特征点"></a>剔除低对比度的特征点</h2><p>候选特征点$x$，其偏移量定义为$Δx$，其对比度为$D(x)$的绝对值$∣D(x)∣$，对$D(x)$应用泰勒展开式</p>
+<script type="math/tex; mode=display">D(x) = D + \frac{\partial D^T}{\partial x}\Delta x+ \frac{1}{2}\Delta x^T\frac{\partial ^2D}{\partial x^2}\Delta x</script><p>由于$x$是$D(x)$的极值点，所以对上式求导并令其为$0$，</p>
+<script type="math/tex; mode=display">\frac{\partial D(x)}{\partial x}=\frac{\partial D}{\partial x}+\frac{\partial ^2D}{\partial x^2}\Delta x=0</script><p>得到</p>
+<script type="math/tex; mode=display">\Delta x = -\frac{\partial^2D^{-1}}{\partial x^2}\frac{\partial D(x)}{\partial x}</script><p>然后再把求得的$Δx$代入到$D(x)$的泰勒展开式中</p>
+<script type="math/tex; mode=display">D(\hat{x}) = D +\frac{1}{2}\frac{\partial D^T}{\partial x}\hat{x}</script><p>设对比度的阈值为$T$，若$\mid D(\hat{x})\mid \ge T$，则该特征点保留，否则剔除掉。</p>
+<h2 id="剔除不稳定的边缘响应点"><a href="#剔除不稳定的边缘响应点" class="headerlink" title="剔除不稳定的边缘响应点"></a>剔除不稳定的边缘响应点</h2><p>在边缘梯度的方向上主曲率值比较大，而沿着边缘方向则主曲率值较小。候选特征点的DoG函数$D(x)$的主曲率与$2×2$Hessian矩阵$H$的特征值成正比。</p>
+<script type="math/tex; mode=display">
+H = \left[
+            \begin{array}{cc}
+                D_{xx} \quad D_{yx} \\
+                D_{xy} \quad D_{yy}
+            \end{array}
+        \right]</script><p>其中，$D_{xx},D_{xy},D_{yy}$是候选点邻域对应位置的差分求得的。<br>为了避免求具体的值，可以使用$H$特征值得比例。设$α=λ_{max}$为$H$的最大特征值，$β=λ_{min}$为$H$的最小特征值，则</p>
+<script type="math/tex; mode=display">Tr(H) = D_{xx} + D_{yy} = \alpha +\beta \\
+Det(H) = D_{xx} · D_{yy} - D_{xy}^2 = \alpha \cdot \beta</script><p>其中，$Tr(H)$为矩阵$H$的迹，$Det(H)$为矩阵$H$的行列式。</p>
+<p>设$\gamma = \frac{\alpha}{\beta}$表示最大特征值和最小特征值的比值，则</p>
+<script type="math/tex; mode=display">\frac{Tr(H)^2}{Det(H)} = \frac{(\alpha +\beta)^2}{\alpha \beta} = \frac{(\gamma \beta + \beta)^2}{\gamma \beta ^2} = \frac{(\gamma +1)^2}{\gamma}</script><p>上式的结果与两个特征值的比例有关，和具体的大小无关，当两个特征值想等时其值最小，并且随着$γ$的增大而增大。因此为了检测主曲率是否在某个阈值$T_γ$下，只需检测</p>
+<script type="math/tex; mode=display">\frac{Tr(H)^2}{Det(H)} > \frac{(T_{\gamma} + 1)^2}{T_{\gamma}}</script><p>如果上式成立，则剔除该特征点，否则保留。（Lowe论文中取$T_γ=10$)</p>
+<h1 id="求取特征点的主方向"><a href="#求取特征点的主方向" class="headerlink" title="求取特征点的主方向"></a>求取特征点的主方向</h1><p><img src="http://image.rexking6.top/img/clip1541665512.png" alt=""></p>
+<p>经过上面的步骤已经找到了在不同尺度下都存在的特征点，为了实现图像旋转不变性，需要给特征点的方向进行赋值。利用特征点邻域像素的梯度分布特性来确定其方向参数，再利用图像的梯度直方图求取关键点局部结构的稳定方向。</p>
+<p>找到了特征点，也就可以得到该特征点的尺度$σ$，也就可以得到特征点所在的尺度图像</p>
+<script type="math/tex; mode=display">L(x,y) = G(x,y,\sigma) \ast I(x,y)</script><p>计算以特征点为中心、以$3×1.5σ$为半径的区域图像的幅角和幅值，每个点$L(x,y)$的梯度的模$m(x,y)$以及方向$θ(x,y)$可通过下面公式求得</p>
+<script type="math/tex; mode=display">m(x,y) = \sqrt{[L(x+1,y) - L(x-1,y)]^2 + [L(x,y + 1) - L(x,y - 1)]^2} \\</script><script type="math/tex; mode=display">\theta(x,y) = \arctan{\frac{L(x,y+1) - L(x,y - 1)}{L(x + 1,y) - L(x-1,y)}}</script><p>计算得到梯度方向后，就要使用直方图统计特征点邻域内像素对应的梯度方向和幅值。梯度方向的直方图的横轴是梯度方向的角度（梯度方向的范围是0到360度，直方图每36度一个柱共10个柱，或者没45度一个柱共8个柱），纵轴是梯度方向对应梯度幅值的累加，在直方图的峰值就是特征点的主方向。在Lowe的论文还提到了使用高斯函数对直方图进行平滑以增强特征点近的邻域点对关键点方向的作用，并减少突变的影响。为了得到更精确的方向，通常还可以对离散的梯度直方图进行插值拟合。具体而言，关键点的方向可以由和主峰值最近的三个柱值通过抛物线插值得到。在梯度直方图中，当存在一个相当于主峰值80%能量的柱值时，则可以将这个方向认为是该特征点辅助方向。所以，一个特征点可能检测到多个方向（也可以理解为，一个特征点可能产生多个坐标、尺度相同，但是方向不同的特征点）。Lowe在论文中指出</p>
+<blockquote>
+<p>15%的关键点具有多方向，而且这些点对匹配的稳定性很关键。</p>
+</blockquote>
+<p>得到特征点的主方向后，对于每个特征点可以得到三个信息$(x,y,σ,θ)$，即位置、尺度和方向。由此可以确定一个SIFT特征区域，一个SIFT特征区域由三个值表示，中心表示特征点位置，半径表示关键点的尺度，箭头表示主方向。具有多个方向的关键点可以被复制成多份，然后将方向值分别赋给复制后的特征点，一个特征点就产生了多个坐标、尺度相等，但是方向不同的特征点。</p>
+<h1 id="生成特征描述"><a href="#生成特征描述" class="headerlink" title="生成特征描述"></a>生成特征描述</h1><p>通过以上的步骤已经找到了SIFT特征点位置、尺度和方向信息，下面就需要使用一组向量来描述关键点也就是生成特征点描述子，这个描述符不只包含特征点，也含有特征点周围对其有贡献的像素点。描述子应具有较高的独立性，以保证匹配率。<br>特征描述符的生成大致有三个步骤：</p>
+<ol>
+<li>校正旋转主方向，确保旋转不变性。</li>
+<li>生成描述子，最终形成一个128维的特征向量</li>
+<li>归一化处理，将特征向量长度进行归一化处理，进一步去除光照的影响。</li>
+</ol>
+<p>为了保证特征矢量的旋转不变性，要以特征点为中心，在附近邻域内将坐标轴旋转$θ$（特征点的主方向）角度，即将坐标轴旋转为特征点的主方向。旋转后邻域内像素的新坐标为：</p>
+<script type="math/tex; mode=display">\left[
+​            \begin{array}{c}
+​            x ^ \prime \\
+​            y ^ \prime
+​            \end{array}
+​        \right] = \left[ \begin{array}{cc} \cos \theta \quad - \sin \theta \\
+​        \sin \theta \quad \cos \theta \end{array} \right] \left[ \begin{array}{c} x \\ y \end{array}\right]</script><p><img src="http://image.rexking6.top/img/clip1537616009.png" alt=""></p>
+<p>旋转后以主方向为中心取$8×8$的窗口。下图所示，左图的中央为当前关键点的位置，每个小格代表为关键点邻域所在尺度空间的一个像素，求取每个像素的梯度幅值与梯度方向，箭头方向代表该像素的梯度方向，长度代表梯度幅值，然后利用高斯窗口对其进行加权运算。最后在每个$4×4$的小块上绘制$8$个方向的梯度直方图，计算每个梯度方向的累加值，即可形成一个种子点，如右图所示。每个特征点由$4$个种子点组成，每个种子点有$8$个方向的向量信息。这种邻域方向性信息联合增强了算法的抗噪声能力，同时对于含有定位误差的特征匹配也提供了比较理性的容错性。</p>
+<p><img src="http://image.rexking6.top/img/clip1537615957.png" alt=""></p>
+<p>与求主方向不同，此时每个种子区域的梯度直方图在$0-360$之间划分为$8$个方向区间，每个区间为$45$度，即每个种子点有$8$个方向的梯度强度信息。<br>在实际的计算过程中，为了增强匹配的稳健性，Lowe建议</p>
+<blockquote>
+<p>对每个关键点使用$4×4$共$16$个种子点来描述，这样一个关键点就可以产生$128$维的SIFT特征向量。<br><img src="http://image.rexking6.top/img/clip1537615980.png" alt=""></p>
+</blockquote>
+<p>通过对特征点周围的像素进行分块，计算块内梯度直方图，生成具有独特性的向量，这个向量是该区域图像信息的一种抽象，具有唯一性。</p>
+<h1 id="归一化"><a href="#归一化" class="headerlink" title="归一化"></a>归一化</h1><p>如上统计的$4×4×8=128$个梯度信息即为该关键点的特征向量。特征向量形成后，为了去除光照变化的影响，需要对它们进行归一化处理。得到的描述子向量为$H=(h_1,h_2,…,h_{128})$，归一化后的特征向量为$L=(l_1,l_2,…,l_{128})$，则</p>
+<script type="math/tex; mode=display">l_i=\frac{h_i}{\sqrt{\sum_{j=1}^{128}h_j}},j=1,2,3,...</script><h1 id="匹配"><a href="#匹配" class="headerlink" title="匹配"></a>匹配</h1><p>生成了A、B两幅图的描述子，（分别是$k_1\ast 128$维和$k_2 \ast 128$维），就将两图中各个scale（所有scale）的描述子进行匹配，匹配上128维即可表示两个特征点match上了。</p>
+<p>实际计算过程中，为了增强匹配的稳健性，Lowe建议对每个关键点使用$4×4$共16个种子点来描述，这样对于一个关键点就可以产生128个数据，即最终形成128维的SIFT特征向量。此时SIFT特征向量已经去除了尺度变化、旋转等几何变形因素的影响，再继续将特征向量的长度归一化，则可以进一步去除光照变化的影响。当两幅图像的SIFT特征向量生成后，下一步我们采用关键点特征向量的欧式距离来作为两幅图像中关键点的相似性判定度量。取图像1中的某个关键点，并找出其与图像2中欧式距离最近的前两个关键点，在这两个关键点中，如果最近的距离除以次近的距离少于某个比例阈值，则接受这一对匹配点。降低这个比例阈值，SIFT匹配点数目会减少，但更加稳定。为了排除因为图像遮挡和背景混乱而产生的无匹配关系的关键点，Lowe提出了比较最近邻距离与次近邻距离的方法，距离比率ratio小于某个阈值的认为是正确匹配。因为对于错误匹配，由于特征空间的高维性，相似的距离可能有大量其他的错误匹配，从而它的ratio值比较高。Lowe推荐ratio的阈值为0.8。但作者对大量任意存在尺度、旋转和亮度变化的两幅图片进行匹配，结果表明ratio取值在0. 4~0. 6之间最佳，小于0.4的很少有匹配点，大于0. 6的则存在大量错误匹配点。（如果这个地方你要改进，最好给出一个匹配率和ration之间的关系图，这样才有说服力）</p>
+<p>作者建议ratio的取值原则如下:</p>
+<ul>
+<li>ratio=0. 4　对于准确度要求高的匹配；</li>
+<li>ratio=0. 6　对于匹配点数目要求比较多的匹配； </li>
+<li>ratio=0. 5　一般情况下。</li>
+</ul>
+<p>也可按如下原则:当最近邻距离$&lt;200$时ratio=0.6，反之ratio=0.4。ratio的取值策略能排分错误匹配点。</p>
+<h1 id="PCA-SIFT"><a href="#PCA-SIFT" class="headerlink" title="PCA-SIFT"></a>PCA-SIFT</h1><p>PCA-SIFT与标准SIFT有相同的亚像素位置，尺度和主方向。但在第4步计算描述子的设计，采用的主成分分析的方法。</p>
+<p>特征描述子计算部分的思想是用特征点周围的$41×41$的像斑计算它的主元，并用PCA-SIFT将原来的$2×39×39$维的向量降成$20$维，以达到更精确的表示方式。</p>
+<p>它的主要步骤为，对每一个关键点：在关键点周围提取一个$41×41$的像斑于给定的尺度，旋转到它的主方向；计算$39×39$水平和垂直的梯度，形成一个大小为$3042$的矢量；用预先计算好的投影矩阵$n×3042$与此矢量相乘；这样生成一个大小为$n$的PCA-SIFT描述子。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>SIFT特征以其对旋转、尺度缩放、亮度等保持不变性，是一种非常稳定的局部特征，在图像处理和计算机视觉领域有着很重要的作用，其本身也是非常复杂的，下面对其计算过程做一个粗略总结。</p>
+<ol>
+<li><p><strong>DoG尺度空间的极值检测。</strong> 首先是构造DoG尺度空间，在SIFT中使用不同参数的高斯模糊来表示不同的尺度空间。而构造尺度空间是为了检测在不同尺度下都存在的特征点，特征点的检测比较常用的方法是$Δ^2G$（高斯拉普拉斯LoG），但是LoG的运算量是比较大的，Marr和Hidreth曾指出，可以使用DoG（差分高斯）来近似计算LoG，所以在DoG的尺度空间下检测极值点。</p>
+</li>
+<li><p><strong>删除不稳定的极值点。</strong> 主要删除两类：低对比度的极值点以及不稳定的边缘响应点。</p>
+</li>
+<li><p><strong>确定特征点的主方向。</strong> 以特征点的为中心、以$3×1.5σ$z为半径的领域内计算各个像素点的梯度的幅角和幅值，然后使用直方图对梯度的幅角进行统计。直方图的横轴是梯度的方向，纵轴为梯度方向对应梯度幅值的累加值，直方图中最高峰所对应的方向即为特征点的方向。</p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\24\SURF特征详解\" rel="bookmark">SURF特征详解</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\11\23\《Unknown-Identity-Rejection-Loss-Utilizing-Unlabeled-Data-for-Face-Recognition》笔记\" rel="bookmark">《Unknown Identity Rejection Loss: Utilizing Unlabeled Data for Face Recognition》笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\10\06\背景检测\" rel="bookmark">背景检测</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/09/23/SIFT%E7%89%B9%E5%BE%81%E8%AF%A6%E8%AF%A6%E8%A7%A3/" title="SIFT特征详详解">https://blog.rexking6.top/2018/09/23/SIFT特征详详解/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/09/22/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89%E3%80%8B/" rel="prev" title="《计算机视觉》">
+      <i class="fa fa-chevron-left"></i> 《计算机视觉》
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/09/24/SURF%E7%89%B9%E5%BE%81%E8%AF%A6%E8%A7%A3/" rel="next" title="SURF特征详解">
+      SURF特征详解 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SIFT%E6%A6%82%E8%BF%B0"><span class="nav-number">2.</span> <span class="nav-text">SIFT概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SIFT%E7%AE%97%E6%B3%95%E5%85%B7%E6%9C%89%E7%9A%84%E7%89%B9%E7%82%B9"><span class="nav-number">2.1.</span> <span class="nav-text">SIFT算法具有的特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SIFT%E7%89%B9%E5%BE%81%E6%A3%80%E6%B5%8B%E7%9A%84%E6%AD%A5%E9%AA%A4"><span class="nav-number">2.2.</span> <span class="nav-text">SIFT特征检测的步骤</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%BA%E5%BA%A6%E7%A9%BA%E9%97%B4"><span class="nav-number">3.</span> <span class="nav-text">尺度空间</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E5%88%86%E8%BE%A8%E7%8E%87%E5%9B%BE%E5%83%8F%E9%87%91%E5%AD%97%E5%A1%94"><span class="nav-number">3.1.</span> <span class="nav-text">多分辨率图像金字塔</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E6%96%AF%E5%B0%BA%E5%BA%A6%E7%A9%BA%E9%97%B4"><span class="nav-number">3.2.</span> <span class="nav-text">高斯尺度空间</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E6%96%AF%E5%87%BD%E6%95%B0%E4%B8%8E%E9%AB%98%E6%96%AF%E6%A8%A1%E7%B3%8A"><span class="nav-number">3.2.1.</span> <span class="nav-text">高斯函数与高斯模糊</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E6%96%AF%E5%B0%BA%E5%BA%A6%E7%A9%BA%E9%97%B4-1"><span class="nav-number">3.3.</span> <span class="nav-text">高斯尺度空间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E6%96%AF%E9%87%91%E5%AD%97%E5%A1%94%EF%BC%9A%E5%8F%8C%E7%A9%BA%E9%97%B4%E7%BB%93%E5%90%88"><span class="nav-number">3.4.</span> <span class="nav-text">高斯金字塔：双空间结合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E6%96%AF%E5%B7%AE%E5%88%86%E9%87%91%E5%AD%97%E5%A1%94"><span class="nav-number">3.5.</span> <span class="nav-text">高斯差分金字塔</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E6%96%AF%E9%87%91%E5%AD%97%E5%A1%94%E6%9E%84%E5%BB%BA%E7%A4%BA%E4%BE%8B"><span class="nav-number">3.6.</span> <span class="nav-text">高斯金字塔构建示例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DoG%E7%A9%BA%E9%97%B4%E6%9E%81%E5%80%BC%E6%A3%80%E6%B5%8B"><span class="nav-number">4.</span> <span class="nav-text">DoG空间极值检测</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%BA%E5%BA%A6%E5%8F%98%E5%8C%96%E7%9A%84%E8%BF%9E%E7%BB%AD%E6%80%A7"><span class="nav-number">4.1.</span> <span class="nav-text">尺度变化的连续性</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E4%B8%8D%E5%A5%BD%E7%9A%84%E6%9E%81%E5%80%BC%E7%82%B9%EF%BC%88%E7%89%B9%E5%BE%81%E7%82%B9%EF%BC%89"><span class="nav-number">5.</span> <span class="nav-text">删除不好的极值点（特征点）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%94%E9%99%A4%E4%BD%8E%E5%AF%B9%E6%AF%94%E5%BA%A6%E7%9A%84%E7%89%B9%E5%BE%81%E7%82%B9"><span class="nav-number">5.1.</span> <span class="nav-text">剔除低对比度的特征点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%94%E9%99%A4%E4%B8%8D%E7%A8%B3%E5%AE%9A%E7%9A%84%E8%BE%B9%E7%BC%98%E5%93%8D%E5%BA%94%E7%82%B9"><span class="nav-number">5.2.</span> <span class="nav-text">剔除不稳定的边缘响应点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B1%82%E5%8F%96%E7%89%B9%E5%BE%81%E7%82%B9%E7%9A%84%E4%B8%BB%E6%96%B9%E5%90%91"><span class="nav-number">6.</span> <span class="nav-text">求取特征点的主方向</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E7%89%B9%E5%BE%81%E6%8F%8F%E8%BF%B0"><span class="nav-number">7.</span> <span class="nav-text">生成特征描述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BD%92%E4%B8%80%E5%8C%96"><span class="nav-number">8.</span> <span class="nav-text">归一化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D"><span class="nav-number">9.</span> <span class="nav-text">匹配</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PCA-SIFT"><span class="nav-number">10.</span> <span class="nav-text">PCA-SIFT</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">11.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

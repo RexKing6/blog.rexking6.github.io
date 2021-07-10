@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="卡尔曼滤波及应用于时序">
+<meta property="og:url" content="https://blog.rexking6.top/2020/12/10/%E5%8D%A1%E5%B0%94%E6%9B%BC%E6%BB%A4%E6%B3%A2%E5%8F%8A%E5%BA%94%E7%94%A8%E4%BA%8E%E6%97%B6%E5%BA%8F/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/20170318140159668">
+<meta property="og:image" content="http://image.rexking6.top/img/robot_ohnoes-300x283.png">
+<meta property="og:image" content="http://image.rexking6.top/img/gauss_0.png">
+<meta property="og:image" content="http://image.rexking6.top/img/gauss_1.png">
+<meta property="og:image" content="http://image.rexking6.top/img/gauss_3.png">
+<meta property="og:image" content="http://image.rexking6.top/img/gauss_2.png">
+<meta property="og:image" content="http://image.rexking6.top/img/gauss_7.jpg">
+<meta property="og:image" content="http://image.rexking6.top/img/gauss_8.jpg">
+<meta property="og:image" content="http://image.rexking6.top/img/gauss_9.jpg">
+<meta property="og:image" content="http://image.rexking6.top/img/gauss_10a.jpg">
+<meta property="og:image" content="http://image.rexking6.top/img/gauss_10b.jpg">
+<meta property="og:image" content="http://image.rexking6.top/img/gauss_12-624x287.jpg">
+<meta property="og:image" content="http://image.rexking6.top/img/gauss_13.jpg">
+<meta property="og:image" content="http://image.rexking6.top/img/gauss_14.jpg">
+<meta property="og:image" content="http://image.rexking6.top/img/gauss_11.jpg">
+<meta property="og:image" content="http://image.rexking6.top/img/gauss_4.jpg">
+<meta property="og:image" content="http://image.rexking6.top/img/gauss_6a.png">
+<meta property="og:image" content="http://image.rexking6.top/img/gauss_6.png">
+<meta property="og:image" content="http://image.rexking6.top/img/20170318174028764">
+<meta property="og:image" content="http://image.rexking6.top/img/kalflow.png">
+<meta property="og:image" content="http://image.rexking6.top/img/2020041405063744.png">
+<meta property="og:image" content="http://image.rexking6.top/img/20200414050721958.png">
+<meta property="og:image" content="http://image.rexking6.top/img/20200414051556155.png">
+<meta property="article:published_time" content="2020-12-10T06:32:41.000Z">
+<meta property="article:modified_time" content="2020-12-10T07:41:14.287Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/20170318140159668">
+
+<link rel="canonical" href="https://blog.rexking6.top/2020/12/10/%E5%8D%A1%E5%B0%94%E6%9B%BC%E6%BB%A4%E6%B3%A2%E5%8F%8A%E5%BA%94%E7%94%A8%E4%BA%8E%E6%97%B6%E5%BA%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>卡尔曼滤波及应用于时序 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2020/12/10/%E5%8D%A1%E5%B0%94%E6%9B%BC%E6%BB%A4%E6%B3%A2%E5%8F%8A%E5%BA%94%E7%94%A8%E4%BA%8E%E6%97%B6%E5%BA%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          卡尔曼滤波及应用于时序
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-12-10 14:32:41 / 修改时间：15:41:14" itemprop="dateCreated datePublished" datetime="2020-12-10T14:32:41+08:00">2020-12-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2020/12/10/%E5%8D%A1%E5%B0%94%E6%9B%BC%E6%BB%A4%E6%B3%A2%E5%8F%8A%E5%BA%94%E7%94%A8%E4%BA%8E%E6%97%B6%E5%BA%8F/" class="post-meta-item leancloud_visitors" data-flag-title="卡尔曼滤波及应用于时序" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>11 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>综合转载于：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://www.bzarg.com/p/how-a-kalman-filter-works-in-pictures/">How a Kalman filter works, in pictures</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/u010720661/article/details/63253509">详解卡尔曼滤波原理</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/PythonLearner/p/12925724.html">特征工程：利用卡尔曼滤波器处理时间序列（快速入门+python实现）</a></li>
+</ul>
+<h1 id="什么是卡尔曼滤波？"><a href="#什么是卡尔曼滤波？" class="headerlink" title="什么是卡尔曼滤波？"></a>什么是卡尔曼滤波？</h1><p>你可以在任何含有<strong>不确定信息</strong>的动态系统中使用卡尔曼滤波，对系统下一步的走向做出<strong>有根据的预测</strong>，即使伴随着各种干扰，卡尔曼滤波总是能指出真实发生的情况。</p>
+<p>在<strong>连续变化的系统</strong>中使用卡尔曼滤波是非常理想的，它具有占用内存小的优点（除了前一个状态量外，不需要保留其它历史数据），并且速度很快，很适合应用于实时问题和嵌入式系统。</p>
+<p>在Google上找到的大多数关于实现卡尔曼滤波的数学公式看起来有点晦涩难懂，这个状况有点糟糕。实际上，如果以正确的方式看待它，卡尔曼滤波是非常简单和容易理解的，下面我将用漂亮的图片和色彩清晰的阐述它，你只需要懂一些基本的概率和矩阵的知识就可以了。</p>
+<h1 id="我们能用卡尔曼滤波做什么？"><a href="#我们能用卡尔曼滤波做什么？" class="headerlink" title="我们能用卡尔曼滤波做什么？"></a>我们能用卡尔曼滤波做什么？</h1><p>用玩具举例：你开发了一个可以在树林里到处跑的小机器人，这个机器人需要知道它所在的确切位置才能导航。</p>
+<p><img src="http://image.rexking6.top/img/20170318140159668" alt="这里写图片描述"></p>
+<p>我们可以说机器人有一个状态 $\vec{x_k}$，表示位置和速度：</p>
+<script type="math/tex; mode=display">
+\vec{x_k} = (\vec{p}, \vec{v})</script><p>注意这个状态只是关于这个系统基本属性的一堆数字，它可以是任何其它的东西。在这个例子中是位置和速度，它也可以是一个容器中液体的总量，汽车发动机的温度，用户手指在触摸板上的位置坐标，或者任何你需要跟踪的信号。</p>
+<p>这个机器人带有GPS，精度大约为10米，还算不错，但是，它需要将自己的位置精确到10米以内。树林里有很多沟壑和悬崖，如果机器人走错了一步，就有可能掉下悬崖，所以只有GPS是不够的。</p>
+<p><img src="http://image.rexking6.top/img/robot_ohnoes-300x283.png" alt="这里写图片描述"></p>
+<p>或许我们知道一些机器人如何运动的信息：例如，机器人知道发送给电机的指令，知道自己是否在朝一个方向移动并且没有人干预，在下一个状态，机器人很可能朝着相同的方向移动。当然，机器人对自己的运动是一无所知的：它可能受到风吹的影响，轮子方向偏了一点，或者遇到不平的地面而翻倒。所以，轮子转过的长度并不能精确表示机器人实际行走的距离，预测也不是很完美。</p>
+<p>GPS <strong>传感器</strong>告诉了我们一些状态信息，我们的<strong>预测</strong>告诉了我们机器人会怎样运动，但都只是间接的，并且伴随着一些不确定和不准确性。但是，如果使用所有对我们可用的信息，我们能得到一个比任何依据自身估计更好的结果吗？回答当然是YES，这就是卡尔曼滤波的用处。</p>
+<h1 id="卡尔曼滤波是如何看待你的问题的"><a href="#卡尔曼滤波是如何看待你的问题的" class="headerlink" title="卡尔曼滤波是如何看待你的问题的"></a>卡尔曼滤波是如何看待你的问题的</h1><p>下面我们继续以只有位置和速度这两个状态的简单例子做解释。</p>
+<script type="math/tex; mode=display">
+\vec{x} = \begin{bmatrix} 
+p\\ 
+v 
+\end{bmatrix}</script><p>我们并不知道实际的位置和速度，它们之间有很多种可能正确的组合，但其中一些的可能性要大于其它部分：</p>
+<p><img src="http://image.rexking6.top/img/gauss_0.png" alt="img"></p>
+<p>卡尔曼滤波假设两个变量（位置和速度，在这个例子中）都是随机的，并且<strong><em>服从高斯分布</em></strong>。每个变量都有一个<strong>均值</strong> $\mu$，表示随机分布的中心（最可能的状态），以及<strong>方差</strong> $\sigma^2$，表示不确定性。</p>
+<p><img src="http://image.rexking6.top/img/gauss_1.png" alt="img"></p>
+<p>在上图中，位置和速度是<strong>不相关</strong>的，这意味着由其中一个变量的状态无法推测出另一个变量可能的值。下面的例子更有趣：位置和速度是<strong>相关</strong>的，观测特定位置的可能性取决于当前的速度：</p>
+<p><img src="http://image.rexking6.top/img/gauss_3.png" alt="img"></p>
+<p>这种情况是有可能发生的，例如，我们基于旧的位置来估计新位置。如果速度过高，我们可能已经移动很远了。如果缓慢移动，则距离不会很远。跟踪这种关系是非常重要的，因为它带给我们<strong>更多的信息</strong>：其中一个测量值告诉了我们其它变量可能的值，这就是卡尔曼滤波的目的，尽可能地在包含不确定性的测量数据中提取更多信息！</p>
+<p>这种相关性用<strong><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Covariance_matrix">协方差矩阵</a></strong>来表示，简而言之，矩阵中的每个元素 $\Sigma_{ij}$ 表示第 $i$ 个和第 $j$ 个状态变量之间的相关度。（你可能已经猜到协方差矩阵是一个<strong><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Symmetric_matrix">对称矩阵</a></strong>，这意味着可以任意交换 $i$ 和 $j$）。协方差矩阵通常用 $\mathbf{\Sigma}$  来表示，其中的元素则表示为 $\Sigma_{ij}$。</p>
+<p><img src="http://image.rexking6.top/img/gauss_2.png" alt="img"></p>
+<h1 id="使用矩阵来描述问题"><a href="#使用矩阵来描述问题" class="headerlink" title="使用矩阵来描述问题"></a>使用矩阵来描述问题</h1><p>我们基于高斯分布来建立状态变量，所以在时刻 $k$ 需要两个信息：最佳估计 $\mathbf{\hat{x}_k}$ （即均值，其它地方常用 $\mu$ 表示），以及协方差矩阵 $\mathbf{P_k}$。</p>
+<script type="math/tex; mode=display">
+\begin{equation} \label{eq:statevars} 
+\begin{aligned} 
+\mathbf{\hat{x}}_k &= \begin{bmatrix} 
+\text{position}\\ 
+\text{velocity} 
+\end{bmatrix}\\ 
+\mathbf{P}_k &= 
+\begin{bmatrix} 
+\Sigma_{pp} & \Sigma_{pv} \\ 
+\Sigma_{vp} & \Sigma_{vv} \\ 
+\end{bmatrix} 
+\end{aligned} 
+\end{equation}</script><p>（当然，在这里我们只用到了位置和速度，实际上这个状态可以包含多个变量，代表任何你想表示的信息）。接下来，我们需要根据<strong>当前状态</strong>（$k-1$ 时刻）来<strong>预测下一状态</strong>（$k$ 时刻）。记住，我们并不知道对下一状态的所有预测中哪个是“真实”的，但我们的预测函数并不在乎。它对所有的可能性进行预测，并给出新的高斯分布。</p>
+<p><img src="http://image.rexking6.top/img/gauss_7.jpg" alt="img"></p>
+<p>我们可以用矩阵 $\mathbf{F_k}$ 来表示这个预测过程：</p>
+<p><img src="http://image.rexking6.top/img/gauss_8.jpg" alt="img"></p>
+<p>它将我们原始估计中的每个点都移动到了一个新的预测位置，如果原始估计是正确的话，这个新的预测位置就是系统下一步会移动到的位置。那我们又如何用矩阵来预测下一个时刻的位置和速度呢？下面用一个基本的运动学公式来表示：</p>
+<script type="math/tex; mode=display">
+\begin{split} 
+\color{deeppink}{p_k} &= \color{royalblue}{p_{k-1}} + \Delta t &\color{royalblue}{v_{k-1}} \\ 
+\color{deeppink}{v_k} &= &\color{royalblue}{v_{k-1}} 
+\end{split}</script><p>换句话说：</p>
+<script type="math/tex; mode=display">
+\begin{align} 
+\color{deeppink}{\mathbf{\hat{x}}_k} &= \begin{bmatrix} 
+1 & \Delta t \\ 
+0 & 1 
+\end{bmatrix} \color{royalblue}{\mathbf{\hat{x}}_{k-1}} \\ 
+&= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}} \label{statevars} 
+\end{align}</script><p>现在，我们有了一个预测矩阵来表示下一时刻的状态，但是，我们仍然不知道怎么更新协方差矩阵。此时，我们需要引入另一个公式，如果我们将分布中的每个点都乘以矩阵 $\color{firebrick}{\mathbf{A}}$ ，那么它的协方差矩阵 $\Sigma$ 会怎样变化呢？很简单，下面给出公式：</p>
+<script type="math/tex; mode=display">
+\begin{equation} 
+\begin{split} 
+Cov(x) &= \Sigma\\ 
+Cov(\color{firebrick}{\mathbf{A}}x) &= \color{firebrick}{\mathbf{A}} \Sigma \color{firebrick}{\mathbf{A}}^T 
+\end{split} \label{covident} 
+\end{equation}</script><p>结合方程（4）和（3）得到：</p>
+<script type="math/tex; mode=display">
+\begin{equation} 
+\begin{split} 
+\color{deeppink}{\mathbf{\hat{x}}_k} &= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}} \\ 
+\color{deeppink}{\mathbf{P}_k} &= \mathbf{F_k} \color{royalblue}{\mathbf{P}_{k-1}} \mathbf{F}_k^T 
+\end{split} 
+\end{equation}</script><h1 id="外部控制量"><a href="#外部控制量" class="headerlink" title="外部控制量"></a>外部控制量</h1><p>我们并没有捕捉到一切信息，可能存在外部因素会对系统进行控制，带来一些与系统自身状态没有相关性的改变。</p>
+<p>以火车的运动状态模型为例，火车司机可能会操纵油门，让火车加速。相同地，在我们机器人这个例子中，导航软件可能会发出一个指令让轮子转向或者停止。如果知道这些额外的信息，我们可以用一个向量 $\color{darkorange}{\vec{\mathbf{u}_k}}$ 来表示，将它加到我们的预测方程中做修正。</p>
+<p>假设由于油门的设置或控制命令，我们知道了期望的加速度 $\color{darkorange}{a}$ ，根据基本的运动学方程可以得到：</p>
+<script type="math/tex; mode=display">
+\begin{split} 
+\color{deeppink}{p_k} &= \color{royalblue}{p_{k-1}} + {\Delta t} &\color{royalblue}{v_{k-1}} + &\frac{1}{2} \color{darkorange}{a} {\Delta t}^2 \\ 
+\color{deeppink}{v_k} &= &\color{royalblue}{v_{k-1}} + & \color{darkorange}{a} {\Delta t} 
+\end{split}</script><p>以矩阵的形式表示就是：</p>
+<script type="math/tex; mode=display">
+\begin{equation} 
+\begin{split} 
+\color{deeppink}{\mathbf{\hat{x}}_k} &= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}} + \begin{bmatrix} 
+\frac{\Delta t^2}{2} \\ 
+\Delta t 
+\end{bmatrix} \color{darkorange}{a} \\ 
+&= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}} + \mathbf{B}_k \color{darkorange}{\vec{\mathbf{u}_k}} 
+\end{split} 
+\end{equation}</script><p>$\mathbf{B}_k$ 称为控制矩阵，$\color{darkorange}{\vec{\mathbf{u}_k}}$ 称为控制向量（对于没有外部控制的简单系统来说，这部分可以忽略）。让我们再思考一下，如果我们的预测并不是100%准确的，该怎么办呢？</p>
+<h1 id="外部干扰"><a href="#外部干扰" class="headerlink" title="外部干扰"></a>外部干扰</h1><p>如果这些状态量是基于系统自身的属性或者已知的外部控制作用来变化的，则不会出现什么问题。</p>
+<p>但是，如果存在未知的干扰呢？例如，假设我们跟踪一个四旋翼飞行器，它可能会受到风的干扰，如果我们跟踪一个轮式机器人，轮子可能会打滑，或者路面上的小坡会让它减速。这样的话我们就不能继续对这些状态进行跟踪，如果没有把这些外部干扰考虑在内，我们的预测就会出现偏差。</p>
+<p>在每次预测之后，我们可以添加一些新的不确定性来建立这种与“外界”（即我们没有跟踪的干扰）之间的不确定性模型：</p>
+<p><img src="http://image.rexking6.top/img/gauss_9.jpg" alt="img"></p>
+<p>原始估计中的每个状态变量更新到新的状态后，仍然服从高斯分布。我们可以说 $\color{royalblue}{\mathbf{\hat{x}}_{k-1}}$ 的每个状态变量移动到了一个新的服从高斯分布的区域，协方差为 $\color{mediumaquamarine}{\mathbf{Q}_k}$ 。换句话说就是，我们将这些没有被跟踪的干扰当作协方差为 $\color{mediumaquamarine}{\mathbf{Q}_k}$ 的<strong>噪声</strong>来处理。</p>
+<p><img src="http://image.rexking6.top/img/gauss_10a.jpg" alt="img"></p>
+<p>这产生了具有不同协方差（但是具有相同的均值）的新的高斯分布。</p>
+<p><img src="http://image.rexking6.top/img/gauss_10b.jpg" alt="img"></p>
+<p>我们通过简单地添加 ${\color{mediumaquamarine}{\mathbf{Q}_k}}$ 得到扩展的协方差，下面给出预测步骤的完整表达式：</p>
+<script type="math/tex; mode=display">
+\begin{equation} 
+\begin{split} 
+\color{deeppink}{\mathbf{\hat{x}}_k} &= \mathbf{F}_k \color{royalblue}{\mathbf{\hat{x}}_{k-1}} + \mathbf{B}_k \color{darkorange}{\vec{\mathbf{u}_k}} \\ 
+\color{deeppink}{\mathbf{P}_k} &= \mathbf{F_k} \color{royalblue}{\mathbf{P}_{k-1}} \mathbf{F}_k^T + \color{mediumaquamarine}{\mathbf{Q}_k} 
+\end{split} 
+\label{kalpredictfull} 
+\end{equation}</script><p>由上式可知，<strong>新的最优估计</strong>是根据<strong>上一最优估计</strong>预测得到的，并加上<strong>已知外部控制量</strong>的修正。而<strong>新的不确定性</strong>由<strong>上一不确定</strong>性<strong>预测</strong>得到，并加上<strong>外部环境的干扰</strong>。</p>
+<p>好了，我们对系统可能的动向有了一个模糊的估计，用 $\color{deeppink}{\mathbf{\hat{x}}_k}$ 和 $\color{deeppink}{\mathbf{P}_k}$ 来表示。如果再结合传感器的数据会怎样呢？</p>
+<h1 id="用测量值来修正估计值"><a href="#用测量值来修正估计值" class="headerlink" title="用测量值来修正估计值"></a>用测量值来修正估计值</h1><p>我们可能会有多个传感器来测量系统当前的状态，哪个传感器具体测量的是哪个状态变量并不重要，也许一个是测量位置，一个是测量速度，每个传感器间接地告诉了我们一些状态信息。</p>
+<p><img src="http://image.rexking6.top/img/gauss_12-624x287.jpg" alt="img"></p>
+<p>注意，传感器读取的数据的单位和尺度有可能与我们要跟踪的状态的单位和尺度不一样，我们用矩阵 $\mathbf{H}_k$ 来表示传感器的数据。</p>
+<p><img src="http://image.rexking6.top/img/gauss_13.jpg" alt="gauss_12"></p>
+<p>我们可以计算出传感器读数的分布，用之前的表示方法如下式所示：</p>
+<script type="math/tex; mode=display">
+\begin{equation} 
+\begin{aligned} 
+\vec{\mu}_{\text{expected}} &= \mathbf{H}_k \color{deeppink}{\mathbf{\hat{x}}_k} \\ 
+\mathbf{\Sigma}_{\text{expected}} &= \mathbf{H}_k \color{deeppink}{\mathbf{P}_k} \mathbf{H}_k^T 
+\end{aligned} 
+\end{equation}</script><p>卡尔曼滤波的一大优点就是能处理传感器噪声，换句话说，我们的传感器或多或少都有点不可靠，并且原始估计中的每个状态可以和一定范围内的传感器读数对应起来。</p>
+<p><img src="http://image.rexking6.top/img/gauss_14.jpg" alt="gauss_12"></p>
+<p>从测量到的传感器数据中，我们大致能猜到系统当前处于什么状态。但是由于存在不确定性，某些状态可能比我们得到的读数更接近真实状态。</p>
+<p><img src="http://image.rexking6.top/img/gauss_11.jpg" alt="img"></p>
+<p>我们将这种不确定性（例如：传感器噪声）用<strong>协方差</strong> $\color{mediumaquamarine}{\mathbf{R}_k}$ 表示，该分布的<strong>均值</strong>就是我们读取到的传感器数据，称之为 $\color{yellowgreen}{\vec{\mathbf{z}_k}}$ 。现在我们有了两个高斯分布，一个是在预测值附近，一个是在传感器读数附近。</p>
+<p><img src="http://image.rexking6.top/img/gauss_4.jpg" alt="img"></p>
+<p>我们必须在<strong>预测值</strong>（<strong>粉红色</strong>）和<strong>传感器测量值</strong>（<strong>绿色</strong>）之间找到最优解。</p>
+<p>那么，我们最有可能的状态是什么呢？对于任何可能的读数 $(z_1,z_2)$，有两种情况：（1）传感器的测量值；（2）由前一状态得到的预测值。如果我们想知道这两种情况都可能发生的概率，将这两个高斯分布相乘就可以了。</p>
+<p><img src="http://image.rexking6.top/img/gauss_6a.png" alt="img"></p>
+<p>剩下的就是重叠部分了，这个重叠部分的均值就是两个估计最可能的值，也就是给定的所有信息中的<strong>最优估计</strong>。</p>
+<p>瞧！这个重叠的区域看起来像另一个高斯分布。</p>
+<p><img src="http://image.rexking6.top/img/gauss_6.png" alt="img"></p>
+<p>如你所见，把两个具有不同均值和方差的高斯分布相乘，你会得到一个新的具有独立均值和方差的高斯分布！下面用公式讲解。</p>
+<h1 id="融合高斯分布"><a href="#融合高斯分布" class="headerlink" title="融合高斯分布"></a>融合高斯分布</h1><p>先以一维高斯分布来分析比较简单点，具有方差 $\sigma^2$ 和 $\mu$ 的高斯曲线可以用下式表示：</p>
+<script type="math/tex; mode=display">
+\begin{equation} \label{gaussformula} 
+\mathcal{N}(x, \mu,\sigma) = \frac{1}{ \sigma \sqrt{ 2\pi } } e^{ -\frac{ (x – \mu)^2 }{ 2\sigma^2 } } 
+\end{equation}</script><p>如果把两个服从高斯分布的函数相乘会得到什么呢？</p>
+<p><img src="http://image.rexking6.top/img/20170318174028764" alt="这里写图片描述"></p>
+<p>将式（9）代入到式（10）中（注意重新归一化，使总概率为1）可以得到：</p>
+<script type="math/tex; mode=display">
+\begin{equation} \label{fusionformula} 
+\begin{aligned} 
+\color{royalblue}{\mu’} &= \mu_0 + \frac{\sigma_0^2 (\mu_1 – \mu_0)} {\sigma_0^2 + \sigma_1^2}\\ 
+\color{mediumblue}{\sigma’}^2 &= \sigma_0^2 – \frac{\sigma_0^4} {\sigma_0^2 + \sigma_1^2} 
+\end{aligned} 
+\end{equation}</script><p>将式（11）中的两个式子相同的部分用 $\color{purple}{\mathbf{k}}$ 表示：</p>
+<script type="math/tex; mode=display">
+\begin{equation} \label{gainformula} 
+\color{purple}{\mathbf{k}} = \frac{\sigma_0^2}{\sigma_0^2 + \sigma_1^2} 
+\end{equation}</script><script type="math/tex; mode=display">
+\begin{equation} 
+\begin{split} 
+\color{royalblue}{\mu’} &= \mu_0 + &\color{purple}{\mathbf{k}} (\mu_1 – \mu_0)\\ 
+\color{mediumblue}{\sigma’}^2 &= \sigma_0^2 – &\color{purple}{\mathbf{k}} \sigma_0^2 
+\end{split} \label{update} 
+\end{equation}</script><p>下面进一步将式（12）和（13）写成矩阵的形式，如果 $\Sigma$ 表示高斯分布的协方差，$\vec{\mu}$ 表示每个维度的均值，则：</p>
+<script type="math/tex; mode=display">
+\begin{equation} \label{matrixgain} 
+\color{purple}{\mathbf{K}} = \Sigma_0 (\Sigma_0 + \Sigma_1)^{-1} 
+\end{equation}</script><script type="math/tex; mode=display">
+\begin{equation} 
+\begin{split} 
+\color{royalblue}{\vec{\mu}’} &= \vec{\mu_0} + &\color{purple}{\mathbf{K}} (\vec{\mu_1} – \vec{\mu_0})\\ 
+\color{mediumblue}{\Sigma’} &= \Sigma_0 – &\color{purple}{\mathbf{K}} \Sigma_0 
+\end{split} \label{matrixupdate} 
+\end{equation}</script><p>矩阵 $\color{purple}{\mathbf{K}}$ 称为卡尔曼增益，下面将会用到。放松！我们快要完成了！</p>
+<h1 id="将所有公式整合起来"><a href="#将所有公式整合起来" class="headerlink" title="将所有公式整合起来"></a>将所有公式整合起来</h1><p>我们有两个高斯分布，预测部分 $(\color{fuchsia}{\mu_0}, \color{deeppink}{\Sigma_0}) = (\color{fuchsia}{\mathbf{H}_k \mathbf{\hat{x}}_k}, \color{deeppink}{\mathbf{H}_k \mathbf{P}_k \mathbf{H}_k^T})$ ，和测量部分 $(\color{yellowgreen}{\mu_1}, \color{mediumaquamarine}{\Sigma_1}) = (\color{yellowgreen}{\vec{\mathbf{z}_k}}, \color{mediumaquamarine}{\mathbf{R}_k})$ ，将它们放到式（15）中算出它们之间的重叠部分：</p>
+<script type="math/tex; mode=display">
+\begin{equation} 
+\begin{aligned} 
+\mathbf{H}_k \color{royalblue}{\mathbf{\hat{x}}_k’} &= \color{fuchsia}{\mathbf{H}_k \mathbf{\hat{x}}_k} & + & \color{purple}{\mathbf{K}} ( \color{yellowgreen}{\vec{\mathbf{z}_k}} – \color{fuchsia}{\mathbf{H}_k \mathbf{\hat{x}}_k} ) \\ 
+\mathbf{H}_k \color{royalblue}{\mathbf{P}_k’} \mathbf{H}_k^T &= \color{deeppink}{\mathbf{H}_k \mathbf{P}_k \mathbf{H}_k^T} & – & \color{purple}{\mathbf{K}} \color{deeppink}{\mathbf{H}_k \mathbf{P}_k \mathbf{H}_k^T} 
+\end{aligned} \label {kalunsimplified} 
+\end{equation}</script><p>由式（14）可得卡尔曼增益为：</p>
+<script type="math/tex; mode=display">
+\begin{equation} \label{eq:kalgainunsimplified} 
+\color{purple}{\mathbf{K}} = \color{deeppink}{\mathbf{H}_k \mathbf{P}_k \mathbf{H}_k^T} ( \color{deeppink}{\mathbf{H}_k \mathbf{P}_k \mathbf{H}_k^T} + \color{mediumaquamarine}{\mathbf{R}_k})^{-1} 
+\end{equation}</script><p>将式（16）和式（17）的两边同时左乘矩阵的逆（注意 $\color{purple}{\mathbf{K}}$ 里面包含了 $\mathbf{H}_k$ ）将其约掉，再将式（16）的第二个等式两边同时右乘矩阵 $\mathbf{H}_k^T$ 的逆得到以下等式：</p>
+<script type="math/tex; mode=display">
+\begin{equation} 
+\begin{split} 
+\color{royalblue}{\mathbf{\hat{x}}_k’} &= \color{fuchsia}{\mathbf{\hat{x}}_k} & + & \color{purple}{\mathbf{K}’} ( \color{yellowgreen}{\vec{\mathbf{z}_k}} – \color{fuchsia}{\mathbf{H}_k \mathbf{\hat{x}}_k} ) \\ 
+\color{royalblue}{\mathbf{P}_k’} &= \color{deeppink}{\mathbf{P}_k} & – & \color{purple}{\mathbf{K}’} \color{deeppink}{\mathbf{H}_k \mathbf{P}_k} 
+\end{split} 
+\label{kalupdatefull} 
+\end{equation}</script><script type="math/tex; mode=display">
+\begin{equation} 
+\color{purple}{\mathbf{K}’} = \color{deeppink}{\mathbf{P}_k \mathbf{H}_k^T} ( \color{deeppink}{\mathbf{H}_k \mathbf{P}_k \mathbf{H}_k^T} + \color{mediumaquamarine}{\mathbf{R}_k})^{-1} 
+\label{kalgainfull} 
+\end{equation}</script><p>上式给出了完整的<strong>更新步骤</strong>方程。$\color{royalblue}{\mathbf{\hat{x}}_k’}$ 就是新的最优估计，我们可以将它和 $\color{royalblue}{\mathbf{P}_k’}$ 放到下一个<strong>预测</strong>和<strong>更新</strong>方程中不断迭代。</p>
+<p><img src="http://image.rexking6.top/img/kalflow.png" alt="img"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>以上所有公式中，你只需要用到式（7）、（18）、（19）。（如果忘了的话，你可以根据式（4）和（15）重新推导一下）</p>
+<p>我们可以用这些公式对任何线性系统建立精确的模型，对于非线性系统来说，我们使用<strong>扩展卡尔曼滤波</strong>，区别在于EKF多了一个把预测和测量部分进行线性化的过程。</p>
+<h1 id="应用于时序"><a href="#应用于时序" class="headerlink" title="应用于时序"></a>应用于时序</h1><p>假设我们有100个时间点的数据，这个数据就是分别在100个点观测出来的结果。</p>
+<p>对于每一个时间点的数据，获取的方法有两个：</p>
+<ul>
+<li>第一个就是观测，但是测量的结果不一定准确，可能受限于测量仪器的精度？</li>
+<li>第二个就是用这个时间点之前的所有数据，预测这个时间点的数据，当然，这个预测值也是不准的。</li>
+<li>可否利用这两种方法，相互促进，预测的值更准，或者说让观测道德值更接近本质？Kalman Filter卡尔曼滤波器就这样做的。</li>
+</ul>
+<h1 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h1><p>每一个观测数据，严谨的说都应该会有一个偏差值。比方说，现在温度计测量是26度，偏差值是0.5度，那么真实的问题应该是在 $(25.5, 26.5)$ 之间，或者写成 $26\pm0.5$。</p>
+<p>这样我们<strong>预测的值</strong>，和<strong>观测的值</strong>，再加上这<strong>两个各自的偏差</strong>，总共四个已知信息，来推测真实的、更本质的数据。</p>
+<ul>
+<li>预测的值：可以通过事先设定的公式，上一个时刻的真实的值算出来；</li>
+<li>观测的值：直接读取测量仪器的值。</li>
+<li>观测的值的偏差：这个也是可以直接得到的；</li>
+<li>预测的值的偏差：这个是从上一个时间点的预测的值的偏差经过给定公式计算出来的。</li>
+</ul>
+<p>下面的公式中，脚标 $k$ 表示时间点，$k-1$ 是上一个时间点。大写字母 $A,B,C$ 表示常数，事先设定的；大写字母 $H$ ，是一个需要计算的。</p>
+<ul>
+<li>预测的值：$x^{预测}_k=A<em>x_{k-1}^{真实}+B</em>u_{k-1}$</li>
+<li>观测的值：$x^{观测}_k$</li>
+<li>观测的值的偏差：$p^{观测}_k$</li>
+<li>预测的值的偏差：$p^{预测}_k = \sqrt{(1-H)*p^{预测}_{k-1}}$</li>
+<li>kalman增益：$H_k=\frac{(p^{预测}_k)^2}{(p^{预测}_k)^2+(p^{观测}_k)^2}$</li>
+<li>真实的值：$x^{真实}_k=H_k<em>x^{观测}_k+(1-H_k)</em>x^{预测}_k$</li>
+</ul>
+<p>可以看出，这个kalman增益就是一个加权平均的权重，是观测值更重要还是预测值更重要；两者的重要性就由两者的偏差大小决定，偏差小的更重要。</p>
+<p>其中 $u_{k-1}$ 表示上一个时间点的控制信号，比方说一个机器人，机器人的状态去觉得机器人自身的行为，但是很多情况这个控制信号是不用考虑的。比方对股市的时间序列做kalman滤波，那么并没有什么控制信号去控制，只是任由其自由发展。</p>
+<h1 id="举个例子"><a href="#举个例子" class="headerlink" title="举个例子"></a>举个例子</h1><p>举一个例子，房间的温度的例子：</p>
+<p>总共有三个时刻，上午、下午和晚上（实际的话，时间点间隔应该会很短，这里只是举例），上午温度是观测值是 $23$ 度，偏差是 $0.5$，因为上午是第一个时间点，所以没有预测值；</p>
+<p>下午，假设 $A=1,B=0$ ，所以下午的预测值是 $23$ 度，然后假设初始偏差是 $1$；下午的观测值是 $25$ 度，观测值的偏差是 $0.5$，所以可以计算得到kalman增益 $H=\frac{1^2}{1^2+0.5^2}=0.8$，所以下午的真实值是：$0.8<em>25+(1-0.8)</em>23=24.6$。 晚上，晚上的预测值就是上一时刻的真实值，所以是 $24.6$，偏差是 $\sqrt{(1-0.8)<em>1}=0.4472$ ；晚上的观测值是 $20$ 度，然后偏差是 $0.5$ ，所以kalman增益 $H=\frac{0.4472^2}{0.4472^2+0.5^2}=0.4444$ ，所以这个时刻的真实值是：$0.4444</em>20+(1-0.4444)*24.6=22.56$。 最后总结一下，其实我们只需要什么呢？需要知道观测的误差是 $0.5$，然后三个时间点的观测数据：$[23,25,20]$，然后用kalman滤波器之后，就变成 $[23, 24.6, 22.56]$。其实起到了一个平滑的作用。</p>
+<h1 id="Python实现"><a href="#Python实现" class="headerlink" title="Python实现"></a>Python实现</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pykalman <span class="keyword">import</span> KalmanFilter</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Kalman1D</span>(<span class="params">observations,damping=<span class="number">1</span></span>):</span></span><br><span class="line">    <span class="comment"># To return the smoothed time series data</span></span><br><span class="line">    observation_covariance = damping</span><br><span class="line">    initial_value_guess = observations[<span class="number">0</span>]</span><br><span class="line">    transition_matrix = <span class="number">1</span></span><br><span class="line">    transition_covariance = <span class="number">0.1</span></span><br><span class="line">    initial_value_guess</span><br><span class="line">    kf = KalmanFilter(</span><br><span class="line">            initial_state_mean=initial_value_guess,</span><br><span class="line">            initial_state_covariance=observation_covariance,</span><br><span class="line">            observation_covariance=observation_covariance,</span><br><span class="line">            transition_covariance=transition_covariance,</span><br><span class="line">            transition_matrices=transition_matrix</span><br><span class="line">        )</span><br><span class="line">    pred_state, state_cov = kf.smooth(observations)</span><br><span class="line">    <span class="keyword">return</span> pred_state</span><br></pre></td></tr></table></figure>
+<p>这里面使用的是pykalman库中的KalmanFilter，因为上面讲解的Kalman Filter是简化的，绕靠了正统的解释的正态分布的知识，所以这里的卡尔曼滤波器的参数可能无法与上面给出的卡尔曼公式中一一对应，会产生一定的脱节。</p>
+<p>这里讲一下参数：</p>
+<ul>
+<li><code>initial_state_mean</code> 和 <code>initial_state_covariance</code>：在上面的公式中，一开始的初始值，就是第一个观测值，但是在这个方法中，初始值并不是第一个观测值，而是由一个正态分布中随机采样出来的一个值，这个正太分布就是以 <code>initial_state_mean</code>  为均值，以 <code>initial_state_covariance</code> 为方差的；</li>
+<li><code>observation_covariance</code> 这个可以相当于观测偏差；</li>
+<li><code>transition_covariance</code> 这个就是预测偏差；</li>
+<li><code>transition_matrices</code> 就是上面公式中的大写字母 $A$，为 $1$。</li>
+</ul>
+<h1 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h1><p>从上面的那个函数中，可以看到<code>transition_covariance</code>是0.1，也就是预测偏差是0.1，所以假设观测偏差很小，那么可以想象，滤波器后的结果应该与观测值非常接近，这里选取观测偏差为0.001：</p>
+<p><img src="http://image.rexking6.top/img/2020041405063744.png" alt="在这里插入图片描述"></p>
+<p>然后假设观测误差很大，那么可以想想，平滑的力度会很大，结果就是：</p>
+<p><img src="http://image.rexking6.top/img/20200414050721958.png" alt="在这里插入图片描述"></p>
+<p>最后看一下在某次比赛中的利用kalman滤波器来平滑数据的前后对比图：</p>
+<p><img src="http://image.rexking6.top/img/20200414051556155.png" alt="在这里插入图片描述"></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\03\21\Fisher线性判别\" rel="bookmark">Fisher线性判别</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\02\13\cs229中文笔记-一二\" rel="bookmark">cs229中文笔记(一二)</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\02\18\cs229中文笔记-七\" rel="bookmark">cs229中文笔记(七)</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2020/12/10/%E5%8D%A1%E5%B0%94%E6%9B%BC%E6%BB%A4%E6%B3%A2%E5%8F%8A%E5%BA%94%E7%94%A8%E4%BA%8E%E6%97%B6%E5%BA%8F/" title="卡尔曼滤波及应用于时序">https://blog.rexking6.top/2020/12/10/卡尔曼滤波及应用于时序/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/09/23/%E5%BF%AB%E9%80%9F%E5%82%85%E7%AB%8B%E5%8F%B6%E5%8F%98%E6%8D%A2%E8%A1%A50/" rel="prev" title="快速傅立叶变换补0">
+      <i class="fa fa-chevron-left"></i> 快速傅立叶变换补0
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/29/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%B9%B3%E6%BB%91/" rel="next" title="时间序列平滑">
+      时间序列平滑 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%8D%A1%E5%B0%94%E6%9B%BC%E6%BB%A4%E6%B3%A2%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">什么是卡尔曼滤波？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%88%91%E4%BB%AC%E8%83%BD%E7%94%A8%E5%8D%A1%E5%B0%94%E6%9B%BC%E6%BB%A4%E6%B3%A2%E5%81%9A%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">我们能用卡尔曼滤波做什么？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%A1%E5%B0%94%E6%9B%BC%E6%BB%A4%E6%B3%A2%E6%98%AF%E5%A6%82%E4%BD%95%E7%9C%8B%E5%BE%85%E4%BD%A0%E7%9A%84%E9%97%AE%E9%A2%98%E7%9A%84"><span class="nav-number">4.</span> <span class="nav-text">卡尔曼滤波是如何看待你的问题的</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%9F%A9%E9%98%B5%E6%9D%A5%E6%8F%8F%E8%BF%B0%E9%97%AE%E9%A2%98"><span class="nav-number">5.</span> <span class="nav-text">使用矩阵来描述问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%96%E9%83%A8%E6%8E%A7%E5%88%B6%E9%87%8F"><span class="nav-number">6.</span> <span class="nav-text">外部控制量</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%96%E9%83%A8%E5%B9%B2%E6%89%B0"><span class="nav-number">7.</span> <span class="nav-text">外部干扰</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%A8%E6%B5%8B%E9%87%8F%E5%80%BC%E6%9D%A5%E4%BF%AE%E6%AD%A3%E4%BC%B0%E8%AE%A1%E5%80%BC"><span class="nav-number">8.</span> <span class="nav-text">用测量值来修正估计值</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%9E%8D%E5%90%88%E9%AB%98%E6%96%AF%E5%88%86%E5%B8%83"><span class="nav-number">9.</span> <span class="nav-text">融合高斯分布</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%86%E6%89%80%E6%9C%89%E5%85%AC%E5%BC%8F%E6%95%B4%E5%90%88%E8%B5%B7%E6%9D%A5"><span class="nav-number">10.</span> <span class="nav-text">将所有公式整合起来</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">11.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E4%BA%8E%E6%97%B6%E5%BA%8F"><span class="nav-number">12.</span> <span class="nav-text">应用于时序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%87%E7%A8%8B"><span class="nav-number">13.</span> <span class="nav-text">过程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BE%E4%B8%AA%E4%BE%8B%E5%AD%90"><span class="nav-number">14.</span> <span class="nav-text">举个例子</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Python%E5%AE%9E%E7%8E%B0"><span class="nav-number">15.</span> <span class="nav-text">Python实现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">16.</span> <span class="nav-text">运行结果</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="三元组损失与TensorFlow在线三元组挖掘">
+<meta property="og:url" content="https://blog.rexking6.top/2018/05/17/%E4%B8%89%E5%85%83%E7%BB%84%E6%8D%9F%E5%A4%B1%E4%B8%8ETensorFlow%E5%9C%A8%E7%BA%BF%E4%B8%89%E5%85%83%E7%BB%84%E6%8C%96%E6%8E%98/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1526566368.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1526568736.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1526600361.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1526610717.png">
+<meta property="article:published_time" content="2018-05-17T12:50:26.000Z">
+<meta property="article:modified_time" content="2019-03-06T09:06:19.630Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="TensorFlow">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1526566368.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/05/17/%E4%B8%89%E5%85%83%E7%BB%84%E6%8D%9F%E5%A4%B1%E4%B8%8ETensorFlow%E5%9C%A8%E7%BA%BF%E4%B8%89%E5%85%83%E7%BB%84%E6%8C%96%E6%8E%98/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>三元组损失与TensorFlow在线三元组挖掘 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/05/17/%E4%B8%89%E5%85%83%E7%BB%84%E6%8D%9F%E5%A4%B1%E4%B8%8ETensorFlow%E5%9C%A8%E7%BA%BF%E4%B8%89%E5%85%83%E7%BB%84%E6%8C%96%E6%8E%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          三元组损失与TensorFlow在线三元组挖掘
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-05-17 20:50:26" itemprop="dateCreated datePublished" datetime="2018-05-17T20:50:26+08:00">2018-05-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 17:06:19" itemprop="dateModified" datetime="2019-03-06T17:06:19+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/TensorFlow/" itemprop="url" rel="index"><span itemprop="name">TensorFlow</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/05/17/%E4%B8%89%E5%85%83%E7%BB%84%E6%8D%9F%E5%A4%B1%E4%B8%8ETensorFlow%E5%9C%A8%E7%BA%BF%E4%B8%89%E5%85%83%E7%BB%84%E6%8C%96%E6%8E%98/" class="post-meta-item leancloud_visitors" data-flag-title="三元组损失与TensorFlow在线三元组挖掘" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>11 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>本文是翻译<a target="_blank" rel="noopener" href="https://omoindrot.github.io/triplet-loss#a-better-implementation-with-online-triplet-mining">Triplet Loss and Online Triplet Mining in TensorFlow</a>而来。</p>
+<p>第一次尝试独自翻译外文博客，不通顺的地方多见谅。</p>
+<p>原作者写这个博客一开始是因为有人在stackflow提了一个问题问，“TensorFlow怎么实现三元组损失？”原作者便在下面给出了回答，“计算三元组并不困难，困难在于怎么挖掘得到三元组”，提问者问了原作者是否有博客能提供参考。时隔两年，在前两个月，原作者发布了这篇博客。</p>
+<p>接下来，开始正文，正文中的“我”是指原作者。</p>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>在人脸识别中， 三元组损失被用来学习好的脸部嵌入矩阵（或“编码矩阵”）。如果你对三元组损失不太熟悉，你应该先从<a target="_blank" rel="noopener" href="https://www.coursera.org/learn/convolutional-neural-networks/lecture/HuUtN/triplet-loss">吴恩达的深度学习课程</a>了解学习一下。</p>
+<p>众所周知，三元组损失是难以实现的，特别是在添加了使用TensorFlow构建计算图这个约束。</p>
+<p>在这篇博客中，我将定义三元组损失和取样得到三元组的不同策略。然后，我将解释如何正确地在TensorFlow中实现在线挖掘得到三元组损失。</p>
+<p>大约在两年前，我在<a target="_blank" rel="noopener" href="https://reminiz.com/">Reminiz</a>实习，做人脸识别。我在stackoverflow上回答了一个关于在TensorFlow中实现三元组损失的问题。我得出的结论：</p>
+<blockquote>
+<p>显然，在Tensorflow中实现三元组损失是很困难的，而且有很多方法可以使它比在python中进行采样更有效，但是解释它们需要一个完整的博客！</p>
+</blockquote>
+<p>两年后了，我们开始吧。</p>
+<p>所有的代码都可以在这个<a target="_blank" rel="noopener" href="https://github.com/omoindrot/tensorflow-triplet-loss">github库</a>中找到。</p>
+<h1 id="三元组损失与三元组在线挖掘"><a href="#三元组损失与三元组在线挖掘" class="headerlink" title="三元组损失与三元组在线挖掘"></a>三元组损失与三元组在线挖掘</h1><h2 id="为什么不使用softmax？"><a href="#为什么不使用softmax？" class="headerlink" title="为什么不使用softmax？"></a>为什么不使用softmax？</h2><p>Google的一篇论文<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1503.03832">“FaceNet: A Unified Embedding for Face Recognition and Clustering”</a>介绍了人脸识别的三元组损失。他们描述了一种使用在线挖掘三元组来训练脸部嵌入矩阵的新方法，这将在下一节中讨论。</p>
+<p>通常在监督学习中，我们有固定数量的类，并使用软-最大交叉熵损失来训练网络。然而，在某些情况下，我们需要能够有一个可变数量的类。例如，在人脸识别中，我们需要能够比较两个未知的面孔，并判断它们是否来自同一个人。</p>
+<p>在这种情况下，三元组损失是一种学习对每个脸部的良好嵌入的方法。在嵌入空间中，来自同一个人的面孔应该紧密地靠近在一起，形成良好的分离的集群。</p>
+<h2 id="损失定义"><a href="#损失定义" class="headerlink" title="损失定义"></a>损失定义</h2><p><img src="http://image.rexking6.top/img/clip1526566368.png" alt=""><br>两张同类脸部（Obama）和一张异类脸部（Macron）</p>
+<p>三元组损失的目标是确保：</p>
+<ul>
+<li>两个具有相同标签的样本在嵌入空间中它们的嵌入紧密靠近；</li>
+<li>两个具有不同标签的样本在嵌入空间中它们的嵌入距离很远。</li>
+</ul>
+<p>但是，我们不想把每个样本的训练嵌入推移缩小到非常小的集群。唯一要求是给定两个正（同类）样本和一个负（异类）样本。负的距离应该要比正的距离更大一些。这与SVM中使用的间隔非常相似，这里我们希望每个类的集群都由该间隔分隔开。</p>
+<p>为了正式定义该要求，损失函数由嵌入矩阵的三元组定义而成：</p>
+<ul>
+<li>一个anchor</li>
+<li>一个与anchor同类的正样本</li>
+<li>一个与anchor异类的负样本</li>
+</ul>
+<p>用于嵌入空间的距离度量$d$，三元$(a,p,n)$的损失为：</p>
+<script type="math/tex; mode=display">\mathcal{L} = max(d(a, p) - d(a, n) + margin, 0)</script><p>我们最小化损失，它使$d(a, p)$趋向于0，使$d(a, n)$大于$d(a, p) + margin$。一旦$n$为简单的负样本，损失即为0。</p>
+<h2 id="三元组挖掘"><a href="#三元组挖掘" class="headerlink" title="三元组挖掘"></a>三元组挖掘</h2><p>根据损失的定义，由三种类型的三元组：</p>
+<ul>
+<li>简单三元组：损失为0的三元组，因为$d(a, p) + margin &lt; d(a,n)$；</li>
+<li>困难三元组：在三元组中，负样本比正样本更靠近anchor，即$d(a,n) &lt; d(a,p)$；</li>
+<li>半困难三元组：三元组中，负样本比正样本更不靠近anchor，但仍然有大于0的损失：$d(a, p) &lt; d(a, n) &lt; d(a, p) + margin$</li>
+</ul>
+<p>每一个定义都依赖于负样本与anchor和正样本的相对位置。因此，我们可以将这三种类型扩展到负样本：困难负样本、半困难负样本或简单负样本。</p>
+<p>下图显示了负样本的嵌入空间的三个对应区域。</p>
+<p><img src="http://image.rexking6.top/img/clip1526568736.png" alt=""><br>给定一个anchor和一个正样本，负样本的三种情况</p>
+<p>选择我们想要训练的三元组将会极大地影响我们的指标。在最初的<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1503.03832">Facenet论文</a>，他们为每对anchor与正样本选取一个随机的半困难负样本，并且在这些三元组上训练。</p>
+<h2 id="离线与在线三元组挖掘"><a href="#离线与在线三元组挖掘" class="headerlink" title="离线与在线三元组挖掘"></a>离线与在线三元组挖掘</h2><p>我们已经定义了一个三元组的损失，并且已经看到一些三元组比其他的更有用。现在的问题是如何对这些三元组进行取样或“挖掘”。</p>
+<h3 id="离线三元组挖掘"><a href="#离线三元组挖掘" class="headerlink" title="离线三元组挖掘"></a>离线三元组挖掘</h3><p>第一种产生三元组的方式是在每个epoch开始之前，离线找到它们。我们计算训练集的所有嵌入，然后只选择困难或半困难的三元组。然后我们就可以在这些三元组上训练一个epoch。</p>
+<p>具体而言，我们会产生一个三元组$(i, j, k)$的列表。我们会构建$B$个三元组的批次，这意味着我们将计算$3B$个嵌入得到$B$个三元组，之后计算这些三元组的损失并且在网络中反向传播。</p>
+<p>总的来说，这种方式不是很有效，因为我们需要对训练集进行全面遍历来生成三元组。它还需要定期离线地更新三元组。</p>
+<h3 id="在线三元组挖掘"><a href="#在线三元组挖掘" class="headerlink" title="在线三元组挖掘"></a>在线三元组挖掘</h3><p>在Facenet中引入在线三元组挖掘，这在Brandon Amos的博客<a target="_blank" rel="noopener" href="http://bamos.github.io/2016/01/19/openface-0.2.0/">“OpenFace 0.2.0: Higher accuracy and halved execution time”</a>得到很好的描述。</p>
+<p>这里的想法是，为每一批输入计算出有用的三元组。给定一个$B$个样本的批次（即有脸部的$B$张图像），我们计算$B$的嵌入，然后我们可以找到最大为$B^3$个三元组，其中大多数三元组都是无效的（它们没有两个正样本和一个负样本）。</p>
+<p>这种方式可以给你的一个batch输入提供更多三元组，并且不需要任何离线挖掘。因此它的效率更高。我们将在最后一部分看到这方面的实现。</p>
+<p><img src="http://image.rexking6.top/img/clip1526600361.png" alt=""><br>在线挖掘的三元组损失：从一组嵌入中计算出三元组。</p>
+<h2 id="在线挖掘的策略"><a href="#在线挖掘的策略" class="headerlink" title="在线挖掘的策略"></a>在线挖掘的策略</h2><p>在线挖掘中，我们已经从一个$B$输入的批次中计算该批次$B$的嵌入。现在我们想从这些$B$嵌入中生成三元组。</p>
+<p>我们有三个索引$i,j,k \in [1,B]$，如果样本$i$和$j$有相同的标签但却相距较远，$k$样本有不同的标签，我们说$(i,j,k)$是一个有效的三元组。剩下的就是要有一个好的策略，在有效的三元组中挑选出一些来计算损失。</p>
+<p>下面这两种策略的详细解释可以在这篇论文<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1703.07737">In Defense of the Triplet Loss for Person Re-Identification</a>的第二部分找到。</p>
+<p>他们假设你有一组面孔作为$B=PK$大小的输入，由P个不同的人，每个人有K张图像。一个经典的值是$K=4$。两种策略是：</p>
+<ul>
+<li>batch all：选择所有有效的三胞胎，并在困难的和半困难的三胞胎中平均损失。</li>
+<li><ul>
+<li>这里的关键点是不考虑简单的三元组（即那些损失为0的），因为把它们加入平均后会使整体的损失非常小；</li>
+</ul>
+</li>
+<li><ul>
+<li>这会产生总共有$PK(K-1)(PK-K)$个三元组（$PK$个anchor，每个anchor有$K-1$个可能的正样本，$PK-K$可能的负样本）。</li>
+</ul>
+</li>
+<li>batch hard：对于每个anchor，在批次中选取出最困难的正样本（$d(a,p)$最大）和最困难的负样本</li>
+<li><ul>
+<li>这会产生$PK$个三元组；</li>
+</ul>
+</li>
+<li><ul>
+<li>被选取的三元组是批次中最困难的。</li>
+</ul>
+</li>
+</ul>
+<p>根据上面提到的论文，batch hard获得了最佳表现：</p>
+<blockquote>
+<p>此外，所选的三元组可以被认为是适合的三元组，因为它们在数据的一小部分中是最困难的，这正是最适合学习三元组损失的方法。</p>
+</blockquote>
+<p>然而，这实际上取决于你的数据集，应该通过比较开发的数据集的表现来决定。</p>
+<h1 id="一种简单的三元组损失的实现"><a href="#一种简单的三元组损失的实现" class="headerlink" title="一种简单的三元组损失的实现"></a>一种简单的三元组损失的实现</h1><p>在<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/38260113/implementing-contrastive-loss-and-triplet-loss-in-tensorflow/38270293#38270293">stackoverflow的回答</a>中，我简单地实现了离线三元组挖掘的三元组损失：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">anchor_output = ...    # shape [None, 128]</span><br><span class="line">positive_output = ...  # shape [None, 128]</span><br><span class="line">negative_output = ...  # shape [None, 128]</span><br><span class="line"></span><br><span class="line">d_pos = tf.reduce_sum(tf.square(anchor_output - positive_output), 1)</span><br><span class="line">d_neg = tf.reduce_sum(tf.square(anchor_output - negative_output), 1)</span><br><span class="line"></span><br><span class="line">loss = tf.maximum(0.0, margin + d_pos - d_neg)</span><br><span class="line">loss = tf.reduce_mean(loss)</span><br></pre></td></tr></table></figure>
+<p>该网络将被复制三次（用共享权重）来产生$B$个anchor，$B$个正样本，$B$个负样本的嵌入。然后我们只需计算这些嵌入的三元组损失。</p>
+<p>这是一个简单的实现，但也是一个非常低效的实现，因为它使用的是离线的三元组挖掘。</p>
+<h1 id="一个更好的在线三元组挖掘的实现"><a href="#一个更好的在线三元组挖掘的实现" class="headerlink" title="一个更好的在线三元组挖掘的实现"></a>一个更好的在线三元组挖掘的实现</h1><p>所有相关的代码都可以在github上的<code>model/triplet_loss.py</code>有提供。</p>
+<p>TensorFlow本身有一种半困难的在线挖掘三元组损失的实现，<a target="_blank" rel="noopener" href="https://www.tensorflow.org/api_docs/python/tf/contrib/losses/metric_learning/triplet_semihard_loss">tf.contrib.losses.metric_learning.triplet_semihard_loss</a>。在这里，我们不会遵循这个实现，并从头开始。</p>
+<h2 id="计算距离矩阵"><a href="#计算距离矩阵" class="headerlink" title="计算距离矩阵"></a>计算距离矩阵</h2><p>因为最后的三元组损失取决于$d(a,p)$和$d(a,n)$，我们首先需要有效地计算成对的距离矩阵。我们在<code>_pairwise_distances</code>实现了欧式范数与欧式范数的平方。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">def _pairwise_distances(embeddings, squared=False):</span><br><span class="line">    &quot;&quot;&quot;Compute the 2D matrix of distances between all the embeddings.</span><br><span class="line"></span><br><span class="line">    Args:</span><br><span class="line">        embeddings: tensor of shape (batch_size, embed_dim)</span><br><span class="line">        squared: Boolean. If true, output is the pairwise squared euclidean distance matrix.</span><br><span class="line">                 If false, output is the pairwise euclidean distance matrix.</span><br><span class="line"></span><br><span class="line">    Returns:</span><br><span class="line">        pairwise_distances: tensor of shape (batch_size, batch_size)</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    # Get the dot product between all embeddings</span><br><span class="line">    # shape (batch_size, batch_size)</span><br><span class="line">    dot_product = tf.matmul(embeddings, tf.transpose(embeddings))</span><br><span class="line"></span><br><span class="line">    # Get squared L2 norm for each embedding. We can just take the diagonal of `dot_product`.</span><br><span class="line">    # This also provides more numerical stability (the diagonal of the result will be exactly 0).</span><br><span class="line">    # shape (batch_size,)</span><br><span class="line">    square_norm = tf.diag_part(dot_product)</span><br><span class="line"></span><br><span class="line">    # Compute the pairwise distance matrix as we have:</span><br><span class="line">    # ||a - b||^2 = ||a||^2  - 2 &lt;a, b&gt; + ||b||^2</span><br><span class="line">    # shape (batch_size, batch_size)</span><br><span class="line">    distances = tf.expand_dims(square_norm, 0) - 2.0 * dot_product + tf.expand_dims(square_norm, 1)</span><br><span class="line"></span><br><span class="line">    # Because of computation errors, some distances might be negative so we put everything &gt;= 0.0</span><br><span class="line">    distances = tf.maximum(distances, 0.0)</span><br><span class="line"></span><br><span class="line">    if not squared:</span><br><span class="line">        # Because the gradient of sqrt is infinite when distances == 0.0 (ex: on the diagonal)</span><br><span class="line">        # we need to add a small epsilon where distances == 0.0</span><br><span class="line">        mask = tf.to_float(tf.equal(distances, 0.0))</span><br><span class="line">        distances = distances + mask * 1e-16</span><br><span class="line"></span><br><span class="line">        distances = tf.sqrt(distances)</span><br><span class="line"></span><br><span class="line">        # Correct the epsilon added: set the distances on the mask to be exactly 0.0</span><br><span class="line">        distances = distances * (1.0 - mask)</span><br><span class="line"></span><br><span class="line">    return distances</span><br></pre></td></tr></table></figure>
+<p>为了更详细地解释代码，我们计算嵌入的点积，维数为$(B,B)$。每个嵌入的欧式范数平方实际上就是在这个点积的对角线上，所以我们用<code>tf.diag_part</code>把它提取出来。最后我们用公式来计算距离：</p>
+<script type="math/tex; mode=display">\Vert a - b \Vert ^2 = \Vert a \Vert^2 - 2 \langle a, b \rangle + \Vert b \Vert ^2</script><p>一个棘手的问题是如果<code>squared=False</code>，我们取距离矩阵的平方根。首先，我们要确保距离矩阵总是正的。有些值可能是负的，因为计算中的小误差。我们只需要确保每个负值都被设置为<code>0.0</code>。</p>
+<p>第二件要注意的事情是如果任何元素都是<code>0.0</code>的话（例如对角线应该都是<code>0.0</code>）。因为$0$的平方根导数是无限的，我们将得到的梯度为<code>nan</code>。为了处理这种情况，我们把等于<code>0.0</code>的值替换为一个比较小的值<code>epsilon=1e-16</code>。然后我们计算平方根，替换$\sqrt{\epsilon}$为<code>0.0</code>的值。</p>
+<h2 id="batch-all-策略"><a href="#batch-all-策略" class="headerlink" title="batch all 策略"></a>batch all 策略</h2><p>在这个策略中，我们想要计算几乎所有三元组的三元组损失。在TensorFlow的计算图中，我们构造了3维的Tensor，维数为$(B,B,B)$，其中索引$(i,j,k)$，包含着它们的三元组损失。</p>
+<p>然后我们得到一个有效三元组的3维mask<code>_get_triplet_mask</code>。这里<code>mask[i,j,k]</code>能正确识别$(i,j,k)$是一个有效的三元组。</p>
+<p>最后，我们把无效的三元组的损失设置为0，并且计算有效的三元组损失的平均值。</p>
+<p>这一切都是在<code>batch_all_triplet_loss</code>函数中实现的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">def batch_all_triplet_loss(labels, embeddings, margin, squared=False):</span><br><span class="line">    &quot;&quot;&quot;Build the triplet loss over a batch of embeddings.</span><br><span class="line"></span><br><span class="line">    We generate all the valid triplets and average the loss over the positive ones.</span><br><span class="line"></span><br><span class="line">    Args:</span><br><span class="line">        labels: labels of the batch, of size (batch_size,)</span><br><span class="line">        embeddings: tensor of shape (batch_size, embed_dim)</span><br><span class="line">        margin: margin for triplet loss</span><br><span class="line">        squared: Boolean. If true, output is the pairwise squared euclidean distance matrix.</span><br><span class="line">                 If false, output is the pairwise euclidean distance matrix.</span><br><span class="line"></span><br><span class="line">    Returns:</span><br><span class="line">        triplet_loss: scalar tensor containing the triplet loss</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    # Get the pairwise distance matrix</span><br><span class="line">    pairwise_dist = _pairwise_distances(embeddings, squared=squared)</span><br><span class="line"></span><br><span class="line">    anchor_positive_dist = tf.expand_dims(pairwise_dist, 2)</span><br><span class="line">    anchor_negative_dist = tf.expand_dims(pairwise_dist, 1)</span><br><span class="line"></span><br><span class="line">    # Compute a 3D tensor of size (batch_size, batch_size, batch_size)</span><br><span class="line">    # triplet_loss[i, j, k] will contain the triplet loss of anchor=i, positive=j, negative=k</span><br><span class="line">    # Uses broadcasting where the 1st argument has shape (batch_size, batch_size, 1)</span><br><span class="line">    # and the 2nd (batch_size, 1, batch_size)</span><br><span class="line">    triplet_loss = anchor_positive_dist - anchor_negative_dist + margin</span><br><span class="line"></span><br><span class="line">    # Put to zero the invalid triplets</span><br><span class="line">    # (where label(a) != label(p) or label(n)  == label(a) or a == p)</span><br><span class="line">    mask = _get_triplet_mask(labels)</span><br><span class="line">    mask = tf.to_float(mask)</span><br><span class="line">    triplet_loss = tf.multiply(mask, triplet_loss)</span><br><span class="line"></span><br><span class="line">    # Remove negative losses (i.e. the easy triplets)</span><br><span class="line">    triplet_loss = tf.maximum(triplet_loss, 0.0)</span><br><span class="line"></span><br><span class="line">    # Count number of positive triplets (where triplet_loss &gt; 0)</span><br><span class="line">    valid_triplets = tf.to_float(tf.greater(triplet_loss, 1e-16))</span><br><span class="line">    num_positive_triplets = tf.reduce_sum(valid_triplets)</span><br><span class="line">    num_valid_triplets = tf.reduce_sum(mask)</span><br><span class="line">    fraction_positive_triplets = num_positive_triplets / (num_valid_triplets + 1e-16)</span><br><span class="line"></span><br><span class="line">    # Get final mean triplet loss over the positive valid triplets</span><br><span class="line">    triplet_loss = tf.reduce_sum(triplet_loss) / (num_positive_triplets + 1e-16)</span><br><span class="line"></span><br><span class="line">    return triplet_loss, fraction_positive_triplets</span><br></pre></td></tr></table></figure>
+<p><code>_get_triplet_mask</code>的实现非常简单，所以我不会详细说明。</p>
+<h2 id="batch-hard-策略"><a href="#batch-hard-策略" class="headerlink" title="batch hard 策略"></a>batch hard 策略</h2><p>在这个策略中，我们想要找到对每个anchor最困难的正样本和负样本。</p>
+<h3 id="最困难的正样本"><a href="#最困难的正样本" class="headerlink" title="最困难的正样本"></a>最困难的正样本</h3><p>为了计算最困难的正样本，我们从成对的距离矩阵开始。然后我们得到一个有效配对的二维mask$(a,p)$（即$a \neq p$并且$a$和$p$有相同的标签），之后把mask外的其他元素都置为0。</p>
+<p>最后一步是取这个经过修改的距离矩阵的每一行的最大距离。结果应该是有效的对$(a,p)$，因为不有效的元素都置为0。</p>
+<h3 id="最困难的负样本"><a href="#最困难的负样本" class="headerlink" title="最困难的负样本"></a>最困难的负样本</h3><p>最困难的负样本也是类似的，但要计算起来有点难。这里我们需要得到每一行的最小距离，所以我们不能把不有效的对$(a,n)$置为0（不有效是指$a$和$n$有相同的标签）。</p>
+<p>这里的技巧是每一行都要为无效的对$(a,n)$添加最大的值。之后然后我们用最小值除以每一行。结果应该是有效的对$(a,n)$，因为不有效的元素都置为最大值。</p>
+<p>最后一步是将这些合并到三元组损失中：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">triplet_loss = tf.maximum(hardest_positive_dist - hardest_negative_dist + margin, 0.0)</span><br></pre></td></tr></table></figure></p>
+<p>这一切都是在<code>batch_hard_triplet_loss</code>函数中实现的。<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">def batch_hard_triplet_loss(labels, embeddings, margin, squared=False):</span><br><span class="line">    &quot;&quot;&quot;Build the triplet loss over a batch of embeddings.</span><br><span class="line"></span><br><span class="line">    For each anchor, we get the hardest positive and hardest negative to form a triplet.</span><br><span class="line"></span><br><span class="line">    Args:</span><br><span class="line">        labels: labels of the batch, of size (batch_size,)</span><br><span class="line">        embeddings: tensor of shape (batch_size, embed_dim)</span><br><span class="line">        margin: margin for triplet loss</span><br><span class="line">        squared: Boolean. If true, output is the pairwise squared euclidean distance matrix.</span><br><span class="line">                 If false, output is the pairwise euclidean distance matrix.</span><br><span class="line"></span><br><span class="line">    Returns:</span><br><span class="line">        triplet_loss: scalar tensor containing the triplet loss</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    # Get the pairwise distance matrix</span><br><span class="line">    pairwise_dist = _pairwise_distances(embeddings, squared=squared)</span><br><span class="line"></span><br><span class="line">    # For each anchor, get the hardest positive</span><br><span class="line">    # First, we need to get a mask for every valid positive (they should have same label)</span><br><span class="line">    mask_anchor_positive = _get_anchor_positive_triplet_mask(labels)</span><br><span class="line">    mask_anchor_positive = tf.to_float(mask_anchor_positive)</span><br><span class="line"></span><br><span class="line">    # We put to 0 any element where (a, p) is not valid (valid if a != p and label(a) == label(p))</span><br><span class="line">    anchor_positive_dist = tf.multiply(mask_anchor_positive, pairwise_dist)</span><br><span class="line"></span><br><span class="line">    # shape (batch_size, 1)</span><br><span class="line">    hardest_positive_dist = tf.reduce_max(anchor_positive_dist, axis=1, keepdims=True)</span><br><span class="line"></span><br><span class="line">    # For each anchor, get the hardest negative</span><br><span class="line">    # First, we need to get a mask for every valid negative (they should have different labels)</span><br><span class="line">    mask_anchor_negative = _get_anchor_negative_triplet_mask(labels)</span><br><span class="line">    mask_anchor_negative = tf.to_float(mask_anchor_negative)</span><br><span class="line"></span><br><span class="line">    # We add the maximum value in each row to the invalid negatives (label(a) == label(n))</span><br><span class="line">    max_anchor_negative_dist = tf.reduce_max(pairwise_dist, axis=1, keepdims=True)</span><br><span class="line">    anchor_negative_dist = pairwise_dist + max_anchor_negative_dist * (1.0 - mask_anchor_negative)</span><br><span class="line"></span><br><span class="line">    # shape (batch_size,)</span><br><span class="line">    hardest_negative_dist = tf.reduce_min(anchor_negative_dist, axis=1, keepdims=True)</span><br><span class="line"></span><br><span class="line">    # Combine biggest d(a, p) and smallest d(a, n) into final triplet loss</span><br><span class="line">    triplet_loss = tf.maximum(hardest_positive_dist - hardest_negative_dist + margin, 0.0)</span><br><span class="line"></span><br><span class="line">    # Get final mean triplet loss</span><br><span class="line">    triplet_loss = tf.reduce_mean(triplet_loss)</span><br><span class="line"></span><br><span class="line">    return triplet_loss</span><br></pre></td></tr></table></figure></p>
+<h2 id="测试我们的实现"><a href="#测试我们的实现" class="headerlink" title="测试我们的实现"></a>测试我们的实现</h2><p>如果你不相信上面的实现是按预期工作的，那么你是对的！要确保实现中没有bug，唯一的方法就是为<code>model/triplet_loss.py</code>的每个函数编写测试。</p>
+<p>这对于像这样的棘手函数来说尤其重要，因为在TensorFlow中很难实现，但是在python中使用三个嵌套for循环来编写更容易。</p>
+<p>测试函数写在<code>model/tests/test_triplet_loss.py</code>，并且将我们的TensorFlow实现的结果与简单的numpy实现的结果进行比较。</p>
+<p>为了检查测试是否通过，运行：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pytest model/tests/test_triplet_loss.py</span><br></pre></td></tr></table></figure><br>（或只是<code>pytest</code>）</p>
+<p>下面是执行的测试列表：</p>
+<ul>
+<li><code>test_pairwise_distances()</code>：比较了TensorFlow与numpy的成对距离的结果。</li>
+<li><code>test_pairwise_distances_are_positive()</code>：确保得到的距离是正的。</li>
+<li><code>test_gradients_pairwise_distances()</code>：确保梯度不是<code>nan</code>。</li>
+<li><code>test_triplet_mask()</code>：比较numpy和tensorflow实现。</li>
+<li><code>test_anchor_positive_triplet_mask()</code>：比较numpy和tensorflow实现。</li>
+<li><code>test_anchor_negative_triplet_mask()</code>：比较numpy和tensorflow实现。</li>
+<li><code>test_simple_batch_all_triplet_loss()</code>：只有一种标签的测试。</li>
+<li><code>test_batch_all_triplet_loss()</code>：对batch all策略的全部测试（与numpy相比）</li>
+<li><code>test_batch_hard_triplet_loss()</code>：对batch hard策略的全部测试（与numpy相比）</li>
+</ul>
+<h1 id="在MNIST上实验"><a href="#在MNIST上实验" class="headerlink" title="在MNIST上实验"></a>在MNIST上实验</h1><p>即使在上面的测试中，也很容易忽视一些错误。例如，一开始我实现了成对的距离而不检查根号下的值是否大于$0$。我通过了所有测试，但是训练过程中的梯度是<code>nan</code>。因此我加入了<code>test_gradients_pairwise_distances</code>，修正了<code>_pairwise_distances</code>函数。</p>
+<p>为了使事情简单，我们将测试MNIST的三元组损失。代码可以在<a target="_blank" rel="noopener" href="https://github.com/omoindrot/tensorflow-triplet-loss">这里</a>找到。</p>
+<p>为了训练和评价模型，运行：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python train.py --model_dir experiments/base_model</span><br></pre></td></tr></table></figure></p>
+<p>这将启动一个新的实验（即一个训练过程）称为<code>base_model</code>。模型目录（包含权重、总结……）在<code>experiments/base_model</code>。这里我们使用了一个json文件<code>experiments/base_model/params.json</code>，指定了模型中的所有超参数。这个在所有新的实验中都应该被创建。</p>
+<p>一旦训练过程完成（或者在模型目录中保存了一些权重），我们可以使用TensorBoard来可视化这些嵌入。要做到这一点，运行:<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python visualize_embeddings.py --model_dir experiments/base_model</span><br></pre></td></tr></table></figure></p>
+<p>在实验目录中运行TensorBoard：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tensorboard --logdir experiments/base_model</span><br></pre></td></tr></table></figure>
+<p><img src="http://image.rexking6.top/img/clip1526610717.png" alt=""><br>用T-SNE可视化的MNIST测试图像的嵌入。</p>
+<p>这些嵌入是由配置文件<code>experiments/base_model/params.json</code>中指定的超参数运行的。看到哪些验证集图片被错误分类是很有趣的：它们中的大多数肯定也会被人类误解。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>TensorFlow并不能很容易地实现三元组损失，但是只要稍加努力，我们就可以通过在线挖掘来构建一个漂亮的三元组损失。</p>
+<p>最棘手的部分是如何有效地计算嵌入的距离，以及如何过滤掉无效的/简单的三胞胎。</p>
+<p>最后，如果你需要记住一件事：总是测试你的代码，特别是当它像三元组损失一样复杂时。</p>
+<h1 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h1><ul>
+<li>这篇博客的<a target="_blank" rel="noopener" href="https://github.com/omoindrot/tensorflow-triplet-loss">github目录</a></li>
+<li>介绍三元组在线挖掘的<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1503.03832">Facenet论文</a></li>
+<li>对在线三元组挖掘的详细解释<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1703.07737">In Defense of the Triplet Loss for Person Re-Identification</a></li>
+<li>Brandon Amos关于在线三元组挖掘的博客<a target="_blank" rel="noopener" href="http://bamos.github.io/2016/01/19/openface-0.2.0/">OpenFace 0.2.0: Higher accuracy and halved execution time</a></li>
+<li>用于半困难在线挖掘三元组损失的内置TensorFlow函数的源代码<a href="tf.contrib.losses.metric_learning.triplet_semihard_loss"><code>tf.contrib.losses.metric_learning.triplet_semihard_loss</code></a></li>
+<li><a target="_blank" rel="noopener" href="https://www.coursera.org/learn/convolutional-neural-networks/lecture/HuUtN/triplet-loss">coursera关于三元组损失的课程</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\04\15\将Keras作为tensorflow的精简接口\" rel="bookmark">将Keras作为TensorFlow的精简接口</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\22\莫烦TensorFlow笔记\" rel="bookmark">莫烦TensorFlow笔记</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/05/17/%E4%B8%89%E5%85%83%E7%BB%84%E6%8D%9F%E5%A4%B1%E4%B8%8ETensorFlow%E5%9C%A8%E7%BA%BF%E4%B8%89%E5%85%83%E7%BB%84%E6%8C%96%E6%8E%98/" title="三元组损失与TensorFlow在线三元组挖掘">https://blog.rexking6.top/2018/05/17/三元组损失与TensorFlow在线三元组挖掘/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/TensorFlow/" rel="tag"># TensorFlow</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/04/28/%E5%A6%82%E4%BD%95%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%9E%84%E5%BB%BA%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E9%A1%B9%E7%9B%AE%EF%BC%9F/" rel="prev" title="如何从零开始构建深度学习项目？">
+      <i class="fa fa-chevron-left"></i> 如何从零开始构建深度学习项目？
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/05/22/%E3%80%8ALearning-Discriminative-Latent-Attributes-for-Zero-Shot-Classification%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="next" title="《Learning Discriminative Latent Attributes for Zero-Shot Classification》笔记">
+      《Learning Discriminative Latent Attributes for Zero-Shot Classification》笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">2.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%89%E5%85%83%E7%BB%84%E6%8D%9F%E5%A4%B1%E4%B8%8E%E4%B8%89%E5%85%83%E7%BB%84%E5%9C%A8%E7%BA%BF%E6%8C%96%E6%8E%98"><span class="nav-number">3.</span> <span class="nav-text">三元组损失与三元组在线挖掘</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BD%BF%E7%94%A8softmax%EF%BC%9F"><span class="nav-number">3.1.</span> <span class="nav-text">为什么不使用softmax？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8D%9F%E5%A4%B1%E5%AE%9A%E4%B9%89"><span class="nav-number">3.2.</span> <span class="nav-text">损失定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E5%85%83%E7%BB%84%E6%8C%96%E6%8E%98"><span class="nav-number">3.3.</span> <span class="nav-text">三元组挖掘</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A6%BB%E7%BA%BF%E4%B8%8E%E5%9C%A8%E7%BA%BF%E4%B8%89%E5%85%83%E7%BB%84%E6%8C%96%E6%8E%98"><span class="nav-number">3.4.</span> <span class="nav-text">离线与在线三元组挖掘</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A6%BB%E7%BA%BF%E4%B8%89%E5%85%83%E7%BB%84%E6%8C%96%E6%8E%98"><span class="nav-number">3.4.1.</span> <span class="nav-text">离线三元组挖掘</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E7%BA%BF%E4%B8%89%E5%85%83%E7%BB%84%E6%8C%96%E6%8E%98"><span class="nav-number">3.4.2.</span> <span class="nav-text">在线三元组挖掘</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8%E7%BA%BF%E6%8C%96%E6%8E%98%E7%9A%84%E7%AD%96%E7%95%A5"><span class="nav-number">3.5.</span> <span class="nav-text">在线挖掘的策略</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E7%A7%8D%E7%AE%80%E5%8D%95%E7%9A%84%E4%B8%89%E5%85%83%E7%BB%84%E6%8D%9F%E5%A4%B1%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">4.</span> <span class="nav-text">一种简单的三元组损失的实现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E6%9B%B4%E5%A5%BD%E7%9A%84%E5%9C%A8%E7%BA%BF%E4%B8%89%E5%85%83%E7%BB%84%E6%8C%96%E6%8E%98%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">5.</span> <span class="nav-text">一个更好的在线三元组挖掘的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E8%B7%9D%E7%A6%BB%E7%9F%A9%E9%98%B5"><span class="nav-number">5.1.</span> <span class="nav-text">计算距离矩阵</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#batch-all-%E7%AD%96%E7%95%A5"><span class="nav-number">5.2.</span> <span class="nav-text">batch all 策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#batch-hard-%E7%AD%96%E7%95%A5"><span class="nav-number">5.3.</span> <span class="nav-text">batch hard 策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E5%9B%B0%E9%9A%BE%E7%9A%84%E6%AD%A3%E6%A0%B7%E6%9C%AC"><span class="nav-number">5.3.1.</span> <span class="nav-text">最困难的正样本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E5%9B%B0%E9%9A%BE%E7%9A%84%E8%B4%9F%E6%A0%B7%E6%9C%AC"><span class="nav-number">5.3.2.</span> <span class="nav-text">最困难的负样本</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E6%88%91%E4%BB%AC%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">5.4.</span> <span class="nav-text">测试我们的实现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9C%A8MNIST%E4%B8%8A%E5%AE%9E%E9%AA%8C"><span class="nav-number">6.</span> <span class="nav-text">在MNIST上实验</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">7.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B5%84%E6%BA%90"><span class="nav-number">8.</span> <span class="nav-text">资源</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

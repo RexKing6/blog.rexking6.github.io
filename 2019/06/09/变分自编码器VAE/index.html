@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="变分自编码器VAE">
+<meta property="og:url" content="https://blog.rexking6.top/2019/06/09/%E5%8F%98%E5%88%86%E8%87%AA%E7%BC%96%E7%A0%81%E5%99%A8VAE/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557210070.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557210161.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557210335.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557210349.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557210367.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557210536.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557211314.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557214087.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557215375.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557218868.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557220375.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557220802.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557224844.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557300958.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557300964.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557225012.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557226951.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557227143.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557301121.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557301131.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557301121.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557301880.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1557208949.png">
+<meta property="article:published_time" content="2019-06-09T09:22:28.000Z">
+<meta property="article:modified_time" content="2019-12-19T09:15:49.866Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1557210070.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2019/06/09/%E5%8F%98%E5%88%86%E8%87%AA%E7%BC%96%E7%A0%81%E5%99%A8VAE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>变分自编码器VAE | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2019/06/09/%E5%8F%98%E5%88%86%E8%87%AA%E7%BC%96%E7%A0%81%E5%99%A8VAE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          变分自编码器VAE
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-06-09 17:22:28" itemprop="dateCreated datePublished" datetime="2019-06-09T17:22:28+08:00">2019-06-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-12-19 17:15:49" itemprop="dateModified" datetime="2019-12-19T17:15:49+08:00">2019-12-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2019/06/09/%E5%8F%98%E5%88%86%E8%87%AA%E7%BC%96%E7%A0%81%E5%99%A8VAE/" class="post-meta-item leancloud_visitors" data-flag-title="变分自编码器VAE" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>34k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>31 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>综合转载以下文章：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://www.atyun.com/17888.html">从自编码器到变分自编码器（其一）</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.atyun.com/17976.html">从自编码器到变分自编码器（其二）</a></li>
+<li><a target="_blank" rel="noopener" href="https://spaces.ac.cn/archives/5253">变分自编码器（一）：原来是这么一回事</a>（极其牛逼）</li>
+<li><a target="_blank" rel="noopener" href="https://spaces.ac.cn/archives/5343">变分自编码器（二）：从贝叶斯观点出发</a>（极其牛逼）</li>
+<li><a target="_blank" rel="noopener" href="https://spaces.ac.cn/archives/5383">变分自编码器（三）：这样做为什么能成？</a>（极其牛逼）</li>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzAxMzc2NDAxOQ==&amp;mid=2650366737&amp;idx=1&amp;sn=087ee2822e507706976a57f137b55b81">一篇文章告诉你「变分自编码器 (VAE)」的优秀</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/55557709">通俗理解变分自编码器VAE(variational auto-encoder)</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jiqizhixin.com/articles/2018-08-16-7?from=synced&amp;keyword=VAE">漫谈概率 PCA 和变分自编码器</a>（牛逼）</li>
+<li><a target="_blank" rel="noopener" href="https://www.jiqizhixin.com/articles/2018-09-18-2">变分自编码器VAE：一步到位的聚类方案</a>（牛逼）</li>
+</ul>
+<h1 id="自编码器及常见架构"><a href="#自编码器及常见架构" class="headerlink" title="自编码器及常见架构"></a>自编码器及常见架构</h1><p>自编码器是一种无监督学习技术，利用神经网络进行表征学习。也就是说，我们设计一个在网络中施加“瓶颈”，即bottleneck，迫使原始输入压缩知识表示的神经网络架构。如果输入特征彼此独立，则该压缩和随后的重构将是非常困难的任务。但是，如果数据中存在某种结构（即输入特征之间存在相关性），则可以学习这种结构，并在强制输入通过网络的瓶颈时使用。</p>
+<p><img src="http://image.rexking6.top/img/clip1557210070.png" alt=""></p>
+<p>如上图所示，我们可以采取的未标记数据集和框架作为任务监督学习问题，负责输出 $\hat x$（原始输入 $x$ 的重构）。这个网络可以通过最小化重构误差（原始输入和重构之间差异的度量）训练。</p>
+<script type="math/tex; mode=display">
+\cal L(x,\hat x)</script><p>瓶颈是我们网络设计的关键属性；如果没有信息瓶颈，我们的网络就会将这些值通过网络传递，并且只学会记住输入值。</p>
+<p><img src="http://image.rexking6.top/img/clip1557210161.png" alt=""></p>
+<p>瓶颈限制了完整网络可以传递的信息量，从而迫使网络学习压缩输入数据。</p>
+<p>注意：事实上，如果我们要构造一个线性网络（即，每层都不使用非线性激活函数），我们会观察到类似PCA中所观察到的降维。</p>
+<p>理想的自编码器模型平衡以下几点：</p>
+<ul>
+<li>对输入敏感足以准确建立重构。</li>
+<li>这种敏感不能过度，导致模型简单的记住甚至过拟合训练数据。</li>
+</ul>
+<p>这种取舍迫使模型在只保留重构输入所需的数据的变化，不保留输入的冗余。一般来说，这涉及构建一个损失函数，其中一项鼓励我们的模型对输入敏感（比如，重构损失），而第二项防止出现直接记住或过度拟合（如正则化）。</p>
+<script type="math/tex; mode=display">
+\mathcal L(x,\hat x)+\text{regularization}</script><p>我们通常会在正则化项前面添加一个缩放参数，以便我们可以调整两个目标之间的平衡。</p>
+<h2 id="欠完备的自编码器"><a href="#欠完备的自编码器" class="headerlink" title="欠完备的自编码器"></a>欠完备的自编码器</h2><p>构建自编码器最简单的架构是限制网络隐藏层中存在的节点数量，进而限制可以通过网络传输的信息量。通过根据重构误差惩罚网络，我们的模型可以学习输入数据的最重要属性，以及从“编码”状态如何最好的重构原始输入。理想情况下，这种编码将学习和描述输入数据的潜在属性。</p>
+<p><img src="http://image.rexking6.top/img/clip1557210335.png" alt=""></p>
+<p>由于神经网络能够学习非线性关系，因此可以认为这是PCA更有力（非线性）的泛化。而PCA试图发现描述原始数据的低维超平面，自编码器则能够学习非线性流形（流形为连续的非交叉的曲面）。这两种方法之间的区别如下图所示。</p>
+<p><img src="http://image.rexking6.top/img/clip1557210349.png" alt=""></p>
+<p>对于更高维数据，自编码器能够学习数据（流形）的复杂表示，可用于描述低维度的观测数据，并可以对应地解码成原始输入空间。</p>
+<p><img src="http://image.rexking6.top/img/clip1557210367.png" alt=""></p>
+<p>欠完备自编码器没有明确的正则化项，只是根据重构损失来训练我们的模型。因此，确保模型不记忆输入数据的唯一方法就是确保我们已经充分限制了隐藏层中的节点数量。</p>
+<p>注意：编码器和解码器模型的容量（capacity ）。即使“瓶颈层”只有一个隐藏节点，只要编码器和解码器模型有足够的容量来学习一些可以将数据映射到索引的任意函数，我们的模型仍然可以记住训练数据。</p>
+<p>因此，我们希望我们的模型能够发现我们数据中的潜在属性，重要的是要确保自编码器模型不仅是学习有效记忆训练数据的方法。像监督学习问题，我们可以对网络采用各种形式的正则化，以鼓励更好的泛化属性。</p>
+<h2 id="稀疏自编码器"><a href="#稀疏自编码器" class="headerlink" title="稀疏自编码器"></a>稀疏自编码器</h2><p>稀疏自编码器为我们提供了一种不需要减少我们隐藏层的节点数量，就可以引入信息瓶颈的的方法。相反，我们将构造我们的损失函数，以惩罚层中的激活。对于任何给定的观察，我们都会鼓励我们的网络学习只依赖激活少量神经元进行编码和解码。值得注意的是，这是一种比较特殊的正则化实现方法，因为我们通常调整网络的权重，而不是激活。</p>
+<p>通用稀疏自编码器的可视化如下，节点的不透明度与激活级别对应。请注意，激活的训练模型的各个节点是数据相关的，不同的输入将导致通过网络不同节点的激活。</p>
+<p><img src="http://image.rexking6.top/img/clip1557210536.png" alt=""></p>
+<p>这样做的结果是，我们使网络的各个隐藏层节点对输入数据的特定属性敏感。欠完备自编码器使用整个网络进行每次观察，而稀疏自编码器将被迫根据输入数据选择性地激活网络区域。因此，我们限制了网络记忆输入数据的容量，而不限制网络从数据中提取特征的能力。这让我们单独考虑网络的潜在状态的表征和正则化分开，这样我们就可以根据给定数据上下文的意义选择潜在状态表征（即编码维度），同时通过稀疏性约束施加正则化。</p>
+<p>我们可以通过两种主要的方式来强加这种稀疏性约束；都涉及到测量每个训练批次的隐藏层激活，并为损失函数添加一些惩罚过度的激活的项。这些项是：</p>
+<ul>
+<li><p>L1正则化：我们可以添加一个对损失函数的正则化项，在 $h$ 层中为观察 $i$ 惩罚激活 $a$ 的向量值的绝对值，使用微调参数 $λ$ 进行缩放。</p>
+<script type="math/tex; mode=display">
+\mathcal L(x,\hat x)+\lambda\sum_i|a_i^{(h)}|</script></li>
+<li><p>KL散度（相对熵）：本质上，KL散度是两个概率分布差异的度量。我们可以定义一个参数 $\hat ρ$，它表示一个神经元在样本集合上的平均激活。这种期望可以计算为，</p>
+<script type="math/tex; mode=display">
+\hat \rho_j=\frac{1}{m}\sum_i[a_i^{(h)}(x)]</script><p>下标 $j$ 表示层 $h$ 中特定的神经元，对 $m$ 个训练观察的表征 $x$ 的激活求和。本质上，通过限制一个神经元在样本集合上的平均激活，我们鼓励神经元只对观测的一个子集进行激活。</p>
+</li>
+</ul>
+<h2 id="降噪自编码器"><a href="#降噪自编码器" class="headerlink" title="降噪自编码器"></a>降噪自编码器</h2><p>我们的模型通过某种信息瓶颈，尽可能重构输入。回想一下，前面我提到我们希望我们的自编码器足够敏感以重构原始观察的结果，但又要对训练数据不够敏感，以至于模型学习通用的编码和解码。还有一种开发通用化模型的方法，我们可以略微破坏输入数据，但仍维持未损坏的数据维作为目标输出。</p>
+<p><img src="http://image.rexking6.top/img/clip1557211314.png" alt=""></p>
+<p>采用这种方法，我们的模型不能简单地开发一个记忆训练数据的映射，因为我们的输入和目标输出不再相同。更确切的说，该模型学习矢量场以将输入数据映射到较低维流形；如果这个流形精确地描述了自然数据，我们就有效地“消除”了多余的噪声。</p>
+<h2 id="压缩自编码器"><a href="#压缩自编码器" class="headerlink" title="压缩自编码器"></a>压缩自编码器</h2><p>人们会期望对于非常相似的输入，学习的编码也会非常相似。我们可以为此训练我们的模型，以便通过要求隐藏层激活的导数相对于输入而言很小。换句话说，对于输入比较小的改动，我们仍然应该保持一个非常类似的编码状态。这与降噪自编码器相似，因为输入的小扰动本质上被认为是噪声，并且我们希望我们的模型对噪声具有很强的鲁棒性。降噪自编码器使重构函数（解码器）抵抗输入有限小的扰动，而压缩自编码器使特征提取函数（编码器）抵抗输入无限小的扰动。</p>
+<p>因为我们明确地鼓励我们的模型学习一种编码，在这种编码中，类似的输入有类似的编码。我们基本上是迫使模型学习如何将输入的临近区域收缩到较小的输出临近区域。注意重构数据的斜率（即微分）对于输入数据的局部邻域来说基本为零。</p>
+<p><img src="http://image.rexking6.top/img/clip1557214087.png" alt=""></p>
+<p>我们可以通过构造一个损失项来实现这一点，该项对输入训练样例中的大量的衍生进行惩罚，本质上是惩罚那些在输入中有微小变化导致编码空间发生巨大变化的实例。</p>
+<p>在更高级的数学术语中，我们可以将我们的正则化损失项设置为雅可比矩阵 $J$ 的Frobenius范数的平方 $||A||_F$，用于对输入观测的隐含层激活。Frobenius范数本质上是矩阵的L2范数，而雅可比矩阵仅仅代表了一个向量值函数的所有一阶偏导数。</p>
+<p>可以将我们的完整损失函数定义为：</p>
+<script type="math/tex; mode=display">
+\mathcal L(x,\hat x)+\lambda \sum_i ||\nabla_xa_i^{(h)}(x)||^2</script><p>原理即是使梯度趋近于0，也就是变化率趋近于0。</p>
+<h1 id="变分自编码器"><a href="#变分自编码器" class="headerlink" title="变分自编码器"></a>变分自编码器</h1><p>VAE和GAN的目标基本是一致的——希望构建一个从隐变量 $Z$ 生成目标数据 $X$ 的模型，但是实现上有所不同。更准确地讲，它们是假设了 $Z$ 服从某些常见的分布（比如正态分布或均匀分布），然后希望训练一个模型 $X=g(Z)$，这个模型能够将原来的概率分布映射到训练集的概率分布，也就是说，它们的目的都是进行分布之间的变换。</p>
+<p><img src="http://image.rexking6.top/img/clip1557215375.png" alt=""></p>
+<p><em>生成模型的难题就是判断生成分布与真实分布的相似度，因为我们只知道两者的采样结果，不知道它们的分布表达式。</em></p>
+<p>那现在假设 $Z$ 服从标准的正态分布，那么我就可以从中采样得到若干个 $Z_1, Z_2, \dots, Z_n$，然后对它做变换得到</p>
+<p> $\hat{X}_1 = g(Z_1),\hat{X}_2 = g(Z_2),\dots,\hat{X}_n = g(Z_n)$，我们怎么判断这个通过 $g$ 构造出来的数据集，它的分布跟我们目标的数据集分布是不是一样的呢？有读者说不是有KL散度吗？当然不行，因为KL散度是根据两个概率分布的表达式来算它们的相似度的，然而目前我们并不知道它们的概率分布的表达式，我们只有一批从构造的分布采样而来的数据 $\{\hat{X}_1,\hat{X}_2,\dots,\hat{X}_n\}$，还有一批从真实的分布采样而来的数据 $\{X_1,X_2,\dots,X_n\}$（也就是我们希望生成的训练集）。我们只有样本本身，没有分布表达式，当然也就没有方法算KL散度。</p>
+<p>虽然遇到困难，但还是要想办法解决的。GAN的思路很直接粗犷：既然没有合适的度量，那我干脆把这个度量也用神经网络训练出来吧。就这样，WGAN就诞生了，详细过程请参考<a target="_blank" rel="noopener" href="https://spaces.ac.cn/archives/4439">《互怼的艺术：从零直达WGAN-GP》</a>。而VAE则使用了一个精致迂回的技巧。</p>
+<h2 id="VAE漫谈"><a href="#VAE漫谈" class="headerlink" title="VAE漫谈"></a>VAE漫谈</h2><p>这一部分我们先回顾一般教程是怎么介绍VAE的，然后再探究有什么问题，接着就自然地发现了VAE真正的面目。</p>
+<h3 id="经典回顾"><a href="#经典回顾" class="headerlink" title="经典回顾"></a>经典回顾</h3><p>首先我们有一批数据样本 $\{X_1,\dots,X_n\}$，其整体用 $X$ 来描述，我们本想根据 $\{X_1,\dots,X_n\}$ 得到 $X$ 的分布 $p(X)$ 来采样，就可以得到所有可能的 $X$ 了（包括 $\{X_1,\dots,X_n\}$ 以外的），这是一个终极理想的生成模型了。当然，这个理想很难实现，于是我们将分布改一改</p>
+<script type="math/tex; mode=display">
+p(X)=\sum_Z p(X|Z)p(Z)\tag{1}</script><p>这里我们就不区分求和还是求积分了，意思对了就行。此时 $p(X|Z)$ 就描述了一个由 $Z$ 来生成 $X$ 的模型，而我们假设 $Z$ 服从标准正态分布，也就是 $p(Z)=\mathcal{N}(0,I)$。如果这个理想能实现，那么我们就可以先从标准正态分布中采样一个 $Z$，然后根据 $Z$ 来算一个 $X$，也是一个很棒的生成模型。接下来就是结合自编码器来实现重构，保证有效信息没有丢失，再加上一系列的推导，最后把模型实现。框架的示意图如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1557218868.png" alt=""></p>
+<p><em>VAE的传统理解。</em></p>
+<p>看出了什么问题了吗？如果像这个图的话，我们其实完全不清楚：究竟经过重新采样出来的 $Z_k$，是不是还对应着原来的 $X_k$，所以我们如果直接最小化 $\mathcal{D}(\hat{X}_k,X_k)^2$（这里 $\cal D$ 代表某种距离函数）是很不科学的，而事实上你看代码也会发现根本不是这样实现的。</p>
+<h3 id="VAE初现"><a href="#VAE初现" class="headerlink" title="VAE初现"></a>VAE初现</h3><p>其实，在整个VAE模型中，我们并没有去使用 $p(Z)$（隐变量空间的分布）是正态分布的假设，我们用的是假设$p(Z|X)$（后验分布）是正态分布。</p>
+<p><strong><em>其实这里作者有点说错了，“$p(Z)$ 是正态分布的假设” 其实还是用了的，不过是先假设的 $p(Z|X)$ 为正态分布，之后添加约束后，再从贝叶斯规则推出 $p(Z)$ 是正态分布的假设。作者主要是想说明经典教程直接假设 “$p(Z)$ 是正态分布”是错误的。</em></strong></p>
+<p>具体来说，给定一个真实样本 $X_k$，我们假设存在一个专属于 $X_k$ 的分布 $p(Z|X_k)$，并进一步假设这个分布是（独立的、多元的）正态分布。为什么要强调“专属”呢？因为我们后面要训练一个生成器 $X=g(Z)$，希望能够把从分布 $p(Z|X_k)$ 采样出来的一个 $Z_k$ 还原为 $X_k$。如果假设 $p(Z)$ 是正态分布，然后从 $p(Z)$ 中采样一个 $Z$，那么我们怎么知道这个 $Z$ 对应于哪个真实的 $X$ 呢？现在 $p(Z|X_k)$ 专属于 $X_k$，我们有理由说从这个分布采样出来的 $Z$ 应该要还原到 $X_k$ 中去。</p>
+<p>事实上，在论文《Auto-Encoding Variational Bayes》的应用部分，也特别强调了这一点：</p>
+<blockquote>
+<p>In this case, we can let the<br>variational approximate posterior be a multivariate Gaussian with a diagonal covariance structure:</p>
+<script type="math/tex; mode=display">
+\log q_{\phi}(\boldsymbol{z}|\boldsymbol{x}^{(i)}) = \log \mathcal{N}(\boldsymbol{z} ;\boldsymbol{\mu}^{(i)},\boldsymbol{\sigma}^{2(i)}\boldsymbol{I})\tag{9}</script><p>注：这里是直接摘录原论文，本文所用的符号跟原论文不尽一致。</p>
+</blockquote>
+<p>论文中的式(9)是实现整个模型的关键，不知道为什么很多教程在介绍VAE时都没有把它凸显出来。尽管论文也提到 $p(Z)$ 是标准正态分布，然而那其实并不是本质重要的。</p>
+<p>回到本文，这时候每一个 $X_k$ 都配上了一个专属的正态分布，才方便后面的生成器做还原。但这样有多少个 $X$ 就有多少个正态分布了。我们知道正态分布有两组参数：均值 $μ$ 和方差 $σ^2$（多元的话，它们都是向量），那我怎么找出专属于 $X_k$ 的正态分布 $p(Z|X_k)$ 的均值和方差呢？好像并没有什么直接的思路。那好吧，那我就用神经网络来拟合出来吧！这就是神经网络时代的哲学：难算的我们都用神经网络来拟合。</p>
+<p><strong><em>这里作者有一点没点到，变分自编码器和变分贝叶斯的区别有一点是：变分自编码器的隐变量分布是假设好哪种分布之后用神经网络拟合的，而变分贝叶斯的隐变量分布是在推导中自动确定形式，如果在一开始确定了共轭先验分布，则形式基本一致。</em></strong></p>
+<p>于是我们构建两个神经网络 $\mu_k = f_1(X_k),\log \sigma^2 = f_2(X_k)$ 来算它们了。我们选择拟合 $\log \sigma^2$ 而不是直接拟合 $\sigma^2$，是因为 $\sigma^2$ 总是非负的，需要加激活函数处理，而拟合 $\log \sigma^2$ 不需要加激活函数，因为它可正可负。</p>
+<p><strong><em>其实，也可以看成用了 $\pmb \log$ 这个激活函数。</em></strong></p>
+<p>到这里，我能知道专属于 $X_k$ 的均值和方差了，也就知道它的正态分布长什么样了，然后从这个专属分布中采样一个 $Z_k$ 出来，然后经过一个生成器得到 $\hat{X}_k=g(Z_k)$，现在我们可以放心地最小化 $\mathcal{D}(\hat{X}_k,X_k)^2$，因为 $Z_k$ 是从专属 $X_k$ 的分布中采样出来的，这个生成器应该要把开始的 $X_k$ 还原回来。可以画出VAE的示意图。</p>
+<p><strong><em>作者这里一直强调的“专属”，其实就是指bottleneck层的均值和方差不是模型所拥有的，而是需要一个样本输入进去之后，Encoder会将其变换成该样本所特有的均值和方差。理解这一点之后，就能理解VAE为什么能被称为生成模型。</em></strong></p>
+<p><img src="http://image.rexking6.top/img/clip1557220375.png" alt=""></p>
+<p><em>事实上，vae是为每个样本构造专属的正态分布，然后采样来重构。</em></p>
+<h3 id="分布标准化"><a href="#分布标准化" class="headerlink" title="分布标准化"></a>分布标准化</h3><p>让我们来思考一下，根据上图的训练过程，最终会得到什么结果。</p>
+<p>首先，我们希望重构 $X$，也就是最小化 $\mathcal{D}(\hat{X}_k,X_k)^2$，但是这个重构过程受到噪声的影响，因为 $Z_k$ 是通过重新采样过的，不是直接由encoder算出来的。显然噪声会增加重构的难度，不过好在这个噪声强度（也就是方差）通过一个神经网络算出来的，所以最终模型为了重构得更好，肯定会想尽办法让方差为0。而方差为0的话，也就没有随机性了，所以不管怎么采样其实都只是得到确定的结果（也就是均值），只拟合一个当然比拟合多个要容易，而均值是通过另外一个神经网络算出来的。</p>
+<p>说白了，模型会慢慢退化成普通的AutoEncoder，噪声不再起作用。</p>
+<p>这样不就白费力气了吗？说好的生成模型呢？</p>
+<p>别急别急，其实VAE还让所有的 $p(Z|X)$ 都向标准正态分布看齐，这样就防止了噪声为零，同时保证了模型具有生成能力。怎么理解“保证了生成能力”呢？如果所有的 $p(Z|X)$ 都很接近标准正态分布 $\mathcal{N}(0,I)$，那么根据定义</p>
+<script type="math/tex; mode=display">
+p(Z)=\sum_X p(Z|X)p(X)=\sum_X \mathcal{N}(0,I)p(X)=\mathcal{N}(0,I) \sum_X p(X) = \mathcal{N}(0,I)\tag{2}</script><p>这样我们就能达到我们的先验假设：$p(Z)$是标准正态分布。然后我们就可以放心地从 $\mathcal{N}(0,I)$ 中采样来生成图像了。</p>
+<p><img src="http://image.rexking6.top/img/clip1557220802.png" alt=""></p>
+<p><em>为了使模型具有生成能力，VAE要求每个 $p(Z|X)$ 都向标准正态分布看齐。</em></p>
+<p><strong><em>这里有点不太理解的地方，如果要将每个样本 $X_k$ 的特有的正态分布都像标准正态分布看齐的话，那不就不特有了，即跟样本本身没有什么关系了。所以要理解的话，应该是两项损失都考虑的话，$p(Z|X)$ 趋近于标准正态分布，却不完全一样，还是因样本而异。</em></strong></p>
+<p>那怎么让所有的 $p(Z|X)$ 都向 $\mathcal{N}(0,I)$ 看齐呢？如果没有外部知识的话，其实最直接的方法应该是在重构误差的基础上中加入额外的loss：</p>
+<script type="math/tex; mode=display">
+\mathcal{L}_{\mu}=\Vert f_1(X_k)\Vert^2,\quad \mathcal{L}_{\sigma^2}=\Vert f_2(X_k)\Vert^2\tag{3}</script><p>因为它们分别代表了均值 $μ_k$ 和方差的对数 $\log\sigma^2$，达到 $\mathcal{N}(0,I)$ 就是希望二者尽量接近于0了。不过，这又会面临着这两个损失的比例要怎么选取的问题，选取得不好，生成的图像会比较模糊。所以，原论文直接算了一般（各分量独立的）正态分布与标准正态分布的KL散度 $KL\Big(N(\mu,\sigma^2)\Big\Vert N(0,I)\Big)$ 作为这个额外的loss，计算结果为</p>
+<script type="math/tex; mode=display">
+\mathcal{L}_{\mu,\sigma^2}=\frac{1}{2} \sum_{i=1}^d \Big(\mu_{(i)}^2 + \sigma_{(i)}^2 - \log \sigma_{(i)}^2 - 1\Big)\tag{4}</script><p>这里的 $d$ 是隐变量 $Z$ 的维度，而 $\mu_{(i)}$ 和 $\sigma_{(i)}^2$ 分别代表一般正态分布的均值向量和方差向量的第 $i$ 个分量。直接用这个式子做补充loss，就不用考虑均值损失和方差损失的相对比例问题了。显然，这个loss也可以分两部分理解：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}&\mathcal{L}_{\mu,\sigma^2}=\mathcal{L}_{\mu} + \mathcal{L}_{\sigma^2}\\ 
+&\mathcal{L}_{\mu}=\frac{1}{2} \sum_{i=1}^d \mu_{(i)}^2=\frac{1}{2}\Vert f_1(X)\Vert^2\\ 
+&\mathcal{L}_{\sigma^2}=\frac{1}{2} \sum_{i=1}^d\Big(\sigma_{(i)}^2 - \log \sigma_{(i)}^2 - 1\Big)\end{aligned}\tag{5}</script><h4 id="推导"><a href="#推导" class="headerlink" title="推导"></a>推导</h4><p>由于我们考虑的是各分量独立的多元正态分布，因此只需要推导一元正态分布的情形即可，根据定义我们可以写出</p>
+<script type="math/tex; mode=display">
+\begin{aligned}&KL\Big(N(\mu,\sigma^2)\Big\Vert N(0,1)\Big)\\ 
+=&\int \frac{1}{\sqrt{2\pi\sigma^2}}e^{-(x-\mu)^2/2\sigma^2} \left(\log \frac{e^{-(x-\mu)^2/2\sigma^2}/\sqrt{2\pi\sigma^2}}{e^{-x^2/2}/\sqrt{2\pi}}\right)dx\\ 
+=&\int \frac{1}{\sqrt{2\pi\sigma^2}}e^{-(x-\mu)^2/2\sigma^2} \log \left\{\frac{1}{\sqrt{\sigma^2}}\exp\left\{\frac{1}{2}\big[x^2-(x-\mu)^2/\sigma^2\big]\right\} \right\}dx\\ 
+=&\frac{1}{2}\int \frac{1}{\sqrt{2\pi\sigma^2}}e^{-(x-\mu)^2/2\sigma^2} \Big[-\log \sigma^2+x^2-(x-\mu)^2/\sigma^2 \Big] dx\end{aligned}</script><p>整个结果分为三项积分，第一项实际上就是 $−\logσ^2$ 乘以概率密度的积分（也就是1），所以结果是 $−\logσ^2$；第二项实际是正态分布的二阶矩，熟悉正态分布的朋友应该都清楚正态分布的二阶矩为 $μ^2+σ^2$；而根据定义，第三项实际上就是“-方差除以方差=-1”。所以总结果就是</p>
+<script type="math/tex; mode=display">
+KL\Big(N(\mu,\sigma^2)\Big\Vert N(0,1)\Big)=\frac{1}{2}\Big(-\log \sigma^2+\mu^2+\sigma^2-1\Big)</script><h3 id="重参数技巧"><a href="#重参数技巧" class="headerlink" title="重参数技巧"></a>重参数技巧</h3><p>最后是实现模型的一个技巧，英文名是reparameterization trick，我这里叫它做重参数吧。其实很简单，就是我们要从 $p(Z|X_k)$ 中采样一个 $Z_k$ 出来，尽管我们知道了 $p(Z|X_k)$ 是正态分布，但是均值方差都是靠模型算出来的，我们要靠这个过程反过来优化均值方差的模型，但是“采样”这个操作是不可导的，而采样的结果是可导的。我们利用</p>
+<script type="math/tex; mode=display">
+\begin{aligned}&\frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(z-\mu)^2}{2\sigma^2}\right)dz \\ 
+=& \frac{1}{\sqrt{2\pi}}\exp\left[-\frac{1}{2}\left(\frac{z-\mu}{\sigma}\right)^2\right]d\left(\frac{z-\mu}{\sigma}\right)\end{aligned}\tag{6}</script><p>这说明 $(z−μ)/σ=ε$ 是服从均值为0、方差为1的标准正态分布的，要同时把 $dz$ 考虑进去，是因为乘上 $dz$ 才算是概率，去掉 $dz$ 是概率密度而不是概率。这时候我们得到：</p>
+<blockquote>
+<p>从 $\mathcal{N}(\mu,\sigma^2)$ 中采样一个 $Z$，相当于从 $\mathcal{N}(0,I)$ 中采样一个 $ε$，然后让 $Z=μ+ε×σ$。</p>
+</blockquote>
+<p>于是，我们将从 $\mathcal{N}(\mu,\sigma^2)$ 采样变成了从 $\mathcal{N}(0,I)$ 中采样，然后通过参数变换得到从 $\mathcal{N}(\mu,\sigma^2)$  中采样的结果。这样一来，“采样”这个操作就不用参与梯度下降了，改为采样的结果参与，使得整个模型可训练了。</p>
+<p><img src="http://image.rexking6.top/img/clip1557224844.png" alt=""></p>
+<p>换张图看，可能会更清晰，</p>
+<p><img src="http://image.rexking6.top/img/clip1557300958.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1557300964.png" alt=""></p>
+<p>“可训练”是指，decoder的梯度传到 $z$ 时，能够再顺利传下去，传到encoder中。</p>
+<h2 id="后续分析"><a href="#后续分析" class="headerlink" title="后续分析"></a>后续分析</h2><p>即便把上面的所有内容都搞清楚了，面对VAE，我们可能还存有很多疑问。</p>
+<h3 id="本质是什么"><a href="#本质是什么" class="headerlink" title="本质是什么"></a>本质是什么</h3><p>VAE的本质是什么？VAE虽然也称是AE（AutoEncoder）的一种，但它的做法（或者说它对网络的诠释）是别具一格的。在VAE中，它的Encoder有两个，一个用来计算均值，一个用来计算方差，这已经让人意外了：Encoder不是用来Encode的，是用来算均值和方差的，这真是大新闻了，还有均值和方差不都是统计量吗，怎么是用神经网络来算的？</p>
+<p>事实上，我觉得VAE从让普通人望而生畏的变分和贝叶斯理论出发，最后落地到一个具体的模型中，虽然走了比较长的一段路，但最终的模型其实是很接地气的：它本质上就是在我们常规的自编码器的基础上，对encoder的结果（在VAE中对应着计算均值的网络）加上了“高斯噪声”，使得结果decoder能够对噪声有鲁棒性；而那个额外的KL loss（目的是让均值为0，方差为1），事实上就是相当于对encoder的一个正则项，希望encoder出来的东西均有零均值。</p>
+<p>那另外一个encoder（对应着计算方差的网络）的作用呢？它是用来动态调节噪声的强度的。直觉上来想，当decoder还没有训练好时（重构误差远大于KL loss），就会适当降低噪声（KL loss增加），使得拟合起来容易一些（重构误差开始下降）；反之，如果decoder训练得还不错时（重构误差小于KL loss），这时候噪声就会增加（KL loss减少），使得拟合更加困难了（重构误差又开始增加），这时候decoder就要想办法提高它的生成能力了。</p>
+<p><img src="http://image.rexking6.top/img/clip1557225012.png" alt=""></p>
+<p><em>VAE的本质结构。</em></p>
+<p>说白了，重构的过程是希望没噪声的，而KL loss则希望有高斯噪声的，两者是对立的。所以，VAE跟GAN一样，内部其实是包含了一个对抗的过程，只不过它们两者是混合起来，共同进化的。从这个角度看，VAE的思想似乎还高明一些，因为在GAN中，造假者在进化时，鉴别者是安然不动的，反之亦然。当然，这只是一个侧面，不能说明VAE就比GAN好。GAN真正高明的地方是：它连度量都直接训练出来了，而且这个度量往往比我们人工想的要好（然而GAN本身也有各种问题，这就不展开了）。</p>
+<h3 id="正态分布？"><a href="#正态分布？" class="headerlink" title="正态分布？"></a>正态分布？</h3><p>对于 $p(Z|X)$ 的分布，读者可能会有疑惑：是不是必须选择正态分布？可以选择均匀分布吗？</p>
+<p>估计不大可行，这还是因为KL散度的计算公式：</p>
+<script type="math/tex; mode=display">
+KL\Big(p(x)\Big\Vert q(x)\Big) = \int p(x) \ln \frac{p(x)}{q(x)}dx\tag{7}</script><p>要是在某个区域中 $p(x)\neq 0$ 而 $q(x)=0$ 的话，那么KL散度就无穷大了。对于正态分布来说，所有点的概率密度都是非负的，因此不存在这个问题。但对于均匀分布来说，只要两个分布不一致，那么就必然存在 $p(x)\neq 0$ 而 $q(x)=0$ 的区间，因此KL散度会无穷大。当然，写代码时我们会防止这种除零错误，但依然避免不了KL loss占比很大，因此模型会迅速降低KL loss，也就是先验分布 $p(Z|X)$ 迅速趋于后验分布 $p(Z)$，而噪声和重构无法起到对抗作用。这又回到我们开始说的，无法区分哪个 $z$ 对应哪个 $x$了。</p>
+<p>当然，非得要用均匀分布也不是不可能，就是算好两个均匀分布的KL散度，然后做好初零错误处理，加大重构loss的权重，等等～但这样就显得太丑陋了。</p>
+<h3 id="变分在哪里"><a href="#变分在哪里" class="headerlink" title="变分在哪里"></a>变分在哪里</h3><p>还有一个有意思（但不大重要）的问题是：VAE叫做“变分自编码器”，它跟变分法有什么联系？在VAE的论文和相关解读中，好像也没看到变分法的存在呀？</p>
+<p>呃～其实如果读者已经承认了KL散度的话，那VAE好像真的跟变分没多大关系了～因为理论上对于KL散度我们要证明：已概率分布 $p(x)$（或固定 $q(x)$）的情况下，对于任意的概率分布 $q(x)$（或 $p(x)$），都有 $KL\Big(p(x)\Big\Vert q(x)\Big)\geq 0$，而且只有当 $p(x)=q(x)$ 时才等于零。因为 $KL\Big(p(x)\Big\Vert q(x)\Big)$ 实际上是一个泛函，要对泛函求极值就要用到变分法，当然，这里的变分法只是普通微积分的平行推广，还没涉及到真正复杂的变分法。而VAE的变分下界，是直接基于KL散度就得到的。所以直接承认了KL散度的话，就没有变分的什么事了。</p>
+<p>一句话，VAE的名字中“变分”，是因为它的推导过程用到了KL散度及其性质。</p>
+<h3 id="条件VAE"><a href="#条件VAE" class="headerlink" title="条件VAE"></a>条件VAE</h3><p>最后，因为目前的VAE是无监督训练的，因此很自然想到：如果有标签数据，那么能不能把标签信息加进去辅助生成样本呢？这个问题的意图，往往是希望能够实现控制某个变量来实现生成某一类图像。当然，这是肯定可以的，我们把这种情况叫做Conditional VAE，或者叫CVAE。（相应地，在GAN中我们也有个CGAN。）</p>
+<p>但是，CVAE不是一个特定的模型，而是一类模型，总之就是把标签信息融入到VAE中的方式有很多，目的也不一样。这里基于前面的讨论，给出一种非常简单的VAE。</p>
+<p><img src="http://image.rexking6.top/img/clip1557226951.png" alt=""></p>
+<p><em>一个简单的CVAE结构。</em></p>
+<p>在前面的讨论中，我们希望 $X$ 经过编码后，$Z$ 的分布都具有零均值和单位方差，这个“希望”是通过加入了KL loss来实现的。如果现在多了类别信息 $Y$，我们可以希望同一个类的样本都有一个专属的均值 $μ^Y$（方差不变，还是单位方差），这个 $μ^Y$ 让模型自己训练出来。这样的话，有多少个类就有多少个正态分布，而在生成的时候，我们就可以通过控制均值来控制生成图像的类别。事实上，这样可能也是在VAE的基础上加入最少的代码来实现CVAE的方案了，因为这个“新希望”也只需通过修改KL loss实现：</p>
+<script type="math/tex; mode=display">
+\mathcal{L}_{\mu,\sigma^2}=\frac{1}{2} \sum_{i=1}^d\Big[\big(\mu_{(i)}-\mu^Y_{(i)}\big)^2 + \sigma_{(i)}^2 - \log \sigma_{(i)}^2 - 1\Big]\tag{8}</script><p>下图显示这个简单的CVAE是有一定的效果的，不过因为encoder和decoder都比较简单（纯MLP），所以控制生成的效果不尽完美。</p>
+<p><img src="http://image.rexking6.top/img/clip1557227143.png" alt=""></p>
+<p><em>用这个CVAE控制生成数字9，可以发现生成了多种样式的9，并且慢慢向7过渡，所以初步观察这种cvae是有效的。</em></p>
+<h2 id="理论框架准备"><a href="#理论框架准备" class="headerlink" title="理论框架准备"></a>理论框架准备</h2><h3 id="数值计算vs采样计算"><a href="#数值计算vs采样计算" class="headerlink" title="数值计算vs采样计算"></a>数值计算vs采样计算</h3><p>比如已知概率密度函数 $p(x)$，那么 $x$ 的期望也就定义为</p>
+<script type="math/tex; mode=display">
+\mathbb{E}[x] = \int x p(x)dx\tag{9}</script><p>如果要对它进行数值计算，也就是数值积分，那么可以选若干个有代表性的点 $x_0 &lt; x_1 &lt; x_2 &lt; \dots &lt; x_n$，然后得到</p>
+<script type="math/tex; mode=display">
+\mathbb{E}[x] \approx \sum_{i=1}^n x_i p(x_i) \left(x_i - x_{i-1}\right)\tag{10}</script><p>这里不讨论“有代表性”是什么意思，也不讨论提高数值计算精度的方法。这样写出来，是为了跟采样计算对比。如果从 $p(x)$ 中采样若干个点 $x_1,x_2,\dots,x_n$，那么我们有</p>
+<script type="math/tex; mode=display">
+\mathbb{E}[x] \approx \frac{1}{n}\sum_{i=1}^n x_i,\quad x_i \sim p(x)\tag{11}</script><p>我们可以比较(10)跟(11)，它们的主要区别是(10)中包含了概率的计算而(11)中仅有 $x$ 的计算，这是因为在(11)中 $x_i$ 是从 $p(x)$ 中依概率采样出来的，概率大的 $x_i$ 出现的次数也多，所以可以说采样的结果已经包含了 $p(x)$ 在里边，就不用再乘以 $p(x_i)$ 了。</p>
+<p>更一般地，我们可以写出</p>
+<script type="math/tex; mode=display">
+\mathbb{E}_{x\sim p(x)}[f(x)] = \int f(x)p(x)dx \approx \frac{1}{n}\sum_{i=1}^n f(x_i),\quad x_i\sim p(x)\tag{12}</script><p>这就是蒙特卡洛模拟的基础。</p>
+<h3 id="KL散度及变分"><a href="#KL散度及变分" class="headerlink" title="KL散度及变分"></a>KL散度及变分</h3><p>我们通常用KL散度来度量两个概率分布 $p(x)$ 和 $q(x)$ 之间的差异，定义为</p>
+<script type="math/tex; mode=display">
+KL\Big(p(x)\Big\Vert q(x)\Big) = \int p(x)\ln \frac{p(x)}{q(x)} dx=\mathbb{E}_{x\sim p(x)}\left[\ln \frac{p(x)}{q(x)}\right]\tag{13}</script><p>KL散度的主要性质是非负性，如果固定 $p(x)$，那么 $KL\Big(p(x)\Big\Vert q(x)\Big)=0 \Leftrightarrow p(x)=q(x)$；如果固定 $q(x)$，同样有 $KL\Big(p(x)\Big\Vert q(x)\Big)=0 \Leftrightarrow p(x)=q(x)$，也就是不管固定哪一个，最小化KL散度的结果都是两者尽可能相等。这一点的严格证明要用到变分法，而事实上VAE中的V（变分）就是因为VAE的推导就是因为用到了KL散度（进而也包含了变分法）。</p>
+<p>当然，KL散度有一个比较明显的问题，就是当 $q(x)$ 在某个区域等于0，而 $p(x)$ 在该区域不等于0，那么KL散度就出现无穷大。这是KL散度的固有问题，我们只能想办法规避它，比如隐变量的先验分布我们用高斯分布而不是均匀分布，原因便在此。</p>
+<p>顺便说点题外话，度量两个概率分布之间的差异只有KL散度吗？当然不是，我们可以看维基百科的<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Statistical_distance">Statistical Distance</a>一节，里边介绍了不少分布距离，比如有一个很漂亮的度量，我们称之为巴氏距离（Bhattacharyya distance），定义为</p>
+<script type="math/tex; mode=display">
+D_B\Big(p(x), q(x)\Big)=-\ln\int \sqrt{p(x)q(x)} dx\tag{14}</script><p>这个距离不仅对称，还没有KL散度的无穷大问题。然而我们还是选用KL散度，因为我们不仅要理论上的漂亮，还要实践上的可行，KL散度可以写成期望的形式，这允许我们对其进行采样计算，相反，巴氏距离就没那么容易了，读者要是想把下面计算过程中的KL散度替换成巴氏距离，就会发现寸步难行了。</p>
+<h3 id="符号表"><a href="#符号表" class="headerlink" title="符号表"></a>符号表</h3><script type="math/tex; mode=display">
+\begin{array}{c|c} 
+\hline 
+x_k, z_k & \text{表示随机变量}x,z\text{的第}k\text{个样本}\\ 
+\hline 
+x_{(k)}, z_{(k)} & \text{表示多元变量}x,z\text{的第}k\text{个分量}\\ 
+\hline 
+\mathbb{E}_{x\sim p(x)}[f(x)] & \text{表示对}f(x)\text{算期望，其中}x\text{的分布为}p(x)\\ 
+\hline 
+KL\Big(p(x)\Big\Vert q(x)\Big)& \text{两个分布的}KL\text{散度}\\ 
+\hline 
+\Vert x\Vert^2& \text{向量}x\text{的}l^2\text{范数，也就是我们通常说的模长的平方}\\ 
+\hline 
+\mathcal{L}& \text{本文的损失函数的符号}\\ 
+\hline 
+D,d & D\text{是输入}x\text{的维度，}d\text{是隐变量}z\text{的维度}\\ 
+\hline 
+\end{array}</script><h2 id="理论框架"><a href="#理论框架" class="headerlink" title="理论框架"></a>理论框架</h2><h3 id="直面联合分布"><a href="#直面联合分布" class="headerlink" title="直面联合分布"></a>直面联合分布</h3><p>出发点依然没变，这里再重述一下。首先我们有一批数据样本 $\{x_1,\dots,x_n\}$，其整体用 $x$ 来描述，我们希望借助隐变量 $z$ 描述 $x$ 的分布 $\tilde{p}(x)$：</p>
+<script type="math/tex; mode=display">
+q(x)=\int q(x|z)q(z)dz,\quad q(x,z) = q(x|z)q(z)\tag{15}</script><p>这里 $q(z)$ 是先验分布（标准正态分布），目的是希望 $q(x)$ 能逼近 $\tilde p(x)$。这样（理论上）我们既描述了 $\tilde p(x)$，又得到了生成模型 $q(x|z)$，一举两得。</p>
+<p>接下来就是利用KL散度进行近似。但我一直搞不明白的是，为什么从原作《Auto-Encoding Variational Bayes》开始，VAE的教程就聚焦于后验分布 $p(z|x)$ 的描述？也许是受了EM算法的影响，这个问题上不能应用EM算法，就是因为后验分布 $p(z|x)$ 难以计算，所以VAE的作者就聚焦于 $p(z|x)$ 的推导。</p>
+<p>但事实上，直接来对 $p(x,z)$ 进行近似是最为干脆的。具体来说，定义 $p(x,z)=\tilde{p}(x)p(z|x)$，我们设想用一个联合概率分布 $q(x,z)$ 来逼近 $p(x,z)$，那么我们用KL散度来看它们的距离：</p>
+<script type="math/tex; mode=display">
+KL\Big(p(x,z)\Big\Vert q(x,z)\Big) = \iint p(x,z)\ln \frac{p(x,z)}{q(x,z)} dzdx\tag{16}</script><p>KL散度是我们的终极目标，因为我们希望两个分布越接近越好，所以KL散度越小越好。</p>
+<p>于是我们有，</p>
+<script type="math/tex; mode=display">
+\begin{aligned}KL\Big(p(x,z)\Big\Vert q(x,z)\Big) =& \int \tilde{p}(x) \left[\int p(z|x)\ln \frac{\tilde{p}(x)p(z|x)}{q(x,z)} dz\right]dx\\ 
+=& \mathbb{E}_{x\sim \tilde{p}(x)} \left[\int p(z|x)\ln \frac{\tilde{p}(x)p(z|x)}{q(x,z)} dz\right] 
+\end{aligned}\tag{17}</script><p>这样一来利用(12)式，把各个 $x_i$ 代入就可以进行计算了，这个式子还可以进一步简化，因为 $\ln \frac{\tilde{p}(x)p(z|x)}{q(x,z)}=\ln \tilde{p}(x) + \ln \frac{p(z|x)}{q(x,z)}$，而</p>
+<script type="math/tex; mode=display">
+\begin{aligned}\mathbb{E}_{x\sim \tilde{p}(x)} \left[\int p(z|x)\ln \tilde{p}(x)dz\right] =& \mathbb{E}_{x\sim \tilde{p}(x)} \left[\ln \tilde{p}(x)\int p(z|x)dz\right]\\ 
+=&\mathbb{E}_{x\sim \tilde{p}(x)} \big[\ln \tilde{p}(x)\big] 
+\end{aligned}\tag{18}</script><p>注意这里的 $\tilde{p}(x)$ 是根据样本 $x_1,x_2,\dots,x_n$ 确定的关于 $x$ 的先验分布，尽管我们不一定能准确写出它的形式，但它是确定的、存在的，因此这一项只是一个常数，所以可以写出</p>
+<script type="math/tex; mode=display">
+\mathcal{L}=KL\Big(p(x,z)\Big\Vert q(x,z)\Big) - \text{常数}= \mathbb{E}_{x\sim \tilde{p}(x)} \left[\int p(z|x)\ln \frac{p(z|x)}{q(x,z)} dz\right]\tag{19}</script><p>目前最小化 $KL\Big(p(x,z)\Big\Vert q(x,z)\Big)$ 也就等价于最小化 $\cal L$。注意减去的常数为 $\mathbb{E}_{x\sim \tilde{p}(x)} \big[\ln \tilde{p}(x)\big]$，所以 $\cal L$ 拥有 $下界-\mathbb{E}_{x\sim \tilde{p}(x)} \big[\ln \tilde{p}(x)\big]$。注意到 $\tilde p(x)$ 不一定是概率，在连续情形时 $\tilde{p}(x)$ 是概率密度，它可以大于1也可以小于1，所以 $-\mathbb{E}_{x\sim \tilde{p}(x)} \big[\ln \tilde{p}(x)\big]$不一定是非负，即loss可能是负数。</p>
+<h3 id="推出VAE"><a href="#推出VAE" class="headerlink" title="推出VAE"></a>推出VAE</h3><p>到这里，我们回顾初衷——为了得到生成模型，所以我们把 $q(x,z)$ 写成 $q(x|z)q(z)$，于是就有</p>
+<script type="math/tex; mode=display">
+\begin{aligned}\mathcal{L} =& \mathbb{E}_{x\sim \tilde{p}(x)} \left[\int p(z|x)\ln \frac{p(z|x)}{q(x|z)q(z)} dz\right]\\ 
+=&\mathbb{E}_{x\sim \tilde{p}(x)} \left[-\int p(z|x)\ln q(x|z)dz+\int p(z|x)\ln \frac{p(z|x)}{q(z)}dz\right]\end{aligned}\tag{20}</script><p>再简明一点，那就是</p>
+<script type="math/tex; mode=display">
+\begin{aligned}\mathcal{L} = &\mathbb{E}_{x\sim \tilde{p}(x)} \left[\mathbb{E}_{z\sim p(z|x)}\big[-\ln q(x|z)\big]+\mathbb{E}_{z\sim p(z|x)}\Big[\ln \frac{p(z|x)}{q(z)}\Big]\right]\\ 
+= &\mathbb{E}_{x\sim \tilde{p}(x)} \Bigg[\mathbb{E}_{z\sim p(z|x)}\big[-\ln q(x|z)\big]+KL\Big(p(z|x)\Big\Vert q(z)\Big)\Bigg] 
+\end{aligned}\tag{21}</script><p>看，括号内的不就是VAE的损失函数嘛？只不过我们换了个符号而已。我们就是要想办法找到适当的 $q(x|z)$ 和 $q(z)$ 使得 $\cal L$ 最小化。</p>
+<p>再回顾一下整个过程，我们几乎都没做什么“让人难以想到”的形式变换，但VAE就出来了。所以，没有必要去对后验分布进行分析，直面联合分布，我们能更快捷地到达终点。</p>
+<h3 id="不能搞分裂"><a href="#不能搞分裂" class="headerlink" title="不能搞分裂"></a>不能搞分裂</h3><p>鉴于(21)式的特点，我们也许会将 $\cal L$分开为两部分看：$\mathbb{E}_{z\sim p(z|x)}\big[-\ln q(x|z)\big]$ 的期望和 $KL\Big(p(z|x)\Big\Vert q(z)\Big)$ 的期望，并且认为问题变成了两个loss的分别最小化。</p>
+<p>然而这种看法是不妥的，因为 $KL\Big(p(z|x)\Big\Vert q(z)\Big)=0$ 意味着 $z$ 没有任何辨识度，所以 $-\ln q(x|z)$ 不可能小（预测不准），而如果 $-\ln q(x|z)$ 小则 $q(x|z)$ 大，预测准确，这时候 $p(z|x)$ 不会太随机，即 $KL\Big(p(z|x)\Big\Vert q(z)\Big)$ 不会小，所以这两部分的loss其实是相互拮抗的。所以，$\cal L$ 不能割裂来看，而是要整体来看，整个的 $\cal L$ 越小模型就越接近收敛，而不能只单独观察某一部分的loss。</p>
+<p>变分自编码器的主要优点是我们能够学习输入数据的平滑潜在状态表示。对于标准的自编码器，我们只需要学习一个编码，它允许我们重现输入。如左图所示，只关注重构损失允许我们分离出类（在这种情况下是MNIST数字），这使我们的解码器模型能够重现原始手写数字，但是它的潜在空间内的数据分布不均匀。换句话说，潜在空间中有一些区域不代表我们观测到的任何数据。</p>
+<p><img src="http://image.rexking6.top/img/clip1557301121.png" alt=""></p>
+<p>另一方面，如果我们只关注于保持潜在分布与先验分布类似（通过KL散度损失项），我们最终将使用相同的单位高斯描述每个观测值，我们随后从中抽样来描述可视化的潜在维度。这有效地把每一个观察都视为具有相同的特征；换句话说，我们没有描述原始数据。</p>
+<p>然而，当这两项同时优化时，我们被鼓励描述一个观察的潜在状态，其分布接近于先验，在必要时偏离，以描述输入的显著特征。</p>
+<p><img src="http://image.rexking6.top/img/clip1557301131.png" alt=""></p>
+<p>事实上，这正是GAN模型中梦寐以求的——有一个总指标能够指示生成模型的训练进程，在VAE模型中天然就具备了这种能力了，而GAN中要到WGAN才有这么一个指标。</p>
+<h2 id="理论落实"><a href="#理论落实" class="headerlink" title="理论落实"></a>理论落实</h2><p>截止上面的内容，其实我们已经完成了VAE整体的理论构建。但为了要将它付诸于实验，还需要做一些工作。事实上原论文《Auto-Encoding Variational Bayes》也在这部分做了比较充分的展开，但遗憾的是，网上很多VAE教程都只是推导到(21)就没有细说了。</p>
+<h3 id="后验分布近似"><a href="#后验分布近似" class="headerlink" title="后验分布近似"></a>后验分布近似</h3><p>现在 $q(z),q(x|z),p(z|x)$ 全都是未知的，连形式都还没确定，而为了实验，就得把(21)式的每一项都明确写出来。</p>
+<p>首先，为了便于采样，我们假设 $z\sim N(0,I)$ ，即标准的多元正态分布，这就解决了 $q(z)$。那 $q(x|z),p(z|x)$ 呢？一股脑用神经网络拟合吧。</p>
+<blockquote>
+<p>注：本来如果已知 $q(x|z)$ 和 $q(z)$，那么 $p(z|x)$最合理的估计应该是：</p>
+<script type="math/tex; mode=display">
+\hat{p}(z|x) = q(z|x) = \frac{q(x|z)q(z)}{q(x)} = \frac{q(x|z)q(z)}{\int q(x|z)q(z)dz}\tag{22}</script><p>这其实就是EM算法中的后验概率估计的步骤。但事实上，分母的积分几乎不可能完成，因此这是行不通的。所以干脆用一般的网络去近似它，这样不一定能达到最优，但终究是一个可用的近似。</p>
+</blockquote>
+<p>具体来说，我们假设 $p(z|x)$ 也是（各分量独立的）正态分布，其均值和方差由 $x$ 来决定，这个“决定”，就是一个神经网络：</p>
+<script type="math/tex; mode=display">
+p(z|x)=\frac{1}{\prod\limits_{k=1}^d \sqrt{2\pi  \sigma_{(k)}^2(x)}}\exp\left(-\frac{1}{2}\left\Vert\frac{z-\mu(x)}{\sigma(x)}\right\Vert^2\right)\tag{23}</script><p>这里的 $μ(x),σ^2(x)$ 是输入为 $x$、输出分别为均值和方差的神经网络，其中 $μ(x)$ 就起到了类似encoder的作用。既然假定了高斯分布，那么(21)式中的KL散度这一项就可以先算出来：</p>
+<script type="math/tex; mode=display">
+KL\Big(p(z|x)\Big\Vert q(z)\Big)=\frac{1}{2} \sum_{k=1}^d \Big(\mu_{(k)}^2(x) + \sigma_{(k)}^2(x) - \ln \sigma_{(k)}^2(x) - 1\Big)\tag{24}</script><p>也就是我们所说的KL loss，之前已经给出。</p>
+<h3 id="生成模型近似"><a href="#生成模型近似" class="headerlink" title="生成模型近似"></a>生成模型近似</h3><p>现在只剩生成模型部分 $q(x|z)$ 了，该选什么分布呢？论文<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1312.6114.pdf">《Auto-Encoding Variational Bayes》</a>给出了两种候选方案：伯努利分布或正态分布。</p>
+<p>什么？又是正态分布？是不是太过简化了？然而并没有办法，因为我们要构造一个分布，而不是任意一个函数，既然是分布就得满足归一化的要求，而要满足归一化，又要容易算，我们还真没多少选择。</p>
+<h4 id="伯努利分布模型"><a href="#伯努利分布模型" class="headerlink" title="伯努利分布模型"></a>伯努利分布模型</h4><p>首先来看伯努利分布，众所周知它其实就是一个二元分布：</p>
+<script type="math/tex; mode=display">
+p(\xi)=\left\{\begin{aligned}&\rho,\, \xi = 1;\\ 
+&1-\rho,\, \xi = 0\end{aligned}\right.\tag{25}</script><p>所以伯努利分布只适用于 $x$ 是一个多元的二值向量的情况，比如 $x$ 是二值图像时（MNIST可以看成是这种情况）。这种情况下，我们用神经网络 $ρ(z)$ 来算参数 $ρ$，从而得到</p>
+<script type="math/tex; mode=display">
+q(x|z)=\prod_{k=1}^D \Big(\rho_{(k)}(z)\Big)^{x_{(k)}} \Big(1 - \rho_{(k)}(z)\Big)^{1 - x_{(k)}}\tag{26}</script><p>这时候可以算出</p>
+<script type="math/tex; mode=display">
+-\ln q(x|z) = \sum_{k=1}^D \Big[- x_{(k)} \ln \rho_{(k)}(z) - (1-x_{(k)}) \ln \Big(1 -\rho_{(k)}(z)\Big)\Big]\tag{27}</script><p>这表明 $ρ(z)$ 要压缩到0～1之间（比如用sigmoid激活），然后用交叉熵作为损失函数，这里 $ρ(z)$ 就起到了类似decoder的作用。</p>
+<h4 id="正态分布模型"><a href="#正态分布模型" class="headerlink" title="正态分布模型"></a>正态分布模型</h4><p>然后是正态分布，这跟 $p(z|x)$ 是一样的，只不过 $x,z$ 交换了位置：</p>
+<script type="math/tex; mode=display">
+q(x|z)=\frac{1}{\prod\limits_{k=1}^D \sqrt{2\pi  \sigma_{(k)}^2(z)}}\exp\left(-\frac{1}{2}\left\Vert\frac{x-\mu(z)}{\sigma(z)}\right\Vert^2\right)\tag{28}</script><p>这里的 $μ(z),σ^2(z)$ 是输入为 $z$、输出分别为均值和方差的神经网络，$μ(z)$ 就起到了decoder的作用。于是</p>
+<script type="math/tex; mode=display">
+-\ln q(x|z) = \frac{1}{2}\left\Vert\frac{x-\mu(z)}{\sigma(z)}\right\Vert^2 + \frac{D}{2}\ln 2\pi + \frac{1}{2}\sum_{k=1}^D \ln \sigma_{(k)}^2(z)\tag{29}</script><p>很多时候我们会固定方差为一个常数 $σ^2$，这时候</p>
+<script type="math/tex; mode=display">
+-\ln q(x|z) \sim \frac{1}{2\sigma^2}\Big\Vert x-\mu(z)\Big\Vert^2\tag{30}</script><p>这就出现了MSE损失函数。</p>
+<p>所以现在就清楚了，对于二值数据，我们可以对decoder用sigmoid函数激活，然后用交叉熵作为损失函数，这对应于 $q(x|z)$ 为伯努利分布；而对于一般数据，我们用MSE作为损失函数，这对应于 $q(x|z)$ 为固定方差的正态分布。</p>
+<h3 id="采样计算技巧"><a href="#采样计算技巧" class="headerlink" title="采样计算技巧"></a>采样计算技巧</h3><p>前一节做了那么多的事情，无非是希望能(21)式明确地写下来。当我们假设 $p(z|x)$ 和 $q(z)$ 都是正态分布时，(21)式的KL散度部分就已经算出来了，结果是(24)式；当我们假设 $q(x|z)$ 是伯努利分布或者高斯分布时，$−\ln q(x|z)$ 也能算出来了。现在缺什么呢？</p>
+<p>采样。</p>
+<p>$p(z|x)$ 的作用分两部分，一部分是用来算 $KL\Big(p(z|x)\Big\Vert q(z)\Big)$，另一部分是用来算 $\mathbb{E}_{z\sim p(z|x)}\big[-\ln q(x|z)\big]$的，而 $\mathbb{E}_{z\sim p(z|x)}\big[-\ln q(x|z)\big]$ 就意味着：</p>
+<script type="math/tex; mode=display">
+-\frac{1}{n}\sum_{i=1}^n \ln q(x|z_i),\quad z_i \sim p(z|x)\tag{31}</script><p>我们已经假定了 $p(z|x)$ 是正态分布，均值和方差由模型来算，这样一来，借助“重参数技巧”就可以完成采样。</p>
+<p>但是采样多少个才适合呢？VAE非常直接了当：一个！所以这时候(21)式就变得非常简单了：</p>
+<script type="math/tex; mode=display">
+\mathcal{L} = \mathbb{E}_{x\sim \tilde{p}(x)} \Bigg[-\ln q(x|z) + KL\Big(p(z|x)\Big\Vert q(z)\Big)\Bigg],\quad z\sim p(z|x)\tag{32}</script><p>该式中的每一项，可以在把(24),(27),(29),(30)式找到。注意对于一个batch中的每个 $x$ ，都需要从 $p(z|x)$ 采样一个“专属”于 $x$ 的 $z$ 出来才去算 $−\ln q(x|z)$。而正因为VAE在 $p(z|x)$ 这里只采样了一个样本，所以它看起来就跟普通的AE差不多了。</p>
+<p>那么最后的问题就是采样一个究竟够了吗？事实上我们会运行多个epoch，每次的隐变量都是随机生成的，因此当epoch数足够多时，事实上是可以保证采样的充分性的。作者也实验过采样多个的情形，感觉生成的样本并没有明显变化。</p>
+<p>简单来说，用这种角度考察的时候，我们心里需要紧抓住两个点：“分布”和“采样”——写出分布形式，并且通过采样来简化过程。由于直接描述复杂分布是难以做到的，所以我们通过引入隐变量来将它变成条件分布的叠加。而这时候我们对隐变量的分布和条件分布都可以做适当的简化（比如都假设为正态分布），并且在条件分布的参数可以跟深度学习模型结合起来（用深度学习来算隐变量的参数），至此，“深度概率图模型”就可见一斑了。</p>
+<h2 id="疑问：采样"><a href="#疑问：采样" class="headerlink" title="疑问：采样"></a>疑问：采样</h2><h3 id="采样一个点就够"><a href="#采样一个点就够" class="headerlink" title="采样一个点就够"></a>采样一个点就够</h3><p>对于式(32)，可能有读者看不过眼了：$KL\Big(p(z|x)\Big\Vert q(z)\Big)$ 事先算出来，相当于是采样了无穷多个点来估算这一项；而 $\mathbb{E}_{z\sim p(z|x)}\big[-\ln q(x|z)\big]$ 却又只采样一个点，大家都是loss的一部分，这样不公平待遇真的好么？</p>
+<p>事实上，$\mathbb{E}_{z\sim p(z|x)}\Big[\ln \frac{p(z|x)}{q(z)}\Big]$ 也可以只采样一个点来算，也就是说，可以通过全体都只采样一个点，将(21)式变为</p>
+<script type="math/tex; mode=display">
+\begin{aligned}\mathcal{L} =&\mathbb{E}_{x\sim \tilde{p}(x)} \left[-\ln q(x|z)+\ln \frac{p(z|x)}{q(z)}\right]\\ 
+=&\mathbb{E}_{x\sim \tilde{p}(x)} \Big[-\ln q(x|z)+\ln p(z|x) - \ln q(z)\Big]\,,\quad z\sim p(z|x) 
+\end{aligned}\tag{33}</script><p>这个loss虽然跟标准的VAE有所不同，但事实上也能收敛到相似的结果。</p>
+<h3 id="为什么一个点就够？"><a href="#为什么一个点就够？" class="headerlink" title="为什么一个点就够？"></a>为什么一个点就够？</h3><p>那么，为什么采样一个点就够了呢？什么情况下才是采样一个点就够？</p>
+<p>首先，我举一个“采样一个点不够”的例子，求解 $q(x|z)$ 其实可以改写成：</p>
+<script type="math/tex; mode=display">
+q(x|z)=\mathop{\arg\max}_{q(x|z)} \mathbb{E}_{x\sim\tilde{p}(x)}\Bigg[\ln\Big(\mathbb{E}_{z\sim q(z)}\big[q(x|z)\big]\Big)\Bigg]\tag{34}</script><p>如果采样一个点就够了，不，这里还是谨慎一点，采样 $k$ 个点吧，那么我们可以写出</p>
+<script type="math/tex; mode=display">
+q(x|z)=\mathop{\arg\max}_{q(x|z)} \mathbb{E}_{x\sim\tilde{p}(x)}\Bigg[\ln\left(\frac{1}{k}\sum_{i=1}^k q(x|z_i)\right)\Bigg],\quad z_1,\dots,z_k \sim q(z)\tag{35}</script><p>然后就可以梯度下降训练了。</p>
+<p>然而，这样的策略是不成功的。实际中我们能采样的数目 $k$，一般要比每个batch的大小要小，这时候最大化 $\ln\left(\frac{1}{k}\sum\limits_{i=1}^k q(x|z_i)\right)$ 就会陷入一个“资源争夺战”的境地：每次迭代时，一个batch中的各个 $x_i$ 都在争夺 $z_1,z_2,\dots,z_k$，谁争夺成功了，$q(x|z)$ 就大（说白了，哪个 $x_i$ 能找到专属于它的 $z_j$，这意味着 $z_j$ 只能生成 $x_i$，不能生成其它的，那么 $z(x_i|z_j)$ 就大），但是每个样本都是平等的，采样又是随机的，我们无法预估每次“资源争夺战”的战况。这完全就是一片混战！如果数据集仅仅是mnist，那还好一点，因为mnist的样本具有比较明显的聚类倾向，所以采样数母 $k$ 超过10，那么就够各个 $x_i$ 分了；但如果像人脸、imagenet这些没有明显聚类倾向、类内方差比较大的数据集，各个 $z$ 完全是不够分的，一会 $x_i$ 抢到了 $z_j$ ，一会 $x_{i+1}$ 抢到了 $z_j$，训练就直接失败了。</p>
+<p><strong><em>上面作者所说的，我还是不太能理解，从1个改成 $k$ 个，按他所说的，应该是从batch数争夺1个变为batch数争夺 $k$ 个，至少应该比原来够分吧；而且实际情况中，按我所想的，一个batch的输入，到网络的输出，都应该是矩阵化的形式，也就是各个样本之间没有影响，暂且不论各种normalization的手段。另外，作者所说的和他所举的例子其实不一样，说的是batch数，例子其实比较的是类别个数，也就是10个类之间训练不均衡。</em></strong></p>
+<p>因此，正是这种“僧多粥少”的情况导致上述模型(35)训练不成功。可是，为什么VAE那里采样一个点就成功了呢？</p>
+<h3 id="一个点确实够了"><a href="#一个点确实够了" class="headerlink" title="一个点确实够了"></a>一个点确实够了</h3><p>这就得再分析一下我们对 $q(x|z)$ 的想法了，我们称 $q(x|z)$ 为生成模型部分，一般情况下我们假设它为伯努利分布或高斯分布，考虑到伯努利分布应用场景有限，这里只假设它是正态分布，那么</p>
+<script type="math/tex; mode=display">
+q(x|z)=\frac{1}{\prod\limits_{k=1}^D \sqrt{2\pi  \sigma_{(k)}^2(z)}}\exp\left(-\frac{1}{2}\left\Vert\frac{x-\mu(z)}{\sigma(z)}\right\Vert^2\right)\tag{36}</script><p>其中 $μ(z)$ 是用来计算均值的网络，$σ^2(z)$ 是用来计算方差的网络，很多时候我们会固定方差，那就只剩一个计算均值的网络了。</p>
+<p>注意，$q(x|z)$ 只是一个概率分布，我们从 $q(z)$ 中采样出 $z$ 后，代入 $q(x|z)$ 后得到 $q(x|z)$ 的具体形式，理论上我们还要从 $q(x|z)$ 中再采样一次才得到 $x$ 。但是，我们并没有这样做，我们直接把均值网络 $μ(z)$ 的结果就当成$x$ 。而能这样做，表明 $q(x|z)$ 是一个方差很小的正态分布（如果是固定方差的话，则训练前需要调低方差，如果不是正态分布而是伯努利分布的话，则不需要考虑这个问题，它只有一组参数），每次采样的结果几乎都是相同的（都是均值 $μ(z)$ ），此时 $x$ 和 $z$ 之间“几乎”具有一一对应关系，接近确定的函数 $x=μ(z)$。</p>
+<p>而对于后验分布 $p(z|x)$ 中，我们假设了它也是一个正态分布。既然前面说 $z$ 与 $x$ 几乎是一一对应的，那么这个性质同样也适用后验分布 $p(z|x)$ ，这就表明后验分布也会是一个方差很小的正态分布（读者也可以自行从mnist的encoder结果来验证这一点），这也就意味着每次从 $p(z|x)$ 中采样的结果几乎都是相同的。既然如此，采样一次跟采样多次也就没有什么差别了，因为每次采样的结果都基本一样呀。所以我们就解释了为什么可以只采样一个点计算。</p>
+<h2 id="疑问：生成"><a href="#疑问：生成" class="headerlink" title="疑问：生成"></a>疑问：生成</h2><p>那么现在我们如何在隐含空间中得到平滑的插值呢？这主要通过隐含空间中的矢量运算来实现。</p>
+<p><img src="http://image.rexking6.top/img/clip1557301121.png" alt=""></p>
+<p>例如我们通过训练得到了上图的隐含空间，现在想得到两个样本之间的新样本，那么只需要计算出他们均值矢量之差，并以其一半加上原来的矢量。最后将得到的结果送入到解码器即可。那对于特殊的特征也，比如生成眼镜该如何操作呢？那就找到分别戴眼镜和不戴眼镜的样本，并得到他们在编码器隐含空间中矢量之差，这就表示了眼镜这一特征。将这新的“眼镜”矢量加到任意的人脸矢量后进行解码即可得到戴眼镜的人脸。</p>
+<p><img src="http://image.rexking6.top/img/clip1557301880.png" alt=""></p>
+<h1 id="VAE升级：IWAE"><a href="#VAE升级：IWAE" class="headerlink" title="VAE升级：IWAE"></a>VAE升级：IWAE</h1><p>“重要性加权自编码器（<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1509.00519v1.pdf">Importance Weighted Autoencoders</a>）”，简写为“IWAE”，是VAE的升级版。</p>
+<p>IWAE引入了后验分布，</p>
+<script type="math/tex; mode=display">
+\int q(x|z)q(z)dz = \int p(z|x)\frac{q(x|z)q(z)}{p(z|x)}dz=\mathbb{E}_{z\sim p(z|x)}\left[\frac{q(x|z)q(z)}{p(z|x)}\right]\tag{37}</script><p>这样一来，从 $q(z)$ 采样变成了从 $p(z|x)$ 中采样。我们前面已经论述了 $p(z|x)$ 方差较小，因此采样几个点就够了：</p>
+<script type="math/tex; mode=display">
+\int q(x|z)q(z)dz = \frac{1}{k}\sum_{i=1}^k \frac{q(x|z_i)q(z_i)}{p(z_i|x)},\quad z_1,\dots,z_k\sim p(z|x)\tag{38}</script><p>代入得到</p>
+<script type="math/tex; mode=display">
+q(x|z)=\mathop{\arg\max}_{q(x|z)} \mathbb{E}_{x\sim\tilde{p}(x)}\Bigg[\ln\left(\frac{1}{k}\sum_{i=1}^k \frac{q(x|z_i)q(z_i)}{p(z_i|x)}\right)\Bigg],\quad z_1,\dots,z_k \sim p(z|x)\tag{39}</script><p>这就是IWAE。为了对齐(33)式，可以将它等价地写成</p>
+<script type="math/tex; mode=display">
+\begin{aligned}&q(x|z) = \mathop{\arg\min}_{q(x|z),p(z|x)} \mathcal{L}_k,\\ 
+\mathcal{L}_k = \mathbb{E}_{x\sim\tilde{p}(x)}\Bigg[&-\ln\left(\frac{1}{k}\sum_{i=1}^k \frac{q(x|z_i)q(z_i)}{p(z_i|x)}\right)\Bigg],\quad z_1,\dots,z_k \sim p(z|x)\end{aligned}\tag{40}</script><p>当 $k=1$ 时，上式正好跟(33)式一样，所以从这个角度来看，IWAE是VAE的升级版。</p>
+<p>从构造过程来看，在(37)式中将 $p(z|x)$ 替换为 $z$ 的任意分布都是可以的，选择 $p(z|x)$ 只是因为它有聚焦性，便于采样。而当 $k$ 足够大时，事实上 $p(z|x)$ 的具体形式已经不重要了。这也就表明，在IWAE中削弱了encoder模型$p(z|x)$ 的作用，换来了生成模型 $q(x|z)$ 的提升。因为在VAE中，我们假设 $p(z|x)$ 是正态分布，这只是一种容易算的近似，这个近似的合理性，同时也会影响生成模型 $q(x|z)$ 的质量。可以证明，$\cal L_k$ 能比 $\cal L$ 更接近下界$-\mathbb{E}_{x\sim \tilde{p}(x)} \left[\ln \tilde{p}(x)\right]$，所以生成模型的质量会更优。</p>
+<p>直觉来讲，就是在IWAE中，$p(z|x)$ 的近似程度已经不是那么重要了，所以能得到更好的生成模型。不过代价是生成模型的质量就降低了，这也是因为 $p(z|x)$ 的重要性降低了，模型就不会太集中精力训练 $p(z|x)$ 了。所以如果我们是希望获得好的encoder的话，IWAE是不可取的。</p>
+<h1 id="VAE用于降维"><a href="#VAE用于降维" class="headerlink" title="VAE用于降维"></a>VAE用于降维</h1><p>PCA、概率 PCA、AutoEncoders、变分 AutoEncoders 这四者的关系。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">降维方法</th>
+<th style="text-align:center">线性</th>
+<th style="text-align:center">非线性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">生成式</td>
+<td style="text-align:center">概率PCA</td>
+<td style="text-align:center">VAE</td>
+</tr>
+<tr>
+<td style="text-align:center">非生成式</td>
+<td style="text-align:center">PCA</td>
+<td style="text-align:center">AE</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="降维的线性方法和非线性方法"><a href="#降维的线性方法和非线性方法" class="headerlink" title="降维的线性方法和非线性方法"></a>降维的线性方法和非线性方法</h2><p>降维分为线性降维和非线性降维，这是最普遍的分类方法。 </p>
+<p>PCA 和 LDA 是最常见的线性降维方法，它们按照某种准则为数据 $\{x_i\}_{i=1}^n$ 找到一个最优投影方向 $W$ 和截距 $b$，然后做变换 $z_i=Wx_i+b$ 得到降维后的数据集 $\{z_i\}_{i=1}^n$。因为 $z_i=Wx_i+b$ 是一个线性变换（严格来说叫仿射变换，因为有截距项），所以这两种方法叫做线性降维。 </p>
+<p>非线性降维的两类代表方法是流形降维和 AutoEncoders，这两类方法也体现出了两种不同角度的“非线性”。流形方法的非线性体现在它认为数据分布在一个低维流形上，而流形本身就是非线性的，流形降维的代表方法是两篇 2000 年的 Science 论文提出的：多维放缩（multidimensional scaling，MDS）和局部线性嵌入（locally linear embedding，LLE）。不得不说实在太巧了，两种流形方法发表在同一年的 Science 上。AutoEncoders 的非线性和神经网络的非线性是一回事，都是利用堆叠非线性激活函数来近似任意函数。</p>
+<h2 id="降维的生成式方法和非生成式方法"><a href="#降维的生成式方法和非生成式方法" class="headerlink" title="降维的生成式方法和非生成式方法"></a>降维的生成式方法和非生成式方法</h2><p>降维还可以分为生成式方法（概率方法）和非生成式方法（非概率方法）。</p>
+<p>教科书对 PCA 的推导一般是基于最小化重建误差或者最大化可分性的，或者说是通过提取数据集的结构信息来建模一个约束最优化问题来推导的。事实上，PCA 还有一种概率形式的推导，那就是概率 PCA，PRML里面有对概率 PCA 的详细讲解，感兴趣的读者可以去阅读。需要注意的是，概率 PCA 不是 PCA 的变体，它就是 PCA 本身，概率 PCA 是从另一种角度来推导和理解 PCA，它把 PCA 纳入了生成式的框架。</p>
+<p>设 $\{x_i\}_{i=1}^n$ 是我们拿到的数据集，我们的目的是得到数据集中每个样本的低维表示 $\{z_i\}_{i=1}^n$，其中 $dim(z_i)&lt;dim(x_i)$。</p>
+<p>降维的非生成式方法不需要概率知识，而是直接利用数据集 $\{x_i\}_{i=1}^n$ 的结构信息建模一个最优化问题，然后求解这个问题得到 $\{x_i\}_{i=1}^n$ 对应的 $\{z_i\}_{i=1}^n$。</p>
+<p>降维的生成式方法认为数据集 $\{x_i\}_{i=1}^n$ 是对一个随机变量 $x$ 的 $n$ 次采样，而随机变量 $x$ 依赖于随机变量 $z$ ，对 $z$ 进行建模：</p>
+<script type="math/tex; mode=display">
+z\sim p_\theta(z)</script><p>再对这个依赖关系进行建模：</p>
+<script type="math/tex; mode=display">
+x|z\sim p_\theta(x|z)</script><p>有了这两个公式，我们就可以表达出随机变量 $x$ 的分布：</p>
+<script type="math/tex; mode=display">
+x\sim p_\theta(x)=\int_Zp_\theta(x|z)p_\theta(z)dz</script><p>随后我们利用数据集 $\{x_i\}_{i=1}^n$ 对分布的参数 $θ$ 进行估计，就得到分布。</p>
+<p>降维就是给定一个高维样本 $x_i$ ，给出对应的低维表示 $z_i$ ，这恰好就是 $p(z|x)$ 的含义。所以我们只要应用 Bayes 定理求出这个概率即可：</p>
+<script type="math/tex; mode=display">
+p_\theta(z|x)=\frac{p_\theta(x|z)p_\theta(z)}{\int_Zp_\theta(x|z)p_\theta(z)dz}</script><p>这样我们就可以得到每个样本点 $x_i$ 上的 $z$ 的分布 $p(z|x=x_i)$ ，可以选择这个分布的峰值点作为 $z_i$，降维就完成了。 </p>
+<blockquote>
+<p><strong>生成式方法和非生成式方法哪个好？</strong></p>
+<p>非生成式方法简单，如果只是为了对现有的数据 $\{x_i\}_{i=1}^n$ 进行降维，而没有其他需求，那么简单粗暴的非生成式方法当然是更好的选择。 而如果在需要生成新样本的情况下，生成式方法是更好的选择。</p>
+</blockquote>
+<h2 id="生成式方法的应用场景"><a href="#生成式方法的应用场景" class="headerlink" title="生成式方法的应用场景"></a>生成式方法的应用场景</h2><p>相似图片生成就是一种最常见的应用场景，现在我们考虑生成 MNIST 风格的手写体数字。假设 $x_i$ 代表一张图片， $\{x_i\}_{i=1}^n$ 是整个 MNIST 数据集，我们该怎样建模才能生成一张新图片呢？ </p>
+<p>最容易想到的方法就是：对 $\{x_i\}_{i=1}^n$ 进行 KDE（核密度估计）得到 $x$ 的分布 $p(x)$，如果顺利的话 $p(x)$ 应该是一个 10 峰分布，一个峰代表一个数字，从对应的峰中采样一个样本 $x^{new}$，它就代表了相应的数字。</p>
+<p>是不是看起来很简单，然而 $x$ 的维度太高（等于 MNIST 的分辨率，28×28=784 ），每一维中包含的信息又十分有限，直接对 $\{x_i\}_{i=1}^n$ 进行KDE完全没有可行性，所以更好的方法是先对数据集进行降维得到 $\{z_i\}_{i=1}^n$ ，然后再对   $\{z_i\}_{i=1}^n$ 进行 KDE，再从 p(z) 中采样 $z^{new}$ 并通过逆变换得到 $x^{new}$。</p>
+<p>这样做当然也是可以的，但是依然存在严重的问题。存在严重问题的步骤是KDE和采样。回想一下KDE其实是一种懒惰学习方法，每来一个样本 $x$ ，它就会计算一下这个样本和数据集中每一个样本 $x_i$ 的核距离 $k(\frac{x-x_i}{h})$，然后估计出这一点的密度。</p>
+<p>这就意味着我们需要把 $z$ 所属的空间划分成网格，估计每个网格点上的密度，才能近似得到 $p(z)$ ，计算复杂度是 $O(n\times \text{grid_scale})$，而 grid_scale 关于 $z$ 的维数是指数级的，这个计算复杂度是十分恐怖的。即使得到了近似的 $p(z)$ ，从这样一个没有解析形式的分布中采样也是很困难的，依然只能求助于网格点近似。因此，KDE和采样这两步无论是计算效率还是计算精度都十分堪忧。</p>
+<p>这时候就要求助于生成式方法了。注意到生成式方法中建模了 $p_θ(z)$ 和 $p_θ(x|z)$，一旦求出了参数 $θ$，我们就得到了变量 $z$ 的解析形式的分布。只要从 $p_θ(z)$ 中采样出一个 $z^{new}$，再取 $p_\theta(x|z=z^{new})$ 的峰值作为 $x^{new}$ ，新样本生成就完成了。 </p>
+<p>在需要生成新样本时，非生成式方法需要对 $z$ 的概率分布进行代价巨大的数值逼近，然后才能从分布中采样；生成式方法本身就对 $z$ 的概率分布进行了建模，因此可以直接从分布中进行采样。所以，在需要生成新样本时，生成式方法是更好的选择，甚至是必然的选择。</p>
+<h2 id="概率PCA和VAE"><a href="#概率PCA和VAE" class="headerlink" title="概率PCA和VAE"></a>概率PCA和VAE</h2><p>注意一些术语，编码=降维，解码=重建，原数据=观测变量，降维后的数据=隐变量。</p>
+<h3 id="PCA"><a href="#PCA" class="headerlink" title="PCA"></a>PCA</h3><p>原数据：</p>
+<script type="math/tex; mode=display">
+x_i \in R^d</script><p>编码后的数据：</p>
+<script type="math/tex; mode=display">
+z_i=W^T(x_i+b)\in R^c</script><p>解码后的数据：</p>
+<script type="math/tex; mode=display">
+\hat x_i=Wz_i-b\in R^d</script><p>重建误差：</p>
+<script type="math/tex; mode=display">
+\sum_{i=1}^n||x_i-\hat x_i||_p^p</script><p>最小化重建误差，就可以得到 $W$ 和 $b$ 的最优解和解析解，PCA 的求解就完成了。</p>
+<p>PCA 中的 $p=2$ ，即最小化二范数意义下的重建误差，如果 $p=1$ 的话我们就得到了鲁棒PCA（Robust PCA）。而最小化误差的二范数等价于对高斯噪声的MLE，最小化误差的一范数等价于对拉普拉斯噪声的MLE。</p>
+<p>因此，PCA其实是在假设存在高斯噪声的条件下对数据集进行重建，这个高斯误差就是我们将要在下面概率 PCA 一节中提到的 $ϵ$。你看，即使不是概率 PCA，其中也隐含着概率的思想。 </p>
+<p>编码和解码用到的 $W$ 和 $b$ 是一样的，即编码过程和解码过程是对称的，这一点与下面要讲的自编码器是不同的。 </p>
+<p>求解上述最优化问题可以得到 $b=-\sum_{i=1}^nx_i$，这恰好是样本均值的相反数。也就是说，PCA 中截距项的含义是让每个样本都减去样本均值，这正是“样本中心化”的含义。</p>
+<p>既然我们已经知道求出来的截距就是样本均值，所以干脆一开始就对样本进行中心化，这样在使用PCA的时候就可以忽略截距项 $b$ 而直接使用 $z_i=W^Tx_i$，变量就只剩下 $W$ 了。教科书上讲解PCA时一般都是上来就说“使用PCA之前需要进行样本中心化”，但是没有人告诉我们为什么要这样做，现在大家应该明白为什么要进行中心化了吧。</p>
+<h3 id="AutoEncoder"><a href="#AutoEncoder" class="headerlink" title="AutoEncoder"></a>AutoEncoder</h3><p>原数据：</p>
+<script type="math/tex; mode=display">
+x_i \in R^d</script><p>编码后的数据：</p>
+<script type="math/tex; mode=display">
+z_i=\sigma(W^Tx_i+b)\in R^c</script><p>解码后的数据：</p>
+<script type="math/tex; mode=display">
+\hat x_i=\hat \sigma(\hat Wz_i+\hat b)\in R^d</script><p>重建误差：</p>
+<script type="math/tex; mode=display">
+\sum_{i=1}^n||x_i-\hat x_i||_p^p</script><p>最小化重建误差，利用反向传播算法可以得到 $W,b,\hat W,\hat b$ 的局部最优解&amp;数值解，AutoEncoders 的求解完成。 </p>
+<p>这里可以使用任意范数，每一个范数都代表我们对数据的一种不同的假设。为了和 PCA 对应，我们也取 $p=2$。 </p>
+<p>$σ(·)$ 是非线性激活函数。AutoEncoder 一般都会堆叠多层，方便起见我们只写了一层。 </p>
+<p>$W$ 和 $\hat W$ 完全不是一个东西，这是因为经过非线性变换之后我们已经无法将样本再用原来的基 $W$ 进行表示了，必须要重新训练解码的基 $\hat W$ 。甚至，AutoEncoder的编码器和解码器堆叠的层数都可以不同，例如可以用 4 层来编码，用 3 层来解码。</p>
+<h3 id="概率PCA"><a href="#概率PCA" class="headerlink" title="概率PCA"></a>概率PCA</h3><p>隐变量边缘分布：</p>
+<script type="math/tex; mode=display">
+p(z)=N(z|0,I)</script><p>观测变量条件分布：</p>
+<script type="math/tex; mode=display">
+p_\theta(x|z)=N(x|f(z;\theta),\sigma^2I)</script><p>确定函数：</p>
+<script type="math/tex; mode=display">
+f(z;\theta)=Wz+\mu</script><p>$x$ 的生成过程：</p>
+<script type="math/tex; mode=display">
+x=f(z;\theta)+\epsilon</script><p>其中，$\epsilon \sim N(0,\sigma^2I)$。因为 $p(z)$ 和 $p_θ(x|z)$ 都是高斯分布，且 $p_θ(x|z)$ 的均值 $f(z;θ) = Wz+μ$ 是 $z$ 的线性函数，所以这是一个线性高斯模型。线性高斯模型有一个非常重要的性质： $p_θ(x)$ 和 $p_θ(z|x)$ 也都是高斯分布。千万不要小瞧这个性质，这个性质保证了我们能够使用极大似然估计或者EM算法来求解PCA。</p>
+<p>如果没有这个性质的话，我们就只能借助变分法（VAE采用的）或者对抗训练（GAN采用的）来近似 $p_θ(x)$ 和 $p_θ(z|x)$ 了。有了这个优秀的性质之后，我们至少有三种方法可以求解概率 PCA：</p>
+<script type="math/tex; mode=display">
+p_\theta(x)=\int_Zp(z)p_\theta(x|z)dz</script><p>是一个形式已知，仅参数未知的高斯分布，因此可以用极大似然估计来求解 $θ$。</p>
+<script type="math/tex; mode=display">
+p_\theta(z|x)=\frac{p_\theta(x|z)p_\theta(z)}{\int_Zp_\theta(x|z)p_\theta(z)dz}</script><p>也是一个形式已知，仅参数未知的高斯分布，因此可以用EM算法来求解 $θ$，顺便还能得到隐变量 $z_i$ 。 </p>
+<p>如果你足够无聊，甚至也可以引入一个变分分布 $q_\phi(z|x)$ 来求解概率 PCA，不过似乎没什么意义，也算是一种方法吧。 </p>
+<p>一旦求出了 $θ$，我们就得到了所有的四个概率：$p(z),p_\theta(x|z),p_\theta(x),p_\theta(z|x)$，有了这四个概率，我们就可以做这些事情了： </p>
+<ol>
+<li>降维：给定样本 $x_i$ ，就得到了分布 $p_θ(z|x=x_i)$ ，取这个分布的峰值点 $z_i$ 就是降维后的数据； </li>
+<li>重建：给定降维后的样本 $z_i$ ，就得到了分布 $p_θ(x|z=z_i)$，取这个分布的峰值点 $x_i$ 就是重建后的数据；</li>
+<li>生成：从分布 $p(z)$ 中采样一个 $z^{new}$ ，就得到了分布 $p_\theta(x|z=z^{new})$，取这个分布的峰值点 $x^{new}$ 就是新生成的数据； </li>
+<li>密度估计：给定样本 $x_i$ ，就得到了这一点的概率密度 $p_θ(x=x_i)$ 。 </li>
+</ol>
+<p>PCA 只能做到 1 和 2，对 3 和 4无力，这一点我们已经分析过了。</p>
+<blockquote>
+<p><strong>为什么要取高斯分布？</strong> </p>
+<p>为了求解方便，如果不取高斯分布，那么 $p_θ(x)$ 有很大的可能没有解析解，这会给求解带来很大的麻烦。还有一个原因，回想生成新样本的过程，要首先从 p(z) 中采样一个 $z^{new}$，高斯分布采样简单。</p>
+<p><strong>为什么是零均值单位方差的？</strong> </p>
+<p>完全可以取任意均值和方差，但是我们要将 $p(z)$ 和 $p_θ(x|z)$ 相乘，均值和方差部分可以挪到 $f(z;θ)$ 中，所以 $p(z)$ 的均值和方差取多少都无所谓，方便起见就取单位均值方差了。</p>
+<p><strong>$p_θ(x|z)$ 为什么选择了高斯分布呢？</strong> </p>
+<p>因为简单，和上一个问题的一样。还有一个直觉的解释是 $p_θ(x|z)$ 认为 $x$ 是由 $f(z:θ)$ 和噪声 $ϵ$ 加和而成的，如果 $ϵ$ 是高斯分布的话，恰好和 PCA 的二范数重建误差相对应，这也算是一个佐证吧。</p>
+<p><strong>$p_θ(x|z)$ 的方差为什么选择了各向同性的 $\sigma^2I$ 而不是更一般的 $∑$ 呢？</strong></p>
+<p>方差可以选择一般的 $∑$ ，但是 $d^2$ 个参数一定会给求解带来困难，所导出的方法虽然也是线性降维，但它已经不是 PCA 了，而是另外的方法（我也不知道是什么方法）。方差也可以选择成一个的各向异性的对角阵 λ，这样只有 $d$ 个参数，事实上这就是因子分析，另一种线性降维方法。只有当方差选择成各向同性的对角阵 $\sigma^2I$ 时，导出来的方法才叫主成分分析，这个地方 PRML 里有介绍。</p>
+</blockquote>
+<h3 id="变分AutoEncoder"><a href="#变分AutoEncoder" class="headerlink" title="变分AutoEncoder"></a>变分AutoEncoder</h3><p>隐变量边缘分布：</p>
+<script type="math/tex; mode=display">
+p(z)=N(z|0,I)</script><p>观测变量条件分布：</p>
+<script type="math/tex; mode=display">
+p_\theta(x|z)=N(x|f(z;\theta),\sigma^2I)</script><p>确定函数：</p>
+<script type="math/tex; mode=display">
+f(z;\theta)=\sigma(Wz+\mu)</script><p>$x$ 的生成过程：</p>
+<script type="math/tex; mode=display">
+x=f(z;\theta)+\epsilon</script><p>其中，$\epsilon \sim N(0,\sigma^2I)$。因为 $f(z;θ)$ 是 $z$ 的非线性函数，所以这不再是一个线性高斯模型。</p>
+<p>通过之前说的VAE理论推导，能够求出：$p(z),p_\theta(x|z),q_\phi(z|x)$，注意因为 $p_θ(x)$ 和 $p_θ(z|x)$ 没有解析形式，所以即使求出了 $θ$ 我们也无法获得这两个概率。但是，$q_\phi(z|x)$ 就是 $p_θ(z|x)$ 的近似，所以需要用 $p_θ(z|x)$ 的地方都可以用 $q_\phi(z|x)$ 代替。</p>
+<p>有了这三个概率，我们就可以做这些事情了： </p>
+<ol>
+<li>降维：给定样本 $x_i$ ，就得到了分布 $p_θ(z|x=x_i)$ ，取这个分布的峰值点 $z_i$ 就是降维后的数据； </li>
+<li>重建：给定降维后的样本 $z_i$ ，就得到了分布 $p_θ(x|z=z_i)$，取这个分布的峰值点 $x_i$ 就是重建后的数据；</li>
+<li>生成：从分布 $p(z)$ 中采样一个 $z^{new}$ ，就得到了分布 $p_\theta(x|z=z^{new})$，取这个分布的峰值点 $x^{new}$ 就是新生成的数据。</li>
+</ol>
+<p>与概率 PCA 不同的是，这里无法解析地得到 $p_θ(x_i)$，进行密度估计需要进行另外的设计，通过采样得到，计算代价还是比较大的，具体步骤VAE的原文中有介绍。AutoEncoder只能做到 1 和 2，对 3 无力。</p>
+<h2 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h2><ol>
+<li>从PCA和AutoEncoder可以看出，PCA 实际上就是线性Autoencoder。两者无论是编码解码形式还是重建误差形式都完全一致，只有是否线性的区别。线性与否给优化求解带来了不同性质：PCA 可以直接得到最优的解析解，而AutoEncoder只能通过反向传播得到局部最优的数值解。</li>
+</ol>
+<ol>
+<li><p>从概率PCA和VAE可以看出，概率PCA和VAE的唯一区别就是 $f(z;θ)$ 是否是 $z$ 的线性函数，但是这个区别给优化求解带来了巨大的影响。在概率PCA中，$f(z;θ)$ 是线性的，所以我们得到了一个线性高斯模型，线性高斯模型的优秀性质是牵扯到的4个概率都是高斯分布，所以我们可以直接给出边缘分布和编码分布的解析形式，极大似然估计和 EM 算法都可以使用，一切处理都非常方便。</p>
+<p>在VAE中，$f(z;θ)$ 是非线性的，所以边缘分布 $p_\theta(x)=\int_Zp(z)p_\theta(x|z)dz$ 不再有解析形式，极大似然估计无法使用；编码分布 $p_\theta(z|x)=p_\theta(x,z)/p_\theta(x)$ 也不再有解析形式，EM算法无法使用，只能求助于变分推断，得到编码分布的近似 $q_\phi(z|x)$，再利用别的技巧得到边缘分布 $p_θ(x)$ 的估计。 </p>
+</li>
+</ol>
+<ol>
+<li>从PCA和概率PCA可以看出，PCA和概率PCA中 $x$ 都是 $z$ 的线性函数，只不过概率PCA显式地把高斯噪声 $ϵ$ 写在了表达式中；PCA 没有显式写出噪声，而是把高斯噪声隐含在了二范数重建误差中。 </li>
+</ol>
+<ol>
+<li><p>从AE和VAE这两节可以看出，AE和VAE的最重要的区别在于VAE迫使隐变量 $z$ 满足高斯分布 $p(z)=N(z|0,I)$，而AE对 $z$ 的分布没有做任何假设。</p>
+<p>这个区别使得在生成新样本时，AE需要先数值拟合 $p(z)$ ，才能生成符合数据集分布的隐变量，而VAE直接从 $N(z|0,I)$ 中采样一个 $z$ ，它天然就符合数据集分布。 </p>
+</li>
+</ol>
+<ol>
+<li>PCA求解简单，但是都是线性降维，提取信息的能力有限；非线性的 AE 提取信息的能力强，但是求解复杂。要根据不同的场景选择不同的降维算法。 </li>
+</ol>
+<h1 id="VAE用于聚类"><a href="#VAE用于聚类" class="headerlink" title="VAE用于聚类"></a>VAE用于聚类</h1><p>在图像领域中，由于 VAE 生成的图片偏模糊，因此大家通常更关心 VAE 作为图像特征提取器的作用。提取特征都是为了下一步的任务准备的，而下一步的任务可能有很多，比如分类、聚类等。</p>
+<p>一般来说，用 AE 或者 VAE 做聚类都是分步来进行的，即先训练一个普通的 VAE，然后得到原始数据的隐变量，接着对隐变量做一个 k-means 或 GMM 之类的。但是这样的思路的整体感显然不够，而且聚类方法的选择也让我们纠结。</p>
+<p>VAE 的一个“一步到位”聚类思路，它同时允许我们完成无监督地完成聚类和条件生成。</p>
+<p>我们将隐变量定为 $(z,y)$，其中 $z$ 是一个连续变量，代表编码向量；$y$ 是离散的变量，代表类别。直接把 (16) 中的 $z$ 替换为 $(z,y)$，就得到：</p>
+<script type="math/tex; mode=display">
+KL(p(x,z,y)||q(x,z,y))=\sum_y \iint p(z,y|x)\tilde p(x)\ln \frac{p(z,y|x)\tilde p(x)}{q(x|z,y)q(z,y)}dzdx\tag{41}</script><p>这就是用来做聚类的 VAE 的 loss 了。</p>
+<h2 id="分步假设"><a href="#分步假设" class="headerlink" title="分步假设"></a>分步假设</h2><p>落实到实践中，(41) 可以有很多不同的实践方案，这里介绍比较简单的一种。首先我们要明确，在 (41) 中，我们只知道 $\tilde p(x)$（通过一批数据给出的经验分布），其他都是没有明确下来的。于是为了求解 (41)，我们需要设定一些形式。一种选取方案为：</p>
+<script type="math/tex; mode=display">
+p(z,y|x)=p(y|z)p(z|x),\ q(x|z,y)=q(x|z),\ q(z,y)=q(z|y)q(y)</script><p>代入 (41) 中得到：</p>
+<script type="math/tex; mode=display">
+KL(p(x,z,y)||q(x,z,y))=\sum_y \iint p(y|z)p(z|x)\tilde p(x)\ln \frac{p(y|z)p(z|x)\tilde p(x)}{q(x|z)q(z|y)q(y)}dzdx\tag{42}</script><p>其实 (42) 式还是相当直观的，它分布描述了编码和生成过程：</p>
+<ol>
+<li><p>从原始数据中采样到 $x$，然后通过 $p(z|x)$ 可以得到编码特征 $z$，然后通过分类器 $p(y|z)$ 对编码特征进行分类，从而得到类别；</p>
+</li>
+<li><p>从分布 $q(y)$ 中选取一个类别 $y$，然后从分布 $q(z|y)$ 中选取一个随机隐变量 $z$，再通过生成器 $q(x|z)$ 解码为原始样本。</p>
+</li>
+</ol>
+<h2 id="具体模型"><a href="#具体模型" class="headerlink" title="具体模型"></a>具体模型</h2><p>(42) 式其实已经很具体了，我们只需要沿用以往VAE的做法：$p(z|x)$ 一般假设为均值为 $\mu(x)$，方差为 $\sigma^2(x)$ 的正态分布，$q(x|z)$ 一般假设为均值为 $G(z)$，方差为常数的正态分布（等价于用MSE作为损失），$q(z|y)$ 可以假设为均值为 $\mu_y$，方差为1的正态分布，至于剩下的 $q(y),p(y|z)$，$q(y)$ 可以假设为均匀分布（它就是个常数），也就是希望每个类大致均衡，而 $p(y|z)$ 是对隐变量的分类器，随便用个softmax的网络就可以拟合了。</p>
+<p>最后，可以形象地将 (42) 改写为：</p>
+<script type="math/tex; mode=display">
+\mathbb E_{x\sim \tilde p(x)}\left[-\log q(x|z)+\sum_y p(y|z)KL(p(z|x)||q(z|y))+KL(p(y|z)||q(y))\right],\ z\sim p(z|x)</script><p>其中，$z\sim p(z|x)$ 是重参数操作，而方括号中地三项损失，各有各的含义：</p>
+<ol>
+<li>$-\log q(x|z)$ 希望重构误差越小越好，也就是 $z$ 尽量保留完整地信息；</li>
+<li>$\sum_yp(y|z)KL(p(z|x)||q(z|y))$ 希望 $z$ 能尽量对其某个类别的“专属”的正态分布，就是这一步起到聚类的作用；</li>
+<li>$KL(p(y|z)||q(y))$ 希望每个类的分布尽量均匀，不会发生两个几乎重合的情况（坍缩为一个类）。当然，有时候可能不需要这个先验要求，那就可以去掉这一项。</li>
+</ol>
+<p>相比普通的 VAE 改动不大。可能稍微有难度的是 $\sum_yp(y|z)KL(p(z|x)||q(z|y))$，这个怎么实现。因为 $y$ 是离散的，所以事实上这就是一个矩阵乘法（相乘然后对某个公共变量求和，就是矩阵乘法的一般形式）。</p>
+<p>详细代码见<a target="_blank" rel="noopener" href="https://github.com/bojone/vae/blob/master/vae_keras_cluster.py">vae_keras_cluster.py</a>。</p>
+<h1 id="与GAN相比"><a href="#与GAN相比" class="headerlink" title="与GAN相比"></a>与GAN相比</h1><p><img src="http://image.rexking6.top/img/clip1557208949.png" alt=""></p>
+<p>两者相比：</p>
+<ul>
+<li>VAE<ul>
+<li>优点：<ul>
+<li>通过编码解码的步骤，直接比较重建图片和原始图片的差异，GAN做不到。 </li>
+<li>VAE是explict density，它对潜变量的分布显式建模，我们训练完VAE后能够通过输出图片的编码过程得到这种类型图片的编码之后的分布，相当于我们是知道每种图片对应的噪声分布，我们就能够通过选择特定的噪声来生成我们想要生成的图片。</li>
+<li>VAE则是一个概率模型，中间向量 $z$ 是在原始数据 $X$ 的基础上引入概率模型后生成的，并不是随机产生的。</li>
+<li>VAE能学到原始数据一个隐式表示，也就是向量 $z$，而GAN不能。</li>
+</ul>
+</li>
+<li>缺点：<ul>
+<li>直接计算生成图片和原始图片的均方误差而不是像GAN那样去对抗来学习，这就使得生成的图片会有点模糊。现在已经有一些工作是将VAE和GAN结合起来，使用VAE的结构，但是使用对抗网络来进行训练，具体可以参考一下<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1512.09300.pdf">这篇论文</a>。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>GAN<ul>
+<li>优点：<ul>
+<li>能从随机噪声开始生成出高质量的图片，也就是说 $z$ 是随机初始化的。</li>
+</ul>
+</li>
+<li>缺点：<ul>
+<li>只能判断生成的图像是不是一个真的图像，但不知道生成的是什么的图像，很有可能生成一个看起来像是真实图像却没有意义的图片。</li>
+<li>GAN是implicit density，意思是它对潜变量的分布隐式建模，即每次用来训练的噪声向量都是随机的高斯噪声，无法生成任意我们指定类型的图片，除非我们能够把初始分布全部试一遍。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\03\21\Fisher线性判别\" rel="bookmark">Fisher线性判别</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\02\13\cs229中文笔记-一二\" rel="bookmark">cs229中文笔记(一二)</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\02\18\cs229中文笔记-七\" rel="bookmark">cs229中文笔记(七)</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2019/06/09/%E5%8F%98%E5%88%86%E8%87%AA%E7%BC%96%E7%A0%81%E5%99%A8VAE/" title="变分自编码器VAE">https://blog.rexking6.top/2019/06/09/变分自编码器VAE/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/05/30/%E5%8F%98%E5%88%86%E6%8E%A8%E7%90%86/" rel="prev" title="变分推理">
+      <i class="fa fa-chevron-left"></i> 变分推理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/06/12/VS-Code%E6%8F%92%E4%BB%B6%E3%80%81%E8%AE%BE%E7%BD%AE%E5%92%8C%E5%BF%AB%E6%8D%B7%E9%94%AE/" rel="next" title="VS Code插件、设置和快捷键">
+      VS Code插件、设置和快捷键 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%87%AA%E7%BC%96%E7%A0%81%E5%99%A8%E5%8F%8A%E5%B8%B8%E8%A7%81%E6%9E%B6%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">自编码器及常见架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AC%A0%E5%AE%8C%E5%A4%87%E7%9A%84%E8%87%AA%E7%BC%96%E7%A0%81%E5%99%A8"><span class="nav-number">1.1.</span> <span class="nav-text">欠完备的自编码器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%80%E7%96%8F%E8%87%AA%E7%BC%96%E7%A0%81%E5%99%A8"><span class="nav-number">1.2.</span> <span class="nav-text">稀疏自编码器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%8D%E5%99%AA%E8%87%AA%E7%BC%96%E7%A0%81%E5%99%A8"><span class="nav-number">1.3.</span> <span class="nav-text">降噪自编码器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%8B%E7%BC%A9%E8%87%AA%E7%BC%96%E7%A0%81%E5%99%A8"><span class="nav-number">1.4.</span> <span class="nav-text">压缩自编码器</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%98%E5%88%86%E8%87%AA%E7%BC%96%E7%A0%81%E5%99%A8"><span class="nav-number">2.</span> <span class="nav-text">变分自编码器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#VAE%E6%BC%AB%E8%B0%88"><span class="nav-number">2.1.</span> <span class="nav-text">VAE漫谈</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%8F%E5%85%B8%E5%9B%9E%E9%A1%BE"><span class="nav-number">2.1.1.</span> <span class="nav-text">经典回顾</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VAE%E5%88%9D%E7%8E%B0"><span class="nav-number">2.1.2.</span> <span class="nav-text">VAE初现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E6%A0%87%E5%87%86%E5%8C%96"><span class="nav-number">2.1.3.</span> <span class="nav-text">分布标准化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8E%A8%E5%AF%BC"><span class="nav-number">2.1.3.1.</span> <span class="nav-text">推导</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E5%8F%82%E6%95%B0%E6%8A%80%E5%B7%A7"><span class="nav-number">2.1.4.</span> <span class="nav-text">重参数技巧</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E7%BB%AD%E5%88%86%E6%9E%90"><span class="nav-number">2.2.</span> <span class="nav-text">后续分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E8%B4%A8%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">2.2.1.</span> <span class="nav-text">本质是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83%EF%BC%9F"><span class="nav-number">2.2.2.</span> <span class="nav-text">正态分布？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E5%88%86%E5%9C%A8%E5%93%AA%E9%87%8C"><span class="nav-number">2.2.3.</span> <span class="nav-text">变分在哪里</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6VAE"><span class="nav-number">2.2.4.</span> <span class="nav-text">条件VAE</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%90%86%E8%AE%BA%E6%A1%86%E6%9E%B6%E5%87%86%E5%A4%87"><span class="nav-number">2.3.</span> <span class="nav-text">理论框架准备</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E5%80%BC%E8%AE%A1%E7%AE%97vs%E9%87%87%E6%A0%B7%E8%AE%A1%E7%AE%97"><span class="nav-number">2.3.1.</span> <span class="nav-text">数值计算vs采样计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#KL%E6%95%A3%E5%BA%A6%E5%8F%8A%E5%8F%98%E5%88%86"><span class="nav-number">2.3.2.</span> <span class="nav-text">KL散度及变分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%A6%E5%8F%B7%E8%A1%A8"><span class="nav-number">2.3.3.</span> <span class="nav-text">符号表</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%90%86%E8%AE%BA%E6%A1%86%E6%9E%B6"><span class="nav-number">2.4.</span> <span class="nav-text">理论框架</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B4%E9%9D%A2%E8%81%94%E5%90%88%E5%88%86%E5%B8%83"><span class="nav-number">2.4.1.</span> <span class="nav-text">直面联合分布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A8%E5%87%BAVAE"><span class="nav-number">2.4.2.</span> <span class="nav-text">推出VAE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E8%83%BD%E6%90%9E%E5%88%86%E8%A3%82"><span class="nav-number">2.4.3.</span> <span class="nav-text">不能搞分裂</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%90%86%E8%AE%BA%E8%90%BD%E5%AE%9E"><span class="nav-number">2.5.</span> <span class="nav-text">理论落实</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%8E%E9%AA%8C%E5%88%86%E5%B8%83%E8%BF%91%E4%BC%BC"><span class="nav-number">2.5.1.</span> <span class="nav-text">后验分布近似</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E6%A8%A1%E5%9E%8B%E8%BF%91%E4%BC%BC"><span class="nav-number">2.5.2.</span> <span class="nav-text">生成模型近似</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%AF%E5%8A%AA%E5%88%A9%E5%88%86%E5%B8%83%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.5.2.1.</span> <span class="nav-text">伯努利分布模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.5.2.2.</span> <span class="nav-text">正态分布模型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%87%E6%A0%B7%E8%AE%A1%E7%AE%97%E6%8A%80%E5%B7%A7"><span class="nav-number">2.5.3.</span> <span class="nav-text">采样计算技巧</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%96%91%E9%97%AE%EF%BC%9A%E9%87%87%E6%A0%B7"><span class="nav-number">2.6.</span> <span class="nav-text">疑问：采样</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%87%E6%A0%B7%E4%B8%80%E4%B8%AA%E7%82%B9%E5%B0%B1%E5%A4%9F"><span class="nav-number">2.6.1.</span> <span class="nav-text">采样一个点就够</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%80%E4%B8%AA%E7%82%B9%E5%B0%B1%E5%A4%9F%EF%BC%9F"><span class="nav-number">2.6.2.</span> <span class="nav-text">为什么一个点就够？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E7%82%B9%E7%A1%AE%E5%AE%9E%E5%A4%9F%E4%BA%86"><span class="nav-number">2.6.3.</span> <span class="nav-text">一个点确实够了</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%96%91%E9%97%AE%EF%BC%9A%E7%94%9F%E6%88%90"><span class="nav-number">2.7.</span> <span class="nav-text">疑问：生成</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#VAE%E5%8D%87%E7%BA%A7%EF%BC%9AIWAE"><span class="nav-number">3.</span> <span class="nav-text">VAE升级：IWAE</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#VAE%E7%94%A8%E4%BA%8E%E9%99%8D%E7%BB%B4"><span class="nav-number">4.</span> <span class="nav-text">VAE用于降维</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%8D%E7%BB%B4%E7%9A%84%E7%BA%BF%E6%80%A7%E6%96%B9%E6%B3%95%E5%92%8C%E9%9D%9E%E7%BA%BF%E6%80%A7%E6%96%B9%E6%B3%95"><span class="nav-number">4.1.</span> <span class="nav-text">降维的线性方法和非线性方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%8D%E7%BB%B4%E7%9A%84%E7%94%9F%E6%88%90%E5%BC%8F%E6%96%B9%E6%B3%95%E5%92%8C%E9%9D%9E%E7%94%9F%E6%88%90%E5%BC%8F%E6%96%B9%E6%B3%95"><span class="nav-number">4.2.</span> <span class="nav-text">降维的生成式方法和非生成式方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E5%BC%8F%E6%96%B9%E6%B3%95%E7%9A%84%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">4.3.</span> <span class="nav-text">生成式方法的应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E7%8E%87PCA%E5%92%8CVAE"><span class="nav-number">4.4.</span> <span class="nav-text">概率PCA和VAE</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PCA"><span class="nav-number">4.4.1.</span> <span class="nav-text">PCA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AutoEncoder"><span class="nav-number">4.4.2.</span> <span class="nav-text">AutoEncoder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E7%8E%87PCA"><span class="nav-number">4.4.3.</span> <span class="nav-text">概率PCA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E5%88%86AutoEncoder"><span class="nav-number">4.4.4.</span> <span class="nav-text">变分AutoEncoder</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E6%AF%94"><span class="nav-number">4.5.</span> <span class="nav-text">对比</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#VAE%E7%94%A8%E4%BA%8E%E8%81%9A%E7%B1%BB"><span class="nav-number">5.</span> <span class="nav-text">VAE用于聚类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%AD%A5%E5%81%87%E8%AE%BE"><span class="nav-number">5.1.</span> <span class="nav-text">分步假设</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.2.</span> <span class="nav-text">具体模型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%8EGAN%E7%9B%B8%E6%AF%94"><span class="nav-number">6.</span> <span class="nav-text">与GAN相比</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

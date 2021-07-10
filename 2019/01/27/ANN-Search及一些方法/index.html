@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ANN Search及一些方法">
+<meta property="og:url" content="https://blog.rexking6.top/2019/01/27/ANN-Search%E5%8F%8A%E4%B8%80%E4%BA%9B%E6%96%B9%E6%B3%95/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1548592972.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1548595512.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1548598660.png">
+<meta property="article:published_time" content="2019-01-27T11:46:22.000Z">
+<meta property="article:modified_time" content="2019-03-06T10:14:42.016Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="图像检索">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1548592972.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2019/01/27/ANN-Search%E5%8F%8A%E4%B8%80%E4%BA%9B%E6%96%B9%E6%B3%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>ANN Search及一些方法 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2019/01/27/ANN-Search%E5%8F%8A%E4%B8%80%E4%BA%9B%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ANN Search及一些方法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-01-27 19:46:22" itemprop="dateCreated datePublished" datetime="2019-01-27T19:46:22+08:00">2019-01-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 18:14:42" itemprop="dateModified" datetime="2019-03-06T18:14:42+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%9B%BE%E5%83%8F%E6%A3%80%E7%B4%A2/" itemprop="url" rel="index"><span itemprop="name">图像检索</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2019/01/27/ANN-Search%E5%8F%8A%E4%B8%80%E4%BA%9B%E6%96%B9%E6%B3%95/" class="post-meta-item leancloud_visitors" data-flag-title="ANN Search及一些方法" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>11k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>10 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>综合转载以下文章：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://yongyuan.name/blog/ann-search.html">图像检索：再叙ANN Search</a></li>
+<li><a target="_blank" rel="noopener" href="http://yongyuan.name/blog/opq-and-hnsw.html">图像检索：OPQ索引与HNSW索引</a></li>
+</ul>
+<p>在具体到不同类的索引方法分类前，从宏观上对ANN有下面的认知显得很有必要：<strong>brute-force搜索的方式是在全空间进行搜索，为了加快查找的速度，几乎所有的ANN方法都是通过对全空间分割，将其分割成很多小的子空间，在搜索的时候，通过某种方式，快速锁定在某一（几）子空间，然后在该（几个）子空间里做遍历</strong>。可以看到，正是因为缩减了遍历的空间大小范围，从而使得ANN能够处理大规模数据的索引。</p>
+<p>可以将ANN的方法分为三大类：基于树的方法、哈希方法、矢量量化方法、基于图的方法。</p>
+<p>关于索引结构，有千千万万，而在图像检索领域，索引主要是为特征索引而设计的一种数据结构。关于ANN搜索领域的学术研究，<a target="_blank" rel="noopener" href="https://www.itu.dk/people/pagh/">Rasmus Pagh</a>发起的大规模相似搜索项目<a target="_blank" rel="noopener" href="http://sss.projects.itu.dk/ann-benchmarks/">ANN-Benchmarks</a>、<a target="_blank" rel="noopener" href="https://github.com/facebookresearch/faiss">Faiss</a>以及<a target="_blank" rel="noopener" href="https://github.com/erikbern/ann-benchmarks">ann-benchmarks</a>都有对一些主流的方法做过对比。虽然三个对比的框架对不同方法的性能均有出入，但一些主流方法的性能差异是可以达成共识的，比如基于图方法的ANN其召回率均要优于其他方法。在工业上，常用的索引方法主要以倒排、<a target="_blank" rel="noopener" href="http://yongyuan.name/blog/ann-search.html">PQ及其变种</a>、基于树的方法（比如KD树）和<a target="_blank" rel="noopener" href="https://github.com/willard-yuan/hashing-baseline-for-image-retrieval">哈希</a>（典型代表LSH和<a target="_blank" rel="noopener" href="http://yongyuan.name/blog/itq-hashing.html">ITQ</a>）为主流。</p>
+<p>首先从检索的召回率上来评估，基于图的索引方法要优于目前其他一些主流ANN搜索方法，比如乘积量化方法（PQ、OPQ）、哈希方法等。虽然乘积量化方法的召回率不如HNSW（基于图的代表方法），但由于乘积量化方法具备内存耗用更小、数据动态增删更灵活等特性，使得在工业检索系统中，在对召回率要求不是特别高的场景下，乘积量化方法仍然是使用得较多的一种索引方法，淘宝（详见<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1707.00143">Fast Approximate Nearest Neighbor Search With The Navigating Spreading-out Graph</a>）、蘑菇街等公司均有使用。乘积量化和HNSW特性对比如下：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>OPQ</th>
+<th>HNSW</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>内存占用</td>
+<td>小</td>
+<td>大</td>
+</tr>
+<tr>
+<td>召回率</td>
+<td>较高</td>
+<td>高</td>
+</tr>
+<tr>
+<td>数据动态增删</td>
+<td>灵活</td>
+<td>不易</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>基于图ANN方法由于数据在插入索引的时候，需要计算（部分）数据间的近邻关系，因而需要实时获取到到数据的原始特征，几乎所有基于图ANN的方法在处理该问题的时候，都是直接将原始特征加载在内存（索引）里，从而造成对内存使用过大，至于召回率图ANN方法要比基于量化的方法要高，这个理解起来比较直观。</p>
+<h1 id="基于树的方法"><a href="#基于树的方法" class="headerlink" title="基于树的方法"></a>基于树的方法</h1><p>几乎所有的ANN方法都是对全空间的划分，所以基于树的方法也不例外。基于树的方法采用<strong>树</strong>这种数据结构的方法来表达对全空间的划分，其中又以KD树最为经典，而KD树之前写过了，下面对Annoy](<a target="_blank" rel="noopener" href="https://github.com/spotify/annoy)进行简单介绍。">https://github.com/spotify/annoy)进行简单介绍。</a></p>
+<h2 id="Annoy"><a href="#Annoy" class="headerlink" title="Annoy"></a>Annoy</h2><p>Annoy是<a target="_blank" rel="noopener" href="https://github.com/erikbern">Erik Bernhardsson</a>写的一个以树为数据结构的近似最近邻搜索库，并用在<a target="_blank" rel="noopener" href="https://www.spotify.com/">Spotify</a>的推荐系统中。Annoy的核心是不断用选取的两个质心的法平面对空间进行分割，最终将每一个区分的子空间里面的样本数据限制在 $K$ 以内。对于待插入的样本 $x_i$，从根节点依次使用法向量跟 $x_i$ 做内积运算，从而判断使用法平面的哪一边（左子树or右子树）。对于查询向量 $q_i$，采用同样的方式（在树结构上体现为从根节点向叶子节点递归遍历），即可定位到跟 $q_i$ 在同一个子空间或者邻近的子空间的样本，这些样本即为 $q_i$ 近邻。</p>
+<p>为了提高查询的召回，Annoy采用建立多棵树的方式，这种做法是一种非常常见的做法，比如NV-tree也采用这种方式，哈希方法采用多表的哈希方法。</p>
+<p>值得注意的是，Annoy如果不保存原始特征，则Annoy只能返回查询的 $k$ 个近邻，至于这 $k$ 个里面的排序顺序是怎么样的，它是不知道的，如果需要知道，需要对这 $k$ 个返回的结果，获取原始特征，再计算各自的相似度，排序一下即可得到这 $k$ 个结果的排序。</p>
+<p>根据Annoy的定义的节点数据结构，如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ANNOY_NODE_ATTRIBUTE</span> <span class="title">Node</span> &#123;</span></span><br><span class="line">S n_descendants;</span><br><span class="line"><span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">  S children[<span class="number">2</span>]; <span class="comment">// Will possibly store more than 2</span></span><br><span class="line">  T norm;</span><br><span class="line">&#125;;</span><br><span class="line">T dot_factor;</span><br><span class="line">T v[<span class="number">1</span>]; <span class="comment">// We let this one overflow intentionally. Need to allocate at least 1 to make GCC happy</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>其中<code>T v[1]</code>保存原始特征，保存原始的特征的坏处是造成占用内存过大，索引文件过大。</p>
+<h1 id="哈希方法"><a href="#哈希方法" class="headerlink" title="哈希方法"></a>哈希方法</h1><p>哈希，顾名思义，就是将连续的实值散列化为0、1的离散值。在散列化的过程中，对散列化函数(也就是哈希函数)有一定的要求。根据学习的策略，可以将哈希方法分为无监督、有监督和半监督三种类型。在评估某种哈希方法用于图像检索的检索精度时，可以使用knn得到的近邻作为ground truth，也可以使用样本自身的类别作为ground truth。所以在实际评估准确度的时候，根据ground truth的定义，这里面是有一点小的trick的。通常对于无监督的哈希图像检索方法，由于我们使用的都是未标记的数据样本，所以我们会很自然的采用knn得到的近邻作为ground truth，但是对于图像检索的这一任务时，在对哈希函数的构造过程中，通常会有“相似的样本经编码后距离尽可能的近，不相似的样本编码后则尽可能的远”这一基本要求，这里讲到的相似，指语义的相似，因而你会发现，编码的基本要求放在无监督哈希方法里，似乎与采用knn得到的近邻作为ground truth的评价方式有些南辕北辙。对无监督哈希方法的ground truth一点小的疑惑在原作者读书的时候就心存这样的困惑，一直悬而未解。当然，在做无监督的图像哈希方法，采用样本自身的类别作为ground truth是毋庸置疑的。</p>
+<p>原作者读书那会儿，研究了很多的哈希图像检索方法（见<a target="_blank" rel="noopener" href="https://github.com/willard-yuan/hashing-baseline-for-image-retrieval">hashing-baseline-for-image-retrieval</a>），有时候总会给一些工程实践上的错觉（在今天看来是这样的），即新论文里的方法远远碾压经典的方法，那是不是在实际中这些方法就很work很好使。实践的经历告诉小白菜，还是经典的东西更靠谱，不是因为新的方法不好，而是新的事物需要经过时间的沉淀与优化。</p>
+<h2 id="局部敏感哈希-LSH"><a href="#局部敏感哈希-LSH" class="headerlink" title="局部敏感哈希 LSH"></a>局部敏感哈希 LSH</h2><p>之前博客写过LSH了，这里主要是原作者的作为补充。</p>
+<p><strong>为什么要用多表哈希？</strong></p>
+<p>对于单表哈希，当我们的哈希函数数目 $K$ 取得太大，查询样本与其对应的最近邻落入同一个桶中的可能性会变得很微弱，针对这个问题，我们可以重复这个过程 $L$ 次，从而增加最近邻的召回率。这个重复 $L$ 次的过程，可以转化为构建 $L$ 个哈希表，这样在给定查询样本时，我们可以找到 $L$ 个哈希桶（每个表找到一个哈希桶），然后我们在这 $L$ 个哈希表中进行遍历。这个过程相当于构建了 $K\ast L$个哈希函数（注意是“相当”，不要做“等价”理解）。</p>
+<p><strong>多表哈希中哈希函数数目K和哈希表数目L如何选取？</strong></p>
+<p>哈希函数数目 $K$ 如果设置得过小，会导致每一个哈希桶中容纳了太多的数据点，从而增加了查询响应的时间；而当 $K$ 设置得过大时，会使得落入每个哈希桶中的数据点变小，而为了增加召回率，我们需要增加 $L$ 以便构建更多的哈希表，但是哈希表数目的增加会导致更多的内存消耗，并且也使得我们需要计算更多的哈希函数，同样会增加查询相应时间。这听起来非常的不妙，但是在 $K$ 过大或过小之间仍然可以找到一个比较合理的折中位置。通过选取合理的 $K$ 和 $L$，我们可以获得比线性扫描极大的性能提升。</p>
+<p><strong>Multiprobe LSH是为了解决什么问题？</strong></p>
+<p>多probe LSH主要是为了提高查找准确率而引入的一种策略。首先解释一下什么是Multiprobe。对于构建的 $L$ 个哈希表，我们在每一个哈希表中找到查询样本落入的哈希桶，然后再在这个哈希桶中做遍历，而Multiprobe指的是我们不止在查询样本所在的哈希桶中遍历，还会找到其他的一些哈希桶，然后这些找到的 $T$ 个哈希桶中进行遍历。这些其他哈希桶的选取准则是：跟查询样本所在的哈希桶邻近的哈希桶，“邻近”指的是汉明距离度量下的邻近。</p>
+<p>通常，如果不使用Multiprobe，我们需要的哈希表数目 $L$ 在100到1000之间，在处理大数据集的时候，其空间的消耗会非常的高，幸运地是，因为有了上面的Multiprobe的策略，LSH在任意一个哈希表中查找到最近邻的概率变得更高，从而使得我们能到减少哈希表的构建数目。</p>
+<p>综上，对于LSH，涉及到的主要的参数有三个：</p>
+<ul>
+<li>$K$，每一个哈希表的哈希函数（空间划分）数目</li>
+<li>$L$，哈希表（每一个哈希表有 $K$ 个哈希函数）的数目</li>
+<li>$T$，近邻哈希桶的数目，即the number of probes</li>
+</ul>
+<p>这三个设置参数可以按照如下顺序进行：首先，根据可使用的内存大小选取 $L$，然后在 $K$ 和 $T$ 之间做出折中：哈希函数数目 $K$ 越大，相应地，近邻哈希桶的数目的数目 $T$ 也应该设置得比较大，反之 $K$ 越小，$L$ 也可以相应的减小。获取 $K$ 和 $L$ 最优值的方式可以按照如下方式进行：对于每个固定的 $K$，如果在查询样本集上获得了我们想要的精度，则此时 $T$ 的值即为合理的值。在对 $T$ 进行调参的时候，我们不需要重新构建哈希表，甚至我们还可以采用二分搜索的方式来加快 $T$ 参数的选取过程。</p>
+<h3 id="LSH开源工具包"><a href="#LSH开源工具包" class="headerlink" title="LSH开源工具包"></a>LSH开源工具包</h3><p>关于LSH开源工具库，有很多，这里推荐两个LSH开源工具包：<a target="_blank" rel="noopener" href="https://github.com/kayzhu/LSHash">LSHash</a>和<a target="_blank" rel="noopener" href="https://falconn-lib.org/">FALCONN</a>, 分别对应于学习和应用场景。</p>
+<h4 id="LSHash"><a href="#LSHash" class="headerlink" title="LSHash"></a>LSHash</h4><p><a target="_blank" rel="noopener" href="https://github.com/kayzhu/LSHash">LSHash</a>非常适合用来学习，里面实现的是最经典的LSH方法，并且还是单表哈希。哈希函数的系数采用随机的方式生成，具体代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_generate_uniform_planes</span>(<span class="params">self</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot; Generate uniformly distributed hyperplanes and return it as a 2D</span></span><br><span class="line"><span class="string">    numpy array.</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> np.random.randn(self.hash_size, self.input_dim)</span><br></pre></td></tr></table></figure>
+<p><code>hash_size</code>为哈希函数的数目，即前面介绍的K。整个框架，不论是LSH的哈希函数的生成方式，还是LSH做查询，都极其的中规中矩，所以用来作为了解LSH的过程，再适合不过。如果要在实用中使用LSH，可以使用<a target="_blank" rel="noopener" href="https://falconn-lib.org/">FALCONN</a>。</p>
+<h4 id="FALCONN"><a href="#FALCONN" class="headerlink" title="FALCONN"></a>FALCONN</h4><p><a target="_blank" rel="noopener" href="https://falconn-lib.org/">FALCONN</a>是经过了极致优化的LSH，其对应的论文为NIPS 2015 <a target="_blank" rel="noopener" href="https://people.csail.mit.edu/ludwigs/papers/nips15_crosspolytopelsh.pdf">Practical and Optimal LSH for Angular Distance</a>，<a target="_blank" rel="noopener" href="https://people.csail.mit.edu/indyk/">Piotr Indyk</a>系作者之一（Piotr Indyk不知道是谁？<a target="_blank" rel="noopener" href="http://web.mit.edu/andoni/www/LSH/index.html">E2LSH</a>这个页面对于看过LSH的应该非常眼熟吧），论文有些晦涩难懂，不过FALCONN工具包却是极其容易使用的，提供有C++使用的例子<a target="_blank" rel="noopener" href="https://github.com/FALCONN-LIB/FALCONN/blob/master/src/benchmark/random_benchmark.cc">random_benchmark.cc</a>以及Python的例子<a target="_blank" rel="noopener" href="https://github.com/FALCONN-LIB/FALCONN/blob/master/src/python/benchmark/random_benchmark.py">random_benchmark.py</a>，另外文档非常的详实，具体可参阅<a target="_blank" rel="noopener" href="https://falconn-lib.org/docs/namespacefalconn.html">falconn Namespace Reference</a>和<a target="_blank" rel="noopener" href="https://falconn-lib.org/pdoc/falconn/">falconn module</a>。下面将其Python例子和C++例子中初始化索引以及构建哈希表的部分提取出来，对其中的参数做一下简要的分析。</p>
+<p>Python初始化与构建索引<a target="_blank" rel="noopener" href="https://github.com/FALCONN-LIB/FALCONN/blob/master/src/python/benchmark/random_benchmark.py#L127">L127</a>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Hyperplane hashing</span></span><br><span class="line">params_hp = falconn.LSHConstructionParameters()</span><br><span class="line">params_hp.dimension = d</span><br><span class="line">params_hp.lsh_family = <span class="string">&#x27;hyperplane&#x27;</span></span><br><span class="line">params_hp.distance_function = <span class="string">&#x27;negative_inner_product&#x27;</span></span><br><span class="line">params_hp.storage_hash_table = <span class="string">&#x27;flat_hash_table&#x27;</span></span><br><span class="line">params_hp.k = <span class="number">19</span></span><br><span class="line">params_hp.l = <span class="number">10</span></span><br><span class="line">params_hp.num_setup_threads = <span class="number">0</span></span><br><span class="line">params_hp.seed = seed ^ <span class="number">833840234</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;Hyperplane hash\n&#x27;</span>)</span><br><span class="line"></span><br><span class="line">start = timeit.default_timer()</span><br><span class="line">hp_table = falconn.LSHIndex(params_hp)</span><br><span class="line">hp_table.setup(data)</span><br><span class="line">hp_table.set_num_probes(<span class="number">2464</span>)</span><br></pre></td></tr></table></figure>
+<p>C++初始化与构建索引<a target="_blank" rel="noopener" href="https://github.com/FALCONN-LIB/FALCONN/blob/master/src/benchmark/random_benchmark.cc#L194">L194</a>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// Hyperplane hashing</span><br><span class="line">LSHConstructionParameters params_hp;</span><br><span class="line">params_hp.dimension = d;</span><br><span class="line">params_hp.lsh_family = LSHFamily::Hyperplane;</span><br><span class="line">params_hp.distance_function = distance_function;</span><br><span class="line">params_hp.storage_hash_table = storage_hash_table;</span><br><span class="line">params_hp.k = <span class="number">19</span>;</span><br><span class="line">params_hp.l = num_tables;</span><br><span class="line">params_hp.num_setup_threads = num_setup_threads;</span><br><span class="line">params_hp.seed = seed ^ <span class="number">833840234</span>;</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; <span class="string">&quot;Hyperplane hash&quot;</span> &lt;&lt; endl &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">Timer hp_construction;</span><br><span class="line"></span><br><span class="line">unique_ptr&lt;LSHNearestNeighborTable&lt;Vec&gt;&gt; hptable(</span><br><span class="line">    std::move(construct_table&lt;Vec&gt;(data, params_hp)));</span><br><span class="line">hptable-&gt;set_num_probes(<span class="number">2464</span>);</span><br></pre></td></tr></table></figure>
+<p>可以看到，有3个很重要的参数，分别是<code>k</code>、<code>l</code>和<code>set_num_probes</code>，对应的具体意义前面已经解释，这里不再赘述。</p>
+<p>FALCONN的索引构建过程非常快，百万量级的数据，维度如果是128维，其构建索引时间大概2-3min的样子，实时搜索可以做到几毫秒的响应时间。总之，这是原作者见过的构建索引时间最短查询响应时间也极快的ANN工具库。</p>
+<p>另外谈一下数据规模问题。对于小数据集和中型规模的数据集(几个million-几十个million)， FALCONN和<a target="_blank" rel="noopener" href="https://github.com/searchivarius/nmslib">NMSLIB</a>是一个非常不错的选择，如果对于大型规模数据集(几百个million以上)，基于矢量量化的<a target="_blank" rel="noopener" href="https://github.com/facebookresearch/faiss/">Faiss</a>是一个明智的选择。关于这方面的讨论，可以参阅原作者参阅的讨论<a target="_blank" rel="noopener" href="https://github.com/facebookresearch/faiss/issues/23">benchmark</a>。</p>
+<p>当然，FALCONN还不是很完善，比如对于数据的动态增删目前还不支持，具体的讨论可以参见<a target="_blank" rel="noopener" href="https://github.com/FALCONN-LIB/FALCONN/issues/2">Add a dynamic LSH table</a>。其实这不是FALCONN独有的问题，NMSLIB目前也不支持。一般而言，动态的增删在实际应用场合是一个基本的要求，但是我们应注意到，增删并不是毫无限制的，在增删频繁且持续了一段时间后，这是的数据分布已经不是我们原来建索引的数据分布形式了，我们应该重新构建索引。在这一点上，Faiss支持数据的动态增删。</p>
+<h1 id="矢量量化方法"><a href="#矢量量化方法" class="headerlink" title="矢量量化方法"></a>矢量量化方法</h1><p>矢量量化方法，即vector quantization，其具体定义为：<a target="_blank" rel="noopener" href="http://blog.pluskid.org/?p=57">将一个向量空间中的点用其中的一个有限子集来进行编码的过程</a>。在矢量量化编码中，<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E7%9F%A2%E9%87%8F%E9%87%8F%E5%8C%96">关键是码本的建立和码字搜索算法</a>。比如常见的聚类算法，就是一种矢量量化方法。而在ANN近似最近邻搜索中，向量量化方法又以乘积量化（PQ, Product Quantization）最为典型。在之前的博文<a target="_blank" rel="noopener" href="http://yongyuan.name/blog/cbir-technique-summary.html">基于内容的图像检索技术</a>的最后，对PQ乘积量化的方法做过简单的概要。在这一小节里，原作者结合自己阅读的论文和代码对倒排乘积量化（IVFPQ）和优化乘积量化（OPQ）做一种更加直观的解释。</p>
+<h2 id="倒排乘积量化"><a href="#倒排乘积量化" class="headerlink" title="倒排乘积量化"></a>倒排乘积量化</h2><p>倒排PQ乘积量化（IVFPQ）是PQ乘积量化的更进一步加速版。其加速的本质逃不开原作者在最前面强调的是加速原理：<strong>brute-force搜索的方式是在全空间进行搜索，为了加快查找的速度，几乎所有的ANN方法都是通过对全空间分割，将其分割成很多小的子空间，在搜索的时候，通过某种方式，快速锁定在某一（几）子空间，然后在该（几个）子空间里做遍历</strong>。在上一小节可以看出，PQ乘积量化计算距离的时候，距离虽然已经预先算好了，但是对于每个样本到查询样本的距离，还是得老老实实挨个去求和相加计算距离。但是，实际上我们感兴趣的是那些跟查询样本相近的样本（原作者称这样的区域为感兴趣区域），也就是说老老实实挨个相加其实做了很多的无用功，如果能够通过某种手段快速将全局遍历锁定为感兴趣区域，则可以舍去不必要的全局计算以及排序。倒排PQ乘积量化的”倒排“，正是这样一种思想的体现，在具体实施手段上，采用的是通过聚类的方式实现感兴趣区域的快速定位，在倒排PQ乘积量化中，聚类可以说应用得淋漓尽致。</p>
+<p>倒排PQ乘积量化整个过程如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1548592972.png" alt=""></p>
+<p>在PQ乘积量化之前，增加了一个粗量化过程。具体地，先对 $N$ 个训练样本采用K-Means进行聚类，这里聚类的数目一般设置得不应过大，一般设置为1024差不多，这种可以以比较快的速度完成聚类过程。得到了聚类中心后，针对每一个样本 $x_i$，找到其距离最近的类中心 $c_i$ 后，两者相减得到样本 $x_i$ 的残差向量 $(x_i-c_i)$，后面剩下的过程，就是针对 $(x_i-c_i)$ 的PQ乘积量化过程，此过程不再赘述。</p>
+<p>在查询的时候，通过相同的粗量化，可以快速定位到查询向量属于哪个 $c_i$（即在哪一个感兴趣区域），然后在该感兴趣区域按上面所述的PQ乘积量化距离计算方式计算距离。</p>
+<h2 id="OPQ"><a href="#OPQ" class="headerlink" title="OPQ"></a>OPQ</h2><p>OPQ是PQ的一种改进方法。</p>
+<p>通常，用于检索的原始特征维度较高，所以实际在使用PQ等方法构建索引的时候，常会对高维的特征使用PCA等降维方法对特征先做降维处理，这样降维预处理，可以达到两个目的：一是降低特征维度；二是在对向量进行子段切分的时候要求特征各个维度是不相关的，做完PCA之后，可以一定程度缓解这个问题。但是这么做了后，在切分子段的时候，采用顺序切分子段仍然存在一定的问题，这个问题可以借用<a target="_blank" rel="noopener" href="http://yongyuan.name/blog/itq-hashing.html">ITQ</a>中的一个二维平面的例子加以说明：</p>
+<p><img src="http://image.rexking6.top/img/clip1548595512.png" alt=""></p>
+<p>如上面左图（a图）所示，对于PCA降维后的二维空间，假设在做PQ的时候，将子段数目设置为2段，即切分成 $x$ 和 $y$ 两个子向量，然后分别在 $x$ 和 $y$ 上做聚类（假设聚类中心设置为2）。对左图（a图）和右图（c图）聚类的结果进行比较，可以明显的发现，左图在y方向上聚类的效果明显差于右图，而PQ又是采用聚类中心来近似原始向量（这里指降维后的向量），也就是右图是我们需要的结果。这个问题可以转化为数据方差来描述：<strong>在做PQ编码时，对于切分的各个子空间，我们应尽可能使得各个子空间的方差比较接近，最理想的情况是各个子空间的方差都相等</strong>。上图左图中，xx和yy各个方向的方差明显是差得比较大的，而对于右图，xx和yy方向各个方向的方差差不多是比较接近的。</p>
+<p>为了在切分子段的时候，使得各个子空间的方差尽可能的一致，<a target="_blank" rel="noopener" href="https://research.fb.com/people/jegou-herve/">Herve Jegou</a>在<a target="_blank" rel="noopener" href="https://lear.inrialpes.fr/pubs/2010/JDSP10/jegou_compactimagerepresentation.pdf">Aggregating local descriptors into a compact image representation</a>中提出使用一个正交矩阵来对PCA降维后的数据再做一次变换，使得各个子空间的方差尽可能的一致。其对应的待优化目标函数见论文的第5页，由于优化该目标函数极其困难，Herve Jegou使用了Householder矩阵来得到该正交矩阵，但是得到的该正交矩阵并不能很好的均衡子空间的方差。</p>
+<p>OPQ致力于解决的问题正是对各个子空间方差的均衡。具体到方法上，OPQ借鉴了ITQ的思想，在聚类的时候对聚类中心寻找对应的最优旋转矩阵，使得所有子空间中各个数据点到对应子空间的类中心的L2损失的求和最小。</p>
+<p>OPQ在具体求解的时候，分为非参求解方法和带参求解方法，具体为：</p>
+<ul>
+<li>非参求解方法。跟ITQ的求解过程一样。</li>
+<li>带参求解方法。带参求解方法假设数据服从高斯分布，在此条件下，最终可以将求解过程简化为数据经过PCA分解后，特征值如何分组的问题。在实际中，该解法更具备高实用性。</li>
+</ul>
+<h1 id="基于图的方法"><a href="#基于图的方法" class="headerlink" title="基于图的方法"></a>基于图的方法</h1><h2 id="HNSW"><a href="#HNSW" class="headerlink" title="HNSW"></a>HNSW</h2><p>HNSW是Yury A. Malkov提出的一种基于图索引的方法，它是Yury A. Malkov在他本人之前工作NSW上一种改进，通过采用层状结构，将边按特征半径进行分层，使每个顶点在所有层中平均度数变为常数，从而将NSW的计算复杂度由多重对数（Polylogarithmic）复杂度降到了对数（logarithmic）复杂度。</p>
+<h3 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h3><ul>
+<li>图输入节点明确的选择</li>
+<li>使用不同尺度划分链接</li>
+<li>使用启发式方式来选择最近邻</li>
+</ul>
+<h3 id="近邻图技术"><a href="#近邻图技术" class="headerlink" title="近邻图技术"></a>近邻图技术</h3><p>对于给定的近邻图，在开始搜索的时候，从若干输入点（随机选取或分割算法）开始迭代遍历整个近邻图。</p>
+<p>在每一次横向迭代的时候，算法会检查链接或当前base节点之间的距离，然后选择下一个base节点作为相邻节点，使得能最好的最小化连接间的距离。</p>
+<p>近邻图主要的缺陷：1. 在路由阶段，如果随机从一个或者固定的阶段开始，迭代的步数会随着库的大小增长呈现幂次增加；2. 当使用k-NN图的时候，一个全局连接可能的损失会导致很差的搜索结果。</p>
+<h3 id="算法描述"><a href="#算法描述" class="headerlink" title="算法描述"></a>算法描述</h3><p>网络图以连续插入的方式构建。对于每一个要插入的元素，采用指数衰变概率分布函数来随机选取整数最大层。</p>
+<p><img src="http://image.rexking6.top/img/clip1548598660.png" alt=""></p>
+<ul>
+<li>图构建元素插入过程（Algorithm 1）：从顶层开始贪心遍历graph，以便在某层A中找到最近邻。当在A层找到局部最小值之后，再将A层中找到的最近邻作为输入点（entry point），继续在下一层中寻找最近邻，重复该过程；</li>
+<li>层内最近邻查找（Algorithm 2）：贪心搜索的改进版本；</li>
+<li>在搜索阶段，维护一个动态列表，用于保持 <code>ef​</code> 个找到的最近邻元素</li>
+</ul>
+<p>在搜索的初步阶段，<code>ef​</code>参数设置为1。搜索过程包括zoom out和zoom in两个阶段，zoom out是远程路由，zoom in顾名思义就是在定位的区域做精细的搜索过程。整个过程可以类比在地图上寻找某个位置的过程：我们可以地球当做最顶层，五大洲作为第二层，国家作为第三层，省份作为第四层……，现在如果要找海淀五道口，我们可以通过顶层以逐步递减的特性半径对其进行路由（第一层地球-&gt;第二层亚洲—&gt;第三层中国-&gt;第四层北京-&gt;海淀区），到了第0层后，再在局部区域做更精细的搜索。</p>
+<h3 id="参数说明"><a href="#参数说明" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>efConstruction</code>​：设置得越大，构建图的质量越高，搜索的精度越高，但同时索引的时间变长，推荐范围100-2000</li>
+<li><code>efSearch​</code>：设置得越大，召回率越高，但同时查询的响应时间变长，推荐范围100-2000，在HNSW，参数<code>ef</code>是​<code>efSearch​</code>的缩写</li>
+<li><code>M​</code>：在一定访问内，设置得越大，召回率增加，查询响应时间变短，但同时<code>M​</code>增大会导致索引时间增加，推荐范围5-100</li>
+</ul>
+<p>HNSW L2space返回的top@K，是距离最小的K个结果，但是在结果表示的时候，距离是从大到小排序的，所以top@K距离是最小的，top@K-1距离是次之，top@1是距离第K大的。只是结果在表示上逆序了而已，不影响最终的结果。如果要按正常的从小到大来排序，则对top@K的结果做个逆序即可。作者在python的接口里，实现了这种逆序，具体见<a target="_blank" rel="noopener" href="https://github.com/nmslib/hnsw/blob/master/python_bindings/bindings.cpp#L287">bindings.cpp#L287</a>，所以python的结果和c++的结果，是逆序的差异。</p>
+<h3 id="参数详细意义"><a href="#参数详细意义" class="headerlink" title="参数详细意义"></a>参数详细意义</h3><ul>
+<li><code>M</code>：参数 <code>M</code> 定义了第0层以及其他层近邻数目，不过实际在处理的时候，第0层设置的近邻数目是 <code>2M</code>​。如果要更改第0层以及其他层层近邻数目，在HNSW的源码中进行更改即可。另外需要注意的是，第0层包含了所有的数据点，其他层数据数目由参数mult定义，详细的细节可以参考HNSW论文。</li>
+<li><code>delaunay_type</code>：检索速度和索引速度可以通过该参数来均衡heuristic。HNSW默认<code>delaunay_type</code>为1，将<code>delaunay_type</code>设置为1可以提高更高的召回率(&gt; 80%)，但同时会使得索引时间变长。因此，对于召回率要求不高的场景，推荐将<code>delaunay_type</code>设置为0。</li>
+<li><code>post</code>：post定义了在构建图的时候，对数据所做预处理的数量（以及类型），默认参数设置为0，表示不对数据做预处理，该参数可以设置为1和2（2表示会做更多的后处理）。</li>
+</ul>
+<p>更详细的参数说明，可以参考<a target="_blank" rel="noopener" href="https://github.com/nmslib/nmslib/blob/9ed3071d0a74156a9559f3347ee751922e4b06e7/python_bindings/parameters.md">parameters说明</a>。</p>
+<h3 id="原作者总结"><a href="#原作者总结" class="headerlink" title="原作者总结"></a>原作者总结</h3><p>以基于PQ的量化方法在工业界最为实用，基于图的ANN方法，在规模不是特别大但对召回要求非常高的检索场景下，是非常适用的。除此之外，图ANN方法可以和OPQ结合起来适用，来提高OPQ的召回能力，具体可以阅读<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1802.02422">Revisiting the Inverted Indices for Billion-Scale Approximate Nearest Neighbors</a>和<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1804.09996">Link and code: Fast indexing with graphs and compact regression codes</a>这两篇文章。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>原作者总结了很多。</p>
+<p>下面是自己的思考：基于图的方法的突出优点是召回率高，在一开始有三个缺点，分别为速度慢、数据动态增删困难、内存占用大。这几年，速度通过很多方法已经有很大提高。而数据动态增删困难主要是因为，插入删除数据后，需要重新构建近邻图。赵老师去年解决了该问题。</p>
+<blockquote>
+<p>Zhao W L . k-NN Graph Construction: a Generic Online Approach[J]. 2018.</p>
+</blockquote>
+<p>所以，目前基于图的方法主要在于内存占用大的缺点，其实问题主要在于为了高召回率，将原数据读到内存中，PQ利用的是聚类中心来粗表示数据点。如果能够利用类似倒排PQ的思想，先用 k-means 粗聚类之后再用爬山算法，可能能够减少内存占用大的问题。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\24\Bag-of-visual-word视觉词袋\" rel="bookmark">Bag-of-visual word视觉词袋</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\10\12\Fisher-Kernel-Fisher-Vector\" rel="bookmark">Fisher Kernel&Fisher Vector</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\28\Geometric-Verification几何验证\" rel="bookmark">Geometric Verification几何验证</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2019/01/27/ANN-Search%E5%8F%8A%E4%B8%80%E4%BA%9B%E6%96%B9%E6%B3%95/" title="ANN Search及一些方法">https://blog.rexking6.top/2019/01/27/ANN-Search及一些方法/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%9B%BE%E5%83%8F%E6%A3%80%E7%B4%A2/" rel="tag"># 图像检索</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/01/27/CMake-%E5%85%A5%E9%97%A8%E5%AE%9E%E6%88%98/" rel="prev" title="CMake 入门实战">
+      <i class="fa fa-chevron-left"></i> CMake 入门实战
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/01/27/%E5%A4%A7%E6%95%B0%E6%8D%AE%E8%BF%91%E4%BC%BC%E6%9C%80%E8%BF%91%E9%82%BB%E6%90%9C%E7%B4%A2%E5%93%88%E5%B8%8C%E6%96%B9%E6%B3%95%E7%BB%BC%E8%BF%B0/" rel="next" title="大数据近似最近邻搜索哈希方法综述">
+      大数据近似最近邻搜索哈希方法综述 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E6%A0%91%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">基于树的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Annoy"><span class="nav-number">2.1.</span> <span class="nav-text">Annoy</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">哈希方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E6%95%8F%E6%84%9F%E5%93%88%E5%B8%8C-LSH"><span class="nav-number">3.1.</span> <span class="nav-text">局部敏感哈希 LSH</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LSH%E5%BC%80%E6%BA%90%E5%B7%A5%E5%85%B7%E5%8C%85"><span class="nav-number">3.1.1.</span> <span class="nav-text">LSH开源工具包</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#LSHash"><span class="nav-number">3.1.1.1.</span> <span class="nav-text">LSHash</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FALCONN"><span class="nav-number">3.1.1.2.</span> <span class="nav-text">FALCONN</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9F%A2%E9%87%8F%E9%87%8F%E5%8C%96%E6%96%B9%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">矢量量化方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%80%92%E6%8E%92%E4%B9%98%E7%A7%AF%E9%87%8F%E5%8C%96"><span class="nav-number">4.1.</span> <span class="nav-text">倒排乘积量化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OPQ"><span class="nav-number">4.2.</span> <span class="nav-text">OPQ</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">基于图的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#HNSW"><span class="nav-number">5.1.</span> <span class="nav-text">HNSW</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%A1%E7%8C%AE"><span class="nav-number">5.1.1.</span> <span class="nav-text">贡献</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%91%E9%82%BB%E5%9B%BE%E6%8A%80%E6%9C%AF"><span class="nav-number">5.1.2.</span> <span class="nav-text">近邻图技术</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E6%8F%8F%E8%BF%B0"><span class="nav-number">5.1.3.</span> <span class="nav-text">算法描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E"><span class="nav-number">5.1.4.</span> <span class="nav-text">参数说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E8%AF%A6%E7%BB%86%E6%84%8F%E4%B9%89"><span class="nav-number">5.1.5.</span> <span class="nav-text">参数详细意义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E4%BD%9C%E8%80%85%E6%80%BB%E7%BB%93"><span class="nav-number">5.1.6.</span> <span class="nav-text">原作者总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

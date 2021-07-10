@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="变分推断（Variational Inference）最新进展简述">
+<meta property="og:url" content="https://blog.rexking6.top/2020/02/13/%E5%8F%98%E5%88%86%E6%8E%A8%E6%96%AD%EF%BC%88Variational-Inference%EF%BC%89%E6%9C%80%E6%96%B0%E8%BF%9B%E5%B1%95%E7%AE%80%E8%BF%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1581515931.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1581517869.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1581517903.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1581521098.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1581521348.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1581521364.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1581521374.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1581578532.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1581578632.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1581578656.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1581578881.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1581579382.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1581586669.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1581587924.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1581588076.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1581588230.png">
+<meta property="article:published_time" content="2020-02-13T04:51:44.000Z">
+<meta property="article:modified_time" content="2020-02-13T13:28:21.929Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1581515931.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2020/02/13/%E5%8F%98%E5%88%86%E6%8E%A8%E6%96%AD%EF%BC%88Variational-Inference%EF%BC%89%E6%9C%80%E6%96%B0%E8%BF%9B%E5%B1%95%E7%AE%80%E8%BF%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>变分推断（Variational Inference）最新进展简述 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2020/02/13/%E5%8F%98%E5%88%86%E6%8E%A8%E6%96%AD%EF%BC%88Variational-Inference%EF%BC%89%E6%9C%80%E6%96%B0%E8%BF%9B%E5%B1%95%E7%AE%80%E8%BF%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          变分推断（Variational Inference）最新进展简述
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-02-13 12:51:44 / 修改时间：21:28:21" itemprop="dateCreated datePublished" datetime="2020-02-13T12:51:44+08:00">2020-02-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2020/02/13/%E5%8F%98%E5%88%86%E6%8E%A8%E6%96%AD%EF%BC%88Variational-Inference%EF%BC%89%E6%9C%80%E6%96%B0%E8%BF%9B%E5%B1%95%E7%AE%80%E8%BF%B0/" class="post-meta-item leancloud_visitors" data-flag-title="变分推断（Variational Inference）最新进展简述" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>14k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>12 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载自<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzIwMTc4ODE0Mw==&amp;mid=2247500416&amp;idx=1&amp;sn=49dd53d44fce1235f1c7d1b9b8e39a83">变分推断（Variational Inference）最新进展简述</a></p>
+<h1 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h1><p>变分推断（Variational Inference, VI）是贝叶斯近似推断方法中的一大类方法，将后验推断问题巧妙地转化为优化问题进行求解，相比另一大类方法马尔可夫链蒙特卡洛方法（Markov Chain Monte Carlo, MCMC），VI 具有更好的收敛性和可扩展性（scalability），更适合求解大规模近似推断问题。</p>
+<p>当前机器学习两大热门研究方向：深度隐变量模型（Deep Latent Variable Model, DLVM）和深度神经网络模型的预测不确定性（Predictive Uncertainty）的计算求解都依赖于 VI，尤其是 Scalable VI。</p>
+<p>其中，DLVM 的一个典型代表是变分自编码器（Variational Autoencoder, VAE），是一种主流的深度生成模型，广泛应用于图像、语音甚至是文本的生成任务上；而预测不确定性的典型代表是贝叶斯神经网络（Bayesian Neural Network, BNN）。</p>
+<p>当前 DNN 的一大缺陷是预测“过于自信”，“不知道自己不知道什么”，对于安全性要求很高的任务来说，难以胜任，而 BNN 不仅给出预测值，而且给出预测的不确定性，从而使得模型“知道自己不知道什么”，BNN 广泛应用于探索与利用（Exploration &amp; Exploitation, EE）问题（比如：主动学习、贝叶斯优化、Bandit 问题）和分布外样本检测问题（比如：异常检测、对抗样本检测）等。</p>
+<h1 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h1><p>考虑一个一般性的问题， $x$ 是 $n$ 维的观测变量，$z$ 是 $m$ 维的隐变量，贝叶斯模型中需要计算后验分布，如下：</p>
+<script type="math/tex; mode=display">
+p(z|x)=\frac{p(z)p(x|z)}{p(x)} \tag 1</script><p>其中，$p(z)$ 是先验分布，$p(x|z)$ 是似然函数， $p(x)=∫p(z)p(x|z)$，称为 evidence，通常 $p(x)$ 是一个不可积的多重积分，导致后验分布 $p(z|x)$ 无法获得解析解，同时因为 $p(x)$ 只与确定的观测变量有关，在计算时可认为是一个常数。</p>
+<p>VI 假设后验分布用一个变分分布 $q(z;θ)$ 来近似，通过构造如下优化问题：</p>
+<script type="math/tex; mode=display">
+\min _{\theta} K L(q(z ; \theta) \| p(z | x ; \phi))\tag 2</script><p>来求解使得两个分布距离最小的变分分布参数 $θ$，从而得到近似后验分布。</p>
+<p>因为真实后验分布是未知的，直接优化公式（2）是一件比较有挑战的事情，VI 巧妙地将其转化为优化 ELBO 的问题。推导过程如下：</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}
+{K L(q(z ; \theta) \| p(z | x ; \phi))} \\
+{=\int q(z ; \theta) \log \frac{q(z ; \theta)}{p(z | x ; \phi)}} \\
+{=E_{q(z ; \theta)} \log \frac{q(z ; \theta)}{p(z | x ; \phi)}} \\
+{=E_{q(z ; \theta)} \log \frac{q(z ; \theta)p(x)}{p(z | x ; \phi)p(x)}} \\
+{=E_{q(z ; \theta)} \log \frac{q(z ; \theta)p(x)}{p(x,z)}} \\
+{=E_{q(z; \theta)} \log \frac{q(z ; \theta)}{p(x,z)}+E_{q(z|x; \theta)} \log p(x)} \\
+{=E_{q(z; \theta)} \log \frac{q(z ; \theta)}{p(x,z)}+\log p(x)} \\
+{=-E L B O(x ; \theta , \phi)+\log p(x)}
+\end{array}\tag 3</script><p>等号两边移动一下可得： </p>
+<script type="math/tex; mode=display">
+\log p(x)=E L B O(x ; \theta , \phi)+K L(q(z ; \theta) \| p(z | x ; \phi)) \geq E L B O(x ; \theta , \phi)\tag 4</script><p>由 KL Divergence 的定义可知， $KL(q(z;θ)||p(z|x;\phi))≥0$，同时 $\log p(x;\phi)$ 是个常数，所以求优化问题（2）等价于求如下优化问题：</p>
+<script type="math/tex; mode=display">
+\max _{\theta} E L B O(x ; \theta, \phi)\tag 5</script><p>这里的目标函数 ELBO 称为 Evidence Lower BOund (ELBO)，继续推导如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+&E L B O(x ; \theta, \phi)\\
+&=-E_{q(z ; \theta)} \log \frac{q(z ; \theta)}{p(x, z)}\\
+&=E_{q(z ; \theta)} \log \frac{p(x | z ; \phi) p(z)}{q(z ; \theta)}\\
+&=E_{q(z ; \theta)}\left[\log p(x | z ; \phi)+\log \frac{p(z)}{q(z ; \theta)}\right]
+\end{aligned}\tag 6</script><p>ELBO 的形式推导可由 Jensen 不等式直接推导出，如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\log p(x)&=\log \int p(x, z) d z \\
+&=\log \int \frac{p(x, z) q(z ; \theta)}{q(z ; \theta)} d z \\
+&=\log E_{q(z; \theta)} \left[\frac{p(x, z)}{q(z ; \theta)}\right] \\
+&\geq E_{q(z ; \theta)}\left[\log \frac{p(x, z)}{q(z ; \theta)}\right]\\
+&=E L B O(x ; \theta, \phi)
+\end{aligned}\tag 7</script><p>公式（6）和公式（7）是一致的，所以求变分后验分布与真实后验分布 KL Divergence 的最小化等价于求 ELBO 的最大化，而 ELBO 的具体形式如（6）（7）所示，进一步整理可得：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+&E L B O(x ; \theta, \phi)=E_{q(z ; \theta)}\left[\log \frac{p(x, z)}{q(z ; \theta)}\right]\\
+&=E_{q(z ; \theta)}[\log p(x | z ; \phi)]-K L(q(z ; \theta) \| p(z))
+\end{aligned}\tag 8</script><p>其中第一项可以理解为基于变分后验分布的重建似然函数，第二项是变分后验分布与先验分布的 KL Divergence。</p>
+<p>ELBO 的形式推导是 VI 的基础，也是后续各种VI 方法的前提，大多数 VI 方法都旨在解决高效求解 ELBO 优化的问题。从 ELBO 的形式可以看出，待优化的目标函数是一个函数的期望，如何高效估计出目标的梯度是解决问题的关键。本文将从最经典的 MFVI 讲起，然后依次从几个改进角度来综述 VI 的研究进展。</p>
+<h1 id="Mean-Field-VI-MFVI"><a href="#Mean-Field-VI-MFVI" class="headerlink" title="Mean Field VI (MFVI)"></a>Mean Field VI (MFVI)</h1><p>MFVI 最早应用于统计物理，假设变分后验分布是一种完全可分解的分布，如下式： </p>
+<script type="math/tex; mode=display">
+q(z ; \theta)=\prod_{j=1}^{m} q_{j}\left(z_{j}\right)\tag 9</script><p>将公式（9）代入公式（7），同时只考虑第 $j$ 个分布，可得：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+E L B O(j)&= E_{q_{j}} E_{q_{-j}}\left[\log p\left(x, z_{j} | z_{-j}\right)+\log p\left(z_{-j}\right)\right]-E_{q_{j}} E_{q_{-j}}\left[\log q_{j}+\log q_{-j}\right] \\
+&=E_{q_{j}} E_{q_{-j}}\left[\log p\left(x, z_{j} | z_{-j}\right)\right]-E_{q_{j}}\left[\log q_{j}\right]+\text { const }_{j}
+\end{aligned}\tag {10}</script><p>其中，$z_{-j}$ 是指除掉第 $j$ 项的所有项，$\text{const}_j$ 是指与第 $j$ 项无关的常数项。 </p>
+<p>公式（10）可以看作是一个负 KL Divergence 项，为使得 $ELBO(j)$ 最大，所以负 KL Divergence 为 0， 可得到：</p>
+<script type="math/tex; mode=display">
+\log q_{j}^{\star}=E_{q_{-j}}\left[\log p\left(z_{j} | x, z_{-j}\right)\right]+\text { const }\tag {11}</script><p>进一步整理得到：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+q_{j}^{\star} & \propto \exp \left[E_{q_{-j}}\left[\log p\left(z_{j} | x, z_{-j}\right)\right]\right] \\
+& \propto \exp \left[E_{q_{-j}}[\log p(x, z)]\right]
+\end{aligned}\tag{12}</script><p>可以利用坐标上升法（Coordinate Ascent, CAVI）来迭代求解该优化问题，具体算法参见下图：</p>
+<p><img src="http://image.rexking6.top/img/clip1581515931.png" alt=""></p>
+<h1 id="改进MFVI的几个角度"><a href="#改进MFVI的几个角度" class="headerlink" title="改进MFVI的几个角度"></a>改进MFVI的几个角度</h1><h2 id="如何更好地度量变分后验分布和真实后验分布之间的差异？"><a href="#如何更好地度量变分后验分布和真实后验分布之间的差异？" class="headerlink" title="如何更好地度量变分后验分布和真实后验分布之间的差异？"></a>如何更好地度量变分后验分布和真实后验分布之间的差异？</h2><p>从公式（2）的目标函数可以看出，VI 将近似推断问题转化为了优化问题，使用的是最基础的分布距离度量方法 KL Divergence，因为 KL Divergence 是一个非对称的度量方法，即 $KL(q||p)≠KL(p||q)$ ， 因此这里存在几个值得深入研究的点。</p>
+<ul>
+<li>是否可以用 $KL(p||q)$ 来度量变分后验分布和真实后验分布的距离？</li>
+<li>是否可以用其他度量方法来度量两者之间的距离？</li>
+</ul>
+<p>本小节中的 Expectation Propagation 旨在回答第一个问题，f-Divergence 和 Stein Disparency 旨在回答第二个问题。</p>
+<h3 id="Expectation-Propagation"><a href="#Expectation-Propagation" class="headerlink" title="Expectation Propagation"></a>Expectation Propagation</h3><p>从广义上讲，凡是基于一个分布簇进行优化参数来逼近真实后验分布的，都可以归为 VI 方法；从狭义上讲，本文开始定义的问题和思路是最经典的 VI 方法。EP 将公式（2）的目标函数更改如下：</p>
+<script type="math/tex; mode=display">
+\min _{\theta} K L(p(z | x ; \phi) \| q(z ; \theta))\tag{13}</script><p>EP 也是一个非常活跃的研究领域，由于本文旨在介绍狭义的 VI 方法，因此对 EP 不作详细介绍，感兴趣的同学可以去看<a target="_blank" rel="noopener" href="https://tminka.github.io/papers/ep/roadmap.html">这个页面的内容</a>。</p>
+<h3 id="α-Divergence"><a href="#α-Divergence" class="headerlink" title="α-Divergence"></a>α-Divergence</h3><p>KL Divergence 是一种特殊的 α-Divergence，一种常见的 Renyi 定义如下：</p>
+<script type="math/tex; mode=display">
+D_{\alpha}^{R}(p \| q)=\frac{1}{\alpha-1} \log \int p(x)^{\alpha} q(x)^{1-\alpha} d x\tag{14}</script><p>同时要求，$α&gt;0,α\neq1,|D_α|&lt;+∞$。</p>
+<p><img src="http://image.rexking6.top/img/clip1581517869.png" alt=""></p>
+<p><em>图：Renyi α-Divergence的几种特殊形式</em></p>
+<p>而 α Divergence 是一种特殊的 $f$ Divergence，形式如下：</p>
+<script type="math/tex; mode=display">
+D_{f}(p \| q)=\int q(x) f\left(\frac{p(x)}{q(x)}\right) d x\tag{15}</script><p>同时要求 $f$ 是凸函数，且 $f(1)=0$ 。</p>
+<p>除了 Renyi 的定义，还有很多不同的定义，有的定义会恰好可以统一VI 和 EP 两种方法，如下图所示，当 $α=0$ 时，该 Divergence 等价于 $KL(q||p)$，相当于是 VI 方法；当 $α=1$ 时，该 Divergence 等价于 $KL(p||q)$，相当于是 EP 方法。</p>
+<p><img src="http://image.rexking6.top/img/clip1581517903.png" alt=""></p>
+<p>接着 Renyi 的定义，考虑公式（3）的形式：</p>
+<script type="math/tex; mode=display">
+\log p(x)=E L B O+K L(q \| p)\tag{16}</script><p>用 Renyi α-Divergence 来代替公式（16）中的 KL Divergence，定义Variational Renyi Bound（VR Bound，Rényi Divergence Variational Inference），将公式（14）代入可得：</p>
+<script type="math/tex; mode=display">
+\log p(x)=\text{VRBound}+D_{\alpha}(q \| p)\tag{17}</script><p>从而推导出 VRBound 如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\text{VRBound}&=\log p(x)-D_{\alpha}(q \| p) \\
+&=\log p(x)-\frac{1}{\alpha-1} \log \int q(z)^{\alpha} p(z | x)^{1-\alpha} d z \\
+&=\frac{1}{1-\alpha} \log \int q(z) q(z)^{\alpha-1} p(z | x)^{1-\alpha} d z+\frac{1-\alpha}{1-\alpha} \log p(x) \\
+&=\frac{1}{1-\alpha} \log E_{q(z)}\left[\left(\frac{p(z | x)}{q(z)}\right)^{1-\alpha}\right]+\log p(x)^{1-\alpha} \\
+&=\frac{1}{1-\alpha} \log E_{q(z)}\left[\left(\frac{p(z, x)}{q(z)}\right)^{1-\alpha}\right] \\
+&\geq \frac{1}{1-\alpha} E_{q(z)}\left[\log \left(\frac{p(z, x)}{q(z)}\right)^{1-\alpha}\right]
+\end{aligned}\tag{18}</script><p>公式（18）的最后一步时根据 Jeson 不等式得来的，它是公式（7）（8）中ELBO 的一般形式，当 $α=0$ 时，VRBound 将降阶为 ELBO。可根据一般 VI 方法的思路来设计 VRBound 的优化算法，将其应用于各种类型的近似推断任务中。</p>
+<h3 id="Stein-Disparency"><a href="#Stein-Disparency" class="headerlink" title="Stein Disparency"></a>Stein Disparency</h3><p>Stein Disparency 是近几年比较热门的一种度量两个分布之间距离的方法，定义如下：</p>
+<script type="math/tex; mode=display">
+D_{\text {stein}}(p \| q)=\sup _{f \in F}\left|E_{q(z)}[f(z)]-E_{p(z | x)}[f(z)]\right|^{2}\tag {19}</script><p>其中，$F$ 表示一系列光滑的函数。两个分布越相似，Stein Disparency 就越小。</p>
+<p>公式（19）中的右边一项包含了未知的真实后验分布 $p(z|x)$ ，无法计算。如何构造一些合适的 $f(z)$ 可以使得 $E_{p(z|x)}[f(z)]=0$ ，从而消除掉未知分布的影响。Stein 的方法给出了一类合适的 $f(z)$ ，如下：</p>
+<script type="math/tex; mode=display">
+f(z)=\phi(z) \nabla_{z} \log p(z, x)+\nabla_{z} \phi(z)</script><p>代入到 $E_{p(z|x)}[f(z)]$ 中可以得到：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+E_{p(z | x)}[f(z)]&=E_{p(z | x)}\left[\phi(z) \nabla_{z} \log p(z, x)+\nabla_{z} \phi(z)\right] \\
+&=\int\left[p(z | x) \phi(z) \frac{\nabla_{z} p(z, x)}{p(z, x)}+p(z | x) \nabla_{z} \phi(z)\right] \\
+&=\int \phi(z)\left[p(z | x) \frac{p(x) \nabla_{z} p(z | x)}{p(x) p(z | x)}+p(z | x) \nabla_{z} \phi(z)\right] \\
+&=\int\left[\phi(z) \nabla_{z} p(z | x)+p(z | x) \nabla_{z} \phi(z)\right] \\
+&= \int \nabla_{z}[\phi(z) p(z | x)] \\
+&=\left.\phi(z) p(z | x)\right|_{-\infty} ^{+\infty}
+\end{aligned}\tag{21}</script><p>令其等于 0，得到：</p>
+<script type="math/tex; mode=display">
+\lim _{|z| \rightarrow \infty} p(z | x) \phi(z)=0\tag{22}</script><p>当找到合适的 $f(z)$ 使得公式（19）右边的一项为 0，只需要计算前面的一项。近几年有一些工作将此方法应用到了 VI 中，其中具有代表性的是 Stein Variational Gradient Descent 和 Operator VI，前者用了 kernel 的方法来计算，后者用了 GAN 的思路来求解。</p>
+<h2 id="如何使用更复杂的先验分布来描述参数信息？"><a href="#如何使用更复杂的先验分布来描述参数信息？" class="headerlink" title="如何使用更复杂的先验分布来描述参数信息？"></a>如何使用更复杂的先验分布来描述参数信息？</h2><p>先验分布通常是专家经验的一个量化途径，将专家对领域的知识表示为一个先验分布，先验越复杂，表明融入的知识会越多，对后验推断会有较大的影响，为简化计算，先验通常选为高斯分布或者混合高斯分布。近些年的一些研究工作表明，先验分布的复杂度以及超参数的选择对于深度生成模型和贝叶斯神经网络的效果影响很大，本小节简单对先验分布的一些相关工作进行介绍。</p>
+<p>AISTATS 2018 一篇来自 Max Welling 组的工作，提出了一种新的复杂先验分布 VampPrior（Variational  Mixture of Posteriors Prior），并且在 VAE 上进行了实验测试，相比标准的高斯分布先验和混合高斯分布先验有更好的 Log Likelihood 和表示学习效果。思路如下： </p>
+<p>将公式（8）改写为以下形式：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+E L B O(x ; \theta, \phi)&=E_{q(z ; \theta)}\left[\log \frac{p(x, z)}{q(z ; \theta)}\right] \\
+&=E_{q(z ; \theta)}[\log p(x | z ; \phi)]-K L(q(z ; \theta) \| p(z)) \\
+&=E_{q(z ; \theta)}[\log p(x | z ; \phi)]-E_{q(z ; \theta)}[\log q(z ; \theta)]+E_{q(z ; \theta)}[\log p(z)] \\
+&=E_{q(z ; \theta)}[\log p(x | z ; \phi)]+H[q(z ; \theta)]-\left[E_{q(z ; \theta)}[-\log p(z)]\right]
+\end{aligned}\tag{23}</script><p>公式（23）中第一项是重建的似然函数，第二项是变分后验分布的熵，第三项是负的变分后验分布和先验分布的交叉熵。</p>
+<p>为了保证 ELBO 最大化，需满足第三项也最大化，问题在于如何找到一个合适的先验分布 ，描述参数为 ，使得其拉格朗日乘子表达式最大：</p>
+<script type="math/tex; mode=display">
+\max _{p_{\lambda}(z)}-\left[E_{q(z ; \theta)}\left[-\log p_{\lambda}(z)\right]\right]+\beta\left(\int p_{\lambda}(z) d z-1\right)\tag{24}</script><p>该问题的最优解为：</p>
+<script type="math/tex; mode=display">
+p_{\lambda}^{\star}(z)=\frac{1}{N} \sum_{i=1}^{N} q\left(z | x_{i} ; \theta\right)\tag{25}</script><p>如果用公式（25）的分布作为先验会导致计算量非常大，同时带来过拟合的风险。因此，这个工作基于此考虑，用下式来代替（25）：</p>
+<script type="math/tex; mode=display">
+p_{\lambda}(z)=\frac{1}{K} \sum_{i=1}^{K} q\left(z | u_{i} ; \theta\right)\tag{26}</script><p>这里需要优化的参数 $\lambda=\left\{\theta, u_{1}, \dots u_{K}\right\}$。因为此先验分布是与后验分布的混合，所以取名为 Variational Mixture of Posteriors Prior。这里的是一些所谓的伪输入，而非真实的输入，也是需要学习的参数。一方面 VampPrior 是更加复杂的多模态分布，对数据的建模更加准确；另一方面，因为 $K&lt;&lt;N$，计算量也会相对较少一些。 </p>
+<p><img src="http://image.rexking6.top/img/clip1581521098.png" alt=""></p>
+<p>由上图可见，VampPrior 比标准的正态分布和混合高斯分布有着明显的提升，同时因为 Prior 的复杂化和 Posterior 的复杂化是解耦的，如果后验分布采用更加复杂的 Normalized Flow，可能会有更好的效果。</p>
+<p>ICLR 2019 一篇来自 Max Welling 参与的工作 <strong><em>Deep Weight Prior</em></strong>，提出了一种 implicit prior distribution 来提升 prior 的复杂度。implicit distribution 大概的定义是，无法得到该分布的 pdf，但可以从该分布中进行采样、估计期望和梯度。这个工作的思路如下：</p>
+<script type="math/tex; mode=display">
+p(z)=\int p(z | w ; \alpha) p(w) d w\tag{27}</script><p>其中，$p(w)$ 是一个显式分布密度函数，作为先验分布 $p(z)$ 的先验分布，$p(z|w;α)$ 是一个显式的参数分布密度函数，由参数 $α$ 描述。</p>
+<p><img src="http://image.rexking6.top/img/clip1581521348.png" alt=""></p>
+<p>为统一符号，本文采用了与原文不同的符号表示，但示意图原理一致。从图中可以看出，BNN（Bayesian Neural Network）权重的先验分布可以通过构造一个 VAE 进行学习，而学习的数据则来自相似任务中具有相同网络架构的模型。</p>
+<p>具体地讲，本文在 cifar10 数据集上用两层的 5×5 和 7×7 卷积核作为网络结构，分别训练了 CNN，从中获取了这两类网络架构的权重值作为数据进行学习。学习得到权重的implicit distribution 之后，作为具有同样结构的Bayesian CNN 的权重的 prior 来应用。</p>
+<p><img src="http://image.rexking6.top/img/clip1581521364.png" alt=""></p>
+<p>上图中左图为学习到的卷积核，而右图为从隐分布中 sample 出来的卷积核。基于复杂的隐先验分布，这篇工作测试了 BCNN 在小样本数据集上的效果，如下图：</p>
+<p><img src="http://image.rexking6.top/img/clip1581521374.png" alt=""></p>
+<p>从上图中可以看出，本文的方法 DWP 比标准正态分布和均匀分布作为先验有更好的效果。</p>
+<h2 id="如何使用更复杂的后验分布簇来降低VI方法的bias？"><a href="#如何使用更复杂的后验分布簇来降低VI方法的bias？" class="headerlink" title="如何使用更复杂的后验分布簇来降低VI方法的bias？"></a>如何使用更复杂的后验分布簇来降低VI方法的bias？</h2><p>变分分布是用来替代真实后验分布的，两者的差异越大，后验推断的系统偏差就会越大。有研究结果表明，变分后验分布簇的选择对变分推断效果的影响非常大。</p>
+<p>经典的 VI，会基于简单的平均场（mean-fifiled）假设，用可分解的高斯分布或者一些简单结构的分布来作为变分分布；现在的 VI，需要解决的是数据规模更大、维度更高的问题，经典 VI 的变分分布难以满足。因此，最近几年有一系列工作来研究如何构造一系列更加复杂且方便计算的复杂后验分布来解决这一问题。</p>
+<p><img src="http://image.rexking6.top/img/clip1581578532.png" alt=""></p>
+<p>上图中，最右边表示分布簇表达能力最弱的 MF，最左边表示表达能力最强的真实后验，中间方法都是对 MFVI 的改进，通过复杂化后验分布来降低 bias。</p>
+<h3 id="Copula方法"><a href="#Copula方法" class="headerlink" title="Copula方法"></a>Copula方法</h3><p>大多数的 VI 方法都基于 Mean-Field 的思路，假设变分后验分布中隐变量之间相互独立，这个假设太强，对结果有一定的影响。</p>
+<p>NIPS 2015 一篇 David M. Blei 组的工作 <strong><em>Copula Variational Inference</em></strong> 尝试用统计学的经典方法 Copula 来解决 MF 中隐变量的独立假设问题。这篇工作的动机非常简单，就是找到一种既考虑隐变量之间的关联性同时也容易进行大规模计算的方法。思路如下：</p>
+<script type="math/tex; mode=display">
+q(z ; \theta, \eta)=\left[\prod_{i=1}^{d} q\left(z_{i} ; \theta\right)\right] c\left(Q\left(z_{1} ; \theta\right), \ldots, Q\left(z_{d} ; \theta\right) ; \eta\right)\tag{28}</script><p>其中公式中的前半部分是 Mean-Field，而后半部分正是所谓的 Copula。</p>
+<p>将公式（28）代入到公式（8）得到 Copula VI 的 EBLO，剩下的工作就是推导 ELBO 的梯度估计式，利用随机优化算法更新参数，不同于一般的 VI，Copula VI 有两种参数，一种是描述变分分布的参数，另一种是描述 Copula 的参数，在训练时，固定其中一种来训练另外一种。梯度估计的公式推导在下一小节会有详细介绍，这里不再赘述。</p>
+<p><img src="http://image.rexking6.top/img/clip1581578632.png" alt=""></p>
+<p>从上图中可以看出 Copula VI 比 MFVI 离真实后验分布更近，bias 更小。Copula 是统计学中的经典方法，对此感兴趣的读者可以去找相关资料进行学习。</p>
+<h3 id="辅助变量法"><a href="#辅助变量法" class="headerlink" title="辅助变量法"></a>辅助变量法</h3><p><img src="http://image.rexking6.top/img/clip1581578656.png" alt=""></p>
+<p>辅助变量法的思路比较简单，它认为隐变量 $z$ 背后还有隐变量 $w$，是一种层次化建模的思想。即：</p>
+<script type="math/tex; mode=display">
+q(z)=\int q(z | w) q(w) d w\tag{29}</script><p>图中 $r(w|x,z)$ 正是所谓的辅助变量。将公式（29）代入到公式（8）中可以得到该方法的 ELBO，推导过程类似，这里不再赘述。这种引入辅助变量的方法，其实也是令变分后验分布成为一种表达能力更强的隐分布。</p>
+<h3 id="Normalized-Flow-归一化流"><a href="#Normalized-Flow-归一化流" class="headerlink" title="Normalized Flow 归一化流"></a>Normalized Flow 归一化流</h3><p>实际应用中的真实后验分布往往是非常复杂的多模态分布，如何构造出一个复杂的分布簇来逼近多模态分布十分重要。本节介绍的归一化流正是解决这个问题的合适方法。归一化流是一系列分布变换操作，可将简单的高斯分布变换成任意形状的分布。</p>
+<p>归一化流的基础是随机变量分布的变换：</p>
+<script type="math/tex; mode=display">
+p(y)=p(x)\left|J\left(f^{-1}\right)\right|\tag{30}</script><p>其中，$p(y)$ 是 $y$ 的分布，$p(x)$ 是 $x$ 的分布，这里 $y=f(x)$，$J$ 是指雅可比矩阵，即多元函数一阶导数矩阵。</p>
+<p>归一化流以及其基础版 pathwise derivative（下一节介绍），核心都在解决一个问题，能否找到一个合适的双射（one-to-one mapping）保证正向映射过程可以很容易 sampling，同时容易计算其雅可比行列式；反向过程，容易计算 inverse function。如果可以解决上述两个问题，就可以将非常简单的分布，比如：均匀分布和高斯分布，通过一系列的变换（Flow）生成出复杂的分布和预期的分布，如下图。</p>
+<p><img src="http://image.rexking6.top/img/clip1581578881.png" alt=""></p>
+<p>如果初始分布经过 $K$ 次变换如下：</p>
+<script type="math/tex; mode=display">
+z_{K}=f_{K} \otimes \ldots \otimes f_{2} \otimes f_{1}\left(z_{0}\right)\tag{31}</script><p>其概率密度函数 pdf 如下：</p>
+<script type="math/tex; mode=display">
+\log q_{K}\left(z_{K}\right)=\log q_{0}\left(z_{0}\right)-\sum_{k=1}^{K} \log \left|\operatorname{det} \frac{\partial f_{k}}{\partial z_{k-1}}\right|\tag{32}</script><p>可以进行如此推导的依据是 law of the unconscious statistician (LOTUS) ，在 pathwise derivative 一节也会提到。</p>
+<p>Rezende 和 Mohamed 在 2015 年的 ICML 上提出了用归一化流作为变分后验分布，并给出了两种 baseline 分布变换，一种是 Planar （一种线性变换）：</p>
+<script type="math/tex; mode=display">
+f(z)=z+u h\left(w^{T} z+b\right)\tag{33}</script><p>这里 $h$ 是一个光滑的非线性函数，先求公式（32）中的行列式：</p>
+<script type="math/tex; mode=display">
+\left|\operatorname{det} \frac{\partial f}{\partial z}\right|=\left|\operatorname{det}\left(I+u \psi(z)^{T}\right)\right|=\left|1+u^{T} \psi(z)\right|\tag{34}</script><p>其中 $\psi(z)=h^{\prime}\left(w^{T} z+b\right) w$，代入到公式（32）可得：</p>
+<script type="math/tex; mode=display">
+\log q_{K}\left(z_{K}\right)=\log q_{0}(z)-\sum_{k=1}^{K} \log \left|1+u_{k}^{T} \psi_{k}\left(z_{k-1}\right)\right|\tag{35}</script><p>一种是 Radial（一种极性变换）：</p>
+<script type="math/tex; mode=display">
+f(z)=z+\beta h(\alpha, r)\left(z-z_{0}\right)\tag{36}</script><p>以 Planar 为例，将归一化流代入到EBLO 中可以得到：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+E L B O&=E_{q(z)}[\log p(x, z)-\log q(z)] \\
+&=E_{q\left(z_{0}\right)}\left[\log p(x, z)-\log q_{K}\left(z_{K}\right)\right] \\
+&= E_{q\left(z_{0}\right)}\left[\log p(x, z)-\log q_{0}(z)-\sum_{k=1}^{K} \log \left|1+u_{k}^{T} \psi_{k}\left(z_{k-1}\right)\right|\right]
+\end{aligned}\tag{37}</script><p><img src="http://image.rexking6.top/img/clip1581579382.png" alt=""></p>
+<p>基于归一化流的 VI 方法在求解时和一般的 VI 没太多区别，这里不再赘述。上图是基于归一化流做的一个分布逼近实验，从结果中可以看出通过 32 次分布变换之后，可以准确地逼近左图中给出的复杂分布。</p>
+<p>除了文章中介绍的归一化流方法，最近几年学术界提出了很多种 Flow 的方法，比如：NICE、Masked Autoregressive Flow（MAF）、Inverse Autoregressive Flow（IAF）等。感兴趣的同学可以去看Stanford CS236 Deep Generative Models Course。</p>
+<h2 id="如何通过随机梯度估计方法来提升VI方法scalability？"><a href="#如何通过随机梯度估计方法来提升VI方法scalability？" class="headerlink" title="如何通过随机梯度估计方法来提升VI方法scalability？"></a>如何通过随机梯度估计方法来提升VI方法scalability？</h2><p>从变分推断的优化目标函数 ELBO 中可以看到，需要优化的是一个函数的期望，而非确定性的函数。相比于其他优化算法，基于梯度的随机优化算法在解决大规模数据、高维度问题中有着巨大的优势，因此，如何准确估计出函数期望的导数是核心问题。机器学习中，常用的随机梯度估计方法包括：score Function 和 pathwise derivative。</p>
+<h3 id="Score-Function-SF"><a href="#Score-Function-SF" class="headerlink" title="Score Function (SF)"></a>Score Function (SF)</h3><p>所谓的 score function 是 ，score function 的期望为 0，证明如下：</p>
+<script type="math/tex; mode=display">
+\mathbb{E}_{p(\mathbf{x} ; \boldsymbol{\theta})}\left[\nabla_{\boldsymbol{\theta}} \log p(\mathbf{x} ; \boldsymbol{\theta})\right]=\int p(\mathbf{x} ; \boldsymbol{\theta}) \frac{\nabla_{\boldsymbol{\theta}} p(\mathbf{x} ; \boldsymbol{\theta})}{p(\mathbf{x} ; \boldsymbol{\theta})} d \mathbf{x}=\nabla_{\boldsymbol{\theta}} \int p(\mathbf{x} ; \boldsymbol{\theta}) d \mathbf{x}=\nabla_{\boldsymbol{\theta}} 1=\mathbf{0}\tag{38}</script><p>这样会带来非常多的便利，比如：一种降低估计方差的思路，将代价函数 $f(x)$ 改造为 $f(x)-b$ ，其中 $b$ 是所谓的 baseline。因为 score function 的期望为 0，所以：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+&E_{p(x; \theta)}\left[(f(x)-b) \nabla_{\theta} \log p(x ; \theta)\right]\\
+=&E_{p(x; \theta)}\left[f(x) \nabla_{\theta} \log p(x ; \theta)-b \nabla_{\theta} \log p(x ; \theta)\right]\\
+=&E_{p(x; \theta)}\left[f(x) \nabla_{\theta} \log p(x ; \theta)\right]
+\end{aligned}\tag{39}</script><p>ELBO 推导出的优化问题如下：</p>
+<script type="math/tex; mode=display">
+\max _{\lambda} L(\lambda)=\max _{\lambda} E_{q_{\lambda}(z)}[\log p(x, z)-\log q(z)]\tag{40}</script><p>其中，$x$ 是观测变量，$z$ 是隐变量，$q(z)$ 是变分分布，$λ$ 是变分分布的参数。</p>
+<p>计算 $L(λ)$ 的梯度如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\nabla_{\lambda} L(\lambda)&=\nabla_{\lambda} E_{q_{\lambda}(z)}[\log p(x, z)-\log q(z)] \\
+&=\int \nabla_{\lambda} q_{\lambda}(z)[\log p(x, z)-\log q(z)]+q_{\lambda}(z) \nabla_{\lambda}[\log p(x, z)-\log q(z)] \\
+&=\int q_{\lambda}(z) \nabla_{\lambda} \log p_{\lambda}(z)[\log p(x, z)-\log q(z)]-q_{\lambda}(z) \nabla_{\lambda} \log q_{\lambda}(z) \\
+&= \int q_{\lambda}(z) \nabla_{\lambda} \log q_{\lambda}(z)[\log p(x, z)-\log q(z)] \\
+&=E_{q_\lambda(z)} \nabla_{\lambda} \log q_{\lambda}(z)[\log p(x, z)-\log q(z)]
+\end{aligned}\tag{41}</script><p>公式（41）倒数第三行到导数第二行的推导利用了 score function 的期望为 0 这一性质，基于公式（41）就可以利用蒙特卡洛采样进行梯度估计，然后利用随机优化算法进行参数的更新。算法流程图如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1581586669.png" alt=""></p>
+<p>参数估计除了要保证无偏之外，还希望估计的方差要尽量小。在此基础上，本节介绍一种经典的降低方差的方法 Control Variates，也会用到 score function 的一些性质。</p>
+<p>这里，假设一个估计是 $f$，希望可以找到一个新估计 $\hat f$，使得：</p>
+<script type="math/tex; mode=display">
+E_{q}[\hat{f}]=E_{q}[f], \operatorname{Var}_{q}[\hat{f}]<\operatorname{Var}_{q}[f]\tag{42}</script><p>控制变量法是构造一类估计函数，定义如下：</p>
+<script type="math/tex; mode=display">
+\hat{f}(z)=f(z)-a(h(z)-E[h(z)])\tag{43}</script><p>其中，$a$ 是一个标量，$h$ 是一个函数。由公式（43）容易得到，$\hat f$ 和 $f$ 的期望相同，方差如下：</p>
+<script type="math/tex; mode=display">
+\operatorname{Var}[\hat{f}]=\operatorname{Var}[f]+a^{2} \operatorname{Var}[h]-2 a \operatorname{Cov}(f, h)\tag{44}</script><p>直观上讲，$\text{Cov}(f,h)$ 越大，新估计的方差越小，控制变量效果越好。令：</p>
+<script type="math/tex; mode=display">
+\frac{d \operatorname{Var}[\hat{f}]}{d a}=0\tag{45}</script><p>可得：</p>
+<script type="math/tex; mode=display">
+a^{\star}=\frac{\operatorname{Cov}(f, h)}{\operatorname{Var}[h]}\tag{46}</script><p>最优参数值是协方差和方差之比。为了方便计算，函数 $h(z)$ 的选择是 score function，即：</p>
+<script type="math/tex; mode=display">
+h(z)=\nabla_{\lambda} \log p_{\lambda}(z)\tag{47}</script><p>所以，$E[h(z)]=0$。</p>
+<p>用新的估计 $\hat f$ 来替换公式（41）中的估计 $f$，如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\nabla_{\lambda} L(\lambda)&= E_{q_{\lambda}(z)}\left[\nabla_{\lambda} \log q_{\lambda}(z)[\log p(x, z)-\log q(z)]-a^{\star} \nabla_{\lambda} \log q_{\lambda}(z)\right] \\
+&=E_{q_{\lambda}(z)} \nabla_{\lambda} \log q_{\lambda}(z)\left[\log p(x, z)-\log q(z)-a^{\star}\right]
+\end{aligned}\tag{48}</script><p>基于蒙特卡洛采样对梯度进行估计，从上述推导中可以保证新的估计方差会更小。</p>
+<p>Score Function 在使用时一般要满足以下条件：</p>
+<ul>
+<li>代价函数 $f(x)$ 可以是任意函数。比如可微的，不可微的；离散的，连续的；白箱的，黑箱的等。</li>
+<li>这个性质是其最大的优点，使得很多不可微的甚至没有具体函数的黑箱优化问题都可以利用梯度优化求解。</li>
+<li>分布函数 $p(x;θ)$ 必须对 $θ$ 是可微的，从公式中也看得出来。</li>
+<li>分布函数必须是便于采样的，因为梯度估计都是基于 MC 的，所以希望分布函数便于采样。</li>
+<li>SF 的方差受很多因素影响，包括输入的维度和代价函数。</li>
+</ul>
+<p>另外，SF 还有一些其他的名称，Likelihood Ratio，Automated Variational Inference，REINFORCE，Policy Gradients，在机器学习的很多领域中都有广泛的应用。</p>
+<p><strong><em>这部分完全没有看懂……</em></strong></p>
+<h3 id="Pathwise-Derivative-PD"><a href="#Pathwise-Derivative-PD" class="headerlink" title="Pathwise Derivative (PD)"></a>Pathwise Derivative (PD)</h3><p>不同于 Score Function 对代价函数没有任何约束，PD 要求代价函数可微，虽然 SF 更具一般性，但 PD 会有更好的性质。PD 在机器学习领域有另一个名称是 reparameterization trick，它是著名的深度生成模型 VAE 中一个重要的步骤。</p>
+<p>PD 的思路是将待学习的参数从分布中变换到代价函数中，核心是做分布变换（即所谓的 reparameterization，重参数化），计算原来分布下的期望梯度时，由于变换后的分布不包含求导参数，可将求导和积分操作进行对换，从而基于 MC 对梯度进行估计。</p>
+<script type="math/tex; mode=display">
+\hat{\mathbf{x}} \sim p(\mathbf{x} ; \boldsymbol{\theta}) \equiv \hat{\mathbf{x}}=g(\hat{\boldsymbol{\epsilon}}, \boldsymbol{\theta}), \quad \hat{\boldsymbol{\epsilon}} \sim p(\boldsymbol{\epsilon})\tag{49}</script><p>如上述公式，从一个含参 $θ$ 分布中采样，等同于从一个简单无参分布中采样，然后进行函数变换，并且此函数的参数也是 $θ$。变换前，采样是直接从所给分布中进行，而采用重参数化技巧后，采样是间接地从一个简单分布进行，然后再映射回去，这个映射是一个确定性的映射。其中，映射有很多中思路，比如：逆函数、极变换等方法。</p>
+<p>PD 的一个重要理论依据是 Law of the Unconscious Statistician (LOTUS) ，即：</p>
+<script type="math/tex; mode=display">
+\mathbb{E}_{p(\mathbf{x} ; \boldsymbol{\theta})}[f(\mathbf{x})]=\mathbb{E}_{p(\boldsymbol{\epsilon})}[f(g(\boldsymbol{\epsilon} ; \boldsymbol{\theta}))]\tag{50}</script><p>从定理中可以看到，计算一个函数的期望，可以不知道其分布，只需要知道一个简单分布，以及从简单分布到当前分布的映射关系即可。</p>
+<p>基于 Law of the Unconscious Statistician (LOTUS) 对 PD 进行推导，如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+&\nabla_{\theta} E_{p(x ; \theta)}[f(x)] \\
+=&\nabla_{\theta} \int p(x ; \theta) f(x) d x \\
+=&\nabla_{\theta} \int p(\epsilon) f(g(\epsilon ; \theta)) d \epsilon \\
+=&E_{p(\varepsilon)}\left[\nabla_{\theta} f(g(\epsilon ; \theta))\right]
+\end{aligned}\tag{51}</script><p>利用 MC 可以估计出梯度为：</p>
+<script type="math/tex; mode=display">
+\frac{1}{N} \sum_{n=1}^{N} \nabla_{\boldsymbol{\theta}} f\left(g\left(\hat{\boldsymbol{\epsilon}}^{(n)} ; \boldsymbol{\theta}\right)\right)</script><p>其中 $\hat{\boldsymbol{\epsilon}}^{(n)} \sim p(\boldsymbol{\epsilon})$。从推导中可以看出，分布中的参数 $θ$ 被 push 到了代价函数中，从而可以将求导和积分操作进行对换。</p>
+<p>分布变换是统计学中一个基本的操作，在计算机中实际产生各种常见分布的随机数时，都是基于均匀分布的变换来完成的。有一些常见的分布变换可参见下表：</p>
+<p><img src="http://image.rexking6.top/img/clip1581587924.png" alt=""></p>
+<p><em>图：常见分布变换</em></p>
+<p>在使用 PD 时需要满足以下性质：</p>
+<ul>
+<li>代价函数要求是可微的，比 SF 更严格</li>
+<li>在使用 PD 时，并不需要显式知道分布的形式，只需要知道一个基础分布和从该基础分布到原分布的一个映射关系即可，这意味着，不管原来分布多么复杂，只要能获取到以上两点信息，都可以进行梯度估计；而 SF 则需要尽量选择一个易采样的分布</li>
+<li>PD 的方差受代价函数的光滑性影响</li>
+</ul>
+<p>另外，PD 还有一些其他名称，Stochastic backpropagation，Affiffiffine-independent inference 和 Reparameterisation Tricks 等。</p>
+<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><p>变分推断方法在深度学习中有两个非常典型而且热门的应用，一个是贝叶斯神经网络 BNN，一个是变分自编码器 VAE。后续会专门写两篇关于 BNN 和 VAE 的综述，这里简单介绍一下。</p>
+<h2 id="贝叶斯神经网络-BNN"><a href="#贝叶斯神经网络-BNN" class="headerlink" title="贝叶斯神经网络 BNN"></a>贝叶斯神经网络 BNN</h2><p>贝叶斯神经网络不同于一般的神经网络，其权重参数是随机变量，而非确定的值。如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1581588076.png" alt=""></p>
+<p>假设 NN 的网络参数为 $W$，$p(W)$ 是参数的先验分布，给定观测数据 $D={X,Y}$，这里 $X$ 是输入数据，$Y$ 是标签数据。BNN 希望给出以下的分布：</p>
+<script type="math/tex; mode=display">
+P\left(Y^{*} | X^{*}, D\right)=\int P\left(Y^{*} | X^{*}, W\right) P(W | D) d W\tag{53}</script><p>其中：</p>
+<script type="math/tex; mode=display">
+P(W | D)=\frac{P(W) P(D | W)}{P(D)}\tag{54}</script><p>这里 $P(W|D)$ 是后验分布，$P(D|W)$ 是似然函数，$P(D)$ 是边缘似然。</p>
+<p>从公式（53）中可以看出，用 BNN 对数据进行概率建模并预测的核心在于做高效近似后验推断，而 VI 是一个非常合适的方法。</p>
+<p>BNN 不同于 DNN，可以对预测分布进行学习，不仅可以给出预测值，而且可以给出预测的不确定性。这对于很多问题来说非常关键，比如：机器学习中著名的 Exploration &amp; Exploitation （EE）的问题，在强化学习问题中，agent 是需要利用现有知识来做决策还是尝试一些未知的东西；实验设计问题中，用贝叶斯优化来调超参数，选择下一个点是根据当前模型的最优值还是利用探索一些不确定性较高的空间。比如：异常样本检测，对抗样本检测等任务，由于 BNN 具有不确定性量化能力，所以具有非常强的鲁棒性。</p>
+<h2 id="变分自编码器-VAE"><a href="#变分自编码器-VAE" class="headerlink" title="变分自编码器 VAE"></a>变分自编码器 VAE</h2><p>深度生成模型中两个最有名的模型是 GAN 和 VAE，有工作介绍过GAN 和 VAE 从 VI 的视角是可以统一起来的。这类简单介绍一下VAE，VAE 是一种隐变量模型（Latent Variable Model, LVM）和深度学习巧妙结合的产物。如下图：</p>
+<p><img src="http://image.rexking6.top/img/clip1581588230.png" alt=""></p>
+<p>模型中由两个部分构成，一个是观测数据 $\textbf x$ 到隐变量 $\textbf z$ 的映射模型，称为 encoder，另一个是从隐变量 $\textbf z$ 到观测数据 $\textbf x$ 的映射模型，称为 decoder。encoder 相当于是求一个后验分布，这里用 VI 的方法，假设用一个高斯变分分布 $q_\phi(\textbf z|\textbf x)$ 来代替真实的后验分布，并用 DNN 来近似逼近这个高斯分布的均值和方差。</p>
+<p>从上图中可以看到，经过encoder 和decoder 的映射，输入是观测数据 $\textbf x$，期待的输出数据也是 $\textbf x$，不需要对样本进行标注。VAE 在 loss function 推导时需要用到随机梯度估计一节提到的 Pathwise Derivative，在这里叫做 Reparameterization Trick 来估计梯度。VAE 是一个非常有趣的模型，从结构上来看，隐变量空间相当于是一个原数据的降维表示，在很多地方将会有非常有趣的应用。</p>
+<p>VI 除了应用在 BNN 和 VAE 之外，还在 Policy Gradient、AutoML 和 PGM 等领域被广泛使用。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文是对 VI 方法进展的一个简述，主要思路是从 VI 经典方法和相关的几个问题来展开，包括：分布测度、复杂先验、复杂后验、VI 的可扩展性以及应用来叙述。</p>
+<p>由于 VI 是一大类方法，每年新增的研究工作不计其数，近二年与 MCMC 的结合和统一催生了一批新的高效方法和理论分析，实在难以覆盖所有工作。希望通过本文介绍的思路，读者可以快速地了解这个领域，做应用的同学可以找一些合适的方法来解决应用问题，准备做机器学习理论研究的同学可以参考本文的思路，有针对性地寻找到感兴趣的方向。</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><p>[1] Zhang, Cheng, et al. “Advances in Variational Inference.” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 41, no. 8, 2019, pp. 2008–2026.</p>
+<p>[2] Blei, David M., et al. “Variational Inference: A Review for Statisticians.” Journal of the American Statistical Association, vol. 112, no. 518, 2017, pp. 859–877.</p>
+<p>[3] Wainwright, Martin J., and Michael I. Jordan. Graphical Models, Exponential Families, and Variational Inference. 2008.</p>
+<p>[4] Rezende, Danilo Jimenez, and Shakir Mohamed. “Variational Inference with Normalizing Flows.” ArXiv Preprint ArXiv:1505.05770, 2015.</p>
+<p>[5] Kingma, Diederik P., et al. “Improving Variational Inference with Inverse Autoregressive Flow.” ArXiv Preprint ArXiv:1606.04934, 2016.</p>
+<p>[6] Tran, Dustin, et al. “Copula Variational Inference.” NIPS’15 Proceedings of the 28th International Conference on Neural Information Processing Systems - Volume 2, 2015, pp. 3564–3572.</p>
+<p>[7] Ranganath, Rajesh, et al. “Operator Variational Inference.” NIPS’16 Proceedings of the 30th International Conference on Neural Information Processing Systems, 2016, pp. 496–504.</p>
+<p>[8] Liu, Qiang, and Dilin Wang. “Stein Variational Gradient Descent: A General Purpose Bayesian Inference Algorithm.” Advances in Neural Information Processing Systems, 2016, pp. 2370–2378.</p>
+<p>[9] Atanov, Andrei, et al. “The Deep Weight Prior.” ICLR 2019 : 7th International Conference on Learning Representations, 2019.</p>
+<p>[10] Tomczak, Jakub M., and Max Welling. “VAE with a VampPrior.” ArXiv Preprint ArXiv:1705.07120, 2017.</p>
+<p>[11] Yin, Mingzhang, and Mingyuan Zhou. “Semi-Implicit Variational Inference.” ICML 2018: Thirty Fifth International Conference on Machine Learning, 2018, pp. 5646–5655.</p>
+<p>[12] Ranganath, Rajesh, et al. “Black Box Variational Inference.” Journal of Machine Learning Research, vol. 33, 2014, pp. 814–822.</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\03\21\Fisher线性判别\" rel="bookmark">Fisher线性判别</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\02\13\cs229中文笔记-一二\" rel="bookmark">cs229中文笔记(一二)</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\02\18\cs229中文笔记-七\" rel="bookmark">cs229中文笔记(七)</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2020/02/13/%E5%8F%98%E5%88%86%E6%8E%A8%E6%96%AD%EF%BC%88Variational-Inference%EF%BC%89%E6%9C%80%E6%96%B0%E8%BF%9B%E5%B1%95%E7%AE%80%E8%BF%B0/" title="变分推断（Variational Inference）最新进展简述">https://blog.rexking6.top/2020/02/13/变分推断（Variational-Inference）最新进展简述/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/12/%E7%9F%A9%E9%98%B5%E6%B1%82%E5%AF%BC/" rel="prev" title="矩阵求导">
+      <i class="fa fa-chevron-left"></i> 矩阵求导
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/20/%E7%8B%AC%E7%AB%8B%E6%88%90%E5%88%86%E5%88%86%E6%9E%90%EF%BC%88Independent-Component-Analysis%EF%BC%89/" rel="next" title="独立成分分析（Independent Component Analysis）">
+      独立成分分析（Independent Component Analysis） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8A%A8%E6%9C%BA"><span class="nav-number">2.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E5%AE%9A%E4%B9%89"><span class="nav-number">3.</span> <span class="nav-text">问题定义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Mean-Field-VI-MFVI"><span class="nav-number">4.</span> <span class="nav-text">Mean Field VI (MFVI)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%94%B9%E8%BF%9BMFVI%E7%9A%84%E5%87%A0%E4%B8%AA%E8%A7%92%E5%BA%A6"><span class="nav-number">5.</span> <span class="nav-text">改进MFVI的几个角度</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E6%9B%B4%E5%A5%BD%E5%9C%B0%E5%BA%A6%E9%87%8F%E5%8F%98%E5%88%86%E5%90%8E%E9%AA%8C%E5%88%86%E5%B8%83%E5%92%8C%E7%9C%9F%E5%AE%9E%E5%90%8E%E9%AA%8C%E5%88%86%E5%B8%83%E4%B9%8B%E9%97%B4%E7%9A%84%E5%B7%AE%E5%BC%82%EF%BC%9F"><span class="nav-number">5.1.</span> <span class="nav-text">如何更好地度量变分后验分布和真实后验分布之间的差异？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Expectation-Propagation"><span class="nav-number">5.1.1.</span> <span class="nav-text">Expectation Propagation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%CE%B1-Divergence"><span class="nav-number">5.1.2.</span> <span class="nav-text">α-Divergence</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Stein-Disparency"><span class="nav-number">5.1.3.</span> <span class="nav-text">Stein Disparency</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%E6%9B%B4%E5%A4%8D%E6%9D%82%E7%9A%84%E5%85%88%E9%AA%8C%E5%88%86%E5%B8%83%E6%9D%A5%E6%8F%8F%E8%BF%B0%E5%8F%82%E6%95%B0%E4%BF%A1%E6%81%AF%EF%BC%9F"><span class="nav-number">5.2.</span> <span class="nav-text">如何使用更复杂的先验分布来描述参数信息？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%E6%9B%B4%E5%A4%8D%E6%9D%82%E7%9A%84%E5%90%8E%E9%AA%8C%E5%88%86%E5%B8%83%E7%B0%87%E6%9D%A5%E9%99%8D%E4%BD%8EVI%E6%96%B9%E6%B3%95%E7%9A%84bias%EF%BC%9F"><span class="nav-number">5.3.</span> <span class="nav-text">如何使用更复杂的后验分布簇来降低VI方法的bias？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Copula%E6%96%B9%E6%B3%95"><span class="nav-number">5.3.1.</span> <span class="nav-text">Copula方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%85%E5%8A%A9%E5%8F%98%E9%87%8F%E6%B3%95"><span class="nav-number">5.3.2.</span> <span class="nav-text">辅助变量法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Normalized-Flow-%E5%BD%92%E4%B8%80%E5%8C%96%E6%B5%81"><span class="nav-number">5.3.3.</span> <span class="nav-text">Normalized Flow 归一化流</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E9%80%9A%E8%BF%87%E9%9A%8F%E6%9C%BA%E6%A2%AF%E5%BA%A6%E4%BC%B0%E8%AE%A1%E6%96%B9%E6%B3%95%E6%9D%A5%E6%8F%90%E5%8D%87VI%E6%96%B9%E6%B3%95scalability%EF%BC%9F"><span class="nav-number">5.4.</span> <span class="nav-text">如何通过随机梯度估计方法来提升VI方法scalability？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Score-Function-SF"><span class="nav-number">5.4.1.</span> <span class="nav-text">Score Function (SF)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pathwise-Derivative-PD"><span class="nav-number">5.4.2.</span> <span class="nav-text">Pathwise Derivative (PD)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%94%E7%94%A8"><span class="nav-number">6.</span> <span class="nav-text">应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C-BNN"><span class="nav-number">6.1.</span> <span class="nav-text">贝叶斯神经网络 BNN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E5%88%86%E8%87%AA%E7%BC%96%E7%A0%81%E5%99%A8-VAE"><span class="nav-number">6.2.</span> <span class="nav-text">变分自编码器 VAE</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">8.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

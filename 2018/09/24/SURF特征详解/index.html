@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SURF特征详解">
+<meta property="og:url" content="https://blog.rexking6.top/2018/09/24/SURF%E7%89%B9%E5%BE%81%E8%AF%A6%E8%A7%A3/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537758447.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537759102.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543373266.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537759894.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537760132.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537762147.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537762587.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537762607.png">
+<meta property="article:published_time" content="2018-09-24T02:54:26.000Z">
+<meta property="article:modified_time" content="2018-11-28T02:48:58.974Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="计算机视觉">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1537758447.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/09/24/SURF%E7%89%B9%E5%BE%81%E8%AF%A6%E8%A7%A3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SURF特征详解 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/09/24/SURF%E7%89%B9%E5%BE%81%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SURF特征详解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-09-24 10:54:26" itemprop="dateCreated datePublished" datetime="2018-09-24T10:54:26+08:00">2018-09-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2018-11-28 10:48:58" itemprop="dateModified" datetime="2018-11-28T10:48:58+08:00">2018-11-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" itemprop="url" rel="index"><span itemprop="name">计算机视觉</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/09/24/SURF%E7%89%B9%E5%BE%81%E8%AF%A6%E8%A7%A3/" class="post-meta-item leancloud_visitors" data-flag-title="SURF特征详解" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>SIFT特征之后的SURF特征。</p>
+<p>综合转载以下文章：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/sin_geek/article/details/52768706">图像特征— —SURF特征</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/YiXiaoZhou/p/5903690.html">Surf特征提取分析</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/zilanpotou182/article/details/72848311">SURF特征提取算法原文翻译与理解（上）</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/jia20003/article/details/52710751">图像处理之积分图算法</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/q123456789098/article/details/52748663">haar</a></li>
+<li><a target="_blank" rel="noopener" href="http://blog.sina.com.cn/s/blog_ebbe6d790101ea8r.html">(含代码)图像的Haar小波变换</a></li>
+</ul>
+<p>看了以上几篇关于SURF特征的介绍，都是先从Hessian矩阵，当然，这也是原论文的顺序，但是我刚看还是有些难理解的，所以这篇博客我还是按照SIFT特征的步骤，一步步比较。</p>
+<h1 id="尺度空间"><a href="#尺度空间" class="headerlink" title="尺度空间"></a>尺度空间</h1><h2 id="外部构造"><a href="#外部构造" class="headerlink" title="外部构造"></a>外部构造</h2><p>图像的尺度空间是这幅图像在不同解析度下的表示。在金字塔图像中分为很多层，每一层叫做一个octave，每一个octave中又有几张尺度不同的图片。</p>
+<p>在SIFT算法中，同一个octave层中的图片尺寸(即大小)相同，但是尺度(即模糊程度)不同，而不同的octave层中的图片尺寸大小也不相同，因为它是由上一层图片降采样得到的。在进行高斯模糊时，SIFT的高斯模板大小是始终不变的，只是在不同的octave之间改变图片的大小。</p>
+<p>而在SURF中，图片的大小是一直不变的，不同的octave层得到的待检测图片是改变高斯模糊尺寸大小得到的，当然了，同一个octave中个的图片用到的高斯模板尺度也不同。这样没有上下octave层的迭代降采样操作，允许了多个octave层同时操作，从而提高了速度。</p>
+<p><img src="http://image.rexking6.top/img/clip1537758447.png" alt=""></p>
+<h2 id="内部构造"><a href="#内部构造" class="headerlink" title="内部构造"></a>内部构造</h2><p>首先是LoG算子的改进，在LoG中首先使用高斯平滑，然后对平滑后的图形进行Laplace获得二阶梯度特征。</p>
+<p>而Fast-Hessian Detector则是首先使用盒滤波器来滤波，然后使用Hessian矩阵表示二阶梯度。</p>
+<p><img src="http://image.rexking6.top/img/clip1537759102.png" alt=""></p>
+<p>图中的(a)和(b)是在$y$轴方向和$xy$方向进行高斯二阶微分经过采样和离散化得到的结果，即$L_{xx}$和$L_{xy}$，而(c)和(d)是使用盒滤波器得到的近似高斯二阶微分，即$D_{xx}$和$D_{xy}$。由此，进一步提高性能。</p>
+<p>另外地，因为使用了盒滤波器，所以可以使用积分图提高计算速度。</p>
+<p><img src="http://image.rexking6.top/img/clip1543373266.png" alt=""></p>
+<p>为了得到卷积结果，我们只需要计算4个块的和。这比Hessian快5倍，比DoG快3倍。计算块越大，加速越明显。</p>
+<h3 id="积分图"><a href="#积分图" class="headerlink" title="积分图"></a>积分图</h3><p>积分图是Crow在1984年首次提出，是为了在多尺度透视投影中提高渲染速度。积分图是一种在图像中快速计算矩形区域和的方法，这种算法主要优点是一旦积分图像首先被计算出来我们可以计算图像中任意大小矩形区域的和而且是在常量时间内。这样在图像模糊、边缘提取、对象检测的时候极大降低计算量、提高计算速度。</p>
+<p>在积分图像(Integral Image - $ii$)上任意位置$(x, y)$处的$ii(x, y)$表示该点左上角所有像素之和，表示如下：</p>
+<script type="math/tex; mode=display">ii(x,y)=\sum_{x'<x \space y'<y}i(x',y')</script><p>其中$i(x,y)$表示输入图像上相关位置的像素点。</p>
+<p><img src="http://image.rexking6.top/img/clip1537759894.png" alt=""></p>
+<p>从给定图像$I$从上到下、从左到右计算得到和的积分图像公式如下：</p>
+<script type="math/tex; mode=display">ii(x,y)=ii(x-1,y)+I(x,y)+ii(x,y-1)-ii(x-1,y-1)</script><p>其中，$(x&lt;0||y&lt;0)$时$ii(x,y)=0$,$i(x,y)=0$。</p>
+<p>得到积分图之后，图像中任意矩形区域和通过如下公式计算：</p>
+<script type="math/tex; mode=display">sum(m,n)=ii(x,y)+ii(u,v)-ii(x,v)-ii(u,y)</script><p>其中矩形大小为：$m=x-u,n=y-u$</p>
+<p><img src="http://image.rexking6.top/img/clip1537760132.png" alt=""></p>
+<h2 id="Hessian矩阵"><a href="#Hessian矩阵" class="headerlink" title="Hessian矩阵"></a>Hessian矩阵</h2><p>假设函数$f(x,y)$，Hessian矩阵$H$是由函数偏导数组成。首先来看看图像中某个像素点的Hessian矩阵的定义为：</p>
+<script type="math/tex; mode=display">
+H(f(x,y))=
+{\left[ 
+\begin{array}{c}
+\frac{\partial^2f}{\partial x^2} & \frac{\partial^2f}{\partial x\partial y}\\
+\frac{\partial^2f}{\partial x\partial y} & \frac{\partial^2f}{\partial y^2} 
+\end{array} 
+\right ]}</script><p>从而每一个像素点都可以求出一个Hessian矩阵，Hessian矩阵判别式为：</p>
+<script type="math/tex; mode=display">det(H)=\frac{\partial^2f}{\partial x^2}\frac{\partial^2 f}{\partial y^2}-(\frac{\partial^2 f}{\partial x \partial y})^2</script><p>判别式的值是$H$矩阵的特征值，可以利用判定结果的符号将所有点分类，根据判别式取值正负，从来判别该点是或不是极点的值。在SURF算法中，通常用图像像素$I(x,y)$取代函数值$f(x,y)$。然后选用二阶标准高斯函数作为滤波器。通过特定核间的卷积计算二阶偏导数，这样便能计算出$H$矩阵的三个矩阵元素$L_{xx}$,$L_{xy}$, $L_{yy}$，从而计算出$H$矩阵公式如下：</p>
+<script type="math/tex; mode=display">H(x,\sigma)=
+{\left[ 
+\begin{array}{c}
+L_{xx}(x,\sigma) & L_{xy}(x, \sigma)\\
+L_{xy}(x,\sigma) & L_{yy}(x,\sigma) 
+\end{array} 
+\right ]}</script><p>再使用上图的类似算子，就可以表示成：</p>
+<script type="math/tex; mode=display">H(x,\sigma)=
+{\left[ 
+\begin{array}{c}
+D_{xx}(x,\sigma) & D_{xy}(x, \sigma)\\
+D_{xy}(x,\sigma) & D_{yy}(x,\sigma) 
+\end{array} 
+\right ]}</script><p>但是近似毕竟是近似，这里近似一点，那里近似一点，累积的方差就大了，所以在计算Hessian矩阵行列式时进行了修正，</p>
+<script type="math/tex; mode=display">\frac{|L_{xy}(1.2)|_F|D_{xx}(9)|_F}{L_{xx}(1.2)|_F|D_{xy}(9)|_F}=0.912 ...\approx 0.9</script><p>$1.2$是LoG的尺度，$9$是盒滤波器的边长。</p>
+<script type="math/tex; mode=display">det(H_{approx})=det(D)=D_{xx}D_{yy}-(0.9D_{xy})^2</script><p>推一推，目的是$det(H)=det(D)$。<br>设$det(D)=D_{xx}D_{yy}-(\alpha D_{xy})^2$，<br>于是，</p>
+<script type="math/tex; mode=display">det(H)=det(D) \\
+L_{xx}L_{yy}-(L_{xy})^2 = D_{xx}D_{yy}-(\alpha D_{xy})^2\\
+\frac{(L_{xy})^2}{L_{xx}L_{yy}}=\frac{\alpha(D_{xy})^2}{D_{xx}D_{yy}} \\
+\alpha^2 = \frac{(L_{xy})^2D_{xx}D_{yy}}{(D_{xy})^2L_{xx}L_{yy}}</script><h2 id="为什么Hessian矩阵可以用来判断极大值-极小值"><a href="#为什么Hessian矩阵可以用来判断极大值-极小值" class="headerlink" title="为什么Hessian矩阵可以用来判断极大值/极小值?"></a>为什么Hessian矩阵可以用来判断极大值/极小值?</h2><p>在$x_0$点上，Hessian矩阵是正定的，且各分量的一阶偏导数为0，则$x_0$为极小值点。在$x_0$点上，Hessian矩阵是负定的，且各分量的一阶偏导数为0，则$x_0$为极大值点。对于某个局部区域，若Hessian矩阵是半正定的，则这个区域是凸的（反之依然成立）；若负定，则这个区域是凹的(反之依然成立)。而对于正定和负定来说，Hessian矩阵的行列式总是大于等于0的。反过来就是说：某个点若是极大值/极小值，hessian矩阵的行列式必然要大于等于0，而大于等于0如果是满足的，这个点不一定是极大值/极小值(还要判断一阶导数)。所以后面还要进行极大值抑制。</p>
+<h1 id="特征点定位"><a href="#特征点定位" class="headerlink" title="特征点定位"></a>特征点定位</h1><p>这里和LoG，DoG相同，都是在生成尺度空间后，找在三维上找极值点。</p>
+<p>这里和DoG不同的是不用剔除边缘导致的极值点了，因为Hessian矩阵的行列式就已经考虑到边缘的问题了，而DoG计算只是把不同方向变化趋势给出来，后续还需要使用Hessian矩阵的特征值剔除边缘产生的影响。</p>
+<h1 id="求特征点的主方向"><a href="#求特征点的主方向" class="headerlink" title="求特征点的主方向"></a>求特征点的主方向</h1><p>不像sift中依靠梯度方向直方图确定主方向，Surf首先将周围$6s$的圆形区域分成6个扇形区间，s是对应的尺度。然后在每个扇形区域使用提取x方向和y方向的Haar小波特征(Haar小波的边长为4s),将该区域每个样本点这两个响应的高斯加权和作为该区域的方向，最后扫面了整个圆形区域，选择最大方向就是该关键点的方向。</p>
+<p><img src="http://image.rexking6.top/img/clip1537762147.png" alt=""></p>
+<h2 id="Haar小波"><a href="#Haar小波" class="headerlink" title="Haar小波"></a>Haar小波</h2><h3 id="一维haar小波"><a href="#一维haar小波" class="headerlink" title="一维haar小波"></a>一维haar小波</h3><p>例如我们有一个一维的图像[2,4,6,8,10,12,14,16]。</p>
+<ol>
+<li>求均值：我们求相邻像素的均值[3,7,11,15]。这个新的图像分辨率就成了原来的一半(8/2=4)。</li>
+<li>求差值。上面的均值我们存储了图像的整体信息。但是很多细节信息我们丢掉了，所以我们同时要记录图像的细节信息，这样在重构时能够恢复图像的全部信息。经过计算我们得到了结果[-1,-1,-1,-1]。</li>
+<li>此时上面两步形成了第一次分解的结果[3,7,11,15,-1,-1,-1,-1]。包含了图像的整体信息和细节信息。接下来的分解我们重复1,2步，将整体信息再次进行分解，得到了二级分解结果[5,13,-2,-2]。同样的，前面的[5,13]是整体信息，后面的[-2,-2]是细节信息。</li>
+</ol>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>分辨率</th>
+<th>整体信息</th>
+<th>细节信息</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4</td>
+<td>3,7,11,15</td>
+<td>-1,-1,-1,-1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>5,13</td>
+<td>-2,-2</td>
+</tr>
+<tr>
+<td>1</td>
+<td>9</td>
+<td>-4</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>经过三次分解，我们得到了一个整体信息和三个细节系数，这个就是一维小波变换。</p>
+<h3 id="二维haar小波"><a href="#二维haar小波" class="headerlink" title="二维haar小波"></a>二维haar小波</h3><p>一维小波变换其实是将一维原始信号分别经过低通滤波和高通滤波以及二元下抽样得到信号的低频部分L和高频部分H。而根据Mallat算法，二维小波变换可以用一系列的一维小波变换得到。对一幅m行n列的图像，二维小波变换的过程是先对图像的每一行做一维小波变换，得到L和H两个对半部分；然后对得到的LH图像（仍是m行n列）的每一列做一维小波变换。这样经过一级小波变换后的图像就可以分为LL，HL，LH，HH四个部分，如下图所示，就是一级二维小波变换的塔式结构：</p>
+<p><img src="http://image.rexking6.top/img/clip1537762587.png" alt=""></p>
+<p>而二级、三级以至更高级的二维小波变换则是对上一级小波变换后图像的左上角部分（LL部分）再进行一级二维小波变换，是一个递归过程。下图是三级二维小波变换的塔式结构图：</p>
+<p><img src="http://image.rexking6.top/img/clip1537762607.png" alt=""></p>
+<h3 id="唔"><a href="#唔" class="headerlink" title="唔"></a>唔</h3><p>看了上面这些，我还是不知道主方向中haar小波具体怎么计算的，水平方向和垂直方向不是只有两个方向吗，怎么计量八个方向或者十个方向呢，当扩展知识吧。</p>
+<h1 id="生成特征描述"><a href="#生成特征描述" class="headerlink" title="生成特征描述"></a>生成特征描述</h1><p>统计特征时，再该关键点周围选取$20s \times 20s$的区域，划分成$4 \times 4$的子区域，在每个子区域内使用$x$方向，$y$方向的的haar小波特征算子提取haar小波特征，然后使用提取结果统计$\sum dx$,$\sum dy$,$\sum|dx|$,$\sum |dy|$四个值作为该子区域的特征，那么一个关键点就可以使用16个子区域的特征联合表示，即64维向量。</p>
+<p>64维向量与sift的128维向量相比，匹配的时间也会更短。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>总的来说，surf与sift相比，有三点提高了速度：</p>
+<ol>
+<li>尺度空间，图像的分辨率不变，能够同时操作；</li>
+<li>极值点检测，使用了盒滤波器近似，再使用积分图辅助；</li>
+<li>最后生成的特征为64维，与sift相比少了64维。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\11\23\《Unknown-Identity-Rejection-Loss-Utilizing-Unlabeled-Data-for-Face-Recognition》笔记\" rel="bookmark">《Unknown Identity Rejection Loss: Utilizing Unlabeled Data for Face Recognition》笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\10\06\背景检测\" rel="bookmark">背景检测</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\11\AlexNet论文翻译\" rel="bookmark">AlexNet论文翻译</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/09/24/SURF%E7%89%B9%E5%BE%81%E8%AF%A6%E8%A7%A3/" title="SURF特征详解">https://blog.rexking6.top/2018/09/24/SURF特征详解/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/09/23/SIFT%E7%89%B9%E5%BE%81%E8%AF%A6%E8%AF%A6%E8%A7%A3/" rel="prev" title="SIFT特征详详解">
+      <i class="fa fa-chevron-left"></i> SIFT特征详详解
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/09/24/Bag-of-visual-word%E8%A7%86%E8%A7%89%E8%AF%8D%E8%A2%8B/" rel="next" title="Bag-of-visual word视觉词袋">
+      Bag-of-visual word视觉词袋 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%BA%E5%BA%A6%E7%A9%BA%E9%97%B4"><span class="nav-number">2.</span> <span class="nav-text">尺度空间</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%96%E9%83%A8%E6%9E%84%E9%80%A0"><span class="nav-number">2.1.</span> <span class="nav-text">外部构造</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E9%83%A8%E6%9E%84%E9%80%A0"><span class="nav-number">2.2.</span> <span class="nav-text">内部构造</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A7%AF%E5%88%86%E5%9B%BE"><span class="nav-number">2.2.1.</span> <span class="nav-text">积分图</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hessian%E7%9F%A9%E9%98%B5"><span class="nav-number">2.3.</span> <span class="nav-text">Hessian矩阵</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88Hessian%E7%9F%A9%E9%98%B5%E5%8F%AF%E4%BB%A5%E7%94%A8%E6%9D%A5%E5%88%A4%E6%96%AD%E6%9E%81%E5%A4%A7%E5%80%BC-%E6%9E%81%E5%B0%8F%E5%80%BC"><span class="nav-number">2.4.</span> <span class="nav-text">为什么Hessian矩阵可以用来判断极大值&#x2F;极小值?</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%89%B9%E5%BE%81%E7%82%B9%E5%AE%9A%E4%BD%8D"><span class="nav-number">3.</span> <span class="nav-text">特征点定位</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B1%82%E7%89%B9%E5%BE%81%E7%82%B9%E7%9A%84%E4%B8%BB%E6%96%B9%E5%90%91"><span class="nav-number">4.</span> <span class="nav-text">求特征点的主方向</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Haar%E5%B0%8F%E6%B3%A2"><span class="nav-number">4.1.</span> <span class="nav-text">Haar小波</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E7%BB%B4haar%E5%B0%8F%E6%B3%A2"><span class="nav-number">4.1.1.</span> <span class="nav-text">一维haar小波</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E7%BB%B4haar%E5%B0%8F%E6%B3%A2"><span class="nav-number">4.1.2.</span> <span class="nav-text">二维haar小波</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%94%94"><span class="nav-number">4.1.3.</span> <span class="nav-text">唔</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E7%89%B9%E5%BE%81%E6%8F%8F%E8%BF%B0"><span class="nav-number">5.</span> <span class="nav-text">生成特征描述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

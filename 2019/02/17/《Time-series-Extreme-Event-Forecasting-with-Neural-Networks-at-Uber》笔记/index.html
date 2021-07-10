@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Time-series Extreme Event Forecasting with Neural Networks at Uber》笔记">
+<meta property="og:url" content="https://blog.rexking6.top/2019/02/17/%E3%80%8ATime-series-Extreme-Event-Forecasting-with-Neural-Networks-at-Uber%E3%80%8B%E7%AC%94%E8%AE%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1550391072.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1550391294.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1550391332.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1550391931.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1550391983.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1550393597.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1550393904.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1550393980.png">
+<meta property="article:published_time" content="2019-02-17T06:55:56.000Z">
+<meta property="article:modified_time" content="2019-03-06T10:17:32.907Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="AIOps">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1550391072.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2019/02/17/%E3%80%8ATime-series-Extreme-Event-Forecasting-with-Neural-Networks-at-Uber%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《Time-series Extreme Event Forecasting with Neural Networks at Uber》笔记 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2019/02/17/%E3%80%8ATime-series-Extreme-Event-Forecasting-with-Neural-Networks-at-Uber%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Time-series Extreme Event Forecasting with Neural Networks at Uber》笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-02-17 14:55:56" itemprop="dateCreated datePublished" datetime="2019-02-17T14:55:56+08:00">2019-02-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 18:17:32" itemprop="dateModified" datetime="2019-03-06T18:17:32+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AIOps/" itemprop="url" rel="index"><span itemprop="name">AIOps</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2019/02/17/%E3%80%8ATime-series-Extreme-Event-Forecasting-with-Neural-Networks-at-Uber%E3%80%8B%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="《Time-series Extreme Event Forecasting with Neural Networks at Uber》笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>5.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>Uber时间序列的前一篇，利用神经网络对Uber极端事件进行时间序列预测。给了M3数据集的方法比较结果，貌似看到希望了。</p>
+<ul>
+<li><a href="">Time-series Extreme Event Forecasting with Neural Networks at Uber </a></li>
+</ul>
+<h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>在高方差段（如节假日）进行准确的时间序列预测对于异常检测、最优资源分配、预算规划和其他相关任务至关重要。在Uber，对特殊事件期间完成的行程进行准确预测，可以提高司机分配的效率，从而减少乘客的等待时间。</p>
+<p>用于处理该任务的现有技术方法通常依赖于单变量预测模型（例如，Holt-Winters）和机器学习方法（例如，随机森林）的组合。 然而，这样的系统难以调整，缩放和添加外生变量。</p>
+<p>基于LSTM网络的复兴，我们提出了一种新的端到端递归神经网络架构，该架构在Uber数据上优于当前最先进的事件预测方法，并很好地推广到用于时间序列预测竞赛的公共M3数据集。</p>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>在高方差段（例如，假期，体育赛事）期间准确的需求时间序列预测对于异常检测，最佳资源分配，预算计划和其他相关任务是至关重要的。 这个问题具有挑战性，因为极端事件预测取决于许多外部因素，包括天气，城市人口增长或营销变化（例如，驾驶员激励）（Horne＆Manzenreiter，2004）。</p>
+<p>经典的时间序列模型，例如标准R预测（Hyndman＆amp; Khandakar，2008）包中的模型，是提供单变量基本级预测的常用方法。 为了结合外生变量，采用机器学习方法通常是基于分位数随机森林（Meinshausen，2006）。 这种现有技术方法在精确建模特殊事件方面是有效的，然而，由于重新训练次数过多，它不灵活并且不能缩放。</p>
+<p>经典时间序列模型通常需要手动调整以设置季节性和其他参数。 此外，尽管存在可以包含外生变量的时间序列模型（Wei，1994），但它们受到维度的诅咒并且需要频繁的再训练。 为了更有效地处理外生变量，在（Opitz，2015）中引入了单变量建模和机器学习模型来处理残差的组合。 然而，由此产生的两阶段模型难以调整，需要手动特征提取和频繁的再训练，这对于数百万个时间序列来说是无法实现的。</p>
+<p>最近，基于长短期记忆（LSTM）（Hochreiter＆amp; Schmidhuber，1997）技术的时间序列建模由于其端到端建模，易于结合外生变量和自动特征提取能力而受到欢迎（Assaad等，2008）。 通过在众多维度上提供大量数据，可以看出LSTM方法可以模拟复杂的非线性特征相互作用（Ogunmolu等，2016），这对于模拟复杂的极端事件至关重要。</p>
+<p>我们的初始LSTM实现相对于上述现有技术方法没有表现出优越的性能。 在第4节中，我们讨论了我们的初始LSTM实现的关键体系结构更改，这些实现是为单模型，异构时间序列预测实现大规模性能所需的。</p>
+<p>本文的贡献如下：</p>
+<ul>
+<li>我们提出了一种新的基于lstm的体系结构，并使用异构时间序列对单个模型进行训练。</li>
+<li>在私有和公共数据的基础上进行了实验，验证了该模型的通用性和可扩展性。</li>
+</ul>
+<p>本文的其余部分结构如下：第2节提供了基于经典和神经网络的时间序列预测模型的简要背景。 第3节描述了数据，更具体地说，它是如何构建和预处理的，用作LSTM模型的输入。 第4节描述了我们最初的LSTM模型的体系结构更改。 第5和第6节提供了结果和随后的讨论。</p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>极端事件预测已成为预测高峰用电需求、交通拥堵严重程度和高峰时段拼车等应用的热门话题。（Thorarinsdottir，2012）。事实上，统计学中有一个分支叫做极值理论（EVT）（de Haan＆Ferreira，2006），它直接涉及这一挑战。为了解决峰值预测问题，提出了单变量时间序列和机器学习方法。</p>
+<p>虽然单变量时间序列方法直接对时域进行建模，但它们经常需要再训练（Ye＆Keogh，2009）。 机器学习模型通常与单变量时间序列模型结合使用，从而产生一个庞大的两步过程来解决极端事件预测问题（Opitz，2015）。 与传统的时间序列方法一样，LSTM可以很好地模拟时域，同时也可以模拟非线性特征相互作用和残差（Assaad等，2008）。</p>
+<p>我们发现普通的LSTM性能比基线差。因此，我们提出了一种新的体系结构，它利用自动编码器进行特征提取，实现了比基线更好的性能。</p>
+<h1 id="数据"><a href="#数据" class="headerlink" title="数据"></a>数据</h1><p>在Uber，我们匿名访问了数百个城市的乘客和司机数据。尽管我们拥有大量的数据，但由于新城市和特殊活动的数据稀疏性，我们面临着挑战。为了避免数据的缺乏，我们使用了额外的功能，包括天气信息（例如，降水、风速、温度）和城市级别信息（例如，当前旅行、当前用户、本地假日）。原始数据集的示例如图1(b)所示。</p>
+<p>创建训练数据集需要分别具有所需回顾和预测范围的滑动窗口 $X$（输入）和 $Y$（输出）。 $X;Y$ 由（批次，时间，特征）组成。 有关 $X$ 和 $Y$ 的示例，请参见图1(a)。</p>
+<p>神经网络对未缩放的数据敏感（Hochreiter＆amp; Schmidhuber，1997），因此我们将每个小批量标准化。 此外，我们发现，与去季节性相反，去趋势可以产生更好的结果。</p>
+<h1 id="建模"><a href="#建模" class="headerlink" title="建模"></a>建模</h1><p>在本节中，我们首先介绍了模型中用于不确定性计算的策略，然后在4.2节中，我们提出了一种用于时间序列预测的新的可扩展神经网络体系结构。</p>
+<h2 id="不确定性估计"><a href="#不确定性估计" class="headerlink" title="不确定性估计"></a>不确定性估计</h2><p>极端事件问题本质上是概率问题，基于神经网络的时间序列预测中的鲁棒不确定性估计是关键。不确定性估计的方法有很多，从贝叶斯方法到基于bootstrap理论的方法（Gal，2016）。在我们的工作中，我们结合Bootstrap和贝叶斯方法来产生一个简单的、健壮的和紧密的不确定性边界，具有良好的覆盖和可证明的收敛性（Maddala，1996）。</p>
+<p><img src="http://image.rexking6.top/img/clip1550391072.png" alt=""></p>
+<p><em>列表1.估计不确定性边界的实际实现</em></p>
+<p>这种方法的实施非常简单实用（见列表1）。 图2(a)和(b)描述了不确定性推导和使用的基础模型。 上述不确定性计算包括了提出的端到端预测模型的完备性，可以用其他不确定性度量代替。 我们将关于近似界限的讨论，与其他方法的比较（Kendall＆Gal，2017）以及其他详细的不确定性实验进行了讨论。</p>
+<p><img src="http://image.rexking6.top/img/clip1550391294.png" alt=""></p>
+<p><em>模型和预测不确定性的推导</em></p>
+<p><img src="http://image.rexking6.top/img/clip1550391332.png" alt=""></p>
+<p><em>模型的不确定性通过左边的体系结构进行估计，而预测的不确定性通过右边的体系结构进行估计。</em></p>
+<p><em>图2. 模型与预测不确定性</em></p>
+<h2 id="使用单一模型进行异构预测"><a href="#使用单一模型进行异构预测" class="headerlink" title="使用单一模型进行异构预测"></a>使用单一模型进行异构预测</h2><p>为数百万个指标训练每个时间序列的模型是不切实际的。 此外，训练单一普通的LSTM不会产生有竞争力的结果。因此，我们提出了一种新颖的模型体系结构，为异构预测提供单一模型。如图3(b)所示，该模型首先通过自动特征提取对网络进行初始化，这对于大规模捕捉特殊事件中的复杂时序动态至关重要。这与手动提取特征的标准特征提取方法相反，见图3(a)。然后通过集成技术（例如平均或其他方法）对特征向量进行聚合。最后的向量与新的输入连接起来，并输入LSTM预测器进行预测。使用这种方法，我们比在一组原始输入上训练的多层LSTM模型平均提高了14.09%。</p>
+<p>注意，在图3 (b)中包含由自动编码器产生的额外功能有不同的方法。可以通过扩展输入大小或增加图3 (b)中LSTM预测器的深度来包含额外功能，从而删除LSTM自动编码器。然而，拥有一个独立的自动编码器模块，在我们的经验中产生了更好的结果。关于设计选择的其他细节留到论文的较长版本中讨论。</p>
+<p><img src="http://image.rexking6.top/img/clip1550391931.png" alt=""></p>
+<p><em>手工推导的经典时间序列特征（Hyndman等，2015）。</em></p>
+<p><img src="http://image.rexking6.top/img/clip1550391983.png" alt=""></p>
+<p><em>自动编码器可以提供强大的特征提取用于启动神经网络。</em></p>
+<p><em>图3. 单模型异构预测</em></p>
+<h1 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h1><p>本节提供了所描述的特殊事件模型和一般时间序列预测准确性的实证结果。 使用带有Tensorflow的AWS GPU实例进行训练。 除非另有说明，否则SMAPE被用作定义为 $\frac{100}{n}\times \sum_n\frac{|\hat y-y_t|}{2(|\hat y_t|+|y_t|)}​$ 的预测误差度量。所描述的神经网络模型在数千个时间序列上进行训练，每个时间序列具有数千个数据点。</p>
+<h2 id="特殊事件预测精度"><a href="#特殊事件预测精度" class="headerlink" title="特殊事件预测精度"></a>特殊事件预测精度</h2><p>一份历时5年的美国各大城市每日完成行程（按人口计算）的历史数据，被用于提供美国所有主要节假日的预测。图4显示了具有相应不确定性的平均SMAPE。测量不确定性的变化系数定义为 $c_v=\frac{\sigma}{\mu}$。我们发现最难预测Uber出行预期的节日之一是圣诞节，它对应着最大的错误和不确定性。较长版本的论文将包含更详细的误差和不确定性评估每个城市。结果表明，与现有的包含单变量时间序列和机器学习单一模型的方法相比，预测精度提高了2%-18%。</p>
+<p><img src="http://image.rexking6.top/img/clip1550393597.png" alt=""></p>
+<p><em>图4. 个体节假日表现</em></p>
+<h2 id="一般时间序列预测精度"><a href="#一般时间序列预测精度" class="headerlink" title="一般时间序列预测精度"></a>一般时间序列预测精度</h2><p>本节描述了训练模型在一般时间序列上的预测精度。 图5显示了相对于单一模型在新时间序列上的预测性能。 请注意，为了与单一模型的每个查询训练要求相比，我们训练单个神经网络。 第3节中描述的类似预处理应用于每个时间序列。 图6显示了同一模型在公共M3基准测试中的表现，该基准测试由1500个月的时间序列组成（Makridakis＆Hibon，2000）。</p>
+<p><img src="http://image.rexking6.top/img/clip1550393904.png" alt=""></p>
+<p><em>图5. 相对于当前专有模型的生产查询的预测错误</em></p>
+<p><img src="http://image.rexking6.top/img/clip1550393980.png" alt=""></p>
+<p><em>图6. 公共M3数据集的预测。 对Uber数据进行单神经网络训练，并与M3专用模型进行比较。</em></p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>我们在Uber提出了一种端到端神经网络的特殊事件预测架构。我们已经展示了它在Uber数据上的性能和可伸缩性。最后，我们展示了模型s对Uber数据和M3公共月数据的一般预测适用性。</p>
+<p>根据我们的经验，选择时间序列的神经网络模型有三个标准：时间序列的数量、时间序列的长度和时间序列之间的相关性。 如果三者够高，则神经网络可能是正确的选择，否则经典的时间序列方法可能效果最好。</p>
+<p>我们未来的工作将集中在利用神经网络调试和执行的不确定性信息的进一步研究对一般为异构的时间序列预测模型预测和特征提取与类似的用例通用ImageNet模型用于一般的图像特征提取和分类（Deng等，2009）。</p>
+<h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><ul>
+<li>Assaad, Mohammad, Bone, Romuald, and Cardot, Hu- bert. A new boosting algorithm for improved time-series forecasting with recurrent neural networks. Inf. Fusion, 2008.</li>
+<li>de Haan, L. and Ferreira, A. Extreme Value Theory: An Introduction. Springer Series in Operations Research and Financial Engineering. 2006.</li>
+<li>Deng, J., Dong, W., Socher, R., Li, L.-J., Li, K., and FeiFei, L. ImageNet: A Large-Scale Hierarchical Image Database. In CVPR09, 2009.</li>
+<li>Friederichs, Petra and Thorarinsdottir, Thordis L. Forecast verification for extreme value distributions with an application to probabilistic peak wind prediction. Environmetrics, 2012.</li>
+<li>Gal, Yarin. Uncertainty in Deep Learning. PhD thesis, University of Cambridge, 2016.</li>
+<li>Hochreiter, Sepp and Schmidhuber, Jurgen. Long short-term memory. Neural Comput., 1997.</li>
+<li>Horne, John D. and Manzenreiter, Wolfram. Accounting for mega-events. International Review for the Sociology of Sport, 39(2):187–203, 2004.</li>
+<li>Hyndman, Rob J and Khandakar, Yeasmin. Automatic time series forecasting: the forecast package for R. Journal of Statistical Software, 26(3):1–22, 2008.</li>
+<li>Hyndman, Rob J., Wang, Earo, and Laptev, Nikolay. Large-scale unusual time series detection. In ICDM, pp. 1616–1619, 2015.</li>
+<li>Kendall, Alex and Gal, Yarin. What Uncertainties Do We Need in Bayesian Deep Learning for Computer Vision? 2017.</li>
+<li>Li, G. S. Hongyi and Maddala. Bootstrapping time series models. Econometric Reviews, 15(2):115–158, 1996.</li>
+<li>Makridakis, Spyros and Hibon, Michele. The m3-competition: results, conclusions and implications. International Journal of Forecasting, 16(4):451–476, 00 2000.</li>
+<li>Meinshausen, Nicolai. Quantile regression forests. JOURNAL OF MACHINE LEARNING RESEARCH, 7:983–999, 2006.</li>
+<li>Ogunmolu, Olalekan P., Gu, Xuejun, Jiang, Steve B., and Gans, Nicholas R. Nonlinear systems identification using deep dynamic neural networks. CoRR, 2016. </li>
+<li>Opitz, T. Modeling asymptotically independent spatial extremes based on Laplace random fields. ArXiv e-prints, 2015. </li>
+<li>Wei, William Wu-Shyong. Time series analysis. Addison Wesley publ Reading, 1994.</li>
+<li>Ye, Lexiang and Keogh, Eamonn. Time series shapelets: A new primitive for data mining. KDD. ACM, 2009. </li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\04\10\AIOps资料\" rel="bookmark">AIOps资料</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2020\12\29\时间序列分解\" rel="bookmark">时间序列分解</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2020\12\29\时间序列平滑\" rel="bookmark">时间序列平滑</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2019/02/17/%E3%80%8ATime-series-Extreme-Event-Forecasting-with-Neural-Networks-at-Uber%E3%80%8B%E7%AC%94%E8%AE%B0/" title="《Time-series Extreme Event Forecasting with Neural Networks at Uber》笔记">https://blog.rexking6.top/2019/02/17/《Time-series-Extreme-Event-Forecasting-with-Neural-Networks-at-Uber》笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AIOps/" rel="tag"># AIOps</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/02/14/%E3%80%8ADeep-and-Confident-Prediction-for-Time-Series-at-Uber%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="prev" title="《Deep and Confident Prediction for Time Series at Uber》笔记">
+      <i class="fa fa-chevron-left"></i> 《Deep and Confident Prediction for Time Series at Uber》笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/02/28/%E3%80%8A%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E3%80%8B/" rel="next" title="《机器学习》">
+      《机器学习》 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">3.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">4.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE"><span class="nav-number">5.</span> <span class="nav-text">数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BB%BA%E6%A8%A1"><span class="nav-number">6.</span> <span class="nav-text">建模</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E7%A1%AE%E5%AE%9A%E6%80%A7%E4%BC%B0%E8%AE%A1"><span class="nav-number">6.1.</span> <span class="nav-text">不确定性估计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%8D%95%E4%B8%80%E6%A8%A1%E5%9E%8B%E8%BF%9B%E8%A1%8C%E5%BC%82%E6%9E%84%E9%A2%84%E6%B5%8B"><span class="nav-number">6.2.</span> <span class="nav-text">使用单一模型进行异构预测</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C"><span class="nav-number">7.</span> <span class="nav-text">结果</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E4%BA%8B%E4%BB%B6%E9%A2%84%E6%B5%8B%E7%B2%BE%E5%BA%A6"><span class="nav-number">7.1.</span> <span class="nav-text">特殊事件预测精度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E8%88%AC%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B%E7%B2%BE%E5%BA%A6"><span class="nav-number">7.2.</span> <span class="nav-text">一般时间序列预测精度</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">8.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">9.</span> <span class="nav-text">引用</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

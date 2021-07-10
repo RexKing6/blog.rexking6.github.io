@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IO多路复用">
+<meta property="og:url" content="https://blog.rexking6.top/2017/12/09/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/640">
+<meta property="og:image" content="http://image.rexking6.top/img/640">
+<meta property="og:image" content="http://image.rexking6.top/img/640">
+<meta property="article:published_time" content="2017-12-09T11:41:41.000Z">
+<meta property="article:modified_time" content="2020-12-09T11:56:18.158Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/640">
+
+<link rel="canonical" href="https://blog.rexking6.top/2017/12/09/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>IO多路复用 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2017/12/09/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          IO多路复用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-12-09 19:41:41" itemprop="dateCreated datePublished" datetime="2017-12-09T19:41:41+08:00">2017-12-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-09 19:56:18" itemprop="dateModified" datetime="2020-12-09T19:56:18+08:00">2020-12-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2017/12/09/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/" class="post-meta-item leancloud_visitors" data-flag-title="IO多路复用" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>4.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/LkCoaUE5sl88J90iVwln9A">一文彻底理解 I/O 多路复用</a>。</p>
+<p>在讲解该技术之前，我们需要预习一下文件以及文件描述符。</p>
+<h1 id="什么是文件"><a href="#什么是文件" class="headerlink" title="什么是文件"></a>什么是文件</h1><p>程序员使用I/O最终都逃不过文件这个概念。</p>
+<p>在Linux世界中文件是一个很简单的概念，作为程序员我们只需要将其理解为一个N byte的<strong>序列</strong>就可以了：</p>
+<p><strong><em>b1, b2, b3, b4, ……. bN</em></strong></p>
+<p>实际上所有的I/O设备都被抽象为了文件这个概念，一切皆文件，Everything is File，磁盘、网络数据、终端，甚至进程间通信工具管道pipe等都被当做文件对待。</p>
+<p><img src="http://image.rexking6.top/img/640" alt="图片"></p>
+<p>所有的I/O操作也都可以通过文件读写来实现，<strong>这一非常优雅的抽象可以让程序员使用一套接口就能对所有外设I/O操作</strong>。</p>
+<p>常用的I/O操作接口一般有以下几类：</p>
+<ul>
+<li>打开文件，open</li>
+<li>改变读写位置，seek</li>
+<li>文件读写，read、write</li>
+<li>关闭文件，close</li>
+</ul>
+<p>程序员通过这几个接口几乎可以实现所有I/O操作，这就是文件这个概念的强大之处。</p>
+<h1 id="文件描述符"><a href="#文件描述符" class="headerlink" title="文件描述符"></a>文件描述符</h1><p>之前说过，要想进行I/O读操作，像磁盘数据，我们需要指定一个buff用来装入数据，一般都是这样写的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">read(buff);</span><br></pre></td></tr></table></figure>
+<p>但是这里我们忽略了一个关键问题，那就是虽然我们指定了往哪里写数据，但是我们该从哪里读数据呢？</p>
+<p>从上一节中我们知道，通过文件这个概念我们能实现几乎所有I/O操作，<strong>因此这里少的一个主角就是文件</strong>。</p>
+<p>那么我们一般都怎样使用文件呢？</p>
+<p>如果周末你去比较火的餐厅吃饭应该会有体会，一般周末人气高的餐厅都会排队，然后服务员会给你一个排队序号，通过这个序号服务员就能找到你，这里的好处就是服务员无需记住你是谁、你的名字是什么、来自哪里、喜好是什么、是不是保护环境爱护小动物等等，这里的关键点就是<strong>服务员对你一无所知，但依然可以通过一个号码就能找到你</strong>。</p>
+<p>同样的，在Linux世界要想使用文件，我们也需要借助一个号码，这个号码就被称为了文件描述符，<strong>file descriptors</strong>，在Linux世界中鼎鼎大名，其道理和上面那个排队号码一样。</p>
+<p>因此，文件描述仅仅就是一个数字而已，但是通过这个数字我们可以操作一个打开的文件，这一点要记住。</p>
+<p><img src="http://image.rexking6.top/img/640" alt="图片"></p>
+<p><strong>有了文件描述符，进程可以对文件一无所知</strong>，比如文件在磁盘的什么位置、加载到内存中又是怎样管理的等等，这些信息统统交由操作系统打理，进程无需关心，操作系统只需要给进程一个文件描述符就足够了。</p>
+<p>因此我们来完善上述程序：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int fd = open(file_name); // 获取文件描述符read(fd, buff);</span><br></pre></td></tr></table></figure>
+<p>怎么样，是不是非常简单。</p>
+<h1 id="文件描述符太多了怎么办"><a href="#文件描述符太多了怎么办" class="headerlink" title="文件描述符太多了怎么办"></a>文件描述符太多了怎么办</h1><p>经过了这么多的铺垫，终于要到高性能、高并发这一主题了。</p>
+<p>从前几节我们知道，所有I/O操作都可以通过文件样的概念来进行，这当然包括网络通信。</p>
+<p>如果你有一个web服务器，当三次握手成功以后，我们会调用accept来获取一个链接，调用该函数我们同样会得到一个文件描述符，通过这个文件描述符就可以处理客户端发送的请求并且把处理结果发送回去。也就是说通过这个描述符我们就可以和客户端进行通信了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">// 通过accept获取客户端的文件描述符int conn_fd = accept(...);</span><br></pre></td></tr></table></figure>
+<p>server的处理逻辑通常是读取客户端请求数据，然后执行某些特定逻辑：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if(read(conn_fd, request_buff) &gt; 0) </span><br><span class="line">&#123;    </span><br><span class="line">	do_something(request_buff);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>是不是非常简单，然而世界终归是复杂的，当然也不是这么简单的。</p>
+<p>接下来就是比较复杂的了。</p>
+<p>既然我们的主题是高并发，那么<strong>server就不可能只和一个客户端通信</strong>，而是可能会同时和成千上万个客户端进行通信。<strong>这时你需要处理不再是一个描述符这么简单，而是有可能要处理成千上万个描述符</strong>。</p>
+<p>为了不让问题一上来就过于复杂，我们先简单化，假设只同时处理两个客户端的请求。</p>
+<p>有的同学可能会说，这还不简单，这样写不就行了：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">if(read(socket_fd1, buff) &gt; 0) </span><br><span class="line">&#123; </span><br><span class="line">	// 处理第一个    do_something();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">if(read(socket_fd2, buff) &gt; 0) </span><br><span class="line">&#123; </span><br><span class="line">	// 处理第二个    do_something();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以前我们讨论过这是非常典型的阻塞式I/O，如果此时没有数据可读那么进程会被阻塞而暂停运行，这时我们就无法处理第二个请求了，即使第二个请求的数据已经就位，这也就意味着处理某一个客户端时由于进程被阻塞导致剩下的所有其它客户端必须<strong>等待</strong>，在同时处理几万客户端的server上，这显然是不能容忍的。</p>
+<p>聪明的你一定会想到使用多线程，为每个客户端请求开启一个线程，这样一个客户端被阻塞就不会影响到处理其它客户端的线程了，注意，既然是高并发，那么我们要为成千上万个请求开启成千上万个线程吗，大量创建销毁线程会严重影响系统性能。</p>
+<p>那么这个问题该怎么解决呢？</p>
+<p><strong>这里的关键点在于，我们事先并不知道一个文件描述对应的I/O设备是否是可读的、是否是可写的</strong>，在外设的不可读或不可写的状态下进行I/O只会导致进程阻塞被暂停运行。</p>
+<p>因此要优雅的解决这个问题，就要从其它角度来思考这个问题了。</p>
+<h1 id="不要打电话给我，有需要我会打给你"><a href="#不要打电话给我，有需要我会打给你" class="headerlink" title="不要打电话给我，有需要我会打给你"></a>不要打电话给我，有需要我会打给你</h1><p>大家生活中肯定会接到过推销电话，而且不止一个，一天下来接上十个八个推销电话你的身体会被掏空的。</p>
+<p>这个场景的关键点在于打电话的人并不知道你是不是要买东西，只能来一遍遍问你，因此一种更好的策略是不要让他们打电话给你，记下他们的电话，有需要的话打给他们，这样推销员就不会一遍一遍的来烦你了(虽然现实生活中这并不可能)。</p>
+<p>在这个例子中，你，就好比内核，推销者就好比应用程序，电话号码就好比文件描述符，和你用电话沟通就好比I/O。</p>
+<p>现在你应该明白了吧，处理多个文件描述符的更好方法其实就存在于推销电话中。</p>
+<p>因此相比上一节中我们通过I/O接口<strong>主动</strong>问内核这些文件描述符对应的外设是不是已经就绪了，一种更好的方法是，我们把这些感兴趣的文件描述符一股脑扔给内核，并霸气的告诉内核：“<strong>我这里有1万个文件描述符，你替我监视着它们，有可以读写的文件描述符时你就告诉我，我好处理</strong>”。而不是弱弱的问内核：“第一个文件描述可以读写了吗？第二个文件描述符可以读写吗？第三个文件描述符可以读写了吗？。。。”</p>
+<p>这样应用程序就<strong>从“繁忙”的主动变为了清闲的被动</strong>，<strong>反正文件描述可读可写了内核会通知我</strong>，能偷懒我才不要那么勤奋。</p>
+<p>这是一种更加高效的I/O处理机制，<strong>现在我们可以一次处理多路I/O了</strong>，为这种机制起一个名字吧，就叫I/O多路复用吧，这就是 I/O multiplexing。</p>
+<h1 id="I-O多路复用，I-O-multiplexing"><a href="#I-O多路复用，I-O-multiplexing" class="headerlink" title="I/O多路复用，I/O multiplexing"></a>I/O多路复用，I/O multiplexing</h1><p>multiplexing一词其实多用于通信领域，为了充分利用通信线路，希望在一个信道中传输多路信号，要想在一个信道中传输多路信号就需要把这多路信号结合为一路，将多路信号组合成一个信号的设备被称为multiplexer，显然接收方接收到这一路组合后的信号后要恢复原先的多路信号，这个设备被称为demultiplexer，如图所示：</p>
+<p><img src="http://image.rexking6.top/img/640" alt="图片"></p>
+<p>回到我们的主题。</p>
+<p>所谓I/O多路复用指的是这样一个过程：</p>
+<ol>
+<li><p>我们拿到了一堆文件描述符(不管是网络相关的、还是磁盘文件相关等等，任何文件描述符都可以)</p>
+</li>
+<li><p>通过调用<strong>某个函数</strong>告诉内核：“<strong>这个函数你先不要返回，你替我监视着这些描述符，当这堆文件描述符中有可以进行I/O读写操作的时候你再返回</strong>”</p>
+</li>
+<li><p>当调用的这个函数返回后我们就能知道哪些文件描述符可以进行I/O操作了。</p>
+</li>
+</ol>
+<p>也就是说<strong>通过I/O多路复用我们可以同时处理多路I/O</strong>。那么有哪些函数可以用来进行I/O多路复用呢？</p>
+<p>在Linux世界中有这样三种机制可以用来进行I/O多路复用：</p>
+<ul>
+<li>select</li>
+<li>poll</li>
+<li>epoll</li>
+</ul>
+<p>接下来我们就来介绍一下牛掰的I/O多路复用三剑客。</p>
+<h1 id="I-O多路复用三剑客"><a href="#I-O多路复用三剑客" class="headerlink" title="I/O多路复用三剑客"></a>I/O多路复用三剑客</h1><p>本质上select、poll、epoll都是阻塞式I/O，也就是我们常说的同步I/O，原因在于调用这些I/O多路复用函数时如果任何一个需要监视的文件描述符都不可读或者可写那么进程会被阻塞暂停执行，直到有文件描述符可读或者可写才继续运行。</p>
+<h2 id="1-select：初出茅庐"><a href="#1-select：初出茅庐" class="headerlink" title="1. select：初出茅庐"></a>1. select：初出茅庐</h2><p>在select这种I/O多路复用机制下，我们需要把想监控的文件描述集合通过函数参数的形式告诉select，然后select会将这些文件描述符集合<strong>拷贝</strong>到内核中，我们知道数据拷贝是有性能损耗的，因此为了减少这种数据拷贝带来的性能损耗，Linux内核对集合的大小做了限制，并规定用户监控的文件描述集合不能超过1024个，同时当select返回后<strong>我们仅仅能知道有些文件描述符可以读写了，但是我们不知道是哪一个</strong>，因此程序员必须再遍历一边找到具体是哪个文件描述符可以读写了。</p>
+<p>因此，总结下来select有这样几个特点：</p>
+<ul>
+<li>我能照看的文件描述符数量有限，不能超过1024个</li>
+<li>用户给我的文件描述符需要拷贝的内核中</li>
+<li>我只能告诉你有文件描述符满足要求了，但是我不知道是哪个，你自己一个一个去找吧(遍历)</li>
+</ul>
+<p>因此我们可以看到，select机制的这些特性在高并发网络服务器动辄几万几十万并发链接的场景下无疑是低效的。</p>
+<h2 id="2-poll：小有所成"><a href="#2-poll：小有所成" class="headerlink" title="2. poll：小有所成"></a>2. poll：小有所成</h2><p>poll和select是非常相似的，poll相对于select的优化仅仅在于解决了文件描述符不能超过1024个的限制，select和poll都会随着监控的文件描述数量增加而性能下降，因此不适合高并发场景。</p>
+<h2 id="3-epoll：独步天下"><a href="#3-epoll：独步天下" class="headerlink" title="3. epoll：独步天下"></a>3. epoll：独步天下</h2><p>在select面临的三个问题中，文件描述数量限制已经在poll中解决了，剩下的两个问题呢？</p>
+<p>针对拷贝问题，epoll使用的策略是<strong>各个击破</strong>与<strong>共享内存</strong>。</p>
+<p>实际上文件描述符集合的变化频率比较低，select和poll频繁的拷贝整个集合，内核都快被烦死了，epoll通过引入epoll_ctl很体贴的做到了只操作那些有变化的文件描述符，同时epoll和内核还成为了好朋友，共享了同一块内存，这块内存中保存的就是那些已经可读或者可写的的文件描述符集合，这样就减少了内核和程序的拷贝开销。</p>
+<p>针对需要遍历文件描述符才能知道哪个可读可写这一问题，epoll使用的策略是“当小弟”。</p>
+<p>在select和poll机制下，<strong>进程要亲自下场去各个文件描述符上等待</strong>，任何一个文件描述可读或者可写就唤醒进程，但是进程被唤醒后也是一脸懵逼并不知道到底是哪个文件描述符可读或可写，还要再从头到尾检查一遍。</p>
+<p>但epoll就懂事多了，主动找到进程要当小弟替大哥出头。</p>
+<p>在这种机制下，进程不需要亲自下场了，进程只要等待在epoll上，epoll代替进程去各个文件描述符上等待，当哪个文件描述符可读或者可写的时候就告诉epoll，epoll用小本本认真记录下来然后唤醒大哥：“进程大哥，快醒醒，你要处理的文件描述符我都记下来了”，这样进程被唤醒后就无需自己从头到尾检查一遍，因为epoll小弟都已经记下来了。</p>
+<p>因此我们可以看到，在epoll这种机制下，实际上利用的就是“不要打电话给我，有需要我会打给你”这种策略，进程不需要一遍一遍麻烦的问各个文件描述符，而是翻身做主人了，“你们这些文件描述符有哪个可读或者可写了主动报上来”，这种机制实际上就是大名鼎鼎的事件驱动，Event-driven，这也是我们下一篇的主题。</p>
+<p>实际上在Linux平台，<strong>epoll基本上就是高并发的代名词</strong>。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>基于一切皆文件的设计哲学，I/O也可以通过文件的形式实现，高并发场景下要与多个文件交互，这就离不开高效的I/O多路复用技术，本文我们详细讲解了什么是I/O多路复用以及使用方法，这其中以epoll为代表的I/O多路复用(基于事件驱动)技术使用非常广泛，实际上你会发现但凡涉及到高并发、高性能的场景基本上都能见到事件驱动的编程方法。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\09\05\Linux知识点\" rel="bookmark">Linux知识点</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\04\04\Linux-Socket编程\" rel="bookmark">Linux Socket编程</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2017/12/09/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/" title="IO多路复用">https://blog.rexking6.top/2017/12/09/IO多路复用/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/11/13/%E3%80%8A%E6%95%B0%E5%AD%A6%E4%B9%8B%E7%BE%8E%E3%80%8B%E8%AE%B0%E5%BD%95/" rel="prev" title="《数学之美》记录">
+      <i class="fa fa-chevron-left"></i> 《数学之美》记录
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/12/19/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9A%84%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/" rel="next" title="机器学习的数学基础">
+      机器学习的数学基础 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%96%87%E4%BB%B6"><span class="nav-number">2.</span> <span class="nav-text">什么是文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6"><span class="nav-number">3.</span> <span class="nav-text">文件描述符</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6%E5%A4%AA%E5%A4%9A%E4%BA%86%E6%80%8E%E4%B9%88%E5%8A%9E"><span class="nav-number">4.</span> <span class="nav-text">文件描述符太多了怎么办</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%8D%E8%A6%81%E6%89%93%E7%94%B5%E8%AF%9D%E7%BB%99%E6%88%91%EF%BC%8C%E6%9C%89%E9%9C%80%E8%A6%81%E6%88%91%E4%BC%9A%E6%89%93%E7%BB%99%E4%BD%A0"><span class="nav-number">5.</span> <span class="nav-text">不要打电话给我，有需要我会打给你</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#I-O%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8%EF%BC%8CI-O-multiplexing"><span class="nav-number">6.</span> <span class="nav-text">I&#x2F;O多路复用，I&#x2F;O multiplexing</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#I-O%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8%E4%B8%89%E5%89%91%E5%AE%A2"><span class="nav-number">7.</span> <span class="nav-text">I&#x2F;O多路复用三剑客</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-select%EF%BC%9A%E5%88%9D%E5%87%BA%E8%8C%85%E5%BA%90"><span class="nav-number">7.1.</span> <span class="nav-text">1. select：初出茅庐</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-poll%EF%BC%9A%E5%B0%8F%E6%9C%89%E6%89%80%E6%88%90"><span class="nav-number">7.2.</span> <span class="nav-text">2. poll：小有所成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-epoll%EF%BC%9A%E7%8B%AC%E6%AD%A5%E5%A4%A9%E4%B8%8B"><span class="nav-number">7.3.</span> <span class="nav-text">3. epoll：独步天下</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

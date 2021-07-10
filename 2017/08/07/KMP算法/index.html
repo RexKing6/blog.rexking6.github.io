@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="KMP算法">
+<meta property="og:url" content="https://blog.rexking6.top/2017/08/07/KMP%E7%AE%97%E6%B3%95/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586225297.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586225316.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586225332.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586225348.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586225365.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586225380.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586225585.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586225608.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586225657.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586225970.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226009.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226073.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226089.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226129.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226148.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226163.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226179.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226196.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226209.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226224.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226313.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226349.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226374.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226476.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226488.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226553.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1587789123.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226603.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226791.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226843.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226939.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586226958.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227121.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227145.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227164.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227178.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227190.png">
+<meta property="og:image" content="https://img-blog.csdn.net/20140721223611515">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227257.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227283.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227375.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227390.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227435.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227478.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227490.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227506.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227553.png">
+<meta property="og:image" content="https://img-blog.csdn.net/20140728192101322">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227697.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227703.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227730.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227742.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227747.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227770.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1586227794.png">
+<meta property="article:published_time" content="2017-08-06T16:17:36.000Z">
+<meta property="article:modified_time" content="2020-04-25T04:32:39.889Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="笔试面试">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1586225297.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2017/08/07/KMP%E7%AE%97%E6%B3%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>KMP算法 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2017/08/07/KMP%E7%AE%97%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          KMP算法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-08-07 00:17:36" itemprop="dateCreated datePublished" datetime="2017-08-07T00:17:36+08:00">2017-08-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-25 12:32:39" itemprop="dateModified" datetime="2020-04-25T12:32:39+08:00">2020-04-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AF%95%E9%9D%A2%E8%AF%95/" itemprop="url" rel="index"><span itemprop="name">笔试面试</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2017/08/07/KMP%E7%AE%97%E6%B3%95/" class="post-meta-item leancloud_visitors" data-flag-title="KMP算法" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>15k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>14 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://blog.csdn.net/v_july_v/article/details/7041827">从头到尾彻底理解KMP（2014年8月22日版）</a>。</p>
+<h1 id="暴力匹配算法"><a href="#暴力匹配算法" class="headerlink" title="暴力匹配算法"></a>暴力匹配算法</h1><p>假设现在我们面临这样一个问题：有一个文本串S，和一个模式串P，现在要查找P在S中的位置，怎么查找呢？</p>
+<p>如果用暴力匹配的思路，并假设现在文本串S匹配到 i 位置，模式串P匹配到 j 位置，则有：</p>
+<ul>
+<li>如果当前字符匹配成功（即S[i] == P[j]），则i++，j++，继续匹配下一个字符；</li>
+<li>如果失配（即S[i]! = P[j]），令i = i - (j - 1)，j = 0。相当于每次匹配失败时，i 回溯，j 被置为0。</li>
+</ul>
+<p>理清楚了暴力匹配算法的流程及内在的逻辑，咱们可以写出暴力匹配的代码，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">int ViolentMatch(char* s, char* p)</span><br><span class="line">&#123;</span><br><span class="line">	int sLen = strlen(s);</span><br><span class="line">	int pLen = strlen(p);</span><br><span class="line"> </span><br><span class="line">	int i = 0;</span><br><span class="line">	int j = 0;</span><br><span class="line">	while (i &lt; sLen &amp;&amp; j &lt; pLen)</span><br><span class="line">	&#123;</span><br><span class="line">		if (s[i] == p[j])</span><br><span class="line">		&#123;</span><br><span class="line">			//①如果当前字符匹配成功（即S[i] == P[j]），则i++，j++    </span><br><span class="line">			i++;</span><br><span class="line">			j++;</span><br><span class="line">		&#125;</span><br><span class="line">		else</span><br><span class="line">		&#123;</span><br><span class="line">			//②如果失配（即S[i]! = P[j]），令i = i - (j - 1)，j = 0    </span><br><span class="line">			i = i - j + 1;</span><br><span class="line">			j = 0;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	//匹配成功，返回模式串p在文本串s中的位置，否则返回-1</span><br><span class="line">	if (j == pLen)</span><br><span class="line">		return i - j;</span><br><span class="line">	else</span><br><span class="line">		return -1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>举个例子，如果给定文本串S“BBC ABCDAB ABCDABCDABDE”，和模式串P“ABCDABD”，现在要拿模式串P去跟文本串S匹配，整个过程如下所示：</p>
+<ol>
+<li><p>S[0]为B，P[0]为A，不匹配，执行第②条指令：“如果失配（即S[i]! = P[j]），令i = i - (j - 1)，j = 0”，S[1]跟P[0]匹配，相当于模式串要往右移动一位（i=1，j=0）</p>
+<p><img src="http://image.rexking6.top/img/clip1586225297.png" alt=""></p>
+</li>
+<li><p>S[1]跟P[0]还是不匹配，继续执行第②条指令：“如果失配（即S[i]! = P[j]），令i = i - (j - 1)，j = 0”，S[2]跟P[0]匹配（i=2，j=0），从而模式串不断的向右移动一位（不断的执行“令i = i - (j - 1)，j = 0”，i从2变到4，j一直为0）<br><img src="http://image.rexking6.top/img/clip1586225316.png" alt=""></p>
+</li>
+<li><p>直到S[4]跟P[0]匹配成功（i=4，j=0），此时按照上面的暴力匹配算法的思路，转而执行第①条指令：“如果当前字符匹配成功（即S[i] == P[j]），则i++，j++”，可得S[i]为S[5]，P[j]为P[1]，即接下来S[5]跟P[1]匹配（i=5，j=1）</p>
+<p><img src="http://image.rexking6.top/img/clip1586225332.png" alt=""></p>
+</li>
+<li><p>S[5]跟P[1]匹配成功，继续执行第①条指令：“如果当前字符匹配成功（即S[i] == P[j]），则i++，j++”，得到S[6]跟P[2]匹配（i=6，j=2），如此进行下去</p>
+<p><img src="http://image.rexking6.top/img/clip1586225348.png" alt=""></p>
+</li>
+<li><p>直到S[10]为空格字符，P[6]为字符D（i=10，j=6），因为不匹配，重新执行第②条指令：“如果失配（即S[i]! = P[j]），令i = i - (j - 1)，j = 0”，相当于S[5]跟P[0]匹配（i=5，j=0）</p>
+<p><img src="http://image.rexking6.top/img/clip1586225365.png" alt=""></p>
+</li>
+<li><p>至此，我们可以看到，如果按照暴力匹配算法的思路，尽管之前文本串和模式串已经分别匹配到了S[9]、P[5]，但因为S[10]跟P[6]不匹配，所以文本串回溯到S[5]，模式串回溯到P[0]，从而让S[5]跟P[0]匹配。</p>
+<p><img src="http://image.rexking6.top/img/clip1586225380.png" alt=""></p>
+</li>
+</ol>
+<p>而S[5]肯定跟P[0]失配。为什么呢？因为在之前第4步匹配中，我们已经得知S[5] = P[1] = B，而P[0] = A，即P[1] != P[0]，故S[5]必定不等于P[0]，所以回溯过去必然会导致失配。那有没有一种算法，让i 不往回退，只需要移动j 即可呢？</p>
+<p>答案是肯定的。这种算法就是本文的主旨KMP算法，它利用之前已经部分匹配这个有效信息，保持i 不回溯，通过修改j 的位置，让模式串尽量地移动到有效的位置。</p>
+<h1 id="KMP算法"><a href="#KMP算法" class="headerlink" title="KMP算法"></a>KMP算法</h1><h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>Knuth-Morris-Pratt 字符串查找算法，简称为 “KMP算法”，常用于在一个文本串S内查找一个模式串P 的出现位置，这个算法由Donald Knuth、Vaughan Pratt、James H. Morris三人于1977年联合发表，故取这3人的姓氏命名此算法。</p>
+<p>下面先直接给出KMP的算法流程（如果感到一点点不适，没关系，坚持下，稍后会有具体步骤及解释，越往后看越会柳暗花明☺）：</p>
+<ul>
+<li>假设现在文本串S匹配到 i 位置，模式串P匹配到 j 位置<ul>
+<li>如果j = -1，或者当前字符匹配成功（即S[i] == P[j]），都令i++，j++，继续匹配下一个字符；</li>
+<li>如果j != -1，且当前字符匹配失败（即S[i] != P[j]），则令 i 不变，j = next[j]。此举意味着失配时，模式串P相对于文本串S向右移动了j - next [j] 位。<ul>
+<li>换言之，当匹配失败时，模式串向右移动的位数为：失配字符所在位置 - 失配字符对应的next 值（next 数组的求解会在下文的3.3.3节中详细阐述），即<strong>移动的实际位数为：j - next[j]</strong>，且此值大于等于1。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>很快，你也会意识到next 数组各值的含义：代表当前字符之前的字符串中，有多大长度的相同前缀后缀。例如如果next [j] = k，代表j 之前的字符串中有最大长度为 k 的相同前缀后缀。</p>
+<p> 此也意味着在某个字符失配时，该字符对应的next 值会告诉你下一步匹配中，模式串应该跳到哪个位置（跳到next [j] 的位置）。如果next [j] 等于0或-1，则跳到模式串的开头字符，若next [j] = k 且 k &gt; 0，代表下次匹配跳到j 之前的某个字符，而不是跳到开头，且具体跳过了k 个字符。</p>
+<p>转换成代码表示，则是：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">kmpsearch</span>(<span class="params">s, p</span>):</span></span><br><span class="line">    i, j = <span class="number">0</span>, <span class="number">0</span></span><br><span class="line">    slen = <span class="built_in">len</span>(s)</span><br><span class="line">    plen = <span class="built_in">len</span>(p)</span><br><span class="line">    nxt = get_nextval(p)</span><br><span class="line">    <span class="keyword">while</span> i &lt; slen <span class="keyword">and</span> j &lt; plen:</span><br><span class="line">        <span class="keyword">if</span> j == -<span class="number">1</span> <span class="keyword">or</span> s[i] == p[j]:</span><br><span class="line">            i += <span class="number">1</span></span><br><span class="line">            j += <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            j = nxt[j]</span><br><span class="line">    <span class="keyword">if</span> j == plen:</span><br><span class="line">        <span class="keyword">return</span> i - j</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>继续拿之前的例子来说，当S[10]跟P[6]匹配失败时，KMP不是跟暴力匹配那样简单的把模式串右移一位，而是执行第②条指令：“如果j != -1，且当前字符匹配失败（即S[i] != P[j]），则令 i 不变，j = next[j]”，即j 从6变到2（后面我们将求得P[6]，即字符D对应的next 值为2），所以相当于模式串向右移动的位数为j - next[j]（j - next[j] = 6-2 = 4）。</p>
+<p><img src="http://image.rexking6.top/img/clip1586225585.png" alt=""></p>
+<p>向右移动4位后，S[10]跟P[2]继续匹配。为什么要向右移动4位呢，因为移动4位后，模式串中又有个“AB”可以继续跟S[8]S[9]对应着，从而不用让i 回溯。相当于在除去字符D的模式串子串中寻找相同的前缀和后缀，然后根据前缀后缀求出next 数组，最后基于next 数组进行匹配（不关心next 数组是怎么求来的，只想看匹配过程是咋样的，可直接跳到下文3.3.4节）。</p>
+<p><img src="http://image.rexking6.top/img/clip1586225608.png" alt=""></p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li><p>寻找前缀后缀最长公共元素长度</p>
+<ul>
+<li><p>对于P = p0 p1 …pj-1 pj，寻找模式串P中长度最大且相等的前缀和后缀。如果存在p0 p1 …pk-1 pk = pj- k pj-k+1…pj-1 pj，那么在包含pj的模式串中有最大长度为k+1的相同前缀后缀。举个例子，如果给定的模式串为“abab”，那么它的各个子串的前缀后缀的公共元素的最大长度如下表格所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1586225657.png" alt=""></p>
+<p>比如对于字符串aba来说，它有长度为1的相同前缀后缀a；而对于字符串abab来说，它有长度为2的相同前缀后缀ab（相同前缀后缀的长度为k + 1，k + 1 = 2）。</p>
+</li>
+</ul>
+</li>
+</ol>
+<ol>
+<li><p>求next数组</p>
+<ul>
+<li><p>next 数组考虑的是除当前字符外的最长相同前缀后缀，所以通过第①步骤求得各个前缀后缀的公共元素的最大长度后，只要稍作变形即可：将第①步骤中求得的值整体右移一位，然后初值赋为-1，如下表格所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1586225970.png" alt=""></p>
+<p>比如对于aba来说，第3个字符a之前的字符串ab中有长度为0的相同前缀后缀，所以第3个字符a对应的next值为0；而对于abab来说，第4个字符b之前的字符串aba中有长度为1的相同前缀后缀a，所以第4个字符b对应的next值为1（相同前缀后缀的长度为k，k = 1）。</p>
+</li>
+</ul>
+</li>
+</ol>
+<ol>
+<li><p>根据next数组进行匹配</p>
+<ul>
+<li><p>匹配失配，j = next [j]，模式串向右移动的位数为：j - next[j]。换言之，当模式串的后缀pj-k pj-k+1, …, pj-1 跟文本串si-k si-k+1, …, si-1匹配成功，但pj 跟si匹配失败时，因为next[j] = k，相当于在不包含pj的模式串中有最大长度为k 的相同前缀后缀，即p0 p1 …pk-1 = pj-k pj-k+1…pj-1，故令j = next[j]，从而让模式串右移j - next[j] 位，使得模式串的前缀p0 p1, …, pk-1对应着文本串 si-k si-k+1, …, si-1，而后让pk 跟si 继续匹配。如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1586226009.png" alt=""></p>
+</li>
+</ul>
+</li>
+</ol>
+<p>综上，KMP的next 数组相当于告诉我们：当模式串中的某个字符跟文本串中的某个字符匹配失配时，模式串下一步应该跳到哪个位置。如模式串中在j 处的字符跟文本串在i 处的字符匹配失配时，下一步用next [j] 处的字符继续跟文本串i 处的字符匹配，相当于模式串向右移动 j - next[j] 位。</p>
+<p>接下来，分别具体解释上述3个步骤。</p>
+<h2 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h2><h3 id="寻找最长前缀后缀"><a href="#寻找最长前缀后缀" class="headerlink" title="寻找最长前缀后缀"></a>寻找最长前缀后缀</h3><p>如果给定的模式串是：“ABCDABD”，从左至右遍历整个模式串，其各个子串的前缀后缀分别如下表格所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1586226073.png" alt=""></p>
+<p>也就是说，原模式串子串对应的各个前缀后缀的公共元素的最大长度表为（<strong>下简称《最大长度表》</strong>）：</p>
+<p><img src="http://image.rexking6.top/img/clip1586226089.png" alt=""></p>
+<h3 id="基于《最大长度表》匹配"><a href="#基于《最大长度表》匹配" class="headerlink" title="基于《最大长度表》匹配"></a>基于《最大长度表》匹配</h3><p>因为模式串中首尾可能会有重复的字符，故可得出下述结论：</p>
+<ul>
+<li>失配时，模式串向右移动的位数为：已匹配字符数 - 失配字符的上一位字符所对应的最大长度值</li>
+</ul>
+<p>下面，咱们就结合之前的《最大长度表》和上述结论，进行字符串的匹配。如果给定文本串“BBC ABCDAB ABCDABCDABDE”，和模式串“ABCDABD”，现在要拿模式串去跟文本串匹配，如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1586226129.png" alt=""></p>
+<ol>
+<li><p>因为模式串中的字符A跟文本串中的字符B、B、C、空格一开始就不匹配，所以不必考虑结论，直接将模式串不断的右移一位即可，直到模式串中的字符A跟文本串的第5个字符A匹配成功：</p>
+<p><img src="http://image.rexking6.top/img/clip1586226148.png" alt=""></p>
+</li>
+<li><p>继续往后匹配，当模式串最后一个字符D跟文本串匹配时失配，显而易见，模式串需要向右移动。但向右移动多少位呢？因为此时已经匹配的字符数为6个（ABCDAB），然后根据《最大长度表》可得失配字符D的上一位字符B对应的长度值为2，所以根据之前的结论，可知需要向右移动6 - 2 = 4 位。</p>
+<p><img src="http://image.rexking6.top/img/clip1586226163.png" alt=""></p>
+</li>
+<li><p>模式串向右移动4位后，发现C处再度失配，因为此时已经匹配了2个字符（AB），且上一位字符B对应的最大长度值为0，所以向右移动：2 - 0 =2 位。</p>
+<p><img src="http://image.rexking6.top/img/clip1586226179.png" alt=""></p>
+</li>
+<li><p>A与空格失配，向右移动1位。</p>
+<p><img src="http://image.rexking6.top/img/clip1586226196.png" alt=""></p>
+</li>
+<li><p>继续比较，发现D与C 失配，故向右移动的位数为：已匹配的字符数6减去上一位字符B对应的最大长度2，即向右移动6 - 2 = 4 位。</p>
+<p><img src="http://image.rexking6.top/img/clip1586226209.png" alt=""></p>
+</li>
+<li><p>经历第5步后，发现匹配成功，过程结束。</p>
+<p><img src="http://image.rexking6.top/img/clip1586226224.png" alt=""></p>
+</li>
+</ol>
+<p>通过上述匹配过程可以看出，问题的关键就是寻找模式串中最大长度的相同前缀和后缀，找到了模式串中每个字符之前的前缀和后缀公共部分的最大长度后，便可基于此匹配。而这个最大长度便正是next 数组要表达的含义。</p>
+<h3 id="根据《最大长度表》求next-数组"><a href="#根据《最大长度表》求next-数组" class="headerlink" title="根据《最大长度表》求next 数组"></a>根据《最大长度表》求next 数组</h3><p>由上文，我们已经知道，字符串“ABCDABD”各个前缀后缀的最大公共元素长度分别为：</p>
+<p><img src="http://image.rexking6.top/img/clip1586226313.png" alt=""></p>
+<p>而且，根据这个表可以得出下述结论：</p>
+<ul>
+<li>失配时，模式串向右移动的位数为：已匹配字符数 - 失配字符的上一位字符所对应的最大长度值</li>
+</ul>
+<p>上文利用这个表和结论进行匹配时，我们发现，当匹配到一个字符失配时，其实没必要考虑当前失配的字符，更何况我们每次失配时，都是看的失配字符的上一位字符对应的最大长度值。如此，便引出了next 数组。</p>
+<p>给定字符串“ABCDABD”，可求得它的next 数组如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1586226349.png" alt=""></p>
+<p>把next 数组跟之前求得的最大长度表对比后，不难发现，next 数组相当于“最大长度值” 整体向右移动一位，然后初始值赋为-1。意识到了这一点，你会惊呼原来next 数组的求解竟然如此简单：就是找最大对称长度的前缀后缀，然后整体右移一位，初值赋为-1（当然，你也可以直接计算某个字符对应的next值，就是看这个字符之前的字符串中有多大长度的相同前缀后缀）。</p>
+<p>换言之，对于给定的模式串：ABCDABD，它的最大长度表及next 数组分别如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1586226374.png" alt=""></p>
+<p>根据最大长度表求出了next 数组后，从而有</p>
+<ul>
+<li>失配时，模式串向右移动的位数为：失配字符所在位置 - 失配字符对应的next 值</li>
+</ul>
+<p>而后，你会发现，无论是基于《最大长度表》的匹配，还是基于next 数组的匹配，两者得出来的向右移动的位数是一样的。为什么呢？因为：</p>
+<ul>
+<li>根据《最大长度表》，失配时，模式串向右移动的位数 = 已经匹配的字符数 - 失配字符的上一位字符的最大长度值</li>
+<li>而根据《next 数组》，失配时，模式串向右移动的位数 = 失配字符的位置 - 失配字符对应的next 值<ul>
+<li>其中，从0开始计数时，失配字符的位置 = 已经匹配的字符数（失配字符不计数），而失配字符对应的next 值 = 失配字符的上一位字符的最大长度值，两相比较，结果必然完全一致。</li>
+</ul>
+</li>
+</ul>
+<p>所以，你可以把《最大长度表》看做是next 数组的雏形，甚至就把它当做next 数组也是可以的，区别不过是怎么用的问题。</p>
+<h3 id="通过代码递推计算next-数组"><a href="#通过代码递推计算next-数组" class="headerlink" title="通过代码递推计算next 数组"></a>通过代码递推计算next 数组</h3><p>接下来，咱们来写代码求下next 数组。</p>
+<p>基于之前的理解，可知计算next 数组的方法可以采用递推：</p>
+<ol>
+<li><p>如果<strong>对于值k，已有p0 p1, …, pk-1 = pj-k pj-k+1, …, pj-1，相当于next[j] = k</strong>。</p>
+<ul>
+<li><p>此意味着什么呢？究其本质，<strong>next[j] = k 代表p[j] 之前的模式串子串中，有长度为k 的相同前缀和后缀</strong>。有了这个next 数组，在KMP匹配中，当模式串中j 处的字符失配时，下一步用next[j]处的字符继续跟文本串匹配，相当于模式串向右移动j - next[j] 位。</p>
+<p>举个例子，如下图，根据模式串“ABCDABD”的next 数组可知失配位置的字符D对应的next 值为2，代表字符D前有长度为2的相同前缀和后缀（这个相同的前缀后缀即为“AB”），失配后，模式串需要向右移动j - next [j] = 6 - 2 =4位。</p>
+<p><img src="http://image.rexking6.top/img/clip1586226476.png" alt=""></p>
+<p>向右移动4位后，模式串中的字符C继续跟文本串匹配。</p>
+<p><img src="http://image.rexking6.top/img/clip1586226488.png" alt=""></p>
+</li>
+</ul>
+</li>
+<li><p>下面的问题是：已知next [0, …, j]，如何求出next [j + 1]呢？</p>
+<p>对于P的前j+1个序列字符：</p>
+<ul>
+<li>若p[k] == p[j]，则next[j + 1 ] = next [j] + 1 = k + 1；</li>
+<li>若p[k ] ≠ p[j]，如果此时p[ next[k] ] == p[j ]，则next[ j + 1 ] =  next[k] + 1，否则继续递归前缀索引k = next[k]，而后重复此过程。 相当于在字符p[j+1]之前不存在长度为k+1的前缀”p0 p1, …, pk-1 pk”跟后缀“pj-k pj-k+1, …, pj-1 pj”相等，那么是否可能存在另一个值t+1 &lt; k+1，使得长度更小的前缀 “p0 p1, …, pt-1 pt” 等于长度更小的后缀 “pj-t pj-t+1, …, pj-1 pj” 呢？如果存在，那么这个t+1 便是next[ j+1]的值，此相当于利用已经求得的next 数组（next [0, …, k, …, j]）进行P串前缀跟P串后缀的匹配。</li>
+</ul>
+</li>
+</ol>
+<p>一般的文章或教材可能就此一笔带过，但大部分的初学者可能还是不能很好的理解上述求解next 数组的原理，故接下来，我再来着重说明下。</p>
+<p>如下图所示，假定给定模式串ABCDABCE，且已知next [j] = k（相当于“p0 pk-1” = “pj-k pj-1” = AB，可以看出k为2），现要求next [j + 1]等于多少？因为pk = pj = C，所以next[j + 1] = next[j] + 1 = k + 1（可以看出next[j + 1] = 3）。代表字符E前的模式串中，有长度k+1 的相同前缀后缀。</p>
+<p><img src="http://image.rexking6.top/img/clip1586226553.png" alt=""></p>
+<p>但如果pk != pj 呢？说明“p0 pk-1 pk”  ≠ “pj-k pj-1 pj”。换言之，当pk != pj后，字符E前有多大长度的相同前缀后缀呢？很明显，因为C不同于D，所以ABC 跟 ABD不相同，即字符E前的模式串没有长度为k+1的相同前缀后缀，也就不能再简单的令：next[j + 1] = next[j] + 1 。所以，咱们只能去寻找长度更短一点的相同前缀后缀。</p>
+<p><img src="http://image.rexking6.top/img/clip1587789123.png" alt=""></p>
+<p>结合上图来讲，若能在前缀“ p0 pk-1 pk ” 中不断的递归前缀索引k = next [k]，找到一个字符pk’ 也为D，代表pk’ = pj，且满足p0 pk’-1 pk’ = pj-k’ pj-1 pj，则最大相同的前缀后缀长度为k’ + 1，从而next [j + 1] = k’ + 1 = next [k’ ] + 1。否则前缀中没有D，则代表没有相同的前缀后缀，next [j + 1] = 0。</p>
+<p>那为何递归前缀索引k = next[k]，就能找到长度更短的相同前缀后缀呢？这又归根到next数组的含义。我们拿前缀 p0 pk-1 pk 去跟后缀pj-k pj-1 pj匹配，如果pk 跟pj 失配，下一步就是用p[next[k]] 去跟pj 继续匹配，如果p[ next[k] ]跟pj还是不匹配，则需要寻找长度更短的相同前缀后缀，即下一步用p[ next[ next[k] ] ]去跟pj匹配。此过程相当于模式串的自我匹配，所以不断的递归k = next[k]，直到要么找到长度更短的相同前缀后缀，要么没有长度更短的相同前缀后缀。如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1586226603.png" alt=""></p>
+<p>引用下一读者wudehua55555于本文评论下留言，以辅助大家从另一个角度理解：“ 一直以为博主在用递归求next数组时没讲清楚，为何要用k = next[k],仔细看了这个红黄蓝分区图才突然恍然大悟，就是找到p[k]对应的next[k]，根据对称性，只需再判断p[next[k]]与p[j]是否相等即可，于是令k = next[k],这里恰好就使用了递归的思路。其实我觉得不要一开始就陷入递归的方法中，换一种思路，直接从考虑对称性入手，可直接得出k = next[k]，而这正好是递归罢了。以上是一些个人看法，非常感谢博主提供的解析，非计算机的学生也能看懂，虽然从昨晚9点看到了现在。高兴。”</p>
+<p>所以，因最终在前缀ABC中没有找到D，故E的next 值为0。</p>
+<p>读到此，有的读者可能又有疑问了，那能否举一个能在前缀中找到字符D的例子呢？OK，咱们便来看一个能在前缀中找到字符D的例子，如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1586226791.png" alt=""></p>
+<p>给定模式串DABCDABDE，我们很顺利的求得字符D之前的“DABCDAB”的各个子串的最长相同前缀后缀的长度分别为0 0 0 0 1 2 3，但当遍历到字符D，要求包括D在内的“DABCDABD”最长相同前缀后缀时，我们发现pj处的字符D跟pk处的字符C不一样，换言之，前缀DABC的最后一个字符C 跟后缀DABD的最后一个字符D不相同，所以不存在长度为4的相同前缀后缀。</p>
+<p>怎么办呢？既然没有长度为4的相同前缀后缀，咱们可以寻找长度短点的相同前缀后缀，最终，因在p0处发现也有个字符D，p0 = pj，所以p[j]对应的长度值为1，相当于E对应的next 值为1（即字符E之前的字符串“DABCDABD”中有长度为1的相同前缀和后缀）。</p>
+<p>综上，可以通过递推求得next 数组，代码如下所示：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_next</span>(<span class="params">s</span>):</span></span><br><span class="line">    nxt = [-<span class="number">1</span> <span class="keyword">for</span> _ <span class="keyword">in</span> s]</span><br><span class="line">    i, j = -<span class="number">1</span>, <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> j &lt; <span class="built_in">len</span>(s) - <span class="number">1</span>:</span><br><span class="line">        <span class="keyword">if</span> i == -<span class="number">1</span> <span class="keyword">or</span> s[i] == s[j]:</span><br><span class="line">            i += <span class="number">1</span></span><br><span class="line">            j += <span class="number">1</span></span><br><span class="line">            nxt[j] = i</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            i = nxt[i]</span><br><span class="line">    <span class="keyword">return</span> nxt</span><br></pre></td></tr></table></figure>
+<p>用代码重新计算下“ABCDABD”的next 数组，以验证之前通过“最长相同前缀后缀长度值右移一位，然后初值赋为-1”得到的next 数组是否正确，计算结果如下表格所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1586226843.png" alt=""></p>
+<p>从上述表格可以看出，无论是之前通过“最长相同前缀后缀长度值右移一位，然后初值赋为-1”得到的next 数组，还是之后通过代码递推计算求得的next 数组，结果是完全一致的。</p>
+<h3 id="基于《next-数组》匹配"><a href="#基于《next-数组》匹配" class="headerlink" title="基于《next 数组》匹配"></a>基于《next 数组》匹配</h3><p>下面，我们来基于next 数组进行匹配。</p>
+<p><img src="http://image.rexking6.top/img/clip1586226939.png" alt=""></p>
+<p>还是给定文本串“BBC ABCDAB ABCDABCDABDE”，和模式串“ABCDABD”，现在要拿模式串去跟文本串匹配，如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1586226958.png" alt=""></p>
+<p>在正式匹配之前，让我们来再次回顾下上文2.1节所述的KMP算法的匹配流程：</p>
+<ul>
+<li>假设现在文本串S匹配到 i 位置，模式串P匹配到 j 位置<ul>
+<li>如果j = -1，或者当前字符匹配成功（即S[i] == P[j]），都令i++，j++，继续匹配下一个字符；</li>
+<li>如果j != -1，且当前字符匹配失败（即S[i] != P[j]），则令 i 不变，j = next[j]。此举意味着失配时，模式串P相对于文本串S向右移动了j - next [j] 位。<ul>
+<li>换言之，当匹配失败时，模式串向右移动的位数为：失配字符所在位置 - 失配字符对应的next 值，即<strong>移动的实际位数为：j - next[j]</strong>，且此值大于等于1。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>例子：</p>
+<ol>
+<li><p>最开始匹配时</p>
+<ul>
+<li><p>P[0]跟S[0]匹配失败</p>
+<ul>
+<li>所以执行“如果j != -1，且当前字符匹配失败（即S[i] != P[j]），则令 i 不变，j = next[j]”，所以j = -1，故转而执行“如果j = -1，或者当前字符匹配成功（即S[i] == P[j]），都令i++，j++”，得到i = 1，j = 0，即P[0]继续跟S[1]匹配。</li>
+</ul>
+</li>
+<li><p>P[0]跟S[1]又失配，j再次等于-1，i、j继续自增，从而P[0]跟S[2]匹配。</p>
+</li>
+<li><p>P[0]跟S[2]失配后，P[0]又跟S[3]匹配。</p>
+</li>
+<li><p>P[0]跟S[3]再失配，直到P[0]跟S[4]匹配成功，开始执行此条指令的后半段：“如果j = -1，或者当前字符匹配成功（即S[i] == P[j]），都令i++，j++”。</p>
+<p><img src="http://image.rexking6.top/img/clip1586227121.png" alt=""></p>
+</li>
+</ul>
+</li>
+<li><p>P[1]跟S[5]匹配成功，P[2]跟S[6]也匹配成功, …，直到当匹配到P[6]处的字符D时失配（即S[10] != P[6]），由于P[6]处的D对应的next 值为2，所以下一步用P[2]处的字符C继续跟S[10]匹配，相当于向右移动：j - next[j] = 6 - 2 =4 位。</p>
+<p><img src="http://image.rexking6.top/img/clip1586227145.png" alt=""></p>
+</li>
+<li><p>向右移动4位后，P[2]处的C再次失配，由于C对应的next值为<strong>0</strong>，所以下一步用<strong>P[0]</strong>处的字符继续跟S[10]匹配，相当于向右移动：j - next[j] = 2 - 0 = 2 位。</p>
+<p><img src="http://image.rexking6.top/img/clip1586227164.png" alt=""></p>
+</li>
+<li><p>移动两位之后，A 跟空格不匹配，模式串后移1位。</p>
+<p><img src="http://image.rexking6.top/img/clip1586227178.png" alt=""></p>
+</li>
+<li><p>P[6]处的D再次失配，因为P[6]对应的next值为<strong>2</strong>，故下一步用<strong>P[2]</strong>继续跟文本串匹配，相当于模式串向右移动 j - next[j] = 6 - 2 = 4 位。</p>
+<p><img src="http://image.rexking6.top/img/clip1586227190.png" alt=""></p>
+</li>
+<li><p>匹配成功，过程结束。</p>
+<p><img src="https://img-blog.csdn.net/20140721223611515" alt="img"></p>
+</li>
+</ol>
+<p>匹配过程一模一样。也从侧面佐证了，next 数组确实是只要将各个最大前缀后缀的公共元素的长度值右移一位，且把初值赋为-1 即可。</p>
+<h3 id="基于《最大长度表》与基于《next-数组》等价"><a href="#基于《最大长度表》与基于《next-数组》等价" class="headerlink" title="基于《最大长度表》与基于《next 数组》等价"></a>基于《最大长度表》与基于《next 数组》等价</h3><p>我们已经知道，利用next 数组进行匹配失配时，模式串向右移动 j - next [ j ] 位，等价于已匹配字符数 - 失配字符的上一位字符所对应的最大长度值。原因是：</p>
+<ol>
+<li>j 从0开始计数，那么当数到失配字符时，j 的数值就是已匹配的字符数；</li>
+<li>由于next 数组是由最大长度值表整体向右移动一位（且初值赋为-1）得到的，那么失配字符的上一位字符所对应的最大长度值，即为当前失配字符的next 值。</li>
+</ol>
+<p>但为何本文不直接利用next 数组进行匹配呢？因为next 数组不好求，而一个字符串的前缀后缀的公共元素的最大长度值很容易求。例如若给定模式串“ababa”，要你快速口算出其next 数组，乍一看，每次求对应字符的next值时，还得把该字符排除之外，然后看该字符之前的字符串中有最大长度为多大的相同前缀后缀，此过程不够直接。而如果让你求其前缀后缀公共元素的最大长度，则很容易直接得出结果：0 0 1 2 3，如下表格所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1586227257.png" alt=""></p>
+<p>然后这5个数字 全部整体右移一位，且初值赋为-1，即得到其next 数组：-1 0 0 1 2。</p>
+<h3 id="Next-数组与有限状态自动机"><a href="#Next-数组与有限状态自动机" class="headerlink" title="Next 数组与有限状态自动机"></a>Next 数组与有限状态自动机</h3><p>next 负责把模式串向前移动，且当第j位不匹配的时候，用第next[j]位和主串匹配，就像打了张“表”。此外，next 也可以看作有限状态自动机的状态，在已经读了多少字符的情况下，失配后，前面读的若干个字符是有用的。</p>
+<p><img src="http://image.rexking6.top/img/clip1586227283.png" alt=""></p>
+<h3 id="Next-数组的优化"><a href="#Next-数组的优化" class="headerlink" title="Next 数组的优化"></a>Next 数组的优化</h3><p>行文至此，咱们全面了解了暴力匹配的思路、KMP算法的原理、流程、流程之间的内在逻辑联系，以及next 数组的简单求解（《最大长度表》整体右移一位，然后初值赋为-1）和代码求解，最后基于《next 数组》的匹配，看似洋洋洒洒，清晰透彻，但以上忽略了一个小问题。</p>
+<p>比如，如果用之前的next 数组方法求模式串“abab”的next 数组，可得其next 数组为-1 0 0 1（0 0 1 2整体右移一位，初值赋为-1），当它跟下图中的文本串去匹配的时候，发现b跟c失配，于是模式串右移j - next[j] = 3 - 1 =2位。</p>
+<p><img src="http://image.rexking6.top/img/clip1586227375.png" alt=""></p>
+<p>右移2位后，b又跟c失配。事实上，因为在上一步的匹配中，已经得知p[3] = b，与s[3] = c失配，而右移两位之后，让p[ next[3] ] = p[1] = b 再跟s[3]匹配时，必然失配。问题出在哪呢？</p>
+<p><img src="http://image.rexking6.top/img/clip1586227390.png" alt=""></p>
+<p>问题出在不该出现p[j] = p[ next[j] ]。为什么呢？理由是：当p[j] != s[i] 时，下次匹配必然是p[ next [j]] 跟s[i]匹配，如果p[j] = p[ next[j] ]，必然导致后一步匹配失败（因为p[j]已经跟s[i]失配，然后你还用跟p[j]等同的值p[next[j]]去跟s[i]匹配，很显然，必然失配），所以不能允许p[j] = p[ next[j ]]。如果出现了p[j] = p[ next[j] ]咋办呢？如果出现了，则需要再次递归，即令next[j] = next[ next[j] ]。</p>
+<p>所以，咱们得修改下求next 数组的代码。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">def get_nextval(s):</span><br><span class="line">    nxt = [-1 for _ in s]</span><br><span class="line">    i, j = -1, 0</span><br><span class="line">    while j &lt; len(s) - 1:</span><br><span class="line">        if i == -1 or s[i] == s[j]:</span><br><span class="line">            i += 1</span><br><span class="line">            j += 1</span><br><span class="line">            if s[i] != s[j]:</span><br><span class="line">                nxt[j] = i</span><br><span class="line">            else:</span><br><span class="line">                nxt[j] = nxt[i]</span><br><span class="line">        else:</span><br><span class="line">            i = nxt[i]</span><br><span class="line">    return nxt</span><br></pre></td></tr></table></figure>
+<p>利用优化过后的next 数组求法，可知模式串“abab”的新next数组为：-1 0 -1 0。可能有些读者会问：原始next 数组是前缀后缀最长公共元素长度值右移一位， 然后初值赋为-1而得，那么优化后的next 数组如何快速心算出呢？实际上，只要求出了原始next 数组，便可以根据原始next 数组快速求出优化后的next 数组。还是以abab为例，如下表格所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1586227435.png" alt=""></p>
+<p>只要出现了p[next[j]] = p[j]的情况，则把next[j]的值再次递归。例如在求模式串“abab”的第2个a的next值时，如果是未优化的next值的话，第2个a对应的next值为0，相当于第2个a失配时，下一步匹配模式串会用p[0]处的a再次跟文本串匹配，必然失配。所以求第2个a的next值时，需要再次递归：next[2] = next[ next[2] ] = next[0] = -1（此后，根据优化后的新next值可知，第2个a失配时，执行“如果j = -1，或者当前字符匹配成功（即S[i] == P[j]），都令i++，j++，继续匹配下一个字符”），同理，第2个b对应的next值为0。</p>
+<p>对于优化后的next数组可以发现一点：如果模式串的后缀跟前缀相同，那么它们的next值也是相同的，例如模式串abcabc，它的前缀后缀都是abc，其优化后的next数组为：-1 0 0 -1 0 0，前缀后缀abc的next值都为-1 0 0。</p>
+<p>接下来，咱们继续拿之前的例子说明，整个匹配过程如下：</p>
+<ol>
+<li><p>S[3]与P[3]匹配失败。</p>
+<p><img src="http://image.rexking6.top/img/clip1586227478.png" alt=""></p>
+</li>
+<li><p>S[3]保持不变，P的下一个匹配位置是P[next[3]]，而next[3]=0，所以P[next[3]]=P[0]与S[3]匹配。</p>
+<p><img src="http://image.rexking6.top/img/clip1586227490.png" alt=""></p>
+</li>
+<li><p>由于上一步骤中P[0]与S[3]还是不匹配。此时i=3，j=next [0]=-1，由于满足条件j==-1，所以执行“++i, ++j”，即主串指针下移一个位置，P[0]与S[4]开始匹配。最后j==pLen，跳出循环，输出结果i - j = 4（即模式串第一次在文本串中出现的位置），匹配成功，算法结束。</p>
+<p><img src="http://image.rexking6.top/img/clip1586227506.png" alt=""></p>
+</li>
+</ol>
+<h2 id="KMP的时间复杂度分析"><a href="#KMP的时间复杂度分析" class="headerlink" title="KMP的时间复杂度分析"></a>KMP的时间复杂度分析</h2><p>相信大部分读者读完上文之后，已经发觉其实理解KMP非常容易，无非是循序渐进把握好下面几点：</p>
+<ol>
+<li>如果模式串中存在相同前缀和后缀，即pj-k pj-k+1, …, pj-1 = p0 p1, …, pk-1，那么在pj跟si失配后，让模式串的前缀p0 p1…pk-1对应着文本串si-k si-k+1…si-1，而后让pk跟si继续匹配。</li>
+<li>之前本应是pj跟si匹配，结果失配了，失配后，令pk跟si匹配，相当于j 变成了k，模式串向右移动j - k位。</li>
+<li>因为k 的值是可变的，所以我们用next[j]表示j处字符失配后，下一次匹配模式串应该跳到的位置。换言之，失配前是j，pj跟si失配时，用p[ next[j] ]继续跟si匹配，相当于j变成了next[j]，所以，j = next[j]，等价于把模式串向右移动j - next [j] 位。</li>
+<li>而next[j]应该等于多少呢？next[j]的值由j 之前的模式串子串中有多大长度的相同前缀后缀所决定，如果j 之前的模式串子串中（不含j）有最大长度为k的相同前缀后缀，那么next [j] = k。</li>
+</ol>
+<p>如之前的图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1586227553.png" alt=""></p>
+<p>接下来，咱们来分析下KMP的时间复杂度。分析之前，先来回顾下KMP匹配算法的流程：</p>
+<ul>
+<li>假设现在文本串S匹配到 i 位置，模式串P匹配到 j 位置<ul>
+<li>如果j = -1，或者当前字符匹配成功（即S[i] == P[j]），都令i++，j++，继续匹配下一个字符；</li>
+<li>如果j != -1，且当前字符匹配失败（即S[i] != P[j]），则令 i 不变，j = next[j]。此举意味着失配时，模式串P相对于文本串S向右移动了j - next [j] 位。</li>
+</ul>
+</li>
+</ul>
+<p>我们发现如果某个字符匹配成功，模式串首字符的位置保持不动，仅仅是i++、j++；如果匹配失配，i 不变（即 i 不回溯），模式串会跳过匹配过的next [j]个字符。整个算法最坏的情况是，当模式串首字符位于i - j的位置时才匹配成功，算法结束。</p>
+<p>所以，如果文本串的长度为n，模式串的长度为m，那么匹配过程的时间复杂度为O(n)，算上计算next的O(m)时间，KMP的整体时间复杂度为O(m + n)。</p>
+<h1 id="扩展1：BM算法"><a href="#扩展1：BM算法" class="headerlink" title="扩展1：BM算法"></a>扩展1：BM算法</h1><p>KMP的匹配是从模式串的开头开始匹配的，而1977年，德克萨斯大学的Robert S. Boyer教授和J Strother Moore教授发明了一种新的字符串匹配算法：Boyer-Moore算法，简称BM算法。该算法从模式串的尾部开始匹配，且拥有在最坏情况下O(N)的时间复杂度。在实践中，比KMP算法的实际效能高。</p>
+<p>BM算法定义了两个规则：</p>
+<ul>
+<li>坏字符规则：当文本串中的某个字符跟模式串的某个字符不匹配时，我们称文本串中的这个失配字符为坏字符，此时模式串需要向右移动，移动的位数 = 坏字符在模式串中的位置 - 坏字符在模式串中最右出现的位置。此外，如果”坏字符”不包含在模式串之中，则最右出现位置为-1。</li>
+<li>好后缀规则：当字符失配时，后移位数 = 好后缀在模式串中的位置 - 好后缀在模式串上一次出现的位置，且如果好后缀在模式串中没有再次出现，则为-1。</li>
+</ul>
+<p>下面举例说明BM算法。例如，给定文本串“HERE IS A SIMPLE EXAMPLE”，和模式串“EXAMPLE”，现要查找模式串是否在文本串中，如果存在，返回模式串在文本串中的位置。</p>
+<ol>
+<li><p>首先，”文本串”与”模式串”头部对齐，从尾部开始比较。”S”与”E”不匹配。这时，”S”就被称为”坏字符”（bad character），即不匹配的字符，它对应着模式串的第6位。且”S”不包含在模式串”EXAMPLE”之中（相当于最右出现位置是-1），这意味着可以把模式串后移6-(-1)=7位，从而直接移到”S”的后一位。</p>
+<p><img src="https://img-blog.csdn.net/20140728192101322" alt="img"></p>
+</li>
+<li><p>依然从尾部开始比较，发现”P”与”E”不匹配，所以”P”是”坏字符”。但是，”P”包含在模式串”EXAMPLE”之中。因为“P”这个“坏字符”对应着模式串的第6位（从0开始编号），且在模式串中的最右出现位置为4，所以，将模式串后移6-4=2位，两个”P”对齐。</p>
+<p><img src="http://image.rexking6.top/img/clip1586227697.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1586227703.png" alt=""></p>
+</li>
+<li><p>依次比较，得到 “MPLE”匹配，称为”好后缀”（good suffix），即所有尾部匹配的字符串。注意，”MPLE”、”PLE”、”LE”、”E”都是好后缀。</p>
+<p><img src="http://image.rexking6.top/img/clip1586227730.png" alt=""></p>
+</li>
+<li><p>发现“I”与“A”不匹配：“I”是坏字符。如果是根据坏字符规则，此时模式串应该后移2-(-1)=3位。问题是，有没有更优的移法？</p>
+<p><img src="http://image.rexking6.top/img/clip1586227742.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1586227747.png" alt=""></p>
+</li>
+<li><p>更优的移法是利用好后缀规则：当字符失配时，后移位数 = 好后缀在模式串中的位置 - 好后缀在模式串中上一次出现的位置，且如果好后缀在模式串中没有再次出现，则为-1。</p>
+<p>所有的“好后缀”（MPLE、PLE、LE、E）之中，只有“E”在“EXAMPLE”的头部出现，所以后移6-0=6位。</p>
+<p>可以看出，“坏字符规则”只能移3位，“好后缀规则”可以移6位。每次后移这两个规则之中的较大值。这两个规则的移动位数，只与模式串有关，与原文本串无关。</p>
+<p><img src="http://image.rexking6.top/img/clip1586227770.png" alt=""></p>
+</li>
+<li><p>继续从尾部开始比较，“P”与“E”不匹配，因此“P”是“坏字符”，根据“坏字符规则”，后移 6 - 4 = 2位。因为是最后一位就失配，尚未获得好后缀。</p>
+<p><img src="http://image.rexking6.top/img/clip1586227794.png" alt=""></p>
+<p>由上可知，BM算法不仅效率高，而且构思巧妙，容易理解。</p>
+</li>
+</ol>
+<h1 id="扩展2：Sunday算法"><a href="#扩展2：Sunday算法" class="headerlink" title="扩展2：Sunday算法"></a>扩展2：Sunday算法</h1><p>上文中，我们已经介绍了KMP算法和BM算法，这两个算法在最坏情况下均具有线性的查找时间。但实际上，KMP算法并不比最简单的c库函数strstr()快多少，而BM算法虽然通常比KMP算法快，但BM算法也还不是现有字符串查找算法中最快的算法，本文最后再介绍一种比BM算法更快的查找算法即Sunday算法。</p>
+<p>Sunday算法由Daniel M.Sunday在1990年提出，它的思想跟BM算法很相似：</p>
+<ul>
+<li>只不过Sunday算法是从前往后匹配，在匹配失败时关注的是文本串中参加匹配的最末位字符的下一位字符。<ul>
+<li>如果该字符没有在模式串中出现则直接跳过，即移动位数 = 匹配串长度 + 1；</li>
+<li>否则，其移动位数 = 模式串中最右端的该字符到末尾的距离+1。</li>
+</ul>
+</li>
+</ul>
+<p>下面举个例子说明下Sunday算法。假定现在要在文本串”substring searching algorithm”中查找模式串”search”。</p>
+<ol>
+<li><p>刚开始时，把模式串与文本串左边对齐：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">substring searching algorithm</span><br><span class="line">search</span><br><span class="line">^</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>结果发现在第2个字符处发现不匹配，不匹配时关注文本串中参加匹配的最末位字符的下一位字符，即标粗的字符 i，因为模式串search中并不存在i，所以模式串直接跳过一大片，向右移动位数 = 匹配串长度 + 1 = 6 + 1 = 7，从 i 之后的那个字符（即字符n）开始下一步的匹配，如下图：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">substring searching algorithm</span><br><span class="line">　　　 search</span><br><span class="line">　　　　^</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>结果第一个字符就不匹配，再看文本串中参加匹配的最末位字符的下一位字符，是’r’，它出现在模式串中的倒数第3位，于是把模式串向右移动3位（r 到模式串末尾的距离 + 1 = 2 + 1 =3），使两个’r’对齐，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">substring searching algorithm</span><br><span class="line">　　　　  search</span><br><span class="line">　　　　　　　^</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>匹配成功。</p>
+</li>
+</ol>
+<p>回顾整个过程，我们只移动了两次模式串就找到了匹配位置，缘于Sunday算法每一步的移动量都比较大，效率很高。完。</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ol>
+<li>《算法导论》的第十二章：字符串匹配；</li>
+<li>本文中模式串“ABCDABD”的部分图来自于此文：<a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2013/05/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm.html；">http://www.ruanyifeng.com/blog/2013/05/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm.html；</a></li>
+<li>本文3.3.7节中有限状态自动机的图由微博网友@龚陆安 绘制：<a target="_blank" rel="noopener" href="http://d.pr/i/NEiz；">http://d.pr/i/NEiz；</a></li>
+<li>北京7月暑假班邹博半小时KMP视频：<a target="_blank" rel="noopener" href="http://www.julyedu.com/video/play/id/5；">http://www.julyedu.com/video/play/id/5；</a></li>
+<li>北京7月暑假班邹博第二次课的PPT：<a target="_blank" rel="noopener" href="http://yun.baidu.com/s/1mgFmw7u；">http://yun.baidu.com/s/1mgFmw7u；</a></li>
+<li>理解KMP 的9张PPT：<a target="_blank" rel="noopener" href="http://weibo.com/1580904460/BeCCYrKz3#_rnd1405957424876；">http://weibo.com/1580904460/BeCCYrKz3#_rnd1405957424876；</a></li>
+<li>详解KMP算法（多图）：<a target="_blank" rel="noopener" href="http://www.cnblogs.com/yjiyjige/p/3263858.html；">http://www.cnblogs.com/yjiyjige/p/3263858.html；</a></li>
+<li>本文第4部分的BM算法参考自此文：<a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2013/05/boyer-moore_string_search_algorithm.html；">http://www.ruanyifeng.com/blog/2013/05/boyer-moore_string_search_algorithm.html；</a></li>
+<li><a target="_blank" rel="noopener" href="http://youlvconglin.blog.163.com/blog/static/5232042010530101020857；">http://youlvconglin.blog.163.com/blog/static/5232042010530101020857；</a></li>
+<li>《数据结构 第二版》，严蔚敏 &amp; 吴伟民编著；</li>
+<li><a target="_blank" rel="noopener" href="http://blog.csdn.net/v_JULY_v/article/details/6545192；">http://blog.csdn.net/v_JULY_v/article/details/6545192；</a></li>
+<li><a target="_blank" rel="noopener" href="http://blog.csdn.net/v_JULY_v/article/details/6111565；">http://blog.csdn.net/v_JULY_v/article/details/6111565；</a></li>
+<li>Sunday算法的原理与实现：<a target="_blank" rel="noopener" href="http://blog.chinaunix.net/uid-22237530-id-1781825.html；">http://blog.chinaunix.net/uid-22237530-id-1781825.html；</a></li>
+<li>模式匹配之Sunday算法：<a target="_blank" rel="noopener" href="http://blog.csdn.net/sunnianzhong/article/details/8820123；">http://blog.csdn.net/sunnianzhong/article/details/8820123；</a></li>
+<li>一篇KMP的英文介绍：<a target="_blank" rel="noopener" href="http://www.inf.fh-flensburg.de/lang/algorithmen/pattern/kmpen.htm；">http://www.inf.fh-flensburg.de/lang/algorithmen/pattern/kmpen.htm；</a></li>
+<li>我2014年9月3日在西安电子科大的面试&amp;算法讲座视频（第36分钟~第94分钟讲KMP）：<a target="_blank" rel="noopener" href="http://www.julyedu.com/video/play/21；">http://www.julyedu.com/video/play/21；</a></li>
+<li>一幅图理解KMP next数组的求法：<a target="_blank" rel="noopener" href="http://v.atob.site/kmp-next.html">http://v.atob.site/kmp-next.html</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\09\13\Django知识点\" rel="bookmark">Django知识点</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\09\05\Linux知识点\" rel="bookmark">Linux知识点</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\09\02\Redis知识点\" rel="bookmark">Redis知识点</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2017/08/07/KMP%E7%AE%97%E6%B3%95/" title="KMP算法">https://blog.rexking6.top/2017/08/07/KMP算法/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AF%95%E9%9D%A2%E8%AF%95/" rel="tag"># 笔试面试</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/07/31/%E5%B0%8F%E7%AE%97%E7%9B%98%E8%A2%AB%E6%89%93%E4%B9%B1%E7%9A%84%E9%98%BF%E9%87%8C%E4%B8%80%E9%9D%A2/" rel="prev" title="小算盘被打乱的阿里一面">
+      <i class="fa fa-chevron-left"></i> 小算盘被打乱的阿里一面
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/08/07/Scrapy%E7%88%AC%E5%8F%96B%E7%AB%99%E7%94%A8%E6%88%B7%E5%8F%8A%E4%BC%98%E5%8C%96/" rel="next" title="Scrapy爬取B站用户及优化">
+      Scrapy爬取B站用户及优化 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9A%B4%E5%8A%9B%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">暴力匹配算法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#KMP%E7%AE%97%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">KMP算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89"><span class="nav-number">3.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4"><span class="nav-number">3.2.</span> <span class="nav-text">步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E9%87%8A"><span class="nav-number">3.3.</span> <span class="nav-text">解释</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BB%E6%89%BE%E6%9C%80%E9%95%BF%E5%89%8D%E7%BC%80%E5%90%8E%E7%BC%80"><span class="nav-number">3.3.1.</span> <span class="nav-text">寻找最长前缀后缀</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E3%80%8A%E6%9C%80%E5%A4%A7%E9%95%BF%E5%BA%A6%E8%A1%A8%E3%80%8B%E5%8C%B9%E9%85%8D"><span class="nav-number">3.3.2.</span> <span class="nav-text">基于《最大长度表》匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E3%80%8A%E6%9C%80%E5%A4%A7%E9%95%BF%E5%BA%A6%E8%A1%A8%E3%80%8B%E6%B1%82next-%E6%95%B0%E7%BB%84"><span class="nav-number">3.3.3.</span> <span class="nav-text">根据《最大长度表》求next 数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E8%BF%87%E4%BB%A3%E7%A0%81%E9%80%92%E6%8E%A8%E8%AE%A1%E7%AE%97next-%E6%95%B0%E7%BB%84"><span class="nav-number">3.3.4.</span> <span class="nav-text">通过代码递推计算next 数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E3%80%8Anext-%E6%95%B0%E7%BB%84%E3%80%8B%E5%8C%B9%E9%85%8D"><span class="nav-number">3.3.5.</span> <span class="nav-text">基于《next 数组》匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E3%80%8A%E6%9C%80%E5%A4%A7%E9%95%BF%E5%BA%A6%E8%A1%A8%E3%80%8B%E4%B8%8E%E5%9F%BA%E4%BA%8E%E3%80%8Anext-%E6%95%B0%E7%BB%84%E3%80%8B%E7%AD%89%E4%BB%B7"><span class="nav-number">3.3.6.</span> <span class="nav-text">基于《最大长度表》与基于《next 数组》等价</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Next-%E6%95%B0%E7%BB%84%E4%B8%8E%E6%9C%89%E9%99%90%E7%8A%B6%E6%80%81%E8%87%AA%E5%8A%A8%E6%9C%BA"><span class="nav-number">3.3.7.</span> <span class="nav-text">Next 数组与有限状态自动机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Next-%E6%95%B0%E7%BB%84%E7%9A%84%E4%BC%98%E5%8C%96"><span class="nav-number">3.3.8.</span> <span class="nav-text">Next 数组的优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#KMP%E7%9A%84%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90"><span class="nav-number">3.4.</span> <span class="nav-text">KMP的时间复杂度分析</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%89%A9%E5%B1%951%EF%BC%9ABM%E7%AE%97%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">扩展1：BM算法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%89%A9%E5%B1%952%EF%BC%9ASunday%E7%AE%97%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">扩展2：Sunday算法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">6.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

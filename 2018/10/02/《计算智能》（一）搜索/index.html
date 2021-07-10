@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《计算智能》（一）搜索">
+<meta property="og:url" content="https://blog.rexking6.top/2018/10/02/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%99%BA%E8%83%BD%E3%80%8B%EF%BC%88%E4%B8%80%EF%BC%89%E6%90%9C%E7%B4%A2/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547345655.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547346158.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547346377.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539246181.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547348194.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547348494.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539771407.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539771775.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539788073.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1547366661.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540727923.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541638991.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541639178.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541639693.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541776624.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541776698.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541776805.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541776839.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541832943.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541832955.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541832966.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541832976.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541832987.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541832998.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541848087.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543375224.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543375395.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543375491.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543375536.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543650839.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543650852.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543650861.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543650870.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543651061.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543651275.png">
+<meta property="article:published_time" content="2018-10-02T11:07:22.000Z">
+<meta property="article:modified_time" content="2019-03-06T10:16:08.147Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="硕士课程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1547345655.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/10/02/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%99%BA%E8%83%BD%E3%80%8B%EF%BC%88%E4%B8%80%EF%BC%89%E6%90%9C%E7%B4%A2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《计算智能》（一）搜索 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/10/02/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%99%BA%E8%83%BD%E3%80%8B%EF%BC%88%E4%B8%80%EF%BC%89%E6%90%9C%E7%B4%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《计算智能》（一）搜索
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-10-02 19:07:22" itemprop="dateCreated datePublished" datetime="2018-10-02T19:07:22+08:00">2018-10-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 18:16:08" itemprop="dateModified" datetime="2019-03-06T18:16:08+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%A1%95%E5%A3%AB%E8%AF%BE%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">硕士课程</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/10/02/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%99%BA%E8%83%BD%E3%80%8B%EF%BC%88%E4%B8%80%EF%BC%89%E6%90%9C%E7%B4%A2/" class="post-meta-item leancloud_visitors" data-flag-title="《计算智能》（一）搜索" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>6.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>这学期选了李翠华老师和曲延云老师的《计算智能》。</p>
+<p>第一部分——搜索，作下记录。</p>
+<h1 id="盲目搜索"><a href="#盲目搜索" class="headerlink" title="盲目搜索"></a>盲目搜索</h1><p>没有有用的知识作指导的搜索，对搜索空间中的状态进行穷举，容易导致组合爆炸。</p>
+<p>在状态空间中检查每一个可能的目标状态，在树结构的搜索空间中</p>
+<ul>
+<li><p>时间复杂度：可以用找到目标前所访问的结点数表示</p>
+</li>
+<li><p>空间复杂度：保证回溯搜索路径所需要的存储总量，即一张访问结点列表的存储量</p>
+</li>
+</ul>
+<p>对于完成某一计算任务的算法，所需要的时间（或存储量）仅为完成这一任务所需的最小时间（或存储量）再乘一个因子，则这个算法在时间（存储空间）上是渐近最优的。乘法因子越接近1越近似于最优算法。</p>
+<h2 id="深度优先搜索（Depth-first-Search）"><a href="#深度优先搜索（Depth-first-Search）" class="headerlink" title="深度优先搜索（Depth-first Search）"></a>深度优先搜索（Depth-first Search）</h2><p>搜索策略：总是扩展深度大的结点，直到找到目标结点（问题的解）。</p>
+<p>算法描述：</p>
+<ol>
+<li>用 $N$ 表示初始结点列表（$N$待扩展）</li>
+<li>如果 $N$ 为空集，则退出并给出失败信号</li>
+<li>$n$ 取为 $N$ 的第一个节点，并在 $N$ 中删除结点 $n$ ，放入已访问结点列表</li>
+<li>如果 $n$ 为目标结点，则退出并给出成功信号</li>
+<li>否则，将 $n$ 的子结点作为表头（第一个结点）扩展到 $N$ 中，返回2步</li>
+</ol>
+<p>优化：</p>
+<ol>
+<li><p>搜索过程中，从继续扩展的结点上删除下列结点：</p>
+<ul>
+<li><p>不再存在后继的结点</p>
+</li>
+<li><p>状态相同的冗余或重复性结点</p>
+</li>
+<li><p>超过规定深度的结点</p>
+</li>
+</ul>
+<p>这么做的目的是避免进入死循环。</p>
+</li>
+<li><p>注意给出深度的限制。</p>
+</li>
+</ol>
+<p>深度优先搜索的缺点是：未必能找到解，即使找到也未必是路径最短解。在存储空间上渐近最优，但对于一棵无穷树，可能永远也找不到目标结点。</p>
+<h2 id="广度优先搜索（Breadth-first-Search）"><a href="#广度优先搜索（Breadth-first-Search）" class="headerlink" title="广度优先搜索（Breadth-first Search）"></a>广度优先搜索（Breadth-first Search）</h2><p>搜索策略：总是在某一深度上先搜索所有结点，之后搜索下一个深度的结点。只要问题有解，广度优先搜索一定能在有限步内找到解且路径最短。</p>
+<p>算法描述：</p>
+<ol>
+<li>用 $N$ 表示初始结点列表（ $N$ 待扩展）</li>
+<li>如果 $N$ 为空集，则退出并给出失败信号</li>
+<li>$n$ 取为 $N$ 的第一个结点，并在 $N$ 中删除结点 $n$，放入已访问结点列表</li>
+<li>如果 $n$ 为目标结点，则退出并给出成功信号</li>
+<li>否则，将 $n$ 的子结点加到 $N​$ 的末尾，并返回2步</li>
+</ol>
+<p>最大弱点：随着深度的增加，结点数目指数增长，导致组合爆炸。</p>
+<h2 id="迭代加深搜索（iterative-deeping）"><a href="#迭代加深搜索（iterative-deeping）" class="headerlink" title="迭代加深搜索（iterative deeping）"></a>迭代加深搜索（iterative deeping）</h2><p>搜索策略：在固定深度上，重复深度优先搜索；增加深度，再重复深度优先搜索，直至找到目标结点。</p>
+<p>算法步骤（给定深度 <code>max</code> ）：</p>
+<ol>
+<li>用 $N$ 表示初始结点列表（$N$待扩展）</li>
+<li>如果 $N$ 为空集，则退出并给出失败信号</li>
+<li>$n$ 取为 $N$ 的首结点，并在 $N$ 中删除结点 $n$，放入已访问结点列表</li>
+<li>如果 $n$ 为目标结点，则退出并给出成功信号</li>
+<li>如果 $n$ 的深度<code>=max</code>，则<code>max++</code>，返回2步</li>
+<li>否则，将 $n$ 的子结点加到 $N$ 的表头，并返回2步</li>
+</ol>
+<h2 id="启发式搜索"><a href="#启发式搜索" class="headerlink" title="启发式搜索"></a>启发式搜索</h2><p>利用启发信息作指导所进行的搜索。</p>
+<p>启发信息：与任务有关的信息，用来指导选择待扩展结点，使搜索总是向着那些被认为是最有希望的区段来扩展，用评价函数 $f(n)$ 对结点 $n$ 的“有希望”程度建立一种数值的评估。</p>
+<h3 id="最佳优先搜索（Best-first-Search）"><a href="#最佳优先搜索（Best-first-Search）" class="headerlink" title="最佳优先搜索（Best-first Search）"></a>最佳优先搜索（Best-first Search）</h3><p>搜索策略：将结点表按距目标的估计距离进行排序，再以结点的估计距离为标准选择待扩展节点。</p>
+<p>算法步骤：</p>
+<ol>
+<li>用 $N$ 表示已经排序的初始结点表（从小到大）</li>
+<li>如果 $N$ 为空集，则退出并给出失败信号</li>
+<li>$n$ 取为 $N$ 的首结点，并在 $N$ 中删除结点 $n$，放入已访问结点列表</li>
+<li>如果 $n$ 为目标结点，则退出并给出成功信号</li>
+<li>否则，将 $n$ 的后继结点加到 $N$ 中，记为 $N’$，对 $N’$ 中的结点按距目标的估计距离排序，并返回2步</li>
+</ol>
+<p>企图通过搜索那些估计离目标很近的结点以迅速找到解，注意计算每个结点距目标的估计距离的代价，尽量避免重复计算。</p>
+<p>评价函数 $f(n)$：一般地，用 $f(n)$ 表示从初始结点 $S$ 经结点 $n$ 到达某一目标 $t$ 的最佳路径的代价 $f^\ast(n)$ 的估计。</p>
+<p>$f(n)$ 由两部分组成：</p>
+<ol>
+<li>从 $S$ 到 $n$ 的最佳代价 $g^\ast(n)$的估计 $g(n)$</li>
+<li>从 $n$ 到 $t$ 的最佳代价 $h^\ast(n)$ 的估计 $h(n)$</li>
+</ol>
+<p>即 $f(n) = g(n) + h(n)$ 作为 $f^\ast(n) = g^\ast(n) + h^\ast(n)$ 的估计。估计值越小的结点，被认为希望度越高，应该优先扩展。代价均取非负值。</p>
+<h3 id="启发式图搜索算法"><a href="#启发式图搜索算法" class="headerlink" title="启发式图搜索算法"></a>启发式图搜索算法</h3><p>很多搜索空间处理的是图结构（而非树结构）。</p>
+<p>用 $G​$ 表示当前已生成的显式搜索图，用一张<code>open</code>表存放已生成而尚未进行扩展的结点，用一张<code>closed</code>表存放已经生成且处理过的结点。这两张表中除了结点的状态描述外，还包括：</p>
+<ul>
+<li>结点的代价估计值 $f$ 和 $g$</li>
+<li>后继元素</li>
+<li>主链的前趋指针：指明该结点在通向初始结点的最优通路上的父结点</li>
+</ul>
+<p>当启发函数 $h=0​$，即毫无启发信息，$g(n)=d(n)​$，其中 $d(n)​$ 表示结点 $n​$ 的深度，此时算法退化为广度优先搜索。</p>
+<p>已证明，若对所有结点 $n$，都有 $h(n)≤h^\ast(n)$，则算法一定能找到一条到达目标结点的最佳路径，此时算法A称为算法A*。</p>
+<p>凡是一定能找到最佳求解路径的算法称为可接纳的。$h=0$ 的广度优先算法是可接纳的。</p>
+<p>在评价函数 $f(n)=g(n)+h(n)$ 中，</p>
+<ul>
+<li>与 $h(n)$ 相比，$g(n)$ 取值越大，越倾向宽度优先搜索（因为下一层结点之间的代价相差越小，在 $f(n)$ 所占的比重越小vb），结点展开增多，效率降低，但得到解的保险系数增大</li>
+<li>$h(n)$ 决定算法的启发能力。一般地，启发能力越强，搜索效率越高。通常，在保证算法是可接纳的前提下，取 $h(n)$ 为 $h^\ast(n)$ 下界的最大值。</li>
+</ul>
+<p>有时，也选用超出 $h^\ast(n)​$下界范围的启发函数，以增大启发能力。当然，此时的搜索算法不一定是可接纳的。</p>
+<h4 id="伪代码"><a href="#伪代码" class="headerlink" title="伪代码"></a>伪代码</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">1. 建立一个只由初始结点S组成的搜索图G，open=(S); closed=() 空表</span><br><span class="line">2. If open为空表 then 退出并给出失败信息</span><br><span class="line">3. n = first(open); remove(n, open); add(n, closed);</span><br><span class="line">4. If n为目标结点 then 退出(成功) (可给出S到n的路径）</span><br><span class="line">5. 否则，扩展结点n，生成不是n的祖先的后继结点集M=&#123;m&#125; 把每个m作为n的后继结点加入G</span><br><span class="line">6. If m没有在open和closed表中出现过</span><br><span class="line">   Then add(m, open)</span><br><span class="line">7. If m在open表中有重复结点k，且g(m)&lt;g(k) Then remove(k,open); add(m, open)</span><br><span class="line">8. If m在closed表中有重复结点k，且g(m)&lt;g(k) then</span><br><span class="line">   ①将closed表中的结点k改为结点m(只需修改主链指针和f,g)</span><br><span class="line">   ②按后继元素，修改k在open表和closed表中的后继元素f,g的值</span><br><span class="line">9. 按f值，自小到大对open表中的结点重新排序，并返回2步</span><br></pre></td></tr></table></figure>
+<h4 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h4><p>九宫重排问题：在 3x3 的井子九宫格棋盘上摆有 8 个将牌，分别标有 1-8 个数码。棋盘上尚有一个空格，允许其周围的将牌向空格移动。通过移动将牌就可以变换将牌的布局。先给定如下两种布局，一种为初始状态（左），一种为目标状态（右），问如何移动将牌，以将初始状态变换为目标状态。</p>
+<p><img src="http://image.rexking6.top/img/clip1547345655.png" alt=""></p>
+<p>综合数据库：用 3x3 矩阵（$S_{i,j}​$）表示九宫图的状态，$S_{i,j}\in\{0,1,…,8\}​$ 且 $S_{ij}​$ 互不相等，$i,j=1,2,3​$，其中 $S_{m,n}=0​$ 表示空格。</p>
+<p>规则集合：</p>
+<ul>
+<li>左移空格 $\text{if } n \ge 2  \text{then }S_{m,n}=S_{m,n-1}, S_{m,n-1}=0​$；</li>
+<li>右移空格 $\text{if } n \le 2  \text{then }S_{m,n}=S_{m,n+1}, S_{m,n+1}=0$；</li>
+<li>上移空格 $\text{if } m \ge 2  \text{then }S_{m,n}=S_{m-1,n}, S_{m-1,n}=0$；</li>
+<li>下移空格 $\text{if } m \le 2  \text{then }S_{m,n}=S_{m+1,n}, S_{m+1,n}=0$；</li>
+</ul>
+<ol>
+<li><p>广度优先搜索</p>
+<p>取 $g(n)=d(n)$，$h(n)=0$；其中 $d(n)$ 为结点 $n$ 的深度。为了加快搜索进程，目标结点一旦生成就立即放在<code>open</code>表中。需要生成47个结点。</p>
+<p><img src="http://image.rexking6.top/img/clip1547346158.png" alt=""></p>
+</li>
+</ol>
+<ol>
+<li><p>A*搜索算法-1</p>
+<p>取 $g(n)=d(n)$，$h(n)=w(n)$，其中 $w(n)$ 表示以目标为基准，结点 $n$ 的状态中不在位将牌的个数。由于从结点 $n$ 转换成目标结点至少需要 $w(n)$ 步，所以对任意 $n$，恒有 $w(n)\le h^\ast (n)$。需要生成14个结点。</p>
+<p><img src="http://image.rexking6.top/img/clip1547346377.png" alt=""></p>
+</li>
+<li><p>A*搜索算法-2</p>
+<p>取 $g(n)=d(n)$，$h(n)=p(n)$，其中 $p(n)$ 表示结点 $n$ 的每一将牌与其目标位置之间的距离综合。易见，$w(n)\le p(n)\le h^\ast(n)$。$p(n)$ 比 $w(n)$ 更具启发能力，只需要生成12个结点便可以完成搜索。</p>
+</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1539246181.png" alt=""></p>
+<h2 id="以上搜索技术的改进"><a href="#以上搜索技术的改进" class="headerlink" title="以上搜索技术的改进"></a>以上搜索技术的改进</h2><ul>
+<li><p>前面的搜索都是从初始状态出发，一步步搜索到目标状态，称为数据驱动或向前搜索。</p>
+</li>
+<li><p>若从目标状态出发搜索到初始状态，则称为目标驱动或向后搜索。</p>
+</li>
+<li><p>向前和向后搜索结合，从初始和目标状态同时出发的搜索称为双向搜索。</p>
+</li>
+<li><p>如果搜索的对象是问题，搜索的原则是把一个复杂问题化成一组简单的子问题的“与”，“或”，则称为问题空间搜索。</p>
+</li>
+<li><p>如果有两方博弈，每一方在向目标(取胜)前进的同时力图阻止对方接近目标，则称为博弈搜索。</p>
+</li>
+</ul>
+<h2 id="问题空间搜索"><a href="#问题空间搜索" class="headerlink" title="问题空间搜索"></a>问题空间搜索</h2><p>基本思想：问题空间由一个个问题构成，用一个结点表示一个问题。如果结点 $A$ 有一边通向结点 $B$，则表示 $A$ 的解决有依赖于问题$B$的解决，$A$ 称为父问题，$B$ 称为子问题。</p>
+<p>如果结点 $A​$ 有 $n​$ 条边分别通往 $B_1​$，$B_2​$，…，$B_n​$，若</p>
+<ul>
+<li>$n$ 条边取逻辑“与”关系，则表示问题 $A$ 的解决有赖于整个子问题组 $\{B_1, B_2, …, B_n\}$ 的全部解决</li>
+<li>$n$ 条边取逻辑“或”关系，则表示问题 $A$ 的解决有赖于子问题组 $\{B_1, B_2, …, B_n\}$ 中任意一个子问题的解决。</li>
+</ul>
+<p>将一个较复杂的问题分解成一组较简单的问题。子问题分解重复进行，直到可求解。可以用“与或树”表示问题空间。</p>
+<p>实际问题的求解中，问题空间的与或树要复杂地多。从问题空间中找出一棵最优的解题树需要对与或树使用启发式搜索技术。原理与状态空间上的搜索技术一样，不过求解的结果不再是路径，而是一棵解题树。</p>
+<ul>
+<li><p>在计算时“与”结点的代价常取</p>
+<script type="math/tex; mode=display">
+h(n)=\sum_{i=1}^m[h(n_i)+c(n,n_i)]</script><p>或者</p>
+<script type="math/tex; mode=display">
+h(n)=\text{max}_{1\le i\le m}[h(n_i)+c(n,n_i)]</script></li>
+</ul>
+<p>这里，结点 $n_1, n_2, …, n_m$ 是“与”节点 $n$ 的后继结点，$h(n_i)$ 为结点 $n_i$ 的评价函数，$c(n,n_i)$ 是边 $(n,n_i)$ 的代价。</p>
+<ul>
+<li>“或“结点的代价函数一般是<script type="math/tex; mode=display">
+h(n)=\text{min}_{1\le i\le m}[h(n_i)+c(n,n_i)]</script></li>
+</ul>
+<p>问题空间的求解方法通常适用于层次化结构很清楚的问题。</p>
+<h3 id="梵塔"><a href="#梵塔" class="headerlink" title="梵塔"></a>梵塔</h3><p>三个柱子似的宝石针，另有64个半径各不相同的金图盘，它们的中心都有一个小孔，以自上而下、从小到大的顺序穿在其中的一根宝石针上。每天移动一个金盘，从一根宝石针移到另一根宝石针上。规则是不得移动其他金盘，且大盘不得压在小盘上，最终任务是把64个金盘从第一根宝石针全部移到第二根宝石针上，第三根宝石针可以作为过渡用。</p>
+<p><img src="http://image.rexking6.top/img/clip1547348194.png" alt=""></p>
+<p>利用问题空间来描述这个问题：将三根宝石针编号为 $i,j,k$，要求搬动的金盘总数记为 $n$，从 $i$ 针全部搬到 $j$ 针，将该问题表示为 $(n,i,j)$。它可以分解为如下三个子问题的“与”，</p>
+<ul>
+<li>把顶部的 $n-1$ 个金盘从 $i$ 搬到 $k$，即 $(n-1,i,k)$</li>
+<li>把余下的 1 个金盘从 $i$ 搬到 $j$，即 $(1,i,j)​$</li>
+<li>把 $k$ 上的 $n-1$ 个金盘搬到 $j$ 上，即 $(n-1,k,j)$</li>
+</ul>
+<p>上面第2个问题一步便可完成，因此一般 $n$ 阶梵塔问题化成2个 $n-1$ 阶梵塔问题，容易用归纳法证明求解梵塔问题需要 $2^n-1$ 步（天）。</p>
+<p>三阶梵塔问题的解题树：</p>
+<p><img src="http://image.rexking6.top/img/clip1547348494.png" alt=""></p>
+<p>这里是一颗解题树，完整的问题空间的“与或树”还包括可能出现的各种子问题。把所有可能的解题树或起来，就构成一颗与或树。</p>
+<h1 id="局部搜索算法"><a href="#局部搜索算法" class="headerlink" title="局部搜索算法"></a>局部搜索算法</h1><h2 id="爬山搜索"><a href="#爬山搜索" class="headerlink" title="爬山搜索"></a>爬山搜索</h2><p>搜索策略：最佳优先搜索的变形——不保存搜索过的所有结点，而只保存当前遇到的那些最佳结点。</p>
+<p>算法步骤：</p>
+<ol>
+<li>取 $n$ 为初始结点</li>
+<li>如果 $n$ 的估计值大于其所有子结点的值，则返回 $n$ 并退出</li>
+<li>否则，取 $n$ 为其具有最大值的子结点，返回2步</li>
+</ol>
+<p>得到的解是局部最优解，不能保证是全局最优解。是一种通用的近似算法，从一个初始解开始，利用一个新解产生器，在当前解的某邻域中迭代搜索，使目标函数逐步优化，直到找不到更优的解为止。</p>
+<p>算法特点：</p>
+<ul>
+<li><p>通用性：只要给定组合优化问题的实例 $(S,f)$（解空间 $S$ 为可行解集，目标函数 $f:S → R​$），产生器和邻域结构，就能实现算法。</p>
+</li>
+<li><p>灵活性：可以选用不同机制的产生器，设定不同复杂程度的邻域结构。</p>
+</li>
+<li><p>最终解是某个局部最优解，依赖于初始解的选择。</p>
+</li>
+<li><p>缺点是容易陷入局部最优的“陷阱”，无法自拔。这种情况下，永远也搜索不到全局最优解。</p>
+</li>
+</ul>
+<h2 id="梯度搜索"><a href="#梯度搜索" class="headerlink" title="梯度搜索"></a>梯度搜索</h2><p>它是目标函数具有连续可微性质的爬山搜索方法。现有的神经网络学习算法中，多数属于梯度下降算法。</p>
+<p>梯度搜索如下：</p>
+<ol>
+<li><p>选取初值 $x_0∈R​$</p>
+</li>
+<li><p>$x_n = x_{n-1} + β(df(x_{n-1}) / dx)​$</p>
+</li>
+<li>当 $|df(x_n) / dx| &lt; \varepsilon$  时，停止搜索。$x_n​$ 作为极大（小）值点。</li>
+</ol>
+<p>其中：</p>
+<ul>
+<li><p>$β$ 是搜索步长， $β&gt;0$</p>
+</li>
+<li><p>$\varepsilon​$ 是终止判据</p>
+</li>
+<li><p>对应 $df(x) / dx = 0$ 为极值点</p>
+</li>
+</ul>
+<h2 id="博弈搜索"><a href="#博弈搜索" class="headerlink" title="博弈搜索"></a>博弈搜索</h2><p>它也称博弈树搜索，是“与或”图搜索的特例。</p>
+<p>搜索的特性：博弈双方的对抗性，对弈各方都努力寻找各自获胜状态格局，同时也努力阻止对方出现获胜状态局。</p>
+<h3 id="极小极大搜索"><a href="#极小极大搜索" class="headerlink" title="极小极大搜索"></a>极小极大搜索</h3><p>简单和复杂博弈问题的残局都可以用类似寻求与或图解的搜索技术来求解，如：深度优先、广度优先、启发式搜索。</p>
+<p>对于某些问题，博弈树的结点太多，直至残局的与或树搜索是不现实的，因此要限制搜索的深度、时间等，此类问题如：国际象棋、围棋。</p>
+<p>当搜索结束后，需要从搜索树中提取一个“最好”的优先走步估价，这个估价可通过对终结点格局应用一种静态估价函数来实现，用以度量一个终结点格局的“价值”。</p>
+<p>记对弈双方为MAX和MIN，通常</p>
+<ul>
+<li>有利于MAX博弈的格局使估价函数产生一个正值</li>
+<li>有利于MIN博弈的格局使估价函数产生一个负值</li>
+<li>对MAX和MIN双方都没有特别有利的，产生一个接近0的值</li>
+</ul>
+<p>通过一个极大极小搜索过程来得到一个最好的走步（模拟人向前看若干步）</p>
+<ul>
+<li>对于MAX，选择有利于己方的结点（即最大估价值的结点），因此MIN的父结点（MAX结点）所赋的倒退值为MIN结点中估价值最大的那个值</li>
+<li><p>对于MIN，选择有利于己方的结点（即最小估价值的结点），因此MAX的父结点（MIN结点）所赋的倒退值为MAX结点中估价值最小的那个值</p>
+</li>
+<li><p>逐级向上递归倒退，于是</p>
+<ul>
+<li><p>MAX总是选择具有最大倒推值的结点</p>
+</li>
+<li><p>MIN总是选择具有最小倒推值的结点</p>
+</li>
+<li>直至初始结点被赋值</li>
+</ul>
+</li>
+</ul>
+<p>于是，引入估价函数 $f(n)$：</p>
+<script type="math/tex; mode=display">
+f(n)\left\{
+\begin{aligned}
+>0, && \text{MAX}方占优，对\text{MIN}方不利 \\
+=0, && 对\text{MAX}方和\text{MIN}方势均 \\
+<0, && \text{MIN}方占优，对\text{MAX}方不利
+\end{aligned}
+\right.</script><p><img src="http://image.rexking6.top/img/clip1539771407.png" alt=""></p>
+<p>在没有说明估价函数 $f(n)$ 时，默认第一层为MAX。</p>
+<h3 id="α-β-剪枝"><a href="#α-β-剪枝" class="headerlink" title="$α-β$剪枝"></a>$α-β$剪枝</h3><p>极大极小搜索的缺陷：</p>
+<ul>
+<li>博弈树一般极其庞大</li>
+<li>搜索树生成与结点静态估价的计算分离，效率低下</li>
+</ul>
+<p>$α-β​$剪枝的基本思想：</p>
+<ul>
+<li><p>将搜索树的生成和结点的估值结合起来，根据一定的依据，尽可能地去掉一些没用的分枝，以加快搜索进程</p>
+</li>
+<li><p>$α​$：一个MAX结点的 $α​$ 值等于其后继结点当前最大的最终倒推值</p>
+</li>
+<li><p>$β$：一个MIN结点的 $β$ 值等于其后继结点当前最小的最终倒推值</p>
+</li>
+<li><p>倒推值的上、下界可以被修正，但遵循下列原则：</p>
+<ul>
+<li>MAX结点的$α$值永不减少；</li>
+<li><p>MIN结点的$β$值永不增加。</p>
+<p><img src="http://image.rexking6.top/img/clip1539771775.png" alt=""></p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>$α-β$剪枝的规则：</strong></p>
+<ol>
+<li><p>（$α$ -剪枝）若MIN结点的 $β$ 值≤其任何父结点MAX的$α$值，则可以终止该MIN结点以下的搜索，且这个MIN结点的最终倒推值可取为它的 $β$ 值</p>
+</li>
+<li><p>（$β$ -剪枝）若任意MAX结点的 $α$ 值≥其父结点MIN的$β$值，则可以终止该MAX结点以下的搜索，且这个MAX结点的最终倒推值可取为它的 $α$ 值</p>
+</li>
+</ol>
+<p>最理想的 $α-β​$ 搜索，就是对MIN结点先扩展最低估值的结点，对MAX结点最先扩展最高估值的结点，即双方均本着对本方有利的原则走步。</p>
+<p><img src="http://image.rexking6.top/img/clip1539788073.png" alt=""></p>
+<h1 id="模拟退火算法"><a href="#模拟退火算法" class="headerlink" title="模拟退火算法"></a>模拟退火算法</h1><p>局部搜索算法（以爬山算法为代表）的缺点：</p>
+<ul>
+<li>仅适用于某类组合优化问题</li>
+<li>所得到的近似解质量通常较差</li>
+<li>时间复杂度高，且最坏情况下的时间复杂度未知</li>
+<li>最致命的是无法跳离局部最优的“陷阱 </li>
+</ul>
+<p>模拟退火算法（Simulated Annealing Algorithm，简称SA算法），源于对固体退火过程的模拟，采用Metropolis接受准则，并用一组称为冷却表的参数控制算法进程，使算法在多项式时间里给出一个近似最优解。 </p>
+<h2 id="Metropolis算法"><a href="#Metropolis算法" class="headerlink" title="Metropolis算法"></a>Metropolis算法</h2><p>模拟退火算法用Metropolis算法产生组合优化问题解的序列。并由Metropolis准则对应的转移概率 $P$ ，</p>
+<script type="math/tex; mode=display">
+P(i \rightarrow j)=\left\{
+\begin{aligned}
+&1, &\space &当f(j)\le f(i)\\
+&exp(\frac{f(i)-f(j)}{t}),&\space &否则
+\end{aligned}
+\right.</script><p>确定是否接受从当前解 $i​$ 到新解 $j​$ 的转移。式中 $t∈R^+​$ 表示控制参数。开始让 $t​$ 取较大的值，在进行足够多<br>的转移后，缓慢减小 $t​$ 的值，如此重复直至满足某个停止准则时算法终止。</p>
+<h2 id="模拟退火的特性"><a href="#模拟退火的特性" class="headerlink" title="模拟退火的特性"></a>模拟退火的特性</h2><ul>
+<li>模拟退火算法依据Metropolis准则接受新解，除接受优化解外，还在一个限定范围内接受恶化解。 </li>
+<li>开始时 $t$ 值较大，可能接受较差的恶化解，随着 $t$ 值的减小，只能接受较好的恶化解；当 $t​$ 值趋于零值时，就不再接受任何恶化解。这就使得算法可以跳出局部最优陷阱。 </li>
+<li>在算法执行期间，随着控制参数 $t​$ 值的减小，算法返回某个整体最优解得概率单调增大，返回某个非最优解的概率单调减小。 </li>
+</ul>
+<h2 id="冷却进度表"><a href="#冷却进度表" class="headerlink" title="冷却进度表"></a>冷却进度表</h2><p>冷却表（cooling schedule）是一组控制算法进程的参数，用以逼近模拟退火算法的渐进收敛性态，使算法在有限时间内执行迭代过程后返回一个近似最优解。</p>
+<p>冷却表是影响模拟退火算法实验性能的重要因素，其合理选取是算法应用的关键。 </p>
+<p>一个冷却表应当规定下述参数： </p>
+<ul>
+<li>控制参数 $t​$ 的初值 $t_0​$；</li>
+<li>控制参数 $t$ 的衰减函数；</li>
+<li>控制参数 $t​$ 的终值 $t_f​$（停止准则）；</li>
+<li>Mapkob 链长 $L_k​$。 </li>
+</ul>
+<h3 id="选取的一般原则"><a href="#选取的一般原则" class="headerlink" title="选取的一般原则"></a>选取的一般原则</h3><ul>
+<li>控制参数初值 $t_0$ 要足够大，才能使算法进程在合理时间里搜索尽可能大的解空间范围。</li>
+<li>控制参数终值 $t_f$ 通常由停止准则决定。合理的停止准则既要确保算法收敛于某一近似解，又要使最终解具有一定的质量。</li>
+<li>Mapkob 链长 $L_k$ 在控制参数 $t$ 的衰减函数已选定的前提下， $L_k$ 应选得在控制参数的每一取值上都能恢复准平衡。</li>
+<li>在控制参数的衰减函数应使 $t_k$ 的衰减以小为宜。</li>
+</ul>
+<h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><p>优点：</p>
+<ul>
+<li>避免陷入局部最优；</li>
+<li>能在多项式时间内给出最优解；</li>
+<li>计算过程简单，通用，鲁棒性强，适用于并行处理，可用于求解复杂的非线性优化问题。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>收敛速度慢，执行时间长，算法性能与初始值有关及参数敏感；</li>
+<li>模拟退火算法对参数（如初始温度）的依赖性较强，且进化速度慢。</li>
+</ul>
+<h2 id="流程图"><a href="#流程图" class="headerlink" title="流程图"></a>流程图</h2><p><img src="http://image.rexking6.top/img/clip1547366661.png" alt=""></p>
+<h2 id="旅行商问题"><a href="#旅行商问题" class="headerlink" title="旅行商问题"></a>旅行商问题</h2><p>旅行商问题（Travelling Salesman Problem, 简记TSP，亦称货郎担问题)：设有$n​$个城市和距离矩阵$D=[d_{ij}]​$，其中$d_{ij}​$表示城市$i​$到城市$j​$的距离，$i, j=1, 2 … n​$，则问题是要找出遍访每个城市恰好一次的一条回路并使其路径长度为最短。 </p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><ul>
+<li>TSP的一个解可表述为一个循环排列$π= (π_1, π_2, π_3 … π_n)$，即$π_1 → π_2 → … → π_n → π_1$。</li>
+<li>一共有$\frac{(n-1)!}{2}$种不同方案，若使用穷举法，当$n$很大时计算量是不可接受的。 </li>
+<li>旅行商问题综合了一大类组合优化问题的典型特征，属于NP难题，不能在多项式时间内进行检验。若使用动态规划的方法时间复杂性和空间复杂性都保持为$n$的指数函数。 </li>
+</ul>
+<h3 id="参数选取的一个例子"><a href="#参数选取的一个例子" class="headerlink" title="参数选取的一个例子"></a>参数选取的一个例子</h3><ul>
+<li>控制参数初值 $t_0=100$</li>
+<li>停止准则：连续2个Mapkob链中对路径无任何变动（优化或恶化的）时即停止算法运行。</li>
+<li>冷却进度表中的控制参数 $t$ 的衰减函数：</li>
+</ul>
+<script type="math/tex; mode=display">
+α(t)=0.9 \ast t</script><ul>
+<li><p>Mapkob链长：定长20000</p>
+</li>
+<li><p>新解的产生：采用2变换法。任选序号 $u$ 和 $v$ （$u&lt;v$），<br>将u和v及其之间的顺序逆转。</p>
+<script type="math/tex; mode=display">
+(π_1 … π_{u-1}π_uπ_{u+1} … π_{v-1}π_vπ_{v+1} … π_n）</script><p>变为</p>
+<script type="math/tex; mode=display">
+(π_1 … π_{u-1}π_vπ_{v-1} … π_{u-1}π_uπ_{v+1} … π_n）</script></li>
+</ul>
+<h1 id="模拟进化与遗传算法"><a href="#模拟进化与遗传算法" class="headerlink" title="模拟进化与遗传算法"></a>模拟进化与遗传算法</h1><p>近二十年来，人们相继发展了许多求解全局优化问题的方法，一般可分为确定型与非确定型（如随机搜索）算法。  </p>
+<p>Monto-Carlo方法及模拟退火算法都归属后者（随机搜索算法）。当目标函数具有为数不多的极值点时，确定型算法常表现出较高的计算效率，但同时也暴露出算法复杂、对目标函数的性质要求高、可靠性差等缺点。相比而言，随机搜索方法具有较强的鲁棒性，算法容易实现，但常有计算效率低的缺点。 </p>
+<p>仿生类算法是近三十年来才发展起来的一类新型全局优化搜索技术，它们通过向自然界学习，借鉴生物进化机制求解问题。这类算法的主要优点在于其本质上的并行性、广泛的可适用性（如对目标函数的性态无特殊要求，特别可以没有明确的表达式）和较强的鲁棒性、 简明性与全局优化性能。</p>
+<p>仿生类算法，就其目前发展而言，可分为仿生过程算法与仿生结构算法两大类，前者以模拟进化算法为代表，后者以神经网络为典型。 </p>
+<p>绝大多数生物的进化通过繁殖（reproduction）、 变异（mutation）、 竞争（competition）、 选择（selection） 四个基本过程实现。 </p>
+<h2 id="模拟进化算法"><a href="#模拟进化算法" class="headerlink" title="模拟进化算法"></a>模拟进化算法</h2><p>模拟进化算法的核心思想源于这样的基本认识：体现在“优胜劣汰”这一自然规律的生物进化过程本身是一个自然的、并行发生的、鲁棒的优化过程，这一优化过程的目标是对环境的适应性（fitness），而生物种群通过生物体的遗传、 变异来达到优化（亦即进化）之目的，对生物进化的这种优化观点早在六十年代就引起 J.H.Holland 、  I.Recenberg 及 L.J.Fogel 等计算智能学者的特别兴趣，并相继创立了现在被称之为<strong>遗传算法（genetic algorithms）</strong>、<strong>演化策略（evolution strategies）</strong>和<strong>进化程序（evolutionary programming）</strong>的模拟进化算法。 </p>
+<p>这样，假定我们考虑全局优化问题：</p>
+<script type="math/tex; mode=display">
+(p):max\{F(x):x\in \Omega \subset R^n \}, F: \Omega \subset R^n \rightarrow R^1</script><p>则$(p)$的多个可行解的一个集合可称之为一个种群（population），种群中的每一元素（可行解）可称之为是一个个体（individual），种群中个体的数目称之为此种群的规模。 </p>
+<p>于是，求解问题$(p)$的一个不变规模（例如设为$N$）的模拟进化算法可抽象地描述如下：</p>
+<ol>
+<li><p>随机确定初始种群：</p>
+<script type="math/tex; mode=display">
+X(0)=(X_1(0),...,X_n(0)),置K=0</script></li>
+<li><p>计算当前种群中每一个体$X_i(K)$的适应性$(i=1,2,…,N)$，并依据适应性指定其相应个体的繁殖概率；依据所指定的繁殖概率,通过遗传机制（杂交、变异）产生适量的新一代种群的候选种群，最后依据某种选择规则，从候选种中确定新一代种群$X(K+1)$</p>
+</li>
+<li><p>检验当前种群是否产生满意解或已达到预设的进化时限，如已满足，停止；否则令$K:=K+1$，转步2</p>
+</li>
+</ol>
+<p>从以上描述，我们看到，模拟进化算法与传统的确定性算法有以下明显区别：</p>
+<ol>
+<li>模拟进化算法的作用对象是由多个可行解组成的集合，而非单个可行解；</li>
+<li>模拟进化算法只利用函数的适应值信息，而无需应用梯度等其它辅助信息；</li>
+<li>模拟进化算法利用概率机制而非确定性迭代过程描述。正是这些有别于确定型方法的特征决定了模拟进化算法应用的广泛性、描述的简单性、本质上的并行性和良好的鲁棒性。</li>
+</ol>
+<p>优点：</p>
+<ol>
+<li><p>具有很好的收敛性，在计算精度要求时，计算时间少</p>
+</li>
+<li><p>并行性、广泛的可适用性和较强的鲁棒性、 简明性与全局优化性能。</p>
+</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>早熟。这是最大的缺点，即算法对新空间的探索能力是有限的，也容易收敛到局部最优解。</li>
+<li>大量计算。涉及到大量个体的计算，当问题复杂时，计算时间是个问题。</li>
+<li>处理规模小。目前对于维数较高的问题，还是很难处理和优化的。</li>
+<li>难于处理非线性约束。对非线性约束的处理，大部分算法都是添加惩罚因子，这是一笔不小的开支。</li>
+<li>稳定性差。因为算法属于随机类算法，需要多次运算，结果的可靠性差，不能稳定的得到解。 </li>
+</ol>
+<h2 id="遗传算法"><a href="#遗传算法" class="headerlink" title="遗传算法"></a>遗传算法</h2><p>假定考虑全局优化问题$(p)$。遗传算法基于以下两条基本策略求解问题：</p>
+<ol>
+<li>对于给定的目标函数$F: \Omega \subset R^n \rightarrow R^1$，它使用$F$的任一适应性（fitness）函数（换言之，一个值域非负、与$F$有相同极值点的函数）；</li>
+<li>代替直接作用于优化变量$X$，它作用于$X$的可称之为染色体（chromosome）的某种编码（换言之，$X$的某种离散化近似表示。例如，长度为$L$且取值于某种字母表的数串）。</li>
+</ol>
+<p>例如：$J(x)=\text{exp}(F(x))$是$F$的一适应性函数，而对任何 $x \in \Omega$ 以它的诸坐标分量的固定长度的二进制近似依次排列，则给出$X$的一个编码。</p>
+<p>给定$F$的任一适应性函数 $J$ 和固定长度 $L$ 、取值于某个字母表的数串染色体编码，求解问题 $(p)$ 的标准遗传算法如下：</p>
+<ol>
+<li>初始化：<ol>
+<li>确定种群规模$N$、杂交概率$P_c$、变异概率$P_m$及终止进化准则；</li>
+<li>从$\Omega$中随机选取$N$个个体$X_i(0)$组成初始种群$X(0)=\{X_1(0),…,X_N(0)\}$，设$X_i(0)$的染色体编码为$Y_i(0)$，并记$Y(0)=\{Y_1(0),…,Y_N(0)\}$；</li>
+<li>计算$Y_i(0)$的适应性值$J(Y_i(0))$；</li>
+<li>置$k=0$。</li>
+</ol>
+</li>
+<li>种群进化：<ol>
+<li>执行$M$（一般$M \ge N/2$）步如下操作：<ol>
+<li>对每一$Y_i(k)$依据其适应性赋一繁殖概率$P_i(k)$；</li>
+<li>以概率$P_i(k)$（$1\le i \le n$）从$Y(k)$中随机选取两个个体，分别记作$Y_{i1}(k)$和$Y_{i2}(k)$；</li>
+<li>以概率$P_c​$对$Y_{i1}(k)​$、$Y_{i2}(k)​$进行杂交，产生两个中间个体$s_1’​$和$s_2’​$；</li>
+<li>以概率$P_m$对中间个体$s_1’$、$s_2’$进行变异，产生两个新个体$s_1$、$s_2$。</li>
+</ol>
+</li>
+<li>计算由第2.1步所产生的$2M$个新个体的适应性，对这$2M$新个体连同$Y(k)$由某种选择规则确定$N$个个体组成新一代种群$Y(k+1)=\{Y_1(k+1),…,Y_N(k+1)\}$</li>
+</ol>
+</li>
+<li>检验终止判据：如果$Y(k+1)$满足预先设定的停机准则，则终止演化，并输出最优解；否则，置$k:=k+1$，返回第2步。</li>
+</ol>
+<h3 id="一般流程"><a href="#一般流程" class="headerlink" title="一般流程"></a>一般流程</h3><p><img src="http://image.rexking6.top/img/clip1540727923.png" alt=""></p>
+<p>在上述算法中，种群进化第2步，反映了遗传算法对生物进化过程的类比特征。如果说算法从父代种群$Y(k)$产生子代种群是某种遗传算子的作用，则根据算法定义，遗传算子将由以下特指的选择算子、杂交算子和变异算子复合构成：</p>
+<ol>
+<li>选择算子：它由算法第2.1步和第2.2步定义，其作用效果反映在对父代种群中每一个体所赋予的允许繁殖概率及其从$2M$个中间个体中如何选择子代种群的机制上。对于每一个体的允许繁殖概率$P_i(k)$的确定,通常按照“适应性强的多复制，适应性差的遭淘汰，而具有平均适应性的基本不变”的原则。常见的赋值方法有“比例选择规则”：</li>
+</ol>
+<script type="math/tex; mode=display">
+P_i(k)=P(x_i(k) \ \text{is selected})=\frac{J(x_i(k))}{\sum_{j=1}^NJ(x_j(k))}</script><p>​    及”模拟退火选择规则“：</p>
+<script type="math/tex; mode=display">
+P_i(k)=P(x_i(k) \ \text{is selected})=\frac{\text{exp}(F(x_i(k))/T_k)}{\sum_{j=1}^N\text{exp}(F(x_j(k))/T_k)}</script><p>​    这里$T_k$为缓慢趋于零的”退火“因子。</p>
+<p>​    对于从中间种群挑选子代的原则（算法中的第2.2步），除遵循“适者生存，不适者遭淘汰”、依据适应性大小选择的普遍原则外，常见的策略还加入“父代种群是否与中间种群一起参与竞争”的因素，如果算法在决定后代种群$Y(k+1)​$时，皆从中间种群与父代种群的并中选择，则我们称这种策略为“父子混合选择”，值得注意的是，算法经常采用的一种父子混合选择策略称作“Elitist（杰出）选择，精英保留策略”，即以概率1保留父代中的最佳个体（即具有最高适应性的个体）到子代；如果父代不参加中间种群而仅由第2.1步产生的$2M​$新个体参与竞争，则我们称之为“自然选择”。</p>
+<ol>
+<li>杂交算子：这是由算法第2.1.3步所体现的二元运算。它作用于两个个体而产生两个新个体，是对生物有性繁殖方式的抽象，因而也是遗传算法中促进进化的主要手段，常见的杂交算子是单点杂交（one-point crossover）。以定长二进制染色体编码为例，单点杂交算子的作用方式为：在所规定的编码格式中随机选取一点（杂交位置），然后依概率交换选作父本的两个个体（数串）杂交位置以后的部分，以形成新的两个个体。例如，给定父本个体：</li>
+</ol>
+<script type="math/tex; mode=display">
+F_1=(11010),F_2=(00100)</script><p>​    如杂交位置选定在编码格式从左向右的第三位，则一点杂交算子的作用产生如下两个新个体：</p>
+<script type="math/tex; mode=display">
+S_1=(11000),S_2=(00110)</script><p>​    类似地，也有应用两点杂交（two-point crossover），多点杂交（multi-point crossover）及均匀杂交（uniform crossover）的报道。应用杂交算子的作用在于：它使杂交产生的新个体不同于用作父代的个体，使算法所产生的种群可遍历定长编码格式的搜索空间，以达到全局优化的目的。</p>
+<ol>
+<li>这是描述算法第2.1.4步的操作，用以模拟生物进化中基因（gene）的变异。在采用优化变量的染色体编码情形，个体可理解作染色体，而染色体中的每一位可理解作基因。</li>
+</ol>
+<p>   变异算子的作用方式是：对染色体（个体）的各个基因，依次以概率改变其相应的码值，替换值（称为等位基因，alleles）则以均匀概率从用于编码的字母表中选取，例如（仍假设采用定长二进制编码，从而字母表是$\{0,1\}$）给定变异概率$P_m=0.05$，且假定产生$(0,1)$之间的随机数依次是$0.55,0.04, 0.27, 0.01, 0.9$，则个体$(11001)$的变异结果为$(10011)$。变异算子的作用在于使算法达到局部极值时有逃离局部极值“陷阱”的可能性。</p>
+<p>​     遗传算法自提出，特别是八十年代中期以来，已得到广泛研究与应用。其研究的内容大体集中在以下几个方面：</p>
+<ol>
+<li>有关算法随机搜索机理的研究。遗传算法是通过作用于一个初始种群，而循环执行复制、杂交、变异及选择过程的随机迭代，故阐明如此简单的循环操作如何有效搜索整个编码空间以达到全局优化之目的有特别重要的意义。在这方面，J.H.Holland等人发展的所谓“模式（schema）理论”引人注目。一个模式是指编码空间（即所使用的染色体的全体。当应用$L$位二进制串编码时，该空间为$\{0,1\}^L$）中具有相同构形（configuration）的编码的子集。 </li>
+</ol>
+<p>​    所谓具有相同构形是指：这个子集中诸编码串在某些位上具有相同的码值。例如，在编码空间$\{0,1\}^L$中，集合</p>
+<script type="math/tex; mode=display">
+M=\{(10\ast 101 \ast0\ast)\ast :表示或0或1\}</script><p>​    是一个模式。给定一个模式，一个编码称为与该模式相匹配，如果在模式的确定位上，此编码的值与模式的值相同。例如，编码$(1000101100)$、$(1010101000)$均与上述所指定的模式$M$相匹配。</p>
+<p>​    任一给定编码必与许多模式相匹配。模式理论的核心在于：遗传算法能够有效搜索的根本原因是，它充分利用了模式所描述的编码之间的相似性，虽然算法仅作用于$N$个编码组成的种群，但这$N$个编码实际上包含$O(N^3)$阶个模式的信息。这一性质常被称作是遗传算法的隐含并行性（implicit parallism）。</p>
+<p>​    模式理论可以较好的解释遗传算法的搜索机制。对于任一模式，定义它的阶为模式中确定码值的个数，而定义它的长度为模式中第一个确定码值位与最后一个确定码值位之间的差，则Holland证明了如下的模式定理：“具有短长度的、低阶的、适应性在群体平均之上的模式将在遗传算法中以指数增长率在子代中被采样”。</p>
+<ol>
+<li>有关算法的全局最优性（或收敛性）研究。生物进化的“趋势向上”性似乎应蕴含遗传算法的最终收敛性，这一研究的目的在于从理论上对这一事实给出证明。A.E.Eiben等（1991）首先证明了遗传算法（一个更为抽象的形式）在elitist选择情形下的收敛性：</li>
+</ol>
+<script type="math/tex; mode=display">
+P(lim_{n \rightarrow \infty}X_n \cap S_0 \neq \varnothing)\neq 1</script><p>​    （其中$X_n$表示算法所产生的第$n$代种群，$S_0$表示问题$(p)$的最优解集）；G.Rudolph（1994）在$lim_{n \rightarrow \infty} P(Z_n=f ^\ast) = 1$的收敛意义下（其中$Z_n$代表算法所产生的第$n$代种群中的最优适应值， $f^\ast$为问题$（p）$的最优函数值），证明了如果选择算子采用自然选择策略，则算法不收敛，而如果对算法采取记录每一代中最佳个体的策略，则改进后的算法收敛；</p>
+<p>​    </p>
+<p>​    张讲社等（1996）对繁殖概率的赋值采取“模拟退火选择规则”的遗传算法证明了其收敛性。与算法收敛性紧密相关的一个问题是遗传算法的过早收敛（premature convergence）。它出现在算法还未达到全局最优情形而不再产生适应性更强的后代。研究表明：遗传算法的过早收敛主要由杂交算子引起。在模式空间中存在大量所谓的早熟集（premature set）（即在选择与杂交算子复合作用下的不变集），而在杂交算子作用下，遗传算法总以非零概率“撞入”早熟集。由于早熟集的吸收性，从而使算法产生过早收敛。</p>
+<ol>
+<li>有关染色体编码格式的讨论。遗传算法的作用对象是优化变量的染色体编码（即实变量的某种离散化近似）。如令$E$表示的编码空间（即$\Omega$中所有实变量编码的全体。通常，$E=\{0,1\}^L$，即采用$L$位二进制编码），则求解问题$(p)$的遗传算法实质上是通过寻求组合优化问题</li>
+</ol>
+<script type="math/tex; mode=display">
+(p'):Max\{J(y):y\in E\}</script><p>的最优解来达到求解问题$(p)$的目的(从这个意义讲上，遗传算法的特征相似于求解连续性问题的离散方法）。 </p>
+<p>​    采取编码方式求解问题$(p)$究竟是利大还是弊大，至今仍存在许多争论。但通常认为：采用编码方式（特别是二进制编码）有以下优点：a）可很好地指导搜索，使得有关某种结构的个体容易生存，以产生适应性更强的后代；b）使算法具有隐含并行性，使在相对少量的种群上进行的操作实质上隐含着大范围的搜索。   </p>
+<p>​    采用编码格式的缺陷是：由于连续问题$(p)$归化到组合问题求解，使算法的求解精度受到很大影响。这些优点和缺点当遗传算法用于（组合）优化问题的求解时均有明显体现。</p>
+<h2 id="演化策略"><a href="#演化策略" class="headerlink" title="演化策略"></a>演化策略</h2><p>演化策略与遗传算法十分相似，但演化策略不使用优化变量的染色体编码，而直接作用于实变量。另外，在杂交算子与变异算子的构造上，演化策略与遗传算法也大有区别。演化策略所使用的杂交算子是从两个个体生成一个个体的操作，而遗传算法则生产两个新个体。常见的有“中间杂交”（intermediate crossover）及“随机杂交”（random crossover）等。 </p>
+<p>演化策略是六十年代I.Recenberg基于模拟生物进化提出的一种求解优化问题的算法  。H.-P.Schwefel系统推广了Recenberg的原始演化策略（简称$(1+1)-ES$）,建立了所谓的$(\mu+\lambda)-ES$及$(\mu,\lambda)-ES$演化策略，这里$\mu$表示当前种群的规模，$\lambda$表示由当前种群所生成的中间种群的规模，$(\mu+\lambda)-ES$表示在算法中父代种群（$\mu$个个体）将与中间种群（$\lambda$个个体）一同参与竞争，以选择产生新一代；而$(\mu, \lambda)-ES$是这样的演化策略：新一代种群仅从中间种群所含的$\lambda$个个体中竞争产生。按上节遗传算法的术语， $(\mu+\lambda)-ES$是使用“父子混合选择”的演化策略，$(\mu,\lambda)-ES$而使用“自然选择”。</p>
+<p>以$(\mu, \lambda)-ES$为例叙述求解问题$(p)$的演化策略如下：</p>
+<ol>
+<li><p>初始化</p>
+<p>确定种群规模$N​$及终止进化准则，在$\Omega​$中随机选取$N​$个元$X_i(0)(i=1,2,…,N)​$以组成初始种群$X(0)=\{X_1(0),…,X_N(0)\}​$，置$k=0​$。</p>
+</li>
+<li><p>产生中间种群</p>
+<p>执行$M$（一般$M\ge N$）步如下操作：</p>
+<ol>
+<li>以等概率从$X(k)$中选择用作父本的个体$X_{L1}(k)$和$X_{L2}(k)$；</li>
+<li>以杂交算子作用于$X_{L1}(k)​$、$X_{L2}(k)​$产生中间个体$S_L’​$（杂交）；</li>
+<li>以变异算子作用于中间个体$S_L’​$产生新个体$S_L​$（变异）。</li>
+</ol>
+</li>
+<li><p>选择</p>
+<p>按适应值$J(S_L)(1\le L \le M)$大小从中间种群$\{S_1,…,S_M\}$中选取$N$个个体组成下一代$X(k+1)$种群。</p>
+</li>
+<li><p>终止检验</p>
+<p>判别$X(k+1)$是否满足终止进化条件，如满足，则停止演化，并输出最优解；否则，置$K:=K+1$，返回第2步。</p>
+</li>
+</ol>
+<h3 id="与遗传算法的不同"><a href="#与遗传算法的不同" class="headerlink" title="与遗传算法的不同"></a>与遗传算法的不同</h3><ul>
+<li><p>杂交：对于给定的两个父本向量$X_{L1}(k)$和$X_{L2}(k)$，中间杂交可产生所给父本向量的平均：$S’=\frac{1}{2}[X_{L1}(k)+X_{L2}(k)]$，而随机杂交可定义为从所给父本向量中随机抽取一个：$S’=Random\{X_{L1}(k),X_{L2}(k)\}$</p>
+</li>
+<li><p>变异：不同于遗传算法的逐点变异，演化策略中的变异算子通常是通过对所作用的个体施加某个随机扰动来实现的，例如，对$S_L’$的变异常定义为：</p>
+<script type="math/tex; mode=display">
+S_L=S_L'+N(0,\sigma_L)</script><p>其中$N(0, \sigma_L)$表示均值为$0$，，偏差为$\sigma_L$的独立正态分布随机向量。由于进化策略中的变异从一定意义上可理解作是一种爬山搜索，$\sigma_L$也常称作步长。</p>
+</li>
+</ul>
+<h2 id="进化程序"><a href="#进化程序" class="headerlink" title="进化程序"></a>进化程序</h2><p>进化程序是六十年代L.J.Fogel等提出的一类进化算法，其目的在于预报与任意支付函数（payoff function）相关的静态或非静态时间序列，模拟一组“输入-输出”所确定的传输器（transducer）等。进化程序的设计思想类似于演化策略，即主要利用变异与选择机制对系统进化优化，但进化程序往往用于处理更复杂的系统（如人工智能领域）的系统优化问题。进化程序只利用变异算子的作用，而没有引用杂交机制。但也有研究表明，如果新一代种群的部分个体经由与演化策略相同的中间杂交过程产生，则算法的性态和效率常会有较大改善。</p>
+<p>假定$J:\Omega \subset R^n \rightarrow R^1$是$F$的一个适应性函数，求解问题$(p)$的进化程序可描述如下：</p>
+<ol>
+<li><p>初始化</p>
+<p>确定种群规模$N$及终止进化准则，在$Ω$中随机选取$2N$个个体$X_i(0)(i=1,2,…,2N)$，以组成初始种群$X_i(0)=\{X_1(0),…,X_{2N}(0)\}$，置$k=0$。</p>
+</li>
+<li><p>产生新一代种群</p>
+<ol>
+<li>计算当前种群个体的适应值$J(X_i(k))(1\le i \le 2N)​$</li>
+<li>依据某个竞争规则，选择$\{X_i(k),i=1,2,…,2N\}$中获胜率最高的N个个体作为父本，记作$\{X_1(k),…,X_N(k)\}$，并令$X_i(k)=(X_{i,1}(k),…,X_(i,n)(k))\in R^n,i=1,2,…,N$。</li>
+<li>通过变异算子作用于父本$X_i(k)(1\le i \le 2N)$产生新个体$S_i(k)=(s_{i1},…,s_{in})(1\le i \le N)$，其中$s_{ij}=x_{ij}+N(0,\alpha J(x_{ij}(k))+\beta_{ij}),j=1,2,…,n$，这里$N(·,·)$是正态分布随机变量，$\alpha_{ij},\beta_{ij}$是可调实参数。</li>
+<li>取新一代种群$X(k+1)=\{X_1(k),…,X_N(k),s_1,…,s_N\}$</li>
+</ol>
+</li>
+<li><p>终止检验</p>
+<p>如果$X(k+1)$满足终止演化条件，则终止演化，并输出最优解；否则，置$k:=k+1$，返回第2步。</p>
+</li>
+</ol>
+<p>在选择父本的第2.2步中，竞争规则和获胜率通常定义如下：任一个体$X_i(k)\in X(k)$称为在一次竞争中获胜，如果随机选取一个$X_j(k)\in X(k) \backslash \{X_i(k)\}$都有$J(X_i(k))\ge J(X_j(k))$。</p>
+<p>在规定的$m$次竞争中，如果$X_i(k)$有$\alpha$次获胜，则比值$\alpha/m$称为$X_i(k)$的获胜率。</p>
+<p>值得注意的是，上述进化程序只利用变异算子的作用，而没有引用杂交机制。但也有研究表明，如果新一代种群的部分个体经由与演化策略相同的中间杂交过程产生，则算法的性态和效率常会有较大改善。已有较多工作考察了上述基本进化程序的改进。例如，在算法第2.2步-第2.4步中，允许每个父本产生多个子代，而以模拟退火算法的接受机制选取最优的子代以取代父本；在算法的第2.2步中，以新的个体取代获胜率最低的个体，以形成更多的父本参加变异等。</p>
+<h1 id="模拟嫁接算法"><a href="#模拟嫁接算法" class="headerlink" title="模拟嫁接算法"></a>模拟嫁接算法</h1><p>结合度约束最小生成树问题的求解，介绍一种带有嫁接和剪接操作的遗传算法，用以求解具有大量结点的度约束最小生成树（DCMST）问题。求解DCMST问题的方法大致分为两类：</p>
+<ul>
+<li><p>一类为对Prim 算法(或Kruskal算法)进行改进，通过消除不满足的约束，以得到问题解的近似算法；</p>
+</li>
+<li><p>另一类就是采用以遗传算法为代表的计算智能算法求解DCMST问题,但求解效果尚不理想，主要表现在求解DCMST问题（特别是Euclidean问题）获得最好解的精度和所求解问题规模的限制。</p>
+</li>
+</ul>
+<h2 id="最小生成树问题"><a href="#最小生成树问题" class="headerlink" title="最小生成树问题"></a>最小生成树问题</h2><p>最小生成树（Minimum Spanning Tree，简称MST）问题是一个经典的图论问题，被广泛应用于组合优化问题中，如运输问题、通信网设计和分布式系统等。人们对最小生成树问题已经进行了大量的研究，设计了许多算法，可以在近似线性的时间复杂度内进行求解，时间复杂度与边的数量或顶点数量相关。然而，在实际应用中，通常面临的是需要带有某种约束的MST，如二次最小生成树问题、度约束最小生成树问题和概率最小生成树问题等。对于这类带约束的MST 问题的求解，目前还不存在多项式时间复杂度的算法，被证明是NP-完全的。</p>
+<h2 id="度约束最小生成树"><a href="#度约束最小生成树" class="headerlink" title="度约束最小生成树"></a>度约束最小生成树</h2><p>度约束最小生成树（Degree-Constrained Minimum Spanning Tree , DCMST）问题是一类难解的NP-hard问题，它在通信网络、电力线网络、计算机网络、大规模集成电路等方面都有重要的应用。</p>
+<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>设连通图$G=(V,E,W)$，$V=\{v_1,v_2,…,v_n\}$表示图的顶点集合，$E=\{e_1,e_2,…,e_m\}$是边的有限集合，$W=\{w_{ij}\}_{n×n}$表示边的权重矩阵，在不同的问题应用领域，可表示相邻顶点间的距离、费用等代价。在DCMST问题中，对图的每个顶点的度值进行了约束，即规定顶点的度约束为$b_i$（给定的约束值，$i=1,2,…,n$），因此度约束最小生成树问题（DCMST）的求解可表述为：</p>
+<script type="math/tex; mode=display">
+\text{min }Z=\sum_{i=1}^n\sum_{j=1}^nw_{ij}x_{ij}\\
+\text{s.t.}\left\{
+\begin{aligned}
+&\sum_{j=1}^n x_{ij} \le b,&&i\in V \\
+&\sum_{i,j\in S}x_{ij}\le |S|-1,&&\forall S \subset V,S \neq \varnothing \\
+&\sum_{i=1}^n \sum_{j=1}^n x_{ij}=n-1,&& x_{ij} \in \{0,1\},i,j \in V
+\end{aligned}
+\right.</script><p>其中，当边$(i,j)$在最优生成树中，变量$x_{ij}=1$；其他情况时，$x_{ij}=0$。$|S|$表示集合$S$（$V$的子集合）的结点个数。</p>
+<p>设$T$为图$G$的所有满足度约束的生成树的集合，对DCMST问题求解就是寻找$G$的一棵满足度约束的最小生成树。约束式1为度限制，约束式2和3保证了所得到的是一棵生成树，不形成圈（无环路）。</p>
+<p><strong>模拟嫁接技术</strong></p>
+<p>通过借鉴花草果树的种植和培育技术，根据嫁接和剪接的不同作用，提出一种求解DCMST问题带有嫁接和剪接操作的遗传算法。在嫁接和剪接算子的设计中，均很好地使用了local search技术。但这两种算子的作用机理又有很大的差异，嫁接操作一般采用local search策略，以一种近似贪婪的方式进行搜索，并为寻求更好的解建立桥梁。</p>
+<p><strong>模拟剪接技术</strong></p>
+<p>剪接则是对嫁接中出现的非可行结点分枝或自然生长中具有较差的分枝进行修剪。这种剪接操作与一些文献中提及的Cut操作有很大差异，通常Cut操作是将生成树中不满足约束的多余分枝剪去，使其满足约束条件。同时，在我们所介绍的算法中，强化了基本遗传算子的作用。它除了提供生成树一种按自然方式（类似随机搜索）生长的功能外，同时能消除某些剪接过程中不能完全处理的冲突。</p>
+<p>重要概念：</p>
+<p><strong>定义1：（树及分枝）</strong></p>
+<p>树是$n(n\ge0)$个有限数据元素的集合，当$n=0$时，称这棵树为空树；在一棵非空树中：</p>
+<ol>
+<li>有一个特殊的元素称为树的根结点；</li>
+<li>若$n&gt;1$时，除根结点之外的其余数据元素被分为 $m(m&gt;0)$ 个不相交的集合$T_1,T_2,…,T_m$，其中每一个集合$T_i$又是一棵树，称为根结点的子树，称每棵子树为树的一条分枝。</li>
+</ol>
+<p>在树的定义中采用了递归的概念，用分形的观点看，树、树枝、叶脉都具有自相似特性。树的定义可形式化描述为$T=(V,R)$，其中$V$为树$T$中结点的集合，$R$表示树中结点之间关系（边）的集合。当树为空树时，$V=\varnothing$；当树不为空时，$V=\{root\}\cup V_c$ ，其中，$root$称为树的根结点，$V_c$为树根结点$\{root\}$的子树集合。当树中的结点个数$n\le1$时，$R=\varnothing$；当树$T$的结点个数$n&gt;1$时，$R=\{<root,n_i>,i=1,2,…,m\}$。</p>
+<p>生成树是指结点数$n&gt;1$的树及其演变产生。同理，一条分枝包含的结点个数应至少为1。为叙述准确，将一棵去掉某一条分枝的生成树称为非完全生成树。</p>
+<p><strong>定义2：（收益和代价）</strong></p>
+<p>对一棵生成树$T_1$，若将某结点的一条分枝移至另一结点作为其一条分枝后产生的生成树为$T_2$，考察分枝移动前后生成树的边长和的变化，则定义收益($gain$)和代价($cost$)分别为：</p>
+<script type="math/tex; mode=display">
+gain=f(T_1)-f(T_2)=\sum_{i=1}^{n-1}\sum_{j=i+1}^n w_{ij} \ast x_{ij}^1-\sum_{i=1}^{n-1}\sum_{j=i+1}^n w_{ij} \ast x_{ij}^2\\
+cost=f(T_2)-f(T_1)=\sum_{i=1}^{n-1}\sum_{j=i+1}^n w_{ij} \ast x_{ij}^2-\sum_{i=1}^{n-1}\sum_{j=i+1}^n w_{ij} \ast x_{ij}^1</script><p>其中，$x_{ij}^1 \in T_1,x_{ij}^2 \in T_2$。从上述定义可知，收益和代价是密切相关的两个指标。对一棵生成树$T_1$，在分枝的移动过程中，若收益大于$0$，则分枝移动后生成树的边长和减小，相应代价必小于$0$；反之亦然。</p>
+<p><strong>定义3：（嫁接）</strong></p>
+<p>将生成树非考察结点且具有某种优良特性的分枝（嫁接枝）接入到非完全生成树的待考察结点中，以形成更好生成树个体（这里指收益大于0）的过程称为嫁接。</p>
+<p><strong>定义4：（剪接）</strong></p>
+<p>将生成树个体考察结点的某一分枝（剪接枝）接入到非完全生成树中另一位置，以形成可行个体或更好个体的过程称为剪接。</p>
+<p>从嫁接及剪接的定义可知，嫁接和剪接是两种包含相似操作的过程，它们均含有选取树的一条分枝（根据操作分别称为嫁接枝和剪接枝），然后将选择的分枝进行剪去及重新接入以形成生成树的过程。但这是两种完全不同的操作，它们发生的作用点、机理、采用的策略及对算法产生的效果完全不同。</p>
+<h2 id="嫁接算子及策略"><a href="#嫁接算子及策略" class="headerlink" title="嫁接算子及策略"></a>嫁接算子及策略</h2><h3 id="嫁接算子的构造"><a href="#嫁接算子的构造" class="headerlink" title="嫁接算子的构造"></a>嫁接算子的构造</h3><p>根据定义3，嫁接算子操作可分为两步：</p>
+<ol>
+<li>根据结点及其关联结点的边长信息，选择具有优良品质的嫁接枝；</li>
+<li>将选择的嫁接枝重新接入，以形成更好的生成树个体，即嫁接后收益大于0。</li>
+</ol>
+<p>如何选取具有优良品质的嫁接枝，是嫁接操作的关键所在。要选取一条有效的嫁接枝，需解决以下两个关键问题：</p>
+<ol>
+<li>如何利用边结点及其关联结点的边长信息。为了使嫁接和剪接操作更为有效，对各结点按其关联结点构成边的长度进行排序，并将排序结果保存在指针变量<code>pnodesortdis</code>中；</li>
+<li>求任意结点的父结点及子结点关系。采用基于度排列的编码方法，设计了通过利用度维关系查找某一结点的父结点函数<code>FindPareNode(par1,par2)</code>及其子结点的函数<code>FindChildNode(par1,par2)</code>，<code>par1</code>、<code>par2</code>为算法所需参数，它们在较好的情形下时间复杂度均为$O(1)$，在最坏的情形下时间复杂度为$O(n)$。</li>
+</ol>
+<p><strong>利用度维关系查找生成树个体某一结点的父结点算法</strong></p>
+<p>其基本思想是：从当前位置向前扫描，记录扫描过的结点的度值，根据扫描过的结点与度值的关系计算出其父结点位置。其伪码描述如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">算法1 (检索某一结点位置nodepos的父结点位置parvpos算法). </span><br><span class="line">Input:生成树个体individual,考察结点位置nodepos. </span><br><span class="line">Output:考察结点nodepos的父结点位置parvpos. </span><br><span class="line">Begin </span><br><span class="line">	初始化参数:degreesum=0,counter=0,parvpos=nodepos; </span><br><span class="line">	根据输入的个体individual,得到其结点维individual.chrom1和度维individual.chrom2; </span><br><span class="line">	if parvpos=1 then </span><br><span class="line">	    return 1; </span><br><span class="line">	end if </span><br><span class="line">	parvpos=parcpos-1,counter=counter+1; </span><br><span class="line">	degreesum=degreesum+individual.chrom2[parvpos]; </span><br><span class="line">	if parv&gt;1 then </span><br><span class="line">	    degreesum=degreesum-1; </span><br><span class="line">	end if </span><br><span class="line">	while degreesum&lt;counter do </span><br><span class="line">	    parvpos=parcpos-1,counter=counter+1; </span><br><span class="line">	    degreesum=degreesum+individual.chrom2[parvpos]; </span><br><span class="line">	    if parv&gt;1 then </span><br><span class="line">	         degreesum=degreesum-1; </span><br><span class="line">	    end if </span><br><span class="line">	 end while </span><br><span class="line">	返回parvpos; </span><br><span class="line"> End </span><br></pre></td></tr></table></figure>
+<p>在算法1中，若需求得结点<code>nodepos</code>和其父结点<code>parvpos</code>对应的序号，通过生成树个体染色体对应的结点维<code>individual.chrom1</code>即可得到。例如，<code>nodepos</code>对应的序号<code>nodeno=individual.chrom1[nodepos]</code>。</p>
+<p>按收益优先及度约束控制嫁接策略执行嫁接操作，算法的伪码描述如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">算法2 (嫁接算法). </span><br><span class="line">Input:生成树个体individual,完全图边长矩阵对应的二维指针变量edgelen. </span><br><span class="line">Output:经嫁接操作后新生成的个体newindividual. </span><br><span class="line">Begin </span><br><span class="line">	设置所有结点使用标志变量pflagnodeuse为0; </span><br><span class="line">	初始化参数contrpara=dc, i=1,k=1, bflaggrafting=false; </span><br><span class="line">	while i≤ n do</span><br><span class="line">	     设置counter=0,结点i对应结点序号的标志pflagnodeuse为1; </span><br><span class="line">	     由pnodesortdis得到与i 关联的第k个结点序号inodeassono; </span><br><span class="line">	     由edgelen得到i 与inodeassono的边长nodedis; </span><br><span class="line">	     while counter&lt;contrpara &amp;&amp;nk≤ do </span><br><span class="line">	         求出inodeassono的父结点assoparenodeno及边长assonodedis; </span><br><span class="line">		     计算边交换后收益gain=nodedis-assonodedis; </span><br><span class="line">		     if inodeassono不是i的子结点&amp;&amp; gain&gt;0 then </span><br><span class="line">		         选择以inodeassono代表的分枝; </span><br><span class="line">		         设置bflaggrafting=true; </span><br><span class="line">		     end if </span><br><span class="line">		 	 if bflaggrafting=true then </span><br><span class="line">		         执行嫁接操作; </span><br><span class="line">		         counter=counter+1; </span><br><span class="line">		         设置结点inodeassono的标志pflagnodeuse为1; </span><br><span class="line">		         设置bflaggrafting=flase; </span><br><span class="line">		     end if </span><br><span class="line">		     k=k+1; </span><br><span class="line">		     由pnodesortdis得到与i 关联的第k个结点序号inodeassono及位置inodeassopos; </span><br><span class="line">		     由edgelen得到i 与inodeassono的边长nodedis; </span><br><span class="line">	     end while </span><br><span class="line">	     i=i+1; </span><br><span class="line">	 end while </span><br><span class="line"> End </span><br></pre></td></tr></table></figure>
+<h3 id="嫁接策略"><a href="#嫁接策略" class="headerlink" title="嫁接策略"></a>嫁接策略</h3><ul>
+<li><p>收益优先嫁接策略</p>
+<p>该策略的基本思想是：对考察结点，若所选关联结点分枝移至考察结点前后收益大于0，则该分枝可选为嫁接枝。按该策略执行嫁接，操作简便，且总体效果较好。其缺点是：嫁接后某些结点的分枝数可能大大超过给定的度约束值，从而增加剪接的负担,需要花费较长的CPU时间 。</p>
+</li>
+<li><p>无度约束最优嫁接策略</p>
+<p>该策略的基本思想是：对考察结点，选取与其具有最小边长的关联结点作为嫁接枝。按该策略执行嫁接，在理想的情形下，通过该策略可生成一棵无度约束的最小生成树。其缺点是：针对给定某一度约束值$d_c$（例如为3），若通过Prim算法得到的无约束生成树对应的度值与$d_c$相差较大，该控制策略往往不能得到好的效果。</p>
+</li>
+<li><p>还有度约束控制嫁接策略、双重信息嫁接策略 、概率选择嫁接策略等。</p>
+</li>
+</ul>
+<h2 id="剪接算子及策略"><a href="#剪接算子及策略" class="headerlink" title="剪接算子及策略"></a>剪接算子及策略</h2><h3 id="剪接算子构造"><a href="#剪接算子构造" class="headerlink" title="剪接算子构造"></a>剪接算子构造</h3><p>对嫁接中产生的生成树可能包含某些结点不满足度约束，以及对经过基本遗传算子操作使其具有较差属性分枝的情形，均要进行剪接操作。</p>
+<p>根据定义4，剪接算子的操作过程如下：</p>
+<ol>
+<li>针对生成树的每一结点，考察其所有的分枝，判断当前结点具有最（较）差属性的分枝是否可作为剪接枝？</li>
+<li>若是,将该分枝插入到其关联结点上 。</li>
+</ol>
+<p>判断一条分枝是否在当前位置具有最（较）差属性的依据为下列两种情形之一：</p>
+<ol>
+<li>若该分枝移动到另一关联结点的收益最（较）大；</li>
+<li>若所有考察的分枝分别移动收益均小于0，则指移动后代价最小的分枝。</li>
+</ol>
+<p>以下以一棵生成树子结点分枝进行修剪为例说明剪接操作的程序流程，算法的伪码描述如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">算法3 (剪接算法). </span><br><span class="line">Input:生成树个体Individual,完全图边长矩阵对应的二维指针变量edgelen. </span><br><span class="line">Output:经剪接操作后新生成的可行个体newindividual. </span><br><span class="line">Begin </span><br><span class="line">	初始化剪接参数,设置iprunflag,iprunneedflag为false, </span><br><span class="line">	设置初始位置i=1; </span><br><span class="line">	while  I ≤ n   do</span><br><span class="line">		取当前结点度值nodegree; </span><br><span class="line">		if nodegree大于给定的度约束值degreecons then </span><br><span class="line">			设置剪接标志iprunflag为true; </span><br><span class="line">		end if </span><br><span class="line">	    求解i的子结点,结果保存在指针变量pichild中; </span><br><span class="line">	    while pichild非空 do </span><br><span class="line">            寻找具有最差属性的子结点selectchildnode分枝 </span><br><span class="line">            if 收益为大于0且iprunflag为false then </span><br><span class="line">		    	if 检测无冲突 then </span><br><span class="line">		        	设置剪接操作标志iprunneedflag为true; </span><br><span class="line">		    	else </span><br><span class="line">		            if 冲突能有效解决 </span><br><span class="line">						设置剪接操作标志iprunneedflag为true; </span><br><span class="line">		            end if </span><br><span class="line">		     	end if </span><br><span class="line">			end if </span><br><span class="line">			if iprunflag or iprunneedflag为true then </span><br><span class="line">		    	执行剪接操作; </span><br><span class="line">		     	iprunneedflag= false; </span><br><span class="line">			else </span><br><span class="line">		    	break; </span><br><span class="line">			end if </span><br><span class="line">			if 剪接插入位置小于当前位置 then </span><br><span class="line">		    	指针回溯; </span><br><span class="line">			end if </span><br><span class="line">			取当前位置度值nodedegree; </span><br><span class="line">			if 当前位置度值nodegree小于等于degreecons then </span><br><span class="line">		    	设置iprunflag为flase; </span><br><span class="line">			end if </span><br><span class="line">		end while </span><br><span class="line">	    i=i+1; </span><br><span class="line">	end while </span><br><span class="line">End</span><br></pre></td></tr></table></figure>
+<p><strong>定义5：（冲突及冲突检测）</strong></p>
+<p>在对消除不满足约束情形进行剪接或对具有较差属性的分枝进行剪接操作的同时，若引起新的不满足约束的情形称为冲突。在剪接过程中引起了冲突，就称找出这一冲突现象的过程为冲突检测 。</p>
+<p><img src="http://image.rexking6.top/img/clip1541638991.png" alt=""></p>
+<p>图1：将结点7代表的分枝插入到结点3之后，未引起冲突（假定度约束为3），虚线为新构建的一条关联边。</p>
+<p><img src="http://image.rexking6.top/img/clip1541639178.png" alt=""></p>
+<p>图2：将结点7代表的分枝插入到结点4之后，引起冲突（假定度约束为3），虚线为新构建的一条关联边。</p>
+<h3 id="剪接策略"><a href="#剪接策略" class="headerlink" title="剪接策略"></a>剪接策略</h3><ul>
+<li><p>收益优先剪接策略 </p>
+<p>该策略的基本思想是：对考察结点的所有分枝，若所选分枝移至另一结点位置后收益大于0，且未引起新不能有效解决的冲突，则该分枝可选为剪接枝，执行剪接操作。按该策略执行剪接,操作简便，且花费的CPU时间较小。</p>
+</li>
+<li><p>双重信息剪接策略 </p>
+<p>该策略的基本思想是：对考察结点的所有分枝，在判断某一分枝是否作为剪接枝时，应将边长信息和位置次序关系信息同时进行分析。同嫁接策略类似，这是一种较为复杂的控制策略。</p>
+</li>
+<li><p>退化剪接策略 </p>
+<p>该策略的基本思想是：当不满足度约束时，若在剪接中出现不能有效解决的冲突，只能按代价最（较）小化原则进行剪接。 </p>
+</li>
+</ul>
+<h2 id="GPOGA算法"><a href="#GPOGA算法" class="headerlink" title="GPOGA算法"></a>GPOGA算法</h2><p>在基本遗传算法体系的基础上，结合嫁接和剪接算子作用，给出基于嫁接和剪接算子的遗传算法（A Genetic Algorithm with Grafting and Pruning Operators，简称GPOGA）。</p>
+<p>算法的伪代码描述如下： </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">算法4 (GPOGA). </span><br><span class="line">Input:与所求DCMST问题有关的数据（结点数,完全图边长等）,遗传算法基本控制参数. </span><br><span class="line">Output:生成的最好解个体及有关计算数据. </span><br><span class="line">Begin </span><br><span class="line">	随机初始化种群P(0),t=0; </span><br><span class="line">	计算P(0)中个体的适应值并按适应值排序; </span><br><span class="line">	while 计算代数 t ≤ maxgen do </span><br><span class="line">	    j=0; </span><br><span class="line">	    while 新产生个体j&lt;N do </span><br><span class="line">            根据个体的适应值随机从当代种群中选择两个父个体,设为oldindi1和oldindi2; </span><br><span class="line">            执行杂交操作CrossOver(oldindi1,oldindi2),将产生的新个体保存在newpop[j],newpop[j+1]中; </span><br><span class="line">            执行交换变异操作SwapMutation(newpop[j])、SwapMutation(newpop[j+1]);将产生的两个新个体 </span><br><span class="line">            复制到临时种群变量数组temp1[j]和temp1[j+1]中; </span><br><span class="line">            执行嫁接操作Grafting(newpop[j]), Grafting (newpop[j+1]); </span><br><span class="line">            执行剪接操作pruning(newpop[j]), pruning (newpop[j+1]); </span><br><span class="line">            计算并评价temp1[j]、temp1[j+1]、newpop[j]、newpop[j+1]、oldindi1及oldindi2的目标值,选择两个较好的个体复制到newpop[j]及newpop[j+1]中; </span><br><span class="line">            j=j+2; </span><br><span class="line">	    end while; </span><br><span class="line">	    计算新种群newpop 的目标值、适应值并排序,同时以oldpop中最好的个体代替newpop中最差的个体; </span><br><span class="line">	    将newpop种群中个体复制到oldpop中,计算其目标值、适应值并排序; </span><br><span class="line">	    t=t+1; </span><br><span class="line">	end while; </span><br><span class="line">	记录及输出结果. </span><br><span class="line">End </span><br></pre></td></tr></table></figure>
+<p>在算法中采用的选择策略称之为 $(μ+λ+λ)$ 选择，即将随机选择的两个父个体、由基本遗传算子交换变异后产生的新个体以及经嫁接和剪接后产生的新个体共同参与竞争，以选择两个较好的个体进入下一代种群。这样做的原因是因为剪接中可能导致退化现象出现，因而将交换变异产生的两个新个体共同参与竞争，以确保算法的收敛性。</p>
+<p>上述算法中，也可采用基于适应值概率的轮赌盘选择策略，只要将由基本遗传算子交叉变异后产生的新个体参与选择过程，或者将由基本遗传算子交叉变异后产生的最好个体与当前种群的最好个体进行比较,选择较好的个体直接进入下一代，就能确保算法以概率1收敛到全局最优解。</p>
+<p>可以证明下列定理：</p>
+<p><strong>定理：带有嫁接和剪接算子操作的遗传算法（GPOGA）以概率1收敛到全局最优解 。</strong></p>
+<p><img src="http://image.rexking6.top/img/clip1541639693.png" alt=""></p>
+<p>图3： GPOGA求解eil51的解对应的最小生成树（度约束为3）</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>度约束最小生成树（DCMST）问题是一类难解的NP-hard问题，目前尚未有可靠、有效的解决方法。通过对现有方法存在的问题和缺陷进行分析，借鉴花草果树的人工种植和培育技术，设计的基于嫁接和剪接算子的遗传算法（GPOGA），理论分析和实验数据都为算法的正确性和有效性提供了依据。GPOGA的三类算子在计算过程中互为补充，协同完成优化搜索过程，从而使算法的性能优越，鲁棒性更好。</p>
+<p>重点是针对超大规模的DCMST问题出现的复杂情形，如何设计出更为有效和易操作的嫁接及剪接策略，以及算法设计的并行化方法，包括多核技术实现，从而为超大规模及复杂情形的DCMST问题提供精确和可靠的解决方案，结合随机森林搜索技术在GPU上实现，或者利用硬件（FPGA）实现也都很有实用价值。</p>
+<h1 id="群体智能算法"><a href="#群体智能算法" class="headerlink" title="群体智能算法"></a>群体智能算法</h1><p>群体智能作为一个新兴领域，自从20 世纪80年代出现以来，引起了多个学科领域研究人员的关注，已经成为人工智能以及经济、社会、生物等交叉学科的热点和前沿领域。由单个复杂个体完成的任务可由大量简单的个体组成的群体合作完成，而后者往往更具有健壮性、灵活性等优势。群体智能（swarm intelligence）利用群体优势，在没有集中控制，不提供全局模型的前提下，为寻找复杂问题解决方案提供了新的思路。</p>
+<p>对群体智能的定义进行扩展，普遍意义上有以下几种理解。一是由一组简单智能体（agent）构成的集体智能（collective intelligence），以蚁群优化算法（Ant Colony Optimization，ACO）和蚂蚁聚类算法等为代表；二是把群体中的成员看作粒子，而不是智能体，以粒子群优化算法（Particle Swarm Optimization，PSO）为代表。  </p>
+<p>群体算法研究对群体智能的研究起源于对以蚂蚁、蜜蜂等为代表的社会性昆虫的群体行为的研究。现有的对群体智能的研究，大都是从某一种由大量个体表现出来的群体行为出发，从它们的群体行为中提取模型，为这些行为建立一些规则，从而提出算法，应用于解决实际中的问题。目前国内外研究得比较多而且也比较成熟的算法有蚂蚁优化算法、蚂蚁聚类算法、粒子群优化算法，还有对蚂蚁分工的研究。 </p>
+<p>群智能理论研究领域有两种主要的算法：蚁群算法（Ant Colony Optimization，ACO）和粒子群算法（Particle Swarm Optimization， PSO）。前者是对蚂蚁群落食物采集过程的模拟，已成功应用于许多离散优化问题。粒子群算法也是起源于对简单社会系统的模拟，最初是模拟鸟群觅食的过程，但后来发现它是一种很好的优化工具。</p>
+<p>与大多数基于梯度的优化算法不同，群体智能依靠的是概率搜索算法。 虽然概率搜索算法通常要采用较多的评价函数，但是与梯度方法及传统的演化算法相比，其优点还是显著的 ，主要表现在以下几个方面：</p>
+<ol>
+<li>无集中控制约束，不会因个别个体的故障影响整个问题的求解，确保了系统具备更强的鲁棒性；</li>
+<li>以非直接的信息交流方式确保了系统的扩展性；</li>
+<li>并行分布式算法模型，可充分利用多处理器；</li>
+<li>对问题定义的连续性无特殊要求；</li>
+<li>算法实现简单。 </li>
+</ol>
+<h2 id="蚁群优化算法（ACO）"><a href="#蚁群优化算法（ACO）" class="headerlink" title="蚁群优化算法（ACO）"></a>蚁群优化算法（ACO）</h2><p>蚂蚁优化算法受蚂蚁取食行为中的通信机制启发而得来。经过大量的观察研究发现，蚂蚁个体之间可以通过分泌信息素(pheromone)来传递信息。蚂蚁在行动的过程中，会在经过的路径上留下信息素，后面的蚂蚁通过感知这种物质的浓度来选择自己的路径。这样，由大量蚂蚁组成的蚁群集体行为就表现出了一种信息正反馈的现象，信息素随时间挥发，在较短的路径上浓度较大，因而蚂蚁总是可以找到更短的路径取食。 </p>
+<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>20世纪50年代中期创立了仿生学，人们从生物进化的机理中受到启发。提出了许多用以解决复杂优化问题的新方法，如进化规划、进化策略、遗传算法等，这些算法成功地解决了一些实际问题。</p>
+<p>20世纪90年代意大利学者M． Dorigo， V． Maniezzo，A． Colorni等从生物进化的机制中受到启发，通过模拟自然界蚂蚁搜索路径的行为，提出来一种新型的模拟进化算法—蚁群算法，是群智能理论研究领域的一种主要算法。用该方法求解TSP问题、分配问题、 job-shop调度问题，取得了较好的试验结果． 虽然研究时间不长，但是现在的研究显示出， 蚁群算法在求解复杂优化问题（特别是离散优化问题）方面有一定优势，表明它是一种有发展前景的算法。 </p>
+<p>最早提出的蚁群优化算法—蚂蚁系统（Ant System，AS），并将其应用于解决经典的旅行商问题（TSP）。从蚂蚁系统开始，基本的蚁群算法得到了不断的发展和完善，并在TSP以及许多实际优化问题求解中进一步得到了验证。这些AS改进版本的一个共同点就是增强了蚂蚁搜索过程中对最优解的探索能力，它们之间的差异仅在于搜索控制策略方面。而且，取得了最佳结果的ACO是通过引入局部搜索算法实现的，这实际上是一些结合了标准局部搜索算法的混合型概率搜索算法，有利于提高蚁群各级系统在优化问题中的求解质量。</p>
+<p>最初提出的AS有三种版本：蚁密（Ant-density）、蚁量（Ant-quantity）和蚁环（Ant-cycle）。在Ant-density和Ant-quantity系统中蚂蚁在两个位置节点间每移动一次后就立即更新信息素，而在Ant-cycle中当所有的蚂蚁都完成了自己的行程后才对信息素进行更新，而且每个蚂蚁所释放的信息素被表达为反映相应行程质量的函数。通过与其它各种通用的启发式算法相比，在不大于75城市的TSP中，这三种基本算法的求解能力还是比较理想的，但是当问题规模扩展时， AS的解题能力大幅度下降。 </p>
+<h3 id="改进：精英策略"><a href="#改进：精英策略" class="headerlink" title="改进：精英策略"></a>改进：精英策略</h3><p>其后的ACO研究工作主要集中在AS性能的改进方面。较早的一种改进方法是精英策略（Elitist Strategy），其思想是在算法开始后即对所有已发现的最好路径给予额外的增强，并将随后与之对应的行程记为Tgb（全局最优行程），当进行信息素更新时，对这些行程予以加权，同时将经过这些行程的蚂蚁记为“精英”，从而增大较好行程的选择机会。这种改进型算法能够以更快的速度获得更好的解。但是若选择的精英过多则算法会由于较早的收敛于局部次优解而导致搜索的过早停滞。</p>
+<p>为了进一步克服AS中暴露出的问题，提出了蚁群系统（Ant Colony System，ACS）。该系统的提出是以Ant-Q算法为基础的。Ant-Q将蚂蚁算法和一种增强型学习算法Q-learning有机的结合了起来。 ACS与AS之间存在三方面的主要差异：首先，ACS采用了更为大胆的行为选择规则；其次，只增强属于全局最优解的路径上的信息素：</p>
+<script type="math/tex; mode=display">
+\tau_{ij}(t+1)=(1-\rho)·\tau_{ij}(t) + \rho·\Delta \tau_{ij}^{gb}(t)</script><p>其中$0&lt;\rho&lt;1$是信息素挥发参数，$L^{gb}$是从寻路开始到当前为止全局最优的路径长度， $\Delta \tau_{ij}^{gb}(t)=1/L^{gb}$。</p>
+<p>再次，还引入了负反馈机制，每当一只蚂蚁由一个节点移动到另一个节点时，该路径上的信息素都按照如下公式被相应的消除一部分，从而实现一种信息素的局部调整，以减小已选择过的路径再次被选择的概率：</p>
+<script type="math/tex; mode=display">
+\tau_{ij}=(1-\xi)·\tau_{ij}+\xi·\tau_0</script><p>其中，$0&lt;\xi&lt;1$。</p>
+<h3 id="改进：Rank-based-Version-AS"><a href="#改进：Rank-based-Version-AS" class="headerlink" title="改进：Rank-based Version AS"></a>改进：Rank-based Version AS</h3><p>另一种对AS改进的算法是Rank-based Version AS。与“精英策略”相似，在此算法中总是更新更好进程上的信息素，选择的标准是其行程长度（$L^1(t)\le L^2(t) \le … \le L^m(t)$）决定的排序，且每个蚂蚁放置信息素的强度通过下式中的排序加权处理确定：</p>
+<script type="math/tex; mode=display">
+\tau_{ij}(t+1)=(1-\rho)·\tau_{ij}(t) = \sum_{r=1}^m(w-r)·\Delta\tau_{ij}^r(t)+w·\Delta\tau_{ij}^{gb}(t)</script><p>其中，$m$为每次迭代后放置信息素的蚂蚁总数，</p>
+<script type="math/tex; mode=display">
+\Delta \tau_{ij}^r(t)=1/L^r, \ \ \ \ \Delta \tau_{ij}^{gb}(t)=1/L^{gb}</script><p>这种算法求解TSP的能力与AS、精英策略AS、遗传算法和模拟退火算法进行了比较。在大型TSP问题中（最多包含132座城市），基于AS的算法都显示出了优于GA和SA的特性。而且在Rank-based AS和精英策略AS均优于基本AS的同时，前者还获得了比精英策略AS更好的解。 </p>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>蚁群算法是对自然界蚂蚁的觅食寻径方式进行模拟而得出的一种仿生算法。为了说明蚁群算法的原理，先简要介绍一下蚂蚁搜寻食物的具体过程。研究表明：蚁群在觅食途中，会在所经过路径留下一种挥发性分泌物—信息素（pheromone），并能感知其存在和强度，朝着信息素浓度高的方向移动。与此同时释放出与路径长度有关的信息素。路径越长，释放的激素浓度越低。浓度越高的路径选择它的蚂蚁越多，越发增加该路径上的信息素浓度，这样又吸引更多的蚂蚁，从而形成一个正反馈。 蚂蚁最终总能找到一条从食物到巢穴之间的最优路径。最优路径上的激素浓度越来越大。而其它路径上的激素浓度却会随着时间的流逝而消减。最终整个蚁群会找出觅食最优路径。 </p>
+<h3 id="简化的蚂蚁寻食过程"><a href="#简化的蚂蚁寻食过程" class="headerlink" title="简化的蚂蚁寻食过程"></a>简化的蚂蚁寻食过程</h3><p><img src="http://image.rexking6.top/img/clip1541776624.png" alt=""></p>
+<p>蚂蚁从A点出发，速度相同，食物在D点，可能随机选择路线ABD或ACD。假设初始时每条路线分配一只蚂蚁，每个时间单位行走一步，本图为经过9个时间单位时的情形：走ABD的蚂蚁到达终点，而走ACD的蚂蚁刚好走到C点， 为一半路程。 </p>
+<p><img src="http://image.rexking6.top/img/clip1541776698.png" alt=""></p>
+<p>本图为从开始算起， 经过18个时间单位时的情形：走ABD的蚂蚁到达终点后得到食物又返回了起点A，而走ACD的蚂蚁刚好走到D点。 结果使信息素的浓度会相差一倍。 </p>
+<p>假设蚂蚁每经过一处所留下的信息素为一个单位，则经过36个时间单位后，所有开始一起出发的蚂蚁都经过不同路径从D点取得了食物，此时ABD的路线往返了2趟，每一处的信息素为4个单位，而 ACD的路线往返了一趟，每一处的信息素为2个单位，其比值为 2:1。</p>
+<p>寻找食物的过程继续进行，则按信息素的指导，蚁群在ABD路线上增派一只蚂蚁（共2只），而ACD路线上仍然为一只蚂蚁。再经过36个时间单位后，两条线路上的信息素单位积累为12和4，比值为 3:1。</p>
+<p>若按以上规则继续，蚁群在ABD路线上再增派一只蚂蚁（共3只），而ACD路线上仍然为一只蚂蚁。再经过36个时间单位后，两条线路上的信息素单位积累为24和6，比值为 4:1。</p>
+<p>若继续进行，则按信息素的指导，最终所有的蚂蚁会放弃ACD路线，而都选择ABD路线。这也就是前面所提到的正反馈效应。 </p>
+<p><img src="http://image.rexking6.top/img/clip1541776805.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541776839.png" alt=""></p>
+<p>用人工蚂蚁来模仿自然蚂蚁，在走过的路径上留下信息素，为解决各种寻优问题提供了一种新的方法。该算法已经被成功地应用在很多复杂的组合优化问题上。</p>
+<p>Dorigo 首先将该方法用于求解TSP 问题，随后很多学者陆续使用了该算法解二次分配问题、皇后问题等。所解决的问题以TSP 问题为主，另外有函数优化问题、背包问题等，而且从离散空间扩展到了连续空间。在解决这些问题的性能方面，比之于传统的优化算法，蚂蚁优化算法表现出了良好的性能。 </p>
+<h3 id="蚁群算法与TSP问题"><a href="#蚁群算法与TSP问题" class="headerlink" title="蚁群算法与TSP问题"></a>蚁群算法与TSP问题</h3><p>TSP问题表示为一个$N$个城市的有向图$G=(N,A)$，其中$N=\{1,2,…,n\}$，$A=\{(i,j)|i,j \in N\}$。城市之间距离：$(d_{ij})_{n \times n}$。目标函数为：$f(w)=\sum_{l=1}^nd_{i_{l-1}i_l}$其中$w=(i_1,i_2,…,i_n)$为城市1,2,….,n的一个排列，$i_{n+1}=i_1$。</p>
+<p>TSP问题的人工蚁群算法中，假设$m$只蚂蚁在图的相邻节点间移动，从而协作异步地得到问题的解。每只蚂蚁的一步转移概率由图中的每条边上的两类参数决定：1.信息素值，也称信息素痕迹。2.可见度，即先验值。</p>
+<p>信息素的更新方式有2种，一是挥发，也就是所有路径上的信息素以一定的比率进行减少，模拟自然蚁群的信息素随时间挥发的过程；二是增强，给评价值“好”（有蚂蚁走过）的边增加信息素。 </p>
+<h3 id="初始的蚁群优化算法—基于图的蚁群系统（GBAS）"><a href="#初始的蚁群优化算法—基于图的蚁群系统（GBAS）" class="headerlink" title="初始的蚁群优化算法—基于图的蚁群系统（GBAS）"></a>初始的蚁群优化算法—基于图的蚁群系统（GBAS）</h3><p>初始的蚁群算法是基于图的蚁群算法，graph-based ant system，简称为GBAS，是由Gutjahr W J在2000年的Future Generation Computing Systems提出的。算法步骤如下：</p>
+<ol>
+<li><p>对$n$个城市的TSP问题，$N=\{1,2,…,n\},A=\{(i,j)|i,j \in N\}$，城市间的距离矩阵为$(d_{ij})_{n\times n}$，给TSP图中的每一条弧$(i,j)$赋信息素初值$\tau_{ij}(0)=\frac{1}{|A|}$，假设$m$只蚂蚁在工作，所有蚂蚁都从同一城市$i_0$出发。当前最好解是$w=(1,2,…,n)$。</p>
+</li>
+<li><p>（外循环）如果满足算法的停止规则， 则停止计算并输出计算得到的最好解。否则使蚂蚁$s$从起点$i_0$出发，用$L(s)$表示$s$行走的城市集合，初始 $L(s)$为空集，$1\le s \le m$。</p>
+</li>
+<li><p>（内循环）按蚂蚁$1 \le s \le m$的顺序分别计算。 当蚂蚁在城市$i$，若$L(s)+N$或$\{l|(i,l)\in A, l \notin L(s) \} = \Phi$， 完成第$s$只蚂蚁的计算。否则，若$L(s) \neq N$且$T=\{l|(i,l) \in A, l \notin L(s)\}-\{i_0\} \neq \Phi$，则以概率$p_{ij}=\frac{\tau_{ij}(k-1)}{\sum_{l \in T}\tau_{ij}(k-1)},j \in T,p_{ij}=0,j\notin T$到达$j$，$L(s)=L(s) \cup \{j\},i:=j$；若$L(s) \neq N$且$T=\{l|(i,l) \in A, l \notin L(s)\}-\{i_0\} = \Phi$，则到达$i_0$，$L(s)=L(s) \cup \{i_0\},i:=i_0$；重复第2步。</p>
+</li>
+<li><p>对$1\le s \le m​$，若$L(s)=N​$，按$L(s)​$中城市的顺序计算路径长度；若$L(s)\neq N​$，路径长度置为一个无穷大值（即不可达）。比较$m​$只蚂蚁中的路径长度，记走最短路径的蚂蚁为$t​$。若$f(L(t))&lt;f(L(W))​$，则$W=L(t)​$。用如下公式对$W​$路径上的信息素痕迹加强， 对其它路径上的信息素进行挥发。 </p>
+<script type="math/tex; mode=display">
+\tau_{ij}(k)=\left\{
+\begin{aligned}
+&(1-\rho_{k-1})\tau_{ij}(k-1)+\frac{\rho_{k-1}}{|W|},&&(i,j)为W上的一条弧 \\
+&(1-\rho_{k-1})\tau_{ij}(k-1),&&(i,j)不是W上的一条弧
+\end{aligned}
+\right.</script><p>其中 $|W|$ 为路径长度，下面例题中永为4；得到新的$\tau_{ij}(k),k:=k+1$，重复第1步。</p>
+</li>
+</ol>
+<p>在第3步中，挥发因子$\rho_k$对于一个固定的$K \ge 1$，满足</p>
+<script type="math/tex; mode=display">
+\rho_k \le 1- \frac{\text{ln }k}{\text{ln}(k+1)},\ \ \ k\ge K</script><p>并且$\sum_{k=1}^\infty \rho_k=\infty$，经过$k$次挥发，非最优路径的信息素逐渐减少至消失。 </p>
+<p>以上算法中，在蚂蚁的搜寻过程中，以信息素的概率分布来决定从城市$i$到城市$j$的转移。算法中包括信息素更新的过程：</p>
+<ol>
+<li>信息素挥发（evaporation）信息素痕迹的挥发过程是每个连接上的信息素痕迹的浓度自动逐渐减弱的过程，由$(1-\rho_k)\tau_{ij}(k)$表示，这个挥发过程主要用于避免算法过快地向局部最优区域集中，有助于搜索区域的扩展。</li>
+<li>信息素增强（reinforcement）增强过程是蚁群优化算法中可选的部分，称为离线更新方式（还有在线更新方式）。 这种方式可以实现由单个蚂蚁无法实现的集中行动。也就是说，增强过程体现在观察蚁群（$m$只蚂蚁）中每只蚂蚁所找到的路径， 并选择其中最优路径上的弧进行信息素的增强，挥发过程是所有弧都进行的，与蚂蚁数量无关。这种增强过程中进行的信息素更新称为离线的信息素更新。在第3步中， 蚁群永远记忆到目前为止的最优解。</li>
+</ol>
+<p>可以验证，下式满足：</p>
+<script type="math/tex; mode=display">
+\sum_{(i,j)\in A}\tau_{ij}(k)=1, \forall k \ge 0</script><p>即$\tau(k)​$是一个随机矩阵。</p>
+<p>蚂蚁以一定的概率从城市$i$到城市$j$进行转移，信息素的更新在第3步完成，并随$K$而变化。假设第$K$次外循环后得<br>到信息素矩阵$\tau(k)=(\tau_{ij}(k)|(i,j)\in A)$，得到当前最优解。第$K$次循环前的信息素和最优解为$W(k)$，$\{\tau(k-1),W(k-1)\}$经过第$K$次外循环后，得到$\{\tau(k),W(k)\}$。由于蚂蚁的一步转移概率是随机的，从$\{\tau(k-1),W(k-1)\}$到$\{\tau(k),W(k)\}$也是随机的，是一个马尔可夫过程。</p>
+<h3 id="例子-1"><a href="#例子-1" class="headerlink" title="例子"></a>例子</h3><p><img src="http://image.rexking6.top/img/clip1541832943.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541832955.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541832966.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541832976.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541832987.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541832998.png" alt=""></p>
+<h3 id="一般蚁群算法的框架"><a href="#一般蚁群算法的框架" class="headerlink" title="一般蚁群算法的框架"></a>一般蚁群算法的框架</h3><p>一般蚁群算法的框架和GBAS基本相同，有三个组成部分：</p>
+<ul>
+<li>蚁群的活动；</li>
+<li>信息素的挥发；</li>
+<li>信息素的增强。</li>
+</ul>
+<p>主要体现在前面的算法中第2步和第3步中的转移概率公式和信素更新公式 。</p>
+<h3 id="GBAS算法的收敛性"><a href="#GBAS算法的收敛性" class="headerlink" title="GBAS算法的收敛性"></a>GBAS算法的收敛性</h3><p>可以证明：当$X_n$首次到达最优路径后，对于任何最优路径上的弧，转移概率</p>
+<script type="math/tex; mode=display">
+p_{ij}(l) \rightarrow 1</script><p>即$\{X_k=(\tau(k),W(k)),k=0,1,…\}$依概率1收敛到$X^\ast=(\tau^\ast,W^\ast)$。</p>
+<h3 id="其他算法及收敛性分析"><a href="#其他算法及收敛性分析" class="headerlink" title="其他算法及收敛性分析"></a>其他算法及收敛性分析</h3><p>MAX-MIN蚁群优化算法指定挥发系数不随时间变化,这是和GBAS算法不同的一点,改变了信息素挥发和增强的规则（详见下式），同时给出一个下界$\tau_{\text{min}}(k-1)$控制信息素的挥发：</p>
+<script type="math/tex; mode=display">
+\tau_{ij}(k)=\left\{
+\begin{aligned}
+&\text{max}\{(1-\rho)\tau_{ij}(k-1)+\frac{\rho}{|W|},\tau_{\text{min}}(k-1)\},&&(i,j)\in W\\
+&\text{max}\{(1-\rho)\tau_{ij}(k-1),\tau_{\text{min}}(k-1)\},&&otherwise
+\end{aligned}
+\right.</script><p>其中，$0 &lt; \rho &lt; 1, \tau_{\text{min}}(k-1)$为实数。</p>
+<h3 id="路由表信息"><a href="#路由表信息" class="headerlink" title="路由表信息"></a>路由表信息</h3><p>常见的路由表信息由下式求得：</p>
+<script type="math/tex; mode=display">
+a_{ij}(k-1)=\left\{
+\begin{aligned}
+&\frac{\tau_{ij}^\alpha(k-1)\eta_{ij}^\beta(k-1)}{\sum_{l \in T}\tau_{il}^\alpha(k-1)\eta_{il}^\beta(k-1)},&&j\in T\\
+&0,&&j \notin T
+\end{aligned}
+\right.</script><p>其中，$\alpha$为残留信息的相对重要程度，$\beta$为预见值的相对重要程度。$\alpha$和$\beta$体现了相关信息痕迹和预见度对蚂蚁决策的相对影响。TSP问题中$\eta_{ij}(k-1)=\frac{1}{d_{ij}}$，为先验知识。</p>
+<p>信息素痕迹$\tau_{ij}(k-1)$为$k-1$时刻连接城市$i$和$j$的路径上的信息残留浓度，为避免过多的残留信息会淹没全局最优解，需要在每只蚂蚁完成一次循环后对残留信息进行更新，削弱旧信息，增强新信息。记$(i,j)$弧上的信息素在第$k-1$个循环的变化为$\Delta \tau_{ij}(k-1)$，则保留的信息素为$\tau_{ij}(k)=\tau_{ij}(k-1)+\Delta \tau_{ij}(k)$，然后进行信息素的挥发：$(1-\rho)\tau_{ij}(k)$。其中，$\rho \in (0,1)$为信息素的衰退系数。</p>
+<p><strong>系数的确定</strong></p>
+<p>残留信息的相对重要程度 $\alpha$ 和预见值的相对重要程度 $\beta$ 体现了相关信息痕迹和预见度对蚂蚁决策的相对影响。 Dorigo在求解TSP问题时，推荐参数的最佳设置为： $\alpha=1,\beta=5,\rho=0.5$。</p>
+<h3 id="蚁群的规模和停止规则"><a href="#蚁群的规模和停止规则" class="headerlink" title="蚁群的规模和停止规则"></a>蚁群的规模和停止规则</h3><ol>
+<li><p>蚁群大小</p>
+<p>一般情况下蚁群中蚂蚁的个数不超过TSP图中节点的个数。 </p>
+</li>
+<li><p>终止条件</p>
+<ol>
+<li>给定一个外循环的最大数目，表明已经有足够的蚂蚁工作；</li>
+<li>当前最优解连续$K$次相同而停止，其中$K$是一个给定的整数，表示算法已经收敛，不再需要继续；</li>
+<li>目标值控制规则，给定优化问题（目标最小化）的一个下界和一个误差值，当算法得到的目标值同下界之差小于给定的误差值时，算法终止。</li>
+</ol>
+</li>
+</ol>
+<h3 id="信息素的更新"><a href="#信息素的更新" class="headerlink" title="信息素的更新"></a>信息素的更新</h3><p>信息素的更新分为离线和在线两种方式。离线方式（ 同步更新方式）的主要思想是在若干只蚂蚁完成$n$个城市的访问后，统一对残留信息进行更新处理。信息素的在线更新（ 异步更新方式）即蚂蚁每行走一步，立即回溯并更新行走路径上的信息素。</p>
+<p>离线方式的信息素更新可以进一步分为单蚂蚁离线更新和蚁群离线更新。蚁群离线更新方式是在蚁群中的$m$只蚂蚁全部完成n城市的访问（第$k-1$次蚁群循环）后，统一对残留信息进行更新处理：</p>
+<script type="math/tex; mode=display">
+\tau_{ij}(k)=\tau_{ij}(k-1)+\Delta \tau_{ij}(k-1)</script><p>其中，$\tau_{ij}(k)$为第$k-1$次循环后的的信息素的痕迹值。</p>
+<p>单蚂蚁离线更新是在第$s$只蚂蚁完成对所有$n$个城市的访问后，进行路径回溯，更新行走路径上的信息素，同时释放分配给它的资源。更新公式为：</p>
+<script type="math/tex; mode=display">
+\tau_{ij}(s+1)=\tau_{ij}(s)+\Delta \tau_{ij}(s)</script><p>第$s+1$只蚂蚁根据$\tau_{ij}(s+1)$重新计算路由表。</p>
+<p>TSP问题中，蚁群优化算法根据信息素痕迹更新方式不同可以分为不同的算法，采用离线方式，并且$\Delta \tau_{ij}(k-1)$或$\Delta \tau_{ij}(s)$为</p>
+<script type="math/tex; mode=display">
+\Delta \tau_{ij}(t)=\left\{
+\begin{aligned}
+&\frac{Q}{|W|},&&(i,j)\in W\\
+&0,&&(i,j) \notin W
+\end{aligned}
+\right.</script><p>其中$W$为$t$循环中$m$只蚂蚁所行走的最佳路线或第$t$只蚂蚁所行走的一条路径。$Q$为一个常数，该算法名为蚁环算法（ant-cycle algotithm），特点是行走的路径越短对应保存的信息素的值就越大。</p>
+<p>与单蚂蚁离线更新方式相比，信息量记忆更小的是信息素在线更新方式，即蚂蚁每走一步，马上回溯并且更新刚刚走过的路径上的信息素，其规则为：</p>
+<script type="math/tex; mode=display">
+\tau_{ij}(k+1)=\tau_{ij}(k) + \Delta \tau_{ij}(k)</script><p>其中，$k$为蚂蚁行走的第$k$步。</p>
+<p>蚁量算法（ant-quantity algorithm）的信息素更新为$\Delta \tau_{ij}(k)=\frac{Q}{d}$，$Q$为常量，$d_{ij}$表示$i$到$j$的距离，这样信息浓度会随城市距离的减小而加大。</p>
+<p>蚁密算法（ ant-density algorithm ）信息素更新为$\Delta \tau_{ij}(k)=Q$。</p>
+<p>以上三种算法中， 蚁环算法效果最好，因为它用的是全局信息，而其余两种算法用的是局部信息。蚁环离线更新方法很好地保证了残留信息不至于无限积累，非最优路径会逐渐随时间推移被忘记。 </p>
+<h3 id="优缺点-1"><a href="#优缺点-1" class="headerlink" title="优缺点"></a>优缺点</h3><p>优点：</p>
+<ol>
+<li>无集中控制约束，不会因个别个体的故障影响整个问题的求解，确保了系统具备更强的鲁棒性；</li>
+<li>以非直接的信息交流方式确保了系统的扩展性；</li>
+<li>并行分布式算法模型，可充分利用多处理器、多核技术；</li>
+<li>对问题的连续性无特殊要求；</li>
+<li>算法实现简单。</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>蚁群算法的成功主要在实验层次上，很少有理论来解释利用蚁群算法为什么能成功解决这些问题，没有坚实的理论基础；</li>
+<li>蚁群算法普适性不强，其模型不能直接应用于实际优化问题；</li>
+<li>蚁群算法的局部搜索能力较弱，易于出现停滞和局部收敛和收敛速度慢等问题。 </li>
+</ol>
+<h2 id="粒子群优化算法（PSO）"><a href="#粒子群优化算法（PSO）" class="headerlink" title="粒子群优化算法（PSO）"></a>粒子群优化算法（PSO）</h2><p>粒子群优化算法（PSO）是由James Kennedy（肯尼迪）博士和R.C. Eberhart博士于1995年提出的。该算法源于对鸟群、鱼群觅食行为的模拟。</p>
+<p>在PSO中，首先初始化一群随机粒子（随机解），然后通过迭代寻找最优解。在每一次迭代中，粒子通过跟踪两个极值来更新自己的速度和位置。</p>
+<p>PSO 算法简单易实现，不需要调整很多参数，主要应用有神经网络的训练、函数的优化等。 </p>
+<p><strong>粒子跟踪的两个极值</strong></p>
+<p>第一个就是粒子本身所找到的最优解，这个解叫做个体极值；另一个极值是整个种群目前找到的最优解，这个极值是全局极值；另外也可以不用整个种群而只是用其中一部分作为粒子的邻居，那么在该邻居中的极值就是局部极值。</p>
+<p>所有的粒子都有一个由被优化的函数决定的适应值（Fitness Value），每个粒子还有一个速度（Velocity）决定它们飞翔的方向和距离。PSO初始化为一群随机粒子（随机解）。然后，粒子们就追随当前的最优粒子在解空间中搜索找到最优解。在每一次迭代中，粒子通过跟踪两个“极值”来更新自己，即跟踪个体极值（Personal Best）和全局极值（Global Best）。</p>
+<p>每次迭代的过程不是完全随机的，如果找到较好解, 将会以此为依据来寻找下一个解。令PSO初始化为一群随机粒子（随机解），在每一次迭代中，粒子通过跟踪两个“极值”来更新自己：第一个就是粒子本身所找到的最好解，这<br>个个体极值点用<code>pbest[]</code>表示（其位置）；全局版PSO中的另一个极值点是整个种群目前找到的最好解,这个全局极值点用<code>gbest</code>表示（其位置），而局部版PSO不用整个种群，而是用其中一部分作为粒子的邻居，所有邻居中的最好解就是局部极值点（用<code>lbest</code>表示其位置）。</p>
+<p><strong>粒子速度的局部调整</strong></p>
+<p>记<code>pbest[]=(pbestx[],pbesty[])</code>，粒子的速度<code>v[ ]=(vx[ ],vy[ ])</code>，每个粒子的X和Y方向的速度可以由下列简单的方式进行调整：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">If presentx[]&gt;pbestx[]</span><br><span class="line">then vx[]=vx[]-rand()*p_increment;</span><br><span class="line">If presentx[]&lt;pbestx[]</span><br><span class="line">then vx[]=vx[]+rand()*p_increment; </span><br><span class="line"></span><br><span class="line">If presenty[]&gt;pbesty[]</span><br><span class="line">then vy[]=vy[]-rand()*p_increment;</span><br><span class="line">If presenty[]&lt;pbesty[]</span><br><span class="line">then vy[]=vy[]+rand()*p_increment;</span><br></pre></td></tr></table></figure>
+<p>其中<code>p_increment</code>是局部速度增量步长。</p>
+<p><strong>粒子速度的全局调整</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">If presentx[ ]&gt;pbestx[gbest]</span><br><span class="line">then vx[ ]=vx[ ]-rand()*g_increment;</span><br><span class="line">If presentx[ ]&lt;pbestx[gbest]</span><br><span class="line">then vx[ ]=vx[ ]+rand()*g_increment;</span><br><span class="line">If presenty[ ]&gt;pbesty[gbest]</span><br><span class="line">then vy[ ]=vy[ ]-rand( )*g_increment;</span><br><span class="line">If presenty[ ]&lt;pbesty[gbest]</span><br><span class="line">then vy[ ]=vy[ ]+rand( )*g_increment;</span><br></pre></td></tr></table></figure>
+<p>其中<code>g_increment</code>是全局速度增量步长。</p>
+<p><strong>综合调整</strong></p>
+<p>假设用$X_i=(x_{i1},x_{i2},..,x_{id})^T$表示第$i$个粒子，其中$d$是粒子的维数，它经历过的最好位置（有最好的适应值）表示为$g_b=(g_{b1},g_{b2},…,g_{bd})^T$，而整个群体经历过的最好位置表为$p_b=(p_{b1},p_{b2},…,p_{bd})^T$。粒子$i$的速度用$V_i=(v_{i1},v_{i2},…,v_{id})^T$表示。对于每一代个体,在找到两个最优值时,粒子根据如下公式来更新自己的速度和位置：</p>
+<script type="math/tex; mode=display">
+V_{id}(t+1)=V_{id}(t)+c_1·rand1()·(P_{id}(t)-X_{id}(t))+c_2·rand2()·(P_{gd}(t)-X_{id}(t))\\
+X_{id}(t+1)=X_{id}(t)+V_{id}(t+1) \ \ (i=1,2,...,N)</script><p>其中，$V_{id}(t)$是粒子原来的速度，$V_{id}(t+1)$是粒子当前的速度，$X_{id}(t)$是粒子当前的位置，$X_{id}(t+1)$是粒子产生的新位置，$c_1$和$c_2$为加速系数，是正常数，也称为学习因子，$rand1()$和$rand2()$为$[0,1]$之间的随机数。</p>
+<p>$V_{id}(t)$是粒子$i$在$t$时刻（或第$t$次迭代）第$d$维的速度，$c_1$和$c_2$分别调节向全局最好粒子和个体最好粒子方向飞行的<br>最大步长，若太小，则粒子可能远离目标区域；若太大，则会导致突然向目标区域飞去，或飞过目标区域。合适的$c_1$和$c_2$可以加快收敛且不易陷入局部最优，通常令$c_1=c_2=2$；$p_{ld}$是粒子$i$在第$d$维的个体极值点的位置（即坐标）；$p_{gd}$是整个群在第$d$维的全局极值点的位置。为防止粒子远离搜索空间，粒子的每一维速度$V_d$都会被限定在$[-V_{d\text{max}},V_{d\text{max}}]$之间，$V_{d\text{max}}$太大，粒子将飞离最好解，太小将会陷入局部最优。假设将搜索空间的第$d$维定义为区间$[-X_{d\text{max}},+X_{d\text{max}}]$，则通常$V_{d\text{max}}=k·X_{d\text{max}}$，$0.1 \le k \le 1.0$，每一维都用相同的设置方法。</p>
+<p><strong>流程图</strong></p>
+<p><img src="http://image.rexking6.top/img/clip1541848087.png" alt=""></p>
+<h3 id="基本PSO的算法流程"><a href="#基本PSO的算法流程" class="headerlink" title="基本PSO的算法流程"></a>基本PSO的算法流程</h3><ol>
+<li><p><strong>初始化</strong></p>
+<p>初始搜索点的位置$X_i(0)$及其速度$V_i(0)$通常是在允许的范围内随机产生的，每个粒子的<code>pbest</code>坐标设置为其当前位置，且计算出其相应的个体极值（即个体极值点的适应度值），而全局极值（即全局极值点的适应度值）就是个体极值中最好的，记录该最好值的粒子序号，并将<code>gbest</code>设置为该最好粒子的当前位置。</p>
+</li>
+<li><p><strong>评价每一个粒子</strong></p>
+<p>计算粒子的适应值，如果好于该粒子当前的个体极值，则将<code>pbest</code>设置为该粒子的位置，且更新个体极值。如果所有粒子的个体极值中最好的好于当前的全局极值，则将<code>gbest</code>设置为该粒子的位置，记录该粒子的序号，且更新全局极值。</p>
+</li>
+<li><p><strong>粒子的更新</strong></p>
+<p>用更新方程对每一个粒子的速度和位置进行更新。</p>
+</li>
+<li><p><strong>检验是否符合结束条件</strong></p>
+<p>如果当前的迭代次数达到了预先设定的最大次数（或达到最小误差要求），则停止迭代，输出最优解，否则转到第2步。</p>
+</li>
+</ol>
+<p><strong>PSO的特点</strong></p>
+<ol>
+<li>基本PSO算法最初是处理连续优化问题的。</li>
+<li>类似于遗传算法（GA），PSO也是多点搜索。</li>
+<li>更新方程(1)的第一项对应多样化（diversification）的特点，第二项、第三项对应于搜索过程的集中化（intensification）特点，因此这个方法在多样化和集中化之间建立均衡。</li>
+</ol>
+<h3 id="PSO的全局版和局部版"><a href="#PSO的全局版和局部版" class="headerlink" title="PSO的全局版和局部版"></a>PSO的全局版和局部版</h3><p>PSO有全局版和局部版两种，全局版收敛快，但有时会陷入局部最优。局部版PSO通过保持多个吸引子<br>来避免早熟，假设每一个粒子在大小 $l$ 的邻域内定义为一个集合，</p>
+<script type="math/tex; mode=display">
+N_i=\{p_{i-l},p_{i-l+1},...,p_{i-1},p_i,p_{i+1},...,p_{i+l-1},p_{i+l}\}</script><p>从 $N_i$ 中选出最好的，将其位置作为<code>lbest</code>代替公式中的<code>gbest</code>，其它与全局版PSO相同。实验表明，局部版比全局版收敛慢，但不容易陷入局部最优。在实际应用中，可以先用全局PSO找到大致的结果，再用局部PSO进行搜索。</p>
+<h3 id="二进制PSO"><a href="#二进制PSO" class="headerlink" title="二进制PSO"></a>二进制PSO</h3><p>最初的PSO是从解决连续优化问题发展起来的，Eberhart等又提出了PSO的离散二进制版，用来解决工程实际中的组合优化问题。他们在提出的模型中将每一维 $X_{id}$ 和 $P_{id}$ 限制为1或者为0，而速度 $V_{id}$ 不作这种限制。用速度来更新位置时，如果 $V_{id}$ 高一些，粒子的位置 $X_{id}$ 更有可能选1，$V_{id}$ 低一点则选0，阈值在 $[0,1]$ 之间，而有这种特点的函数就是Sigmoid函数：</p>
+<script type="math/tex; mode=display">
+sig(V_{id}(t))=\frac{1}{1+\text{exp}(-V_{id})}</script><p>二进制版本PSO的公式为：</p>
+<script type="math/tex; mode=display">
+X_{id}(t+1)=\left\{
+\begin{aligned}
+&1 && \rho_{id}(t+1)<sig(V_{id}(t+1)) \\
+&0 && \text{otherwise}
+\end{aligned}
+\right.</script><p>向量$\rho_{id}(t+1)$的各个分量是 $[0,1]$ 之间的随机数。为了防止Sigmoid函数饱和，可以将 $V_{id}(t)$ 限定在$[-410,+410]$之间。二进制PSO其它部分与基本连续PSO 类似。实验结果显示，在大多数测试函数中，二进制PSO都比遗传算法速度快，尤其在问题的维数增加时。</p>
+<h3 id="PSO的变化和改进"><a href="#PSO的变化和改进" class="headerlink" title="PSO的变化和改进"></a>PSO的变化和改进</h3><p>PSO与GA有很多共同之处，两者都随机初始化种群，使用适应值来评价系统和进行一定的随机搜索。但PSO是根据自己的速度来决定搜索，没有GA的明显的交叉和变异。如果将<code>pbest</code>也看作是种群的成员，那么PSO也有一种很弱形式的选择。速度更新方程中如果没有 $V_{id}(t)$ 项，可以解释为一种代数交叉，而对 $V_{id}(t)$ 更好的理解是把每次迭代看成是一种不断适应的过程。GA中染色体共享信息，故整个种群较均匀地向最优区域移动。</p>
+<p>在PSO中<code>gbest</code>（或者<code>lbest</code>）将信息传给其它粒子，是单向的信息流动，多数情况下，所有的粒子可能更快地收敛于最优解。由于每个粒子在算法结束时仍然保持着其个体极值，因此，如将PSO用于调度和决策问题时，可以给出多种有意义的选择方案。而基本遗传算法在结束时，只能得到最后一代个体的信息，前面迭代的信息没有保留。</p>
+<p>另外，PSO算法对种群大小不十分敏感，即种群数目下降时性能下降不是很大。PSO收敛快，特别是在算法的早期，但也存在着精度较低，易发散等缺点。若加速系数、最大速度等参数太大，粒子群可能错过最优解，算法不收敛；而在收敛的情况下，由于所有的粒子都向最优解的方向飞去，所以粒子趋向同一化（失去了多样性），使得后期收敛速度明显变慢，同时算法收敛到一定精度时，无法继续优化，所能达到的精度也比GA低，因此很多学者都致力于提高PSO算法性能的研究。</p>
+<h3 id="收敛速度的改进"><a href="#收敛速度的改进" class="headerlink" title="收敛速度的改进"></a>收敛速度的改进</h3><h4 id="惯性权重（inertia-weight）法"><a href="#惯性权重（inertia-weight）法" class="headerlink" title="惯性权重（inertia weight）法"></a>惯性权重（inertia weight）法</h4><p>Shi等提出了惯性权重的方法。惯性权重 $w$ 是与前一次速度有关的一个比例因子，而速度更新方程为：</p>
+<script type="math/tex; mode=display">
+V_{id}(t+1)=w·V_{id}(t)+c_1·rand()·(P_{id}(t)-X_{id}(t))+c_2·Rand()·(P_{gd}(t)-X_{gd}(t))</script><p>$w$ 为惯性权重因子（取$w=1$时，就变成了Kennedy的速度更新方程(1)）。用惯性权重来控制前面的速度对当前速度的影响，较大的 $w$ 可以加强PSO的全局搜索能力，而较小的 $w$ 能加强局部搜索能力。</p>
+<p>基本的PSO可以看作 $w=1$，因此在迭代后期缺少局部搜索能力。实验结果表明，$w$ 在$[0.8,1.2]$之间PSO有更快的收敛速度。也有文献试验了将 $w$ 设置为从 0.9 到 0.4 的线性下降，使得PSO在开始时探索较大的区域，较快地定位最优解的大致位置，随着 $w$ 逐渐减小，粒子速度减慢，开始精细的局部搜索（这里 $w$ 类似于模拟退火中的温度参数）。该方法加快了收敛速度，提高了PSO算法的性能。当待解问题很复杂时，该方法使得PSO在迭代后期全局搜索能力不足，导致不能找到要求的最优解，这可以用自适应改变惯性权重来克服。</p>
+<h4 id="模糊惯性权重（fuzzy-inertia-weight）法"><a href="#模糊惯性权重（fuzzy-inertia-weight）法" class="headerlink" title="模糊惯性权重（fuzzy inertia weight）法"></a>模糊惯性权重（fuzzy inertia weight）法</h4><p>Shi 等提出用模糊控制器来动态自适应地改变惯性权重的技术。控制器的输入是当前惯性权重 $w$ 和当前最好的性能评价值（CBPE），CBPE衡量PSO目前找到的最好候选解的性能；输出是 $w$ 的改变量。由于不同的问题有不同范围的性能评价值，因此需要对CBPE进行如下的规范化：</p>
+<script type="math/tex; mode=display">
+NCBPE=\frac{CBPE-CBPE_{\text{min}}}{CBPE_{\text{max}}-CBPE_{\text{min}}}</script><p>NCBPE 是规范化后的评价值，$CBPE_{\text{min}}$和$CBPE_{\text{max}}$依问题而定，且需事先得知或者可估计。模糊 $w$ 法与线性下降 $w$ 方法的比较结果显示，后者不知道应该降低 $w$ 的合适时机，而自适应模糊控制器能预测使用什么样的 $w$ 更合适，可以动态地平衡全局和局部搜索能力。但是由于需知道$CBPE_{\text{min}}$和$CBPE_{\text{max}}$等，使得模糊权重法的实现较为困难，因而无法广泛使用。 </p>
+<h4 id="压缩因子（const-riction-factor）法"><a href="#压缩因子（const-riction-factor）法" class="headerlink" title="压缩因子（const riction factor）法"></a>压缩因子（const riction factor）法</h4><p>Clerc得出结论：压缩因子有助于确保PSO 算法收敛。这种方法的速度更新方程为，</p>
+<script type="math/tex; mode=display">
+V_{id}(t+1)=\mathcal{X}(V_{id}(t)+c_1·rand()·(P_{id}(t)-X_{id}(t))+c_2·Rand()·(P_{gd}(t)-X_{gd}(t)))</script><p>其中$\mathcal{X}=\frac{2}{|2-\phi-\sqrt{\phi^2-4\phi}|}$为压缩因子，$\phi=c_1+c_2$，且$\phi&gt;4$。</p>
+<p>约束因子法控制系统行为最终收敛，且可以有效搜索不同的区域，该法能得到高质量的解，如果与此同时将每维 $V_{d\text{max}}$ 设置为一维搜索空间的大小 $X_{d\text{max}}$，则可以得到更好的效果。</p>
+<h3 id="优缺点-2"><a href="#优缺点-2" class="headerlink" title="优缺点"></a>优缺点</h3><p>优点：</p>
+<ol>
+<li>实现容易、精度高、收敛快， 不需要调整参数；</li>
+<li>对种群大小不十分敏感；</li>
+<li>在多样化和集中化中建立平衡。</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>对于离散的优化问题处理不佳；</li>
+<li>容易陷入局部最优。</li>
+</ol>
+<h3 id="发展趋势及展望"><a href="#发展趋势及展望" class="headerlink" title="发展趋势及展望"></a>发展趋势及展望</h3><p>蚂蚁优化算法、粒子优化算法等为解决一类优化问题提供了新的思路，众多研究者纷纷给予改进，使之得到了扩展和完善，在解决某些问题方面表现出了比传统优化算法更好的性能，但是单纯对优化算法的研究很难再有其它大的突破。然而，生物群体拥有巨大的潜力供人们研究，目前还没有形成系统的理论，许多问题有待回答。以下几个方面将是研究的热点：刺激产生新的算法的生物群体的行为模型；各种算法的完善和结合在实际问题上的应用；群体机器人的研究；群体智能系统的底层机制的研究；系统的建模、仿真以及实际应用、GPU实现等。 </p>
+<h3 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h3><p>PSO 比较有潜力的应用包括系统设计、多目标优化、分类、模式识别、调度、信号处理、决策、机器人应用等。其中具体应用实例有: 模糊控制器设计、车间作业调度、机器人实时路径规划、自动目标检测、时频分析等 。 </p>
+<h3 id="存在的问题"><a href="#存在的问题" class="headerlink" title="存在的问题"></a>存在的问题</h3><p>一种新兴的优化算法：其数学基础薄弱，在收敛性理论、计算性能、实现技术和参数的设置等方面缺乏严密的数学基础，其应用大多数仍然依靠经验和实验。 </p>
+<p>PSO算法的理论研究：纵观PSO的研究成果，大部分研究都集中在算法的设计上，对算法的性能、收敛性、收敛速度、参数选取及参数的鲁棒性等理论性的研究则很少，偶有一些理论研究，但仅仅局限在对算法的参数、状态及概念等方面，且理论分析的内容和深度都很浅，因此理论研究大大滞后于PSO在工程中的应用。 </p>
+<p>PSO在实际应用中被证明是有效的，但并没有给出收敛性、收敛速度估计等方面的数学证明。有些文献也对收敛性等做了一些研究，但是目前其理论和数学基础的研究还很不够。</p>
+<p>PSO的算法研究，利用不同问题的特点设计出相应的有效算法，应注重高效的算法开发,提出合理的核心更新公式以及有效的均衡全局搜索和局部改进的策略。尤其要注重把PSO与其它算法，如进化算法、模糊逻辑、生物智能以及混沌等方法或策略相结合，解决PSO易陷入局部最优的问题。</p>
+<p>PSO的应用研究，在算法的应用研究上应注重PSO算法在离散、多目标、约束、不确定、动态及神经网络等优化问题上的探讨和应用。同时，PSO的应用领域也有待进一步拓宽。例如：应用于分类XOR问题的神经网络训练、解决整数规划和系统辨识等领域。</p>
+<h3 id="热点研究问题"><a href="#热点研究问题" class="headerlink" title="热点研究问题"></a>热点研究问题</h3><p>2004 年, IEEE进化计算会议PSO专集（Guest Editorial Special Issue on Particle Swarm Optimization），卷首语中指出了当前研究的几个主要方向及热点：</p>
+<ol>
+<li>算法收敛性分析：PSO在实际应用中被证明是有效的，但目前还没有给出收敛性、收敛速度估计等方面的数学证明，已有的工作还远远不够。</li>
+<li>粒子群拓扑结构：不同的粒子群邻居拓扑结构是对不同类型社会的模拟，研究不同拓扑结构的适用范围，对PSO算法推广和使用有重要意义。</li>
+<li>参数选择与优化：参数 $w$、$\phi_1$、$\phi_2$的选择分别关系粒子速度的3个部分：惯性部分、社会部分和自身部分在搜索中的作用。如何选择、优化和调整参数，使得算法既能避免早熟又能比较快速地收敛，对工程实践有着重要意义。 </li>
+<li>与其它演化计算的融合：如何将其它演化的优点和PSO的优点相结合，构造出有特色有实用价值的混合算法是当前算法改进的一个重要方向。</li>
+<li>算法应用：算法的有效性必须在应用中才能体现，广泛地开拓PSO的应用领域，也对深化研究PSO算法非常有意义。</li>
+</ol>
+<h2 id="优化算法测试的六个典型的多维函数"><a href="#优化算法测试的六个典型的多维函数" class="headerlink" title="优化算法测试的六个典型的多维函数"></a>优化算法测试的六个典型的多维函数</h2><ul>
+<li><p>Generalized Schwefel’s Problem 2.26</p>
+<script type="math/tex; mode=display">
+f_1(x)=\sum_{i=1}^m(-x_isin\sqrt{|x_i|}),\ \ \ \ x_i \in [-500,500]^m</script></li>
+<li><p>Generalized Rastrigin’s Function</p>
+<script type="math/tex; mode=display">
+f_2(x)=\sum_{i=1}^m[x_i^2-10cos(2\pi x_i)+10],\ \ \ \ x_i \in [-5.12,5.12]^m</script></li>
+<li><p>Ackley’s Function</p>
+<script type="math/tex; mode=display">
+f_3(x)=-20\text{exp}\left (-0.2\sqrt{\frac{1}{m}\sum_{i=1}^mx_i^2}\right )-\text{exp}\left (\frac{1}{m}\sum_{i=1}^mcos(2\pi x_i) \right )+20+e,x_i\in[-32,32]^m</script></li>
+<li><p>Generalized Griewank Function </p>
+<script type="math/tex; mode=display">
+f_4(x)=\frac{1}{4000}\sum_{i=1}^mx_i^2-\prod_{i=1}^m cos(\frac{x_i}{\sqrt{i}})+1, \ \ \ \ x_i\in[-600,600]^m</script></li>
+<li><p>Sphere Model</p>
+<script type="math/tex; mode=display">
+f_5(x)=\sum_{i=1}^mx_i^2, \ \ \ \ x_i \in [-100,100]^m</script></li>
+<li><p>Schwefel’s Problem 2.22</p>
+<script type="math/tex; mode=display">
+f_6(x)=\sum_{i=1}^m|x_i|+\prod_{i=1}^m|x_i|, \ \ \ \ x_i \in [-10,10]^m</script></li>
+</ul>
+<h1 id="人工神经网络"><a href="#人工神经网络" class="headerlink" title="人工神经网络"></a>人工神经网络</h1><p><strong>因为NN之前在吴恩达的三门课程中已经记录了许多，所以这里只记录下之前没有的知识点。</strong></p>
+<p><strong>PS：因为目前的神经网络和人脑的神经元的计算方式并不一样，只是结构有些类似，媒体就炒起来了，所以没必要介绍人脑的神经元结构。</strong></p>
+<h2 id="无监督学习规则"><a href="#无监督学习规则" class="headerlink" title="无监督学习规则"></a>无监督学习规则</h2><p>神经网络中最基本的学习规则是Hebb规则，是由Hebb于1949年提出的，基本思想是：如果一个单元 $u_i$ 从另一个单元 $u_j$ 处接收输入，且两者都是兴奋的，那么从 $u_j$ 到 $u_i$ 的连接权 $W_{ij}$ 应该加强。最简单的Hebb规则如下：</p>
+<script type="math/tex; mode=display">
+W_{ij}(n+1)=W_{ij}(n)+\mu x_ix_j</script><p>其中：</p>
+<ul>
+<li>$W_{ij}(n)​$ 为调整前从神经元 $\mu_j​$ 到 $\mu_i​$ 的连接权值</li>
+<li>$W_{ij}(n+1)$ 为调整后从神经元 $\mu_j$ 到 $\mu_i$ 的连接权值</li>
+<li>$\mu&gt;0$ 为学习率常数</li>
+<li>$x_i$ 为神经元 $\mu_i$ 的输出值，同时也是 $\mu_j$ 的输入值</li>
+<li>$x_j$ 为神经元 $\mu_j​$ 的输出值</li>
+</ul>
+<h2 id="异或问题（XOR）的例子"><a href="#异或问题（XOR）的例子" class="headerlink" title="异或问题（XOR）的例子"></a>异或问题（XOR）的例子</h2><p><img src="http://image.rexking6.top/img/clip1543375224.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1543375395.png" alt=""></p>
+<p>Rosenblat（1962）证明了一个著名的定理：当感知器的层数足够多时，它可以有任意复杂的表征能力，即可以表示任意可积函数。例如，可以用三层感知器表示异或（XOR）问题。</p>
+<p><img src="http://image.rexking6.top/img/clip1543375491.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1543375536.png" alt=""></p>
+<p>按$δ$-规则学习：$\Delta W_{ij}=\mu\delta_jx_i$</p>
+<ol>
+<li>选定训练集：\{输入，输出\}，并初始化网络权值（可以取随机值）</li>
+<li>如果单元 $u_i$ 反应正确，则输入到 $u_i$ 的连接权值都不变</li>
+<li>如果单元的反应应该是兴奋的，而实际的反应是抑制的，则输入到 $u_i​$ 的所有兴奋连接的权值都增加步长 $\mu​$</li>
+<li>如果单元 $u_i$ 的反应应该是抑制的，而实际的反应是兴奋的，则输入到 $u_i$ 的所有兴奋连接的权值都减少步长 $\mu$</li>
+</ol>
+<p>通过权值的不断修改，即学习，可将输出单元的反应与教师信号不断接近，直到网络收敛为止。完成训练之后，网络就可以独立工作了。 </p>
+<p><img src="http://image.rexking6.top/img/clip1543650839.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1543650852.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1543650861.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1543650870.png" alt=""></p>
+<h2 id="BP推导"><a href="#BP推导" class="headerlink" title="BP推导"></a>BP推导</h2><p>纯粹为了考试，正经的可以转向吴恩达的深度学习。</p>
+<p>由于在梯度下降方法中，要求目标函数连续可微，故取可微函数作为功能函数。这里取S型函数$f(x)=\frac{1}{1+e^{-x}}$。</p>
+<p>以下图所示的多层前馈网络为例： </p>
+<p><img src="http://image.rexking6.top/img/clip1543651061.png" alt=""></p>
+<ul>
+<li>$X=[x_0,x_1,…,x_{N-1}]$</li>
+<li>$Y=[y_0,y_1,…,y_{M-1}]$</li>
+<li>第一层：$g_0,g_1,…,g_{J-1}$</li>
+<li>第二层：$h_0,h_1,…,h_{K-1}$</li>
+<li>第三层：$y_0,y_1,…,y_{M-1}$</li>
+</ul>
+<p>通用层（可代表第一到三层）见下图：</p>
+<p><img src="http://image.rexking6.top/img/clip1543651275.png" alt=""></p>
+<p>例如，对于第一层：</p>
+<ul>
+<li>$l=1,L=N,S=J$</li>
+<li>$O_{p^j}^{(l-1)}=x_j,  j=0,1,…,N-1$</li>
+<li>$O_{p^i}^{(l)}=g_i,  i=0,1,…,J-1$</li>
+<li><p>$O_{p^i}^{(l)}=f(I_{p^i}^{(l)})=\frac{1}{1+e^{-I_{p^i}^{(l)}}}$</p>
+</li>
+<li><p>$I_{p^i}^{(l)}=\sum_{j=0}^{L-1}w_{ij}^{(l)}O_{p^j}^{(l-1)}-\theta_i^{(l)},   i=0,1,…,S-1$</p>
+</li>
+</ul>
+<p>设：$O_{p^L}^{(l-1)}=1$，$-\theta_i^{(l)}=w_{iL}^{(l)}$</p>
+<p>有：$I_{p^i}^{(l)}=\sum_{j=0}^Lw_{ij}^{(l)}O_{p^j}^{(l-1)}$</p>
+<p>BP算法：</p>
+<ul>
+<li><p>设对于样本$P$，总的输出矢量：</p>
+<ul>
+<li>理想输出值$d_{p^i}$</li>
+<li>实际输出值$y_{p^i},   i=0,…,M-1$</li>
+</ul>
+</li>
+<li><p>误差为：$\varepsilon_{p^i}=d_{p^i}-y_{p^i}$</p>
+</li>
+<li>输出误差的平方和为：$E_p=\sum_{i=0}^{M-1}\varepsilon_{p^i}^2​$</li>
+</ul>
+<p>希望得到连接权的递推算法：</p>
+<script type="math/tex; mode=display">
+w_{ij}^{(l)}(k+1)=w_{ij}^{(l)}(k)+\Delta_pw_{ij}^{(l)}</script><p>其中，$\Delta_pw_{ij}^{(l)}=-\alpha\frac{\partial E_p}{\partial w_{ij}^{(l)}},  (i=0,…,S-1;j=0,…L-1;l=1,2,3)$。这就是梯度下降法，$\alpha$为步长。</p>
+<p>根据链导法则，有$\frac{\partial E_p}{\partial w_{ij}^{(l)}}=\frac{\partial E_p}{\partial I_{p^i}^{(l)}}·\frac{\partial I_{p^i}^{(l)}}{\partial w_{ij}^{(l)}}$。</p>
+<p>记$\delta_{p^i}^{(l)}=-\frac{\partial E_p}{\partial I_{p^i}^{(l)}}​$，而$\frac{\partial I_{p^i}^{(l)}}{\partial w_{ij}^{(l)}}=\frac{\partial \{\sum_{j=0}^Lw_{ij}^{(l)}O_{p^j}^{(l-1)}\}}{\partial w_{ij}^{(l)}}=O_{p^j}^{(l-1)}​$。</p>
+<p>于是有$\Delta_pw_{ij}^{(l)}=\alpha \delta_{p^i}^{(l)}·O_{p^j}^{(l-1)}$。</p>
+<p>再利用链导法则，得：$\delta_{p^i}^{(l)}=-\frac{\partial E_p}{\partial I_{p^i}^{(l)}}=-\frac{\partial E_p}{\partial O_{p^i}^{(l)}}·\frac{\partial O_{p^i}^{(l)}}{\partial I_{p^i}^{(l)}}$，</p>
+<p>而$\frac{\partial O_{p^i}^{(l)}}{\partial I_{p^i}^{(l)}}=f’(I_{p^i}^{(l)})=f(I_{p^i}^{(l)})(1-f(I_{p^i}^{(l)}))=O_{p^i}^{(l)}(1-O_{p^i}^{(l)})$。</p>
+<p>$\frac{\partial E_{p^i}}{\partial O_{p^i}^{(l)}}$：</p>
+<ol>
+<li>先看输出层：</li>
+</ol>
+<ul>
+<li>$O_{p^i}^{(l)}=y_{p^i}$</li>
+<li>$E_p=\sum_{i=0}^{M-1}(d_{p^i}-y_{p^i})^2$</li>
+</ul>
+<p>因此，$\frac{\partial E_p}{\partial O_{p^i}^{(l)}}=-2(d_{p^i}-y_{p^i})=-2(d_{p^i}-O_{p^i}^{(l)})$。</p>
+<p>故对输出层有，$\delta_{p^i}^{(l)}=2(d_{p^i}-O_{p^i}^{(l)})·O_{p^i}^{(l)}·(1-O_{p^i}^{(l)})$。</p>
+<p>故有：$w_{ij}^{(l)}(k+1)=w_{ij}^{(l)}(k)+\Delta_pw_{ij}^{(l)}$，</p>
+<p>其中，$\Delta_pw_{ij}^{(l)}=2\alpha(d_{p^i}-O_{p^i}^{(l)})·O_{p^i}^{(l)}·(1-O_{p^i}^{(l)})·O_{p^j}^{(l-1)}$。</p>
+<ol>
+<li>其他层（隐层）：</li>
+</ol>
+<script type="math/tex; mode=display">
+I_{p^k}^{(l+1)}=\sum_{j=0}^Lw_{kj}^{(l+1)}O_{p^j}^{(l)}</script><p>其中，当$l=1$时，$L=J,k=0,1,….,K-1$；当$l=2$时，$L=K,k=0,1,…,M-1$。</p>
+<p>链导：$\frac{\partial E_p}{\partial O_{p^i}^{(l)}}=\sum_{k=0}^{S-1}\left(\frac{\partial E_p}{\partial I_{p^k}^{(l+1)}}·\frac{\partial I_{p^k}^{(l+1)}}{\partial O_{p^i}^{(l)}} \right)$，当$l=1$时，$S=K$；当$l=2$时，$S=M$。</p>
+<p>第一项仍记为：$\frac{\partial E_p}{\partial I_{p^k}^{(l+1)}}=-\delta_{p^k}^{(l+1)}$，第二项：$\frac{\partial I_{p^k}^{(l+1)}}{\partial O_{p^i}^{(l)}}=w_{ki}^{(l+1)}$，</p>
+<p>代入得，$\frac{\partial E_p}{\partial O_{p^i}^{(l)}}=-\sum_{k=0}^{S-1}\delta_{p^k}^{(l+1)}·w_{k^i}^{(l+1)}$。</p>
+<p>结合得：$\delta_{p^i}^{(l)}-\frac{\partial E_p}{\partial O_{p^i}^{(l)}}·\frac{\partial O_{p^i}^{(l)}}{\partial I_{p^i}^{(l)}}=\left\{\sum_{k=0}^{S-1}\delta_{p^k}^{(l+1)}·w_{k^i}^{(l+1)}  \right\}·O_{p^i}^{(l)}·(1-O_{p^i}^{(l)})$，当$l=1$时，$S=K,i=0,1,…,J-1$；当$l=2$时，$S=M,i=0,1,…,K-1$。</p>
+<p>于是有：</p>
+<script type="math/tex; mode=display">
+\Delta_p w_{ij}^{(l)}=\alpha\left\{\sum_{k=0}^{S-1}\delta_{p^k}^{(l+1)}·w_{k^i}^{(l+1)}  \right\}·O_{p^i}^{(l)}·(1-O_{p^i}^{(l)})·O_{p^j}^{(l-1)}</script><p>总结：$w_{ij}^{(l)}(k+1)=w_{ij}^{(l)}(k)+\Delta_pw_{ij}^{(l)}​$，</p>
+<p>对输出层：</p>
+<script type="math/tex; mode=display">
+\Delta_pw_{ij}^{(l)}=2\alpha(d_{p^i}-O_{p^i}^{(l)})·O_{p^i}^{(l)}·(1-O_{p^i}^{(l)})·O_{p^j}^{(l-1)}</script><p>对隐层：</p>
+<script type="math/tex; mode=display">
+\Delta_p w_{ij}^{(l)}=\alpha\left\{\sum_{k=0}^{S-1}\delta_{p^k}^{(l+1)}·w_{k^i}^{(l+1)}  \right\}·O_{p^i}^{(l)}·(1-O_{p^i}^{(l)})·O_{p^j}^{(l-1)}</script><p>当$l=1​$时，$S=K,i=0,1,…,J-1​$；当$l=2​$时，$S=M,i=0,1,…,K-1​$。</p>
+<p>注意：通常$\alpha \in (0.1,0.4)​$，$w_{ij}^{(l)}​$一般取$(0,1)​$中较小得随机数。</p>
+<h3 id="总步骤"><a href="#总步骤" class="headerlink" title="总步骤"></a>总步骤</h3><ol>
+<li><p>初始化网络各层权值以及神经元阈值为小的随机数 </p>
+</li>
+<li><p>提供训练样本集 $\{x_n,y_n\}_{n=1}^N$</p>
+</li>
+<li><p>计算网络的实际输出以及各隐层单元的状态（即所谓前向过程）</p>
+</li>
+<li><p>反向计算误差，由(4)，(5)完成（即所谓的误差反传过程）</p>
+</li>
+<li><p>修改权值和阈值: </p>
+<script type="math/tex; mode=display">
+w_{ij}^{(l)}(k+1)=w_{ij}^{(l)}(k)+\alpha \delta_{p^i}^{(l)}·O_{p^j}^{(l-1)}(k)+\eta \Delta w_{ij}^{(l)}(k-1)\\
+\theta_i^{(l)}(k+1)=\theta_i^{(l)}(k)-\alpha \delta_{p^i}^{(l)}+\eta \Delta \theta_i^{(l)}(k-1)\\</script></li>
+<li><p>判断误差是否满足要求，若满足要求则停止训练，否则转向(3) </p>
+</li>
+</ol>
+<h2 id="惯性效应"><a href="#惯性效应" class="headerlink" title="惯性效应"></a>惯性效应</h2><p>1986年， Rumelhart、 Hinton和Williams提出了一个BP算法改进训练时间的方法，通过添加惯性效应来调整： </p>
+<script type="math/tex; mode=display">
+\Delta_pw_{ij}^{(l)}(t)=\alpha \delta_{p^i}^{(l)}(t)·O_{p^j}^{(l-1)}+\eta \Delta w_{ij}^{(t)}(t-1)</script><p>其中，$\Delta w_{ij}^{(l)}(t)=w_{ij}^{(l)}(t)w_{ij}^{(l)}(t-1)$，惯性因子$\eta$取0.9左右，或在$(0.7,0.9)$中取值，其作用是使学习效率$\alpha$足够大，且不产生振荡。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\10\29\《多媒体技术》\" rel="bookmark">《多媒体技术》</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\27\《视频分析前沿》一\" rel="bookmark">《视频分析前沿》一</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\01\06\《计算智能》（二）概率\" rel="bookmark">《计算智能》（二）概率</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/10/02/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%99%BA%E8%83%BD%E3%80%8B%EF%BC%88%E4%B8%80%EF%BC%89%E6%90%9C%E7%B4%A2/" title="《计算智能》（一）搜索">https://blog.rexking6.top/2018/10/02/《计算智能》（一）搜索/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%A1%95%E5%A3%AB%E8%AF%BE%E7%A8%8B/" rel="tag"># 硕士课程</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/09/28/Geometric-Verification%E5%87%A0%E4%BD%95%E9%AA%8C%E8%AF%81/" rel="prev" title="Geometric Verification几何验证">
+      <i class="fa fa-chevron-left"></i> Geometric Verification几何验证
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/10/06/%E8%83%8C%E6%99%AF%E6%A3%80%E6%B5%8B/" rel="next" title="背景检测">
+      背景检测 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%B2%E7%9B%AE%E6%90%9C%E7%B4%A2"><span class="nav-number">2.</span> <span class="nav-text">盲目搜索</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2%EF%BC%88Depth-first-Search%EF%BC%89"><span class="nav-number">2.1.</span> <span class="nav-text">深度优先搜索（Depth-first Search）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2%EF%BC%88Breadth-first-Search%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">广度优先搜索（Breadth-first Search）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%AD%E4%BB%A3%E5%8A%A0%E6%B7%B1%E6%90%9C%E7%B4%A2%EF%BC%88iterative-deeping%EF%BC%89"><span class="nav-number">2.3.</span> <span class="nav-text">迭代加深搜索（iterative deeping）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2"><span class="nav-number">2.4.</span> <span class="nav-text">启发式搜索</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E4%BD%B3%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2%EF%BC%88Best-first-Search%EF%BC%89"><span class="nav-number">2.4.1.</span> <span class="nav-text">最佳优先搜索（Best-first Search）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E5%8F%91%E5%BC%8F%E5%9B%BE%E6%90%9C%E7%B4%A2%E7%AE%97%E6%B3%95"><span class="nav-number">2.4.2.</span> <span class="nav-text">启发式图搜索算法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%AA%E4%BB%A3%E7%A0%81"><span class="nav-number">2.4.2.1.</span> <span class="nav-text">伪代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">2.4.2.2.</span> <span class="nav-text">例子</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A5%E4%B8%8A%E6%90%9C%E7%B4%A2%E6%8A%80%E6%9C%AF%E7%9A%84%E6%94%B9%E8%BF%9B"><span class="nav-number">2.5.</span> <span class="nav-text">以上搜索技术的改进</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E7%A9%BA%E9%97%B4%E6%90%9C%E7%B4%A2"><span class="nav-number">2.6.</span> <span class="nav-text">问题空间搜索</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A2%B5%E5%A1%94"><span class="nav-number">2.6.1.</span> <span class="nav-text">梵塔</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E6%90%9C%E7%B4%A2%E7%AE%97%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">局部搜索算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%88%AC%E5%B1%B1%E6%90%9C%E7%B4%A2"><span class="nav-number">3.1.</span> <span class="nav-text">爬山搜索</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A2%AF%E5%BA%A6%E6%90%9C%E7%B4%A2"><span class="nav-number">3.2.</span> <span class="nav-text">梯度搜索</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%9A%E5%BC%88%E6%90%9C%E7%B4%A2"><span class="nav-number">3.3.</span> <span class="nav-text">博弈搜索</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%81%E5%B0%8F%E6%9E%81%E5%A4%A7%E6%90%9C%E7%B4%A2"><span class="nav-number">3.3.1.</span> <span class="nav-text">极小极大搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%CE%B1-%CE%B2-%E5%89%AA%E6%9E%9D"><span class="nav-number">3.3.2.</span> <span class="nav-text">$α-β$剪枝</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A8%A1%E6%8B%9F%E9%80%80%E7%81%AB%E7%AE%97%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">模拟退火算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Metropolis%E7%AE%97%E6%B3%95"><span class="nav-number">4.1.</span> <span class="nav-text">Metropolis算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E6%8B%9F%E9%80%80%E7%81%AB%E7%9A%84%E7%89%B9%E6%80%A7"><span class="nav-number">4.2.</span> <span class="nav-text">模拟退火的特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%B7%E5%8D%B4%E8%BF%9B%E5%BA%A6%E8%A1%A8"><span class="nav-number">4.3.</span> <span class="nav-text">冷却进度表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E5%8F%96%E7%9A%84%E4%B8%80%E8%88%AC%E5%8E%9F%E5%88%99"><span class="nav-number">4.3.1.</span> <span class="nav-text">选取的一般原则</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">4.4.</span> <span class="nav-text">优缺点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="nav-number">4.5.</span> <span class="nav-text">流程图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%85%E8%A1%8C%E5%95%86%E9%97%AE%E9%A2%98"><span class="nav-number">4.6.</span> <span class="nav-text">旅行商问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-number">4.6.1.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E9%80%89%E5%8F%96%E7%9A%84%E4%B8%80%E4%B8%AA%E4%BE%8B%E5%AD%90"><span class="nav-number">4.6.2.</span> <span class="nav-text">参数选取的一个例子</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A8%A1%E6%8B%9F%E8%BF%9B%E5%8C%96%E4%B8%8E%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">模拟进化与遗传算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E6%8B%9F%E8%BF%9B%E5%8C%96%E7%AE%97%E6%B3%95"><span class="nav-number">5.1.</span> <span class="nav-text">模拟进化算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95"><span class="nav-number">5.2.</span> <span class="nav-text">遗传算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E8%88%AC%E6%B5%81%E7%A8%8B"><span class="nav-number">5.2.1.</span> <span class="nav-text">一般流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%94%E5%8C%96%E7%AD%96%E7%95%A5"><span class="nav-number">5.3.</span> <span class="nav-text">演化策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95%E7%9A%84%E4%B8%8D%E5%90%8C"><span class="nav-number">5.3.1.</span> <span class="nav-text">与遗传算法的不同</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E5%8C%96%E7%A8%8B%E5%BA%8F"><span class="nav-number">5.4.</span> <span class="nav-text">进化程序</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A8%A1%E6%8B%9F%E5%AB%81%E6%8E%A5%E7%AE%97%E6%B3%95"><span class="nav-number">6.</span> <span class="nav-text">模拟嫁接算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%E9%97%AE%E9%A2%98"><span class="nav-number">6.1.</span> <span class="nav-text">最小生成树问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BA%A6%E7%BA%A6%E6%9D%9F%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91"><span class="nav-number">6.2.</span> <span class="nav-text">度约束最小生成树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0"><span class="nav-number">6.3.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AB%81%E6%8E%A5%E7%AE%97%E5%AD%90%E5%8F%8A%E7%AD%96%E7%95%A5"><span class="nav-number">6.4.</span> <span class="nav-text">嫁接算子及策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AB%81%E6%8E%A5%E7%AE%97%E5%AD%90%E7%9A%84%E6%9E%84%E9%80%A0"><span class="nav-number">6.4.1.</span> <span class="nav-text">嫁接算子的构造</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AB%81%E6%8E%A5%E7%AD%96%E7%95%A5"><span class="nav-number">6.4.2.</span> <span class="nav-text">嫁接策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%AA%E6%8E%A5%E7%AE%97%E5%AD%90%E5%8F%8A%E7%AD%96%E7%95%A5"><span class="nav-number">6.5.</span> <span class="nav-text">剪接算子及策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%AA%E6%8E%A5%E7%AE%97%E5%AD%90%E6%9E%84%E9%80%A0"><span class="nav-number">6.5.1.</span> <span class="nav-text">剪接算子构造</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%AA%E6%8E%A5%E7%AD%96%E7%95%A5"><span class="nav-number">6.5.2.</span> <span class="nav-text">剪接策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GPOGA%E7%AE%97%E6%B3%95"><span class="nav-number">6.6.</span> <span class="nav-text">GPOGA算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">6.7.</span> <span class="nav-text">结论</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BE%A4%E4%BD%93%E6%99%BA%E8%83%BD%E7%AE%97%E6%B3%95"><span class="nav-number">7.</span> <span class="nav-text">群体智能算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%9A%81%E7%BE%A4%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95%EF%BC%88ACO%EF%BC%89"><span class="nav-number">7.1.</span> <span class="nav-text">蚁群优化算法（ACO）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">7.1.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%B9%E8%BF%9B%EF%BC%9A%E7%B2%BE%E8%8B%B1%E7%AD%96%E7%95%A5"><span class="nav-number">7.1.2.</span> <span class="nav-text">改进：精英策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%B9%E8%BF%9B%EF%BC%9ARank-based-Version-AS"><span class="nav-number">7.1.3.</span> <span class="nav-text">改进：Rank-based Version AS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">7.1.4.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8C%96%E7%9A%84%E8%9A%82%E8%9A%81%E5%AF%BB%E9%A3%9F%E8%BF%87%E7%A8%8B"><span class="nav-number">7.1.5.</span> <span class="nav-text">简化的蚂蚁寻食过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%9A%81%E7%BE%A4%E7%AE%97%E6%B3%95%E4%B8%8ETSP%E9%97%AE%E9%A2%98"><span class="nav-number">7.1.6.</span> <span class="nav-text">蚁群算法与TSP问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E7%9A%84%E8%9A%81%E7%BE%A4%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95%E2%80%94%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84%E8%9A%81%E7%BE%A4%E7%B3%BB%E7%BB%9F%EF%BC%88GBAS%EF%BC%89"><span class="nav-number">7.1.7.</span> <span class="nav-text">初始的蚁群优化算法—基于图的蚁群系统（GBAS）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90-1"><span class="nav-number">7.1.8.</span> <span class="nav-text">例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E8%88%AC%E8%9A%81%E7%BE%A4%E7%AE%97%E6%B3%95%E7%9A%84%E6%A1%86%E6%9E%B6"><span class="nav-number">7.1.9.</span> <span class="nav-text">一般蚁群算法的框架</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GBAS%E7%AE%97%E6%B3%95%E7%9A%84%E6%94%B6%E6%95%9B%E6%80%A7"><span class="nav-number">7.1.10.</span> <span class="nav-text">GBAS算法的收敛性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95%E5%8F%8A%E6%94%B6%E6%95%9B%E6%80%A7%E5%88%86%E6%9E%90"><span class="nav-number">7.1.11.</span> <span class="nav-text">其他算法及收敛性分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%AF%E7%94%B1%E8%A1%A8%E4%BF%A1%E6%81%AF"><span class="nav-number">7.1.12.</span> <span class="nav-text">路由表信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%9A%81%E7%BE%A4%E7%9A%84%E8%A7%84%E6%A8%A1%E5%92%8C%E5%81%9C%E6%AD%A2%E8%A7%84%E5%88%99"><span class="nav-number">7.1.13.</span> <span class="nav-text">蚁群的规模和停止规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E7%B4%A0%E7%9A%84%E6%9B%B4%E6%96%B0"><span class="nav-number">7.1.14.</span> <span class="nav-text">信息素的更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E7%BC%BA%E7%82%B9-1"><span class="nav-number">7.1.15.</span> <span class="nav-text">优缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B2%92%E5%AD%90%E7%BE%A4%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95%EF%BC%88PSO%EF%BC%89"><span class="nav-number">7.2.</span> <span class="nav-text">粒子群优化算法（PSO）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%ACPSO%E7%9A%84%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B"><span class="nav-number">7.2.1.</span> <span class="nav-text">基本PSO的算法流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PSO%E7%9A%84%E5%85%A8%E5%B1%80%E7%89%88%E5%92%8C%E5%B1%80%E9%83%A8%E7%89%88"><span class="nav-number">7.2.2.</span> <span class="nav-text">PSO的全局版和局部版</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E8%BF%9B%E5%88%B6PSO"><span class="nav-number">7.2.3.</span> <span class="nav-text">二进制PSO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PSO%E7%9A%84%E5%8F%98%E5%8C%96%E5%92%8C%E6%94%B9%E8%BF%9B"><span class="nav-number">7.2.4.</span> <span class="nav-text">PSO的变化和改进</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%B6%E6%95%9B%E9%80%9F%E5%BA%A6%E7%9A%84%E6%94%B9%E8%BF%9B"><span class="nav-number">7.2.5.</span> <span class="nav-text">收敛速度的改进</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%83%AF%E6%80%A7%E6%9D%83%E9%87%8D%EF%BC%88inertia-weight%EF%BC%89%E6%B3%95"><span class="nav-number">7.2.5.1.</span> <span class="nav-text">惯性权重（inertia weight）法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A8%A1%E7%B3%8A%E6%83%AF%E6%80%A7%E6%9D%83%E9%87%8D%EF%BC%88fuzzy-inertia-weight%EF%BC%89%E6%B3%95"><span class="nav-number">7.2.5.2.</span> <span class="nav-text">模糊惯性权重（fuzzy inertia weight）法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8E%8B%E7%BC%A9%E5%9B%A0%E5%AD%90%EF%BC%88const-riction-factor%EF%BC%89%E6%B3%95"><span class="nav-number">7.2.5.3.</span> <span class="nav-text">压缩因子（const riction factor）法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E7%BC%BA%E7%82%B9-2"><span class="nav-number">7.2.6.</span> <span class="nav-text">优缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%91%E5%B1%95%E8%B6%8B%E5%8A%BF%E5%8F%8A%E5%B1%95%E6%9C%9B"><span class="nav-number">7.2.7.</span> <span class="nav-text">发展趋势及展望</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8"><span class="nav-number">7.2.8.</span> <span class="nav-text">应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">7.2.9.</span> <span class="nav-text">存在的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%83%AD%E7%82%B9%E7%A0%94%E7%A9%B6%E9%97%AE%E9%A2%98"><span class="nav-number">7.2.10.</span> <span class="nav-text">热点研究问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95%E6%B5%8B%E8%AF%95%E7%9A%84%E5%85%AD%E4%B8%AA%E5%85%B8%E5%9E%8B%E7%9A%84%E5%A4%9A%E7%BB%B4%E5%87%BD%E6%95%B0"><span class="nav-number">7.3.</span> <span class="nav-text">优化算法测试的六个典型的多维函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%BA%E5%B7%A5%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="nav-number">8.</span> <span class="nav-text">人工神经网络</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A0%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A0%E8%A7%84%E5%88%99"><span class="nav-number">8.1.</span> <span class="nav-text">无监督学习规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%82%E6%88%96%E9%97%AE%E9%A2%98%EF%BC%88XOR%EF%BC%89%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">8.2.</span> <span class="nav-text">异或问题（XOR）的例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BP%E6%8E%A8%E5%AF%BC"><span class="nav-number">8.3.</span> <span class="nav-text">BP推导</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E6%AD%A5%E9%AA%A4"><span class="nav-number">8.3.1.</span> <span class="nav-text">总步骤</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%83%AF%E6%80%A7%E6%95%88%E5%BA%94"><span class="nav-number">8.4.</span> <span class="nav-text">惯性效应</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

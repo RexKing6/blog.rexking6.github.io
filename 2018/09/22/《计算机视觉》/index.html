@@ -1,0 +1,2192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《计算机视觉》">
+<meta property="og:url" content="https://blog.rexking6.top/2018/09/22/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89%E3%80%8B/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537623663.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537623860.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537623997.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537677494.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537677534.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537677790.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537677913.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537684310.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537684351.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537687763.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537690270.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537690405.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538279337.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538279357.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538279373.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538279390.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538279408.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538279432.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538279511.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538279528.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538279548.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538295952.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538296208.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538315111.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538315353.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538315445.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538315484.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538323619.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538357888.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538357914.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538358024.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538358708.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538358871.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538358880.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538358894.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538358902.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538358916.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538358925.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538359019.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538359170.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538359204.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538359212.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538359284.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538359384.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538359393.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538359421.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538359475.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538359649.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538359665.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538359707.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538359714.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538359860.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1538359924.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539232060.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539232091.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539232003.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539232020.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539232116.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539232138.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539232194.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539232227.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539232287.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539232569.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539232581.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539769837.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539769863.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539770638.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539790087.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539790343.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539790377.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539790442.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539820022.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539820039.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539820094.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539820281.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539820299.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539820331.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539820384.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539820681.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539820803.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539823350.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539823449.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539823557.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539823603.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539823634.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539823649.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539824261.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539824304.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539824343.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539824407.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539824579.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539824595.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539824603.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539824775.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1539824800.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540371260.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540371351.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540371470.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540372797.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540372844.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540372865.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540372895.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540372913.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540372929.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540371574.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540371664.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540371943.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540372280.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540372474.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540372576.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540372662.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540374955.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540375107.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540375236.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540375303.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540375339.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540375477.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540376029.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540376109.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540376238.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540376746.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540376757.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540376829.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540376847.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540377001.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540377209.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540377336.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540377365.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540377380.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540377397.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540377433.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540377520.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540377711.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1540377743.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541039999.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541040027.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541040223.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541040252.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541040284.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541040316.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541040564.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541040606.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541040641.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541040665.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541047337.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541047420.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541047486.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541048078.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541048208.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541048767.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541049422.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541049733.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541049874.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541052401.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541056685.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541572902.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541573217.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541573247.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541573255.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541573371.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541573568.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541573776.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541573867.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541573930.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541573958.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541573978.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541573990.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541574610.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541575104.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541575132.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541575154.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541575175.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541664824.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541664938.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541664976.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541664994.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541665014.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541665039.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541665058.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541665149.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1541665252.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542353374.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542353389.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542353494.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542353574.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542357015.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542357116.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542357485.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542357585.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542357881.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542358029.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542358447.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542358527.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542358615.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542358639.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542358663.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542358674.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542358742.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542359187.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542359202.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542359209.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542359219.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1542359226.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543330571.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543330835.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543331188.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543332546.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543365268.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543366293.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543367522.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543367560.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543367724.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543367779.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543367814.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543367959.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543367994.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543368011.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543368034.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543368075.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543371500.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543371554.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543371575.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543371624.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543371644.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543371694.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543372037.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543390126.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543390277.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543390414.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543390462.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543391031.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543391185.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543391287.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543391314.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543391505.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543391505.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543392061.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543395362.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543395555.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1543395659.png">
+<meta property="article:published_time" content="2018-09-22T13:37:44.000Z">
+<meta property="article:modified_time" content="2019-03-06T10:16:30.621Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="硕士课程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1537623663.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/09/22/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89%E3%80%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《计算机视觉》 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/09/22/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89%E3%80%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《计算机视觉》
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-09-22 21:37:44" itemprop="dateCreated datePublished" datetime="2018-09-22T21:37:44+08:00">2018-09-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 18:16:30" itemprop="dateModified" datetime="2019-03-06T18:16:30+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%A1%95%E5%A3%AB%E8%AF%BE%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">硕士课程</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/09/22/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89%E3%80%8B/" class="post-meta-item leancloud_visitors" data-flag-title="《计算机视觉》" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>18k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>16 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>这学期上《计算机视觉》，感觉很多不懂，记录一下。</p>
+<p>综合转载以下文章：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://www.360doc.com/content/10/1226/10/3843418_81406265.shtml">齐次坐标</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/19763358">傅里叶分析之掐死教程（完整版）更新于2014.06.06</a></li>
+</ul>
+<h1 id="一"><a href="#一" class="headerlink" title="一"></a>一</h1><p><img src="http://image.rexking6.top/img/clip1537623663.png" alt=""></p>
+<p>现实中平行的直线在照片中，尽管还是直的，但很多时候都不会平行，将它们延伸至相交，交点称为“<strong>消失点</strong>“。两个消失点相连，称为”<strong>消失线</strong>“。</p>
+<p><img src="http://image.rexking6.top/img/clip1537623860.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1537623997.png" alt=""></p>
+<p>在欧几里得几何空间里，两条平行线永远都不会相交。但是在投影空间中，如右图中的两条铁轨在地平线处却是会相交的，因为在无限远处它们看起来相交于一点。</p>
+<p>在欧几里得（或称笛卡尔）空间里描述2D/3D 几何物体是很理想的，但在投影空间里面却并不见得。 我们用 (x, y) 表示笛卡尔空间中的一个 2D 点，而处于无限远处的点 (∞,∞) 在笛卡尔空间里是没有意义的。投影空间里的两条平行线会在无限远处相交于一点，但笛卡尔空间里面无法搞定这个问题（因为无限远处的点在笛卡尔空间里是没有意义的），因此数学家想出齐次坐标这个点子来了。</p>
+<h2 id="齐次坐标"><a href="#齐次坐标" class="headerlink" title="齐次坐标"></a>齐次坐标</h2><p>由 August Ferdinand Möbius 提出的齐次坐标（Homogeneous coordinates）让我们能够在投影空间里进行图像和几何处理，齐次坐标用 $N + 1$个分量来描述 $N$ 维坐标。比如，2D 齐次坐标是在笛卡尔坐标$(X, Y)$的基础上增加一个新分量 $w$，变成$(x, y, w)$，其中笛卡尔坐标系中的大$X$，$Y$ 与齐次坐标中的小$x$，$y$有如下对应关系：</p>
+<script type="math/tex; mode=display">X = x/w \\
+Y = y/w</script><p>笛卡尔坐标中的点 $(1, 2) $在齐次坐标中就是$ (1, 2, 1)$ 。如果这点移动到无限远$(∞,∞)$处，在齐次坐标中就是 $(1, 2, 0)$ ，这样我们就避免了用没意义的”$∞$” 来描述无限远处的点。</p>
+<h3 id="为什么叫齐次坐标？"><a href="#为什么叫齐次坐标？" class="headerlink" title="为什么叫齐次坐标？"></a>为什么叫齐次坐标？</h3><p>前面提到，我们分别用齐次坐标中的 $x$ 和 $y$ 除以 $w$ 就得到笛卡尔坐标中的 $x$ 和 $y$，如图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1537677494.png" alt=""></p>
+<p>仔细观察下面的转换例子，可以发现些有趣的东西：</p>
+<p><img src="http://image.rexking6.top/img/clip1537677534.png" alt=""></p>
+<p>上图中，点 $(1, 2, 3)$,$(2, 4, 6)$ 和 $(4, 8, 12)$ 对应笛卡尔坐标中的同一点 $(\frac{1}{3}, \frac{2}{3})$。 任意数量积的$(1a, 2a, 3a)$ 始终对应于笛卡尔坐标中的同一点 $(\frac{1}{3}, \frac{2}{3})$。因此这些点是“齐次”的，因为他们始终对应于笛卡尔坐标中的同一点。换句话说，齐次坐标描述缩放不变性（scale invariant）。</p>
+<h3 id="证明-两平行线可以相交"><a href="#证明-两平行线可以相交" class="headerlink" title="证明: 两平行线可以相交"></a>证明: 两平行线可以相交</h3><p>笛卡尔坐标系中，对于如下两个直线方程：</p>
+<p><img src="http://image.rexking6.top/img/clip1537677790.png" alt=""></p>
+<p>如果 $C ≠ D$，以上方程组无解；如果 $C = D$，那这两条线就是同一条线了。<br>下面我们用 $\frac{x}{w}$,$\frac{y}{w}$ 代替 $x$, $y$ 放到投影空间里来求解：</p>
+<p><img src="http://image.rexking6.top/img/clip1537677913.png" alt=""></p>
+<p>现在我们就可以在 $C ≠ D$ 的情况得到一组解 $(x, y, 0)$，代入得 $(C - D)w = 0$，因为 $C ≠ D$，所以 $w = 0$。因而，两条平行线相交于投影空间中无限远处的一点 $(x, y, 0)$。</p>
+<p>齐次坐标在计算机图形学中是有用的，将 3D 场景投影到 2D 平面的过程中就用到它了。</p>
+<h2 id="三坐标系"><a href="#三坐标系" class="headerlink" title="三坐标系"></a>三坐标系</h2><p><img src="http://image.rexking6.top/img/clip1537684310.png" alt=""></p>
+<h3 id="图像坐标系"><a href="#图像坐标系" class="headerlink" title="图像坐标系"></a>图像坐标系</h3><p><img src="http://image.rexking6.top/img/clip1537684351.png" alt=""></p>
+<p>如图所示，以图像左上角为原点建立以像素为单位的直接坐标系$u-v$。像素的横坐标$u$与纵坐标$v$分别是在其图像数组中所在的列数与所在行数。</p>
+<p>由于$(u,v)$只代表像素的列数与行数，而像素在图像中的位置并没有用物理单位表示出来，所以，我们还要建立以物理单位（如毫米）表示的图像坐标系$x-y$。将相机光轴与图像平面的交点（一般位于图像平面的中心处，也称为图像的主点（principal point）定义为该坐标系的原点$O_1$，且$x$轴与$u$轴平行，$y$轴与$v$轴平行，假设$(u_0,v_0)$代表$O_1$在$u-v$坐标系下的坐标，$dx$与$dy$分别表示每个像素在横轴$x$和纵轴$y$上的物理尺寸，则图像中的每个像素在$u-v$坐标系中的坐标和在$x-y$坐标系中的坐标之间都存在如下的关系：</p>
+<script type="math/tex; mode=display">u = \frac{x}{dx}+u_0 \\
+v = \frac{v}{dy}+v_0</script><p>(上述公式中我们假设物理坐标系中的单位为毫米，那么$dx$的的单位为:毫米/像素。那么$x/dx$的单位就是像素了，即和$u$的单位一样都是像素）</p>
+<p>为了使用方便，可将上式用齐次坐标与矩阵形式表示为：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+\left[ \begin{array}{ccc}
+u\\
+v\\
+1
+\end{array} 
+\right ]=
+\left[ \begin{array}{ccc}
+\frac{1}{dx} & 0 & u_0\\
+0 & \frac{1}{dy}& v_0\\
+0 & 0 & 1
+\end{array} 
+\right ]
+\left[ \begin{array}{ccc}
+x\\
+y\\
+1
+\end{array} 
+\right ]
+\end{equation}</script><p>其逆关系可表示为：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+\left[ \begin{array}{ccc}
+x\\
+y\\
+1
+\end{array} 
+\right ]=
+\left[ \begin{array}{ccc}
+dx & 0 & -u_0dx\\
+0 & dy & -v_0dy\\
+0 & 0 & 1
+\end{array} 
+\right ]
+\left[ \begin{array}{ccc}
+u\\
+v\\
+1
+\end{array} 
+\right ]
+\end{equation}</script><h3 id="相机坐标系"><a href="#相机坐标系" class="headerlink" title="相机坐标系"></a>相机坐标系</h3><p>相机成像的几何关系可由图表示。其中$O$点为摄像机光心（投影中心），$X_c$轴和$Y_c$轴与成像平面坐标系的$x$轴和$y$轴平行，$Z_c$轴为摄像机的光轴，和图像平面垂直。光轴与图像平面的交点为图像的主点$O_1$，由点$O$与$X_c$,$Y_c$,$Z_c$轴组成的直角坐标系称为摄像机的坐标系。$OO_1$为摄像机的焦距。</p>
+<h3 id="世界坐标系"><a href="#世界坐标系" class="headerlink" title="世界坐标系"></a>世界坐标系</h3><p>世界坐标系是为了描述相机的位置而被引入的，如图中坐标系$O_wX_wY_wZ_w$即为世界坐标系。平移向量$t$和旋转矩阵$R$可以用来表示相机坐标系与世界坐标系的关系。所以，假设空间点$P$在世界坐标系下的齐次坐标是$(X_w,Y_w,Z_w,1)^T$，（这里$T$是上标转置），在相机坐标下的齐次坐标是$(X_c,Y_c,Z_c,1)^T$,则存在如下的关系：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+\left[ \begin{array}{ccc}
+X_c\\
+Y_c\\
+Z_c
+\end{array} 
+\right ]=
+\left[ \begin{array}{ccc}
+R & t\\
+\overrightarrow{0} & 1
+\end{array} 
+\right ]
+\left[ \begin{array}{ccc}
+X_w\\
+Y_w\\
+Z_w\\
+1
+\end{array} 
+\right ]
+\end{equation}</script><p>上式中$R$是$3×3$的正交单位矩阵（也成为旋转矩阵），$t$是三维的平移向量。矢量$0=(0,0,0)$。</p>
+<h2 id="投影矩阵"><a href="#投影矩阵" class="headerlink" title="投影矩阵"></a>投影矩阵</h2><p>结合以上三种坐标系的转换，得到下图。</p>
+<p><img src="http://image.rexking6.top/img/clip1537687763.png" alt=""></p>
+<h3 id="内部矩阵-K"><a href="#内部矩阵-K" class="headerlink" title="内部矩阵$K$"></a>内部矩阵$K$</h3><h4 id="1-焦距-f"><a href="#1-焦距-f" class="headerlink" title="1.焦距$f$"></a>1.焦距$f$</h4><script type="math/tex; mode=display">
+\begin{equation}
+w\left[ \begin{array}{ccc}
+u\\
+v\\
+1
+\end{array} 
+\right ]=
+\left[ \begin{array}{ccc}
+f & 0 & 0 &0\\
+0 & f & 0 & 0\\
+0 & 0 & 1 & 0
+\end{array} 
+\right ]
+\left[ \begin{array}{ccc}
+x\\
+y\\
+z\\
+1
+\end{array} 
+\right ]
+\end{equation}</script><h4 id="2-光中心-u-0-v-0"><a href="#2-光中心-u-0-v-0" class="headerlink" title="2. 光中心$(u_0,v_0)$"></a>2. 光中心$(u_0,v_0)$</h4><script type="math/tex; mode=display">
+\begin{equation}
+w\left[ \begin{array}{ccc}
+u\\
+v\\
+1
+\end{array} 
+\right ]=
+\left[ \begin{array}{ccc}
+f & 0 & u_0 &0\\
+0 & f & v_0 & 0\\
+0 & 0 & 1 & 0
+\end{array} 
+\right ]
+\left[ \begin{array}{ccc}
+x\\
+y\\
+z\\
+1
+\end{array} 
+\right ]
+\end{equation}</script><h4 id="3-单元的长宽比，非方形-alpha-beta"><a href="#3-单元的长宽比，非方形-alpha-beta" class="headerlink" title="3.单元的长宽比，非方形$\alpha$,$\beta$"></a>3.单元的长宽比，非方形$\alpha$,$\beta$</h4><script type="math/tex; mode=display">
+\begin{equation}
+w\left[ \begin{array}{ccc}
+u\\
+v\\
+1
+\end{array} 
+\right ]=
+\left[ \begin{array}{ccc}
+\alpha & 0 & u_0 &0\\
+0 & \beta & v_0 & 0\\
+0 & 0 & 1 & 0
+\end{array} 
+\right ]
+\left[ \begin{array}{ccc}
+x\\
+y\\
+z\\
+1
+\end{array} 
+\right ]
+\end{equation}</script><h4 id="4-倾斜程度-s"><a href="#4-倾斜程度-s" class="headerlink" title="4.倾斜程度$s$"></a>4.倾斜程度$s$</h4><script type="math/tex; mode=display">
+\begin{equation}
+w\left[ \begin{array}{ccc}
+u\\
+v\\
+1
+\end{array} 
+\right ]=
+\left[ \begin{array}{ccc}
+\alpha & s & u_0 &0\\
+0 & \beta & v_0 & 0\\
+0 & 0 & 1 & 0
+\end{array} 
+\right ]
+\left[ \begin{array}{ccc}
+x\\
+y\\
+z\\
+1
+\end{array} 
+\right ]
+\end{equation}</script><h3 id="旋转矩阵-R"><a href="#旋转矩阵-R" class="headerlink" title="旋转矩阵$R$"></a>旋转矩阵$R$</h3><p>逆时针旋转。</p>
+<h4 id="1-绕-x-轴"><a href="#1-绕-x-轴" class="headerlink" title="1.绕$x$轴"></a>1.绕$x$轴</h4><script type="math/tex; mode=display">
+\begin{equation}
+R_x(\alpha)=
+\left[ \begin{array}{ccc}
+1 & 0 &0\\
+0 & cos\alpha& -sin\alpha\\
+0 & sin\alpha & cos\alpha
+\end{array} 
+\right ]
+\end{equation}</script><h4 id="2-绕-y-轴"><a href="#2-绕-y-轴" class="headerlink" title="2.绕$y$轴"></a>2.绕$y$轴</h4><script type="math/tex; mode=display">
+\begin{equation}
+R_y(\beta)=
+\left[ \begin{array}{ccc}
+cos\beta & 0 &sin\beta\\
+0 & 1& 0\\
+-sin\beta & 0 & cos\beta
+\end{array} 
+\right ]
+\end{equation}</script><h4 id="3-绕-z-轴"><a href="#3-绕-z-轴" class="headerlink" title="3.绕$z$轴"></a>3.绕$z$轴</h4><script type="math/tex; mode=display">
+\begin{equation}
+R_z(\gamma)=
+\left[ \begin{array}{ccc}
+cos\gamma & -sin\gamma &0\\
+sin\gamma & cos\gamma& 0\\
+0 & 0 & 1
+\end{array} 
+\right ]
+\end{equation}</script><h3 id="平移向量-T"><a href="#平移向量-T" class="headerlink" title="平移向量$T$"></a>平移向量$T$</h3><script type="math/tex; mode=display">
+\begin{equation}
+w\left[ \begin{array}{ccc}
+u\\
+v\\
+1
+\end{array} 
+\right ]=
+\left[ \begin{array}{ccc}
+\alpha & s & u_0\\
+0 & \beta & v_0\\
+0 & 0 & 1
+\end{array} 
+\right ]
+\left[ \begin{array}{ccc}
+r_{11} & r_{12} & r_{13} & t_x\\
+r_{21} & r_{22} & r_{23} & t_y\\
+r_{31} & r_{32} & r_{33} & t_z\\
+\end{array} 
+\right ]
+\left[ \begin{array}{ccc}
+x\\
+y\\
+z\\
+1
+\end{array} 
+\right ]
+\end{equation}</script><h3 id="自由度"><a href="#自由度" class="headerlink" title="自由度"></a>自由度</h3><p>$K$有5个自由度，$R$有3个自由度，$xyz$三轴的旋转角度，$T$有3个自由度，总共有11个自由度。</p>
+<h3 id="常见2D变换-仿射变换"><a href="#常见2D变换-仿射变换" class="headerlink" title="常见2D变换/仿射变换"></a>常见2D变换/仿射变换</h3><p><img src="http://image.rexking6.top/img/clip1537690270.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1537690405.png" alt=""></p>
+<h1 id="二"><a href="#二" class="headerlink" title="二"></a>二</h1><h2 id="景深"><a href="#景深" class="headerlink" title="景深"></a>景深</h2><p>景深（DOF），是指在摄影机镜头或其他成像器前沿能够取得清晰图像的成像所测定的被摄物体前后距离范围。而光圈、镜头、及拍摄物的距离是影响景深的重要因素。</p>
+<p>在聚焦完成后，焦点前后的范围内所呈现的清晰图像，这一前一后的距离范围，便叫做景深。在镜头前方（调焦点的前、后）有一段一定长度的空间，当被摄物体位于这段空间内时，其在底片上的成像恰位于焦点前后这两个弥散圆之间。被摄体所在的这段空间的长度，就叫景深。换言之，在这段空间内的被摄体，其呈现在底片面的影象模糊度，都在容许弥散圆的限定范围内，这段空间的长度就是景深。</p>
+<h2 id="光子"><a href="#光子" class="headerlink" title="光子"></a>光子</h2><h3 id="吸收"><a href="#吸收" class="headerlink" title="吸收"></a>吸收</h3><p> <img src="http://image.rexking6.top/img/clip1538279337.png" alt=""></p>
+<h3 id="漫射"><a href="#漫射" class="headerlink" title="漫射"></a>漫射</h3><p><img src="http://image.rexking6.top/img/clip1538279357.png" alt=""></p>
+<h3 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h3><p><img src="http://image.rexking6.top/img/clip1538279373.png" alt=""></p>
+<h3 id="透射"><a href="#透射" class="headerlink" title="透射"></a>透射</h3><p><img src="http://image.rexking6.top/img/clip1538279390.png" alt=""></p>
+<h3 id="折射"><a href="#折射" class="headerlink" title="折射"></a>折射</h3><p><img src="http://image.rexking6.top/img/clip1538279408.png" alt=""></p>
+<h3 id="荧光"><a href="#荧光" class="headerlink" title="荧光"></a>荧光</h3><p><img src="http://image.rexking6.top/img/clip1538279432.png" alt=""></p>
+<h3 id="子面散射"><a href="#子面散射" class="headerlink" title="子面散射"></a>子面散射</h3><p><img src="http://image.rexking6.top/img/clip1538279511.png" alt=""></p>
+<h3 id="磷光"><a href="#磷光" class="headerlink" title="磷光"></a>磷光</h3><p><img src="http://image.rexking6.top/img/clip1538279528.png" alt=""></p>
+<h3 id="相互反射"><a href="#相互反射" class="headerlink" title="相互反射"></a>相互反射</h3><p><img src="http://image.rexking6.top/img/clip1538279548.png" alt=""></p>
+<h2 id="图片显示的两种方式"><a href="#图片显示的两种方式" class="headerlink" title="图片显示的两种方式"></a>图片显示的两种方式</h2><ul>
+<li>Global shutter是通过整幅场景在同一时间曝光实现的。</li>
+<li>Rolling shutter与Global shutter不同， 它是通过Sensor逐行曝光的方式实现的。</li>
+</ul>
+<h2 id="人眼"><a href="#人眼" class="headerlink" title="人眼"></a>人眼</h2><p><img src="http://image.rexking6.top/img/clip1538295952.png" alt=""></p>
+<h3 id="视锥细胞"><a href="#视锥细胞" class="headerlink" title="视锥细胞"></a>视锥细胞</h3><p>视细胞的一种，位于视网膜内。因为它能接受光刺激，并将光能转换为神经冲动，故亦称光感受器。由外节、内节、胞体和终足四部分组成。其外节为圆锥状，故名视锥细胞。内含有感光物质(视紫蓝质)。在光刺激下，感光物质可发生一系列的光化学变化和电位改变，使视锥细胞发放神经冲动。</p>
+<p>视锥细胞是感受强光和颜色的细胞，对弱光和明暗的感知不如视杆细胞敏感；而对强光和颜色，具有高度的分辨能力。在视网膜的黄斑中央凹处，只有视锥细胞，光线可直接到达视锥细胞，故此处感光和辨色最敏锐。而以视杆细胞为主的视网膜周缘部，则光的分辨率低，色觉不完善，但对暗光敏感。家鸡等动物视网膜中视锥细胞较多，故黄昏以后视觉减弱。人的视网膜中约有600万～800万个视锥细胞。</p>
+<p><img src="http://image.rexking6.top/img/clip1538296208.png" alt=""></p>
+<ul>
+<li>锥形</li>
+<li>不敏感</li>
+<li>在高光下操作</li>
+<li>彩色视觉</li>
+</ul>
+<h3 id="视杆细胞"><a href="#视杆细胞" class="headerlink" title="视杆细胞"></a>视杆细胞</h3><p>视细胞的一种，位于视网膜内。因为它能接受光刺激，并将光能转换为电能，发放神经冲动，故亦称光感受器。</p>
+<p>由外节、内节、胞体和终足四部分组成。其外节呈细杆状，故名视杆细胞。内含有感光物质，在光刺激下，感光物质可发生一系列的光化学变化和电位改变，使视细胞发放神经冲动。视杆细胞是感受弱光刺激的细胞，对光线的强弱反应非常敏感，对不同颜色光波反应不敏感。它所含的感光物质为视紫红质。</p>
+<p>猫头鹰等动物视网膜中视杆细胞较多，故夜间活动视觉灵敏。人的视网膜中约有12000万个视杆细胞。</p>
+<ul>
+<li>杆状</li>
+<li>高度敏感的</li>
+<li>在晚上工作</li>
+<li>灰度视觉</li>
+</ul>
+<p>中央凹没有杆体细胞，只有锥体细胞，其密度高达每平方毫米150,000。</p>
+<p>离开中央凹，锥体细胞急剧减少，而杆体细胞急剧增多，在离开中央凹20度的地方，杆体细胞最多．中央凹的锥体细胞密度很高，是产生最清晰视觉的地方．杆体细胞主要是在黑暗的条件下起作用，同时还负责察觉物体的运动。</p>
+<h2 id="感受野"><a href="#感受野" class="headerlink" title="感受野"></a>感受野</h2><p>直接或间接影响某一特定神经细胞的光感受器细胞的全体。</p>
+<p>感受野分两大类：</p>
+<ul>
+<li>On型感受野：由中心的兴奋区域和周边的抑制区域构成的同心圆结构</li>
+<li>Off型感受野：由中心抑制和周边兴奋区域构成的同心圆结构</li>
+</ul>
+<h1 id="三"><a href="#三" class="headerlink" title="三"></a>三</h1><h2 id="图像滤波"><a href="#图像滤波" class="headerlink" title="图像滤波"></a>图像滤波</h2><p>三种滤波方式：</p>
+<ul>
+<li>空间域的图像滤波器：一种数字网格的数学运算，包括平滑，锐化，测量纹理</li>
+<li>频域的图像滤波器：一种修改图像频率的方法，包括去噪，采样，图像压缩</li>
+<li>模板和图像金字塔：一种将模板匹配到图像的方法，包括检测，粗到细的配准</li>
+</ul>
+<h2 id="空间域的图像滤波器"><a href="#空间域的图像滤波器" class="headerlink" title="空间域的图像滤波器"></a>空间域的图像滤波器</h2><script type="math/tex; mode=display">
+h[m,n]=\sum_{k,l}g[k,l]f[m+k,n+l]</script><h3 id="盒滤波器"><a href="#盒滤波器" class="headerlink" title="盒滤波器"></a>盒滤波器</h3><p><img src="http://image.rexking6.top/img/clip1538315111.png" alt=""></p>
+<p>作用：实现平滑效果，删除锐利的特征</p>
+<h3 id="锐化滤波器"><a href="#锐化滤波器" class="headerlink" title="锐化滤波器"></a>锐化滤波器</h3><p><img src="http://image.rexking6.top/img/clip1538315353.png" alt=""></p>
+<p>作用：突出与局部平均水平的差异</p>
+<h3 id="垂直边缘滤波器"><a href="#垂直边缘滤波器" class="headerlink" title="垂直边缘滤波器"></a>垂直边缘滤波器</h3><p><img src="http://image.rexking6.top/img/clip1538315445.png" alt=""></p>
+<h3 id="水平边缘滤波器"><a href="#水平边缘滤波器" class="headerlink" title="水平边缘滤波器"></a>水平边缘滤波器</h3><p><img src="http://image.rexking6.top/img/clip1538315484.png" alt=""></p>
+<h3 id="滤波与卷积的区别"><a href="#滤波与卷积的区别" class="headerlink" title="滤波与卷积的区别"></a>滤波与卷积的区别</h3><p><img src="http://image.rexking6.top/img/clip1538323619.png" alt=""></p>
+<ul>
+<li><p>线性：<br><code>filter(f1 + f2) = filter(f1) + filter(f2)</code></p>
+</li>
+<li><p>位移不变性：<br><code>filter(shift(f)) = shift(filter(f))</code></p>
+</li>
+</ul>
+<p>任何线性、位移不变算子都可以表示为卷积。</p>
+<h3 id="滤波的可分离性"><a href="#滤波的可分离性" class="headerlink" title="滤波的可分离性"></a>滤波的可分离性</h3><p><img src="http://image.rexking6.top/img/clip1538357888.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1538357914.png" alt=""></p>
+<h3 id="滤波器的大小"><a href="#滤波器的大小" class="headerlink" title="滤波器的大小"></a>滤波器的大小</h3><p><img src="http://image.rexking6.top/img/clip1538358024.png" alt=""></p>
+<h3 id="中值滤波器"><a href="#中值滤波器" class="headerlink" title="中值滤波器"></a>中值滤波器</h3><p>中值滤波器通过选择窗口中的中值强度来进行，对于离群值有很高的鲁棒性。</p>
+<h3 id="其他非线性滤波器"><a href="#其他非线性滤波器" class="headerlink" title="其他非线性滤波器"></a>其他非线性滤波器</h3><ul>
+<li>加权中值滤波器（离中心计数远一点的像素）</li>
+<li>修剪均值滤波器（均值，但忽略一些最亮和最暗的像素）</li>
+<li>双边滤波滤波器（按空间距离和强度差加权）</li>
+</ul>
+<h1 id="三外：卷积"><a href="#三外：卷积" class="headerlink" title="三外：卷积"></a>三外：卷积</h1><h2 id="一维卷积"><a href="#一维卷积" class="headerlink" title="一维卷积"></a>一维卷积</h2><p>定义：</p>
+<p><img src="http://image.rexking6.top/img/clip1538358708.png" alt=""></p>
+<p>将函数$g$反折，向右移动距离$t$，计算$x$和反折后的$g$在各点的积，积分得到在$t$处的输出值。</p>
+<p><img src="http://image.rexking6.top/img/clip1538358871.png" alt=""><br><img src="http://image.rexking6.top/img/clip1538358880.png" alt=""><br><img src="http://image.rexking6.top/img/clip1538358894.png" alt=""><br><img src="http://image.rexking6.top/img/clip1538358902.png" alt=""><br><img src="http://image.rexking6.top/img/clip1538358916.png" alt=""><br><img src="http://image.rexking6.top/img/clip1538358925.png" alt=""></p>
+<h2 id="离散一维卷积"><a href="#离散一维卷积" class="headerlink" title="离散一维卷积"></a>离散一维卷积</h2><p>两个长度分别为$m$和$n$的序列$f(i)$,$g(i)$的卷积为：</p>
+<p><img src="http://image.rexking6.top/img/clip1538359019.png" alt=""></p>
+<p>$h(i)$给出了一个长度为$N=m+n-1$的输出序列。<br>$f(i)$是一个周期至少为$Ｎ$的无限长周期序列的一部分，由于$f(i)$的长度小于$Ｎ$，其空余部分必须补$0$。</p>
+<p><img src="http://image.rexking6.top/img/clip1538359170.png" alt=""></p>
+<p>$g(i)$,$h(i)$有相同的操作</p>
+<p><img src="http://image.rexking6.top/img/clip1538359204.png" alt=""><br><img src="http://image.rexking6.top/img/clip1538359212.png" alt=""></p>
+<p>矩阵$G$叫做环矩阵。</p>
+<h2 id="二维卷积"><a href="#二维卷积" class="headerlink" title="二维卷积"></a>二维卷积</h2><p><img src="http://image.rexking6.top/img/clip1538359284.png" alt=""></p>
+<p>$g(-u,-v)$是$g(u,v)$绕其原点旋转$180$度，$g(x-u,y-v)$将旋转后的$g$移至点$(x,y)$。随后这两个函数逐点相乘，将得到的积函数做二维积分。例：</p>
+<p><img src="http://image.rexking6.top/img/clip1538359384.png" alt=""><br><img src="http://image.rexking6.top/img/clip1538359393.png" alt=""></p>
+<h2 id="离散二维卷积"><a href="#离散二维卷积" class="headerlink" title="离散二维卷积"></a>离散二维卷积</h2><p>定义：</p>
+<p><img src="http://image.rexking6.top/img/clip1538359421.png" alt=""></p>
+<p>由于$F$和$G$仅在有限范围内非$0$，因此求和计算只在非$0$部分重叠的区域上进行。$G$叫做卷积核，若$G$较大，卷积将耗费相当长的时间。</p>
+<p><img src="http://image.rexking6.top/img/clip1538359475.png" alt=""></p>
+<p>假设数组$F$和$G$在$x$方向上是周期的，周期长度至少等于这两个数组水平长度之和，$y$方向也做如此假设。扩展后的新矩阵为$F_p$,$G_p$按行堆叠的方法从$F_p$构造一个$N^2×1$维列向量$f_p$：将$F_p$的第一行转置，使之成为$F_p$的最上面$N$个元素，然后将其他行转置依此放在它下面。将矩阵$G_p$的第一行先生成一个$N×N$循环矩阵，总共生成$N$个这样的矩阵$G_i$。按如下方式生成一个$N^2×N^2$的块矩阵$G_b$：</p>
+<p><img src="http://image.rexking6.top/img/clip1538359649.png" alt=""></p>
+<p>二维卷积写成简单的矩阵形式：</p>
+<p><img src="http://image.rexking6.top/img/clip1538359665.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1538359707.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1538359714.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1538359860.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1538359924.png" alt=""></p>
+<h1 id="四"><a href="#四" class="headerlink" title="四"></a>四</h1><p>首先，贴一下傅里叶变换的介绍，<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/19763358">傅里叶分析之掐死教程（完整版）更新于2014.06.06</a></p>
+<p>连续：</p>
+<p><img src="http://image.rexking6.top/img/clip1539232060.png" alt=""></p>
+<p>离散：</p>
+<p><img src="http://image.rexking6.top/img/clip1539232091.png" alt=""></p>
+<h2 id="图像傅里叶变换的物理意义"><a href="#图像傅里叶变换的物理意义" class="headerlink" title="图像傅里叶变换的物理意义"></a>图像傅里叶变换的物理意义</h2><p>图像的频率是表征图像中灰度变化剧烈程度的指标，是灰度在平面空间上的梯度。如：大面积的沙漠在图像中是一片灰度变化缓慢的区域，对应的频率值很低；而对于地表属性变换剧烈的边缘区域在图像中是一片灰度变化剧烈的区域，对应的频率值较高。傅里叶变换在实际中有非常明显的物理意义，设f是一个能量有限的模拟信号，则其傅里叶变换就表示f的频谱。从纯粹的数学意义上看，傅里叶变换是将一个函数转换为一系列周期函数来处理的。从物理效果看，傅里叶变换是将图像从空间域转换到频率域，其逆变换是将图像从频率域转换到空间域。换句话说，傅里叶变换的物理意义是将图像的灰度分布函数变换为图像的频率分布函数。</p>
+<p>傅里叶逆变换是将图像的频率分布函数变换为灰度分布函数傅里叶变换以前，图像（未压缩的位图）是由对在连续空间（现实空间）上的采样得到一系列点的集合，通常用一个二维矩阵表示空间上各点，记为z=f(x,y)。又因空间是三维的，图像是二维的，因此空间中物体在另一个维度上的关系就必须由梯度来表示，这样我们才能通过观察图像得知物体在三维空间中的对应关系。</p>
+<p>傅里叶频谱图上我们看到的明暗不一的亮点，其意义是指图像上某一点与邻域点差异的强弱，即梯度的大小，也即该点的频率的大小（可以这么理解，图像中的低频部分指低梯度的点，高频部分相反）。一般来讲，梯度大则该点的亮度强，否则该点亮度弱。这样通过观察傅里叶变换后的频谱图，也叫功率图，我们就可以直观地看出图像的能量分布：如果频谱图中暗的点数更多，那么实际图像是比较柔和的（因为各点与邻域差异都不大，梯度相对较小）；反之，如果频谱图中亮的点数多，那么实际图像一定是尖锐的、边界分明且边界两边像素差异较大的。</p>
+<p>对频谱移频到原点以后，可以看出图像的频率分布是以原点为圆心，对称分布的。将频谱移频到圆心除了可以清晰地看出图像频率分布以外，还有一个好处，它可以分离出有周期性规律的干扰信号，比如正弦干扰。一幅频谱图如果带有正弦干扰，移频到原点上就可以看出，除了中心以外还存在以另一点为中心、对称分布的亮点集合，这个集合就是干扰噪音产生的。这时可以很直观的通过在该位置放置带阻滤波器消除干扰。</p>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p><img src="http://image.rexking6.top/img/clip1539232003.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1539232020.png" alt=""></p>
+<h2 id="性质"><a href="#性质" class="headerlink" title="性质"></a>性质</h2><ol>
+<li>两个函数卷积的傅里叶变换是它们的傅里叶变换的乘积</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1539232116.png" alt=""></p>
+<ol>
+<li>空间域的卷积等于频域的乘法</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1539232138.png" alt=""></p>
+<ol>
+<li>线性</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1539232194.png" alt=""></p>
+<ol>
+<li><p>实信号的傅里叶变换关于原点是对称的</p>
+</li>
+<li><p>信号的能量等于它的傅里叶变换的能量</p>
+</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1539232227.png" alt=""></p>
+<h2 id="频域滤波"><a href="#频域滤波" class="headerlink" title="频域滤波"></a>频域滤波</h2><p><img src="http://image.rexking6.top/img/clip1539232287.png" alt=""></p>
+<p>将图像和滤波器先转换成频域图，相乘之后，再用逆傅里叶变换转换成时域图像。</p>
+<h3 id="高斯滤波"><a href="#高斯滤波" class="headerlink" title="高斯滤波"></a>高斯滤波</h3><p><img src="http://image.rexking6.top/img/clip1539232569.png" alt=""></p>
+<h3 id="盒滤波"><a href="#盒滤波" class="headerlink" title="盒滤波"></a>盒滤波</h3><p><img src="http://image.rexking6.top/img/clip1539232581.png" alt=""></p>
+<h1 id="五"><a href="#五" class="headerlink" title="五"></a>五</h1><h2 id="采样"><a href="#采样" class="headerlink" title="采样"></a>采样</h2><h3 id="混叠问题"><a href="#混叠问题" class="headerlink" title="混叠问题"></a>混叠问题</h3><p><img src="http://image.rexking6.top/img/clip1539769837.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1539769863.png" alt=""></p>
+<p>在统计、信号处理和相关领域中，<strong>混叠</strong>是指取样信号被还原成连续信号时产生彼此交叠而<strong>失真</strong>的现象。当混叠发生时，原始信号无法从取样信号还原。而混叠可能发生在时域上，称做时间混叠，或是发生在频域上，被称作空间混叠。</p>
+<p><img src="http://image.rexking6.top/img/clip1539770638.png" alt=""></p>
+<h4 id="奈奎斯特准则"><a href="#奈奎斯特准则" class="headerlink" title="奈奎斯特准则"></a>奈奎斯特准则</h4><p>所定的取样频率若取样的频率太低，就会产生取样的结果和原来的样本不同的状况。若一样本的频谱是带限频谱，也就是在某一频率$|w_n|$之外都为0的频谱，那么取样频率$w_s$就必须要大于两倍的$w_n$，才不至于使频谱产生交叠，也因此产生失真。</p>
+<p>数学式表示为：$w_s&gt;2w_n$。</p>
+<h4 id="消除混叠"><a href="#消除混叠" class="headerlink" title="消除混叠"></a>消除混叠</h4><p>采样定理的一个重要指导意义是给出了消除混叠的最低条件，混叠本身是采样的必然效应，只不过如果混叠到原信号带宽范围内的频率成分为零的话，信号不会被破坏，也就能“完全重构”了。消除频率混叠的途径有两种：</p>
+<ol>
+<li>提高采样频率$f_s$，即缩小采样时间间隔。然而实际的信号处理系统不可能达到很大的采样频率。另外，许多信号本身可能含有$0\sim \infty$范围内的频率，不可能将采样频率提高到$\infty$。所以，通过提高采样频率避免混叠的方法是有限制的。</li>
+<li>采用抗混滤波器。在采样频率fs一定的前提下，通过低通滤波器滤掉高于fs/2的频率成分，通过低通滤波的信号则可避免出现频率混叠。</li>
+</ol>
+<h3 id="人类感知线索"><a href="#人类感知线索" class="headerlink" title="人类感知线索"></a>人类感知线索</h3><p>人类的早期处理过滤各种方向和频率范围。</p>
+<p>中高频的感知线索主导着感知。</p>
+<p>当我们看到远处的图像时，我们实际上是对它进行子采样。</p>
+<p><img src="http://image.rexking6.top/img/clip1539790087.png" alt=""></p>
+<h2 id="离散傅利叶变换"><a href="#离散傅利叶变换" class="headerlink" title="离散傅利叶变换"></a>离散傅利叶变换</h2><p><img src="http://image.rexking6.top/img/clip1539790343.png" alt=""></p>
+<p>逆变换：</p>
+<p><img src="http://image.rexking6.top/img/clip1539790377.png" alt=""></p>
+<p>快速傅里叶变换(FFT)在串行机器上最优地实现，DFT在并行机器上更快。</p>
+<p><img src="http://image.rexking6.top/img/clip1539790442.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1539820022.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1539820039.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1539820094.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1539820281.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1539820299.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1539820331.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1539820384.png" alt=""></p>
+<h2 id="模板匹配"><a href="#模板匹配" class="headerlink" title="模板匹配"></a>模板匹配</h2><p><img src="http://image.rexking6.top/img/clip1539820681.png" alt=""></p>
+<h3 id="滤波器匹配"><a href="#滤波器匹配" class="headerlink" title="滤波器匹配"></a>滤波器匹配</h3><p>用眼睛对图像进行滤波。</p>
+<p><img src="http://image.rexking6.top/img/clip1539820803.png" alt=""></p>
+<h3 id="零均值滤波器匹配"><a href="#零均值滤波器匹配" class="headerlink" title="零均值滤波器匹配"></a>零均值滤波器匹配</h3><p>用零均值的眼睛对图像进行滤波。</p>
+<p><img src="http://image.rexking6.top/img/clip1539823350.png" alt=""></p>
+<h3 id="SSD"><a href="#SSD" class="headerlink" title="SSD"></a>SSD</h3><p><img src="http://image.rexking6.top/img/clip1539823449.png" alt=""></p>
+<h4 id="潜在缺点"><a href="#潜在缺点" class="headerlink" title="潜在缺点"></a>潜在缺点</h4><p><img src="http://image.rexking6.top/img/clip1539823557.png" alt=""></p>
+<h3 id="归一化互相关"><a href="#归一化互相关" class="headerlink" title="归一化互相关"></a>归一化互相关</h3><p><img src="http://image.rexking6.top/img/clip1539823603.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1539823634.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1539823649.png" alt=""></p>
+<h3 id="方法比对"><a href="#方法比对" class="headerlink" title="方法比对"></a>方法比对</h3><p>视情况而定：</p>
+<ul>
+<li>SSD：更快，对整体强度敏感；</li>
+<li>归一化互相关：较慢，对局部平均强度和对比度不变</li>
+</ul>
+<p>但实际上，这些方法已经过时。</p>
+<h3 id="图像金字塔"><a href="#图像金字塔" class="headerlink" title="图像金字塔"></a>图像金字塔</h3><p>用于不同尺度的匹配。</p>
+<p>流程：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1.输入:图像,模板</span><br><span class="line">2.按当前比例匹配模板</span><br><span class="line">3.下采样图像</span><br><span class="line">4.重复1-2直到图像很小</span><br><span class="line">5.在某些阈值以上采取响应，可能带有非最大值抑制</span><br></pre></td></tr></table></figure>
+<p><img src="http://image.rexking6.top/img/clip1539824261.png" alt=""></p>
+<h4 id="二维边缘检测滤波器"><a href="#二维边缘检测滤波器" class="headerlink" title="二维边缘检测滤波器"></a>二维边缘检测滤波器</h4><p><img src="http://image.rexking6.top/img/clip1539824304.png" alt=""></p>
+<h4 id="拉普拉斯滤波器"><a href="#拉普拉斯滤波器" class="headerlink" title="拉普拉斯滤波器"></a>拉普拉斯滤波器</h4><p><img src="http://image.rexking6.top/img/clip1539824343.png" alt=""></p>
+<h4 id="计算高斯-拉普拉斯的金字塔"><a href="#计算高斯-拉普拉斯的金字塔" class="headerlink" title="计算高斯/拉普拉斯的金字塔"></a>计算高斯/拉普拉斯的金字塔</h4><p><img src="http://image.rexking6.top/img/clip1539824407.png" alt=""></p>
+<h3 id="图像表示总结"><a href="#图像表示总结" class="headerlink" title="图像表示总结"></a>图像表示总结</h3><ul>
+<li>像素：非常适合空间域，对频率不适用；</li>
+<li>傅里叶变换：非常适合频率，而不适用于空间信息；</li>
+<li>金字塔/滤波器组：空间和频率信息之间的平衡。</li>
+</ul>
+<h3 id="应用：纹理表示"><a href="#应用：纹理表示" class="headerlink" title="应用：纹理表示"></a>应用：纹理表示</h3><p><img src="http://image.rexking6.top/img/clip1539824579.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1539824595.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1539824603.png" alt=""></p>
+<p>纹理：由凸起、凹槽和/或标记引起的规则或随机模式。</p>
+<p>纹理表示：计算在不同方向和尺度上的斑点和边缘的响应。</p>
+<h3 id="过完备表示：滤波器组（filter-banks）"><a href="#过完备表示：滤波器组（filter-banks）" class="headerlink" title="过完备表示：滤波器组（filter banks）"></a>过完备表示：滤波器组（filter banks）</h3><p><img src="http://image.rexking6.top/img/clip1539824775.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1539824800.png" alt=""></p>
+<h2 id="纹理特征表示"><a href="#纹理特征表示" class="headerlink" title="纹理特征表示"></a>纹理特征表示</h2><p>测量斑点和边缘在不同方向和尺度上的响应。</p>
+<p><strong>idea1：记录完全过滤器响应的简单统计信息(如均值、标准差)</strong></p>
+<p><img src="http://image.rexking6.top/img/clip1540371260.png" alt=""></p>
+<p>用完全响应表示纹理，</p>
+<p><img src="http://image.rexking6.top/img/clip1540371351.png" alt=""></p>
+<p><strong>idea2：取每个像素的滤波器响应向量并将它们聚类，然后取直方图</strong></p>
+<p><img src="http://image.rexking6.top/img/clip1540371470.png" alt=""></p>
+<h2 id="图像压缩"><a href="#图像压缩" class="headerlink" title="图像压缩"></a>图像压缩</h2><h3 id="离散余弦变换（DCT）"><a href="#离散余弦变换（DCT）" class="headerlink" title="离散余弦变换（DCT）"></a>离散余弦变换（DCT）</h3><p><img src="http://image.rexking6.top/img/clip1540372797.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1540372844.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1540372865.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1540372895.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1540372913.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1540372929.png" alt=""></p>
+<h3 id="有损图像压缩（JPEG）"><a href="#有损图像压缩（JPEG）" class="headerlink" title="有损图像压缩（JPEG）"></a>有损图像压缩（JPEG）</h3><p>块状离散余弦变换</p>
+<p><img src="http://image.rexking6.top/img/clip1540371574.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1540371664.png" alt=""></p>
+<ul>
+<li>第一个系数$B(0,0)$是DC分量，即平均强度</li>
+<li>左上角的系数表示低频，右下角表示高频</li>
+</ul>
+<h3 id="将DCT用于图像压缩"><a href="#将DCT用于图像压缩" class="headerlink" title="将DCT用于图像压缩"></a>将DCT用于图像压缩</h3><ul>
+<li>量化：<ul>
+<li>高频更粗略（也往往具有更小的值）</li>
+<li>许多量化的高频值将为零</li>
+</ul>
+</li>
+<li>编码：<ul>
+<li>可以用逆DCT解码</li>
+</ul>
+</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1540371943.png" alt=""></p>
+<h3 id="JPEG压缩的总结"><a href="#JPEG压缩的总结" class="headerlink" title="JPEG压缩的总结"></a>JPEG压缩的总结</h3><ol>
+<li><p>将图像转换为$YC_rC_b$颜色空间</p>
+</li>
+<li><p>子样本颜色的因子2</p>
+<p>人们对颜色的分辨能力很差</p>
+</li>
+<li><p>分成块(通常是8x8)，减去128</p>
+</li>
+<li><p>对于每个块，</p>
+<ol>
+<li><p>计算DCT系数</p>
+</li>
+<li><p>粗量化</p>
+<p>许多高频部分将变为零</p>
+</li>
+<li><p>编码(例如，用霍夫曼编码)</p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="无损压缩（PNG）"><a href="#无损压缩（PNG）" class="headerlink" title="无损压缩（PNG）"></a>无损压缩（PNG）</h3><ol>
+<li>根据左上角的邻域预测像素值</li>
+<li>存储预测值和实际值的差值</li>
+<li>Pkzip它（DEFLATE算法）</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1540372280.png" alt=""></p>
+<h2 id="降噪"><a href="#降噪" class="headerlink" title="降噪"></a>降噪</h2><h3 id="减少高斯噪声"><a href="#减少高斯噪声" class="headerlink" title="减少高斯噪声"></a>减少高斯噪声</h3><p><img src="http://image.rexking6.top/img/clip1540372474.png" alt=""></p>
+<p>用较大的标准差进行平滑可以抑制噪声，但也会模糊图像。</p>
+<h3 id="通过高斯平滑减少椒盐噪声"><a href="#通过高斯平滑减少椒盐噪声" class="headerlink" title="通过高斯平滑减少椒盐噪声"></a>通过高斯平滑减少椒盐噪声</h3><p><img src="http://image.rexking6.top/img/clip1540372576.png" alt=""></p>
+<h3 id="中值滤波器-1"><a href="#中值滤波器-1" class="headerlink" title="中值滤波器"></a>中值滤波器</h3><h4 id="对离群值有鲁棒性"><a href="#对离群值有鲁棒性" class="headerlink" title="对离群值有鲁棒性"></a>对离群值有鲁棒性</h4><p><img src="http://image.rexking6.top/img/clip1540372662.png" alt=""></p>
+<h1 id="六：边缘-边界检测"><a href="#六：边缘-边界检测" class="headerlink" title="六：边缘/边界检测"></a>六：边缘/边界检测</h1><p><strong>目标：识别图像中的突然变化（不连续）</strong></p>
+<ul>
+<li>直观上，图像的大部分语义和形状信息都在边缘上进行编码表示</li>
+<li>比像素更紧凑</li>
+</ul>
+<p><strong>理想情况：生成像艺术家的线条画（虽然艺术家也使用对象级知识）</strong></p>
+<p><img src="http://image.rexking6.top/img/clip1540374955.png" alt=""></p>
+<p>边缘是由多种因素造成的：</p>
+<ul>
+<li>表面正常的不连续</li>
+<li>深度不连续</li>
+<li>表面颜色不连续</li>
+<li>光照不连续</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1540375107.png" alt=""></p>
+<h2 id="描述边缘"><a href="#描述边缘" class="headerlink" title="描述边缘"></a>描述边缘</h2><ul>
+<li>边缘是图像强度函数快速变化的地方</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1540375236.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1540375303.png" alt=""></p>
+<h3 id="噪声的影响"><a href="#噪声的影响" class="headerlink" title="噪声的影响"></a>噪声的影响</h3><p><img src="http://image.rexking6.top/img/clip1540375339.png" alt=""></p>
+<p>差分滤波器对噪声有很强的响应能力：</p>
+<ul>
+<li>图像噪声产生的像素看起来与它们的相邻非常不同</li>
+<li>一般来说，噪音越大，响应越强</li>
+</ul>
+<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h4><ol>
+<li>平滑</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1540375477.png" alt=""></p>
+<p>在$\frac{d}{dx}(f\ast g)$的山峰寻找边缘。</p>
+<h4 id="卷积导数定理"><a href="#卷积导数定理" class="headerlink" title="卷积导数定理"></a>卷积导数定理</h4><p>微分是卷积，卷积是联合的。</p>
+<script type="math/tex; mode=display">
+\frac{d}{dx}(f \ast g)=f \ast \frac{d}{dx}g</script><p><img src="http://image.rexking6.top/img/clip1540376029.png" alt=""></p>
+<p>平滑和定位之间的权衡：</p>
+<p><img src="http://image.rexking6.top/img/clip1540376109.png" alt=""></p>
+<h4 id="实施问题"><a href="#实施问题" class="headerlink" title="实施问题"></a>实施问题</h4><p><img src="http://image.rexking6.top/img/clip1540376238.png" alt=""></p>
+<ul>
+<li>沿着一条厚厚的“轨迹”或“山脊”，梯度大小很大，那么我们如何识别实际的边缘点呢？</li>
+<li>我们如何将边缘点连接起来形成曲线？</li>
+</ul>
+<h4 id="设计边缘检测器"><a href="#设计边缘检测器" class="headerlink" title="设计边缘检测器"></a>设计边缘检测器</h4><p>好的边缘检测器的标准：</p>
+<ul>
+<li>好的检测：最优检测器应找到所有真实边缘，忽略噪声或其他人为因素</li>
+<li>好的定位：<ul>
+<li>检测到的边缘必须尽可能接近真实的边缘</li>
+<li>探测器必须仅为每一个真正的边缘点返回一个点</li>
+</ul>
+</li>
+</ul>
+<p>边缘检测线索：</p>
+<ul>
+<li>颜色、强度或纹理的差异</li>
+<li>连续性和闭合性</li>
+<li>高层次的知识</li>
+</ul>
+<h4 id="Canny边缘检测器"><a href="#Canny边缘检测器" class="headerlink" title="Canny边缘检测器"></a>Canny边缘检测器</h4><p>这可能是计算机视觉中应用最广泛的边缘检测器。</p>
+<p>理论模型：加性高斯噪声破坏的阶梯边缘。</p>
+<p>Canny已经证明高斯的一阶导数非常接近于优化信噪比和定位的乘积的算子。</p>
+<h5 id="Matlab中的Canny边缘检测器"><a href="#Matlab中的Canny边缘检测器" class="headerlink" title="Matlab中的Canny边缘检测器"></a>Matlab中的Canny边缘检测器</h5><p><strong>实现中的小错误：</strong></p>
+<ul>
+<li>高斯函数没有很好地归一化</li>
+<li>首先用高斯滤波器，然后是高斯差分。（相当于用更大的高斯函数进行滤波并取差）</li>
+</ul>
+<h5 id="样例"><a href="#样例" class="headerlink" title="样例"></a>样例</h5><p><img src="http://image.rexking6.top/img/clip1540376746.png" alt=""></p>
+<ol>
+<li>高斯滤波器的导数</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1540376757.png" alt=""></p>
+<ol>
+<li>计算梯度(DoG)</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1540376829.png" alt=""></p>
+<ol>
+<li>获得每个像素的方向</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1540376847.png" alt=""></p>
+<ol>
+<li>每个方向的非最大值抑制</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1540377001.png" alt=""></p>
+<p>在$q$处，如果值大于$p$处和$r$处的值，就会得到最大值。</p>
+<ol>
+<li>边缘连接</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1540377209.png" alt=""></p>
+<p>假设标记点是一个边缘点。然后我们构造一条与边缘曲线相切的曲线（这条曲线与该点的梯度是垂直的），然后用它来预测下一个点（这里不是$r$就是$s$）。</p>
+<ol>
+<li>其他工具：双线性插值</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1540377336.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1540377365.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1540377380.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1540377397.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1540377433.png" alt=""></p>
+<ol>
+<li>双阈值</li>
+</ol>
+<ul>
+<li>阈值在低/高水平得到弱/强边缘像素</li>
+<li>连接组件，从强边缘像素开始</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1540377520.png" alt=""></p>
+<ul>
+<li>检查梯度值的最大值是否足够大</li>
+<li>使用高阈值构建边缘曲线，使用低阈值延伸它们</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1540377711.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1540377743.png" alt=""></p>
+<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><ol>
+<li><p>用高斯函数的$x$, $y$导数对图像进行滤波</p>
+</li>
+<li><p>求梯度的大小和方向</p>
+</li>
+<li><p>非极大值抑制</p>
+<p>宽薄的多像素“脊”变为单像素宽度</p>
+</li>
+<li><p>阈值化与连接（双阈值）</p>
+<ul>
+<li>定义两个阈值：低阈值和高阈值</li>
+<li>使用高阈值构建边缘曲线和低阈值延伸它们</li>
+</ul>
+</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1541039999.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541040027.png" alt=""></p>
+<h3 id="pB边缘探测器"><a href="#pB边缘探测器" class="headerlink" title="pB边缘探测器"></a>pB边缘探测器</h3><p><img src="http://image.rexking6.top/img/clip1541040223.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541040252.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541040284.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541040316.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541040564.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541040606.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541040641.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541040665.png" alt=""></p>
+<h1 id="七：兴趣点和角点"><a href="#七：兴趣点和角点" class="headerlink" title="七：兴趣点和角点"></a>七：兴趣点和角点</h1><h2 id="跨越视角的对应"><a href="#跨越视角的对应" class="headerlink" title="跨越视角的对应"></a>跨越视角的对应</h2><p>对应：图像之间的匹配点、小块、边缘或区域。</p>
+<p><img src="http://image.rexking6.top/img/clip1541047337.png" alt=""></p>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>特征点用于：</p>
+<ul>
+<li>图像对齐</li>
+<li>三维重建</li>
+<li>运动跟踪</li>
+<li>机器人导航</li>
+<li>索引和数据库检索</li>
+<li>对象识别</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1541047420.png" alt=""></p>
+<h2 id="关键点匹配概述"><a href="#关键点匹配概述" class="headerlink" title="关键点匹配概述"></a>关键点匹配概述</h2><p><img src="http://image.rexking6.top/img/clip1541047486.png" alt=""></p>
+<ol>
+<li>找到一组有鉴别力的关键点</li>
+<li>围绕每个关键点定义一个区域</li>
+<li>提取和正则化区域内容</li>
+<li>从正则化区域计算局部描述符</li>
+<li>匹配局部描述符</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1541048078.png" alt=""></p>
+<h2 id="不变局部特征"><a href="#不变局部特征" class="headerlink" title="不变局部特征"></a>不变局部特征</h2><p>图像内容被转换成局部特征坐标，这些坐标对平移、旋转、缩放和其他成像参数不变。</p>
+<p><img src="http://image.rexking6.top/img/clip1541048208.png" alt=""></p>
+<ol>
+<li>检测：识别感兴趣的点</li>
+<li>描述：提取每个兴趣点周围的向量特征描述符。</li>
+<li>匹配：确定两个视图中描述符之间的对应关系</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1541048767.png" alt=""></p>
+<h2 id="好的特征的特点"><a href="#好的特征的特点" class="headerlink" title="好的特征的特点"></a>好的特征的特点</h2><ul>
+<li><p>可重复性</p>
+<p>同样的特征可以在一些图像中发现，尽管存在着几何变换和光度变换</p>
+</li>
+<li><p>鉴别性</p>
+<p>每个特征都有鉴别性的</p>
+</li>
+<li><p>紧致性和效率性</p>
+<p>比图像像素更少的特征</p>
+</li>
+<li><p>局域性</p>
+<p>一个特征占据图像相对较小的区域；抗杂乱和抗遮挡</p>
+</li>
+</ul>
+<h3 id="可重复性"><a href="#可重复性" class="headerlink" title="可重复性"></a>可重复性</h3><p>我们希望在这两幅图像中检测到（至少部分）相同的点。然而，我们必须能够独立地根据图像运行检测程序。</p>
+<h3 id="鉴别性"><a href="#鉴别性" class="headerlink" title="鉴别性"></a>鉴别性</h3><p>我们希望能够可靠地确定哪一点与哪一点相匹配。必须为两个视图之间的几何和光度差异提供一定的不变性。</p>
+<h2 id="角点检测"><a href="#角点检测" class="headerlink" title="角点检测"></a>角点检测</h2><p>透过小窗口可以使人很容易地认出它。向任何方向移动一个窗口都会使强度发生很大的变化。</p>
+<p><img src="http://image.rexking6.top/img/clip1541049422.png" alt=""></p>
+<p>关键性质：在角点区域，图像梯度有两个或两个以上的主导方向；而且角点是可重复的和鉴别性的。</p>
+<h3 id="数学推导"><a href="#数学推导" class="headerlink" title="数学推导"></a>数学推导</h3><p><img src="http://image.rexking6.top/img/clip1541049733.png" alt=""></p>
+<p>窗口坐标函数$w(x,y)$，偏移量$[u,v]$，强度$I(x,y)$，偏移强度$I(x,y)$：</p>
+<script type="math/tex; mode=display">
+E(u,v)=\sum_{x,y}w(x,y)[I(x+u,y+v)-I(x,y)]^2</script><p><img src="http://image.rexking6.top/img/clip1541049874.png" alt=""></p>
+<p>窗口坐标函数$w(x,y)$为，</p>
+<p><img src="http://image.rexking6.top/img/clip1541052401.png" alt=""></p>
+<p>$E(u,v)$在$(0,0)$附近的局部二次逼近由二阶泰勒展开式给出:</p>
+<script type="math/tex; mode=display">
+E(u,v) \approx E(0,0) + [u,v]\left[\begin{matrix}E_u(0,0)\\E_v(0,0)\end{matrix}\right]+\frac{1}{2}[u,v]\left[\begin{matrix}E_{uu}(0,0) & E_{uv}(0,0)\\E_{uv}(0,0) & E_{vv}(0,0)\end{matrix}\right]\left[\begin{matrix}u\\v\end{matrix}\right]\\
+E_u(u,v)=\sum_{x,y}2w(x,y)[I(x+u,y+v)-I(x,y)]I_x(x+u,y+v)\\
+\begin{align*}
+E_{uu}(u,v)&=\sum_{x,y}2w(x,y)I_x(x+u,y+v)I_x(x+u,y+v)\\
+&+\sum_{x,y}2w(x,y)[I(x+u,y+v)-I(x,y)]I_{xx}(x+u,y+v)\\
+E_{uv}(u,v)&=\sum_{x,y}2w(x,y)I_y(x+u,y+v)I_x(x+u,y+v)\\
+&+\sum_{x,y}2w(x,y)[I(x+u,y+v)-I(x,y)]I_{xy}(x+u,y+v)\\
+E(0,0)&=0\\
+E_u(0,0)&=0\\
+E_v(0,0)&=0\\
+E_{uu}(0,0)&=\sum_{x,y}2w(x,y)I_x(x,y)I_x(x,y)\\
+E_{vv}(0,0)&=\sum_{x,y}2w(x,y)I_y(x,y)I_y(x,y)\\
+E_{uv}(0,0)&=\sum_{x,y}2w(x,y)I_x(x,y)I_y(x,y)\\
+E(u,v) &\approx \left[\begin{matrix}u & v\end{matrix}\right]\left[\begin{matrix}\sum_{x,y}w(x,y)I_x^2(x,y) & \sum_{x,y}w(x,y)I_x(x,y)I_y(x,y)\\\sum_{x,y}w(x,y)I_x(x,y)I_y(x,y) & \sum_{x,y}w(x,y)I_x^2(x,y)\end{matrix}\right]\left[\begin{matrix}u \\ v\end{matrix}\right]
+\end{align*}</script><p>所以，</p>
+<script type="math/tex; mode=display">
+E(u,v) \approx\left[\begin{matrix}u & v\end{matrix}\right]M\left[\begin{matrix}u \\ v\end{matrix}\right]</script><p>其中$M$为图像导数计算的二阶矩矩阵：</p>
+<script type="math/tex; mode=display">
+M=\sum_{x,y}w(x,y)\left[\begin{matrix}I_x^2 & I_xI_y\\I_xI_y & I_y^2\end{matrix}\right]\\
+M=\left[\begin{matrix}\sum I_xI_x & \sum I_xI_y\\\sum I_xI_y & \sum I_yI_y\end{matrix}\right]=\sum \left[\begin{matrix}I_x \\I_y \end{matrix}\right]\left[\begin{matrix}I_x & I_y \end{matrix}\right]=\sum \bigtriangledown I(\bigtriangledown I)^T</script><p><img src="http://image.rexking6.top/img/clip1541056685.png" alt=""></p>
+<h4 id="解释二次矩阵"><a href="#解释二次矩阵" class="headerlink" title="解释二次矩阵"></a>解释二次矩阵</h4><p><img src="http://image.rexking6.top/img/clip1541572902.png" alt=""></p>
+<p>表面$E(u,v)$局部近似为二次形式。</p>
+<p>首先，考虑轴对齐的情况（渐变是水平的或垂直的），如果$λ$接近0，那么这不是一个角点，所以寻找两者都很大的位置。</p>
+<p>之后，考虑水平切片的情况，$M$的对角化，</p>
+<script type="math/tex; mode=display">
+M = R^{-1}\left[\begin{matrix}\lambda_1 & 0 \\ 0 & \lambda 2\end{matrix}\right]R</script><p>椭圆的轴长度由特征值$\lambda$确定，方向由$R$确定。</p>
+<p><img src="http://image.rexking6.top/img/clip1541573217.png" alt=""></p>
+<p>二次矩阵的可视化：</p>
+<p><img src="http://image.rexking6.top/img/clip1541573247.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541573255.png" alt=""></p>
+<h4 id="解释特征值"><a href="#解释特征值" class="headerlink" title="解释特征值"></a>解释特征值</h4><p>使用$M$的特征值对图像点进行分类：</p>
+<p><img src="http://image.rexking6.top/img/clip1541573371.png" alt=""></p>
+<p>角点响应方程：</p>
+<script type="math/tex; mode=display">
+R=\text{det}(M)-\alpha \text{ trace}(M)^2=\lambda_1 \lambda_2-\alpha(\lambda_1+\lambda_2)^2</script><p>其中$\alpha$为$(0.04,0.06)$的定值。</p>
+<p><img src="http://image.rexking6.top/img/clip1541573568.png" alt=""></p>
+<h3 id="Harris角点检测"><a href="#Harris角点检测" class="headerlink" title="Harris角点检测"></a>Harris角点检测</h3><ol>
+<li>计算每个图像窗口的$M$矩阵来获得其角度得分</li>
+<li>找到周围窗口给出大角点响应的点（$f&gt;threshold$）</li>
+<li>取局部最大值的点，即执行非最大值抑制</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1541573776.png" alt=""></p>
+<h4 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h4><p><img src="http://image.rexking6.top/img/clip1541573867.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541573930.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541573958.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541573978.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541573990.png" alt=""></p>
+<h3 id="Hessian角点检测"><a href="#Hessian角点检测" class="headerlink" title="Hessian角点检测"></a>Hessian角点检测</h3><h4 id="Hessian-amp-Harris"><a href="#Hessian-amp-Harris" class="headerlink" title="Hessian&amp;Harris"></a>Hessian&amp;Harris</h4><p>Hessian检测：</p>
+<script type="math/tex; mode=display">
+Hessian(I)=\left[\begin{matrix}I_{xx} & I_{xy} \\ I_{yx} & I_{yy}\end{matrix}\right]\\
+\text{det}(Hessian(I))=I_{xx}I_{yy}-I_{xy}^2</script><p>Harris检测：</p>
+<script type="math/tex; mode=display">
+\mu(\sigma_1,\sigma_D)=g(\sigma_1)·\left[\begin{matrix}I_x^2(\sigma_D) & I_xI_y(\sigma_D) \\ I_xI_y(\sigma_D) & I_y^2(\sigma_D)\end{matrix}\right]\\
+\begin{align*}
+Harris &= \text{det}(\mu(\sigma_1, \sigma_D))-\alpha[\text{trace}(\mu(\sigma_1, \sigma_D))]\\
+&=g(I_x^2)g(I_y^2)-[g(I_xI_y)]^2-\alpha[g(I_x^2)+g(I_y^2)]^2
+\end{align*}</script><p><img src="http://image.rexking6.top/img/clip1541574610.png" alt=""></p>
+<h3 id="不变性和齐变换性"><a href="#不变性和齐变换性" class="headerlink" title="不变性和齐变换性"></a>不变性和齐变换性</h3><p>我们希望角点位置对光度变换是不变的，并且对几何变换是一起变换的，</p>
+<ul>
+<li>不变性：图像被转换，角点位置不会改变</li>
+<li>齐变换性：如果同一幅图像经过了两次变换，特征应该能在相应的位置被检测到</li>
+</ul>
+<h4 id="仿射强度变化"><a href="#仿射强度变化" class="headerlink" title="仿射强度变化"></a>仿射强度变化</h4><p><img src="http://image.rexking6.top/img/clip1541575104.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541575132.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541575154.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541575175.png" alt=""></p>
+<h1 id="八：局部图像特征"><a href="#八：局部图像特征" class="headerlink" title="八：局部图像特征"></a>八：局部图像特征</h1><h2 id="自动选择尺度"><a href="#自动选择尺度" class="headerlink" title="自动选择尺度"></a>自动选择尺度</h2><p><img src="http://image.rexking6.top/img/clip1541664824.png" alt=""></p>
+<p><strong>如何自动选择：增加尺度的函数响应（尺度签名）</strong></p>
+<p><img src="http://image.rexking6.top/img/clip1541664938.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541664976.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541664994.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541665014.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541665039.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1541665058.png" alt=""></p>
+<h2 id="有用的签名函数"><a href="#有用的签名函数" class="headerlink" title="有用的签名函数"></a>有用的签名函数</h2><p><strong>高斯差分=“斑点”检测器</strong></p>
+<p><img src="http://image.rexking6.top/img/clip1541665149.png" alt=""></p>
+<p>DoG过程参考：<a href="http://blog.rexking6.top/2018/09/22/SIFT%E7%89%B9%E5%BE%81%E8%AF%A6%E8%AF%A6%E8%A7%A3/">SIFT特征详详解</a></p>
+<p>结果：</p>
+<p><img src="http://image.rexking6.top/img/clip1541665252.png" alt=""></p>
+<h2 id="Harris-Laplace"><a href="#Harris-Laplace" class="headerlink" title="Harris-Laplace"></a>Harris-Laplace</h2><p><img src="http://image.rexking6.top/img/clip1542353374.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1542353389.png" alt=""></p>
+<h2 id="最大稳定极值区域（MSER"><a href="#最大稳定极值区域（MSER" class="headerlink" title="最大稳定极值区域（MSER)"></a>最大稳定极值区域（MSER)</h2><p>基于分水岭分割算法，选择在大参数范围内保持稳定的区域。</p>
+<p><img src="http://image.rexking6.top/img/clip1542353494.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1542353574.png" alt=""></p>
+<ul>
+<li>极值区域：$\forall p \in Q,q\in \delta Q$</li>
+<li>有序区域：$I(p)&gt;I(q)$或$I(p)&lt;I(q)$，$Q_1 \subset … \subset Q_i \subset Q_{i+1} \subset … \subset Q_n$</li>
+<li>MSER：$q(i)=|Q_{i+\Delta}\backslash Q_{i-\Delta}|/Q_i$</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1542357015.png" alt=""></p>
+<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><ol>
+<li><p>聚类（Clustering）</p>
+<p>对于目标图像在每一个灰度级做二值化处理，例如对于灰度级$i$，将原图中灰度大于等于$i$的像素的灰度级置为$1$，将灰度小于$i$的像素置为$0$。于是在此二值图像中必有若干个像素值为$1$的连通区。那么对于每一个灰度级都可以形成相应的连通区域。于是纵向观察这些区域，不同灰度级的连通区域之间必然存在嵌套关系（即嵌套树结构）。</p>
+<p><img src="http://image.rexking6.top/img/clip1542357116.png" alt=""></p>
+</li>
+<li><p>探测最大稳定极值区域（MSER detection）</p>
+<p>$Q_1,Q_2,…,Q_i$为相互嵌套的区域（Region）且（属于$Q_i$灰度级$i$的连通区域）定义函数：</p>
+<script type="math/tex; mode=display">
+q(i)=|Q_{i+\Delta}\backslash Q_{i-\Delta}|/Q_i</script><p>其中$\Delta$为人为选定的参数，$|Q_i|$为$Q_i$连通区域的势（即包含的点的个数），对每个$Q_i$计算其$q(i)$，若$q(i)$为局部极小值，则$Q_i$为MSER。</p>
+</li>
+<li><p>结果显示</p>
+<p>将一幅灰度图像按照上述步骤进行处理得到MSER+特征区域，再将该图象反转，重复上述步骤得到MSER-特征区域。于是取这些区域的重心，并且以1.5倍该区域的尺度做椭圆形区域。</p>
+</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1542357485.png" alt=""></p>
+<h2 id="图像表示：直方图"><a href="#图像表示：直方图" class="headerlink" title="图像表示：直方图"></a>图像表示：直方图</h2><p><img src="http://image.rexking6.top/img/clip1542357585.png" alt=""></p>
+<p>直方图：每个bin中数据的概率或计数。</p>
+<h3 id="距离计算"><a href="#距离计算" class="headerlink" title="距离计算"></a>距离计算</h3><ol>
+<li>直方图交集（假设已归一化）</li>
+</ol>
+<script type="math/tex; mode=display">
+\text{histint}(h_i,h_j)=1-\sum_{m=1}^K \text{min}(h_i(m),h_j(m))</script><ol>
+<li>卡方距离<script type="math/tex; mode=display">
+\mathcal{X}^2(h_i,h_j)=\frac{1}{2}\sum_{m=1}^K \frac{[h_i(m)-h_j(m)]^2}{h_i(m)+h_j(m)}</script></li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1542357881.png" alt=""></p>
+<h3 id="量化"><a href="#量化" class="headerlink" title="量化"></a>量化</h3><ul>
+<li>网格：快速但只适用于很少的维数</li>
+<li>聚类：速度较慢，但可以量化高维数据</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1542358029.png" alt=""></p>
+<h3 id="匹配"><a href="#匹配" class="headerlink" title="匹配"></a>匹配</h3><ul>
+<li>直方图交集或欧几里德可能更快。</li>
+<li>卡方距离经常表现更好。</li>
+<li>当附近的bin代表相似的值时，EMD距离（Earth mover’s distance）会表现得更好。</li>
+</ul>
+<h2 id="局部描述符：形状上下文"><a href="#局部描述符：形状上下文" class="headerlink" title="局部描述符：形状上下文"></a>局部描述符：形状上下文</h2><p><img src="http://image.rexking6.top/img/clip1542358447.png" alt=""></p>
+<p>计算每个bin里的点数，如上图。使用对数极坐标系的原因：对附近的点更精确，对更远的点更灵活。</p>
+<p><img src="http://image.rexking6.top/img/clip1542358527.png" alt=""></p>
+<h2 id="局部描述符：几何模糊"><a href="#局部描述符：几何模糊" class="headerlink" title="局部描述符：几何模糊"></a>局部描述符：几何模糊</h2><p><img src="http://image.rexking6.top/img/clip1542358615.png" alt=""></p>
+<h2 id="自相似性描述符"><a href="#自相似性描述符" class="headerlink" title="自相似性描述符"></a>自相似性描述符</h2><p><img src="http://image.rexking6.top/img/clip1542358639.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1542358663.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1542358674.png" alt=""></p>
+<h2 id="学习局部图像描述符"><a href="#学习局部图像描述符" class="headerlink" title="学习局部图像描述符"></a>学习局部图像描述符</h2><p><img src="http://image.rexking6.top/img/clip1542358742.png" alt=""></p>
+<h2 id="局部描述符：总结"><a href="#局部描述符：总结" class="headerlink" title="局部描述符：总结"></a>局部描述符：总结</h2><ul>
+<li>形状：场景比例，物体比例，细节比例，2D形式，阴影，阴影，纹理，线性透视</li>
+<li>材料特性：反射率，手感，硬度，颜色，质地</li>
+<li>运动：光流，跟踪点</li>
+<li>距离：立体，位置，遮挡，场景形状，大小，其他对象</li>
+</ul>
+<p>大多数特征可以看作是模板、直方图（计数）或组合。应该是鲁棒性的、判别性的、紧凑的、高效的。</p>
+<p>大多数可用的描述符集中在边缘/梯度信息上，捕获纹理信息，颜色特征很少使用。</p>
+<h2 id="局部描述符：匹配"><a href="#局部描述符：匹配" class="headerlink" title="局部描述符：匹配"></a>局部描述符：匹配</h2><p>寻找欧式距离下最接近的描述符，与第二接近的描述符之间到达一个阈值即为成功匹配。</p>
+<p><img src="http://image.rexking6.top/img/clip1542359187.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1542359202.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1542359209.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1542359219.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1542359226.png" alt=""></p>
+<h2 id="SURF"><a href="#SURF" class="headerlink" title="SURF"></a>SURF</h2><p>参照<a href="http://blog.rexking6.top/2018/09/24/SURF%E7%89%B9%E5%BE%81%E8%AF%A6%E8%A7%A3/">SURF特征详解</a>。</p>
+<h1 id="九：拟合"><a href="#九：拟合" class="headerlink" title="九：拟合"></a>九：拟合</h1><p>拟合：找到最适合数据的模型参数。</p>
+<p>设计挑战：</p>
+<ul>
+<li>设计合适的拟合度量<ul>
+<li>相似性应反映应用目标</li>
+<li>编码对异常值和噪声的鲁棒性</li>
+</ul>
+</li>
+<li>设计优化方法<ul>
+<li>避免局部最优值</li>
+<li>快速找到最佳参数</li>
+</ul>
+</li>
+</ul>
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><ul>
+<li>全局优化/参数搜索<ul>
+<li>最小二乘法拟合</li>
+<li>鲁棒最小二乘法拟合</li>
+<li>最近点迭代（ICP）</li>
+</ul>
+</li>
+<li>假设与测试<ul>
+<li>广义Hough变换</li>
+<li>RANSAC</li>
+</ul>
+</li>
+</ul>
+<h2 id="简单例子：拟合一条直线"><a href="#简单例子：拟合一条直线" class="headerlink" title="简单例子：拟合一条直线"></a>简单例子：拟合一条直线</h2><h3 id="“垂直”最小二乘法"><a href="#“垂直”最小二乘法" class="headerlink" title="“垂直”最小二乘法"></a>“垂直”最小二乘法</h3><p><img src="http://image.rexking6.top/img/clip1543330571.png" alt=""></p>
+<p>“垂直”最小二乘法的问题：</p>
+<p><img src="http://image.rexking6.top/img/clip1543330835.png" alt=""></p>
+<ul>
+<li>不具有旋转不变性</li>
+<li>完全失败的垂直线</li>
+</ul>
+<h3 id="总体最小二乘法"><a href="#总体最小二乘法" class="headerlink" title="总体最小二乘法"></a>总体最小二乘法</h3><p><img src="http://image.rexking6.top/img/clip1543331188.png" alt=""></p>
+<p>如果$a^2+b^2=1$，那么点$(x_i,y_i)$到单位法线的距离为$|ax_i+by_i+c|$。</p>
+<p>找到$(a,b,c)$以最小化垂直距离的平方和，$E=\sum_{i=1}^n(ax_i+by_i+c)^2$。</p>
+<p><img src="http://image.rexking6.top/img/clip1543332546.png" alt=""></p>
+<p>解是对应于$A^TA$最小特征值的特征向量。</p>
+<p>概述：两个优化问题</p>
+<p><img src="http://image.rexking6.top/img/clip1543365268.png" alt=""></p>
+<p>最小二乘法（全局）优化：</p>
+<ul>
+<li><p>优点：</p>
+<ul>
+<li>有明确的目标函数</li>
+<li>优化是很容易的</li>
+</ul>
+</li>
+<li><p>缺点：</p>
+<ul>
+<li><p>可能不是按照预期所优化的</p>
+</li>
+<li><p>对异常值敏感</p>
+<p>不好的匹配，额外的点</p>
+</li>
+<li><p>不允许得到多个好的拟合</p>
+<p>检测多个对象和线等</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="鲁棒最小二乘法（用于处理异常值）"><a href="#鲁棒最小二乘法（用于处理异常值）" class="headerlink" title="鲁棒最小二乘法（用于处理异常值）"></a>鲁棒最小二乘法（用于处理异常值）</h3><script type="math/tex; mode=display">
+\text{min}\sum_i\rho(u_i(x_i,\theta);\sigma),\ \ \ \ u^2=\sum_{i=1}^n(y_i-mx_i-b)^2</script><p>其中，$u_i(x_i,\theta)$为关于模型参数 $\theta$ 的第 $i$ 个点的残差，$\rho$ 是具有尺度参数 $\sigma$ 的鲁棒函数。</p>
+<h4 id="鲁棒函数-rho"><a href="#鲁棒函数-rho" class="headerlink" title="鲁棒函数 $\rho$"></a>鲁棒函数 $\rho$</h4><script type="math/tex; mode=display">
+\rho(u;\sigma)=\frac{u^2}{\sigma^2+u^2}</script><ul>
+<li>支持具有较小残差</li>
+<li>对于较大的残差，惩罚不变</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1543366293.png" alt=""></p>
+<h2 id="鲁棒估计"><a href="#鲁棒估计" class="headerlink" title="鲁棒估计"></a>鲁棒估计</h2><ol>
+<li>初始化：通过最小二乘拟合选择 $θ$，$\sigma=1.5·\text{median}(error)$。</li>
+<li>选择参数最小化：$\sum_i=\frac{error(\theta,data_i)^2}{\sigma^2+error(\theta,data_i)^2}$，例如数值优化。</li>
+<li>计算新的$\sigma=1.5·\text{median}(error)$。</li>
+<li>重复第2步和第3步直至收敛。</li>
+</ol>
+<h2 id="搜索参数的方法（当不存在闭式解时）"><a href="#搜索参数的方法（当不存在闭式解时）" class="headerlink" title="搜索参数的方法（当不存在闭式解时）"></a>搜索参数的方法（当不存在闭式解时）</h2><ul>
+<li>线性搜索/一维搜索<ol>
+<li>对于每个参数，逐步检查值并选择最适合的值</li>
+<li>重复第1步直到没有参数发生变化</li>
+</ol>
+</li>
+<li>网格搜索/二维搜索<ol>
+<li>提出几组参数，在联合集中均匀采样</li>
+<li>选择最佳（或前几个）并围绕当前最佳样本联合参数，重复</li>
+</ol>
+</li>
+<li>梯度下降法<ol>
+<li>生成初始化位置（例如随机化）</li>
+<li>根据梯度在局部搜索更好的参数</li>
+</ol>
+</li>
+</ul>
+<h2 id="假设与测试"><a href="#假设与测试" class="headerlink" title="假设与测试"></a>假设与测试</h2><ol>
+<li>提出参数<ul>
+<li>尝试所有可能</li>
+<li>每个点都为所有一致性参数投票</li>
+<li>重复采样足够的点来求解参数</li>
+</ul>
+</li>
+<li><p>对给定参数进行评分</p>
+<ul>
+<li>一致点的数目，可以由距离加权</li>
+</ul>
+</li>
+<li><p>从一组参数中进行选择</p>
+<ul>
+<li>全局/局部最优值得分</li>
+</ul>
+</li>
+<li>可以通过内点来优化参数</li>
+</ol>
+<h2 id="Hough变换"><a href="#Hough变换" class="headerlink" title="Hough变换"></a>Hough变换</h2><ol>
+<li>创建参数值网格</li>
+<li>每个点投票给一组参数，在网格中增加这些值</li>
+<li>在网格中找到最大值或局部最大值</li>
+</ol>
+<p>给定一组点，找出最能解释数据点的曲线或直线。</p>
+<p><img src="http://image.rexking6.top/img/clip1543367522.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1543367560.png" alt=""></p>
+<p>问题：参数空间 $[m,b]$ 是无界的。</p>
+<p>解决方法：对参数空间使用极坐标表示。</p>
+<p><img src="http://image.rexking6.top/img/clip1543367724.png" alt=""></p>
+<h3 id="一些实验结果"><a href="#一些实验结果" class="headerlink" title="一些实验结果"></a>一些实验结果</h3><p><img src="http://image.rexking6.top/img/clip1543367779.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1543367814.png" alt=""></p>
+<p>问题：由于均匀的噪声产生的伪峰值。</p>
+<p><img src="http://image.rexking6.top/img/clip1543367959.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1543367994.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1543368011.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1543368034.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1543368075.png" alt=""></p>
+<h3 id="利用Hough变换求解直线"><a href="#利用Hough变换求解直线" class="headerlink" title="利用Hough变换求解直线"></a>利用Hough变换求解直线</h3><ul>
+<li>使用 $m$，$b$ 参数化</li>
+<li><p>使用 $r$，$\theta$ 参数化</p>
+<ul>
+<li>使用有方向的梯度</li>
+</ul>
+</li>
+<li><p>实际考虑</p>
+<ul>
+<li>bin大小</li>
+<li>平滑化</li>
+<li>求解多条线</li>
+<li>求解线段</li>
+</ul>
+</li>
+</ul>
+<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ul>
+<li>对异常值的健壮性：每个点单独投票</li>
+<li>十分高效（比尝试所有参数快得多）</li>
+<li>生成多个好的拟合</li>
+</ul>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li><p>对噪音的敏感性</p>
+</li>
+<li><p>bin的大小在噪音容限、精度和速度/内存之间进行权衡</p>
+</li>
+<li><p>不适合多个参数</p>
+<p>网格大小呈指数增长</p>
+</li>
+</ul>
+<h3 id="应用-1"><a href="#应用-1" class="headerlink" title="应用"></a>应用</h3><ul>
+<li>直线拟合（圆、椭圆等）</li>
+<li>对象实例识别（参数为仿射变换）</li>
+<li>对象类别识别（参数为位置/尺度）</li>
+</ul>
+<h2 id="RANSAC"><a href="#RANSAC" class="headerlink" title="RANSAC"></a>RANSAC</h2><p>随机抽样一致性算法。</p>
+<p><img src="http://image.rexking6.top/img/clip1543371500.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1543371554.png" alt=""></p>
+<p>步骤：</p>
+<ol>
+<li><p>（随机）抽样所需的点数，以适应模型</p>
+<p><img src="http://image.rexking6.top/img/clip1543371575.png" alt=""></p>
+</li>
+<li><p>使用样本求解模型参数</p>
+<p><img src="http://image.rexking6.top/img/clip1543371624.png" alt=""></p>
+</li>
+<li><p>根据模型预设阈值内的离群值的百分比进行评分</p>
+<p><img src="http://image.rexking6.top/img/clip1543371644.png" alt=""></p>
+</li>
+<li><p>重复第1步至第3步，直到找到最适合的模型</p>
+<p><img src="http://image.rexking6.top/img/clip1543371694.png" alt=""></p>
+</li>
+</ol>
+<h3 id="怎样选择参数"><a href="#怎样选择参数" class="headerlink" title="怎样选择参数"></a>怎样选择参数</h3><ul>
+<li><p>样本个数 $N$</p>
+<p>选择 $N$，使得在概率为 $p$ 的情况下，至少有一个随机样本不存在离群值，如$p=0.99$（离群比：e）。</p>
+<script type="math/tex; mode=display">
+N=\frac{\text{log}(1-p)}{log(1-(1-e)^s)}</script></li>
+</ul>
+<ul>
+<li><p>采样点个数 $s$</p>
+<p>符合模型所需的最小数量。</p>
+</li>
+<li><p>距离阈值 $\delta$</p>
+<ul>
+<li>选择 $\delta$ 以便在阈值内可能存在具有噪声的好点，例如 $prob = 0.95$。</li>
+<li>零均值，标准差为 $t^2=3.84\sigma^2$ 的高斯噪声。</li>
+</ul>
+</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1543372037.png" alt=""></p>
+<h3 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h3><ul>
+<li>对异常点/离群点鲁棒</li>
+<li>适用于比Hough变换更多的目标函数参数</li>
+<li>优化参数的选择比Hough变换简单</li>
+</ul>
+<h3 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li>计算时间随着异常值的占比和参数的数量快速增长</li>
+<li>不适合生成多个拟合</li>
+</ul>
+<h3 id="应用-2"><a href="#应用-2" class="headerlink" title="应用"></a>应用</h3><ul>
+<li>计算单应性，例如图像拼接</li>
+<li>估计基本矩阵（关联两个视图）</li>
+</ul>
+<h1 id="十：对齐"><a href="#十：对齐" class="headerlink" title="十：对齐"></a>十：对齐</h1><p>对齐：搜索将一组点映射到另一组的模型参数。通常希望得到有最多真实对应关系占比的全局转换。</p>
+<p>难点：</p>
+<ul>
+<li>噪声（一般为1-3像素）</li>
+<li>离群值（通常是50%）</li>
+<li>多对一匹配或多个对象</li>
+</ul>
+<h2 id="参数（全局）变化"><a href="#参数（全局）变化" class="headerlink" title="参数（全局）变化"></a>参数（全局）变化</h2><p><img src="http://image.rexking6.top/img/clip1543390126.png" alt=""></p>
+<p>变换 $T$ 用于坐标变换，</p>
+<script type="math/tex; mode=display">
+p'=T(p)</script><p>$T$ 是全局的，意味着对于任何点 $p$ 都是一样的，可以只用几个参数来描述。对于线性变换，我们可以将 $T$ 表示为矩阵，</p>
+<script type="math/tex; mode=display">
+p'=Tp</script><h2 id="基础变换"><a href="#基础变换" class="headerlink" title="基础变换"></a>基础变换</h2><p><img src="http://image.rexking6.top/img/clip1543390277.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1543390414.png" alt=""></p>
+<h2 id="仿射变换"><a href="#仿射变换" class="headerlink" title="仿射变换"></a>仿射变换</h2><p><img src="http://image.rexking6.top/img/clip1543390462.png" alt=""></p>
+<p>仿射变换的性质：</p>
+<ul>
+<li>直线映射到直线</li>
+<li>平行线保持平行</li>
+<li>保留比率</li>
+<li>仍然保持闭合</li>
+</ul>
+<h2 id="投影变换"><a href="#投影变换" class="headerlink" title="投影变换"></a>投影变换</h2><p><img src="http://image.rexking6.top/img/clip1543391031.png" alt=""></p>
+<p>投影变换是仿射变换和投影变形的组合。有以下性质：</p>
+<ul>
+<li>直线映射到直线</li>
+<li>平行线不一定保持平行</li>
+<li>不保持原本的比率</li>
+<li>仍然闭合</li>
+<li>基础模型发生改变</li>
+<li>8个自由度</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1543391185.png" alt=""></p>
+<h2 id="例子：解决变换问题"><a href="#例子：解决变换问题" class="headerlink" title="例子：解决变换问题"></a>例子：解决变换问题</h2><p>给定 $\{A\}$ 和 $\{B\}$ 中的匹配点，估计对象的平移量</p>
+<p><img src="http://image.rexking6.top/img/clip1543391287.png" alt=""></p>
+<h3 id="最小二乘法"><a href="#最小二乘法" class="headerlink" title="最小二乘法"></a>最小二乘法</h3><ol>
+<li>确定目标函数</li>
+<li>利用导数<ol>
+<li>计算导数</li>
+<li>计算结果</li>
+</ol>
+</li>
+<li>计算结果<ol>
+<li>写成 $Ax=b$ 的形式</li>
+<li>利用伪逆或特征值分解求解</li>
+</ol>
+</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1543391314.png" alt=""></p>
+<h3 id="RANSAC-1"><a href="#RANSAC-1" class="headerlink" title="RANSAC"></a>RANSAC</h3><ol>
+<li>样本一组（一对）匹配点</li>
+<li>求解变换参数</li>
+<li>具有异常值数量的得分参数</li>
+<li>重复第1步至第3步，$N$ 次</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1543391505.png" alt=""></p>
+<h3 id="Hough变换-1"><a href="#Hough变换-1" class="headerlink" title="Hough变换"></a>Hough变换</h3><ol>
+<li>初始化参数值网格</li>
+<li>每个匹配对都对一致性值进行投票</li>
+<li>找到得票最多的参数</li>
+<li>使用最小二乘法对内点求解</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1543391505.png" alt=""></p>
+<p><strong>如果没有初始的匹配对，那么RANSAC和Hough变换就不适用。</strong></p>
+<h2 id="迭代最近点法（ICP）"><a href="#迭代最近点法（ICP）" class="headerlink" title="迭代最近点法（ICP）"></a>迭代最近点法（ICP）</h2><p>目标：估计两组密集点之间的变换。</p>
+<ol>
+<li><strong>初始化</strong>变换，例如计算均值和尺度的偏差</li>
+<li><strong>分配</strong>$\{Set 1\}$中的每个点到$\{Set 2\}$中最近邻</li>
+<li><strong>估计</strong>变换参数，即最小二乘法/鲁棒最小二乘法</li>
+<li><strong>变换</strong>使用估计参数转换 $\{Set 1\}$ 中的点</li>
+<li><strong>重复</strong>第2步至第4步，直至变化非常小</li>
+</ol>
+<h3 id="例子：边界对齐"><a href="#例子：边界对齐" class="headerlink" title="例子：边界对齐"></a>例子：边界对齐</h3><p><img src="http://image.rexking6.top/img/clip1543392061.png" alt=""></p>
+<ol>
+<li><p>提取边缘像素 $p_1..p_n$ 和 $q_1..q_m$</p>
+</li>
+<li><p>计算初始变换（例如，根据质心和方差计算平移和缩放）</p>
+</li>
+<li><p>得到每个点 $p$ 的最近邻，对应匹配</p>
+<script type="math/tex; mode=display">
+\text{match}(i)=\text{arg min}_j \ dist(p_i,q_j)</script></li>
+</ol>
+<ol>
+<li>根据匹配计算变换 $T$ </li>
+<li>根据 $T$ 变换点 $p$ </li>
+<li>重复第3步至第5步，直至收敛</li>
+</ol>
+<h2 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>最小二乘法<ul>
+<li>闭式解</li>
+<li>对噪声鲁棒</li>
+<li>对异常点不鲁棒</li>
+</ul>
+</li>
+<li>鲁棒最小二乘法<ul>
+<li>提高对噪声的鲁棒性</li>
+<li>需要迭代优化</li>
+</ul>
+</li>
+<li>Hough变换<ul>
+<li>对噪声和异常点鲁棒</li>
+<li>能够拟合多个模型</li>
+<li>只适用于少数参数（一般1至4）</li>
+</ul>
+</li>
+<li>RANSAC<ul>
+<li>对噪声和异常点鲁棒</li>
+<li>能够适用于较多的参数（一般1至8）</li>
+</ul>
+</li>
+<li>迭代最近点法（ICP）<ul>
+<li>仅用于局部对齐：不需要初始对应</li>
+</ul>
+</li>
+</ul>
+<h2 id="对象实例识别"><a href="#对象实例识别" class="headerlink" title="对象实例识别"></a>对象实例识别</h2><ol>
+<li>将关键点与对象模型匹配</li>
+<li>求解仿射变换参数</li>
+<li>按内点评分排序并选择分数高于阈值的内点</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1543395362.png" alt=""></p>
+<h2 id="特征点匹配"><a href="#特征点匹配" class="headerlink" title="特征点匹配"></a>特征点匹配</h2><ol>
+<li>找到一组独特的关键点</li>
+<li>描述每个关键点周围的区域</li>
+<li>提取并正则化区域内容</li>
+<li>从正则化区域计算局部描述符</li>
+<li>匹配局部描述符</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1543395555.png" alt=""></p>
+<h2 id="基于特征点的实例识别"><a href="#基于特征点的实例识别" class="headerlink" title="基于特征点的实例识别"></a>基于特征点的实例识别</h2><p>给出两个图像及其关键点（位置，比例，方向，描述符）。<br>目标：验证它们是否属于一致的。</p>
+<p><img src="http://image.rexking6.top/img/clip1543395659.png" alt=""></p>
+<h2 id="对象搜索"><a href="#对象搜索" class="headerlink" title="对象搜索"></a>对象搜索</h2><ol>
+<li>匹配从输入图像到数据库图像的特征点</li>
+<li>匹配点投票选择粗略的位置、方向、对象比例</li>
+<li>找到至少有三票的位置、方向、对象比例</li>
+<li>使用具有异常值检查的迭代最小二乘法计算仿射定位和匹配</li>
+<li>如果至少有 $T$ 个匹配点，则报告对象</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\10\29\《多媒体技术》\" rel="bookmark">《多媒体技术》</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\27\《视频分析前沿》一\" rel="bookmark">《视频分析前沿》一</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\01\06\《计算智能》（二）概率\" rel="bookmark">《计算智能》（二）概率</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/09/22/%E3%80%8A%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89%E3%80%8B/" title="《计算机视觉》">https://blog.rexking6.top/2018/09/22/《计算机视觉》/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%A1%95%E5%A3%AB%E8%AF%BE%E7%A8%8B/" rel="tag"># 硕士课程</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/09/01/%E6%A8%A1%E5%9E%8B%E8%9E%8D%E5%90%88Stacking/" rel="prev" title="模型融合Stacking">
+      <i class="fa fa-chevron-left"></i> 模型融合Stacking
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/09/23/SIFT%E7%89%B9%E5%BE%81%E8%AF%A6%E8%AF%A6%E8%A7%A3/" rel="next" title="SIFT特征详详解">
+      SIFT特征详详解 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80"><span class="nav-number">2.</span> <span class="nav-text">一</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%BD%90%E6%AC%A1%E5%9D%90%E6%A0%87"><span class="nav-number">2.1.</span> <span class="nav-text">齐次坐标</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8F%AB%E9%BD%90%E6%AC%A1%E5%9D%90%E6%A0%87%EF%BC%9F"><span class="nav-number">2.1.1.</span> <span class="nav-text">为什么叫齐次坐标？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%81%E6%98%8E-%E4%B8%A4%E5%B9%B3%E8%A1%8C%E7%BA%BF%E5%8F%AF%E4%BB%A5%E7%9B%B8%E4%BA%A4"><span class="nav-number">2.1.2.</span> <span class="nav-text">证明: 两平行线可以相交</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E5%9D%90%E6%A0%87%E7%B3%BB"><span class="nav-number">2.2.</span> <span class="nav-text">三坐标系</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E5%9D%90%E6%A0%87%E7%B3%BB"><span class="nav-number">2.2.1.</span> <span class="nav-text">图像坐标系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E6%9C%BA%E5%9D%90%E6%A0%87%E7%B3%BB"><span class="nav-number">2.2.2.</span> <span class="nav-text">相机坐标系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%96%E7%95%8C%E5%9D%90%E6%A0%87%E7%B3%BB"><span class="nav-number">2.2.3.</span> <span class="nav-text">世界坐标系</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%95%E5%BD%B1%E7%9F%A9%E9%98%B5"><span class="nav-number">2.3.</span> <span class="nav-text">投影矩阵</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E9%83%A8%E7%9F%A9%E9%98%B5-K"><span class="nav-number">2.3.1.</span> <span class="nav-text">内部矩阵$K$</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E7%84%A6%E8%B7%9D-f"><span class="nav-number">2.3.1.1.</span> <span class="nav-text">1.焦距$f$</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%85%89%E4%B8%AD%E5%BF%83-u-0-v-0"><span class="nav-number">2.3.1.2.</span> <span class="nav-text">2. 光中心$(u_0,v_0)$</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%8D%95%E5%85%83%E7%9A%84%E9%95%BF%E5%AE%BD%E6%AF%94%EF%BC%8C%E9%9D%9E%E6%96%B9%E5%BD%A2-alpha-beta"><span class="nav-number">2.3.1.3.</span> <span class="nav-text">3.单元的长宽比，非方形$\alpha$,$\beta$</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E5%80%BE%E6%96%9C%E7%A8%8B%E5%BA%A6-s"><span class="nav-number">2.3.1.4.</span> <span class="nav-text">4.倾斜程度$s$</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%8B%E8%BD%AC%E7%9F%A9%E9%98%B5-R"><span class="nav-number">2.3.2.</span> <span class="nav-text">旋转矩阵$R$</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E7%BB%95-x-%E8%BD%B4"><span class="nav-number">2.3.2.1.</span> <span class="nav-text">1.绕$x$轴</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E7%BB%95-y-%E8%BD%B4"><span class="nav-number">2.3.2.2.</span> <span class="nav-text">2.绕$y$轴</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E7%BB%95-z-%E8%BD%B4"><span class="nav-number">2.3.2.3.</span> <span class="nav-text">3.绕$z$轴</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B3%E7%A7%BB%E5%90%91%E9%87%8F-T"><span class="nav-number">2.3.3.</span> <span class="nav-text">平移向量$T$</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E7%94%B1%E5%BA%A6"><span class="nav-number">2.3.4.</span> <span class="nav-text">自由度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%812D%E5%8F%98%E6%8D%A2-%E4%BB%BF%E5%B0%84%E5%8F%98%E6%8D%A2"><span class="nav-number">2.3.5.</span> <span class="nav-text">常见2D变换&#x2F;仿射变换</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C"><span class="nav-number">3.</span> <span class="nav-text">二</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%99%AF%E6%B7%B1"><span class="nav-number">3.1.</span> <span class="nav-text">景深</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%89%E5%AD%90"><span class="nav-number">3.2.</span> <span class="nav-text">光子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%B8%E6%94%B6"><span class="nav-number">3.2.1.</span> <span class="nav-text">吸收</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%AB%E5%B0%84"><span class="nav-number">3.2.2.</span> <span class="nav-text">漫射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E5%B0%84"><span class="nav-number">3.2.3.</span> <span class="nav-text">反射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%8F%E5%B0%84"><span class="nav-number">3.2.4.</span> <span class="nav-text">透射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%98%E5%B0%84"><span class="nav-number">3.2.5.</span> <span class="nav-text">折射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8D%A7%E5%85%89"><span class="nav-number">3.2.6.</span> <span class="nav-text">荧光</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%90%E9%9D%A2%E6%95%A3%E5%B0%84"><span class="nav-number">3.2.7.</span> <span class="nav-text">子面散射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A3%B7%E5%85%89"><span class="nav-number">3.2.8.</span> <span class="nav-text">磷光</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E4%BA%92%E5%8F%8D%E5%B0%84"><span class="nav-number">3.2.9.</span> <span class="nav-text">相互反射</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="nav-number">3.3.</span> <span class="nav-text">图片显示的两种方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%BA%E7%9C%BC"><span class="nav-number">3.4.</span> <span class="nav-text">人眼</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%86%E9%94%A5%E7%BB%86%E8%83%9E"><span class="nav-number">3.4.1.</span> <span class="nav-text">视锥细胞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%86%E6%9D%86%E7%BB%86%E8%83%9E"><span class="nav-number">3.4.2.</span> <span class="nav-text">视杆细胞</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%84%9F%E5%8F%97%E9%87%8E"><span class="nav-number">3.5.</span> <span class="nav-text">感受野</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%89"><span class="nav-number">4.</span> <span class="nav-text">三</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E6%BB%A4%E6%B3%A2"><span class="nav-number">4.1.</span> <span class="nav-text">图像滤波</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A9%BA%E9%97%B4%E5%9F%9F%E7%9A%84%E5%9B%BE%E5%83%8F%E6%BB%A4%E6%B3%A2%E5%99%A8"><span class="nav-number">4.2.</span> <span class="nav-text">空间域的图像滤波器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%92%E6%BB%A4%E6%B3%A2%E5%99%A8"><span class="nav-number">4.2.1.</span> <span class="nav-text">盒滤波器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%94%90%E5%8C%96%E6%BB%A4%E6%B3%A2%E5%99%A8"><span class="nav-number">4.2.2.</span> <span class="nav-text">锐化滤波器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9E%82%E7%9B%B4%E8%BE%B9%E7%BC%98%E6%BB%A4%E6%B3%A2%E5%99%A8"><span class="nav-number">4.2.3.</span> <span class="nav-text">垂直边缘滤波器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B0%B4%E5%B9%B3%E8%BE%B9%E7%BC%98%E6%BB%A4%E6%B3%A2%E5%99%A8"><span class="nav-number">4.2.4.</span> <span class="nav-text">水平边缘滤波器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BB%A4%E6%B3%A2%E4%B8%8E%E5%8D%B7%E7%A7%AF%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">4.2.5.</span> <span class="nav-text">滤波与卷积的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BB%A4%E6%B3%A2%E7%9A%84%E5%8F%AF%E5%88%86%E7%A6%BB%E6%80%A7"><span class="nav-number">4.2.6.</span> <span class="nav-text">滤波的可分离性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BB%A4%E6%B3%A2%E5%99%A8%E7%9A%84%E5%A4%A7%E5%B0%8F"><span class="nav-number">4.2.7.</span> <span class="nav-text">滤波器的大小</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AD%E5%80%BC%E6%BB%A4%E6%B3%A2%E5%99%A8"><span class="nav-number">4.2.8.</span> <span class="nav-text">中值滤波器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E9%9D%9E%E7%BA%BF%E6%80%A7%E6%BB%A4%E6%B3%A2%E5%99%A8"><span class="nav-number">4.2.9.</span> <span class="nav-text">其他非线性滤波器</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%89%E5%A4%96%EF%BC%9A%E5%8D%B7%E7%A7%AF"><span class="nav-number">5.</span> <span class="nav-text">三外：卷积</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E7%BB%B4%E5%8D%B7%E7%A7%AF"><span class="nav-number">5.1.</span> <span class="nav-text">一维卷积</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A6%BB%E6%95%A3%E4%B8%80%E7%BB%B4%E5%8D%B7%E7%A7%AF"><span class="nav-number">5.2.</span> <span class="nav-text">离散一维卷积</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E7%BB%B4%E5%8D%B7%E7%A7%AF"><span class="nav-number">5.3.</span> <span class="nav-text">二维卷积</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A6%BB%E6%95%A3%E4%BA%8C%E7%BB%B4%E5%8D%B7%E7%A7%AF"><span class="nav-number">5.4.</span> <span class="nav-text">离散二维卷积</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%9B"><span class="nav-number">6.</span> <span class="nav-text">四</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84%E7%89%A9%E7%90%86%E6%84%8F%E4%B9%89"><span class="nav-number">6.1.</span> <span class="nav-text">图像傅里叶变换的物理意义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-number">6.2.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%A7%E8%B4%A8"><span class="nav-number">6.3.</span> <span class="nav-text">性质</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%91%E5%9F%9F%E6%BB%A4%E6%B3%A2"><span class="nav-number">6.4.</span> <span class="nav-text">频域滤波</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E6%96%AF%E6%BB%A4%E6%B3%A2"><span class="nav-number">6.4.1.</span> <span class="nav-text">高斯滤波</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%92%E6%BB%A4%E6%B3%A2"><span class="nav-number">6.4.2.</span> <span class="nav-text">盒滤波</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%94"><span class="nav-number">7.</span> <span class="nav-text">五</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%87%E6%A0%B7"><span class="nav-number">7.1.</span> <span class="nav-text">采样</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B7%E5%8F%A0%E9%97%AE%E9%A2%98"><span class="nav-number">7.1.1.</span> <span class="nav-text">混叠问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A5%88%E5%A5%8E%E6%96%AF%E7%89%B9%E5%87%86%E5%88%99"><span class="nav-number">7.1.1.1.</span> <span class="nav-text">奈奎斯特准则</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B6%88%E9%99%A4%E6%B7%B7%E5%8F%A0"><span class="nav-number">7.1.1.2.</span> <span class="nav-text">消除混叠</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%BA%E7%B1%BB%E6%84%9F%E7%9F%A5%E7%BA%BF%E7%B4%A2"><span class="nav-number">7.1.2.</span> <span class="nav-text">人类感知线索</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A6%BB%E6%95%A3%E5%82%85%E5%88%A9%E5%8F%B6%E5%8F%98%E6%8D%A2"><span class="nav-number">7.2.</span> <span class="nav-text">离散傅利叶变换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E6%9D%BF%E5%8C%B9%E9%85%8D"><span class="nav-number">7.3.</span> <span class="nav-text">模板匹配</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BB%A4%E6%B3%A2%E5%99%A8%E5%8C%B9%E9%85%8D"><span class="nav-number">7.3.1.</span> <span class="nav-text">滤波器匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%B6%E5%9D%87%E5%80%BC%E6%BB%A4%E6%B3%A2%E5%99%A8%E5%8C%B9%E9%85%8D"><span class="nav-number">7.3.2.</span> <span class="nav-text">零均值滤波器匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSD"><span class="nav-number">7.3.3.</span> <span class="nav-text">SSD</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BD%9C%E5%9C%A8%E7%BC%BA%E7%82%B9"><span class="nav-number">7.3.3.1.</span> <span class="nav-text">潜在缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%92%E4%B8%80%E5%8C%96%E4%BA%92%E7%9B%B8%E5%85%B3"><span class="nav-number">7.3.4.</span> <span class="nav-text">归一化互相关</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E6%AF%94%E5%AF%B9"><span class="nav-number">7.3.5.</span> <span class="nav-text">方法比对</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E9%87%91%E5%AD%97%E5%A1%94"><span class="nav-number">7.3.6.</span> <span class="nav-text">图像金字塔</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C%E7%BB%B4%E8%BE%B9%E7%BC%98%E6%A3%80%E6%B5%8B%E6%BB%A4%E6%B3%A2%E5%99%A8"><span class="nav-number">7.3.6.1.</span> <span class="nav-text">二维边缘检测滤波器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8B%89%E6%99%AE%E6%8B%89%E6%96%AF%E6%BB%A4%E6%B3%A2%E5%99%A8"><span class="nav-number">7.3.6.2.</span> <span class="nav-text">拉普拉斯滤波器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E9%AB%98%E6%96%AF-%E6%8B%89%E6%99%AE%E6%8B%89%E6%96%AF%E7%9A%84%E9%87%91%E5%AD%97%E5%A1%94"><span class="nav-number">7.3.6.3.</span> <span class="nav-text">计算高斯&#x2F;拉普拉斯的金字塔</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E8%A1%A8%E7%A4%BA%E6%80%BB%E7%BB%93"><span class="nav-number">7.3.7.</span> <span class="nav-text">图像表示总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%EF%BC%9A%E7%BA%B9%E7%90%86%E8%A1%A8%E7%A4%BA"><span class="nav-number">7.3.8.</span> <span class="nav-text">应用：纹理表示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%87%E5%AE%8C%E5%A4%87%E8%A1%A8%E7%A4%BA%EF%BC%9A%E6%BB%A4%E6%B3%A2%E5%99%A8%E7%BB%84%EF%BC%88filter-banks%EF%BC%89"><span class="nav-number">7.3.9.</span> <span class="nav-text">过完备表示：滤波器组（filter banks）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%B9%E7%90%86%E7%89%B9%E5%BE%81%E8%A1%A8%E7%A4%BA"><span class="nav-number">7.4.</span> <span class="nav-text">纹理特征表示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E5%8E%8B%E7%BC%A9"><span class="nav-number">7.5.</span> <span class="nav-text">图像压缩</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A6%BB%E6%95%A3%E4%BD%99%E5%BC%A6%E5%8F%98%E6%8D%A2%EF%BC%88DCT%EF%BC%89"><span class="nav-number">7.5.1.</span> <span class="nav-text">离散余弦变换（DCT）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%89%E6%8D%9F%E5%9B%BE%E5%83%8F%E5%8E%8B%E7%BC%A9%EF%BC%88JPEG%EF%BC%89"><span class="nav-number">7.5.2.</span> <span class="nav-text">有损图像压缩（JPEG）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%86DCT%E7%94%A8%E4%BA%8E%E5%9B%BE%E5%83%8F%E5%8E%8B%E7%BC%A9"><span class="nav-number">7.5.3.</span> <span class="nav-text">将DCT用于图像压缩</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JPEG%E5%8E%8B%E7%BC%A9%E7%9A%84%E6%80%BB%E7%BB%93"><span class="nav-number">7.5.4.</span> <span class="nav-text">JPEG压缩的总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A0%E6%8D%9F%E5%8E%8B%E7%BC%A9%EF%BC%88PNG%EF%BC%89"><span class="nav-number">7.5.5.</span> <span class="nav-text">无损压缩（PNG）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%8D%E5%99%AA"><span class="nav-number">7.6.</span> <span class="nav-text">降噪</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%8F%E5%B0%91%E9%AB%98%E6%96%AF%E5%99%AA%E5%A3%B0"><span class="nav-number">7.6.1.</span> <span class="nav-text">减少高斯噪声</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E8%BF%87%E9%AB%98%E6%96%AF%E5%B9%B3%E6%BB%91%E5%87%8F%E5%B0%91%E6%A4%92%E7%9B%90%E5%99%AA%E5%A3%B0"><span class="nav-number">7.6.2.</span> <span class="nav-text">通过高斯平滑减少椒盐噪声</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AD%E5%80%BC%E6%BB%A4%E6%B3%A2%E5%99%A8-1"><span class="nav-number">7.6.3.</span> <span class="nav-text">中值滤波器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E7%A6%BB%E7%BE%A4%E5%80%BC%E6%9C%89%E9%B2%81%E6%A3%92%E6%80%A7"><span class="nav-number">7.6.3.1.</span> <span class="nav-text">对离群值有鲁棒性</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%AD%EF%BC%9A%E8%BE%B9%E7%BC%98-%E8%BE%B9%E7%95%8C%E6%A3%80%E6%B5%8B"><span class="nav-number">8.</span> <span class="nav-text">六：边缘&#x2F;边界检测</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%8F%E8%BF%B0%E8%BE%B9%E7%BC%98"><span class="nav-number">8.1.</span> <span class="nav-text">描述边缘</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%99%AA%E5%A3%B0%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">8.1.1.</span> <span class="nav-text">噪声的影响</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">8.1.1.1.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E5%AF%BC%E6%95%B0%E5%AE%9A%E7%90%86"><span class="nav-number">8.1.1.2.</span> <span class="nav-text">卷积导数定理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E6%96%BD%E9%97%AE%E9%A2%98"><span class="nav-number">8.1.1.3.</span> <span class="nav-text">实施问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E8%BE%B9%E7%BC%98%E6%A3%80%E6%B5%8B%E5%99%A8"><span class="nav-number">8.1.1.4.</span> <span class="nav-text">设计边缘检测器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Canny%E8%BE%B9%E7%BC%98%E6%A3%80%E6%B5%8B%E5%99%A8"><span class="nav-number">8.1.1.5.</span> <span class="nav-text">Canny边缘检测器</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Matlab%E4%B8%AD%E7%9A%84Canny%E8%BE%B9%E7%BC%98%E6%A3%80%E6%B5%8B%E5%99%A8"><span class="nav-number">8.1.1.5.1.</span> <span class="nav-text">Matlab中的Canny边缘检测器</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%A0%B7%E4%BE%8B"><span class="nav-number">8.1.1.5.2.</span> <span class="nav-text">样例</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">8.1.1.5.3.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pB%E8%BE%B9%E7%BC%98%E6%8E%A2%E6%B5%8B%E5%99%A8"><span class="nav-number">8.1.2.</span> <span class="nav-text">pB边缘探测器</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%83%EF%BC%9A%E5%85%B4%E8%B6%A3%E7%82%B9%E5%92%8C%E8%A7%92%E7%82%B9"><span class="nav-number">9.</span> <span class="nav-text">七：兴趣点和角点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%A8%E8%B6%8A%E8%A7%86%E8%A7%92%E7%9A%84%E5%AF%B9%E5%BA%94"><span class="nav-number">9.1.</span> <span class="nav-text">跨越视角的对应</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BA%94%E7%94%A8"><span class="nav-number">9.2.</span> <span class="nav-text">应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E7%82%B9%E5%8C%B9%E9%85%8D%E6%A6%82%E8%BF%B0"><span class="nav-number">9.3.</span> <span class="nav-text">关键点匹配概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%8F%98%E5%B1%80%E9%83%A8%E7%89%B9%E5%BE%81"><span class="nav-number">9.4.</span> <span class="nav-text">不变局部特征</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A5%BD%E7%9A%84%E7%89%B9%E5%BE%81%E7%9A%84%E7%89%B9%E7%82%B9"><span class="nav-number">9.5.</span> <span class="nav-text">好的特征的特点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E9%87%8D%E5%A4%8D%E6%80%A7"><span class="nav-number">9.5.1.</span> <span class="nav-text">可重复性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%89%B4%E5%88%AB%E6%80%A7"><span class="nav-number">9.5.2.</span> <span class="nav-text">鉴别性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%92%E7%82%B9%E6%A3%80%E6%B5%8B"><span class="nav-number">9.6.</span> <span class="nav-text">角点检测</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E5%AD%A6%E6%8E%A8%E5%AF%BC"><span class="nav-number">9.6.1.</span> <span class="nav-text">数学推导</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%A3%E9%87%8A%E4%BA%8C%E6%AC%A1%E7%9F%A9%E9%98%B5"><span class="nav-number">9.6.1.1.</span> <span class="nav-text">解释二次矩阵</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%A3%E9%87%8A%E7%89%B9%E5%BE%81%E5%80%BC"><span class="nav-number">9.6.1.2.</span> <span class="nav-text">解释特征值</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Harris%E8%A7%92%E7%82%B9%E6%A3%80%E6%B5%8B"><span class="nav-number">9.6.2.</span> <span class="nav-text">Harris角点检测</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">9.6.2.1.</span> <span class="nav-text">例子</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hessian%E8%A7%92%E7%82%B9%E6%A3%80%E6%B5%8B"><span class="nav-number">9.6.3.</span> <span class="nav-text">Hessian角点检测</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Hessian-amp-Harris"><span class="nav-number">9.6.3.1.</span> <span class="nav-text">Hessian&amp;Harris</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%8F%98%E6%80%A7%E5%92%8C%E9%BD%90%E5%8F%98%E6%8D%A2%E6%80%A7"><span class="nav-number">9.6.4.</span> <span class="nav-text">不变性和齐变换性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%BF%E5%B0%84%E5%BC%BA%E5%BA%A6%E5%8F%98%E5%8C%96"><span class="nav-number">9.6.4.1.</span> <span class="nav-text">仿射强度变化</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%AB%EF%BC%9A%E5%B1%80%E9%83%A8%E5%9B%BE%E5%83%8F%E7%89%B9%E5%BE%81"><span class="nav-number">10.</span> <span class="nav-text">八：局部图像特征</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E9%80%89%E6%8B%A9%E5%B0%BA%E5%BA%A6"><span class="nav-number">10.1.</span> <span class="nav-text">自动选择尺度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%89%E7%94%A8%E7%9A%84%E7%AD%BE%E5%90%8D%E5%87%BD%E6%95%B0"><span class="nav-number">10.2.</span> <span class="nav-text">有用的签名函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Harris-Laplace"><span class="nav-number">10.3.</span> <span class="nav-text">Harris-Laplace</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%A4%A7%E7%A8%B3%E5%AE%9A%E6%9E%81%E5%80%BC%E5%8C%BA%E5%9F%9F%EF%BC%88MSER"><span class="nav-number">10.4.</span> <span class="nav-text">最大稳定极值区域（MSER)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4"><span class="nav-number">10.4.1.</span> <span class="nav-text">步骤</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E8%A1%A8%E7%A4%BA%EF%BC%9A%E7%9B%B4%E6%96%B9%E5%9B%BE"><span class="nav-number">10.5.</span> <span class="nav-text">图像表示：直方图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%9D%E7%A6%BB%E8%AE%A1%E7%AE%97"><span class="nav-number">10.5.1.</span> <span class="nav-text">距离计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8F%E5%8C%96"><span class="nav-number">10.5.2.</span> <span class="nav-text">量化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D"><span class="nav-number">10.5.3.</span> <span class="nav-text">匹配</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E6%8F%8F%E8%BF%B0%E7%AC%A6%EF%BC%9A%E5%BD%A2%E7%8A%B6%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="nav-number">10.6.</span> <span class="nav-text">局部描述符：形状上下文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E6%8F%8F%E8%BF%B0%E7%AC%A6%EF%BC%9A%E5%87%A0%E4%BD%95%E6%A8%A1%E7%B3%8A"><span class="nav-number">10.7.</span> <span class="nav-text">局部描述符：几何模糊</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E7%9B%B8%E4%BC%BC%E6%80%A7%E6%8F%8F%E8%BF%B0%E7%AC%A6"><span class="nav-number">10.8.</span> <span class="nav-text">自相似性描述符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E5%B1%80%E9%83%A8%E5%9B%BE%E5%83%8F%E6%8F%8F%E8%BF%B0%E7%AC%A6"><span class="nav-number">10.9.</span> <span class="nav-text">学习局部图像描述符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E6%8F%8F%E8%BF%B0%E7%AC%A6%EF%BC%9A%E6%80%BB%E7%BB%93"><span class="nav-number">10.10.</span> <span class="nav-text">局部描述符：总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E6%8F%8F%E8%BF%B0%E7%AC%A6%EF%BC%9A%E5%8C%B9%E9%85%8D"><span class="nav-number">10.11.</span> <span class="nav-text">局部描述符：匹配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SURF"><span class="nav-number">10.12.</span> <span class="nav-text">SURF</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B9%9D%EF%BC%9A%E6%8B%9F%E5%90%88"><span class="nav-number">11.</span> <span class="nav-text">九：拟合</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95"><span class="nav-number">11.1.</span> <span class="nav-text">方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E4%BE%8B%E5%AD%90%EF%BC%9A%E6%8B%9F%E5%90%88%E4%B8%80%E6%9D%A1%E7%9B%B4%E7%BA%BF"><span class="nav-number">11.2.</span> <span class="nav-text">简单例子：拟合一条直线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%80%9C%E5%9E%82%E7%9B%B4%E2%80%9D%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95"><span class="nav-number">11.2.1.</span> <span class="nav-text">“垂直”最小二乘法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E4%BD%93%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95"><span class="nav-number">11.2.2.</span> <span class="nav-text">总体最小二乘法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%B2%81%E6%A3%92%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95%EF%BC%88%E7%94%A8%E4%BA%8E%E5%A4%84%E7%90%86%E5%BC%82%E5%B8%B8%E5%80%BC%EF%BC%89"><span class="nav-number">11.2.3.</span> <span class="nav-text">鲁棒最小二乘法（用于处理异常值）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%B2%81%E6%A3%92%E5%87%BD%E6%95%B0-rho"><span class="nav-number">11.2.3.1.</span> <span class="nav-text">鲁棒函数 $\rho$</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%B2%81%E6%A3%92%E4%BC%B0%E8%AE%A1"><span class="nav-number">11.3.</span> <span class="nav-text">鲁棒估计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%9C%E7%B4%A2%E5%8F%82%E6%95%B0%E7%9A%84%E6%96%B9%E6%B3%95%EF%BC%88%E5%BD%93%E4%B8%8D%E5%AD%98%E5%9C%A8%E9%97%AD%E5%BC%8F%E8%A7%A3%E6%97%B6%EF%BC%89"><span class="nav-number">11.4.</span> <span class="nav-text">搜索参数的方法（当不存在闭式解时）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%87%E8%AE%BE%E4%B8%8E%E6%B5%8B%E8%AF%95"><span class="nav-number">11.5.</span> <span class="nav-text">假设与测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hough%E5%8F%98%E6%8D%A2"><span class="nav-number">11.6.</span> <span class="nav-text">Hough变换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">11.6.1.</span> <span class="nav-text">一些实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8Hough%E5%8F%98%E6%8D%A2%E6%B1%82%E8%A7%A3%E7%9B%B4%E7%BA%BF"><span class="nav-number">11.6.2.</span> <span class="nav-text">利用Hough变换求解直线</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E7%82%B9"><span class="nav-number">11.6.3.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E7%82%B9"><span class="nav-number">11.6.4.</span> <span class="nav-text">缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8-1"><span class="nav-number">11.6.5.</span> <span class="nav-text">应用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RANSAC"><span class="nav-number">11.7.</span> <span class="nav-text">RANSAC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%8E%E6%A0%B7%E9%80%89%E6%8B%A9%E5%8F%82%E6%95%B0"><span class="nav-number">11.7.1.</span> <span class="nav-text">怎样选择参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E7%82%B9-1"><span class="nav-number">11.7.2.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E7%82%B9-1"><span class="nav-number">11.7.3.</span> <span class="nav-text">缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8-2"><span class="nav-number">11.7.4.</span> <span class="nav-text">应用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%81%EF%BC%9A%E5%AF%B9%E9%BD%90"><span class="nav-number">12.</span> <span class="nav-text">十：对齐</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%EF%BC%88%E5%85%A8%E5%B1%80%EF%BC%89%E5%8F%98%E5%8C%96"><span class="nav-number">12.1.</span> <span class="nav-text">参数（全局）变化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E5%8F%98%E6%8D%A2"><span class="nav-number">12.2.</span> <span class="nav-text">基础变换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%BF%E5%B0%84%E5%8F%98%E6%8D%A2"><span class="nav-number">12.3.</span> <span class="nav-text">仿射变换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%95%E5%BD%B1%E5%8F%98%E6%8D%A2"><span class="nav-number">12.4.</span> <span class="nav-text">投影变换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%EF%BC%9A%E8%A7%A3%E5%86%B3%E5%8F%98%E6%8D%A2%E9%97%AE%E9%A2%98"><span class="nav-number">12.5.</span> <span class="nav-text">例子：解决变换问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95"><span class="nav-number">12.5.1.</span> <span class="nav-text">最小二乘法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RANSAC-1"><span class="nav-number">12.5.2.</span> <span class="nav-text">RANSAC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hough%E5%8F%98%E6%8D%A2-1"><span class="nav-number">12.5.3.</span> <span class="nav-text">Hough变换</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%AD%E4%BB%A3%E6%9C%80%E8%BF%91%E7%82%B9%E6%B3%95%EF%BC%88ICP%EF%BC%89"><span class="nav-number">12.6.</span> <span class="nav-text">迭代最近点法（ICP）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%EF%BC%9A%E8%BE%B9%E7%95%8C%E5%AF%B9%E9%BD%90"><span class="nav-number">12.6.1.</span> <span class="nav-text">例子：边界对齐</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93-1"><span class="nav-number">12.7.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E5%AE%9E%E4%BE%8B%E8%AF%86%E5%88%AB"><span class="nav-number">12.8.</span> <span class="nav-text">对象实例识别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%B9%E5%BE%81%E7%82%B9%E5%8C%B9%E9%85%8D"><span class="nav-number">12.9.</span> <span class="nav-text">特征点匹配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E7%89%B9%E5%BE%81%E7%82%B9%E7%9A%84%E5%AE%9E%E4%BE%8B%E8%AF%86%E5%88%AB"><span class="nav-number">12.10.</span> <span class="nav-text">基于特征点的实例识别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E6%90%9C%E7%B4%A2"><span class="nav-number">12.11.</span> <span class="nav-text">对象搜索</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="coursera深度学习笔记">
+<meta property="og:url" content="https://blog.rexking6.top/2018/03/12/coursera%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1516066704.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520852862.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520853057.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520643786.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520643869.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520827911.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520828112.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520643672.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520643786.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520643869.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520854494.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1520909284.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521001176.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521001306.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521001992.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521002045.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521002239.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521003854.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521077185.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521077224.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521077662.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521086129.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521086453.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521095084.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521174112.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521174680.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521201768.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521201851.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521248335.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521248694.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521248885.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521248959.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521249071.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521251300.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521251319.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521251339.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521251363.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521251789.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521251810.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521251830.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521252817.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521254312.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521256618.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521256708.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521263275.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521264021.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521264961.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521265012.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521266003.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521266160.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521292400.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521292624.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521293626.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521293748.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521299767.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521299815.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521300263.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521331259.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521331844.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521331937.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521332421.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521332494.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521332520.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521332859.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521332885.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521338608.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521344285.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521344409.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521352859.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521353362.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521353761.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521354285.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521355236.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521355326.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521357637.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521422992.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521425038.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521425116.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521428035.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521429824.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521431713.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521432040.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521432251.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521432526.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521432671.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521432701.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521432925.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521433438.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521433461.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521436450.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521436515.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521436625.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521439235.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521439310.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521506326.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521507659.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521508368.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521508818.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521509631.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521510180.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521510623.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521511459.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521512633.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521513108.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521513352.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521545177.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521546829.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521546963.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521548578.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521554271.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521554659.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521555061.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521591688.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521596204.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521596518.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521596563.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521598278.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521618787.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521618838.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521619063.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521619835.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521620174.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521621361.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1521621550.png">
+<meta property="article:published_time" content="2018-03-12T10:45:16.000Z">
+<meta property="article:modified_time" content="2021-07-06T01:01:03.260Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1516066704.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/03/12/coursera%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>coursera深度学习笔记 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/03/12/coursera%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          coursera深度学习笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-03-12 18:45:16" itemprop="dateCreated datePublished" datetime="2018-03-12T18:45:16+08:00">2018-03-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-06 09:01:03" itemprop="dateModified" datetime="2021-07-06T09:01:03+08:00">2021-07-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/03/12/coursera%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="coursera深度学习笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>58k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>53 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>大部分转载：<a target="_blank" rel="noopener" href="http://kyonhuang.top/Andrew-Ng-Deep-Learning-notes/#/">大黄菌的深度学习笔记</a>。</p>
+<p>第四课和第五课部分内容为自己笔记，质量有限，玉中掺瑕。</p>
+<h1 id="神经网络和深度学习"><a href="#神经网络和深度学习" class="headerlink" title="神经网络和深度学习"></a>神经网络和深度学习</h1><h2 id="神经网络基础"><a href="#神经网络基础" class="headerlink" title="神经网络基础"></a>神经网络基础</h2><h3 id="神经网络种类"><a href="#神经网络种类" class="headerlink" title="神经网络种类"></a>神经网络种类</h3><p><img src="http://image.rexking6.top/img/clip1516066704.png" alt=""><br>一般非结构化的数据，用的是标准神经网络（NN），左一；<br>图像视频之类的数据，用的是卷积神经网络（CNN），左二；<br>音频翻译之类的数据，用的是序列神经网络（RNN），左三。</p>
+<h3 id="结构化数据"><a href="#结构化数据" class="headerlink" title="结构化数据"></a>结构化数据</h3><p>结构化数据：音频图像视频<br>非结构化数据：普通数据</p>
+<h3 id="缺失数据"><a href="#缺失数据" class="headerlink" title="缺失数据"></a>缺失数据</h3><p>1.使用可用特征的均值来填补缺失值；<br>2.使用特殊值来填补缺失值，如-1；<br>3.忽略有缺失值的样本；<br>4.使用相似样本的均值添补缺失值；<br>5.使用另外的机器学习算法预测缺失值。</p>
+<h2 id="浅层神经网络"><a href="#浅层神经网络" class="headerlink" title="浅层神经网络"></a>浅层神经网络</h2><h3 id="神经网络表示"><a href="#神经网络表示" class="headerlink" title="神经网络表示"></a>神经网络表示</h3><p>竖向堆叠起来的输入特征被称作神经网络的输入层（the input layer）。</p>
+<p>神经网络的隐藏层（a hidden layer）。“隐藏”的含义是在训练集中，这些中间节点的真正数值是无法看到的。</p>
+<p>输出层（the output layer）负责输出预测值。</p>
+<p><img src="http://image.rexking6.top/img/clip1520852862.png" alt=""></p>
+<p>如图是一个双层神经网络，也称作单隐层神经网络（a single hidden layer neural network）。当我们计算网络的层数时，通常不考虑输入层，因此图中隐藏层是第一层，输出层是第二层。</p>
+<p>约定俗成的符号表示是：</p>
+<ul>
+<li>输入层的激活值为 $a^{[0]}$；</li>
+<li>同样，隐藏层也会产生一些激活值，记作 $a^{[1]}$ 隐藏层的第一个单元（或者说节点）就记作 $a_1^{[1]}$输出层同理。<br>另外，隐藏层和输出层都是带有参数 W 和 b 的。它们都使用上标$^{[1]}$来表示是和第一个隐藏层有关，或者上标$^{[2]}$来表示是和输出层有关。</li>
+</ul>
+<h3 id="计算神经网络的输出"><a href="#计算神经网络的输出" class="headerlink" title="计算神经网络的输出"></a>计算神经网络的输出</h3><p><img src="http://image.rexking6.top/img/clip1520853057.png" alt=""></p>
+<p>实际上，神经网络只不过将 Logistic 回归的计算步骤重复很多次。对于隐藏层的第一个节点，有</p>
+<script type="math/tex; mode=display">z _1^{[1]} = (W _1^{[1]})^TX+b _1^{[1]}</script><script type="math/tex; mode=display">a _1^{[1]} = \sigma(z _1^{[1]})</script><p>我们可以类推得到，对于第一个隐藏层有下列公式：</p>
+<script type="math/tex; mode=display">z^{[1]} = (W^{[1]})^Ta^{[0]}+b^{[1]}</script><script type="math/tex; mode=display">a^{[1]} = \sigma(z^{[1]})</script><p>其中，$a^{[0]}$可以是一个列向量，也可以将多个列向量堆叠起来得到矩阵。如果是后者的话，得到的 $z^{[1]}$和 $a^{[1]}$也是一个矩阵。</p>
+<p>同理，对于输出层有：</p>
+<script type="math/tex; mode=display">z^{[2]} = (W^{[2]})^Ta^{[1]}+b^{[2]}</script><script type="math/tex; mode=display">\hat{y} = a^{[2]} = \sigma(z^{[2]})</script><p>值得注意的是层与层之间参数矩阵的规格大小。</p>
+<ul>
+<li>输入层和隐藏层之间：$W^{[1]}$的 shape 为(4,3)，前面的 4 是隐藏层神经元的个数，后面的 3 是输入层神经元的个数；$b^{[1]}$的 shape 为(4,1)，和隐藏层的神经元个数相同。</li>
+<li>隐藏层和输出层之间：$W^{[2]}$的 shape 为(1,4)，前面的 1 是输出层神经元的个数，后面的 4 是隐藏层神经元的个数；$b^{[2]}$的 shape 为(1,1)，和输出层的神经元个数相同。</li>
+</ul>
+<h3 id="激活函数"><a href="#激活函数" class="headerlink" title="激活函数"></a>激活函数</h3><p>有一个问题是神经网络的隐藏层和输出单元用什么激活函数。之前我们都是选用 sigmoid 函数，但有时其他函数的效果会好得多。</p>
+<p>可供选用的激活函数有：</p>
+<ul>
+<li>sigmoid 函数：</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1520643786.png" alt=""></p>
+<script type="math/tex; mode=display">g(z)=\frac{1}{1+e^{-z}}</script><script type="math/tex; mode=display">g'(z)=g(z)(1-g(z))</script><ul>
+<li>tanh 函数（the hyperbolic tangent function，双曲正切函数）：</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1520643869.png" alt=""></p>
+<script type="math/tex; mode=display">g(z)=tanh(z)=\frac{e^z-e^{-z}}{e^z+e^{-z}}</script><script type="math/tex; mode=display">g'(z)=1-(g(z))^2</script><p>效果几乎总比 sigmoid 函数好（除开二元分类的输出层，因为我们希望输出的结果介于 0 到 1 之间），因为函数输出介于 -1 和 1 之间，激活函数的平均值就更接近 0，有类似数据中心化的效果。</p>
+<p>然而，tanh 函数存在和 sigmoid 函数一样的缺点：当 z 趋紧无穷大（或无穷小），导数的梯度（即函数的斜率）就趋紧于 0，这使得梯度算法的速度大大减缓。</p>
+<ul>
+<li>ReLU 函数（the rectified linear unit，修正线性单元）：</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1520827911.png" alt=""></p>
+<script type="math/tex; mode=display">g(z)=max(0,z)</script><script type="math/tex; mode=display">g'(z)=\left\{
+\begin{aligned}
+0,x< 0 \\
+1,x \ge 0
+\end{aligned}
+\right.</script><p>当 z &gt; 0 时，梯度始终为 1，从而提高神经网络基于梯度算法的运算速度，收敛速度远大于 sigmoid 和 tanh。然而当 z &lt; 0 时，梯度一直为 0，但是实际的运用中，该缺陷的影响不是很大。</p>
+<ul>
+<li>Leaky ReLU（带泄漏的 ReLU）：</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1520828112.png" alt=""></p>
+<script type="math/tex; mode=display">g(z)=max(0.01z, z)</script><script type="math/tex; mode=display">g'(z)=\left\{
+\begin{aligned}
+0.01,x< 0 \\
+1,x \ge 0
+\end{aligned}
+\right.</script><p>Leaky ReLU 保证在 z &lt; 0 的时候，梯度仍然不为 0。理论上来说，Leaky ReLU 有 ReLU 的所有优点，但在实际操作中没有证明总是好于 ReLU，因此不常用。</p>
+<h3 id="使用非线性激活函数的原因"><a href="#使用非线性激活函数的原因" class="headerlink" title="使用非线性激活函数的原因"></a>使用非线性激活函数的原因</h3><p>假如没有非线性激活函数，称为“恒等激活函数”，$g(z)=z$，则<br>$a^{[1]}=z^{[1]}=w^{[1]}x+b^{[1]}$<br>$a^{[2]}=z^{[2]}=w^{[2]}a^{[1]}+b^{[2]}$<br>$则a^{[2]}=w^{[2]}(w^{[1]}x+b^{[1]})+b^{[2]}$<br>$=(w^{[2]}w^{[1]})x+(w^{[2]}b^{[1]}+b^{[2]})$<br>$=w’x+b’$<br>即使经过多层多个神经元的传递，最后得到也是输入数据的线性变换，那还不如去掉所有隐藏层。</p>
+<h3 id="激活函数：饱和与非饱和"><a href="#激活函数：饱和与非饱和" class="headerlink" title="激活函数：饱和与非饱和"></a>激活函数：饱和与非饱和</h3><p>$f(z)是非饱和激活函数， 当(|lim_{z→−∞}f(z)|=+∞)∨(|lim_{z→+∞}f(z)|=+∞)。$<br>例子：<br>Rectified Linear Unit (ReLU) 激活函数$f(x)=max(0,x)$是非饱和的因为当$x$趋向于正无穷，$f(x)$趋向于正无穷。<br><img src="http://image.rexking6.top/img/clip1520643672.png" alt=""></p>
+<p>sigmoid激活函数, $f(x)=\frac{1}{1+e^{−x}}$是饱和的，因为$f(x)$的值的范围为$[0,1]$。<br><img src="http://image.rexking6.top/img/clip1520643786.png" alt=""></p>
+<p>$f(x)=tanh(x)$激活函数是饱和的，因为$f(x)$的值的范围为$[−1,1]$。<br><img src="http://image.rexking6.top/img/clip1520643869.png" alt=""></p>
+<h3 id="神经网络的梯度下降法"><a href="#神经网络的梯度下降法" class="headerlink" title="神经网络的梯度下降法"></a>神经网络的梯度下降法</h3><h4 id="正向梯度下降"><a href="#正向梯度下降" class="headerlink" title="正向梯度下降"></a>正向梯度下降</h4><script type="math/tex; mode=display">Z^{[1]}=W^{[1]}X+b^{[1]}</script><script type="math/tex; mode=display">A^{[1]}=g^{[1]}(Z^{[1]})</script><script type="math/tex; mode=display">Z^{[2]}=W^{[2]}A^{[1]}+b^{[2]}</script><script type="math/tex; mode=display">A^{[2]}=g^{[2]}(Z^{[2]})=\sigma(Z^{[2]})</script><h4 id="反向梯度下降"><a href="#反向梯度下降" class="headerlink" title="反向梯度下降"></a>反向梯度下降</h4><p>神经网络反向梯度下降公式（左）和其代码向量化（右）：</p>
+<p><img src="http://image.rexking6.top/img/clip1520854494.png" alt=""></p>
+<script type="math/tex; mode=display">da=\frac{dL(a,y)}{da}=−\frac{y}{a}+\frac{1−y}{1−a}</script><script type="math/tex; mode=display">dz=\frac{dL}{dz}=\frac{dL(a,y)}{dz}=\frac{dL}{da}\frac{da}{dz}=a−y</script><script type="math/tex; mode=display">dz^{[1]}=W^{[2]T}dz^{[2]}*g^{[1]}{'}(z^{[1]})</script><h3 id="随机初始化"><a href="#随机初始化" class="headerlink" title="随机初始化"></a>随机初始化</h3><p>如果在初始时将两个隐藏神经元的参数设置为相同的大小，那么两个隐藏神经元对输出单元的影响也是相同的，通过反向梯度下降去进行计算的时候，会得到同样的梯度大小，所以在经过多次迭代后，两个隐藏层单位仍然是对称的。无论设置多少个隐藏单元，其最终的影响都是相同的，那么多个隐藏神经元就没有了意义。</p>
+<p>在初始化的时候，W 参数要进行随机初始化，不可以设置为 0。而 b 因为不存在对称性的问题，可以设置为 0。</p>
+<p>以 2 个输入，2 个隐藏神经元为例：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">W = np.random.rand(2,2)* 0.01</span><br><span class="line">b = np.zero((2,1))</span><br></pre></td></tr></table></figure><br>这里将 W 的值乘以 0.01（或者其他的常数值）的原因是为了使得权重 W 初始化为较小的值，这是因为使用 sigmoid 函数或者 tanh 函数作为激活函数时，W 比较小，则 Z=WX+b 所得的值趋近于 0，梯度较大，能够提高算法的更新速度。而如果 W 设置的太大的话，得到的梯度较小，训练过程因此会变得很慢。</p>
+<p>ReLU 和 Leaky ReLU 作为激活函数时不存在这种问题，因为在大于 0 的时候，梯度均为 1。</p>
+<h2 id="深层神经网络"><a href="#深层神经网络" class="headerlink" title="深层神经网络"></a>深层神经网络</h2><h3 id="深层网络中的前向和反向传播"><a href="#深层网络中的前向和反向传播" class="headerlink" title="深层网络中的前向和反向传播"></a>深层网络中的前向和反向传播</h3><h4 id="前向传播"><a href="#前向传播" class="headerlink" title="前向传播"></a>前向传播</h4><p>输入：$a^{[l−1]}$</p>
+<p>输出：$a^{[l]}$，cache(z^{[l]})</p>
+<p>公式：</p>
+<script type="math/tex; mode=display">Z^{[l]}=W^{[l]}\cdot a^{[l-1]}+b^{[l]}</script><script type="math/tex; mode=display">a^{[l]}=g^{[l]}(Z^{[l]})</script><h4 id="反向传播"><a href="#反向传播" class="headerlink" title="反向传播"></a>反向传播</h4><p>输入：$da^{[l]}$</p>
+<p>输出：$da^{[l-1]}$,$dW^{[l]}$,$db^{[l]}$</p>
+<p>公式：</p>
+<script type="math/tex; mode=display">dZ^{[l]}=da^{[l]}*g^{[l]}{'}(Z^{[l]})</script><script type="math/tex; mode=display">dW^{[l]}=dZ^{[l]}\cdot a^{[l-1]}</script><script type="math/tex; mode=display">db^{[l]}=dZ^{[l]}</script><script type="math/tex; mode=display">da^{[l-1]}=W^{[l]T}\cdot dZ^{[l]}</script><h3 id="搭建深层神经网络块"><a href="#搭建深层神经网络块" class="headerlink" title="搭建深层神经网络块"></a>搭建深层神经网络块</h3><p><img src="http://image.rexking6.top/img/clip1520909284.png" alt=""></p>
+<p>神经网络的一步训练（一个梯度下降循环），包含了从$a^{[0]}$（即 x）经过一系列正向传播计算得到$\hat y$（即$a^{[l]}$）。然后再计算 $da^{[l]}$，开始实现反向传播，得到所有的导数项，W 和 b 也会在每一层被更新。</p>
+<p>在代码实现时，可以将正向传播过程中计算出来的 z 值缓存下来，待到反向传播计算时使用。</p>
+<h3 id="矩阵的维度"><a href="#矩阵的维度" class="headerlink" title="矩阵的维度"></a>矩阵的维度</h3><script type="math/tex; mode=display">W^{[l]}: (n^{[l]}, n^{[l-1]})</script><script type="math/tex; mode=display">b^{[l]}: (n^{[l]}, 1)</script><script type="math/tex; mode=display">dW^{[l]}: (n^{[l]}, n^{[l-1]})</script><script type="math/tex; mode=display">db^{[l]}: (n^{[l]}, 1)</script><p>对于 Z、a，向量化之前有：</p>
+<script type="math/tex; mode=display">Z^{[l]}, a^{[l]}: (n^{[l]}, 1)</script><p>而在向量化之后，则有：</p>
+<script type="math/tex; mode=display">Z^{[l]}, A^{[l]}: (n^{[l]}, m)</script><p>在计算反向传播时，dZ、dA 的维度和 Z、A 是一样的。</p>
+<h3 id="使用深层表示的原因"><a href="#使用深层表示的原因" class="headerlink" title="使用深层表示的原因"></a>使用深层表示的原因</h3><p>对于人脸识别，神经网络的第一层从原始图片中提取人脸的轮廓和边缘，每个神经元学习到不同边缘的信息；网络的第二层将第一层学得的边缘信息组合起来，形成人脸的一些局部的特征，例如眼睛、嘴巴等；后面的几层逐步将上一层的特征组合起来，形成人脸的模样。随着神经网络层数的增加，特征也从原来的边缘逐步扩展为人脸的整体，由整体到局部，由简单到复杂。层数越多，那么模型学习的效果也就越精确。</p>
+<p>同样的，对于语音识别，第一层神经网络可以学习到语言发音的一些音调，后面更深层次的网络可以检测到基本的音素，再到单词信息，逐渐加深可以学到短语、句子。</p>
+<p>通过例子可以看到，随着神经网络的深度加深，模型能学习到更加复杂的问题，功能也更加强大。</p>
+<p>举个例子，逻辑运算，多个逻辑运算时，使用单层网络将会使神经元个数成指数级增长。</p>
+<h3 id="参数和超参数"><a href="#参数和超参数" class="headerlink" title="参数和超参数"></a>参数和超参数</h3><p>参数即是我们在过程中想要模型学习到的信息（模型自己能计算出来的），例如$W^{[l]}$，$b^{[l]}$。而超参数（hyper parameters）即为控制参数的输出值的一些网络信息（需要人经验判断）。超参数的改变会导致最终得到的参数 $W^{[l]}$，$b^{[l]}$的改变。</p>
+<p>典型的超参数有：</p>
+<ul>
+<li>学习速率：α</li>
+<li>迭代次数：N</li>
+<li>隐藏层的层数：L</li>
+<li>每一层的神经元个数：$n^{[1]}$，$n^{[2]}$，…</li>
+<li>激活函数 g(z) 的选择 </li>
+</ul>
+<p>当开发新应用时，预先很难准确知道超参数的最优值应该是什么。因此，通常需要尝试很多不同的值。应用深度学习领域是一个很大程度基于经验的过程。</p>
+<h1 id="改善深层神经网络：超参数调试、正则化以及优化"><a href="#改善深层神经网络：超参数调试、正则化以及优化" class="headerlink" title="改善深层神经网络：超参数调试、正则化以及优化"></a>改善深层神经网络：超参数调试、正则化以及优化</h1><h2 id="深度学习的实用层面"><a href="#深度学习的实用层面" class="headerlink" title="深度学习的实用层面"></a>深度学习的实用层面</h2><h3 id="数据划分：训练-验证-测试集"><a href="#数据划分：训练-验证-测试集" class="headerlink" title="数据划分：训练 / 验证 / 测试集"></a>数据划分：训练 / 验证 / 测试集</h3><p>应用深度学习是一个典型的迭代过程。</p>
+<p>对于一个需要解决的问题的样本数据，在建立模型的过程中，数据会被划分为以下几个部分：</p>
+<ul>
+<li>训练集（train set）：用训练集对算法或模型进行训练过程；</li>
+<li>验证集（development set）：利用验证集（又称为简单交叉验证集，hold-out cross validation set）进行交叉验证，选择出最好的模型；</li>
+<li>测试集（test set）：最后利用测试集对模型进行测试，获取模型运行的无偏估计（对学习方法进行评估）。</li>
+</ul>
+<p>在小数据量的时代，如 100、1000、10000 的数据量大小，可以将数据集按照以下比例进行划分：</p>
+<ul>
+<li>无验证集的情况：70% / 30%；</li>
+<li>有验证集的情况：60% / 20% / 20%；</li>
+</ul>
+<p>而在如今的大数据时代，对于一个问题，我们拥有的数据集的规模可能是百万级别的，所以验证集和测试集所占的比重会趋向于变得更小。</p>
+<p>验证集的目的是为了验证不同的算法哪种更加有效，所以验证集只要足够大到能够验证大约 2-10 种算法哪种更好，而不需要使用 20% 的数据作为验证集。如百万数据中抽取 1 万的数据作为验证集就可以了。</p>
+<p>测试集的主要目的是评估模型的效果，如在单个分类器中，往往在百万级别的数据中，我们选择其中 1000 条数据足以评估单个模型的效果。</p>
+<ul>
+<li>100 万数据量：98% / 1% / 1%；</li>
+<li>超百万数据量：99.5% / 0.25% / 0.25%（或者99.5% / 0.4% / 0.1%）</li>
+</ul>
+<h3 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h3><p>建议验证集要和训练集来自于同一个分布（数据来源一致），可以使得机器学习算法变得更快并获得更好的效果。</p>
+<p>如果不需要用无偏估计来评估模型的性能，则可以不需要测试集。</p>
+<h3 id="模型估计：偏差-方差"><a href="#模型估计：偏差-方差" class="headerlink" title="模型估计：偏差 / 方差"></a>模型估计：偏差 / 方差</h3><p>“偏差-方差分解”（bias-variance decomposition）是解释学习算法泛化性能的一种重要工具。</p>
+<p>泛化误差可分解为偏差、方差与噪声之和：</p>
+<ul>
+<li>偏差：度量了学习算法的期望预测与真实结果的偏离程度，即刻画了学习算法本身的拟合能力；</li>
+<li>方差：度量了同样大小的训练集的变动所导致的学习性能的变化，即刻画了数据扰动所造成的影响；</li>
+<li>噪声：表达了在当前任务上任何学习算法所能够达到的期望泛化误差的下界，即刻画了学习问题本身的难度。</li>
+</ul>
+<p>偏差-方差分解说明，泛化性能是由学习算法的能力、数据的充分性以及学习任务本身的难度所共同决定的。给定学习任务，为了取得好的泛化性能，则需要使偏差较小，即能够充分拟合数据，并且使方差较小，即使得数据扰动产生的影响小。</p>
+<p>在欠拟合（underfitting）的情况下，出现高偏差（high bias）的情况，即不能很好地对数据进行分类。</p>
+<p>当模型设置的太复杂时，训练集中的一些噪声没有被排除，使得模型出现过拟合（overfitting）的情况，在验证集上出现高方差（high variance）的现象。</p>
+<p>当训练出一个模型以后，如果：</p>
+<ul>
+<li>训练集的错误率较小，而验证集的错误率却较大，说明模型存在较大方差，可能出现了过拟合；</li>
+<li>训练集和开发集的错误率都较大，且两者相当，说明模型存在较大偏差，可能出现了欠拟合；</li>
+<li>训练集错误率较大，且开发集的错误率远较训练集大，说明方差和偏差都较大，模型很差；</li>
+<li>训练集和开发集的错误率都较小，且两者的相差也较小，说明方差和偏差都较小，这个模型效果比较好。</li>
+</ul>
+<p>偏差和方差的权衡问题对于模型来说十分重要。</p>
+<p>最优误差通常也称为“贝叶斯误差”。</p>
+<h4 id="应对方法"><a href="#应对方法" class="headerlink" title="应对方法"></a>应对方法</h4><p>存在高偏差：</p>
+<ul>
+<li>扩大网络规模，如添加隐藏层或隐藏单元数目；</li>
+<li>寻找合适的网络架构，使用更大的 NN 结构；</li>
+<li>花费更长时间训练。</li>
+</ul>
+<p>存在高方差：</p>
+<ul>
+<li>获取更多的数据；</li>
+<li>正则化（regularization）；</li>
+<li>寻找更合适的网络结构。</li>
+</ul>
+<p>不断尝试，直到找到低偏差、低方差的框架。</p>
+<p>在深度学习的早期阶段，没有太多方法能做到只减少偏差或方差而不影响到另外一方。而在大数据时代，深度学习对监督式学习大有裨益，使得我们不用像以前一样太过关注如何平衡偏差和方差的权衡问题，通过以上方法可以在不增加某一方的前提下减少另一方的值。</p>
+<h3 id="正则化（regularization）"><a href="#正则化（regularization）" class="headerlink" title="正则化（regularization）"></a>正则化（regularization）</h3><p>正则化是在成本函数中加入一个正则化项，惩罚模型的复杂度。正则化可以用于解决低方差的问题。</p>
+<h4 id="Logistic-回归中的正则化"><a href="#Logistic-回归中的正则化" class="headerlink" title="Logistic 回归中的正则化"></a>Logistic 回归中的正则化</h4><p>对于 Logistic 回归，加入 L2 正则化（也称“L2 范数”）的成本函数：</p>
+<script type="math/tex; mode=display">J(w,b) = \frac{1}{m}\sum_{i=1}^mL(\hat{y}^{(i)},y^{(i)})+\frac{\lambda}{2m}{||w||}^2_2</script><ul>
+<li>L2 正则化：</li>
+</ul>
+<script type="math/tex; mode=display">\frac{\lambda}{2m}{||w||}^2_2 = \frac{\lambda}{2m}\sum_{j=1}^{n_x}w^2_j = \frac{\lambda}{2m}w^Tw</script><ul>
+<li>L1 正则化 </li>
+</ul>
+<script type="math/tex; mode=display">\frac{\lambda}{2m}{||w||}_1 = \frac{\lambda}{2m}\sum_{j=1}^{n_x}{|w_j|}</script><p>其中，$λ$ 为正则化因子，是超参数。</p>
+<p>由于 L1 正则化最后得到 w 向量中将存在大量的 0，使模型变得稀疏化，因此 L2 正则化更加常用。</p>
+<p>注意，<code>lambda</code>在 Python 中属于保留字，所以在编程的时候，用<code>lambd</code>代替这里的正则化因子。</p>
+<h4 id="神经网络中的正则化"><a href="#神经网络中的正则化" class="headerlink" title="神经网络中的正则化"></a>神经网络中的正则化</h4><p>对于神经网络，加入正则化的成本函数：</p>
+<script type="math/tex; mode=display">J(w^{[1]}, b^{[1]}, ..., w^{[L]}, b^{[L]}) = \frac{1}{m}\sum_{i=1}^mL(\hat{y}^{(i)},y^{(i)})+\frac{\lambda}{2m}\sum_{l=1}^L{||w^{[l]}||}^2_F</script><p>因为 w 的大小为 ($n^{[l−1]}$,$n^{[l]}$)，因此</p>
+<script type="math/tex; mode=display">{||w^{[l]}||}^2_F = \sum^{n^{[l-1]}}_{i=1}\sum^{n^{[l]}}_{j=1}(w^{[l]}_{ij})^2</script><p>该矩阵范数被称为弗罗贝尼乌斯范数（Frobenius Norm），所以神经网络中的正则化项被称为弗罗贝尼乌斯范数矩阵。</p>
+<h4 id="权重衰减（Weight-decay）"><a href="#权重衰减（Weight-decay）" class="headerlink" title="权重衰减（Weight decay）"></a>权重衰减（Weight decay）</h4><p>在加入正则化项后，梯度变为（反向传播要按这个计算）：</p>
+<script type="math/tex; mode=display">dW^{[l]}= \frac{\partial L}{\partial w^{[l]}} +\frac{\lambda}{m}W^{[l]}</script><p>代入梯度更新公式：</p>
+<script type="math/tex; mode=display">W^{[l]} := W^{[l]}-\alpha dW^{[l]}</script><p>可得：</p>
+<script type="math/tex; mode=display">W^{[l]} := W^{[l]} - \alpha [\frac{\partial L}{\partial w^{[l]}} + \frac{\lambda}{m}W^{[l]}]</script><script type="math/tex; mode=display">= W^{[l]} - \alpha \frac{\lambda}{m}W^{[l]} - \alpha \frac{\partial L}{\partial w^{[l]}}</script><script type="math/tex; mode=display">= (1 - \frac{\alpha\lambda}{m})W^{[l]} - \alpha \frac{\partial L}{\partial w^{[l]}}</script><p>其中，</p>
+<script type="math/tex; mode=display">(1 - \frac{\alpha\lambda}{m})W^{[l]}< 1</script><p>会给原来的 $W^{[l]}$一个衰减的参数。所以 L2 正则化项也被称为权重衰减（Weight Decay）。</p>
+<h3 id="正则化可以减小过拟合的原因"><a href="#正则化可以减小过拟合的原因" class="headerlink" title="正则化可以减小过拟合的原因"></a>正则化可以减小过拟合的原因</h3><h4 id="直观解释"><a href="#直观解释" class="headerlink" title="直观解释"></a>直观解释</h4><p>正则化因子设置的足够大的情况下，为了使成本函数最小化，权重矩阵 W 就会被设置为接近于 0 的值，直观上相当于消除了很多神经元的影响，那么大的神经网络就会变成一个较小的网络。当然，实际上隐藏层的神经元依然存在，但是其影响减弱了，便不会导致过拟合。</p>
+<h4 id="数学解释"><a href="#数学解释" class="headerlink" title="数学解释"></a>数学解释</h4><p>假设神经元中使用的激活函数为<code>g(z) = tanh(z)</code>（sigmoid 同理）。</p>
+<p><img src="http://image.rexking6.top/img/clip1521001176.png" alt=""></p>
+<p>在加入正则化项后，当 λ 增大，导致 $W^{[l]}$减小，$Z^{[l]} = W^{[l]}a^{[l-1]} + b^{[l]}$便会减小。由上图可知，在 z 较小（接近于 0）的区域里，<code>tanh(z)</code>函数近似线性，所以每层的函数就近似线性函数，整个网络就成为一个简单的近似线性的网络，因此不会发生过拟合。</p>
+<h4 id="其他解释"><a href="#其他解释" class="headerlink" title="其他解释"></a>其他解释</h4><p>在权值$w^{[L]}$变小之下，输入样本 X 随机的变化不会对神经网络模造成过大的影响，神经网络受局部噪音的影响的可能性变小。这就是正则化能够降低模型方差的原因。</p>
+<h3 id="dropout-正则化"><a href="#dropout-正则化" class="headerlink" title="dropout 正则化"></a>dropout 正则化</h3><p>dropout（随机失活）是在神经网络的隐藏层为每个神经元结点设置一个随机消除的概率，保留下来的神经元形成一个结点较少、规模较小的网络用于训练。dropout 正则化较多地被使用在计算机视觉（Computer Vision）领域。</p>
+<p><img src="http://image.rexking6.top/img/clip1521001306.png" alt=""></p>
+<h4 id="反向随机失活（Inverted-dropout）"><a href="#反向随机失活（Inverted-dropout）" class="headerlink" title="反向随机失活（Inverted dropout）"></a>反向随机失活（Inverted dropout）</h4><p>反向随机失活是实现 dropout 的方法。对第<code>l</code>层进行 dropout：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">keep_prob = 0.8    # 设置神经元保留概率</span><br><span class="line">dl = np.random.rand(al.shape[0], al.shape[1]) &lt; keep_prob</span><br><span class="line">al = np.multiply(al, dl)</span><br><span class="line">al /= keep_prob</span><br></pre></td></tr></table></figure></p>
+<p>最后一步<code>al /= keep_prob</code>是因为$a^{[l]}$中的一部分元素失活（相当于被归零），为了在下一层计算时不影响 $Z^{[l+1]} = W^{[l+1]}a^{[l]} + b^{[l+1]}$的期望值，因此除以一个<code>keep_prob</code>。</p>
+<p>注意，在测试阶段不要使用 dropout，因为那样会使得预测结果变得随机。</p>
+<h4 id="理解-dropout"><a href="#理解-dropout" class="headerlink" title="理解 dropout"></a>理解 dropout</h4><p>对于单个神经元，其工作是接收输入并产生一些有意义的输出。但是加入了 dropout 后，输入的特征都存在被随机清除的可能，所以该神经元不会再特别依赖于任何一个输入特征，即不会给任何一个输入特征设置太大的权重。</p>
+<p>因此，通过传播过程，dropout 将产生和 L2 正则化相同的收缩权重的效果。</p>
+<p>对于不同的层，设置的<code>keep_prob</code>也不同。一般来说，神经元较少的层，会设<code>keep_prob</code>为 1.0，而神经元多的层则会设置比较小的<code>keep_prob</code>。</p>
+<p>dropout 的一大缺点是成本函数无法被明确定义。因为每次迭代都会随机消除一些神经元结点的影响，因此无法确保成本函数单调递减。因此，使用 dropout 时，先将<code>keep_prob</code>全部设置为 1.0 后运行代码，确保 $J(w,b)$函数单调递减，再打开 dropout。</p>
+<h3 id="其他正则化方法"><a href="#其他正则化方法" class="headerlink" title="其他正则化方法"></a>其他正则化方法</h3><ul>
+<li>数据扩增（Data Augmentation）：通过图片的一些变换（翻转，局部放大后切割等），得到更多的训练集和验证集。</li>
+<li>早停止法（Early Stopping）：将训练集和验证集进行梯度下降时的成本变化曲线画在同一个坐标轴内，在两者开始发生较大偏差时及时停止迭代，避免过拟合。这种方法的缺点是无法同时达成偏差和方差的最优。</li>
+</ul>
+<h3 id="梯度消失和梯度爆炸"><a href="#梯度消失和梯度爆炸" class="headerlink" title="梯度消失和梯度爆炸"></a>梯度消失和梯度爆炸</h3><p>在梯度函数上出现的以指数级递增或者递减的情况分别称为梯度爆炸或者梯度消失。<br>假定$g(z) = z, b^{[l]} = 0$，对于目标输出有：</p>
+<script type="math/tex; mode=display">\hat{y} = W^{[L]}W^{[L-1]}...W^{[2]}W^{[1]}X</script><ul>
+<li>对于$W^{[l]}$的值大于 1 的情况，激活函数的值将以指数级递增；</li>
+<li>对于$W^{[l]}$的值小于 1 的情况，激活函数的值将以指数级递减。</li>
+</ul>
+<p>对于导数同理。因此，在计算梯度时，根据不同情况梯度函数会以指数级递增或递减，导致训练导数难度上升，梯度下降算法的步长会变得非常小，需要训练的时间将会非常长。</p>
+<h4 id="利用初始化缓解梯度消失和爆炸"><a href="#利用初始化缓解梯度消失和爆炸" class="headerlink" title="利用初始化缓解梯度消失和爆炸"></a>利用初始化缓解梯度消失和爆炸</h4><p>根据</p>
+<script type="math/tex; mode=display">z={w}_1{x}_1+{w}_2{x}_2 + ... + {w}_n{x}_n + b</script><p>可知，当输入的数量 n 较大时，我们希望每个 wi 的值都小一些，这样它们的和得到的 z 也较小。</p>
+<p>为了得到较小的 wi，设置<code>Var(wi)=1/n</code>，这里称为 Xavier initialization。<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WL = np.random.randn(WL.shape[0], WL.shape[1]) * np.sqrt(1/n)</span><br></pre></td></tr></table></figure></p>
+<p>其中 n 是输入的神经元个数，即<code>WL.shape[1]</code>。</p>
+<p>这样，激活函数的输入 x 近似设置成均值为 0，标准方差为 1，神经元输出 z 的方差就正则化到 1 了。虽然没有解决梯度消失和爆炸的问题，但其在一定程度上确实减缓了梯度消失和爆炸的速度。</p>
+<p>同理，也有 He Initialization。它和 Xavier initialization 唯一的区别是<code>Var(wi)=2/n</code>，适用于 ReLU 作为激活函数时。</p>
+<p>当激活函数使用 ReLU 时，<code>Var(wi)=2/n</code>；当激活函数使用 tanh 时，<code>Var(wi)=1/n</code>。</p>
+<h3 id="梯度检验（Gradient-checking）"><a href="#梯度检验（Gradient-checking）" class="headerlink" title="梯度检验（Gradient checking）"></a>梯度检验（Gradient checking）</h3><h4 id="梯度的数值逼近"><a href="#梯度的数值逼近" class="headerlink" title="梯度的数值逼近"></a>梯度的数值逼近</h4><p>使用双边误差的方法去逼近导数，精度要高于单边误差。</p>
+<ul>
+<li>单边误差：</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1521001992.png" alt=""></p>
+<script type="math/tex; mode=display">f'(\theta) = {\lim_{\varepsilon\to 0}} = \frac{f(\theta + \varepsilon) - (\theta)}{\varepsilon}</script><p>误差：$O(\varepsilon)$</p>
+<ul>
+<li>双边误差求导（即导数的定义）：</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1521002045.png" alt=""></p>
+<script type="math/tex; mode=display">f'(\theta) = {\lim_{\varepsilon\to 0}} = \frac{f(\theta + \varepsilon) - (\theta - \varepsilon)}{2\varepsilon}</script><p>误差：$O(\varepsilon^2)$</p>
+<p>当 ε 越小时，结果越接近真实的导数，也就是梯度值。可以使用这种方法来判断反向传播进行梯度下降时，是否出现了错误。</p>
+<h3 id="梯度检验的实施"><a href="#梯度检验的实施" class="headerlink" title="梯度检验的实施"></a>梯度检验的实施</h3><h4 id="连接参数"><a href="#连接参数" class="headerlink" title="连接参数"></a>连接参数</h4><p>将$W^{[1]}, b^{[1]}, …, W^{[L]}, b^{[L]}$全部连接出来，成为一个巨型向量 θ。这样，</p>
+<script type="math/tex; mode=display">J(W^{[1]}, b^{[1]}, ..., W^{[L]}，b^{[L]}) = J(\theta)</script><p>同时，对$dW^{[1]},db^{[1]},…,dW^{[L]},db^{[L]}$执行同样的操作得到巨型向量 dθ，它和 θ 有同样的维度。</p>
+<p><img src="http://image.rexking6.top/img/clip1521002239.png" alt=""></p>
+<p>现在，我们需要找到 dθ 和代价函数 J 的梯度的关系。</p>
+<h4 id="进行梯度检验"><a href="#进行梯度检验" class="headerlink" title="进行梯度检验"></a>进行梯度检验</h4><p>求得一个梯度逼近值</p>
+<script type="math/tex; mode=display">d\theta_{approx}[i] ＝ \frac{J(\theta_1, \theta_2, ..., \theta_i+\varepsilon, ...) - J(\theta_1, \theta_2, ..., \theta_i-\varepsilon, ...)}{2\varepsilon}</script><p>应该</p>
+<script type="math/tex; mode=display">\approx{d\theta[i]} = \frac{\partial J}{\partial \theta_i}</script><p>因此，我们用梯度检验值</p>
+<p><img src="http://image.rexking6.top/img/clip1521003854.png" alt=""></p>
+<p>检验反向传播的实施是否正确。其中，</p>
+<script type="math/tex; mode=display">{||x||}_2 = \sum^N_{i=1}{|x_i|}^2</script><p>表示向量 x 的 2-范数（也称“欧几里德范数”）。</p>
+<p>如果梯度检验值和 ε 的值相近，说明神经网络的实施是正确的，否则要去检查代码是否存在 bug。</p>
+<h3 id="在神经网络实施梯度检验的实用技巧和注意事项"><a href="#在神经网络实施梯度检验的实用技巧和注意事项" class="headerlink" title="在神经网络实施梯度检验的实用技巧和注意事项"></a>在神经网络实施梯度检验的实用技巧和注意事项</h3><ol>
+<li>不要在训练中使用梯度检验，它只用于调试（debug）。使用完毕关闭梯度检验的功能；</li>
+<li>如果算法的梯度检验失败，要检查所有项，并试着找出 bug，即确定哪个 dθapprox[i] 与 dθ 的值相差比较大；</li>
+<li>当成本函数包含正则项时，也需要带上正则项进行检验；</li>
+<li>梯度检验不能与 dropout 同时使用。因为每次迭代过程中，dropout 会随机消除隐藏层单元的不同子集，难以计算 dropout 在梯度下降上的成本函数 J。建议关闭 dropout，用梯度检验进行双重检查，确定在没有 dropout 的情况下算法正确，然后打开 dropout。</li>
+</ol>
+<h2 id="优化算法"><a href="#优化算法" class="headerlink" title="优化算法"></a>优化算法</h2><p>深度学习难以在大数据领域发挥最大效果的一个原因是，在巨大的数据集基础上进行训练速度很慢。而优化算法能够帮助快速训练模型，大大提高效率。</p>
+<h3 id="batch-梯度下降法"><a href="#batch-梯度下降法" class="headerlink" title="batch 梯度下降法"></a>batch 梯度下降法</h3><p>batch 梯度下降法（批梯度下降法，我们之前一直使用的梯度下降法）是最常用的梯度下降形式，即同时处理整个训练集。其在更新参数时使用所有的样本来进行更新。</p>
+<p>对整个训练集进行梯度下降法的时候，我们必须处理整个训练数据集，然后才能进行一步梯度下降，即每一步梯度下降法需要对整个训练集进行一次处理，如果训练数据集很大的时候，处理速度就会比较慢。</p>
+<p>但是如果每次处理训练数据的一部分即进行梯度下降法，则我们的算法速度会执行的更快。而处理的这些一小部分训练子集即称为 mini-batch。</p>
+<h3 id="Mini-Batch-梯度下降法"><a href="#Mini-Batch-梯度下降法" class="headerlink" title="Mini-Batch 梯度下降法"></a>Mini-Batch 梯度下降法</h3><p>Mini-Batch 梯度下降法（小批量梯度下降法）每次同时处理单个的 mini-batch，其他与 batch 梯度下降法一致。</p>
+<p>使用 batch 梯度下降法，对整个训练集的一次遍历只能做一个梯度下降；而使用 Mini-Batch 梯度下降法，对整个训练集的一次遍历（称为一个 epoch）能做 mini-batch 个数个梯度下降。之后，可以一直遍历训练集，直到最后收敛到一个合适的精度。</p>
+<p>batch 梯度下降法和 Mini-batch 梯度下降法代价函数的变化趋势如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1521077185.png" alt=""></p>
+<h4 id="batch-的不同大小（size）带来的影响"><a href="#batch-的不同大小（size）带来的影响" class="headerlink" title="batch 的不同大小（size）带来的影响"></a>batch 的不同大小（size）带来的影响</h4><ul>
+<li>mini-batch 的大小为 1，即是随机梯度下降法（stochastic gradient descent），每个样本都是独立的 mini-batch；</li>
+<li>mini-batch 的大小为 m（数据集大小），即是 batch 梯度下降法。</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1521077224.png" alt=""></p>
+<ul>
+<li><p>batch 梯度下降法：</p>
+</li>
+<li><ul>
+<li>对所有 m 个训练样本执行一次梯度下降，每一次迭代时间较长，训练过程慢；</li>
+</ul>
+</li>
+<li><ul>
+<li>相对噪声低一些，幅度也大一些；</li>
+</ul>
+</li>
+<li><ul>
+<li>成本函数总是向减小的方向下降。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>随机梯度下降法：</li>
+<li><ul>
+<li>对每一个训练样本执行一次梯度下降，训练速度快，但丢失了向量化带来的计算加速；</li>
+</ul>
+</li>
+<li><ul>
+<li>有很多噪声，减小学习率可以适当；</li>
+</ul>
+</li>
+<li><ul>
+<li>成本函数总体趋势向全局最小值靠近，但永远不会收敛，而是一直在最小值附近波动。</li>
+</ul>
+</li>
+</ul>
+<p>因此，选择一个<code>1 &lt; size &lt; m</code>的合适的大小进行 Mini-batch 梯度下降，可以实现快速学习，也应用了向量化带来的好处，且成本函数的下降处于前两者之间。</p>
+<h4 id="mini-batch-大小的选择"><a href="#mini-batch-大小的选择" class="headerlink" title="mini-batch 大小的选择"></a>mini-batch 大小的选择</h4><ul>
+<li>如果训练样本的大小比较小，如 m ⩽ 2000 时，选择 batch 梯度下降法；</li>
+<li>如果训练样本的大小比较大，选择 Mini-Batch 梯度下降法。为了和计算机的信息存储方式相适应，代码在 mini-batch 大小为 2 的幂次时运行要快一些。典型的大小为 $2^6$、$2^7$、…、$2^9$；</li>
+<li>mini-batch 的大小要符合 CPU/GPU 内存。</li>
+</ul>
+<p>mini-batch 的大小也是一个重要的超变量，需要根据经验快速尝试，找到能够最有效地减少成本函数的值。</p>
+<h4 id="获得-mini-batch-的步骤"><a href="#获得-mini-batch-的步骤" class="headerlink" title="获得 mini-batch 的步骤"></a>获得 mini-batch 的步骤</h4><ol>
+<li>将数据集打乱；</li>
+<li>按照既定的大小分割数据集。</li>
+</ol>
+<p>其中打乱数据集的代码：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">m = X.shape[1] </span><br><span class="line">permutation = list(np.random.permutation(m))</span><br><span class="line">shuffled_X = X[:, permutation]</span><br><span class="line">shuffled_Y = Y[:, permutation].reshape((1,m))</span><br></pre></td></tr></table></figure></p>
+<p><code>np.random.permutation</code>与<code>np.random.shuffle</code>有两处不同：</p>
+<p>如果传给<code>permutation</code>一个矩阵，它会返回一个洗牌后的矩阵副本；而<code>shuffle</code>只是对一个矩阵进行洗牌，没有返回值。<br>如果传入一个整数，它会返回一个洗牌后的<code>arange</code>。</p>
+<h3 id="符号表示"><a href="#符号表示" class="headerlink" title="符号表示"></a>符号表示</h3><ul>
+<li>使用上角小括号 i 表示训练集里的值，$x^{(i)}$ 是第 i 个训练样本；</li>
+<li>使用上角中括号 l 表示神经网络的层数，$z^{[l]}$ 表示神经网络中第 l 层的 z 值；</li>
+<li>现在引入大括号 t 来代表不同的 mini-batch，因此有 $X^t$、$Y^t$。</li>
+</ul>
+<h3 id="指数平均加权"><a href="#指数平均加权" class="headerlink" title="指数平均加权"></a>指数平均加权</h3><p>指数加权平均（Exponentially Weight Average）是一种常用的序列数据处理方式，计算公式为：</p>
+<script type="math/tex; mode=display">S_t = 
+\begin{cases} 
+Y_1, &t = 1 \\ 
+\beta S_{t-1} + (1-\beta)Y_t, &t > 1 
+\end{cases}</script><p>其中$Y_t$ 为 t 下的实际值，$S_t$ 为 t 下加权平均后的值，$β$ 为权重值。</p>
+<p>指数加权平均数在统计学中被称为“指数加权移动平均值”。</p>
+<p><img src="http://image.rexking6.top/img/clip1521077662.png" alt=""></p>
+<p>给定一个时间序列，例如伦敦一年每天的气温值，图中蓝色的点代表真实数据。对于一个即时的气温值，取权重值 β 为 0.9，根据求得的值可以得到图中的红色曲线，它反映了气温变化的大致趋势。</p>
+<p>当取权重值 β=0.98 时，可以得到图中更为平滑的绿色曲线。而当取权重值 β=0.5 时，得到图中噪点更多的黄色曲线。β 越大相当于求取平均利用的天数越多，曲线自然就会越平滑而且越滞后。</p>
+<h4 id="理解指数平均加权"><a href="#理解指数平均加权" class="headerlink" title="理解指数平均加权"></a>理解指数平均加权</h4><p>当 β 为 0.9 时，</p>
+<script type="math/tex; mode=display">v_{100} = 0.9v_{99} + 0.1 \theta_{100}</script><script type="math/tex; mode=display">v_{99} = 0.9v_{98} + 0.1 \theta_{99}</script><script type="math/tex; mode=display">v_{98} = 0.9v_{97} + 0.1 \theta_{98}</script><script type="math/tex; mode=display">...</script><p>展开：</p>
+<script type="math/tex; mode=display">v_{100} = 0.1 \theta_{100} + 0.1 0.9 \theta_{99} + 0.1 {(0.9)}^2 \theta_{98} + ...</script><p>其中 $θ_i$ 指第 i 天的实际数据。所有 θ 前面的系数（不包括 0.1）相加起来为 1 或者接近于 1，这些系数被称作偏差修正（Bias Correction）。</p>
+<p>根据函数极限的一条定理：</p>
+<script type="math/tex; mode=display">{\lim_{\beta\to 0}}(1 - \beta)^{\frac{1}{\beta}} = \frac{1}{e} \approx 0.368</script><p>当 β 为 0.9 时，可以当作把过去 10 天的气温指数加权平均作为当日的气温，因为 10 天后权重已经下降到了当天的 1/3 左右。同理，当 β 为 0.98 时，可以把过去 50 天的气温指数加权平均作为当日的气温。</p>
+<p>因此，在计算当前时刻的平均值时，只需要前一天的平均值和当前时刻的值。</p>
+<script type="math/tex; mode=display">v_t = \beta v_{t-1} + (1 - \beta)\theta_t</script><p>考虑到代码，只需要不断更新 v 即可：</p>
+<script type="math/tex; mode=display">v := \beta v + (1 - \beta)\theta_t</script><p>指数平均加权并不是最精准的计算平均数的方法，你可以直接计算过去 10 天或 50 天的平均值来得到更好的估计，但缺点是保存数据需要占用更多内存，执行更加复杂，计算成本更加高昂。</p>
+<p>指数加权平均数公式的好处之一在于它只需要一行代码，且占用极少内存，因此效率极高，且节省成本。</p>
+<h4 id="指数平均加权的偏差修正"><a href="#指数平均加权的偏差修正" class="headerlink" title="指数平均加权的偏差修正"></a>指数平均加权的偏差修正</h4><p>我们通常有</p>
+<script type="math/tex; mode=display">v_0 = 0</script><script type="math/tex; mode=display">v_1 = 0.98v_0 + 0.02\theta_1</script><p>因此，$v_1$ 仅为第一个数据的 0.02（或者说 1-β），显然不准确。往后递推同理。</p>
+<p>因此，我们修改公式为</p>
+<script type="math/tex; mode=display">v_t = \frac{\beta v_{t-1} + (1 - \beta)\theta_t}{ {1-\beta^t} }</script><p>随着 t 的增大，β 的 t 次方趋近于 0。因此当 t 很大的时候，偏差修正几乎没有作用，但是在前期学习可以帮助更好的预测数据。在实际过程中，一般会忽略前期偏差的影响。</p>
+<h3 id="动量梯度下降法"><a href="#动量梯度下降法" class="headerlink" title="动量梯度下降法"></a>动量梯度下降法</h3><p>动量梯度下降（Gradient Descent with Momentum）是计算梯度的指数加权平均数，并利用该值来更新参数值。具体过程为：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">for l = 1, .. , L：</span><br></pre></td></tr></table></figure></p>
+<script type="math/tex; mode=display">v_{dW^{[l]}} = \beta v_{dW^{[l]}} + (1 - \beta) dW^{[l]}</script><script type="math/tex; mode=display">v_{db^{[l]}} = \beta v_{db^{[l]}} + (1 - \beta) db^{[l]}</script><script type="math/tex; mode=display">W^{[l]} := W^{[l]} - \alpha v_{dW^{[l]}}</script><script type="math/tex; mode=display">b^{[l]} := b^{[l]} - \alpha v_{db^{[l]}}</script><p>其中，将动量衰减参数 β 设置为 0.9 是超参数的一个常见且效果不错的选择。当 β 被设置为 0 时，显然就成了 batch 梯度下降法。</p>
+<p><img src="http://image.rexking6.top/img/clip1521086129.png" alt=""></p>
+<p>进行一般的梯度下降将会得到图中的蓝色曲线，由于存在上下波动，减缓了梯度下降的速度，因此只能使用一个较小的学习率进行迭代。如果用较大的学习率，结果可能会像紫色曲线一样偏离函数的范围。</p>
+<p>而使用动量梯度下降时，通过累加过去的梯度值来减少抵达最小值路径上的波动，加速了收敛，因此在横轴方向下降得更快，从而得到图中红色的曲线。</p>
+<p>当前后梯度方向一致时，动量梯度下降能够加速学习；而前后梯度方向不一致时，动量梯度下降能够抑制震荡。</p>
+<p>另外，在 10 次迭代之后，移动平均已经不再是一个具有偏差的预测。因此实际在使用梯度下降法或者动量梯度下降法时，不会同时进行偏差修正。</p>
+<h4 id="动量梯度下降法的形象解释"><a href="#动量梯度下降法的形象解释" class="headerlink" title="动量梯度下降法的形象解释"></a>动量梯度下降法的形象解释</h4><p>将成本函数想象为一个碗状，从顶部开始运动的小球向下滚，其中 dw，db 想象成球的加速度；而 $v_{dw}$、$v_{db}$ 相当于速度。</p>
+<p>小球在向下滚动的过程中，因为加速度的存在速度会变快，但是由于 β 的存在，其值小于 1，可以认为是摩擦力，所以球不会无限加速下去。</p>
+<h3 id="RMSProp-算法"><a href="#RMSProp-算法" class="headerlink" title="RMSProp 算法"></a>RMSProp 算法</h3><p>RMSProp（Root Mean Square Prop，均方根支）算法是在对梯度进行指数加权平均的基础上，引入平方和平方根。具体过程为（省略了 l）：</p>
+<script type="math/tex; mode=display">s_{dw} = \beta s_{dw} + (1 - \beta)(dw)^2</script><script type="math/tex; mode=display">s_{db} = \beta s_{db} + (1 - \beta)(db)^2</script><script type="math/tex; mode=display">w := w - \alpha \frac{dw}{\sqrt{s_{dw} + \epsilon}}</script><script type="math/tex; mode=display">b := b - \alpha \frac{db}{\sqrt{s_{db} + \epsilon}}</script><p>其中，$ϵ$ 是一个实际操作时加上的较小数（例如$10^{-8}$），为了防止分母太小而导致的数值不稳定。</p>
+<p>当 $dw$ 或 $db$ 较大时，$(dw)^2$、$(db)^2$会较大，进而 $s_{dw}$、$s_{db}$也会较大，最终使得</p>
+<script type="math/tex; mode=display">\frac{dw}{\sqrt{s_{dw} + \epsilon}}</script><p>和</p>
+<script type="math/tex; mode=display">\frac{db}{\sqrt{s_{db} + \epsilon}}</script><p>较小，从而减小某些维度梯度更新波动较大的情况，使下降速度变得更快。</p>
+<p><img src="http://image.rexking6.top/img/clip1521086453.png" alt=""></p>
+<p>RMSProp 有助于减少抵达最小值路径上的摆动，并允许使用一个更大的学习率 α，从而加快算法学习速度。并且，它和 Adam 优化算法已被证明适用于不同的深度学习网络结构。</p>
+<p>注意，β 也是一个超参数。</p>
+<h3 id="Adam-优化算法"><a href="#Adam-优化算法" class="headerlink" title="Adam 优化算法"></a>Adam 优化算法</h3><p>Adam 优化算法（Adaptive Moment Estimation，自适应矩估计）基本上就是将 Momentum 和 RMSProp 算法结合在一起，通常有超越二者单独时的效果。具体过程如下（省略了 l）：</p>
+<p>首先进行初始化：</p>
+<script type="math/tex; mode=display">v_{dW} = 0, s_{dW} = 0, v_{db} = 0, s_{db} = 0</script><p>用每一个 mini-batch 计算 dW、db，第 t 次迭代时：</p>
+<script type="math/tex; mode=display">v_{dW} = \beta_1 v_{dW} + (1 - \beta_1) dW</script><script type="math/tex; mode=display">v_{db} = \beta_1 v_{db} + (1 - \beta_1) db</script><script type="math/tex; mode=display">s_{dW} = \beta_2 s_{dW} + (1 - \beta_2) {(dW)}^2</script><script type="math/tex; mode=display">s_{db} = \beta_2 s_{db} + (1 - \beta_2) {(db)}^2</script><p>一般使用 Adam 算法时需要计算偏差修正：</p>
+<script type="math/tex; mode=display">v^{corrected}_{dW} = \frac{v_{dW}}{1-{\beta_1}^t}</script><script type="math/tex; mode=display">v^{corrected}_{db} = \frac{v_{db}}{1-{\beta_1}^t}</script><script type="math/tex; mode=display">s^{corrected}_{dW} = \frac{s_{dW}}{1-{\beta_2}^t}</script><script type="math/tex; mode=display">s^{corrected}_{db} = \frac{s_{db}}{1-{\beta_2}^t}</script><p>所以，更新 W、b 时有：</p>
+<script type="math/tex; mode=display">W := W - \alpha \frac{v^{corrected}_{dW}}{\sqrt{s^{corrected}_{dW}} + \epsilon}</script><script type="math/tex; mode=display">b := b - \alpha \frac{v^{corrected}_{db}}{\sqrt{s^{corrected}_{db}} + \epsilon}</script><p>（可以看到 Andrew 在这里 ϵ 没有写到平方根里去，和他在 RMSProp 中写的不太一样。考虑到 ϵ 所起的作用，我感觉影响不大）</p>
+<h4 id="超参数的选择"><a href="#超参数的选择" class="headerlink" title="超参数的选择"></a>超参数的选择</h4><p>Adam 优化算法有很多的超参数，其中</p>
+<ul>
+<li>学习率 α：需要尝试一系列的值，来寻找比较合适的；</li>
+<li>β1：常用的缺省值为 0.9；</li>
+<li>β2：Adam 算法的作者建议为 0.999；</li>
+<li>ϵ：不重要，不会影响算法表现，Adam 算法的作者建议为 $10^{−8}$；</li>
+<li>β1、β2、ϵ 通常不需要调试。</li>
+</ul>
+<h3 id="学习率衰减"><a href="#学习率衰减" class="headerlink" title="学习率衰减"></a>学习率衰减</h3><p>如果设置一个固定的学习率 α，在最小值点附近，由于不同的 batch 中存在一定的噪声，因此不会精确收敛，而是始终在最小值周围一个较大的范围内波动。</p>
+<p>而如果随着时间慢慢减少学习率 α 的大小，在初期 α 较大时，下降的步长较大，能以较快的速度进行梯度下降；而后期逐步减小 α 的值，即减小步长，有助于算法的收敛，更容易接近最优解。</p>
+<p>最常用的学习率衰减方法：</p>
+<script type="math/tex; mode=display">\alpha = \frac{1}{1 + decay\_rate * epoch\_num} \alpha_0</script><p>其中，<code>decay_rate</code>为衰减率（超参数），<code>epoch_num</code>为将所有的训练样本完整过一遍的次数。</p>
+<ul>
+<li>指数衰减：</li>
+</ul>
+<script type="math/tex; mode=display">\alpha = 0.95^{epoch\_num} * \alpha_0</script><ul>
+<li>其他：</li>
+</ul>
+<script type="math/tex; mode=display">\alpha = \frac{k}{\sqrt{epoch\_num}} * \alpha_0</script><ul>
+<li>离散下降：</li>
+</ul>
+<p>对于较小的模型，也有人会在训练时根据进度手动调小学习率。</p>
+<h3 id="局部最优问题"><a href="#局部最优问题" class="headerlink" title="局部最优问题"></a>局部最优问题</h3><p><img src="http://image.rexking6.top/img/clip1521095084.png" alt=""></p>
+<p>鞍点（saddle）是函数上的导数为零，但不是轴上局部极值的点。当我们建立一个神经网络时，通常梯度为零的点是上图所示的鞍点，而非局部最小值。减少损失的难度也来自误差曲面中的鞍点，而不是局部最低点。因为在一个具有高维度空间的成本函数中，如果梯度为 0，那么在每个方向，成本函数或是凸函数，或是凹函数。而所有维度均需要是凹函数的概率极小，因此在低维度的局部最优点的情况并不适用于高维度。</p>
+<p>结论：</p>
+<ul>
+<li>在训练较大的神经网络、存在大量参数，并且成本函数被定义在较高的维度空间时，困在极差的局部最优中是不大可能的；</li>
+<li>鞍点附近的平稳段会使得学习非常缓慢，而这也是动量梯度下降法、RMSProp 以及 Adam 优化算法能够加速学习的原因，它们能帮助尽早走出平稳段。</li>
+</ul>
+<h2 id="超参数调试、Batch-正则化和程序框架"><a href="#超参数调试、Batch-正则化和程序框架" class="headerlink" title="超参数调试、Batch 正则化和程序框架"></a>超参数调试、Batch 正则化和程序框架</h2><h3 id="超参数调试处理"><a href="#超参数调试处理" class="headerlink" title="超参数调试处理"></a>超参数调试处理</h3><h4 id="重要程度排序"><a href="#重要程度排序" class="headerlink" title="重要程度排序"></a>重要程度排序</h4><p>目前已经讲到过的超参数中，重要程度依次是（仅供参考）：</p>
+<ul>
+<li>最重要：</li>
+<li><ul>
+<li>学习率 α；</li>
+</ul>
+</li>
+<li>其次重要：</li>
+<li><ul>
+<li>β：动量衰减参数，常设置为 0.9；</li>
+</ul>
+</li>
+<li><ul>
+<li>hidden units：各隐藏层神经元个数；</li>
+</ul>
+</li>
+<li><ul>
+<li>mini-batch 的大小；</li>
+</ul>
+</li>
+<li>再次重要：</li>
+<li><ul>
+<li>β1，β2，ϵ：Adam 优化算法的超参数，常设为 0.9、0.999、$10^{−8}$；</li>
+</ul>
+</li>
+<li><ul>
+<li>layers：神经网络层数;</li>
+</ul>
+</li>
+<li><ul>
+<li>decay_rate：学习衰减率。</li>
+</ul>
+</li>
+</ul>
+<h4 id="调参技巧"><a href="#调参技巧" class="headerlink" title="调参技巧"></a>调参技巧</h4><p>系统地组织超参调试过程的技巧：</p>
+<ul>
+<li>随机选择点（而非均匀选取），用这些点实验超参数的效果。这样做的原因是我们提前很难知道超参数的重要程度，可以通过选择更多值来进行更多实验；</li>
+<li>由粗糙到精细：聚焦效果不错的点组成的小区域，在其中更密集地取值，以此类推。</li>
+</ul>
+<h4 id="选择合适的范围"><a href="#选择合适的范围" class="headerlink" title="选择合适的范围"></a>选择合适的范围</h4><ul>
+<li>对于学习率 α，用对数标尺而非线性轴更加合理：0.0001、0.001、0.01、0.1 等，然后在这些刻度之间再随机均匀取值；</li>
+<li>对于 β，取 0.9 就相当于在 10 个值中计算平均值，而取 0.999 就相当于在 1000 个值中计算平均值。可以考虑给 1-β 取值，这样就和取学习率类似了。</li>
+</ul>
+<p>上述操作的原因是当 β 接近 1 时，即使 β 只有微小的改变，所得结果的灵敏度会有较大的变化。例如，β 从 0.9 增加到 0.9005 对结果（1/(1-β)）几乎没有影响，而 β 从 0.999 到 0.9995 对结果的影响巨大（从 1000 个值中计算平均值变为 2000 个值中计算平均值）。</p>
+<h4 id="一些建议"><a href="#一些建议" class="headerlink" title="一些建议"></a>一些建议</h4><ul>
+<li>深度学习如今已经应用到许多不同的领域。不同的应用出现相互交融的现象，某个应用领域的超参数设定有可能通用于另一领域。不同应用领域的人也应该更多地阅读其他研究领域的 paper，跨领域地寻找灵感；</li>
+<li>考虑到数据的变化或者服务器的变更等因素，建议每隔几个月至少一次，重新测试或评估超参数，来获得实时的最佳模型；</li>
+<li>根据你所拥有的计算资源来决定你训练模型的方式：</li>
+<li><ul>
+<li>Panda（熊猫方式）：在在线广告设置或者在计算机视觉应用领域有大量的数据，但受计算能力所限，同时试验大量模型比较困难。可以采用这种方式：试验一个或一小批模型，初始化，试着让其工作运转，观察它的表现，不断调整参数；</li>
+</ul>
+</li>
+<li><ul>
+<li>Caviar（鱼子酱方式）：拥有足够的计算机去平行试验很多模型，尝试很多不同的超参数，选取效果最好的模型。</li>
+</ul>
+</li>
+</ul>
+<h3 id="Batch-Normalization"><a href="#Batch-Normalization" class="headerlink" title="Batch Normalization"></a>Batch Normalization</h3><p>批标准化（Batch Normalization，经常简称为 BN）会使参数搜索问题变得很容易，使神经网络对超参数的选择更加稳定，超参数的范围会更庞大，工作效果也很好，也会使训练更容易。</p>
+<p>之前，我们对输入特征 X 使用了标准化处理。我们也可以用同样的思路处理隐藏层的激活值$a^{[l]}$，以加速$W^{[l+1]}$和$b^{[l+1]}$的训练。在实践中，经常选择标准化$Z^{[l]}$：</p>
+<script type="math/tex; mode=display">\mu = \frac{1}{m} \sum_i z^{(i)}</script><script type="math/tex; mode=display">\sigma^2 = \frac{1}{m} \sum_i {(z_i - \mu)}^2</script><script type="math/tex; mode=display">z_{norm}^{(i)} = \frac{z^{(i)} - \mu}{\sqrt{\sigma^2 + \epsilon}}</script><p>其中，m 是单个 mini-batch 所包含的样本个数，ϵ 是为了防止分母为零，通常取 10^{−8}。</p>
+<p>这样，我们使得所有的输入 $z^{(i)}$均值为 0，方差为 1。但我们不想让隐藏层单元总是含有平均值 0 和方差 1，也许隐藏层单元有了不同的分布会更有意义。因此，我们计算</p>
+<script type="math/tex; mode=display">\tilde z^{(i)} = \gamma z^{(i)}_{norm} + \beta</script><p>其中，γ 和 β 都是模型的学习参数，所以可以用各种梯度下降算法来更新 γ 和 β 的值，如同更新神经网络的权重一样。</p>
+<p>通过对 γ 和 β 的合理设置，可以让$\tilde z^{(i)}$的均值和方差为任意值。这样，我们对隐藏层的的均值和方差为任意值。这样，我们对隐藏层的$z^{(i)}$进行标准化处理，用得到的$\tilde z^{(i)}$替代$z^{(i)}$。</p>
+<p>设置 γ 和 β 的原因是，如果各隐藏层的输入均值在靠近 0 的区域，即处于激活函数的线性区域，不利于训练非线性神经网络，从而得到效果较差的模型。因此，需要用 γ 和 β 对标准化后的结果做进一步处理。</p>
+<h4 id="将-BN-应用于神经网络"><a href="#将-BN-应用于神经网络" class="headerlink" title="将 BN 应用于神经网络"></a>将 BN 应用于神经网络</h4><p>对于 L 层神经网络，经过 Batch Normalization 的作用，整体流程如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1521174112.png" alt=""></p>
+<p>实际上，Batch Normalization 经常使用在 mini-batch 上，这也是其名称的由来。</p>
+<p>使用 Batch Normalization 时，因为标准化处理中包含减去均值的一步，因此 b 实际上没有起到作用，其数值效果交由 β 来实现。因此，在 Batch Normalization 中，可以省略 b 或者暂时设置为 0。</p>
+<p>在使用梯度下降算法时，分别对$W^{[l]}$，$β^{[l]}$，$γ^{[l]}$进行迭代更新。除了传统的梯度下降算法之外，还可以使用之前学过的动量梯度下降、RMSProp 或者 Adam 等优化算法。</p>
+<h4 id="BN-有效的原因"><a href="#BN-有效的原因" class="headerlink" title="BN 有效的原因"></a>BN 有效的原因</h4><p>Batch Normalization 效果很好的原因有以下两点：</p>
+<ol>
+<li>通过对隐藏层各神经元的输入做类似的标准化处理，提高神经网络训练速度；</li>
+<li>可以使前面层的权重变化对后面层造成的影响减小，整体网络更加健壮。</li>
+</ol>
+<p>关于第二点，如果实际应用样本和训练样本的数据分布不同（例如，橘猫图片和黑猫图片），我们称发生了“Covariate Shift”。这种情况下，一般要对模型进行重新训练。Batch Normalization 的作用就是减小 Covariate Shift 所带来的影响，让模型变得更加健壮，鲁棒性（Robustness）更强。</p>
+<p>即使输入的值改变了，由于 Batch Normalization 的作用，使得均值和方差保持不变（由 γ 和 β 决定），限制了在前层的参数更新对数值分布的影响程度，因此后层的学习变得更容易一些。Batch Normalization 减少了各层 W 和 b 之间的耦合性，让各层更加独立，实现自我训练学习的效果。</p>
+<p>另外，Batch Normalization 也起到微弱的正则化（regularization）效果。因为在每个 mini-batch 而非整个数据集上计算均值和方差，只由这一小部分数据估计得出的均值和方差会有一些噪声，因此最终计算出的 z~(i)也有一定噪声。类似于 dropout，这种噪声会使得神经元不会再特别依赖于任何一个输入特征。</p>
+<p>因为 Batch Normalization 只有微弱的正则化效果，因此可以和 dropout 一起使用，以获得更强大的正则化效果。通过应用更大的 mini-batch 大小，可以减少噪声，从而减少这种正则化效果。</p>
+<p>最后，不要将 Batch Normalization 作为正则化的手段，而是当作加速学习的方式。正则化只是一种非期望的副作用，Batch Normalization 解决的还是反向传播过程中的梯度问题（梯度消失和爆炸）。</p>
+<h4 id="测试时的-Batch-Normalization"><a href="#测试时的-Batch-Normalization" class="headerlink" title="测试时的 Batch Normalization"></a>测试时的 Batch Normalization</h4><p>Batch Normalization 将数据以 mini-batch 的形式逐一处理，但在测试时，可能需要对每一个样本逐一处理，这样无法得到 μ 和$σ^2$。</p>
+<p>理论上，我们可以将所有训练集放入最终的神经网络模型中，然后将每个隐藏层计算得到的$μ^{[l]}$和$σ^{2[l]}$直接作为测试过程的 μ 和 σ 来使用。但是，实际应用中一般不使用这种方法，而是使用之前学习过的指数加权平均的方法来预测测试过程单个样本的 μ 和$σ^2$。</p>
+<p>对于第 l 层隐藏层，考虑所有 mini-batch 在该隐藏层下的$μ^{[l]}$和$σ^{2[l]}$，然后用指数加权平均的方式来预测得到当前单个样本的$μ^{[l]}$和$σ^{2[l]}$。这样就实现了对测试过程单个样本的均值和方差估计。</p>
+<h3 id="Softmax-回归"><a href="#Softmax-回归" class="headerlink" title="Softmax 回归"></a>Softmax 回归</h3><p>目前为止，介绍的分类例子都是二分类问题：神经网络输出层只有一个神经元，表示预测输出$\hat y$正类的概率 P(y = 1|x)，$\hat y$&gt; 0.5 则判断为正类，反之判断为负类。</p>
+<p>对于多分类问题，用 C 表示种类个数，则神经网络输出层，也就是第 L 层的单元数量$n^{[L]} = C$。每个神经元的输出依次对应属于该类的概率，即$P(y = c|x), c = 0, 1, .., C-1$。</p>
+<p>有一种 Logistic 回归的一般形式，叫做 Softmax 回归，可以处理多分类问题。</p>
+<p>对于 Softmax 回归模型的输出层，即第 L 层，有：</p>
+<script type="math/tex; mode=display">Z^{[L]} = W^{[L]}a^{[L-1]} + b^{[L]}</script><p><code>for i in range(L)</code>，有：</p>
+<script type="math/tex; mode=display">a^{[L]}_i = \frac{e^{Z^{[L]}_i}}{\sum^C_{i=1}e^{Z^{[L]}_i}}</script><p>为输出层每个神经元的输出，对应属于该类的概率，满足：</p>
+<script type="math/tex; mode=display">\sum^C_{i=1}a^{[L]}_i = 1</script><p>一个直观的计算例子如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1521174680.png" alt=""></p>
+<h4 id="损失函数和成本函数"><a href="#损失函数和成本函数" class="headerlink" title="损失函数和成本函数"></a>损失函数和成本函数</h4><p>定义损失函数为：</p>
+<script type="math/tex; mode=display">L(\hat y, y) = -\sum^C_{j=1}y_jlog\hat y_j</script><p>当 i 为样本真实类别，则有：</p>
+<script type="math/tex; mode=display">y_j = 0, j \ne i</script><p>因此，损失函数可以简化为：</p>
+<script type="math/tex; mode=display">L(\hat y, y) = -y_ilog\hat y_i = log \hat y_i</script><p>所有 m 个样本的成本函数为：</p>
+<script type="math/tex; mode=display">J = \frac{1}{m}\sum^m_{i=1}L(\hat y, y)</script><h4 id="梯度下降法"><a href="#梯度下降法" class="headerlink" title="梯度下降法"></a>梯度下降法</h4><p>多分类的 Softmax 回归模型与二分类的 Logistic 回归模型只有输出层上有一点区别。经过不太一样的推导过程，仍有</p>
+<script type="math/tex; mode=display">dZ^{[L]} = A^{[L]} - Y</script><p>反向传播过程的其他步骤也和 Logistic 回归的一致。</p>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><ul>
+<li><a target="_blank" rel="noopener" href="http://ufldl.stanford.edu/wiki/index.php/Softmax%E5%9B%9E%E5%BD%92">Softmax回归 - Ufldl</a></li>
+</ul>
+<h3 id="深度学习框架"><a href="#深度学习框架" class="headerlink" title="深度学习框架"></a>深度学习框架</h3><h4 id="比较著名的框架"><a href="#比较著名的框架" class="headerlink" title="比较著名的框架"></a>比较著名的框架</h4><ul>
+<li>Caffe / Caffe 2</li>
+<li>CNTK</li>
+<li>DL4J</li>
+<li>Keras</li>
+<li>Lasagne</li>
+<li>mxnet</li>
+<li>PaddlePaddle</li>
+<li>TensorFlow</li>
+<li>Theano</li>
+<li>Torch</li>
+</ul>
+<h4 id="选择框架的标准"><a href="#选择框架的标准" class="headerlink" title="选择框架的标准"></a>选择框架的标准</h4><ul>
+<li>便于编程：包括神经网络的开发和迭代、配置产品；</li>
+<li>运行速度：特别是训练大型数据集时；</li>
+<li>是否真正开放：不仅需要开源，而且需要良好的管理，能够持续开放所有功能。</li>
+</ul>
+<h3 id="Tensorflow"><a href="#Tensorflow" class="headerlink" title="Tensorflow"></a>Tensorflow</h3><p>目前最火的深度学习框架大概是 Tensorflow 了。这里简单的介绍一下。</p>
+<p>Tensorflow 框架内可以直接调用梯度下降算法，极大地降低了编程人员的工作量。例如以下代码：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">import numpy as np</span><br><span class="line">import tensorflow as tf</span><br><span class="line"></span><br><span class="line">cofficients = np.array([[1.],[-10.],[25.]])</span><br><span class="line"></span><br><span class="line">w = tf.Variable(0,dtype=tf.float32)</span><br><span class="line">x = tf.placeholder(tf.float32,[3,1])</span><br><span class="line"># Tensorflow 重载了加减乘除符号</span><br><span class="line">cost = x[0][0]*w**2 + x[1][0]*w + x[2][0]</span><br><span class="line"># 改变下面这行代码，可以换用更好的优化算法</span><br><span class="line">train = tf.train.GradientDescentOptimizer(0.01).minimize(cost)</span><br><span class="line"></span><br><span class="line">init = tf.global_variables_initializer()</span><br><span class="line">session = tf.Session()</span><br><span class="line">session.run(init)</span><br><span class="line">for i in range(1000):</span><br><span class="line">    session.run(train, feed_dict=(x:coefficients))</span><br><span class="line">print(session.run(w))</span><br></pre></td></tr></table></figure><br>打印为 4.99999，基本可以认为是我们需要的结果。更改 cofficients 的值可以得到不同的结果 w。</p>
+<p>上述代码中：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">session = tf.Session()</span><br><span class="line">session.run(init)</span><br><span class="line">print(session.run(w))</span><br></pre></td></tr></table></figure></p>
+<p>也可以写作：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">with tf.Session() as session:</span><br><span class="line">    session.run(init)</span><br><span class="line">    print(session.run(w))</span><br></pre></td></tr></table></figure></p>
+<p>with 语句适用于对资源进行访问的场合，确保不管使用过程中是否发生异常都会执行必要的“清理”操作，释放资源，比如文件使用后自动关闭、线程中锁的自动获取和释放等。</p>
+<p>想了解更多 Tensorflow 有关知识，请参考<a target="_blank" rel="noopener" href="https://www.tensorflow.org/">官方文档</a>。</p>
+<h1 id="搭建机器学习项目"><a href="#搭建机器学习项目" class="headerlink" title="搭建机器学习项目"></a>搭建机器学习项目</h1><h2 id="机器学习（ML）策略（1）"><a href="#机器学习（ML）策略（1）" class="headerlink" title="机器学习（ML）策略（1）"></a>机器学习（ML）策略（1）</h2><p>对于一个已经被构建好且产生初步结果的机器学习系统，为了能使结果更令人满意，往往还要进行大量的改进。鉴于之前的课程介绍了多种改进的方法，例如收集更多数据、调试超参数、调整神经网络的大小或结构、采用不同的优化算法、进行正则化等等，我们有可能浪费大量时间在一条错误的改进路线上。</p>
+<p>想要找准改进的方向，使一个机器学习系统更快更有效地工作，就需要学习一些在构建机器学习系统时常用到的策略。</p>
+<h3 id="正交化"><a href="#正交化" class="headerlink" title="正交化"></a>正交化</h3><p>正交化（Orthogonalization）的核心在于每次调整只会影响模型某一方面的性能，而对其他功能没有影响。这种方法有助于更快更有效地进行机器学习模型的调试和优化。</p>
+<p>在机器学习（监督学习）系统中，可以划分四个“功能”：</p>
+<ol>
+<li>建立的模型在训练集上表现良好；</li>
+<li>建立的模型在验证集上表现良好；</li>
+<li>建立的模型在测试集上表现良好；</li>
+<li>建立的模型在实际应用中表现良好。</li>
+</ol>
+<p>其中，</p>
+<ul>
+<li>对于第一条，如果模型在训练集上表现不好，可以尝试训练更大的神经网络或者换一种更好的优化算法（例如 Adam）；</li>
+<li>对于第二条，如果模型在验证集上表现不好，可以进行正则化处理或者加入更多训练数据；</li>
+<li>对于第三条，如果模型在测试集上表现不好，可以尝试使用更大的验证集进行验证；</li>
+<li>对于第四条，如果模型在实际应用中表现不好，可能是因为测试集没有设置正确或者成本函数评估指标有误，需要改变测试集或成本函数。</li>
+</ul>
+<p>面对遇到的各种问题，正交化能够帮助我们更为精准有效地解决问题。</p>
+<p>一个反例是早停止法（Early Stopping）。如果早期停止，虽然可以改善验证集的拟合表现，但是对训练集的拟合就不太好。因为对两个不同的“功能”都有影响，所以早停止法不具有正交化。虽然也可以使用，但是用其他正交化控制手段来进行优化会更简单有效。</p>
+<h3 id="单值评价指标"><a href="#单值评价指标" class="headerlink" title="单值评价指标"></a>单值评价指标</h3><p>构建机器学习系统时，通过设置一个量化的单值评价指标（single-number evaluation metric），可以使我们根据这一指标比较不同超参数对应的模型的优劣，从而选择最优的那个模型。</p>
+<p>例如，对于二分类问题，常用的评价指标是精确率（Precision）和召回率（Recall）。假设我们有 A 和 B 两个分类器，其两项指标分别如下：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>分类器</th>
+<th>精确率</th>
+<th>召回率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>95%</td>
+<td>90%</td>
+</tr>
+<tr>
+<td>B</td>
+<td>98%</td>
+<td>85%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul>
+<li>精确率：$\frac{预测为正类的正类数量}{预测为正类的数量} * 100\%$</li>
+<li>召回率：$\frac{预测为正类的正类数量}{正类数量} * 100\%$</li>
+</ul>
+<p>实际应用中，我们通常使用综合了精确率和召回率的单值评价指标 F1 Score 来评价模型的好坏。F1 Score 其实就是精准率和召回率的调和平均数（Harmonic Mean），比单纯的平均数效果要好。</p>
+<script type="math/tex; mode=display">F1 = \frac{2}{\frac{1}{P}+\frac{1}{R}} = \frac{2PR}{P+R}</script><p>因此，我们计算出两个分类器的 F1 Score。可以看出 A 模型的效果要更好。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>分类器</th>
+<th>精确率</th>
+<th>召回率</th>
+<th>F1 Score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>95%</td>
+<td>90%</td>
+<td>92.4%</td>
+</tr>
+<tr>
+<td>B</td>
+<td>98%</td>
+<td>85%</td>
+<td>91.0%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>通过引入单值评价指标，我们可以更方便快速地对不同模型进行比较。</p>
+<h3 id="优化指标和满足指标"><a href="#优化指标和满足指标" class="headerlink" title="优化指标和满足指标"></a>优化指标和满足指标</h3><p>如果我们还想要将分类器的运行时间也纳入考虑范围，将其和精确率、召回率组合成一个单值评价指标显然不那么合适。这时，我们可以将某些指标作为优化指标（Optimizing Matric），寻求它们的最优值；而将某些指标作为满足指标（Satisficing Matric），只要在一定阈值以内即可。</p>
+<p>在这个例子中，准确率就是一个优化指标，因为我们想要分类器尽可能做到正确分类；而运行时间就是一个满足指标，如果你想要分类器的运行时间不多于某个阈值，那最终选择的分类器就应该是以这个阈值为界里面准确率最高的那个。</p>
+<h3 id="动态改变评价指标"><a href="#动态改变评价指标" class="headerlink" title="动态改变评价指标"></a>动态改变评价指标</h3><p>对于模型的评价标准优势需要根据实际情况进行动态调整，以让模型在实际应用中获得更好的效果。</p>
+<p>例如，有时我们不太能接受某些分类错误，于是改变单纯用错误率作为评价标准，给某些分类错误更高的权重，以从追求最小错误率转为追求最小风险。</p>
+<h3 id="训练-验证-测试集划分"><a href="#训练-验证-测试集划分" class="headerlink" title="训练 / 验证 / 测试集划分"></a>训练 / 验证 / 测试集划分</h3><p>我们一般将数据集分为训练集、验证集、测试集。构建机器学习系统时，我们采用不同的学习方法，在训练集上训练出不同的模型，然后使用验证集对模型的好坏进行评估，确信其中某个模型足够好时再用测试集对其进行测试。</p>
+<p>因此，训练集、验证集、测试集的设置对于机器学习模型非常重要，合理的设置能够大大提高模型训练效率和模型质量。</p>
+<h4 id="验证集和测试集的分布"><a href="#验证集和测试集的分布" class="headerlink" title="验证集和测试集的分布"></a>验证集和测试集的分布</h4><p>验证集和测试集的数据来源应该相同（来自同一分布）、和机器学习系统将要在实际应用中面对的数据一致，且必须从所有数据中随机抽取。这样，系统才能做到尽可能不偏离目标。</p>
+<h4 id="验证集和测试集的大小"><a href="#验证集和测试集的大小" class="headerlink" title="验证集和测试集的大小"></a>验证集和测试集的大小</h4><p>过去数据量较小（小于 1 万）时，通常将数据集按照以下比例进行划分：</p>
+<ul>
+<li>无验证集的情况：70% / 30%；</li>
+<li>有验证集的情况：60% / 20% / 20%。</li>
+</ul>
+<p>这是为了保证验证集和测试集有足够的数据。现在的机器学习时代数据集规模普遍较大，例如 100 万数据量，这时将相应比例设为 98% / 1% / 1% 或 99% / 1% 就已经能保证验证集和测试集的规模足够。</p>
+<p>测试集的大小应该设置得足够提高系统整体性能的可信度，验证集的大小也要设置得足够用于评估几个不同的模型。应该根据实际情况对数据集灵活地进行划分，而不是死板地遵循老旧的经验。</p>
+<h3 id="比较人类表现水平"><a href="#比较人类表现水平" class="headerlink" title="比较人类表现水平"></a>比较人类表现水平</h3><p>很多机器学习模型的诞生是为了取代人类的工作，因此其表现也会跟人类表现水平作比较。</p>
+<p><img src="http://image.rexking6.top/img/clip1521201768.png" alt=""></p>
+<p>上图展示了随着时间的推进，机器学习系统和人的表现水平的变化。一般的，当机器学习超过人的表现水平后，它的进步速度逐渐变得缓慢，最终性能无法超过某个理论上限，这个上限被称为贝叶斯最优误差（Bayes Optimal Error）。</p>
+<p>贝叶斯最优误差一般认为是理论上可能达到的最优误差，换句话说，其就是理论最优函数，任何从 x 到精确度 y 映射的函数都不可能超过这个值。例如，对于语音识别，某些音频片段嘈杂到基本不可能知道说的是什么，所以完美的识别率不可能达到 100%。</p>
+<p>因为人类对于一些自然感知问题的表现水平十分接近贝叶斯最优误差，所以当机器学习系统的表现超过人类后，就没有太多继续改善的空间了。</p>
+<p>也因此，只要建立的机器学习模型的表现还没达到人类的表现水平时，就可以通过各种手段来提升它。例如采用人工标记过的数据进行训练，通过人工误差分析了解为什么人能够正确识别，或者是进行偏差、方差分析。</p>
+<p>当模型的表现超过人类后，这些手段起的作用就微乎其微了。</p>
+<h4 id="可避免偏差"><a href="#可避免偏差" class="headerlink" title="可避免偏差"></a>可避免偏差</h4><p>通过与贝叶斯最优误差，或者说，与人类表现水平的比较，可以表明一个机器学习模型表现的好坏程度，由此判断后续操作应该注重于减小偏差还是减小方差。</p>
+<p>模型在训练集上的误差与人类表现水平的差值被称作可避免偏差（Avoidable Bias）。可避免偏差低便意味着模型在训练集上的表现很好，而训练集与验证集之间错误率的差值越小，意味着模型在验证集与测试集上的表现和训练集同样好。</p>
+<p>如果可避免偏差大于训练集与验证集之间错误率的差值，之后的工作就应该专注于减小偏差；反之，就应该专注于减小方差。</p>
+<h4 id="理解人类表现水平"><a href="#理解人类表现水平" class="headerlink" title="理解人类表现水平"></a>理解人类表现水平</h4><p>我们一般用人类水平误差（Human-level Error）来代表贝叶斯最优误差（或者简称贝叶斯误差）。对于不同领域的例子，不同人群由于其经验水平不一，错误率也不同。一般来说，我们将表现最好的作为人类水平误差。但是实际应用中，不同人选择人类水平误差的基准是不同的，这会带来一定的影响。</p>
+<p>例如，如果某模型在训练集上的错误率为 0.7%，验证集的错误率为 0.8%。如果选择的人类水平误差为 0.5%，那么偏差（bias）比方差（variance）更加突出；而如果选择的人类水平误差为 0.7%，则方差更加突出。也就是说，根据人类水平误差的不同选择，我们可能因此选择不同的优化操作。</p>
+<p>这种问题只会发生在模型表现很好，接近人类水平误差的时候才会出现。人类水平误差给了我们一种估计贝叶斯误差的方式，而不是像之前一样将训练的错误率直接对着 0% 的方向进行优化。</p>
+<p>当机器学习模型的表现超过了人类水平误差时，很难再通过人的直觉去判断模型还能够往什么方向优化以提高性能。</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>想让一个监督学习算法达到使用程度，应该做到以下两点：</p>
+<ol>
+<li>算法对训练集的拟合很好，可以看作可避免偏差很低；</li>
+<li>推广到验证集和测试集效果也很好，即方差不是很大。</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1521201851.png" alt=""></p>
+<p>根据正交化的思想，我们有一些措施可以独立地优化二者之一。</p>
+<h2 id="机器学习（ML）策略（2）"><a href="#机器学习（ML）策略（2）" class="headerlink" title="机器学习（ML）策略（2）"></a>机器学习（ML）策略（2）</h2><h3 id="错误分析"><a href="#错误分析" class="headerlink" title="错误分析"></a>错误分析</h3><p>通过人工检查机器学习模型得出的结果中出现的一些错误，有助于深入了解下一步要进行的工作。这个过程被称作错误分析（Error Analysis）。</p>
+<p>例如，你可能会发现一个猫图片识别器错误地将一些看上去像猫的狗误识别为猫。这时，立即盲目地去研究一个能够精确识别出狗的算法不一定是最好的选择，因为我们不知道这样做会对提高分类器的准确率有多大的帮助。</p>
+<p>这时，我们可以从分类错误的样本中统计出狗的样本数量。根据狗样本所占的比重来判断这一问题的重要性。假如狗类样本所占比重仅为 5%，那么即使花费几个月的时间来提升模型对狗的识别率，改进后的模型错误率并没有显著改善；而如果错误样本中狗类所占比重为 50%，那么改进后的模型性能会有较大的提升。因此，花费更多的时间去研究能够精确识别出狗的算法是值得的。</p>
+<p>这种人工检查看似简单而愚笨，但却是十分必要的，因为这项工作能够有效避免花费大量的时间与精力去做一些对提高模型性能收效甚微的工作，让我们专注于解决影响模型准确率的主要问题。</p>
+<p>在对输出结果中分类错误的样本进行人工分析时，可以建立一个表格来记录每一个分类错误的具体信息，例如某些图像是模糊的，或者是把狗识别成了猫等，并统计属于不同错误类型的错误数量。这样，分类结果会更加清晰。</p>
+<p><img src="http://image.rexking6.top/img/clip1521248335.png" alt=""></p>
+<p>总结一下，进行错误分析时，你应该观察错误标记的例子，看看假阳性和假阴性，统计属于不同错误类型的错误数量。在这个过程中，你可能会得到启发，归纳出新的错误类型。总之，通过统计不同错误标记类型占总数的百分比，有助于发现哪些问题亟待解决，或者提供构思新优化方向的灵感。</p>
+<h3 id="修正错误标记"><a href="#修正错误标记" class="headerlink" title="修正错误标记"></a>修正错误标记</h3><p>我们用 mislabeled examples 来表示学习算法输出了错误的 Y 值。而在做误差分析时，有时会注意到数据集中有些样本被人为地错误标记（incorrectly labeled）了，这时该怎么做？</p>
+<p>如果是在训练集中，由于机器学习算法对于随机误差的稳健性（Robust）（也称作“鲁棒性”），只要这些出错的样本数量较小，且分布近似随机，就不必花费时间一一修正。</p>
+<p>而如果出现在验证集或者测试集，则可以在进行误差分析时，通过统计人为标记错误所占的百分比，来大致分析这种情况对模型的识别准确率的影响，并比较该比例的大小和其他错误类型的比例，以此判断是否值得去将错误的标记一一进行修正，还是可以忽略。</p>
+<p>当你决定在验证集和测试集上手动检查标签并进行修正时，有一些额外的方针和原则需要考虑：</p>
+<ul>
+<li>在验证集和测试集上同时使用同样的修正手段，以保证验证集和测试集来自相同的分布；</li>
+<li>同时检查判断正确和判断错误的例子（通常不用这么做）；</li>
+<li>在修正验证集和测试集时，鉴于训练集的分布不必和验证/测试集完全相同，可以不去修正训练集。</li>
+</ul>
+<h3 id="快速搭建系统并迭代"><a href="#快速搭建系统并迭代" class="headerlink" title="快速搭建系统并迭代"></a>快速搭建系统并迭代</h3><p>对于每个可以改善模型的合理方向，如何选择一个方向集中精力处理成了问题。如果想搭建一个全新的机器学习系统，建议根据以下步骤快速搭建好第一个系统，然后开始迭代：</p>
+<ol>
+<li>设置好训练、验证、测试集及衡量指标，确定目标；</li>
+<li>快速训练出一个初步的系统，用训练集来拟合参数，用验证集调参，用测试集评估；</li>
+<li>通过偏差/方差分析以及错误分析等方法，决定下一步优先处理的方向。</li>
+</ol>
+<h3 id="在不同的分布上训练和测试"><a href="#在不同的分布上训练和测试" class="headerlink" title="在不同的分布上训练和测试"></a>在不同的分布上训练和测试</h3><p>有时，我们很难得到来自同一个分布的训练集和验证/测试集。还是以猫识别作为例子，我们的训练集可能由网络爬取得到，图片比较清晰，而且规模较大（例如 20 万）；而验证/测试集可能来自用户手机拍摄，图片比较模糊，且数量较少（例如 1 万），难以满足作为训练集时的规模需要。</p>
+<p>虽然验证/测试集的质量不高，但是机器学习模型最终主要应用于识别这些用户上传的模糊图片。考虑到这一点，在划分数据集时，可以将 20 万张网络爬取的图片和 5000 张用户上传的图片作为训练集，而将剩下的 5000 张图片一半作验证集，一半作测试集。比起混合数据集所有样本再随机划分，这种分配方法虽然使训练集分布和验证/测试集的分布并不一样，但是能保证验证/测试集更接近实际应用场景，在长期能带来更好的系统性能。</p>
+<h3 id="数据不匹配"><a href="#数据不匹配" class="headerlink" title="数据不匹配"></a>数据不匹配</h3><p>之前的学习中，我们通过比较人类水平误差、训练集错误率、验证集错误率的相对差值来判断进行偏差/方差分析。但在训练集和验证/测试集分布不一致的情况下，无法根据相对差值来进行偏差/方差分析。这是因为训练集错误率和验证集错误率的差值可能来自于算法本身（归为方差），也可能来自于样本分布不同，和模型关系不大。</p>
+<p>在可能存在训练集和验证/测试集分布不一致的情况下，为了解决这个问题，我们可以再定义一个训练-验证集（Training-dev Set）。训练-验证集和训练集的分布相同（或者是训练集分割出的子集），但是不参与训练过程。</p>
+<p>现在，我们有了训练集错误率、训练-验证集错误率，以及验证集错误率。其中，训练集错误率和训练-验证集错误率的差值反映了方差；而训练-验证集错误率和验证集错误率的差值反映了样本分布不一致的问题，从而说明模型擅长处理的数据和我们关心的数据来自不同的分布，我们称之为数据不匹配（Data Mismatch）问题。</p>
+<p>人类水平误差、训练集错误率、训练-验证集错误率、验证集错误率、测试集错误率之间的差值所反映的问题如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1521248694.png" alt=""></p>
+<h4 id="处理方法"><a href="#处理方法" class="headerlink" title="处理方法"></a>处理方法</h4><p>这里有两条关于如何解决数据不匹配问题的建议：</p>
+<ol>
+<li>做错误分析，尝试了解训练集和验证/测试集的具体差异（主要是人工查看训练集和验证集的样本）；</li>
+<li>尝试将训练数据调整得更像验证集，或者收集更多类似于验证/测试集的数据。</li>
+</ol>
+<p>如果你打算将训练数据调整得更像验证集，可以使用的一种技术是人工合成数据。我们以语音识别问题为例，实际应用场合（验证/测试集）是包含背景噪声的，而作为训练样本的音频很可能是清晰而没有背景噪声的。为了让训练集与验证/测试集分布一致，我们可以给训练集人工添加背景噪声，合成类似实际场景的声音。</p>
+<p>人工合成数据能够使数据集匹配，从而提升模型的效果。但需要注意的是，不能给每段语音都增加同一段背景噪声，因为这样模型会对这段背景噪音出现过拟合现象，使得效果不佳。</p>
+<h3 id="迁移学习"><a href="#迁移学习" class="headerlink" title="迁移学习"></a>迁移学习</h3><p>迁移学习（Tranfer Learning）是通过将已训练好的神经网络模型的一部分网络结构应用到另一模型，将一个神经网络从某个任务中学到的知识和经验运用到另一个任务中，以显著提高学习任务的性能。</p>
+<p>例如，我们将为猫识别器构建的神经网络迁移应用到放射科诊断中。因为猫识别器的神经网络已经学习到了有关图像的结构和性质等方面的知识，所以只要先删除神经网络中原有的输出层，加入新的输出层并随机初始化权重系数（$W^{[L]}$、$b^{[L]}$），随后用新的训练集进行训练，就完成了以上的迁移学习。</p>
+<p>如果新的数据集很小，可能只需要重新训练输出层前的最后一层的权重，即$W^{[L]}$、$b^{[L]}$，并保持其他参数不变；而如果有足够多的数据，可以只保留网络结构，重新训练神经网络中所有层的系数。这时初始权重由之前的模型训练得到，这个过程称为预训练（Pre-Training），之后的权重更新过程称为微调（Fine-Tuning）。</p>
+<p>你也可以不止加入一个新的输出层，而是多向神经网络加几个新层。</p>
+<p><img src="http://image.rexking6.top/img/clip1521248885.png" alt=""></p>
+<p>在下述场合进行迁移学习是有意义的：</p>
+<ol>
+<li>两个任务有同样的输入（比如都是图像或者都是音频）；</li>
+<li>拥有更多数据的任务迁移到数据较少的任务；</li>
+<li>某一任务的低层次特征（底层神经网络的某些功能）对另一个任务的学习有帮助。</li>
+</ol>
+<h3 id="多任务学习"><a href="#多任务学习" class="headerlink" title="多任务学习"></a>多任务学习</h3><p>迁移学习中的步骤是串行的；而多任务学习（Multi-Task Learning）使用单个神经网络模型来同时实现多个任务，学习是同时开始的，并且任务之间可以相互促进。</p>
+<p>以汽车自动驾驶为例，需要实现的多任务是识别行人、车辆、交通标志和信号灯。如果在输入的图像中检测出车辆和交通标志，则输出的 y 为：</p>
+<script type="math/tex; mode=display">y = \begin{bmatrix} 0 \\ 1 \\ 1 \\ 0 \end{bmatrix}\quad</script><p><img src="http://image.rexking6.top/img/clip1521248959.png" alt=""></p>
+<p>多任务学习模型的成本函数为：</p>
+<script type="math/tex; mode=display">\frac{1}{m} \sum^m_{i=1} \sum^c_{j=1} L(\hat y_j^{(i)}, y_j^{(i)})</script><p>其中，j 代表任务下标，总有 c 个任务。对应的损失函数为：</p>
+<script type="math/tex; mode=display">L(\hat y_j^{(i)}, y_j^{(i)}) = -y_j^{(i)} log \hat y_j^{(i)} - (1 -y_j^{(i)})log(1 - \hat y_j^{(i)})</script><p>多任务学习是使用单个神经网络模型来实现多个任务。实际上，也可以分别构建多个神经网络来实现。多任务学习中可能存在训练样本 Y 某些标签空白的情况，这不会影响多任务学习模型的训练。</p>
+<p>多任务学习和 Softmax 回归看上去有些类似，容易混淆。它们的区别是，Softmax 回归的输出向量 y 中只有一个元素为 1；而多任务学习的输出向量 y 中可以有多个元素为 1。</p>
+<p>在下述场合进行多任务学习是有意义的：</p>
+<ol>
+<li>训练的一组任务可以供用低层次特征；</li>
+<li>通常，每个任务的数据量接近；</li>
+<li>能够训练一个足够大的神经网络，以同时做好所有的工作。多任务学习会降低性能的唯一情况（即和为每个任务训练单个神经网络相比性能更低的情况）是神经网络还不够大。</li>
+</ol>
+<p>在实践中，多任务学习的使用频率要远低于迁移学习。计算机视觉领域中的物体识别是一个多任务学习的例子。</p>
+<h3 id="端到端学习"><a href="#端到端学习" class="headerlink" title="端到端学习"></a>端到端学习</h3><p>在传统的机器学习分块模型中，每一个模块处理一种输入，然后其输出作为下一个模块的输入，构成一条流水线。而端到端深度学习（End-to-end Deep Learning）只用一个单一的神经网络模型来实现所有的功能。它将所有模块混合在一起，只关心输入和输出。</p>
+<p>如果数据量较少，传统机器学习分块模型所构成的流水线效果会很不错。但如果训练样本足够大，并且训练出的神经网络模型足够复杂，那么端到端深度学习模型的性能会比传统机器学习分块模型更好。</p>
+<p>而如果数据集规模适中，还是可以使用流水线方法，但是可以混合端到端深度学习，通过神经网络绕过某些模块，直接输出某些特征。</p>
+<p><img src="http://image.rexking6.top/img/clip1521249071.png" alt=""></p>
+<h4 id="优点与缺点"><a href="#优点与缺点" class="headerlink" title="优点与缺点"></a>优点与缺点</h4><p>应用端到端学习的优点：</p>
+<ol>
+<li>只要有足够多的数据，剩下的全部交给一个足够大的神经网络。比起传统的机器学习分块模型，可能更能捕获数据中的任何统计信息，而不需要用人类固有的认知（或者说，成见）来进行分析；</li>
+<li>所需手工设计的组件更少，简化设计工作流程；</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>需要大量的数据；</li>
+<li>排除了可能有用的人工设计组件；</li>
+</ol>
+<p>根据以上分析，决定一个问题是否应用端到端学习的关键点是：是否有足够的数据，支持能够直接学习从 x 映射到 y 并且足够复杂的函数？</p>
+<h1 id="卷积神经网络"><a href="#卷积神经网络" class="headerlink" title="卷积神经网络"></a>卷积神经网络</h1><h2 id="卷积神经网络-1"><a href="#卷积神经网络-1" class="headerlink" title="卷积神经网络"></a>卷积神经网络</h2><h3 id="计算机视觉"><a href="#计算机视觉" class="headerlink" title="计算机视觉"></a>计算机视觉</h3><p>计算机视觉（Computer Vision）的高速发展标志着新型应用产生的可能，例如自动驾驶、人脸识别、创造新的艺术风格。人们对于计算机视觉的研究也催生了很多机算机视觉与其他领域的交叉成果。一般的计算机视觉问题包括以下几类：</p>
+<ul>
+<li>图片分类（Image Classification）；</li>
+<li>目标检测（Object detection）；</li>
+<li>神经风格转换（Neural Style Transfer）。</li>
+</ul>
+<p>应用计算机视觉时要面临的一个挑战是数据的输入可能会非常大。例如一张 1000x1000x3 的图片，神经网络输入层的维度将高达三百万，使得网络权重 W 非常庞大。这样会造成两个后果：</p>
+<ol>
+<li>神经网络结构复杂，数据量相对较少，容易出现过拟合；</li>
+<li>所需内存和计算量巨大。</li>
+</ol>
+<p>因此，一般的神经网络很难处理蕴含着大量数据的图像。解决这一问题的方法就是使用卷积神经网络（Convolutional Neural Network, CNN）。</p>
+<h3 id="卷积运算"><a href="#卷积运算" class="headerlink" title="卷积运算"></a>卷积运算</h3><p>我们之前提到过，神经网络由浅层到深层，分别可以检测出图片的边缘特征、局部特征（例如眼睛、鼻子等），到最后面的一层就可以根据前面检测的特征来识别整体面部轮廓。这些工作都是依托卷积神经网络来实现的。</p>
+<p>卷积运算（Convolutional Operation）是卷积神经网络最基本的组成部分。我们以边缘检测为例，来解释卷积是怎样运算的。</p>
+<h4 id="边缘检测"><a href="#边缘检测" class="headerlink" title="边缘检测"></a>边缘检测</h4><p>图片最常做的边缘检测有两类：垂直边缘（Vertical Edges）检测和水平边缘（Horizontal Edges）检测。</p>
+<p><img src="http://image.rexking6.top/img/clip1521251300.png" alt=""></p>
+<p>图片的边缘检测可以通过与相应滤波器进行卷积来实现。以垂直边缘检测为例，原始图片尺寸为 6x6，中间的矩阵被称作滤波器（filter），尺寸为 3x3，卷积后得到的图片尺寸为 4x4，得到结果如下（数值表示灰度，以左上角和右下角的值为例）：</p>
+<p><img src="http://image.rexking6.top/img/clip1521251319.png" alt=""></p>
+<p>可以看到，卷积运算的求解过程是从左到右，由上到下，每次在原始图片矩阵中取与滤波器同等大小的一部分，每一部分中的值与滤波器中的值对应相乘后求和，将结果组成一个矩阵。</p>
+<p>下图对应一个垂直边缘检测的例子：</p>
+<p><img src="http://image.rexking6.top/img/clip1521251339.png" alt=""></p>
+<p>如果将最右边的矩阵当作图像，那么中间一段亮一些的区域对应最左边的图像中间的垂直边缘。</p>
+<p>这里有另一个卷积运算的动态的例子，方便理解：</p>
+<p><img src="http://image.rexking6.top/img/clip1521251363.png" alt=""></p>
+<p>图中的<code>*</code>表示卷积运算符号。在计算机中这个符号表示一般的乘法，而在不同的深度学习框架中，卷积操作的 API 定义可能不同：</p>
+<ul>
+<li>在 Python 中，卷积用<code>conv_forward()</code>表示；</li>
+<li>在 Tensorflow 中，卷积用<code>tf.nn.conv2d()</code>表示；</li>
+<li>在 keras 中，卷积用<code>Conv2D()</code>表示。</li>
+</ul>
+<h4 id="更多边缘检测的例子"><a href="#更多边缘检测的例子" class="headerlink" title="更多边缘检测的例子"></a>更多边缘检测的例子</h4><p>如果将灰度图左右的颜色进行翻转，再与之前的滤波器进行卷积，得到的结果也有区别。实际应用中，这反映了由明变暗和由暗变明的两种渐变方式。可以对输出图片取绝对值操作，以得到同样的结果。</p>
+<p><img src="http://image.rexking6.top/img/clip1521251789.png" alt=""></p>
+<p>垂直边缘检测和水平边缘检测的滤波器如下所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1521251810.png" alt=""></p>
+<p>其他常用的滤波器还有 Sobel 滤波器和 Scharr 滤波器。它们增加了中间行的权重，以提高结果的稳健性。</p>
+<p><img src="http://image.rexking6.top/img/clip1521251830.png" alt=""></p>
+<p>滤波器中的值还可以设置为参数，通过模型训练来得到。这样，神经网络使用反向传播算法可以学习到一些低级特征，从而实现对图片所有边缘特征的检测，而不仅限于垂直边缘和水平边缘。</p>
+<h3 id="填充-padding"><a href="#填充-padding" class="headerlink" title="填充(padding)"></a>填充(padding)</h3><p>假设输入图片的大小为$n \times n$，而滤波器的大小为$f \times f$，则卷积后的输出图片大小为$(n-f+1) \times (n-f+1)$。</p>
+<p>这样就有两个问题：</p>
+<ul>
+<li>每次卷积运算后，输出图片的尺寸缩小；</li>
+<li>原始图片的角落、边缘区像素点在输出中采用较少，输出图片丢失边缘位置的很多信息。</li>
+</ul>
+<p>为了解决这些问题，可以在进行卷积操作前，对原始图片在边界上进行填充（Padding），以增加矩阵的大小。通常将 0 作为填充值。</p>
+<p><img src="http://image.rexking6.top/img/clip1521252817.png" alt=""></p>
+<p>设每个方向扩展像素点数量为$p$，则填充后原始图片的大小为$(n+2p) \times (n+2p)$，滤波器大小保持$f \times f$不变，则输出图片大小为$(n+2p-f+1) \times (n+2p-f+1)$。</p>
+<p>因此，在进行卷积运算时，我们有两种选择：</p>
+<ul>
+<li>Valid 卷积：不填充，直接卷积。结果大小为$(n-f+1) \times (n-f+1)$；</li>
+<li>Same 卷积：进行填充，并使得卷积后结果大小与输入一致，这样$p = \frac{f-1}{2}$。</li>
+</ul>
+<p>在计算机视觉领域，$f$通常为奇数。原因包括 Same 卷积中$p = \frac{f-1}{2}$能得到自然数结果，并且滤波器有一个便于表示其所在位置的中心点。</p>
+<h3 id="卷积步长"><a href="#卷积步长" class="headerlink" title="卷积步长"></a>卷积步长</h3><p>卷积过程中，有时需要通过填充来避免信息损失，有时也需要通过设置步长（Stride）来压缩一部分信息。</p>
+<p>步长表示滤波器在原始图片的水平方向和垂直方向上每次移动的距离。之前，步长被默认为 1。而如果我们设置步长为 2，则卷积过程如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1521254312.png" alt=""></p>
+<p>设步长为$s$，填充长度为$p$，输入图片大小为$n \times n$，滤波器大小为$f \times f$，则卷积后图片的尺寸为：</p>
+<script type="math/tex; mode=display">\biggl\lfloor \frac{n+2p-f}{s}+1   \biggr\rfloor \times \biggl\lfloor \frac{n+2p-f}{s}+1 \biggr\rfloor</script><p>注意公式中有一个向下取整的符号，用于处理商不为整数的情况。向下取整反映着当取原始矩阵的图示蓝框完全包括在图像内部时，才对它进行运算。</p>
+<p>目前为止我们学习的“卷积”实际上被称为互相关（cross-correlation），而非数学意义上的卷积。真正的卷积操作在做元素乘积求和之前，要将滤波器沿水平和垂直轴翻转（相当于旋转 180 度，相当于按次对角线转置）。因为这种翻转对一般为水平或垂直对称的滤波器影响不大，按照机器学习的惯例，我们通常不进行翻转操作，在简化代码的同时使神经网络能够正常工作。</p>
+<h3 id="高维卷积"><a href="#高维卷积" class="headerlink" title="高维卷积"></a>高维卷积</h3><p>如果我们想要对三通道的 RGB 图片进行卷积运算，那么其对应的滤波器组也同样是三通道的。过程是将每个单通道（R，G，B）与对应的滤波器进行卷积运算求和，然后再将三个通道的和相加，将 27 个乘积的和作为输出图片的一个像素值。</p>
+<p><img src="http://image.rexking6.top/img/clip1521256618.png" alt=""></p>
+<p>不同通道的滤波器可以不相同。例如只检测 R 通道的垂直边缘，G 通道和 B 通道不进行边缘检测，则 G 通道和 B 通道的滤波器全部置零。当输入有特定的高、宽和通道数时，滤波器可以有不同的高和宽，但通道数必须和输入一致。</p>
+<p>如果想同时检测垂直和水平边缘，或者更多的边缘检测，可以增加更多的滤波器组。例如设置第一个滤波器组实现垂直边缘检测，第二个滤波器组实现水平边缘检测。设输入图片的尺寸为$n \times n \times n_c$（$n_c$为通道数），滤波器尺寸为 $f \times f \times n_c$，则卷积后的输出图片尺寸为$(n-f+1) \times (n-f+1) \times n’_c$，$n’_c$为滤波器组的个数。</p>
+<p><img src="http://image.rexking6.top/img/clip1521256708.png" alt=""></p>
+<h3 id="单层卷积网络"><a href="#单层卷积网络" class="headerlink" title="单层卷积网络"></a>单层卷积网络</h3><p><img src="http://image.rexking6.top/img/clip1521263275.png" alt=""></p>
+<p>与之前的卷积过程相比较，卷积神经网络的单层结构多了激活函数和偏移量；而与标准神经网络：</p>
+<script type="math/tex; mode=display">Z^{[l]} = W^{[l]}A^{[l-1]}+b</script><script type="math/tex; mode=display">A^{[l]} = g^{[l]}(Z^{[l]})</script><p>相比，滤波器的数值对应着权重$W^{[l]}$，卷积运算对应着$W^{[l]}$与$A^{[l-1]}$的乘积运算，所选的激活函数变为 ReLU。</p>
+<p>对于一个 3x3x3 的滤波器，包括偏移量 b在内共有 28 个参数。不论输入的图片有多大，用这一个滤波器来提取特征时，参数始终都是 28 个，固定不变。即选定滤波器组后，参数的数目与输入图片的尺寸无关。因此，卷积神经网络的参数相较于标准神经网络来说要少得多。这是 CNN 的优点之一。</p>
+<h3 id="符号总结"><a href="#符号总结" class="headerlink" title="符号总结"></a>符号总结</h3><p>设 $l$ 层为卷积层：</p>
+<ul>
+<li>$f^{[l]}$：滤波器的高（或宽）</li>
+<li>$p^{[l]}$：填充长度</li>
+<li>$s^{[l]}$：步长</li>
+<li>$n_c^{[l]}$：滤波器组的数量</li>
+<li>输入维度：$n^{[l-1]}_H \times n^{[l-1]}_W \times n^{[l-1]}_c$。其中$n^{[l-1]}_H$表示输入图片的高，$n^{[l-1]}_W$表示输入图片的宽。之前的示例中输入图片的高和宽都相同，但是实际中也可能不同，因此加上下标予以区分。</li>
+<li><p>输出维度：$n^{[l]}_H \times n^{[l]}_W \times n^{[l]}_c$。其中</p>
+<script type="math/tex; mode=display">n^{[l]}_H = \biggl\lfloor \frac{n^{[l-1]}_H+2p^{[l]}-f^{[l]}}{s^{[l]}}+1   \biggr\rfloor</script><script type="math/tex; mode=display">n^{[l]}_W = \biggl\lfloor \frac{n^{[l-1]}_W+2p^{[l]}-f^{[l]}}{s^{[l]}}+1   \biggr\rfloor</script></li>
+<li><p>每个滤波器组的维度：$f^{[l]} \times f^{[l]} \times n^{[l-1]}_c$。其中$n^{[l-1]}_c$为输入图片通道数（也称深度）。</p>
+</li>
+<li>权重维度：$f^{[l]} \times f^{[l]} \times n^{[l-1]}_c \times n^{[l]}_c$</li>
+<li>偏置维度：$1 \times 1 \times 1 \times n^{[l]}_c$</li>
+</ul>
+<p>由于深度学习的相关文献并未对卷积标示法达成一致，因此不同的资料关于高度、宽度和通道数的顺序可能不同。有些作者会将通道数放在首位，需要根据标示自行分辨。</p>
+<h3 id="简单卷积网络示例"><a href="#简单卷积网络示例" class="headerlink" title="简单卷积网络示例"></a>简单卷积网络示例</h3><p>一个简单的 CNN 模型如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1521264021.png" alt=""></p>
+<p>其中，$a^{[3]}$的维度为 7x7x40，将 1960 个特征平滑展开成 1960 个单元的一列，然后连接最后一级的输出层。输出层可以是一个神经元，即二元分类（logistic）；也可以是多个神经元，即多元分类（softmax）。最后得到预测输出$\hat y$。</p>
+<p>随着神经网络计算深度不断加深，图片的高度和宽度$f^{[l]}$一般逐渐减小，而$n^{[l]}_c$在增加。</p>
+<p>一个典型的卷积神经网络通常包含有三种层：卷积层（Convolution layer）、池化层（Pooling layer）、全连接层（Fully Connected layer）。仅用卷积层也有可能构建出很好的神经网络，但大部分神经网络还是会添加池化层和全连接层，它们更容易设计。</p>
+<h3 id="池化层"><a href="#池化层" class="headerlink" title="池化层"></a>池化层</h3><p>池化层的作用是缩减模型的大小，提高计算速度，同时减小噪声提高所提取特征的稳健性。</p>
+<p>采用较多的一种池化过程叫做最大池化（Max Pooling）。将输入拆分成不同的区域，输出的每个元素都是对应区域中元素的最大值，如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1521264961.png" alt=""></p>
+<p>池化过程类似于卷积过程，上图所示的池化过程中相当于使用了一个大小$f=2$的滤波器，且池化步长$s=2$。卷积过程中的几个计算大小的公式也都适用于池化过程。如果有多个通道，那么就对每个通道分别执行计算过程。</p>
+<p>对最大池化的一种直观解释是，元素值较大可能意味着池化过程之前的卷积过程提取到了某些特定的特征，池化过程中的最大化操作使得只要在一个区域内提取到某个特征，它都会保留在最大池化的输出中。但是，没有足够的证据证明这种直观解释的正确性，而最大池化被使用的主要原因是它在很多实验中的效果都很好。</p>
+<p>另一种池化过程是平均池化（Average Pooling），就是从取某个区域的最大值改为求这个区域的平均值：</p>
+<p><img src="http://image.rexking6.top/img/clip1521265012.png" alt=""></p>
+<p>池化过程的特点之一是，它有一组超参数，但是并没有参数需要学习。池化过程的超参数包括滤波器的大小$f$、步长 $s$，以及选用最大池化还是平均池化。而填充$p$则很少用到。</p>
+<p>池化过程的输入维度为：</p>
+<script type="math/tex; mode=display">n_H \times n_W \times n_c</script><p>输出维度为：</p>
+<script type="math/tex; mode=display">\biggl\lfloor \frac{n_H-f}{s}+1   \biggr\rfloor \times \biggl\lfloor \frac{n_W-f}{s}+1   \biggr\rfloor \times n_c</script><h3 id="卷积神经网络示例"><a href="#卷积神经网络示例" class="headerlink" title="卷积神经网络示例"></a>卷积神经网络示例</h3><p><img src="http://image.rexking6.top/img/clip1521266003.png" alt=""></p>
+<p>在计算神经网络的层数时，通常只统计具有权重和参数的层，因此池化层通常和之前的卷积层共同计为一层。</p>
+<p>图中的 FC3 和 FC4 为全连接层，与标准的神经网络结构一致。整个神经网络各层的尺寸与参数如下表所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1521266160.png" alt=""></p>
+<p>大黄菌推荐的<a target="_blank" rel="noopener" href="http://scs.ryerson.ca/~aharley/vis/conv/">一个直观感受卷积神经网络的网站</a>。</p>
+<h3 id="使用卷积的原因"><a href="#使用卷积的原因" class="headerlink" title="使用卷积的原因"></a>使用卷积的原因</h3><p>相比标准神经网络，对于大量的输入数据，卷积过程有效地减少了 CNN 的参数数量，原因有以下两点：</p>
+<ul>
+<li>参数共享（Parameter sharing）：特征检测如果适用于图片的某个区域，那么它也可能适用于图片的其他区域。即在卷积过程中，不管输入有多大，一个特征探测器（滤波器）就能对整个输入的某一特征进行探测。</li>
+<li>稀疏连接（Sparsity of connections）：在每一层中，由于滤波器的尺寸限制，输入和输出之间的连接是稀疏的，每个输出值只取决于输入在局部的一小部分值。</li>
+</ul>
+<p>池化过程则在卷积后很好地聚合了特征，通过降维来减少运算量。</p>
+<p>由于 CNN 参数数量较小，所需的训练样本就相对较少，因此在一定程度上不容易发生过拟合现象。并且 CNN 比较擅长捕捉区域位置偏移。即进行物体检测时，不太受物体在图片中位置的影响，增加检测的准确性和系统的健壮性。</p>
+<h2 id="深度卷积网络：实例探究"><a href="#深度卷积网络：实例探究" class="headerlink" title="深度卷积网络：实例探究"></a>深度卷积网络：实例探究</h2><p>讲到的经典 CNN 模型包括：</p>
+<ul>
+<li>LeNet-5</li>
+<li>AlexNet</li>
+<li>VGG</li>
+</ul>
+<p>此外还有 ResNet（Residual Network，残差网络），以及 Inception Neural Network。</p>
+<h3 id="经典卷积网络"><a href="#经典卷积网络" class="headerlink" title="经典卷积网络"></a>经典卷积网络</h3><h4 id="LeNet-5"><a href="#LeNet-5" class="headerlink" title="LeNet-5"></a>LeNet-5</h4><p><img src="http://image.rexking6.top/img/clip1521292400.png" alt=""></p>
+<p>特点：</p>
+<ul>
+<li>LeNet-5 针对灰度图像而训练，因此输入图片的通道数为 1。</li>
+<li>该模型总共包含了约 6 万个参数，远少于标准神经网络所需。</li>
+<li>典型的 LeNet-5 结构包含卷积层（CONV layer），池化层（POOL layer）和全连接层（FC layer），排列顺序一般为 CONV layer-&gt;POOL layer-&gt;CONV layer-&gt;POOL layer-&gt;FC layer-&gt;FC layer-&gt;OUTPUT layer。一个或多个卷积层后面跟着一个池化层的模式至今仍十分常用。</li>
+<li>当 LeNet-5模型被提出时，其池化层使用的是平均池化，而且各层激活函数一般选用 Sigmoid 和 tanh。现在，我们可以根据需要，做出改进，使用最大池化并选用 ReLU 作为激活函数。</li>
+</ul>
+<p>相关论文：<a target="_blank" rel="noopener" href="http://ieeexplore.ieee.org/document/726791/?denied">LeCun et.al., 1998. Gradient-based learning applied to document recognition</a>。吴恩达老师建议精读第二段，泛读第三段。</p>
+<h4 id="AlexNet"><a href="#AlexNet" class="headerlink" title="AlexNet"></a>AlexNet</h4><p><img src="http://image.rexking6.top/img/clip1521292624.png" alt=""></p>
+<p>特点：</p>
+<ul>
+<li>AlexNet 模型与 LeNet-5 模型类似，但是更复杂，包含约 6000 万个参数。另外，AlexNet 模型使用了 ReLU 函数。</li>
+<li>当用于训练图像和数据集时，AlexNet 能够处理非常相似的基本构造模块，这些模块往往包含大量的隐藏单元或数据。</li>
+</ul>
+<p>相关论文：<a target="_blank" rel="noopener" href="http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf">Krizhevsky et al.,2012. ImageNet classification with deep convolutional neural networks</a>。这是一篇易于理解并且影响巨大的论文，计算机视觉群体自此开始重视深度学习。</p>
+<h4 id="VGG"><a href="#VGG" class="headerlink" title="VGG"></a>VGG</h4><p><img src="http://image.rexking6.top/img/clip1521293626.png" alt=""></p>
+<p>特点：</p>
+<ul>
+<li>VGG 又称 VGG-16 网络，“16”指网络中包含 16 个卷积层和全连接层。</li>
+<li>超参数较少，只需要专注于构建卷积层。</li>
+<li>结构不复杂且规整，在每一组卷积层进行滤波器翻倍操作。</li>
+<li>VGG 需要训练的特征数量巨大，包含多达约 1.38 亿个参数。</li>
+</ul>
+<p>相关论文：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1409.1556.pdf">Simonvan &amp; Zisserman 2015. Very deep convolutional networks for large-scale image recognition</a>。</p>
+<h3 id="残差网络"><a href="#残差网络" class="headerlink" title="残差网络"></a>残差网络</h3><p>因为存在梯度消失和梯度爆炸问题，网络越深，就越难以训练成功。残差网络（Residual Networks，简称为 ResNets）可以有效解决这个问题。</p>
+<p><img src="http://image.rexking6.top/img/clip1521293748.png" alt=""></p>
+<p>上图的结构被称为残差块（Residual block）。通过捷径（Short cut，或者称跳远连接，Skip connections）可以将$a^{[l]}$添加到第二个 ReLU 过程中，直接建立$a^{[l]}$与$a^{[l+2]}$之间的隔层联系。表达式如下：</p>
+<script type="math/tex; mode=display">z^{[l+1]} = W^{[l+1]}a^{[l]} + b^{[l+1]}</script><script type="math/tex; mode=display">a^{[l+1]} = g(z^{[l+1]})</script><script type="math/tex; mode=display">z^{[l+2]} = W^{[l+2]}a^{[l+1]} + b^{[l+2]}</script><script type="math/tex; mode=display">a^{[l+2]} = g(z^{[l+2]} + a^{[l]})</script><p>构建一个残差网络就是将许多残差块堆积在一起，形成一个深度网络。</p>
+<p><img src="http://image.rexking6.top/img/clip1521299767.png" alt=""></p>
+<p>为了便于区分，在 ResNets 的论文<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1512.03385.pdf">He et al., 2015. Deep residual networks for image recognition</a>中，非残差网络被称为普通网络（Plain Network）。将它变为残差网络的方法是加上所有的跳远连接。</p>
+<p>在理论上，随着网络深度的增加，性能应该越来越好。但实际上，对于一个普通网络，随着神经网络层数增加，训练错误会先减少，然后开始增多。但残差网络的训练效果显示，即使网络再深，其在训练集上的表现也会越来越好。</p>
+<p><img src="http://image.rexking6.top/img/clip1521299815.png" alt=""></p>
+<p>残差网络有助于解决梯度消失和梯度爆炸问题，使得在训练更深的网络的同时，又能保证良好的性能。</p>
+<h4 id="残差网络有效的原因"><a href="#残差网络有效的原因" class="headerlink" title="残差网络有效的原因"></a>残差网络有效的原因</h4><p>假设有一个大型神经网络，其输入为$X$，输出为$a^{[l]}$。给这个神经网络额外增加两层，输出为$a^{[l+2]}$。将这两层看作一个具有跳远连接的残差块。为了方便说明，假设整个网络中都选用 ReLU 作为激活函数，因此输出的所有激活值都大于等于 0。</p>
+<p><img src="http://image.rexking6.top/img/clip1521300263.png" alt=""></p>
+<p>则有：</p>
+<script type="math/tex; mode=display">\begin{equation}
+\begin{split}
+ a^{[l+2]} &= g(z^{[l+2]}+a^{[l]})      \\ &= g(W^{[l+2]}a^{[l+1]}+b^{[l+2]}+a^{[l]})
+\end{split}
+\end{equation}</script><p>当发生梯度消失时，$W^{[l+2]}\approx0$，$b^{[l+2]}\approx0$，则有：</p>
+<script type="math/tex; mode=display">a^{[l+2]} = g(a^{[l]}) = ReLU(a^{[l]}) = a^{[l]}</script><p>因此，这两层额外的残差块不会降低网络性能。而如果没有发生梯度消失时，训练得到的非线性关系会使得表现效果进一步提高。</p>
+<p>注意，如果$a^{[l]}$与$a^{[l+2]}$的维度不同，需要引入矩阵$W_s$与$a^{[l]}$相乘，使得二者的维度相匹配。参数矩阵$W_s$既可以通过模型训练得到，也可以作为固定值，仅使$a^{[l]}$截断或者补零。</p>
+<p><img src="http://image.rexking6.top/img/clip1521331259.png" alt=""></p>
+<p>上图是论文提供的 CNN 中 ResNet 的一个典型结构。卷积层通常使用 Same 卷积以保持维度相同，而不同类型层之间的连接（例如卷积层和池化层），如果维度不同，则需要引入矩阵$W_s$。</p>
+<h3 id="1x1-卷积"><a href="#1x1-卷积" class="headerlink" title="1x1 卷积"></a>1x1 卷积</h3><p>1x1 卷积（1x1 convolution，或称为 Network in Network）指滤波器的尺寸为 1。当通道数为 1 时，1x1 卷积意味着卷积操作等同于乘积操作。</p>
+<p><img src="http://image.rexking6.top/img/clip1521331844.png" alt=""></p>
+<p>而当通道数更多时，1x1 卷积的作用实际上类似全连接层的神经网络结构，从而降低（或升高，取决于滤波器组数）数据的维度。</p>
+<p>池化能压缩数据的高度（$n_H$）及宽度（$n_W$），而 1×1 卷积能压缩数据的通道数（$n_C$）。在如下图所示的例子中，用 32 个大小为 1×1×192 的滤波器进行卷积，就能使原先数据包含的 192 个通道压缩为 32 个。</p>
+<p><img src="http://image.rexking6.top/img/clip1521331937.png" alt=""></p>
+<p>虽然论文<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1312.4400.pdf">Lin et al., 2013. Network in network</a>中关于架构的详细内容并没有得到广泛应用，但是 1x1 卷积的理念十分有影响力，许多神经网络架构（包括 Inception 网络）都受到它的影响。</p>
+<h3 id="Inception-网络"><a href="#Inception-网络" class="headerlink" title="Inception 网络"></a>Inception 网络</h3><p>在之前的卷积网络中，我们只能选择单一尺寸和类型的滤波器。而 Inception 网络的作用即是代替人工来确定卷积层中的滤波器尺寸与类型，或者确定是否需要创建卷积层或池化层。</p>
+<p><img src="http://image.rexking6.top/img/clip1521332421.png" alt=""></p>
+<p>如图，Inception 网络选用不同尺寸的滤波器进行 Same 卷积，并将卷积和池化得到的输出组合拼接起来，最终让网络自己去学习需要的参数和采用的滤波器组合。</p>
+<p>相关论文：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1409.4842.pdf">Szegedy et al., 2014, Going Deeper with Convolutions</a></p>
+<h4 id="计算成本问题"><a href="#计算成本问题" class="headerlink" title="计算成本问题"></a>计算成本问题</h4><p>在提升性能的同时，Inception 网络有着较大的计算成本。下图是一个例子：</p>
+<p><img src="http://image.rexking6.top/img/clip1521332494.png" alt=""></p>
+<p>图中有 32 个滤波器，每个滤波器的大小为 5x5x192。输出大小为 28x28x32，所以需要计算 28x28x32 个数字，对于每个数，都要执行 5x5x192 次乘法运算。加法运算次数与乘法运算次数近似相等。因此，可以看作这一层的计算量为 28x28x32x5x5x192 = 1.2亿。</p>
+<p>为了解决计算量大的问题，可以引入 1x1 卷积来减少其计算量。</p>
+<p><img src="http://image.rexking6.top/img/clip1521332520.png" alt=""></p>
+<p>对于同一个例子，我们使用 1x1 卷积把输入数据从 192 个通道减少到 16 个通道，然后对这个较小层运行 5x5 卷积，得到最终输出。这个 1x1 的卷积层通常被称作瓶颈层（Bottleneck layer）。</p>
+<p>改进后的计算量为 28x28x192x16 + 28x28x32x5x5x15 = 1.24 千万，减少了约 90%。</p>
+<p>只要合理构建瓶颈层，就可以既显著缩小计算规模，又不会降低网络性能。</p>
+<h4 id="完整的-Inception-网络"><a href="#完整的-Inception-网络" class="headerlink" title="完整的 Inception 网络"></a>完整的 Inception 网络</h4><p><img src="http://image.rexking6.top/img/clip1521332859.png" alt=""></p>
+<p>上图是引入 1x1 卷积后的 Inception 模块。值得注意的是，为了将所有的输出组合起来，红色的池化层使用 Same 类型的填充（padding）来池化使得输出的宽高不变，通道数也不变。</p>
+<p>多个 Inception 模块组成一个完整的 Inception 网络（被称为 GoogLeNet，以向 LeNet 致敬），如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1521332885.png" alt=""></p>
+<p>注意黑色椭圆圈出的隐藏层，这些分支都是 Softmax 的输出层，可以用来参与特征的计算及结果预测，起到调整并防止发生过拟合的效果。</p>
+<p>经过研究者们的不断发展，Inception 模型的 V2、V3、V4 以及引入残差网络的版本被提出，这些变体都基于 Inception V1 版本的基础思想上。顺便一提，Inception 模型的名字来自电影《盗梦空间》。</p>
+<h3 id="使用开源的实现方案"><a href="#使用开源的实现方案" class="headerlink" title="使用开源的实现方案"></a>使用开源的实现方案</h3><p>很多神经网络复杂细致，并充斥着参数调节的细节问题，因而很难仅通过阅读论文来重现他人的成果。想要搭建一个同样的神经网络，查看开源的实现方案会快很多。</p>
+<h3 id="迁移学习-1"><a href="#迁移学习-1" class="headerlink" title="迁移学习"></a>迁移学习</h3><p>在“搭建机器学习项目”课程中，迁移学习已经被提到过。计算机视觉是一个经常用到迁移学习的领域。在搭建计算机视觉的应用时，相比于从头训练权重，下载别人已经训练好的网络结构的权重，用其做预训练，然后转换到自己感兴趣的任务上，有助于加速开发。</p>
+<p>对于已训练好的卷积神经网络，可以将所有层都看作是冻结的，只需要训练与你的 Softmax 层有关的参数即可。大多数深度学习框架都允许用户指定是否训练特定层的权重。</p>
+<p>而冻结的层由于不需要改变和训练，可以看作一个固定函数。可以将这个固定函数存入硬盘，以便后续使用，而不必每次再使用训练集进行训练了。</p>
+<p>上述的做法适用于你只有一个较小的数据集。如果你有一个更大的数据集，应该冻结更少的层，然后训练后面的层。越多的数据意味着冻结越少的层，训练更多的层。如果有一个极大的数据集，你可以将开源的网络和它的权重整个当作初始化（代替随机初始化），然后训练整个网络。</p>
+<h3 id="数据扩增"><a href="#数据扩增" class="headerlink" title="数据扩增"></a>数据扩增</h3><p>计算机视觉领域的应用都需要大量的数据。当数据不够时，数据扩增（Data Augmentation）就有帮助。常用的数据扩增包括镜像翻转、随机裁剪、色彩转换。</p>
+<p>其中，色彩转换是对图片的 RGB 通道数值进行随意增加或者减少，改变图片色调。另外，PCA 颜色增强指更有针对性地对图片的 RGB 通道进行主成分分析（Principles Components Analysis，PCA），对主要的通道颜色进行增加或减少，可以采用高斯扰动做法来增加有效的样本数量。具体的 PCA 颜色增强做法可以查阅 AlexNet 的相关论文或者开源代码。</p>
+<p>在构建大型神经网络的时候，数据扩增和模型训练可以由两个或多个不同的线程并行来实现。</p>
+<h3 id="计算机视觉现状"><a href="#计算机视觉现状" class="headerlink" title="计算机视觉现状"></a>计算机视觉现状</h3><p>通常，学习算法有两种知识来源：</p>
+<ul>
+<li>被标记的数据</li>
+<li>手工工程</li>
+</ul>
+<p>手工工程（Hand-engineering，又称 hacks）指精心设计的特性、网络体系结构或是系统的其他组件。手工工程是一项非常重要也比较困难的工作。在数据量不多的情况下，手工工程是获得良好表现的最佳方式。正因为数据量不能满足需要，历史上计算机视觉领域更多地依赖于手工工程。近几年数据量急剧增加，因此手工工程量大幅减少。</p>
+<p>另外，在模型研究或者竞赛方面，有一些方法能够有助于提升神经网络模型的性能：</p>
+<ul>
+<li>集成（Ensembling）：独立地训练几个神经网络，并平均输出它们的输出</li>
+<li>Multi-crop at test time：将数据扩增应用到测试集，对结果进行平均</li>
+</ul>
+<p>但是由于这些方法计算和内存成本较大，一般不适用于构建实际的生产项目。</p>
+<h2 id="目标检测"><a href="#目标检测" class="headerlink" title="目标检测"></a>目标检测</h2><p>目标检测是计算机视觉领域中一个新兴的应用方向，其任务是对输入图像进行分类的同时，检测图像中是否包含某些目标，并对他们准确定位并标识。</p>
+<h3 id="目标定位"><a href="#目标定位" class="headerlink" title="目标定位"></a>目标定位</h3><p>定位分类问题不仅要求判断出图片中物体的种类，还要在图片中标记出它的具体位置，用边框（Bounding Box，或者称包围盒）把物体圈起来。一般来说，定位分类问题通常只有一个较大的对象位于图片中间位置；而在对象检测问题中，图片可以含有多个对象，甚至单张图片中会有多个不同分类的对象。</p>
+<p>为了定位图片中汽车的位置，可以让神经网络多输出 4 个数字，标记为$b_x$、$b_y$、$b_h$、$b_w$。将图片左上角标记为 (0, 0)，右下角标记为 (1, 1)，则有：</p>
+<ul>
+<li>红色方框的中心点：($b_x$，$b_y$)</li>
+<li>边界框的高度：$b_h$</li>
+<li>边界框的宽度：$b_w$</li>
+</ul>
+<p>因此，训练集不仅包含对象分类标签，还包含表示边界框的四个数字。定义目标标签 Y 如下：</p>
+<script type="math/tex; mode=display">\left[\begin{matrix}P_c\\ b_x\\ b_y\\ b_h\\ b_w\\ c_1\\ c_2\\ c_3\end{matrix}\right]
+P_c=1:\left[\begin{matrix}1\\ b_x\\ b_y\\ b_h\\ b_w\\ c_1\\ c_2\\ c_3\end{matrix}\right]</script><p>其中，$c_n$表示存在第$n$个种类的概率；如果$P_c=0$，表示没有检测到目标，则输出标签后面的 7 个参数都是无效的，可以忽略（用 ? 来表示）。</p>
+<script type="math/tex; mode=display">P_c=0:\left[\begin{matrix}0\\ ?\\ ?\\ ?\\ ?\\ ?\\ ?\\ ?\end{matrix}\right]</script><p>损失函数可以表示为$L(\hat y, y)$，如果使用平方误差形式，对于不同的$P_c$有不同的损失函数：</p>
+<ol>
+<li><p>$P_c=1$，即$y_1=1$：<br>$L(\hat y,y)=(\hat y_1-y_1)^2+(\hat y_2-y_2)^2+\cdots+(\hat y_8-y_8)^2$</p>
+</li>
+<li><p>$P_c=0$，即$y_1=0$：<br>$L(\hat y,y)=(\hat y_1-y_1)^2$</p>
+</li>
+</ol>
+<p>除了使用平方误差，也可以使用逻辑回归损失函数，类标签$c_1,c_2,c_3$也可以通过 softmax 输出。相比较而言，平方误差已经能够取得比较好的效果。</p>
+<h3 id="特征点检测"><a href="#特征点检测" class="headerlink" title="特征点检测"></a>特征点检测</h3><p>神经网络可以像标识目标的中心点位置那样，通过输出图片上的特征点，来实现对目标特征的识别。在标签中，这些特征点以多个二维坐标的形式表示。</p>
+<p>通过检测人脸特征点可以进行情绪分类与判断，或者应用于 AR 领域等等。也可以透过检测姿态特征点来进行人体姿态检测。</p>
+<h3 id="目标检测-1"><a href="#目标检测-1" class="headerlink" title="目标检测"></a>目标检测</h3><p>想要实现目标检测，可以采用基于滑动窗口的目标检测（Sliding Windows Detection）算法。该算法的步骤如下：</p>
+<ol>
+<li>训练集上搜集相应的各种目标图片和非目标图片，样本图片要求尺寸较小，相应目标居于图片中心位置并基本占据整张图片。</li>
+<li>使用训练集构建 CNN 模型，使得模型有较高的识别率。</li>
+<li>选择大小适宜的窗口与合适的固定步幅，对测试图片进行从左到右、从上倒下的滑动遍历。每个窗口区域使用已经训练好的 CNN 模型进行识别判断。</li>
+<li>可以选择更大的窗口，然后重复第三步的操作。</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1521338608.png" alt=""></p>
+<p>滑动窗口目标检测的优点是原理简单，且不需要人为选定目标区域；缺点是需要人为直观设定滑动窗口的大小和步幅。滑动窗口过小或过大，步幅过大均会降低目标检测的正确率。另外，每次滑动都要进行一次 CNN 网络计算，如果滑动窗口和步幅较小，计算成本往往很大。</p>
+<p>所以，滑动窗口目标检测算法虽然简单，但是性能不佳，效率较低。</p>
+<h3 id="卷积的滑动窗口实现"><a href="#卷积的滑动窗口实现" class="headerlink" title="卷积的滑动窗口实现"></a>卷积的滑动窗口实现</h3><h4 id="把神经网络的全连接层转化成卷积层"><a href="#把神经网络的全连接层转化成卷积层" class="headerlink" title="把神经网络的全连接层转化成卷积层"></a>把神经网络的全连接层转化成卷积层</h4><p><img src="http://image.rexking6.top/img/clip1521344285.png" alt=""></p>
+<p>假设对象检测算法输入一个14x14x3的图像，过滤器1大小为5x5x3，数量是16，过滤器处理之后映射为10x10x16，然后通过2x2的最大池化操作，图像减小到5x5x16，然后添加一个连接400个单元的全连接层，接着再添加一个全连接层，最终通过softmax单元输出Y，最后4个输出分别对应softmax单元所输出的4个分类出现的概率。</p>
+<p>现在将最大池化操作后的全连接层改为400个5x5x16的滤波器，再将接下来的全连接层改为400个1x1x400的滤波器，最后再用4个1x1x400的滤波器完成输出。</p>
+<h4 id="卷积中的重复操作"><a href="#卷积中的重复操作" class="headerlink" title="卷积中的重复操作"></a>卷积中的重复操作</h4><p><img src="http://image.rexking6.top/img/clip1521344409.png" alt=""></p>
+<p>第一行为普通卷积操作，第二行在14x14x3添加至16x16x3大小，一系列操作后得到2x2x4，左上角为原本左上角14x14x3的卷积操作。可以发现，卷积操作里存在着很多重复的操作。</p>
+<p>第三行也是如此，在左上角14x14x3进行卷积操作，之后步幅为2，继续操作。</p>
+<p>这样直接对28x28x3执行卷积操作，便能一次性得到所有结果。</p>
+<p>这样操作有一个缺点：边界框的位置可能不够准确。</p>
+<p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1312.6229.pdf">Sermanet et al.2014, OverFeat: Integrated recognition, localization and detection using convolutional networks</a></p>
+<h3 id="Bounding-Box预测"><a href="#Bounding-Box预测" class="headerlink" title="Bounding Box预测"></a>Bounding Box预测</h3><p>边界框的位置可能不够准确。</p>
+<h4 id="YOLO算法"><a href="#YOLO算法" class="headerlink" title="YOLO算法"></a>YOLO算法</h4><p><img src="http://image.rexking6.top/img/clip1521352859.png" alt=""></p>
+<p>将图像划分为9个格子，每个格子由人为给出一个8维输出向量：</p>
+<script type="math/tex; mode=display">\left[\begin{matrix}P_c\\ b_x\\ b_y\\ b_h\\ b_w\\ c_1\\ c_2\\ c_3\end{matrix}\right]</script><p>则目标输出为3x3x8大小的。之后用这些数据训练出一个输入维度为100x100x3的图像，输出维度为3x3x8大小的神经网络，可以得到精确的边框。</p>
+<p>现在举例所讲的划分是3x3x8大小的，论文和实际中采用19x19x3的会比较多，这样两个物体中心落在同一个格子的概率也会小很多。</p>
+<p>计算次数3x3为9次，19x19为361次，但是在处理中很多计算步骤是共享的，因为这是一个卷积实现。</p>
+<p><img src="http://image.rexking6.top/img/clip1521353362.png" alt=""></p>
+<p>之后是边框的表示，在YOLO论文中，每个格子的左上角为(0,0)，右下角为(1,1)。所以中心点bx和by在例子中表示为0.4和0.3，范围在0和1之间。而bh和bw的范围允许大于1，因为有可能遇到占两个格子大小的物体。</p>
+<p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1506.02640.pdf">Redmon et al., 2015, You Only Look Once: Unified real-time object detection</a></p>
+<h3 id="交并比-loU"><a href="#交并比-loU" class="headerlink" title="交并比(loU)"></a>交并比(loU)</h3><p>交并比用来判断边界框是否正确。</p>
+<p><img src="http://image.rexking6.top/img/clip1521353761.png" alt=""></p>
+<p>如图所示，交并比为两个边界框的交集面积与它们的并集面积比。</p>
+<script type="math/tex; mode=display">loU=\frac{size \space of \space yellow}{size \space of \space green}</script><script type="math/tex; mode=display">"correct" \space if \space loU \ge 0.5</script><h3 id="非极大值抑制"><a href="#非极大值抑制" class="headerlink" title="非极大值抑制"></a>非极大值抑制</h3><p>很多时候，对象检测会对同一个对象做出多次检测，例如下图19x19格子中汽车覆盖的多个格子会认为它们所检测到的是汽车并给出相应的概率。</p>
+<p><img src="http://image.rexking6.top/img/clip1521354285.png" alt=""></p>
+<p>非极大值抑制即是选取最大概率的边框，之后将其余边框与该边框计算交并比，如果交并比过高，则将该边框清除。图中左边的汽车保留了0.8的边框，清除了0.7的边框。右边的汽车保留了0.9的边框，清除了0.6和0.7的边框。</p>
+<p>具体算法如下：<br>假设现在只检测汽车的定位边框。则输出为：</p>
+<script type="math/tex; mode=display">\left[\begin{matrix}P_c\\ b_x\\ b_y\\ b_h\\ b_w\end{matrix}\right]</script><p>所以我们最后得到的是输出维度为19x19x5，清除$p_c\le 0.6$的所有边框。<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">While 有剩余的边框</span><br><span class="line">	选取最大pc值的边框。</span><br><span class="line">	计算其他边框与该边框的交并比，大于0.5的清除。</span><br></pre></td></tr></table></figure></p>
+<p>现在把只检测汽车的定位边框这个假设去掉，则我们需要对每个类独立做一次非极大值抑制。</p>
+<h3 id="Anchor-Boxes"><a href="#Anchor-Boxes" class="headerlink" title="Anchor Boxes"></a>Anchor Boxes</h3><p>假设在划分格子后，出现了两个对象被划分在同一格子的情况，则原本的8维的输出向量无法表示该情况。</p>
+<p><img src="http://image.rexking6.top/img/clip1521355236.png" alt=""></p>
+<p>为此，可以设置多种Anchor Boxes形状。</p>
+<p><img src="http://image.rexking6.top/img/clip1521355326.png" alt=""></p>
+<p>假设设置了上面两种Anchor box形状，之后行人的边框更符合Anchor box1，而汽车的边框更符合Anchor box2，则y为：</p>
+<script type="math/tex; mode=display">\left[\begin{matrix}P_c\\ b_x\\ b_y\\ b_h\\ b_w\\ c_1\\ c_2\\ c_3\\P_c\\ b_x\\ b_y\\ b_h\\ b_w\\ c_1\\ c_2\\ c_3\end{matrix}\right]</script><p>前8维为Anchor box1的输出，即行人的边框界信息，后8维为Anchor box2的输出，即汽车的边框界信息。</p>
+<p>这样训练即可。</p>
+<p>另外一种情况，当你有两个Anchor box时，但是在同一个格子中却有3个对象，这种情况算法处理效果不好，针对这种情况没有什么系统方法。一般这种情况很少见，特别是划分成19x19，361个格子时。</p>
+<p>Anchor box的形状一般是手工设置，而有一种高级的自动方法，在后期YOLO论文，对对象们的边框用k-means聚类出多种Anchor box形状。</p>
+<h3 id="R-CNN"><a href="#R-CNN" class="headerlink" title="R-CNN"></a>R-CNN</h3><p>R-CNN意思是针对候选区域运行CNN检测出对象。研究者发现，图像中很容易对一些完全没有对象的区域进行卷积操作，比如一大片都是背景。有人提出，根据色彩划分出候选区域，例如图中蓝色和浅蓝色的形状，针对这些候选区域逐一进行卷积操作检测对象。</p>
+<p><img src="http://image.rexking6.top/img/clip1521357637.png" alt=""></p>
+<p>而这个算法的缺点是速度慢，有人推出Fast R-CNN，相比R-CNN对候选区域逐一进行卷积操作，这里用的滑动窗口法的卷积实现。</p>
+<p>而Fast R-CNN的问题是得到候选区域的聚类步骤仍然非常缓慢，有人推出Faster R-CNN，使用卷积网络来寻找候选区域，提高了速度。</p>
+<p>但是这些R-CNN算法，相比于一步到位的YOLO算法，速度还是慢了许多。</p>
+<h2 id="特殊应用：人脸识别和神经风格转换"><a href="#特殊应用：人脸识别和神经风格转换" class="headerlink" title="特殊应用：人脸识别和神经风格转换"></a>特殊应用：人脸识别和神经风格转换</h2><h3 id="人脸识别"><a href="#人脸识别" class="headerlink" title="人脸识别"></a>人脸识别</h3><h4 id="什么是人脸识别？"><a href="#什么是人脸识别？" class="headerlink" title="什么是人脸识别？"></a>什么是人脸识别？</h4><ul>
+<li>验证：输入图像和姓名，输出输入的图像是否是声称的人的图像</li>
+<li>识别：在K个人的数据库中，输入图像，找出这个人。验证的错误率会在识别率叠加。</li>
+</ul>
+<p>另外，一开始在百度展示的人脸识别里，还包括了活体检测这一技术。</p>
+<h4 id="One-shot-learning"><a href="#One-shot-learning" class="headerlink" title="One-shot learning"></a>One-shot learning</h4><p><img src="http://image.rexking6.top/img/clip1521422992.png" alt=""></p>
+<p>假设现在数据库里k个人每个人一张自己的图像，输入一张测试图像，判断它属于哪个人。很明显，这样的数据量不适合训练卷积神经网络来输出。另外一个，当公司来了一个新员工，加入了一张新图像，也要重新训练卷积神经网络，显然是不合理的。</p>
+<p>我们需要训练的是一个相似性函数$d$：</p>
+<script type="math/tex; mode=display">d(img1, img2)=degree\space of \space difference \space between \space images</script><script type="math/tex; mode=display">If \space d(img1, img2) \le \tau ,则符合</script><p>这里说点题外话，自己在大二大三搞过一阵Zero-shot learning，期间也听说过One-shot learning，以为是类似的东西，但其实不是。</p>
+<ul>
+<li>One-shot learning：数据库里每一类都只有一个样本，因此不符合机器学习数据量的要求。</li>
+<li>Zero-shot learning：类别分已知类和未知类，已知类在数据库有属性和有样本进行训练，未知类没有样本，但是会有属性，输入一个未知类的图像，判断它属于哪个类。这样主要构建的是样本特征空间和属性空间之间的映射。</li>
+</ul>
+<h4 id="Siamese-network"><a href="#Siamese-network" class="headerlink" title="Siamese network"></a>Siamese network</h4><p>每张图像输入到一个卷积神经网络里，最后输出一个能代表这张图像的128维向量。</p>
+<p>这样的话，每两张图像计算最后两个128维向量之间的距离判断相似性即可。</p>
+<p><img src="http://image.rexking6.top/img/clip1521425038.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1521425116.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="http://www.cs.toronto.edu/~ranzato/publications/taigman_cvpr14.pdf?WT.mc_id=Blog_MachLearn_General_DI">Taigman et al., 2014. DeepFace closing the gap to human level performance</a></p>
+<h4 id="Triplet损失"><a href="#Triplet损失" class="headerlink" title="Triplet损失"></a>Triplet损失</h4><p><img src="http://image.rexking6.top/img/clip1521428035.png" alt=""></p>
+<p>为了计算损失函数，我们需要一对相近的样本(A, P)和一对相差大的样本(A, N)。我们想要的是</p>
+<script type="math/tex; mode=display">||f(A)-f(P)||^2(d(A,P))\le ||f(A)-f(N)||^2(d(A,N))</script><p>这样，有可能出现$f(x)=0$的情况，所以我们需要加上一个新的超参数：间隔$\alpha$</p>
+<script type="math/tex; mode=display">||f(A)-f(P)||^2+\alpha \le ||f(A)-f(N)||^2</script><p>所以我们的损失函数为：</p>
+<script type="math/tex; mode=display">L(A,P,N)=max(||f(A)-f(P)||^2-||f(A)-f(N)||^2+\alpha,0)</script><p>这样能够让左项小于或等于0。</p>
+<p>所以总的损失函数为：</p>
+<script type="math/tex; mode=display">J=\sum_{i=1}^m L(A^{(i)},P^{(i)}, N^{(i)})</script><p>这样的一个方法我们需要每个人都要有比较多的图像，才能结对训练。</p>
+<p>而我们随机选取的(A, N)对都会比(A, P)对的距离大，为了更好地训练网络。我们最好选取不同人却相近的(A, P)对。</p>
+<script type="math/tex; mode=display">d(A, P) \approx d(A, N)</script><p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1503.03832.pdf">Schroff et al., 2015, FaceNet:A unified embedding for face recognition and clustering</a></p>
+<h4 id="面部验证与二分类"><a href="#面部验证与二分类" class="headerlink" title="面部验证与二分类"></a>面部验证与二分类</h4><p>另外一种方法，将人脸识别变为二分类方法</p>
+<p><img src="http://image.rexking6.top/img/clip1521429824.png" alt=""></p>
+<p>如图所示，将两个Siamese网络组合起来，输入一对图像，最终比较特征向量，得到输出y=1或y=0。最后一层的单个神经元可以是：</p>
+<script type="math/tex; mode=display">\hat y=\sigma(\sum_{k=1}^{128}w_i|f(x^{(i)})_k-f(x^{(j)})_k|+b)</script><p>中间绝对值部分也可能改成$X^2$分布：</p>
+<script type="math/tex; mode=display">\frac{(f(x^{(i)})_k-f(x^{(j)})_k)^2}{f(x^{(i)})_k+f(x^{(j)})_k}</script><p>另外一个需要注意的地方是，上下两个Siamese网络的参数要成套。因为，网络参数是固定的，所以我们可以预先得到已经在公司的员工的特征向量，保存本地，当新员工进入测试时，直接读取进行比较。</p>
+<p>这个方法的输入是成对图像，它们同一个人或是不是同一个人。这也是与上小节方法不同的地方。</p>
+<h3 id="神经风格转换"><a href="#神经风格转换" class="headerlink" title="神经风格转换"></a>神经风格转换</h3><h4 id="什么是神经风格转换"><a href="#什么是神经风格转换" class="headerlink" title="什么是神经风格转换"></a>什么是神经风格转换</h4><p><img src="http://image.rexking6.top/img/clip1521431713.png" alt=""></p>
+<p>用C代表内容图像，S代表风格图像，G代表合成图像。</p>
+<h3 id="深度卷积网络在学什么？"><a href="#深度卷积网络在学什么？" class="headerlink" title="深度卷积网络在学什么？"></a>深度卷积网络在学什么？</h3><p><img src="http://image.rexking6.top/img/clip1521432040.png" alt=""></p>
+<p>首先 ，从第一层的隐藏单元开始，假设你历遍了训练集，然后发现一些图片或是图片块，最大化地激活了那个运算单元，则将它们画出来。</p>
+<p><img src="http://image.rexking6.top/img/clip1521432251.png" alt=""></p>
+<p>第一层的卷积神经元只能找到似乎是图片浅层区域，类似某个角度的直线，或者是某种颜色的区域块。这里假设的是有9个通道，即有9层，所有能看到有9种模式（因为9个滤波器造成的），每个模式画出最大化激活运算单元的图片或是图片块。</p>
+<p><img src="http://image.rexking6.top/img/clip1521432526.png" alt=""></p>
+<p>第二层的卷积神经元找到了更复杂的形状和模式</p>
+<p><img src="http://image.rexking6.top/img/clip1521432671.png" alt=""></p>
+<p>第三层已经开始找到人脸了，还有左下角的车轮。</p>
+<p><img src="http://image.rexking6.top/img/clip1521432701.png" alt=""></p>
+<p>第四层和第五层已经可以识别狗头。</p>
+<p>可以看到，卷积神经网络随着层数的加深，能识别的模式会更加复杂。</p>
+<p><a target="_blank" rel="noopener" href="https://cs.nyu.edu/~fergus/papers/zeilerECCV2014.pdf">Zeiler and Fergus., 2015. Visualizing and understanding convolutional networks</a></p>
+<h4 id="代价函数"><a href="#代价函数" class="headerlink" title="代价函数"></a>代价函数</h4><p><img src="http://image.rexking6.top/img/clip1521432925.png" alt=""></p>
+<p>定义损失函数，分为内容代价和风格代价：</p>
+<script type="math/tex; mode=display">J(G)=\alpha J_{content}(C,G)+\beta J_{style}(S,G)</script><p><img src="http://image.rexking6.top/img/clip1521433438.png" alt=""></p>
+<p>步骤：</p>
+<ol>
+<li>随机初始化G，例如100x100x3；</li>
+<li>使用梯度下降法最小化$J(G)$ 。</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1521433461.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1508.06576v2.pdf">Gatys et al., 2015. A neural algorithm of artistic style . Images on slide generated by Justin Johnson</a></p>
+<h5 id="内容代价函数"><a href="#内容代价函数" class="headerlink" title="内容代价函数"></a>内容代价函数</h5><p>内容代价函数只能用既不太浅又不太深的网络去做，因为太浅会在像素上非常接近你的内容图片，太深会识别出内容图像的对象。就像之前所说，卷积神经网络浅层会找一些像素上接近的浅层结构；深层会找到一些复杂的对象。</p>
+<p>设我们的网络为$l$层，则$a^{<a href="C">l</a>}$和$a^{<a href="G">l</a>}$为$l$层上的激活值，所以内容代价函数为：</p>
+<script type="math/tex; mode=display">J_{content}(C,G)=||a^{[l](C)}-a^{[l](G)}||^2</script><h5 id="风格代价函数"><a href="#风格代价函数" class="headerlink" title="风格代价函数"></a>风格代价函数</h5><p><img src="http://image.rexking6.top/img/clip1521436450.png" alt=""></p>
+<p>倘若一个卷积神经网络如上，选取其中一层：</p>
+<p><img src="http://image.rexking6.top/img/clip1521436515.png" alt=""></p>
+<p>假设这里$n_c$为5，即有5个通道，那么我们需要计算的是每个通道之间相同像素位置之间相关系数。</p>
+<p><img src="http://image.rexking6.top/img/clip1521436625.png" alt=""></p>
+<p>现在我们假设只有两个通道，是图中圈出的红色框和黄色框，红色框代表是多条竖直的线的风格，而黄色框代表的是橘黄色的风格，而我们要判断的是出现多条竖直的线的风格时，出现橘黄色的风格的概率大不大，如果大的话，则它们是相关的；如果不大的话，则它们是不相关的。</p>
+<script type="math/tex; mode=display">设a_{i,j,k}^{[l]}=activation \space at \space(i,j,k)</script><p>$l$代表第$l$层，$i$代表行，$j$代表列，$k$代表通道。</p>
+<script type="math/tex; mode=display">G^{[l](S)}是n_c^{[l]} \times n_c^{[l]}维。</script><p>每两个通道间的相关系数可以表示为：</p>
+<script type="math/tex; mode=display">G_{kk'}^{[l](S)}=\sum_{i=1}^{n_H^{[l]}} \sum_{j=1}^{n_W^{[l]}} a_{ijk}^{[l](S)}a_{ijk'}^{[l](S)}</script><script type="math/tex; mode=display">G_{kk'}^{[l](G)}=\sum_{i=1}^{n_H^{[l]}} \sum_{j=1}^{n_W^{[l]}} a_{ijk}^{[l](G)}a_{ijk'}^{[l](G)}</script><p>第l层的代价函数可以表示为：</p>
+<script type="math/tex; mode=display">J_{style}^{[l]}(S,G)=||G^{[l](S)}-G^{[l](G)}||_F^2</script><script type="math/tex; mode=display">=\frac{1}{(2n_H^{[l]}n_W^{[l]}n_C^{[l]})^2}\sum_k \sum_{k'}(G_{kk'}^{[l](S)}-G_{kk'}^{[l](G)})^2</script><p>实际上，如果对每层网络都使用风格代价函数，会使结果变得更好，因为这样能使浅层模式风格和深层模式风格都得到学习。</p>
+<p>所以，总的风格代价函数为：</p>
+<script type="math/tex; mode=display">J_{style}(S,G)=\sum_l \lambda^{[l]} J_{style}^{[l]}(S,G)</script><p>$\lambda$为每一层的权重。</p>
+<h3 id="一维到三维的推广"><a href="#一维到三维的推广" class="headerlink" title="一维到三维的推广"></a>一维到三维的推广</h3><p>我们目前为止所处理的数据，在某种意义上说，都是2D数据。</p>
+<p>现在将卷积操作推广到1维的情况上：</p>
+<p><img src="http://image.rexking6.top/img/clip1521439235.png" alt=""></p>
+<p>假设左侧心电图维14x1，我们用一个5x1的滤波器，可以得到10x1的输出。</p>
+<p><img src="http://image.rexking6.top/img/clip1521439310.png" alt=""></p>
+<p>相同地，假设左侧长方体维14x14x14，滤波器维5x5x5，我们可以得到5x5x5x$n_c$，$n_c$是滤波器的数量。</p>
+<h1 id="序列模型"><a href="#序列模型" class="headerlink" title="序列模型"></a>序列模型</h1><h2 id="循环序列模型"><a href="#循环序列模型" class="headerlink" title="循环序列模型"></a>循环序列模型</h2><p>自然语言和音频都是前后相互关联的数据，对于这些序列数据需要使用循环神经网络（Recurrent Neural Network，RNN）来进行处理。</p>
+<p>使用 RNN 实现的应用包括下图中所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1521506326.png" alt=""></p>
+<h3 id="数学符号"><a href="#数学符号" class="headerlink" title="数学符号"></a>数学符号</h3><p>对于一个序列数据$x$，用符号$x^{⟨t⟩}$来表示这个数据中的第$t$个元素，用$y^{⟨t⟩}$来表示第$t$标签，用$T_x$和$T_y$来表示输入和输出的长度。对于一段音频，元素可能是其中的几帧；对于一句话，元素可能是一到多个单词。</p>
+<p>第$i$个序列数据的第$t$个元素用符号$x^{(i)⟨t⟩}$，第$t$个标签即为$y^{(i)⟨t⟩}$。对应即有$T^{(i)}_x$和$T^{(i)}_y$。</p>
+<p>想要表示一个词语，需要先建立一个词汇表（Vocabulary），或者叫字典（Dictionary）。将需要表示的所有词语变为一个列向量，可以根据字母顺序排列，然后根据单词在向量中的位置，用 one-hot 向量（one-hot vector）来表示该单词的标签：将每个单词编码成一个$R^{|V| \times 1}$向量，其中$|V|$是词汇表中单词的数量。一个单词在词汇表中的索引在该向量对应的元素为 1，其余元素均为 0。</p>
+<p>例如，’zebra’排在词汇表的最后一位，因此它的词向量表示为：</p>
+<script type="math/tex; mode=display">w^{zebra} = \left [ 0, 0, 0, ..., 1\right ]^T</script><p>补充：one-hot 向量是最简单的词向量。它的缺点是，由于每个单词被表示为完全独立的个体，因此单词间的相似度无法体现。例如单词 hotel 和 motel 意思相近，而与 cat 不相似，但是</p>
+<script type="math/tex; mode=display">(w^{hotel})^Tw^{motel} = (w^{hotel})^Tw^{cat} = 0</script><h3 id="循环神经网络模型"><a href="#循环神经网络模型" class="headerlink" title="循环神经网络模型"></a>循环神经网络模型</h3><p>对于序列数据，使用标准神经网络存在以下问题：</p>
+<ul>
+<li>对于不同的示例，输入和输出可能有不同的长度，因此输入层和输出层的神经元数量无法固定。</li>
+<li>从输入文本的不同位置学到的同一特征无法共享。</li>
+<li>模型中的参数太多，计算量太大。</li>
+</ul>
+<p>为了解决这些问题，引入循环神经网络（Recurrent Neural Network，RNN）。一种循环神经网络的结构如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1521507659.png" alt=""></p>
+<p>当元素$x^{⟨t⟩}$输入对应时间步（Time Step）的隐藏层的同时，该隐藏层也会接收来自上一时间步的隐藏层的激活值$a^{⟨t-1⟩}$，其中$a^{⟨0⟩}$一般直接初始化为零向量。一个时间步输出一个对应的预测结果$\hat y^{⟨t⟩}$。</p>
+<p>循环神经网络从左向右扫描数据，同时每个时间步的参数也是共享的，输入、激活、输出的参数对应为$W_{ax}$、$W_{aa}$、$W_{ay}$。</p>
+<p>目前我们看到的模型的问题是，只使用了这个序列中之前的信息来做出预测，即后文没有被使用。可以通过双向循环神经网络（Bidirectional RNN，BRNN）来解决这个问题。</p>
+<p>前向传播过程的公式如下：</p>
+<script type="math/tex; mode=display">a^{⟨0⟩} = \vec{0}</script><script type="math/tex; mode=display">a^{⟨t⟩} = g_1(W_{aa}a^{⟨t-1⟩} + W_{ax}x^{⟨t⟩} + b_a)</script><script type="math/tex; mode=display">\hat y^{⟨t⟩} = g_2(W_{ya}a^{⟨t⟩} + b_y)</script><p>激活函数$g_1$通常选择 tanh，有时也用 ReLU；$g_2$可选 sigmoid 或 softmax，取决于需要的输出类型。</p>
+<p>为了进一步简化公式以方便运算，可以将$W_{ax}$、$W_{aa}$水平并列为一个矩阵$W_a$，同时$a^{⟨t-1⟩}$和$x^{⟨t⟩}$堆叠成一个矩阵。则有：</p>
+<script type="math/tex; mode=display">W_a = [W_{ax}, W_{aa}]</script><script type="math/tex; mode=display">a^{⟨t⟩} = g_1(W_a[a^{⟨t-1⟩}, x^{⟨t⟩}] + b_a)</script><script type="math/tex; mode=display">\hat y^{⟨t⟩} = g_2(W_{y}a^{⟨t⟩} + b_y)</script><h3 id="反向传播-1"><a href="#反向传播-1" class="headerlink" title="反向传播"></a>反向传播</h3><p>为了计算反向传播过程，需要先定义一个损失函数。单个位置上（或者说单个时间步上）某个单词的预测值的损失函数采用交叉熵损失函数，如下所示：</p>
+<script type="math/tex; mode=display">L^{⟨t⟩}(\hat y^{⟨t⟩}, y^{⟨t⟩}) = -y^{⟨t⟩}log\hat y^{⟨t⟩} - (1 - y^{⟨t⟩})log(1-\hat y^{⟨t⟩})</script><p>将单个位置上的损失函数相加，得到整个序列的成本函数如下：</p>
+<script type="math/tex; mode=display">J = L(\hat y, y) = \sum^{T_x}_{t=1} L^{⟨t⟩}(\hat y^{⟨t⟩}, y^{⟨t⟩})</script><p>循环神经网络的反向传播被称为通过时间反向传播（Backpropagation through time），因为从右向左计算的过程就像是时间倒流。</p>
+<p>更详细的计算公式如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1521508368.png" alt=""></p>
+<h3 id="不同结构"><a href="#不同结构" class="headerlink" title="不同结构"></a>不同结构</h3><p>某些情况下，输入长度和输出长度不一致。根据所需的输入及输出长度，循环神经网络可分为“一对一”、“多对一”、“多对多”等结构：</p>
+<p><img src="http://image.rexking6.top/img/clip1521508818.png" alt=""></p>
+<p>根据不同的应用选择不同的结构，“多对一”是情感评价，“一对多”是音乐生成，“多对多”是人名检测和机器翻译。</p>
+<h3 id="语言模型"><a href="#语言模型" class="headerlink" title="语言模型"></a>语言模型</h3><p>语言模型（Language Model）是根据语言客观事实而进行的语言抽象数学建模，能够估计某个序列中各元素出现的可能性。例如，在一个语音识别系统中，语言模型能够计算两个读音相近的句子为正确结果的概率，以此为依据作出准确判断。</p>
+<p>建立语言模型所采用的训练集是一个大型的语料库（Corpus），指数量众多的句子组成的文本。建立过程的第一步是标记化（Tokenize），即建立字典；然后将语料库中的每个词表示为对应的 one-hot 向量。另外，需要增加一个额外的标记 EOS（End of Sentence）来表示一个句子的结尾。标点符号可以忽略，也可以加入字典后用 one-hot 向量表示。</p>
+<p>对于语料库中部分特殊的、不包含在字典中的词汇，例如人名、地名，可以不必针对这些具体的词，而是在词典中加入一个 UNK（Unique Token）标记来表示。</p>
+<p>将标志化后的训练集用于训练 RNN，过程如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1521509631.png" alt=""></p>
+<p>在第一个时间步中，输入的$a^{⟨0⟩}$和$x^{⟨1⟩}$都是零向量，$\hat y^{⟨1⟩}$是通过 softmax 预测出的字典中每个词作为第一个词出现的概率；在第二个时间步中，输入的$x^{⟨2⟩}$是训练样本的标签中的第一个单词$y^{⟨1⟩}$（即“cats”）和上一层的激活项$a^{⟨1⟩}$，输出的$y^{⟨2⟩}$表示的是通过 softmax 预测出的、单词“cats”后面出现字典中的其他每个词的条件概率。以此类推，最后就可以得到整个句子出现的概率。</p>
+<p>定义损失函数为：</p>
+<script type="math/tex; mode=display">L(\hat y^{⟨t⟩}, y^{⟨t⟩}) = -\sum_t y_i^{⟨t⟩} log \hat y^{⟨t⟩}</script><p>则成本函数为：</p>
+<script type="math/tex; mode=display">J = \sum_t L^{⟨t⟩}(\hat y^{⟨t⟩}, y^{⟨t⟩})</script><h3 id="采样"><a href="#采样" class="headerlink" title="采样"></a>采样</h3><p>在训练好一个语言模型后，可以通过采样（Sample）新的序列来了解这个模型中都学习到了一些什么。</p>
+<p><img src="http://image.rexking6.top/img/clip1521510180.png" alt=""></p>
+<p>在第一个时间步输入$a^{⟨0⟩}$和$x^{⟨1⟩}$为零向量，输出预测出的字典中每个词作为第一个词出现的概率，根据 softmax 的分布进行随机采样（<code>np.random.choice</code>），将采样得到的$\hat y^{⟨1⟩}$作为第二个时间步的输入$x^{⟨2⟩}$。以此类推，直到采样到 EOS，最后模型会自动生成一些句子，从这些句子中可以发现模型通过语料库学习到的知识。</p>
+<p>这里建立的是基于词汇构建的语言模型。根据需要也可以构建基于字符的语言模型，其优点是不必担心出现未知标识（UNK），其缺点是得到的序列过多过长，并且训练成本高昂。因此，基于词汇构建的语言模型更为常用。</p>
+<h3 id="RNN-的梯度消失"><a href="#RNN-的梯度消失" class="headerlink" title="RNN 的梯度消失"></a>RNN 的梯度消失</h3><p><img src="http://image.rexking6.top/img/clip1521510623.png" alt=""></p>
+<p>对于以上两个句子，后面的动词单复数形式由前面的名词的单复数形式决定。但是基本的 RNN 不擅长捕获这种长期依赖关系。究其原因，由于梯度消失，在反向传播时，后面层的输出误差很难影响到较靠前层的计算，网络很难调整靠前的计算。</p>
+<p>在反向传播时，随着层数的增多，梯度不仅可能指数型下降，也有可能指数型上升，即梯度爆炸。不过梯度爆炸比较容易发现，因为参数会急剧膨胀到数值溢出（可能显示为 NaN）。这时可以采用梯度修剪（Gradient Clipping）来解决：观察梯度向量，如果它大于某个阈值，则缩放梯度向量以保证其不会太大。相比之下，梯度消失问题更难解决。GRU 和 LSTM 都可以作为缓解梯度消失问题的方案。</p>
+<h3 id="GRU（门控循环单元）"><a href="#GRU（门控循环单元）" class="headerlink" title="GRU（门控循环单元）"></a>GRU（门控循环单元）</h3><p>GRU（Gated Recurrent Units, 门控循环单元）改善了 RNN 的隐藏层，使其可以更好地捕捉深层连接，并改善了梯度消失问题。</p>
+<p><img src="http://image.rexking6.top/img/clip1521511459.png" alt=""></p>
+<p>当我们从左到右读上面这个句子时，GRU 单元有一个新的变量称为$c$，代表记忆细胞（Memory Cell），其作用是提供记忆的能力，记住例如前文主语是单数还是复数等信息。在时间t，记忆细胞的值$c^{⟨t⟩}$等于输出的激活值$a^{⟨t⟩}$；$\tilde c^{⟨t⟩}$代表下一个$c$的候选值。$Γ_u$代表更新门（Update Gate），用于决定什么时候更新记忆细胞的值。以上结构的具体公式为：</p>
+<script type="math/tex; mode=display">\tilde c^{⟨t⟩} = tanh(W_c[c^{⟨t-1⟩}, x^{⟨t⟩}] + b_c)</script><script type="math/tex; mode=display">Γ_u = \sigma(W_u[c^{⟨t-1⟩}, x^{⟨t⟩}] + b_u)</script><script type="math/tex; mode=display">c^{⟨t⟩} = Γ_u \times \tilde c^{⟨t⟩} + (1 - Γ_u) \times c^{⟨t-1⟩}</script><script type="math/tex; mode=display">a^{⟨t⟩} = c^{⟨t⟩}</script><p>当使用 sigmoid 作为激活函数$\sigma$来得到$Γ_u$时，$Γ_u$的值在 0 到 1 的范围内，且大多数时间非常接近于 0 或 1。当$Γ_u = 1$时，$c^{⟨t⟩}$被更新为$\tilde c^{⟨t⟩}$，否则保持为$c^{⟨t-1⟩}$。因为$Γ_u$可以很接近 0，因此$c^{⟨t⟩}$几乎就等于$c^{⟨t-1⟩}$。在经过很长的序列后，$c$的值依然被维持，从而实现“记忆”的功能。</p>
+<p>以上实际上是简化过的 GRU 单元，但是蕴涵了 GRU 最重要的思想。完整的 GRU 单元添加了一个新的相关门（Relevance Gate）$Γ_r$，表示$\tilde c^{⟨t⟩}$和$c^{⟨t⟩}$的相关性。因此，表达式改为如下所示：</p>
+<script type="math/tex; mode=display">\tilde c^{⟨t⟩} = tanh(W_c[Γ_r * c^{⟨t-1⟩}, x^{⟨t⟩}] + b_c)</script><script type="math/tex; mode=display">Γ_u = \sigma(W_u[c^{⟨t-1⟩}, x^{⟨t⟩}] + b_u)</script><script type="math/tex; mode=display">Γ_r = \sigma(W_r[c^{⟨t-1⟩}, x^{⟨t⟩}] + b_r)</script><script type="math/tex; mode=display">c^{⟨t⟩} = Γ_u \times \tilde c^{⟨t⟩} + (1 - Γ_u) \times c^{⟨t-1⟩}</script><script type="math/tex; mode=display">a^{⟨t⟩} = c^{⟨t⟩}</script><p>相关论文：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1409.1259.pdf">Cho et al., 2014. On the properties of neural machine translation: Encoder-decoder approaches</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1412.3555.pdf">Chung et al., 2014. Empirical Evaluation of Gated Recurrent Neural Networks on Sequence Modeling</a></li>
+</ol>
+<h3 id="LSTM（长短期记忆）"><a href="#LSTM（长短期记忆）" class="headerlink" title="LSTM（长短期记忆）"></a>LSTM（长短期记忆）</h3><p>LSTM（Long Short Term Memory，长短期记忆）网络比 GRU 更加灵活和强大，它额外引入了遗忘门（Forget Gate）$Γ_f$和输出门（Output Gate）$Γ_o$。公式如下：</p>
+<script type="math/tex; mode=display">\tilde c^{⟨t⟩} = tanh(W_c[a^{⟨t-1⟩}, x^{⟨t⟩}] + b_c)</script><script type="math/tex; mode=display">Γ_u = \sigma(W_u[a^{⟨t-1⟩}, x^{⟨t⟩}] + b_u)</script><script type="math/tex; mode=display">Γ_f = \sigma(W_f[a^{⟨t-1⟩}, x^{⟨t⟩}] + b_f)</script><script type="math/tex; mode=display">Γ_o = \sigma(W_o[a^{⟨t-1⟩}, x^{⟨t⟩}] + b_o)</script><script type="math/tex; mode=display">c^{⟨t⟩} = Γ^{⟨t⟩}_u \times \tilde c^{⟨t⟩} + Γ^{⟨t⟩}_f \times c^{⟨t-1⟩}</script><script type="math/tex; mode=display">a^{⟨t⟩} = Γ_o^{⟨t⟩} \times tanh(c^{⟨t⟩})</script><p><img src="http://image.rexking6.top/img/clip1521512633.png" alt=""></p>
+<p>将多个 LSTM 单元按时间次序连接起来，就得到一个 LSTM 网络。</p>
+<p>以上是简化版的 LSTM。在更为常用的版本中，几个门值不仅取决于$a^{⟨t-1⟩}$和$x^{⟨t⟩}$，有时也可以偷窥上一个记忆细胞输入的值$c^{⟨t-1⟩}$，这被称为窥视孔连接（Peephole Connection)。这时，和 GRU 不同，$c^{⟨t-1⟩}$和门值是一对一的。</p>
+<p>相关论文：<a target="_blank" rel="noopener" href="https://www.researchgate.net/publication/13853244_Long_Short-term_Memory">Hochreiter &amp; Schmidhuber 1997. Long short-term memory</a></p>
+<h3 id="双向循环神经网络（BRNN）"><a href="#双向循环神经网络（BRNN）" class="headerlink" title="双向循环神经网络（BRNN）"></a>双向循环神经网络（BRNN）</h3><p>单向的循环神经网络在某一时刻的预测结果只能使用之前输入的序列信息。双向循环神经网络（Bidirectional RNN，BRNN）可以在序列的任意位置使用之前和之后的数据。其工作原理是增加一个反向循环层，结构如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1521513108.png" alt=""></p>
+<p>因此，有</p>
+<script type="math/tex; mode=display">y^{⟨t⟩} = g(W_y[a^{⟨t⟩}_{\to},  a^{⟨t⟩}_{\gets}] + b_y)</script><p>这个改进的方法不仅能用于基本的 RNN，也可以用于 GRU 或 LSTM。缺点是需要完整的序列数据，才能预测任意位置的结果。例如构建语音识别系统，需要等待用户说完并获取整个语音表达，才能处理这段语音并进一步做语音识别。因此，实际应用会有更加复杂的模块。</p>
+<h3 id="深度循环神经网络（DRNN"><a href="#深度循环神经网络（DRNN" class="headerlink" title="深度循环神经网络（DRNN)"></a>深度循环神经网络（DRNN)</h3><p>循环神经网络的每个时间步上也可以包含多个隐藏层，形成深度循环神经网络（Deep RNN)。结构如下图所示：</p>
+<p><img src="http://image.rexking6.top/img/clip1521513352.png" alt=""></p>
+<p>以$a^{[2]⟨3⟩}$为例，有$a^{[2]⟨3⟩} = g(W_a^{[2]}[a^{[2]⟨2⟩}, a^{[1]⟨3⟩}] + b_a^{[2]})$。</p>
+<h2 id="自然语言处理与词嵌入"><a href="#自然语言处理与词嵌入" class="headerlink" title="自然语言处理与词嵌入"></a>自然语言处理与词嵌入</h2><h3 id="词嵌入"><a href="#词嵌入" class="headerlink" title="词嵌入"></a>词嵌入</h3><p>one-hot 向量将每个单词表示为完全独立的个体，不同词向量都是正交的，因此单词间的相似度无法体现。</p>
+<p>换用特征化表示方法能够解决这一问题。我们可以通过用语义特征作为维度来表示一个词，因此语义相近的词，其词向量也相近。</p>
+<p>将高维的词嵌入“嵌入”到一个二维空间里，就可以进行可视化。常用的一种可视化算法是 t-SNE 算法。在通过复杂而非线性的方法映射到二维空间后，每个词会根据语义和相关程度聚在一起。相关论文：<a target="_blank" rel="noopener" href="https://www.seas.harvard.edu/courses/cs281/papers/tsne.pdf">van der Maaten and Hinton., 2008. Visualizing Data using t-SNE</a></p>
+<p>词嵌入（Word Embedding）是 NLP 中语言模型与表征学习技术的统称，概念上而言，它是指把一个维数为所有词的数量的高维空间（one-hot 形式表示的词）“嵌入”到一个维数低得多的连续向量空间中，每个单词或词组被映射为实数域上的向量。对大量词汇进行词嵌入后获得的词向量，可用于完成命名实体识别（Named Entity Recognition）等任务。</p>
+<h3 id="词嵌入与迁移学习"><a href="#词嵌入与迁移学习" class="headerlink" title="词嵌入与迁移学习"></a>词嵌入与迁移学习</h3><p>用词嵌入做迁移学习可以降低学习成本，提高效率。其步骤如下：</p>
+<ol>
+<li>从大量的文本集中学习词嵌入，或者下载网上开源的、预训练好的词嵌入模型；</li>
+<li>将这些词嵌入模型迁移到新的、只有少量标注训练集的任务中；</li>
+<li>可以选择是否微调词嵌入。当标记数据集不是很大时可以省下这一步。</li>
+</ol>
+<h3 id="词嵌入与类比推理"><a href="#词嵌入与类比推理" class="headerlink" title="词嵌入与类比推理"></a>词嵌入与类比推理</h3><p>词嵌入可用于类比推理。例如，给定对应关系“男性（Man）”对“女性（Woman）”，想要类比出“国王（King）”对应的词汇。则可以有$e_{man} - e_{woman} \approx e_{king} - e_?$，之后的目标就是找到词向量$w$，来找到使相似度$sim(e_w, e_{king} - e_{man} + e_{woman})$最大。</p>
+<p>一个最常用的相似度计算函数是余弦相似度（cosine similarity）。公式为：</p>
+<script type="math/tex; mode=display">sim(u, v) = \frac{u^T v}{|| u ||_2 || v ||_2}</script><p>相关论文：<a target="_blank" rel="noopener" href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/rvecs.pdf">Mikolov et. al., 2013, Linguistic regularities in continuous space word representations</a></p>
+<h3 id="嵌入矩阵"><a href="#嵌入矩阵" class="headerlink" title="嵌入矩阵"></a>嵌入矩阵</h3><p>不同的词嵌入方法能够用不同的方式学习到一个嵌入矩阵（Embedding Matrix）$E$。将字典中位置为 $i$的词的 one-hot 向量表示为$o_i$，词嵌入后生成的词向量用$e_i$表示，则有：</p>
+<script type="math/tex; mode=display">E \cdot o_i = e_i</script><p>但在实际情况下一般不这么做。因为 one-hot 向量维度很高，且几乎所有元素都是 0，这样做的效率太低。因此，实践中直接用专门的函数查找矩阵$E$的特定列。</p>
+<h3 id="学习词嵌入"><a href="#学习词嵌入" class="headerlink" title="学习词嵌入"></a>学习词嵌入</h3><p><img src="http://image.rexking6.top/img/clip1521545177.png" alt=""></p>
+<p>假设我们现在有这么一个句子</p>
+<script type="math/tex; mode=display">I \space want \space a \space glass \space of \space orange \space</script><p>要求你预测出下一个单词，我们可以先把one-hot向量转化为词嵌入向量，再把它们作为神经网络的输入，最终softmax找出概率最大的那个词汇。</p>
+<p>但是在一般情况下，我们都会固定输入窗口，例如每次只使用4个单词来预测它们后面的一个单词，这样的话，我们就可以处理任意长的句子而不用在意输入规模的大小。</p>
+<p>这种称为“上下文（context）”，别的上下文方法有：选取目标词的前后各4个词汇、选取目标词前面1个词汇，选取目标词附近1个词汇。研究者发现，如果是想建立一个语言模型，那么采用目标词之前4个单词就会取得很好的效果；如果只是想学习词嵌入，那么其他的方法也能取得很好的效果。</p>
+<p>参考论文：<a target="_blank" rel="noopener" href="http://www.jmlr.org/papers/volume3/bengio03a/bengio03a.pdf">Bengio et al., 2003. A neural probabilistic language model</a></p>
+<h3 id="Word2Vec"><a href="#Word2Vec" class="headerlink" title="Word2Vec"></a>Word2Vec</h3><h4 id="Skip-Gram模型"><a href="#Skip-Gram模型" class="headerlink" title="Skip-Gram模型"></a>Skip-Gram模型</h4><p>假设有这么一个句子：</p>
+<script type="math/tex; mode=display">I \space want \space a \space glass \space of \space orange \space juice \space to \space go \space along \space with \space my \space cereal.</script><p>假设我们取得上下文词是orange，则我们在orange正负n个词距里，选取目标词组成词对。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Context</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>orange</td>
+<td>juice</td>
+</tr>
+<tr>
+<td>orange</td>
+<td>glass</td>
+</tr>
+<tr>
+<td>orange</td>
+<td>my</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>这些词对作为训练样本进行训练，目的是学习出嵌入矩阵$E$。</p>
+<p><img src="http://image.rexking6.top/img/clip1521546829.png" alt=""></p>
+<p>这个算法的一个问题是softmax计算时，需要对整个词汇表做求和运算，在百万级千万级的词汇表操作时，十分耗时。</p>
+<p>解决方法：分级softmax</p>
+<p><img src="http://image.rexking6.top/img/clip1521546963.png" alt=""></p>
+<p>分级softmax树会告诉你目标词落在前5000词里还是后5000词里，从而分叉。类似搜索二叉树，常用的词会放在浅层，不常用的词会放在深层处，为了提高效率。这样计算时间随着词汇表增大而对数级增加，原本是指数级。</p>
+<p>参考论文：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1301.3781.pdf">Mikolov et al., 2013. Efficient estimation of word representations in vector space</a></p>
+<h4 id="如何对上下文c采样"><a href="#如何对上下文c采样" class="headerlink" title="如何对上下文c采样"></a>如何对上下文c采样</h4><p>如果在语料库均匀随机选取c，在c正负n个词距里选取上下文，这样的话，将会出现大量这样的词，“the”，“of”，“a”，“and”，“to”……所以，在实际情况中，我们常用不同的启发来平衡选取c。</p>
+<p>Word2Vec中的Skip-Gram模型只是论文中其中一个模型，另外一个模型是CBOW，连续词袋模型，用周围的词来预测中间的词。</p>
+<h3 id="负采样"><a href="#负采样" class="headerlink" title="负采样"></a>负采样</h3><p>构造这样的词对：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Context</th>
+<th>Word</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>orange</td>
+<td>juice</td>
+<td>1</td>
+</tr>
+<tr>
+<td>orange</td>
+<td>king</td>
+<td>0</td>
+</tr>
+<tr>
+<td>orange</td>
+<td>book</td>
+<td>0</td>
+</tr>
+<tr>
+<td>orange</td>
+<td>the</td>
+<td>0</td>
+</tr>
+<tr>
+<td>orange</td>
+<td>of</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>正词对在上下文词n个词距里选取，负词对在词汇表里随机选取，即使选取到了n个词距里的也没关系。（随机误差，非系统误差）</p>
+<p>k为负词对的个数，数据集越小，k应该取越大。</p>
+<p>这样我们可以把上小节的softmax函数改为logistics函数，因为增加了负样本，所以转化为二分类问题。</p>
+<script type="math/tex; mode=display">P(y=1|c,t)=\sigma(\theta_t^Te_c)</script><p><img src="http://image.rexking6.top/img/clip1521548578.png" alt=""></p>
+<p>另外，我们在训练时，不是每次都训练10000个输出，而是每次训练k+1个，减少了迭代的计算成本。</p>
+<p>对于负词对的选取，一种是根据词汇在语料库的频率选取，这样的话会选取到大量无用的词汇；另外一种是均匀随机选取，这样没有代表性。论文作者根据经验提出了这样一种选取规则：</p>
+<script type="math/tex; mode=display">P(w_i)=\frac{f(w_i)^{3/4}}{\sum_{j=1}^{10000}f(w_j)^{3/4}}</script><p>参考论文：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1310.4546.pdf">Mikolov et al., 2013. Distributed representation of words and phrases and their compositionality</a></p>
+<h3 id="GloVe词向量"><a href="#GloVe词向量" class="headerlink" title="GloVe词向量"></a>GloVe词向量</h3><p>这样定义$X_{ij}$：</p>
+<script type="math/tex; mode=display">X_{ij}=词汇i出现在词汇j的上下文里的次数</script><p>当词距为10时，大致会有$X_{ij}=X_{ji}$的关系。</p>
+<p>目标函数：</p>
+<script type="math/tex; mode=display">minimize \sum_{i=1}^{10000} \sum_{j=1}^{10000} f(X_{ij})(\theta_i^Te_j+b_i-b_j'-logX_{ij})^2</script><p>为了防止$X_{ij}$为0时无法计算，所以添加$f(X_{ij})$因子来计算$0log0$等于0。$f(X_{ij})设置为当$X_{ij}$为0时，$f(X_{ij})$为0；同时，它也给一些意义不大的词汇较小的权重，给一些不常用的词汇较大的权重。</p>
+<p>在这里，$\theta_i$和$e_j$是对称的。所以在计算时：</p>
+<script type="math/tex; mode=display">e_w^{(final)}=\frac{\theta_w+e_w}{2}</script><h3 id="嵌入的理解"><a href="#嵌入的理解" class="headerlink" title="嵌入的理解"></a>嵌入的理解</h3><p>在一开始为了直观上理解嵌入的含义和作用，我们先规定了每一维的含义，之后再计算每个词汇在这一维上的值，最后得到嵌入向量。</p>
+<p>但是实际上，我们训练出来的嵌入矩阵，它在每一维上可能都不会具有我们能理解的含义。</p>
+<h3 id="情感分类"><a href="#情感分类" class="headerlink" title="情感分类"></a>情感分类</h3><p>我们需要根据短评来预测出星级评价（1星到5星）。</p>
+<p><img src="http://image.rexking6.top/img/clip1521554271.png" alt=""></p>
+<p>将短评每个词汇经过嵌入矩阵转换，输入到一个Avg单元计算平均，最后用softmax在1星到5星之间计算概率最大的评价。</p>
+<p>这样会出现一个问题，当出现下图这样，多个“good”的正面词，但是实际上却是消极的评价。</p>
+<p><img src="http://image.rexking6.top/img/clip1521554659.png" alt=""></p>
+<p>这个问题还是需要RNN来理解上下文具体的含义：</p>
+<p><img src="http://image.rexking6.top/img/clip1521555061.png" alt=""></p>
+<p>这样训练，即使词汇表里没有“lack”这个词汇，这样训练出来后，泛化能力也会很强。</p>
+<h3 id="词嵌入除偏"><a href="#词嵌入除偏" class="headerlink" title="词嵌入除偏"></a>词嵌入除偏</h3><p>机器学习越来越多地被用在了人类某些政策上的决定，所以需要防止它出现性别歧视。</p>
+<p>像“babysitter”、“nurse”等经常被认为是女性相关的职业。</p>
+<p>我们用图来表示这些点之间的关系。横轴为性别维度，竖轴为其他299维。</p>
+<ol>
+<li>对$“e_{he}-e_{she}”、“e_{man}-e_{woman}”、“e_{male}-e_{female}”$取平均；</li>
+<li>对于这些像“babysitter”、“nurse”的词汇，保证它们在性别维度上没有距离；</li>
+<li>对于这些像”grandmother“、”grandfather“的词汇，我们得保证它们到其他299维的距离相等，意思是不能出现”grandfather“比”grandmother“更容易得到”babysitter“的情况。</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1521591688.png" alt=""></p>
+<p>参考论文：[<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1607.06520.pdf">Bolukbasi et al., 2016.Man is to computer programmer as woman is to homemaker? Debiasing Word Embeddings</a></p>
+<h2 id="序列模型和注意力机制"><a href="#序列模型和注意力机制" class="headerlink" title="序列模型和注意力机制"></a>序列模型和注意力机制</h2><h3 id="基础模型-seq2seq"><a href="#基础模型-seq2seq" class="headerlink" title="基础模型(seq2seq)"></a>基础模型(seq2seq)</h3><p><img src="http://image.rexking6.top/img/clip1521596204.png" alt=""></p>
+<p>机器翻译是输入不定长序列之后输出不定长序列，这种通常建立出上图“many to many”的模型。</p>
+<h4 id="图像描述"><a href="#图像描述" class="headerlink" title="图像描述"></a>图像描述</h4><p>给定一张图像，输出这张图像的描述。我们已经知道如何把图像输入到卷积神经网络里，消除掉最后一层softmax。</p>
+<p><img src="http://image.rexking6.top/img/clip1521596518.png" alt=""></p>
+<p>我们得到的是每张图片的4096维向量。</p>
+<p><img src="http://image.rexking6.top/img/clip1521596563.png" alt=""></p>
+<p>参考论文：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1412.6632.pdf">Mao et al,. 2014. Deep captioning with multimodal recurrent neural networks</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1411.4555.pdf">Vinyals et al., 2014. Show and tell: A Neural image caption generator</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1412.2306v1.pdf">Karpathy and Li, 2015. Deep visual-semantic alignments for generating image descriptions</a></li>
+</ul>
+<h3 id="选择最有可能性的句子"><a href="#选择最有可能性的句子" class="headerlink" title="选择最有可能性的句子"></a>选择最有可能性的句子</h3><p>对于机器翻译，我们需要在给定原句的情况下找出条件概率最大的翻译句。</p>
+<script type="math/tex; mode=display">P(y^{<1>},...,y^{T_y}|x^{<1>},...,x^{T_x})</script><h4 id="为什么不使用贪心算法"><a href="#为什么不使用贪心算法" class="headerlink" title="为什么不使用贪心算法"></a>为什么不使用贪心算法</h4><p>贪心算法是从一开始，每一步都取最优值，直到最后的最优值即是全局最优值。在这里，我们无法保证该问题具有最优子结构性质。</p>
+<p><img src="http://image.rexking6.top/img/clip1521598278.png" alt=""></p>
+<p>倘若在<code>is</code>之后，<code>going</code>的概率比<code>visiting</code>的概率大，但是从整个句子来说，上句比下句的效果要好。</p>
+<h4 id="搜索问题"><a href="#搜索问题" class="headerlink" title="搜索问题"></a>搜索问题</h4><p>在10000大小的词汇表，我们想找到一个长度为10的目标句，需要$10000^{10}$的计算量，所以我们需要一种搜索方法来减少计算量。</p>
+<h3 id="集束搜索"><a href="#集束搜索" class="headerlink" title="集束搜索"></a>集束搜索</h3><p>假设我们设置集束宽(beam width)为3，则我们在$y^{<1>}$时计算softmax后选取三个概率最大的$P(y^{<1>}|x)作为三个副本，例如选取的是“in”、“jane”、“september”，之后对这三个副本继续寻找概率最大的三个$P(y^{<1>},y^{<2>}|x)=P(y^{<1>}|x)P(y^{<2>}|x,y^{<1>})$，假设我们选取到了“in september”、“jane is”、“jane visit”，则我们需要抛弃掉“september”，这样直到选到句子终结符。</p>
+<p>当B为1时，即是我们上小节所说的贪心算法。</p>
+<h3 id="改进集束搜索"><a href="#改进集束搜索" class="headerlink" title="改进集束搜索"></a>改进集束搜索</h3><p>观察我们选取时的规则</p>
+<script type="math/tex; mode=display">argmax_y \prod_{t=1}^{T_y} P(y^{<t>}|x,y^{<1>},...,y^{<t-1>})</script><p>发现随着句子长度的增加，概率相乘到一定时候，会非常小，难于计算，所以取对数</p>
+<script type="math/tex; mode=display">argmax_y \sum_{t=1}^{T_y}logP(y^{<t>}|x,y^{<1>},...,y^{<t-1>})</script><p>另外可以发现随着句子长度的增加，概率相乘值会越来越小，所以模型会偏向于选取较短的句子，这显然是不对的。</p>
+<p>所以，加上有关句子长度的因子</p>
+<script type="math/tex; mode=display">argmax_y \frac{1}{T_y^\alpha}\sum_{t=1}^{T_y}logP(y^{<t>}|x,y^{<1>},...,y^{<t-1>})</script><p>当$\alpha=1$时，是直接以句子长度为归一化；当$\alpha=0$时，取消归一化。$\alpha$也是一个超参数。</p>
+<h4 id="如何选取集束宽B"><a href="#如何选取集束宽B" class="headerlink" title="如何选取集束宽B"></a>如何选取集束宽B</h4><ul>
+<li>B很大：更好的结果，速度慢</li>
+<li>B很小：较差的结果，速度快</li>
+</ul>
+<h3 id="定向搜索的误差分析"><a href="#定向搜索的误差分析" class="headerlink" title="定向搜索的误差分析"></a>定向搜索的误差分析</h3><script type="math/tex; mode=display">Jane \space visite \space l'Afrique \space en \space septembre.</script><p>假设现在翻译出来的句子不是我们想要的。</p>
+<script type="math/tex; mode=display">Human:Jane \space visits \space Africa \space in \space September.(y*)</script><script type="math/tex; mode=display">Algorithm:Jane \space visited \space Africa \space last \space September.(\hat y)</script><p>我们的模型包括两个部分：RNN和集束搜索，我们需要分析哪一部分出了问题：</p>
+<ol>
+<li>$P(y*|x) &gt; p(\hat y|x)$，集束搜索出了错，增大集束宽B；</li>
+<li>$P(y*|x) \le p(\hat y|x)$，RNN出了错，改进RNN。</li>
+</ol>
+<p>对于多个样本，我们可以列表计数，观察哪一部分出错的次数较多。</p>
+<h3 id="Bleu得分"><a href="#Bleu得分" class="headerlink" title="Bleu得分"></a>Bleu得分</h3><p>当一个待翻译句给出多个翻译句时，我们用Bleu(bilingual evaluation understudy双语评估替补)得分评判哪一个句子的翻译更好。</p>
+<p>现在有以下两个参考翻译</p>
+<script type="math/tex; mode=display">French:Le \space chat \space est \space sur \space le \space tapis.</script><script type="math/tex; mode=display">Reference1:The \space cat \space is \space on \space the \space mat.</script><script type="math/tex; mode=display">Reference2:There \space is \space a \space cat \space on \space the \space mat.</script><script type="math/tex; mode=display">MT \space output:the \space the \space the \space the \space the \space the \space the.</script><p>我们分别判断机器翻译句每个词汇是否在参考句子里出现，计数。<br>这里机器翻译句的得分是$\frac{7}{7}$，这显然是不合理的，所以设置得分上限，例如$the$在参考句1里只出现了两次，所以$the$最高计数为2，所以得分为$\frac{2}{7}$。</p>
+<p>假设有这样的机器翻译句：</p>
+<script type="math/tex; mode=display">MT \space output:The \space cat \space the \space cat \space on \space the \space mat.</script><p>这时我们开始计算每两个单词在参考句里出现的得分：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Count</th>
+<th>Count-clip</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the cat</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr>
+<td>cat the</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>cat on</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>on the</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>the mat</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>第三列为上限计数，这样得分为：$\frac{4}{6}$。</p>
+<script type="math/tex; mode=display">P_n=\frac{\sum_{n-gram \in {\hat y}}Count_{clip}(n-gram)}{\sum_{n-gram \in {\hat y}}Count(n-gram)}</script><p>计算出$P_1$、$P_2$……之后，计算联合Bleu得分为：</p>
+<script type="math/tex; mode=display">BP \times exp(\frac{1}{4}\sum_{n=1}^4 P_n)</script><p>BP(brevity penalty)为简短惩罚。因为这样训练后，会导致较短的句子能够得到更多的评分。所以BP通常这样设置：</p>
+<script type="math/tex; mode=display">BP=\left\{
+\begin{aligned}
+1,if \space MT\_output\_length > reference\_output_length \\
+exp(1-MT\_output\_length/reference\_output\_length),otherwise
+\end{aligned}
+\right.</script><p>参考论文：<a target="_blank" rel="noopener" href="http://nlp.cs.swarthmore.edu/~richardw/papers/2up/P02-1040.pdf">Papineni et al,. 2002. A method for automatic evaluation of machine translation</a></p>
+<h3 id="注意力模型"><a href="#注意力模型" class="headerlink" title="注意力模型"></a>注意力模型</h3><p>以往训练出来的模型在遇到如下图的长句子的时候，都会效果不理想。</p>
+<p><img src="http://image.rexking6.top/img/clip1521618787.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1521618838.png" alt=""></p>
+<p>注意力模型能够使机器翻译遇到长句时，发挥出良好的效果。</p>
+<p><img src="http://image.rexking6.top/img/clip1521619063.png" alt=""></p>
+<p>先对每个词汇使用双向RNN得到每个词汇的特征。</p>
+<p><img src="http://image.rexking6.top/img/clip1521619835.png" alt=""></p>
+<p>之后把这些特征输入到一个单向RNN里，具体形式如上图。每个RNN神经元$S^{t}$接受上一个神经元的输出$y^{t}$和$c^{t}$作为输入，$c^{t}$是词汇的特征乘以它们在该时刻的权重（意思是在翻译第t个词汇时，应该放多少注意力在哪些词汇上）。</p>
+<p>$\alpha^{t,t’}$表示在t时刻的目标$y^{t}$应该放多少权重在活性值$a^{t’}$上。用softmax计算。</p>
+<script type="math/tex; mode=display">\alpha^{<t,t'>}=\frac{exp(e^{<t,t'>})}{\sum_{t'=1}^{T_x}exp(e^{<t,t'>})}</script><p>我们用上一时刻的$S^{t-1}$和$t’$时刻的活性值$a^{t’}$作为输入，训练一个小型的神经网络来得到$e^{t,t’}$。</p>
+<p><img src="http://image.rexking6.top/img/clip1521620174.png" alt=""></p>
+<p>总的算法时间复杂度为$T(n^3)$。</p>
+<p>参考论文：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1409.0473.pdf">Bahdanau at al., 2014. Neural machine translation by jointly learning to align and translate</a></p>
+<h3 id="语音辨识"><a href="#语音辨识" class="headerlink" title="语音辨识"></a>语音辨识</h3><p>传统的语音辨识需要做划分声音的基本单元作为预处理，而使用深度学习则不用考虑这种问题，直接端到端。一般实验室使用300h、3000h来作为训练集。而大型企业已经有的使用100000h长度的训练集。</p>
+<p><img src="http://image.rexking6.top/img/clip1521621361.png" alt=""></p>
+<p>我们可以采用注意力模型，将每个时刻的字母输出。</p>
+<p>另外一种模型：CTC(Connectionist temporal classification)损失函数。</p>
+<p>比如你有一段10秒的音频，并且特征是100Hz的，那么这段音频时1000维的，就是简单地用100赫兹乘上10秒。但是你的输出可能就没有1000个字母。所以CTC模型允许生成下面的序列：</p>
+<script type="math/tex; mode=display">ttt\_h\_eee\_\_\_ \space \_\_\_qqq\_\_</script><p>这时候将重复字符折叠起来，就可以得到“the q”。这样就能满足1000个输出。</p>
+<p><img src="http://image.rexking6.top/img/clip1521621550.png" alt=""></p>
+<p>参考论文：<a target="_blank" rel="noopener" href="http://people.idsia.ch/~santiago/papers/icml2006.pdf">Graves et al., 2006. Connectionist Temporal Classification: Labeling unsegmented sequence data with recurrent neural networks</a></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\28\AMPC-1080Ti机器-深度环境搭建\" rel="bookmark">AMPC-1080Ti机器-深度环境搭建</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\09\22\Transformer\" rel="bookmark">Transformer</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\04\07\triplet-loss原理推导及变体\" rel="bookmark">triplet loss原理推导及变体</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/03/12/coursera%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="coursera深度学习笔记">https://blog.rexking6.top/2018/03/12/coursera深度学习笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag"># 深度学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/03/11/AlexNet%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91/" rel="prev" title="AlexNet论文翻译">
+      <i class="fa fa-chevron-left"></i> AlexNet论文翻译
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/03/22/%E8%8E%AB%E7%83%A6TensorFlow%E7%AC%94%E8%AE%B0/" rel="next" title="莫烦TensorFlow笔记">
+      莫烦TensorFlow笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%92%8C%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0"><span class="nav-number">1.</span> <span class="nav-text">神经网络和深度学习</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80"><span class="nav-number">1.1.</span> <span class="nav-text">神经网络基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%A7%8D%E7%B1%BB"><span class="nav-number">1.1.1.</span> <span class="nav-text">神经网络种类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E5%8C%96%E6%95%B0%E6%8D%AE"><span class="nav-number">1.1.2.</span> <span class="nav-text">结构化数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E5%A4%B1%E6%95%B0%E6%8D%AE"><span class="nav-number">1.1.3.</span> <span class="nav-text">缺失数据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%85%E5%B1%82%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="nav-number">1.2.</span> <span class="nav-text">浅层神经网络</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E8%A1%A8%E7%A4%BA"><span class="nav-number">1.2.1.</span> <span class="nav-text">神经网络表示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%9A%84%E8%BE%93%E5%87%BA"><span class="nav-number">1.2.2.</span> <span class="nav-text">计算神经网络的输出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.3.</span> <span class="nav-text">激活函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E9%9D%9E%E7%BA%BF%E6%80%A7%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">1.2.4.</span> <span class="nav-text">使用非线性激活函数的原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0%EF%BC%9A%E9%A5%B1%E5%92%8C%E4%B8%8E%E9%9D%9E%E9%A5%B1%E5%92%8C"><span class="nav-number">1.2.5.</span> <span class="nav-text">激活函数：饱和与非饱和</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%9A%84%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%B3%95"><span class="nav-number">1.2.6.</span> <span class="nav-text">神经网络的梯度下降法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A3%E5%90%91%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D"><span class="nav-number">1.2.6.1.</span> <span class="nav-text">正向梯度下降</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%8D%E5%90%91%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D"><span class="nav-number">1.2.6.2.</span> <span class="nav-text">反向梯度下降</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9A%8F%E6%9C%BA%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">1.2.7.</span> <span class="nav-text">随机初始化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%B1%E5%B1%82%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="nav-number">1.3.</span> <span class="nav-text">深层神经网络</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B1%E5%B1%82%E7%BD%91%E7%BB%9C%E4%B8%AD%E7%9A%84%E5%89%8D%E5%90%91%E5%92%8C%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD"><span class="nav-number">1.3.1.</span> <span class="nav-text">深层网络中的前向和反向传播</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%89%8D%E5%90%91%E4%BC%A0%E6%92%AD"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">前向传播</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">反向传播</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA%E6%B7%B1%E5%B1%82%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%9D%97"><span class="nav-number">1.3.2.</span> <span class="nav-text">搭建深层神经网络块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9F%A9%E9%98%B5%E7%9A%84%E7%BB%B4%E5%BA%A6"><span class="nav-number">1.3.3.</span> <span class="nav-text">矩阵的维度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%B7%B1%E5%B1%82%E8%A1%A8%E7%A4%BA%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">1.3.4.</span> <span class="nav-text">使用深层表示的原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E5%92%8C%E8%B6%85%E5%8F%82%E6%95%B0"><span class="nav-number">1.3.5.</span> <span class="nav-text">参数和超参数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%94%B9%E5%96%84%E6%B7%B1%E5%B1%82%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%9A%E8%B6%85%E5%8F%82%E6%95%B0%E8%B0%83%E8%AF%95%E3%80%81%E6%AD%A3%E5%88%99%E5%8C%96%E4%BB%A5%E5%8F%8A%E4%BC%98%E5%8C%96"><span class="nav-number">2.</span> <span class="nav-text">改善深层神经网络：超参数调试、正则化以及优化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%9A%84%E5%AE%9E%E7%94%A8%E5%B1%82%E9%9D%A2"><span class="nav-number">2.1.</span> <span class="nav-text">深度学习的实用层面</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%88%92%E5%88%86%EF%BC%9A%E8%AE%AD%E7%BB%83-%E9%AA%8C%E8%AF%81-%E6%B5%8B%E8%AF%95%E9%9B%86"><span class="nav-number">2.1.1.</span> <span class="nav-text">数据划分：训练 &#x2F; 验证 &#x2F; 测试集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E8%AE%AE"><span class="nav-number">2.1.2.</span> <span class="nav-text">建议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E4%BC%B0%E8%AE%A1%EF%BC%9A%E5%81%8F%E5%B7%AE-%E6%96%B9%E5%B7%AE"><span class="nav-number">2.1.3.</span> <span class="nav-text">模型估计：偏差 &#x2F; 方差</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E5%AF%B9%E6%96%B9%E6%B3%95"><span class="nav-number">2.1.3.1.</span> <span class="nav-text">应对方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E5%8C%96%EF%BC%88regularization%EF%BC%89"><span class="nav-number">2.1.4.</span> <span class="nav-text">正则化（regularization）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Logistic-%E5%9B%9E%E5%BD%92%E4%B8%AD%E7%9A%84%E6%AD%A3%E5%88%99%E5%8C%96"><span class="nav-number">2.1.4.1.</span> <span class="nav-text">Logistic 回归中的正则化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%AD%E7%9A%84%E6%AD%A3%E5%88%99%E5%8C%96"><span class="nav-number">2.1.4.2.</span> <span class="nav-text">神经网络中的正则化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9D%83%E9%87%8D%E8%A1%B0%E5%87%8F%EF%BC%88Weight-decay%EF%BC%89"><span class="nav-number">2.1.4.3.</span> <span class="nav-text">权重衰减（Weight decay）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E5%8C%96%E5%8F%AF%E4%BB%A5%E5%87%8F%E5%B0%8F%E8%BF%87%E6%8B%9F%E5%90%88%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">2.1.5.</span> <span class="nav-text">正则化可以减小过拟合的原因</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9B%B4%E8%A7%82%E8%A7%A3%E9%87%8A"><span class="nav-number">2.1.5.1.</span> <span class="nav-text">直观解释</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B0%E5%AD%A6%E8%A7%A3%E9%87%8A"><span class="nav-number">2.1.5.2.</span> <span class="nav-text">数学解释</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E8%A7%A3%E9%87%8A"><span class="nav-number">2.1.5.3.</span> <span class="nav-text">其他解释</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dropout-%E6%AD%A3%E5%88%99%E5%8C%96"><span class="nav-number">2.1.6.</span> <span class="nav-text">dropout 正则化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%8D%E5%90%91%E9%9A%8F%E6%9C%BA%E5%A4%B1%E6%B4%BB%EF%BC%88Inverted-dropout%EF%BC%89"><span class="nav-number">2.1.6.1.</span> <span class="nav-text">反向随机失活（Inverted dropout）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%90%86%E8%A7%A3-dropout"><span class="nav-number">2.1.6.2.</span> <span class="nav-text">理解 dropout</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%AD%A3%E5%88%99%E5%8C%96%E6%96%B9%E6%B3%95"><span class="nav-number">2.1.7.</span> <span class="nav-text">其他正则化方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1%E5%92%8C%E6%A2%AF%E5%BA%A6%E7%88%86%E7%82%B8"><span class="nav-number">2.1.8.</span> <span class="nav-text">梯度消失和梯度爆炸</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E5%88%9D%E5%A7%8B%E5%8C%96%E7%BC%93%E8%A7%A3%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1%E5%92%8C%E7%88%86%E7%82%B8"><span class="nav-number">2.1.8.1.</span> <span class="nav-text">利用初始化缓解梯度消失和爆炸</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A2%AF%E5%BA%A6%E6%A3%80%E9%AA%8C%EF%BC%88Gradient-checking%EF%BC%89"><span class="nav-number">2.1.9.</span> <span class="nav-text">梯度检验（Gradient checking）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A2%AF%E5%BA%A6%E7%9A%84%E6%95%B0%E5%80%BC%E9%80%BC%E8%BF%91"><span class="nav-number">2.1.9.1.</span> <span class="nav-text">梯度的数值逼近</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A2%AF%E5%BA%A6%E6%A3%80%E9%AA%8C%E7%9A%84%E5%AE%9E%E6%96%BD"><span class="nav-number">2.1.10.</span> <span class="nav-text">梯度检验的实施</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5%E5%8F%82%E6%95%B0"><span class="nav-number">2.1.10.1.</span> <span class="nav-text">连接参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%9B%E8%A1%8C%E6%A2%AF%E5%BA%A6%E6%A3%80%E9%AA%8C"><span class="nav-number">2.1.10.2.</span> <span class="nav-text">进行梯度检验</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%AE%9E%E6%96%BD%E6%A2%AF%E5%BA%A6%E6%A3%80%E9%AA%8C%E7%9A%84%E5%AE%9E%E7%94%A8%E6%8A%80%E5%B7%A7%E5%92%8C%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">2.1.11.</span> <span class="nav-text">在神经网络实施梯度检验的实用技巧和注意事项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">优化算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#batch-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%B3%95"><span class="nav-number">2.2.1.</span> <span class="nav-text">batch 梯度下降法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mini-Batch-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%B3%95"><span class="nav-number">2.2.2.</span> <span class="nav-text">Mini-Batch 梯度下降法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#batch-%E7%9A%84%E4%B8%8D%E5%90%8C%E5%A4%A7%E5%B0%8F%EF%BC%88size%EF%BC%89%E5%B8%A6%E6%9D%A5%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">batch 的不同大小（size）带来的影响</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mini-batch-%E5%A4%A7%E5%B0%8F%E7%9A%84%E9%80%89%E6%8B%A9"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">mini-batch 大小的选择</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%8E%B7%E5%BE%97-mini-batch-%E7%9A%84%E6%AD%A5%E9%AA%A4"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">获得 mini-batch 的步骤</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%A6%E5%8F%B7%E8%A1%A8%E7%A4%BA"><span class="nav-number">2.2.3.</span> <span class="nav-text">符号表示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E6%95%B0%E5%B9%B3%E5%9D%87%E5%8A%A0%E6%9D%83"><span class="nav-number">2.2.4.</span> <span class="nav-text">指数平均加权</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%90%86%E8%A7%A3%E6%8C%87%E6%95%B0%E5%B9%B3%E5%9D%87%E5%8A%A0%E6%9D%83"><span class="nav-number">2.2.4.1.</span> <span class="nav-text">理解指数平均加权</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8C%87%E6%95%B0%E5%B9%B3%E5%9D%87%E5%8A%A0%E6%9D%83%E7%9A%84%E5%81%8F%E5%B7%AE%E4%BF%AE%E6%AD%A3"><span class="nav-number">2.2.4.2.</span> <span class="nav-text">指数平均加权的偏差修正</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A8%E9%87%8F%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%B3%95"><span class="nav-number">2.2.5.</span> <span class="nav-text">动量梯度下降法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A8%E9%87%8F%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%B3%95%E7%9A%84%E5%BD%A2%E8%B1%A1%E8%A7%A3%E9%87%8A"><span class="nav-number">2.2.5.1.</span> <span class="nav-text">动量梯度下降法的形象解释</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RMSProp-%E7%AE%97%E6%B3%95"><span class="nav-number">2.2.6.</span> <span class="nav-text">RMSProp 算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Adam-%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95"><span class="nav-number">2.2.7.</span> <span class="nav-text">Adam 优化算法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B6%85%E5%8F%82%E6%95%B0%E7%9A%84%E9%80%89%E6%8B%A9"><span class="nav-number">2.2.7.1.</span> <span class="nav-text">超参数的选择</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E7%8E%87%E8%A1%B0%E5%87%8F"><span class="nav-number">2.2.8.</span> <span class="nav-text">学习率衰减</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E6%9C%80%E4%BC%98%E9%97%AE%E9%A2%98"><span class="nav-number">2.2.9.</span> <span class="nav-text">局部最优问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B6%85%E5%8F%82%E6%95%B0%E8%B0%83%E8%AF%95%E3%80%81Batch-%E6%AD%A3%E5%88%99%E5%8C%96%E5%92%8C%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6"><span class="nav-number">2.3.</span> <span class="nav-text">超参数调试、Batch 正则化和程序框架</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B6%85%E5%8F%82%E6%95%B0%E8%B0%83%E8%AF%95%E5%A4%84%E7%90%86"><span class="nav-number">2.3.1.</span> <span class="nav-text">超参数调试处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8D%E8%A6%81%E7%A8%8B%E5%BA%A6%E6%8E%92%E5%BA%8F"><span class="nav-number">2.3.1.1.</span> <span class="nav-text">重要程度排序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B0%83%E5%8F%82%E6%8A%80%E5%B7%A7"><span class="nav-number">2.3.1.2.</span> <span class="nav-text">调参技巧</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E5%90%88%E9%80%82%E7%9A%84%E8%8C%83%E5%9B%B4"><span class="nav-number">2.3.1.3.</span> <span class="nav-text">选择合适的范围</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E5%BB%BA%E8%AE%AE"><span class="nav-number">2.3.1.4.</span> <span class="nav-text">一些建议</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Batch-Normalization"><span class="nav-number">2.3.2.</span> <span class="nav-text">Batch Normalization</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B0%86-BN-%E5%BA%94%E7%94%A8%E4%BA%8E%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="nav-number">2.3.2.1.</span> <span class="nav-text">将 BN 应用于神经网络</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#BN-%E6%9C%89%E6%95%88%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">2.3.2.2.</span> <span class="nav-text">BN 有效的原因</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E6%97%B6%E7%9A%84-Batch-Normalization"><span class="nav-number">2.3.2.3.</span> <span class="nav-text">测试时的 Batch Normalization</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Softmax-%E5%9B%9E%E5%BD%92"><span class="nav-number">2.3.3.</span> <span class="nav-text">Softmax 回归</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0%E5%92%8C%E6%88%90%E6%9C%AC%E5%87%BD%E6%95%B0"><span class="nav-number">2.3.3.1.</span> <span class="nav-text">损失函数和成本函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%B3%95"><span class="nav-number">2.3.3.2.</span> <span class="nav-text">梯度下降法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">2.3.3.3.</span> <span class="nav-text">参考资料</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%A1%86%E6%9E%B6"><span class="nav-number">2.3.4.</span> <span class="nav-text">深度学习框架</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AF%94%E8%BE%83%E8%91%97%E5%90%8D%E7%9A%84%E6%A1%86%E6%9E%B6"><span class="nav-number">2.3.4.1.</span> <span class="nav-text">比较著名的框架</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E6%A1%86%E6%9E%B6%E7%9A%84%E6%A0%87%E5%87%86"><span class="nav-number">2.3.4.2.</span> <span class="nav-text">选择框架的标准</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tensorflow"><span class="nav-number">2.3.5.</span> <span class="nav-text">Tensorflow</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E9%A1%B9%E7%9B%AE"><span class="nav-number">3.</span> <span class="nav-text">搭建机器学习项目</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%EF%BC%88ML%EF%BC%89%E7%AD%96%E7%95%A5%EF%BC%881%EF%BC%89"><span class="nav-number">3.1.</span> <span class="nav-text">机器学习（ML）策略（1）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A3%E4%BA%A4%E5%8C%96"><span class="nav-number">3.1.1.</span> <span class="nav-text">正交化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%95%E5%80%BC%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87"><span class="nav-number">3.1.2.</span> <span class="nav-text">单值评价指标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E6%8C%87%E6%A0%87%E5%92%8C%E6%BB%A1%E8%B6%B3%E6%8C%87%E6%A0%87"><span class="nav-number">3.1.3.</span> <span class="nav-text">优化指标和满足指标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E6%94%B9%E5%8F%98%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87"><span class="nav-number">3.1.4.</span> <span class="nav-text">动态改变评价指标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83-%E9%AA%8C%E8%AF%81-%E6%B5%8B%E8%AF%95%E9%9B%86%E5%88%92%E5%88%86"><span class="nav-number">3.1.5.</span> <span class="nav-text">训练 &#x2F; 验证 &#x2F; 测试集划分</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81%E9%9B%86%E5%92%8C%E6%B5%8B%E8%AF%95%E9%9B%86%E7%9A%84%E5%88%86%E5%B8%83"><span class="nav-number">3.1.5.1.</span> <span class="nav-text">验证集和测试集的分布</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81%E9%9B%86%E5%92%8C%E6%B5%8B%E8%AF%95%E9%9B%86%E7%9A%84%E5%A4%A7%E5%B0%8F"><span class="nav-number">3.1.5.2.</span> <span class="nav-text">验证集和测试集的大小</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AF%94%E8%BE%83%E4%BA%BA%E7%B1%BB%E8%A1%A8%E7%8E%B0%E6%B0%B4%E5%B9%B3"><span class="nav-number">3.1.6.</span> <span class="nav-text">比较人类表现水平</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%AF%E9%81%BF%E5%85%8D%E5%81%8F%E5%B7%AE"><span class="nav-number">3.1.6.1.</span> <span class="nav-text">可避免偏差</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%90%86%E8%A7%A3%E4%BA%BA%E7%B1%BB%E8%A1%A8%E7%8E%B0%E6%B0%B4%E5%B9%B3"><span class="nav-number">3.1.6.2.</span> <span class="nav-text">理解人类表现水平</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.1.6.3.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%EF%BC%88ML%EF%BC%89%E7%AD%96%E7%95%A5%EF%BC%882%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">机器学习（ML）策略（2）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%94%99%E8%AF%AF%E5%88%86%E6%9E%90"><span class="nav-number">3.2.1.</span> <span class="nav-text">错误分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%AD%A3%E9%94%99%E8%AF%AF%E6%A0%87%E8%AE%B0"><span class="nav-number">3.2.2.</span> <span class="nav-text">修正错误标记</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA%E7%B3%BB%E7%BB%9F%E5%B9%B6%E8%BF%AD%E4%BB%A3"><span class="nav-number">3.2.3.</span> <span class="nav-text">快速搭建系统并迭代</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E4%B8%8D%E5%90%8C%E7%9A%84%E5%88%86%E5%B8%83%E4%B8%8A%E8%AE%AD%E7%BB%83%E5%92%8C%E6%B5%8B%E8%AF%95"><span class="nav-number">3.2.4.</span> <span class="nav-text">在不同的分布上训练和测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E4%B8%8D%E5%8C%B9%E9%85%8D"><span class="nav-number">3.2.5.</span> <span class="nav-text">数据不匹配</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E6%96%B9%E6%B3%95"><span class="nav-number">3.2.5.1.</span> <span class="nav-text">处理方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0"><span class="nav-number">3.2.6.</span> <span class="nav-text">迁移学习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E4%BB%BB%E5%8A%A1%E5%AD%A6%E4%B9%A0"><span class="nav-number">3.2.7.</span> <span class="nav-text">多任务学习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%88%B0%E7%AB%AF%E5%AD%A6%E4%B9%A0"><span class="nav-number">3.2.8.</span> <span class="nav-text">端到端学习</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E7%82%B9%E4%B8%8E%E7%BC%BA%E7%82%B9"><span class="nav-number">3.2.8.1.</span> <span class="nav-text">优点与缺点</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="nav-number">4.</span> <span class="nav-text">卷积神经网络</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C-1"><span class="nav-number">4.1.</span> <span class="nav-text">卷积神经网络</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89"><span class="nav-number">4.1.1.</span> <span class="nav-text">计算机视觉</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E8%BF%90%E7%AE%97"><span class="nav-number">4.1.2.</span> <span class="nav-text">卷积运算</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BE%B9%E7%BC%98%E6%A3%80%E6%B5%8B"><span class="nav-number">4.1.2.1.</span> <span class="nav-text">边缘检测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9B%B4%E5%A4%9A%E8%BE%B9%E7%BC%98%E6%A3%80%E6%B5%8B%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">4.1.2.2.</span> <span class="nav-text">更多边缘检测的例子</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A1%AB%E5%85%85-padding"><span class="nav-number">4.1.3.</span> <span class="nav-text">填充(padding)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E6%AD%A5%E9%95%BF"><span class="nav-number">4.1.4.</span> <span class="nav-text">卷积步长</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E7%BB%B4%E5%8D%B7%E7%A7%AF"><span class="nav-number">4.1.5.</span> <span class="nav-text">高维卷积</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%95%E5%B1%82%E5%8D%B7%E7%A7%AF%E7%BD%91%E7%BB%9C"><span class="nav-number">4.1.6.</span> <span class="nav-text">单层卷积网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%A6%E5%8F%B7%E6%80%BB%E7%BB%93"><span class="nav-number">4.1.7.</span> <span class="nav-text">符号总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E5%8D%B7%E7%A7%AF%E7%BD%91%E7%BB%9C%E7%A4%BA%E4%BE%8B"><span class="nav-number">4.1.8.</span> <span class="nav-text">简单卷积网络示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B1%A0%E5%8C%96%E5%B1%82"><span class="nav-number">4.1.9.</span> <span class="nav-text">池化层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%A4%BA%E4%BE%8B"><span class="nav-number">4.1.10.</span> <span class="nav-text">卷积神经网络示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%8D%B7%E7%A7%AF%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">4.1.11.</span> <span class="nav-text">使用卷积的原因</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%8D%B7%E7%A7%AF%E7%BD%91%E7%BB%9C%EF%BC%9A%E5%AE%9E%E4%BE%8B%E6%8E%A2%E7%A9%B6"><span class="nav-number">4.2.</span> <span class="nav-text">深度卷积网络：实例探究</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%8F%E5%85%B8%E5%8D%B7%E7%A7%AF%E7%BD%91%E7%BB%9C"><span class="nav-number">4.2.1.</span> <span class="nav-text">经典卷积网络</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#LeNet-5"><span class="nav-number">4.2.1.1.</span> <span class="nav-text">LeNet-5</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AlexNet"><span class="nav-number">4.2.1.2.</span> <span class="nav-text">AlexNet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#VGG"><span class="nav-number">4.2.1.3.</span> <span class="nav-text">VGG</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AE%8B%E5%B7%AE%E7%BD%91%E7%BB%9C"><span class="nav-number">4.2.2.</span> <span class="nav-text">残差网络</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AE%8B%E5%B7%AE%E7%BD%91%E7%BB%9C%E6%9C%89%E6%95%88%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">4.2.2.1.</span> <span class="nav-text">残差网络有效的原因</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1x1-%E5%8D%B7%E7%A7%AF"><span class="nav-number">4.2.3.</span> <span class="nav-text">1x1 卷积</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Inception-%E7%BD%91%E7%BB%9C"><span class="nav-number">4.2.4.</span> <span class="nav-text">Inception 网络</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%88%90%E6%9C%AC%E9%97%AE%E9%A2%98"><span class="nav-number">4.2.4.1.</span> <span class="nav-text">计算成本问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E7%9A%84-Inception-%E7%BD%91%E7%BB%9C"><span class="nav-number">4.2.4.2.</span> <span class="nav-text">完整的 Inception 网络</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%BC%80%E6%BA%90%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88"><span class="nav-number">4.2.5.</span> <span class="nav-text">使用开源的实现方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0-1"><span class="nav-number">4.2.6.</span> <span class="nav-text">迁移学习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%89%A9%E5%A2%9E"><span class="nav-number">4.2.7.</span> <span class="nav-text">数据扩增</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89%E7%8E%B0%E7%8A%B6"><span class="nav-number">4.2.8.</span> <span class="nav-text">计算机视觉现状</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B"><span class="nav-number">4.3.</span> <span class="nav-text">目标检测</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87%E5%AE%9A%E4%BD%8D"><span class="nav-number">4.3.1.</span> <span class="nav-text">目标定位</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E5%BE%81%E7%82%B9%E6%A3%80%E6%B5%8B"><span class="nav-number">4.3.2.</span> <span class="nav-text">特征点检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B-1"><span class="nav-number">4.3.3.</span> <span class="nav-text">目标检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E7%9A%84%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E5%AE%9E%E7%8E%B0"><span class="nav-number">4.3.4.</span> <span class="nav-text">卷积的滑动窗口实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8A%8A%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%9A%84%E5%85%A8%E8%BF%9E%E6%8E%A5%E5%B1%82%E8%BD%AC%E5%8C%96%E6%88%90%E5%8D%B7%E7%A7%AF%E5%B1%82"><span class="nav-number">4.3.4.1.</span> <span class="nav-text">把神经网络的全连接层转化成卷积层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E6%93%8D%E4%BD%9C"><span class="nav-number">4.3.4.2.</span> <span class="nav-text">卷积中的重复操作</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bounding-Box%E9%A2%84%E6%B5%8B"><span class="nav-number">4.3.5.</span> <span class="nav-text">Bounding Box预测</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#YOLO%E7%AE%97%E6%B3%95"><span class="nav-number">4.3.5.1.</span> <span class="nav-text">YOLO算法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%A4%E5%B9%B6%E6%AF%94-loU"><span class="nav-number">4.3.6.</span> <span class="nav-text">交并比(loU)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E6%9E%81%E5%A4%A7%E5%80%BC%E6%8A%91%E5%88%B6"><span class="nav-number">4.3.7.</span> <span class="nav-text">非极大值抑制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Anchor-Boxes"><span class="nav-number">4.3.8.</span> <span class="nav-text">Anchor Boxes</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#R-CNN"><span class="nav-number">4.3.9.</span> <span class="nav-text">R-CNN</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E5%BA%94%E7%94%A8%EF%BC%9A%E4%BA%BA%E8%84%B8%E8%AF%86%E5%88%AB%E5%92%8C%E7%A5%9E%E7%BB%8F%E9%A3%8E%E6%A0%BC%E8%BD%AC%E6%8D%A2"><span class="nav-number">4.4.</span> <span class="nav-text">特殊应用：人脸识别和神经风格转换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%BA%E8%84%B8%E8%AF%86%E5%88%AB"><span class="nav-number">4.4.1.</span> <span class="nav-text">人脸识别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%BA%BA%E8%84%B8%E8%AF%86%E5%88%AB%EF%BC%9F"><span class="nav-number">4.4.1.1.</span> <span class="nav-text">什么是人脸识别？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#One-shot-learning"><span class="nav-number">4.4.1.2.</span> <span class="nav-text">One-shot learning</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Siamese-network"><span class="nav-number">4.4.1.3.</span> <span class="nav-text">Siamese network</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Triplet%E6%8D%9F%E5%A4%B1"><span class="nav-number">4.4.1.4.</span> <span class="nav-text">Triplet损失</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9D%A2%E9%83%A8%E9%AA%8C%E8%AF%81%E4%B8%8E%E4%BA%8C%E5%88%86%E7%B1%BB"><span class="nav-number">4.4.1.5.</span> <span class="nav-text">面部验证与二分类</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A5%9E%E7%BB%8F%E9%A3%8E%E6%A0%BC%E8%BD%AC%E6%8D%A2"><span class="nav-number">4.4.2.</span> <span class="nav-text">神经风格转换</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E7%A5%9E%E7%BB%8F%E9%A3%8E%E6%A0%BC%E8%BD%AC%E6%8D%A2"><span class="nav-number">4.4.2.1.</span> <span class="nav-text">什么是神经风格转换</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%8D%B7%E7%A7%AF%E7%BD%91%E7%BB%9C%E5%9C%A8%E5%AD%A6%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">4.4.3.</span> <span class="nav-text">深度卷积网络在学什么？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E4%BB%B7%E5%87%BD%E6%95%B0"><span class="nav-number">4.4.3.1.</span> <span class="nav-text">代价函数</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E4%BB%A3%E4%BB%B7%E5%87%BD%E6%95%B0"><span class="nav-number">4.4.3.1.1.</span> <span class="nav-text">内容代价函数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%A3%8E%E6%A0%BC%E4%BB%A3%E4%BB%B7%E5%87%BD%E6%95%B0"><span class="nav-number">4.4.3.1.2.</span> <span class="nav-text">风格代价函数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E7%BB%B4%E5%88%B0%E4%B8%89%E7%BB%B4%E7%9A%84%E6%8E%A8%E5%B9%BF"><span class="nav-number">4.4.4.</span> <span class="nav-text">一维到三维的推广</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.</span> <span class="nav-text">序列模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.1.</span> <span class="nav-text">循环序列模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E5%AD%A6%E7%AC%A6%E5%8F%B7"><span class="nav-number">5.1.1.</span> <span class="nav-text">数学符号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.1.2.</span> <span class="nav-text">循环神经网络模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD-1"><span class="nav-number">5.1.3.</span> <span class="nav-text">反向传播</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E7%BB%93%E6%9E%84"><span class="nav-number">5.1.4.</span> <span class="nav-text">不同结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.1.5.</span> <span class="nav-text">语言模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%87%E6%A0%B7"><span class="nav-number">5.1.6.</span> <span class="nav-text">采样</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RNN-%E7%9A%84%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1"><span class="nav-number">5.1.7.</span> <span class="nav-text">RNN 的梯度消失</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GRU%EF%BC%88%E9%97%A8%E6%8E%A7%E5%BE%AA%E7%8E%AF%E5%8D%95%E5%85%83%EF%BC%89"><span class="nav-number">5.1.8.</span> <span class="nav-text">GRU（门控循环单元）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LSTM%EF%BC%88%E9%95%BF%E7%9F%AD%E6%9C%9F%E8%AE%B0%E5%BF%86%EF%BC%89"><span class="nav-number">5.1.9.</span> <span class="nav-text">LSTM（长短期记忆）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8C%E5%90%91%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88BRNN%EF%BC%89"><span class="nav-number">5.1.10.</span> <span class="nav-text">双向循环神经网络（BRNN）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88DRNN"><span class="nav-number">5.1.11.</span> <span class="nav-text">深度循环神经网络（DRNN)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86%E4%B8%8E%E8%AF%8D%E5%B5%8C%E5%85%A5"><span class="nav-number">5.2.</span> <span class="nav-text">自然语言处理与词嵌入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%8D%E5%B5%8C%E5%85%A5"><span class="nav-number">5.2.1.</span> <span class="nav-text">词嵌入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%8D%E5%B5%8C%E5%85%A5%E4%B8%8E%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0"><span class="nav-number">5.2.2.</span> <span class="nav-text">词嵌入与迁移学习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%8D%E5%B5%8C%E5%85%A5%E4%B8%8E%E7%B1%BB%E6%AF%94%E6%8E%A8%E7%90%86"><span class="nav-number">5.2.3.</span> <span class="nav-text">词嵌入与类比推理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B5%8C%E5%85%A5%E7%9F%A9%E9%98%B5"><span class="nav-number">5.2.4.</span> <span class="nav-text">嵌入矩阵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E8%AF%8D%E5%B5%8C%E5%85%A5"><span class="nav-number">5.2.5.</span> <span class="nav-text">学习词嵌入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Word2Vec"><span class="nav-number">5.2.6.</span> <span class="nav-text">Word2Vec</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Skip-Gram%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.2.6.1.</span> <span class="nav-text">Skip-Gram模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AF%B9%E4%B8%8A%E4%B8%8B%E6%96%87c%E9%87%87%E6%A0%B7"><span class="nav-number">5.2.6.2.</span> <span class="nav-text">如何对上下文c采样</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%9F%E9%87%87%E6%A0%B7"><span class="nav-number">5.2.7.</span> <span class="nav-text">负采样</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GloVe%E8%AF%8D%E5%90%91%E9%87%8F"><span class="nav-number">5.2.8.</span> <span class="nav-text">GloVe词向量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B5%8C%E5%85%A5%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">5.2.9.</span> <span class="nav-text">嵌入的理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%83%85%E6%84%9F%E5%88%86%E7%B1%BB"><span class="nav-number">5.2.10.</span> <span class="nav-text">情感分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%8D%E5%B5%8C%E5%85%A5%E9%99%A4%E5%81%8F"><span class="nav-number">5.2.11.</span> <span class="nav-text">词嵌入除偏</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B%E5%92%8C%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6"><span class="nav-number">5.3.</span> <span class="nav-text">序列模型和注意力机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E6%A8%A1%E5%9E%8B-seq2seq"><span class="nav-number">5.3.1.</span> <span class="nav-text">基础模型(seq2seq)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E6%8F%8F%E8%BF%B0"><span class="nav-number">5.3.1.1.</span> <span class="nav-text">图像描述</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E6%9C%80%E6%9C%89%E5%8F%AF%E8%83%BD%E6%80%A7%E7%9A%84%E5%8F%A5%E5%AD%90"><span class="nav-number">5.3.2.</span> <span class="nav-text">选择最有可能性的句子</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BD%BF%E7%94%A8%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95"><span class="nav-number">5.3.2.1.</span> <span class="nav-text">为什么不使用贪心算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%90%9C%E7%B4%A2%E9%97%AE%E9%A2%98"><span class="nav-number">5.3.2.2.</span> <span class="nav-text">搜索问题</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%86%E6%9D%9F%E6%90%9C%E7%B4%A2"><span class="nav-number">5.3.3.</span> <span class="nav-text">集束搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%B9%E8%BF%9B%E9%9B%86%E6%9D%9F%E6%90%9C%E7%B4%A2"><span class="nav-number">5.3.4.</span> <span class="nav-text">改进集束搜索</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E9%80%89%E5%8F%96%E9%9B%86%E6%9D%9F%E5%AE%BDB"><span class="nav-number">5.3.4.1.</span> <span class="nav-text">如何选取集束宽B</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E5%90%91%E6%90%9C%E7%B4%A2%E7%9A%84%E8%AF%AF%E5%B7%AE%E5%88%86%E6%9E%90"><span class="nav-number">5.3.5.</span> <span class="nav-text">定向搜索的误差分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bleu%E5%BE%97%E5%88%86"><span class="nav-number">5.3.6.</span> <span class="nav-text">Bleu得分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.3.7.</span> <span class="nav-text">注意力模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E9%9F%B3%E8%BE%A8%E8%AF%86"><span class="nav-number">5.3.8.</span> <span class="nav-text">语音辨识</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

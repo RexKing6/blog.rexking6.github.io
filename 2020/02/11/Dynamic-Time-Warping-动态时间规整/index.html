@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dynamic Time Warping 动态时间规整">
+<meta property="og:url" content="https://blog.rexking6.top/2020/02/11/Dynamic-Time-Warping-%E5%8A%A8%E6%80%81%E6%97%B6%E9%97%B4%E8%A7%84%E6%95%B4/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1580007413.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1580007442.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1580011617.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1580014068.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1580014753.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1580014804.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1580014835.png">
+<meta property="article:published_time" content="2020-02-11T12:01:30.000Z">
+<meta property="article:modified_time" content="2020-02-13T13:27:57.575Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="AIOps">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1580007413.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2020/02/11/Dynamic-Time-Warping-%E5%8A%A8%E6%80%81%E6%97%B6%E9%97%B4%E8%A7%84%E6%95%B4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Dynamic Time Warping 动态时间规整 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2020/02/11/Dynamic-Time-Warping-%E5%8A%A8%E6%80%81%E6%97%B6%E9%97%B4%E8%A7%84%E6%95%B4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Dynamic Time Warping 动态时间规整
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-02-11 20:01:30" itemprop="dateCreated datePublished" datetime="2020-02-11T20:01:30+08:00">2020-02-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-13 21:27:57" itemprop="dateModified" datetime="2020-02-13T21:27:57+08:00">2020-02-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AIOps/" itemprop="url" rel="index"><span itemprop="name">AIOps</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2020/02/11/Dynamic-Time-Warping-%E5%8A%A8%E6%80%81%E6%97%B6%E9%97%B4%E8%A7%84%E6%95%B4/" class="post-meta-item leancloud_visitors" data-flag-title="Dynamic Time Warping 动态时间规整" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>4.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>综合转载于以下文章：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/raym0ndkwan/article/details/45614813">算法笔记-DTW动态时间规整</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/86987069">Dynamic Time Warping - UCR Suit 优化详解</a></li>
+</ul>
+<p>动态时间规整/规划（Dynamic Time Warping，DTW）是一个比较老的算法，大概在1970年左右被提出来，最早用于处理语音方面识别分类的问题。</p>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>简单来说，给定两个离散的序列（实际上不一定要与时间有关），DTW能够衡量这两个序列的相似程度，或者说两个序列的距离。同时DTW能够对两个序列的延展或者压缩能够有一定的适应性，举个例子，不同人对同一个词语的发音会有细微的差别，特别在时长上，有些人的发音会比标准的发音或长或短，DTW对这种序列的延展和压缩不敏感，所以给定标准语音库，DTW能够很好得识别单个字词，这也是为什么DTW一直被认为是语音处理方面的专门算法。实际上，DTW虽然老，但简单且灵活地实现模板匹配，能解决很多离散时间序列匹配的问题，视频动作识别，生物信息比对等等诸多领域都有应用。</p>
+<p>例如下图，有两个呈现正弦规律序列，其中蓝色序列是稍微被拉长了。即使这两个序列，不重合，但是我们也可以有把握说这两个序列的相似程度很高（或者说这两个序列的距离很小）。</p>
+<p><img src="http://image.rexking6.top/img/clip1580007413.png" alt=""></p>
+<p>DTW能够计算这两个序列的相似程度，并且给出一个能最大程度降低两个序列距离的点到点的匹配。见下图，其中黑色与红色曲线中的虚线就是表示点点之间的一个对应关系。</p>
+<p><img src="http://image.rexking6.top/img/clip1580007442.png" alt=""></p>
+<p>也就是说，两个比对序列之间的特征是相似的，只是在时间上有不对齐的可能，这个算法名中的Time Warping，指的就是对时间序列进行的压缩或者延展以达到一个更好的匹对。</p>
+<h1 id="简单的例子"><a href="#简单的例子" class="headerlink" title="简单的例子"></a>简单的例子</h1><p>比如说，给定一个样本序列X和比对序列Y，Z​：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">X：3，5，6，7，7，1</span><br><span class="line">Y：3，6，6，7，8，1，1</span><br><span class="line">Z：2，5，7，7，7，7，2</span><br></pre></td></tr></table></figure>
+<p>请问是X和Y更相似还是X和Z更相似？</p>
+<p>DTW首先会根据序列点之间的距离（欧氏距离），获得一个序列距离矩阵 $M$，其中行对应X序列，列对应Y序列，矩阵元素为对应行列中X序列和Y序列点到点的欧氏距离：</p>
+<p>X和Y的距离矩阵：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>X/Y</th>
+<th>3</th>
+<th>6</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>1</th>
+<th>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td>0</td>
+<td>3</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>5</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr>
+<td>6</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>5</td>
+<td>5</td>
+</tr>
+<tr>
+<td>7</td>
+<td>4</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>6</td>
+<td>6</td>
+</tr>
+<tr>
+<td>7</td>
+<td>4</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>6</td>
+<td>6</td>
+</tr>
+<tr>
+<td>1</td>
+<td>2</td>
+<td>5</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>然后根据距离矩阵生成损失矩阵（Cost Matrix）或者叫累积距离矩阵 $M_c$，其计算方法如下：</p>
+<ol>
+<li>第一行第一列元素为 $M$ 的第一行第一列元素，在这里就是0；</li>
+<li>其他位置的元素 $M_c(i,j)$ 的值则需要逐步计算，具体值的计算方法为 $M_c(i,j)=\text{Min}(M_c(i-1,j-1),M_c(i-1,j),M_c(i,j-1))+M(i,j)$ ，得到的 $M_c$ 如下：</li>
+</ol>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>X/Y</th>
+<th>3</th>
+<th>6</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>1</th>
+<th>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td>0</td>
+<td>3</td>
+<td>6</td>
+<td>10</td>
+<td>15</td>
+<td>17</td>
+<td>19</td>
+</tr>
+<tr>
+<td>5</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>4</td>
+<td>7</td>
+<td>11</td>
+<td>15</td>
+</tr>
+<tr>
+<td>6</td>
+<td>5</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>4</td>
+<td>9</td>
+<td>14</td>
+</tr>
+<tr>
+<td>7</td>
+<td>9</td>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>8</td>
+<td>14</td>
+</tr>
+<tr>
+<td>7</td>
+<td>13</td>
+<td>3</td>
+<td>3</td>
+<td>1</td>
+<td>2</td>
+<td>8</td>
+<td>14</td>
+</tr>
+<tr>
+<td>1</td>
+<td>15</td>
+<td>8</td>
+<td>8</td>
+<td>7</td>
+<td>8</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>最后，两个序列的距离，由损失矩阵最后一行最后一列给出，在这里也就是2。同样的，计算X和Z的距离矩阵：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>X/Z</th>
+<th>2</th>
+<th>5</th>
+<th>7</th>
+<th>7</th>
+<th>7</th>
+<th>7</th>
+<th>2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td>1</td>
+<td>2</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>1</td>
+</tr>
+<tr>
+<td>5</td>
+<td>3</td>
+<td>0</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+</tr>
+<tr>
+<td>6</td>
+<td>4</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>4</td>
+</tr>
+<tr>
+<td>7</td>
+<td>5</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+</tr>
+<tr>
+<td>7</td>
+<td>5</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>5</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>4</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>和损失矩阵：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>X/Z</th>
+<th>2</th>
+<th>5</th>
+<th>7</th>
+<th>7</th>
+<th>7</th>
+<th>7</th>
+<th>2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td>1</td>
+<td>3</td>
+<td>7</td>
+<td>11</td>
+<td>15</td>
+<td>19</td>
+<td>20</td>
+</tr>
+<tr>
+<td>5</td>
+<td>4</td>
+<td>1</td>
+<td>3</td>
+<td>5</td>
+<td>7</td>
+<td>9</td>
+<td>12</td>
+</tr>
+<tr>
+<td>6</td>
+<td>8</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>9</td>
+</tr>
+<tr>
+<td>7</td>
+<td>13</td>
+<td>4</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>7</td>
+</tr>
+<tr>
+<td>7</td>
+<td>18</td>
+<td>6</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>7</td>
+</tr>
+<tr>
+<td>1</td>
+<td>19</td>
+<td>10</td>
+<td>8</td>
+<td>8</td>
+<td>8</td>
+<td>8</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>所以，X和Y的距离为2，X和Z的距离为3，X和Y更相似。</p>
+<h1 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h1><p>有一个具体例子作为帮助，我们再来定义DTW算法。</p>
+<p>假设给定两个序列，样本序列 $X=(x_1,…,x_N)$ 和测试序列 $Y=(y_1,…,y_N)$，同时给定一个序列中点到点的距离函数 $d(i,j)=f(x_i,y_j)\geq 0$（一般为欧氏距离，实际上也可以是别的函数）。</p>
+<p>那么DTW的核心在于求解扭曲曲线（Warping Curve）或者说扭曲路径，也就是点点之间的对应关系。我们表示为 $\phi(k)=(\phi_x(k),\phi_y(k))$，其中 $\phi_x(k)$ 的可能值为 $1,2,…,N$，$\phi_y(k)$ 的可能值为 $1,2,…,M$，$k=1,…,T$。也就是说，求出 $T$ 个从X序列中点到Y序列中点的对应关系，例如若 $\phi(k)=(1,1)$，那么就是说X曲线的第一个点与Y曲线的第一个点是一个对应。</p>
+<p>给定了 $\phi(k)$，我们可以求解两个序列的累积距离（Accumulated Distortion）：</p>
+<script type="math/tex; mode=display">
+d_\phi(X,Y) = \sum\limits_{k=1}^T d((\phi_x(k),\phi_y(k))</script><p>DTW的最后输出，就是要找到一个最合适的 $\phi(k)$ 扭曲曲线，使得累积距离最小，也就是损失矩阵的最后一行最后一列的值：</p>
+<script type="math/tex; mode=display">
+\text{DTW}(X,Y) = \min_{\phi}d_\phi(X,Y)</script><p>换句话说，就是给定了距离矩阵，如何找到一条从左上角到右下角的路径，使得路径经过的元素值之和最小。这个问题可以由动态规划（Dynamic Programming）解决（时间复杂度 O(N+M)​），也就是上面例子中，计算损失矩阵的过程，实际上不需要把整个矩阵都求解出来，大致将对角线上的元素求解出来即可。</p>
+<h1 id="讨论"><a href="#讨论" class="headerlink" title="讨论"></a>讨论</h1><p>实际上，虽然这个算法简单，但是有很多值得讨论的细节。</p>
+<h2 id="约束条件"><a href="#约束条件" class="headerlink" title="约束条件"></a>约束条件</h2><p>首先，路径的寻找不是任意的，一般来说有三个约束条件：</p>
+<ol>
+<li>单调性：$\phi_x(k+1)\geq\phi_x(k)$ 且 $\phi_y(k+1)\geq\phi_y(k)$ 也就是说扭曲曲线不能往左或者往上后退，否则会出现无意义的循环；</li>
+<li>连续性：$\phi_x(k+1)-\phi_x(k)\leq1$，即扭曲曲线不能跳跃，必须是连续的，保证两个序列里的所有点都被匹配到，但这个条件可以一定程度上被放松；</li>
+<li>边界条件确定性：$\phi_x(1)=\phi_y(1)=1$，$\phi_x(T)=N$，$\phi_y(T)=M$，即路径一定从左上开始，结束于右下，这个条件也可以被放松，以实现局部匹配。</li>
+</ol>
+<p>除此之外，我们还可以增加别的约束：</p>
+<ol>
+<li>全局路径窗口（Warping Window）：$|\phi_x(s)-\phi_y(s)|\leq r$，比较好的匹配路径往往在对角线附近，所以我们可以只考虑在对角线附近的一个区域寻找合适路径（$r$ 就是这个区域的宽度）；</li>
+<li>斜率约束（Slope Constrain）：$\dfrac{\phi_x(m)-\phi_x(n)}{\phi_y(m)-\phi_y(n)}\leq p$ 和 $\dfrac{\phi_y(m)-\phi_y(n)}{\phi_x(m)-\phi_x(n)}\leq q$， 这个可以看做是局部的Warping Window，用于避免路径太过平缓或陡峭，导致短的序列匹配到太长的序列或者太长的序列匹配到太短的序列。</li>
+</ol>
+<h2 id="步模式"><a href="#步模式" class="headerlink" title="步模式"></a>步模式</h2><p>实际上，这些步模式（Step Pattern）一定程度上涵盖了不同的约束，步模式指的是生成损失矩阵时的具体算法，例如在例子中使用的是：</p>
+<script type="math/tex; mode=display">
+M_c(i,j)=\text{Min}(M_c(i-1,j-1),M_c(i-1,j),M_c(i,j-1))+M(i,j)</script><p>准对称步模式。实际上还有很多其他步模式，不同的步模式会影响最终匹配的结果。关于不同的步模式，可以参见[2]第四章。常用的有对称，准对称和非对称三种。</p>
+<h2 id="标准化"><a href="#标准化" class="headerlink" title="标准化"></a>标准化</h2><p>序列的累积距离，可以被标准化，因为长的测试序列累积距离很容易比短的测试序列累积距离更大，但这不一定说明后者比前者与样本序列更相似，可以通过标准化累积距离再进行比较。不同的步模式会需要的不同的标准化参数。</p>
+<h2 id="点与点的距离函数"><a href="#点与点的距离函数" class="headerlink" title="点与点的距离函数"></a>点与点的距离函数</h2><p>除了测试序列以外，DTW唯一需要的输入，就是距离函数 $d$（除了欧氏距离，也可以选择Mahalanobis距离等），所以不需要考虑输入的具体形式（一维或多维，离散或连续），只要能够给定合适的距离函数，就可以DTW比对。前面说到，DTW是对时间上的压缩和延展不敏感，但是对值的大小是敏感的，可以通过合理选取距离函数来让DTW适应值大小的差异。</p>
+<h1 id="具体应用场景"><a href="#具体应用场景" class="headerlink" title="具体应用场景"></a>具体应用场景</h1><p>这里讨论两个具体应用DTW的可能场景：</p>
+<h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><p>气象指数在旱季和雨季的样本序列分别为 $X_1$ 和 $X_2$，现有一段新的气象指数 $Y$，要判断该气象指数测得时，是雨季还旱季？</p>
+<p>算出DTW$(X_1,Y)$ 和 DTW$(X_2,Y)$，小者即为与新测得气象指数更贴近，根据此作判断。</p>
+<p>DTW就是一个很好的差异比较的工具，给出的距离（或标准化距离）能够进一步输入到KNN等分类器里（KNN就是要找最近的邻居，DTW能够用于衡量“近”与否），进行进一步分类，比对。</p>
+<h2 id="点到点匹配"><a href="#点到点匹配" class="headerlink" title="点到点匹配"></a>点到点匹配</h2><p>给定标准语句的录音X，现有一段新的不标准的语句录音Y，其中可能缺少或者掺入了别的字词。如何确定哪些是缺少的或者哪些是掺入别的？</p>
+<p>通过DTW的扭曲路径，我们可以大致得到结论：</p>
+<p><img src="http://image.rexking6.top/img/clip1580011617.png" alt=""></p>
+<p>DTW的输出是很丰富的，除了距离外，还提供了扭曲路径，可用于点到点的匹配，这个信息是非常丰富的，能够看到序列的比对，发现异常的序列。</p>
+<h1 id="优化算法（2012以前）"><a href="#优化算法（2012以前）" class="headerlink" title="优化算法（2012以前）"></a>优化算法（2012以前）</h1><p>论文中还提到了利用多核并行化优化。因为在这里不涉及到具体数学优化算法，所以不做介绍。</p>
+<h2 id="去平方根操作"><a href="#去平方根操作" class="headerlink" title="去平方根操作"></a>去平方根操作</h2><p>在 DWT 和 ED 计算中都有带有开平方根的操作，为了方便理解后边优化在这里就去掉了平方根，因为这两种累加计算是单调递增的，所以去掉平方根对排序相似度结果上没有任何影响。</p>
+<h2 id="使用下界"><a href="#使用下界" class="headerlink" title="使用下界"></a>使用下界</h2><p>通过使用下界可以提前筛选掉部分不符合条件的候选结果。我们可以这样理解<strong>下界</strong>这个概念：如果想找到班里最高的同学，常规做法是准确测量全班同学的身高并按身高排序，再择测得最高身高数据的那个。这样做当然可行，但想得到最终结果我们必须测量每一个同学的身高，这个工作量是相对比较大的。但也可以换个方法考虑：比如通过目测估计，选出一个中等偏上高的同学作为标杆，所有目测比他矮的同学肯定都不是要找的最高的那个，所以就不用花时间准确测量这些目测都不达标同学的身高。这样就通过这个中等偏上身高的同学（下界）排除了一大批是最高那个同学的可能。最后只需要测量小部分比这个下界高的同学，就能很快找到最终结果。</p>
+<p>计算下界有很多种不同的方法，有些虽然复杂度小，但筛选效果未必很理想，有些效果好，但是计算量却很高。本文中提到了下面两种被工业广泛应用的计算下界方法。</p>
+<h3 id="LB-Kim-FL"><a href="#LB-Kim-FL" class="headerlink" title="LB_Kim_FL"></a>LB_Kim_FL</h3><p>该算法其实是 LB_Kim 算法的一个在归一化处理后的简化版本。原始的 LB_Kim 会一共取了4个观测点，即：初始点，终止点，时序数据最大值，时序数据最小值。我们在这里提到的 LB_Kim_FL 只用了起始和终止值，因为在归一化后的极值在这里几乎不起任何作用，但是在省略它们后整个算法的时间复杂度却从 O(n) 降为 O(1)。复杂度的下降是省略了遍历整个数组寻找全局最大和最小值的过程而做到的。经实践证明，这种方法在大多数情况下十分地粗暴有效，但在起始值和终止值差别较大时会对筛选结果造成一定的误差。</p>
+<p>计算公式为：</p>
+<script type="math/tex; mode=display">
+\text{LB}_{\text{Kim}_{\text{FL}}}=\text{max}\{|\text{First}(Q)-\text{First(C)}|,|\text{Last}(Q)-\text{Last}(C)|\}</script><h3 id="LB-Keogh"><a href="#LB-Keogh" class="headerlink" title="LB_Keogh"></a>LB_Keogh</h3><p>与简单粗暴的 LB_Kim 不同，LB_Keogh 计算时不只关注四个关键值，对查询子序列 Q 引入了 Upper Bound 和 Lower Bound 的概念。这种方法很好的解决了 LB_Kim 只关注起始值与终止值的问题，从而达到了更加精确地定义下界的目的，但由于它需要遍历整个样本才能完成计算，故复杂度为O(n)。</p>
+<p>具体计算步骤如下：</p>
+<ol>
+<li><p>定义一个时间序列子序列 $Q:\{q_1,\dots,q_n\}$ 以及窗口值 $r$ 且在其范围内寻找 max 和 min 分别作为 Upper Bound，Lower Bound。</p>
+</li>
+<li><p>确定 Upper Bound ：$U_i=\text{max}(q_{i-r},q_{i+r})$</p>
+</li>
+<li><p>确定 Lower Bound ：$L_i=\text{min}(q_{i-r},q_{i+r})$</p>
+</li>
+<li><p>利用公式计算 LB_Keogh：</p>
+<script type="math/tex; mode=display">
+\text {LB}_{\text {Keogh}} (Q, C) = \sqrt{\sum_{i=1}^n(c_i-U_i)^2I_{\{c_i>U_i\}}+\sum_{i=1}^N(c_i-L_i)^2I_{\{c_i<L_i\}}}</script></li>
+</ol>
+<blockquote>
+<p>引用一位大牛对这个算法的理解： LB_Keogh 方法首先求出 Q 序列的上下包络线，然后对data序列 ( C ) 与上下包络线进行比较，如果不在上下包络线的范围内，就对该点与对应的包络线上的点求欧几里得距离（此处的欧几里得距离主要是指Y轴上的距离，并非二维），最终求和得到误差，与之前得到的误差进行比较，整条data中误差最小的就是目标序列。</p>
+</blockquote>
+<h2 id="Early-Abandoning-of-ED-and-LB-Keogh"><a href="#Early-Abandoning-of-ED-and-LB-Keogh" class="headerlink" title="Early Abandoning of ED and LB_Keogh"></a>Early Abandoning of ED and LB_Keogh</h2><p>我们在之前讨论的 Lower Bound 剪枝其实就是一种 Early Abandoning。在计算中涉及到一个 best-so-far 的概念，在初始化时这个值被设置为无穷大。本着一旦找到更好的结果就替换的原则，然后用下界（Lower Bound）与这个值对比，如果下界大于它，那么就可以在此终止后面计算且筛选掉这条不符合条件的数据，反之则取代（更新）当前 best-so-far。</p>
+<h2 id="Early-Abandoning-of-DTW"><a href="#Early-Abandoning-of-DTW" class="headerlink" title="Early Abandoning of DTW"></a>Early Abandoning of DTW</h2><p>对于计算完 LB_Keogh 再计算 DTW 的复杂度也有相应的优化方法，在原文中作者也介绍了他们自己的方法。文章指出在 LB_Keogh 已经计算完一次后，这个结果可以被重复使用在计算 DTW 中，以省略重复计算带来的开销。</p>
+<p><img src="http://image.rexking6.top/img/clip1580014068.png" alt=""></p>
+<p>如上图所示，在计算 DTW 时从 K = 0 位置开始，计算至 K = 10 结束，这时我们得到了部分 DTW 距离累加的结果。在此可以用该部分结果与之前 LB_Keogh 的 K = 11 后的结果拼接，并把这个拼接的结果当做 Lower Bound 对比 best-so-far 决定是否要提前终止计算。</p>
+<p>这种混合 Lower Bound 计算可以表示为：</p>
+<script type="math/tex; mode=display">
+\text{LB}=\text{DTW}(Q_{1:K},C_{1:K})+\text {LB}_{\text{Keogh}}(Q_{K+1, n},C_{K+1, n})</script><h1 id="本文的优化算法"><a href="#本文的优化算法" class="headerlink" title="本文的优化算法"></a>本文的优化算法</h1><p>Searching and Mining Trillions of Time Series Subsequences under Dynamic Time Warping</p>
+<h2 id="Early-Abandoning-Z-Normalization"><a href="#Early-Abandoning-Z-Normalization" class="headerlink" title="Early Abandoning Z-Normalization"></a>Early Abandoning Z-Normalization</h2><p>作者在这里吐槽了一下之前人研究成果的疏忽，他指出尽管计算归一化的开销远大于计算欧氏距离的开销，但迄今为止（2012年）还没人提出过对这个归一化过程做优化，并在此引出他们的创意：在计算欧式距离或者 LB_Keogh 的过程中同时进行 online Z-Normalization，而不是分别做。而且一旦发现 C 子序列已经可以排除在最优结果之外了也没有必要继续对该序列做剩余归一化的操作。这个方案可以节省的对时间序列做完整归一化操作带来的巨大开销，因为这里的归一化操作只是针对部分子序列的计算而不是全部。</p>
+<p>常规来讲想要对某个子序列进行 Z-Normalization 需要先计算其整体的均值和标准差。即：</p>
+<script type="math/tex; mode=display">
+\mu=\frac{1}{m}\sum x_i,\sigma^2=\frac{1}{m}\sum{x_i^2-\mu^2}</script><p>这里的标准差计算和公式略有不同，因为作者展开了平方差项。然后用遍历样本后求得的值带入归一化公式：</p>
+<script type="math/tex; mode=display">
+\text{Normalized}-C_i=\frac{x-\mu}{\sigma}</script><p>用这种常规方法计算均值和标准差是需要遍历整个子序列的，这个造成了一定的开销。在此原文作者提出了他改良过的方法，专门计算子序列归一化涉及到的均值和标准差的计算。即：</p>
+<script type="math/tex; mode=display">
+\mu=\frac{1}{m}\left(\sum_{i=1}^kx_i-\sum_{i=1}^{k-m}x_i\right),\sigma^2=\frac{1}{m}\left(\sum_{i=1}^kx_i^2-\sum_{i=1}^{k-m}x_i^2\right)-\mu^2</script><p>且在计算过程中储存中间输出的部分子序列<strong>加和结果</strong>和<strong>加和平方结果</strong>，这样做可以避免重复计算。这里的 $m$ 指的是时间子序列的长度，$k$ 为整个时间序列中从起点到截取的第 $k$ 个时间段序列。</p>
+<blockquote>
+<p>此处需要用图解释 $m$ 和 $k$ 在整个时序数据中的位置 TBD</p>
+</blockquote>
+<p>论文中，作者提到此处存在浮点计算在上亿条数据下回出现累加误差的问题，并提出这里每比对100万子序列后，就要进行一次完整的Z-normalization。</p>
+<h2 id="Reordering-Early-Abandoning"><a href="#Reordering-Early-Abandoning" class="headerlink" title="Reordering Early Abandoning"></a>Reordering Early Abandoning</h2><p>前面 Early Abandoning 的计算方式都是从子序列的起点自左向右进行计算的。作者在这里提出一种先快速找到子序列 Q 和 C 之间差值之和最大的部分，然后以它为中心计算 LB 来判断这个子序列是否大于best-so-far值，从而可达到降低计算成本的目的。引用下原文的图：</p>
+<p><img src="http://image.rexking6.top/img/clip1580014753.png" alt=""></p>
+<p>左图中计算的顺序是从左向右的，在计算到第9个时间点时发现 Lower Bound 已经超过了 best-so-far 值，然后终止了计算并筛选掉 C。 右图中将顶点放在离 Q 峰值很近的位置，且交替的从初始点两侧分别取值累加，这样只运算了 5 次就超过了 best-so-far 值，这里就可以提前终止运算并排除当前 C是最优解的可能性。紧接着作者引出他的优化问题，如何选择合适的初始点来做优化，并给出了他的经验：在已经做完归一化的时序子序列中，由于本文讨论的是 Z-Normalization 也就是说归一化操作后的序列均值为0，方差为1 的高斯分布。使用离均值 0 最远距离的点一般应该是对计算距离贡献最大的点，也是起始的最佳位置，并在文章后边的实验中给予了证实。</p>
+<h2 id="Reversing-the-Query-Data-Role-in-LB-Keogh"><a href="#Reversing-the-Query-Data-Role-in-LB-Keogh" class="headerlink" title="Reversing the Query/Data Role in LB_Keogh"></a>Reversing the Query/Data Role in LB_Keogh</h2><p>在讨论 LB_Keogh 算法时我们是围绕 Q 进行展开的，而不是全部的时间序列 C。这样只需要对 Q 进行一次计算，而不是针对每一个可能的结果进行逐次计算。但有时候对 Q 的计算有可能效果并不理想，这里作者提出了可以 just-in-time 的互换 Q 和 C 的角色来加速计算。</p>
+<p>上文讲过 LB_Keogh 的计算复杂度是 O(n) 而 DTW 是动规问题，高于 O(n) 。比起算所有的 C 的 DTW值，这里计算所有 C 的 LB_Keogh 还是比计算 DTW 节省开销的。具体看后边逐层优化，这个优化算法是在比较后面才被用到的。越往后剩下的 C 子序列越少，因为大部分不符合最优解的 C 已经被简单的 LB 方法排除出去了。</p>
+<p><img src="http://image.rexking6.top/img/clip1580014804.png" alt=""></p>
+<h2 id="Cascading-Lower-Bounds"><a href="#Cascading-Lower-Bounds" class="headerlink" title="Cascading Lower Bounds"></a>Cascading Lower Bounds</h2><p>原文作者在50个数据集上使用18种不同的计算 Lower Bound 的方式测试了筛选效果，并绘制了下图。</p>
+<p><img src="http://image.rexking6.top/img/clip1580014835.png" alt=""></p>
+<p>从图中可以看出每个 LB 算法都可以从计算复杂度和筛选宽松度来评价。在此基础上作者引出了“层级筛选”的概念，即：先使用复杂度较低的算法快速过滤掉一批不符合最优结果的候选 C，再逐渐使用复杂度高且比复杂度低算法更严谨的筛选算法过滤掉剩余数据。准确的说：先使用 O(1) 复杂度的 LB_Kim_FL，然后对 Q 进行 LB_Keogh_EQ 剪枝，此处的算法复杂度可能介于O(1) 与 O(n) 之间，如果该剪枝算法执行完后 LB 仍没有达到 best-so-far 再用 3.3 章节提到的互换 Q 和 C 的 LB_Keogh_EC 算法辅助剪枝效果，最后使用 提前终止 DTW 的算法处理剩余数据。利用这个顺序剪枝可以节省99.9999%的DTW算法的时间开销。</p>
+<p>总的来说，这个层级筛选的方法是整个 Paper 的精华所在，之前作者在考虑到计算复杂度和筛选精准的前提下分别介绍了几种高效计算 LB 的方法，最后从18种中选出四个组合效果最好的，并按复杂度从小到大依次就情况使用。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>通过使用URC优化的 DTW 可以大大提升搜索速度，这方便了大文本时间序列相似度对比在工业中的落地。在写完这个总结时原作者脑子里从日常的需求中浮现出如下应用场景：</p>
+<ol>
+<li>实时系统监控： 当今的分布式系统例如 Hadoop， Kubernetes 等每天都在工业界产生大量时序日志数据。如果可以将这些数据导入分布式时序数据库中的话，可以通过对特定指标的搜索来更好地做日志分析，甚至由于改善后的速度提升做系统的实时监控。</li>
+<li>股票 K 线分析：假设可以观察股票 K 线的走势预测未来股票的涨跌。那么可以通过查找历史数据中某个盈利股票在暴涨前的一段时序数据，将这个数据作为 Q 去搜索当前所有股票 C 与这个股票最相近的一个，如果他们的相似度高，也许可以预测这个股票在未来的一段时间会涨。</li>
+<li>客服中心 Trend 预测： 以本人所在保险行业为例，客服中心（Call Center）的工作量与时间周期，突发性事件（如：自然灾害，政治变动，传染病）有极大的相关性。一旦某事件发生，会引起 Hotline 在未来的一段时间段打入电话数量暴增，导致需要同时在线的客服人员数量翻倍增长。为了节约成本，优化安排客服人员工作量，可以使用 DTW 这类算法对历史数据进行搜索，如发现某个 Trend 会在未来的一段时间造成工作量非正常的变化，则可以提前组织相应工作以便做到节约成本（如：通过优化客服人员数量、工时）和提高客服质量的目的。</li>
+<li>销售 Trend 预测： 方法同3，可以预测下个阶段销售数量，以便优化供应链管理。</li>
+<li>工业中可以结合分布式流式处理中间件 Kafka 以及 Kafka Streams，Spark Streaming，Flink 等分布式框架，结合时序 NoSQL 数据库实现海量数据高并发实时监控/预测。</li>
+</ol>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ol>
+<li>Giorgino, Toni. “Computing and visualizing dynamic time warping alignments in R: the dtw package.” Journal of statistical Software 31.7 (2009): 1-24.</li>
+<li>Rabiner, Lawrence R., and Biing-Hwang Juang. Fundamentals of speech recognition. Vol. 14. Englewood Cliffs: PTR Prentice Hall, 1993.</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\04\10\AIOps资料\" rel="bookmark">AIOps资料</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\02\17\《Time-series-Extreme-Event-Forecasting-with-Neural-Networks-at-Uber》笔记\" rel="bookmark">《Time-series Extreme Event Forecasting with Neural Networks at Uber》笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2020\12\29\时间序列分解\" rel="bookmark">时间序列分解</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2020/02/11/Dynamic-Time-Warping-%E5%8A%A8%E6%80%81%E6%97%B6%E9%97%B4%E8%A7%84%E6%95%B4/" title="Dynamic Time Warping 动态时间规整">https://blog.rexking6.top/2020/02/11/Dynamic-Time-Warping-动态时间规整/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AIOps/" rel="tag"># AIOps</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/27/gnuplot%E5%85%A5%E9%97%A8/" rel="prev" title="gnuplot入门">
+      <i class="fa fa-chevron-left"></i> gnuplot入门
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/02/12/%E7%9F%A9%E9%98%B5%E6%B1%82%E5%AF%BC/" rel="next" title="矩阵求导">
+      矩阵求导 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">2.</span> <span class="nav-text">简单的例子</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89"><span class="nav-number">3.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%A8%E8%AE%BA"><span class="nav-number">4.</span> <span class="nav-text">讨论</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%A6%E6%9D%9F%E6%9D%A1%E4%BB%B6"><span class="nav-number">4.1.</span> <span class="nav-text">约束条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A5%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.2.</span> <span class="nav-text">步模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%87%E5%87%86%E5%8C%96"><span class="nav-number">4.3.</span> <span class="nav-text">标准化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%82%B9%E4%B8%8E%E7%82%B9%E7%9A%84%E8%B7%9D%E7%A6%BB%E5%87%BD%E6%95%B0"><span class="nav-number">4.4.</span> <span class="nav-text">点与点的距离函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">5.</span> <span class="nav-text">具体应用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E7%B1%BB"><span class="nav-number">5.1.</span> <span class="nav-text">分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%82%B9%E5%88%B0%E7%82%B9%E5%8C%B9%E9%85%8D"><span class="nav-number">5.2.</span> <span class="nav-text">点到点匹配</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95%EF%BC%882012%E4%BB%A5%E5%89%8D%EF%BC%89"><span class="nav-number">6.</span> <span class="nav-text">优化算法（2012以前）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%BB%E5%B9%B3%E6%96%B9%E6%A0%B9%E6%93%8D%E4%BD%9C"><span class="nav-number">6.1.</span> <span class="nav-text">去平方根操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E4%B8%8B%E7%95%8C"><span class="nav-number">6.2.</span> <span class="nav-text">使用下界</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LB-Kim-FL"><span class="nav-number">6.2.1.</span> <span class="nav-text">LB_Kim_FL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LB-Keogh"><span class="nav-number">6.2.2.</span> <span class="nav-text">LB_Keogh</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Early-Abandoning-of-ED-and-LB-Keogh"><span class="nav-number">6.3.</span> <span class="nav-text">Early Abandoning of ED and LB_Keogh</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Early-Abandoning-of-DTW"><span class="nav-number">6.4.</span> <span class="nav-text">Early Abandoning of DTW</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%AC%E6%96%87%E7%9A%84%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95"><span class="nav-number">7.</span> <span class="nav-text">本文的优化算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Early-Abandoning-Z-Normalization"><span class="nav-number">7.1.</span> <span class="nav-text">Early Abandoning Z-Normalization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reordering-Early-Abandoning"><span class="nav-number">7.2.</span> <span class="nav-text">Reordering Early Abandoning</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reversing-the-Query-Data-Role-in-LB-Keogh"><span class="nav-number">7.3.</span> <span class="nav-text">Reversing the Query&#x2F;Data Role in LB_Keogh</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cascading-Lower-Bounds"><span class="nav-number">7.4.</span> <span class="nav-text">Cascading Lower Bounds</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">9.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization》笔记">
+<meta property="og:url" content="https://blog.rexking6.top/2018/07/10/%E3%80%8AGrad-CAM-Visual-Explanations-from-Deep-Networks-via-Gradient-based-Localization%E3%80%8B%E7%AC%94%E8%AE%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531277596.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531311900.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531297966.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531298272.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531313454.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531319981.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531320247.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531322065.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531378852.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531381058.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531381434.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531382111.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531382328.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531382805.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531383309.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531406759.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531407275.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531447390.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531447425.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531447455.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531447520.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531450770.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531451359.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531451602.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531451908.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531451702.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531452075.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531452476.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531454741.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531487796.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531488097.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531488121.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531488668.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531488687.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531489243.png">
+<meta property="article:published_time" content="2018-07-10T12:45:53.000Z">
+<meta property="article:modified_time" content="2019-03-06T10:20:54.823Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="语义分割">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1531277596.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/07/10/%E3%80%8AGrad-CAM-Visual-Explanations-from-Deep-Networks-via-Gradient-based-Localization%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization》笔记 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/07/10/%E3%80%8AGrad-CAM-Visual-Explanations-from-Deep-Networks-via-Gradient-based-Localization%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization》笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-07-10 20:45:53" itemprop="dateCreated datePublished" datetime="2018-07-10T20:45:53+08:00">2018-07-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 18:20:54" itemprop="dateModified" datetime="2019-03-06T18:20:54+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2/" itemprop="url" rel="index"><span itemprop="name">语义分割</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/07/10/%E3%80%8AGrad-CAM-Visual-Explanations-from-Deep-Networks-via-Gradient-based-Localization%E3%80%8B%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="《Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization》笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>28k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>25 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>主要参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/gm_margin/article/details/79339761">Grad-CAM:Visual Explanations from Deep Networks via Gradient-based L阅读笔记-网络可视化NO.3</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/stu_sun/article/details/80628406">【论文翻译】Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization ICCV 2017</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/1d7b5c4ecb93">凭什么相信你，我的CNN模型？（篇一：CAM和Grad-CAM)</a></li>
+</ul>
+<h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>我们提出了一种方法，用于为来自一大类基于卷积神经网络（CNN）的模型的决策产生“视觉解释”，使其更加透明化。我们的方法 - 梯度加权的类激活映射（Grad-CAM），使用任何目标概念的梯度（比如说’狗’或甚至标题的逻辑），在最后一个卷积层产生一个粗略的定位图，突出显示图像中用于预测概念的重要的区域。与以前的方法不同，Grad-CAM适用于各种各样的CNN模型族：（1）具有全连接层的CNN（例如VGG）；（2）用于结构化输出的CNN（例如captioning）；（3）用于具有多模式输入（例如视觉问答）或强化学习的任务，无需进行架构更改或重新训练。我们将Grad-CAM与现有的细粒度可视化技术相结合，创建具有高分辨率的类别鉴别的可视化技术，并将其应用于图像分类，图像描述生成和视觉问答（VQA）模型，包括基于ResNet结构的模型。在图像分类模型中，我们的可视化技术（a）为这些模型的失效模式提供了见解（表明那些好像不合理的预测是具有合理的解释的）；（b）对对抗图像具有鲁棒性；（c）在ILSVRC-15弱监督定位任务上优于以前的方法；（d）在基础模型上更成功；（e）通过识别数据集偏差来帮助实现模型泛化。对于图像描述生成和VQA，我们的可视化显示，即使是基于非注意力（non-attention）的模型也可以对输入进行定位。最后，我们设计并开展人类研究，以评估Grad-CAM解释是否有助于用户建立对来自深度网络的预测的合适的信任，并表明Grad-CAM帮助未经训练的用户成功地从“较弱”的神经网络辨别出“较强”的一个，即使它们都做出相同的预测。我们的代码可在 <a target="_blank" rel="noopener" href="https://github.com/ramprs/grad-cam/">https://github.com/ramprs/grad-cam/</a> 上获得，同时在CloudCV [2]上运行demo，在 youtu.be/COjUB9Izk6E 上观看演示视频。</p>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>卷积神经网络（CNN）和其他深度网络已经在多种计算机视觉任务中实现了前所未有的突破，从图像分类 [27, 18]到物体检测 [16]，语义分割 [31]，图像描述生成[47 , 7, 13, 23]，以及最近的视觉问答[3, 15, 36, 41]。虽然这些深度神经网络能够实现卓越的性能，但由于它们缺乏可分解性，不能转化为直观和易于理解的组件，因此它们很难被解释 [30]。因此，当今天的智能系统出现故障时，如果没有任何警告或解释，它们就会失败得令人失望，用户盯着一个不连贯的输出，不知道为什么。</p>
+<p><strong>可解释性问题</strong><br>为了建立对智能系统的信任，并将他们有意义地融入我们的日常生活中，很显然我们必须建立“透明”的模型来解释为什么它们这么预测。广义而言，这种透明度在人工智能（AI）演变的三个不同阶段非常有用。首先，当AI比人类弱得多并且还不能可靠地“部署”时（例如视觉问答[3]），透明度和解释的目标是识别失效模式[1, 19]，从而帮助研究人员集中精力在最富有成果的研究方向上。其次，当人工智能与人类平等并且可靠地“可部署”时（例如，在一组类别上训练了足够多的数据的图像分类[24]），目标是在用户中建立适当的信任和置信度。第三，当AI比人类强得多时（例如国际象棋或Go [43]），解释的目标是在机器教学中[22] - 即一台机器教人如何做出更好的决策。</p>
+<p>在准确性和简单性或可解释性之间通常存在一种平衡。传统的基于规则或专家系统 [20] 是高度可解释的，但不是非常准确（或强大）。每个阶段都是手工设计的可分解管道被认为更具可解释性，因为每个单独的组件都假设了一个自然、直观的解释。通过使用深层模型，我们牺牲可解释模块来解释不可解释的模块，通过更好的抽象（更多层）和更紧密的集成（端到端训练）实现更高的性能。最近引入的深度残差网络（ResNets）[18] 深度超过200层，并且在几项具有挑战性的任务中展现了最先进的性能。这种复杂性使得这些模型很难解释。因此，深层模型开始探索解释性和准确性之间的关系。</p>
+<p>Zhou等人 [51]最近提出了一种称为类激活映射（CAM）的技术，用于识别由一有限类的不包含任何全连接层的图像分类CNN所使用的判别性区域。实质上，这项工作将模型复杂性和性能折衷，为使模型的工作更加透明。相比之下，我们使现有的最先进的深层模型能够在不改变其架构的情况下进行解释，从而避免了可解释性与准确性之间的平衡。我们的方法是对CAM的推广 [51]，适用于CNN模型系列的显著的更广泛的范围：（1）具有全连接层的CNN（例如VGG），（2）用于结构化输出（例如描述）的CNN，（3）用于具有多模式输入（例如VQA）或强化学习任务的CNN。</p>
+<p><strong>好的视觉解释由什么组成？</strong><br>考虑图像分类 [10] – 在模型中一个用于证明任何目标类别的“良好”的视觉解释应该是（a）类别鉴别（即图像中的鉴别定位）和（b）高分辨率（即捕获细粒度细节）。</p>
+<p>图1显示了来自’老虎猫’类（顶部）和’拳师狗’类（底部）的大量可视化的输出。像素空间梯度可视化，如导向反向传播（Guided Backpropagation）[46] 和反卷积（Deconvolution）[49]，就是有高分辨率并且在图像中突出细粒度细节，但没有类别判别（图1b和图1h非常相似）。</p>
+<p><img src="http://image.rexking6.top/img/clip1531277596.png" alt=""><br>图1：（a）猫和狗的原始图像。（b-f）根据各种可视化方法对VGG-16和ResNet模型中的猫类的支持。（b）导向反向传播 [46] ：突出显示所有有贡献的特征。（c，f）Grad-CAM（Ours）：定位类别鉴别区域，（d）结合（b）和（c）给出的Guided Grad-CAM，其给出高分辨率类别的鉴别可视化。有趣的是，我们的Grad-CAM技术实现的定位（c）与遮挡灵敏度（e）的结果非常相似，而计算量更少。（f，l）是对ResNet-18层的Grad-CAM可视化。注意在（c，f，i，l）中，红色区域对应于类别的高分区域，而在（e，k）中，蓝色对应于类别的高分区域。图最好用彩色看的。</p>
+<p>相反，像CAM这样的定位方法或我们提出的方法梯度加权类激活映射（Grad-CAM），具有很高的类别鉴别能力（图1c中’cat’解释仅仅强调了’猫’区域，而不是’狗’区域，反之亦然，如图1i）。</p>
+<p>为了结合两者的优点，我们证明可以将现有的像素空间梯度可视化与Grad-CAM融合，以创建既有高分辨率又可以类别判别的Guided Grad-CAM可视化。结果，即使图像包含多个可能概念的证据，图像中与目标任何决定对应的重要区域也可以以高分辨率细节显现，如图1d和1j所示。当“虎猫”可视化时，引导式Grad-CAM不仅突出了猫的区域，而且突出了猫身上的条纹，这对于预测特定种类的猫是重要的。</p>
+<p>（1）我们提出Grad-CAM，这是一种类别鉴别的定位技术，可以从任何基于CNN的网络生成视觉解释，而不需要架构变更或重新训练。我们评估Grad-CAM的定位（第4.1节）、指向（第4.2节）和对模型的可信度（第5.3节），它在这方面优于基准。</p>
+<p>（2）我们将Grad-CAM应用于现有的高性能的分类，captioning（8.1节）和VQA（8.2节）模型。对于图像分类，我们的可视化有助于识别数据集偏差（第6.3节），并为当前CNN的失败提供见解（第6.1节），表明那些看起来不合理的预测是具有合理的解释的。对于captioning和VQA，我们的可视化揭示了一些有点令人惊讶的见解，即常见的CNN + LSTM模型常常擅长定位判别性图像区域，尽管未经过基础的图像文本对的训练。</p>
+<p>（3）我们可视化ResNets [18] 应用于图像分类和VQA（8.2节）。从深层到浅层，随着我们遇到具有不同输出维数的层，Grad-CAM的鉴别能力显著降低。</p>
+<p>（4）我们进行的试验（第5节）显示Guided Grad-CAM解释具有类别鉴别能力，不仅帮助人类建立信任，而且帮助未经训练的用户成功地从“较弱”的网络中辨别出“更强”的网络，甚至他们都做出相同的预测。</p>
+<h1 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h1><p>我们的工作借鉴了最近在CNN可视化，模型信任度评估和弱监督定位方面的工作。</p>
+<p><strong>可视化CNN</strong><br>许多先前的作品[44, 46, 49, 14]通过突出显示“重要”像素（即这些像素的强度变化对预测的分数有很大的影响）而使CNN预测可视化。 具体而言，Simonyan等人 [44] 将预测的类别分数关于像素强度的偏导数可视化，而导向反向传播[46]和反卷积[49]对“原始”梯度进行修改，从而改进质量。这些方法在[34]中进行了比较。尽管产生了细粒度的可视化，但这些方法不具有类别判别能力。关于不同类别的可视化几乎完全相同（见图1b和1h）。</p>
+<p>其他可视化方法合成图像以最大程度地激活网络单元[44, 12]或反转潜在表示[35, 11]。 虽然这些可以是高分辨率，也可以进行类别判别，但它们可以对整个模型进行可视化，而不能预测特定的输入图像。</p>
+<p><strong>评估模型可信度</strong><br>受可解释性概念[30]和评估模型[42]信任度的影响，我们通过人类研究以类似于[42]的方式评估Grad-CAM可视化，以表明它们可以成为用户在自动化系统中评估和放置信任度的重要工具。</p>
+<p><strong>弱监督定位</strong><br>另一个相关的工作是在CNN中进行弱监督定位，其任务是仅使用整个图像类别标签对图像中的对象进行定位[8, 38, 39, 51]。</p>
+<p>与我们的方法最相关的是定位的类激活映射（CAM）方法 [51]。这种方法修改了图像分类CNN架构，用卷积层和全局平均池化 [28] 替换全连接层，从而实现类特定的特征映射。其他人则使用全局最大池化 [39] 和对数汇总池化（log-sum-exp pooling）[40] 研究了类似的方法。</p>
+<p>CAM的一个缺点是它要求特征映射直接在softmax层之前，所以它只适用于一种特殊类型的CNN体​​系结构，在即将进行预测之前在卷积映射上执行全局平均池化（即卷积特征映射→全局平均池化→softmax层）。在某些任务（例如图像分类）上，这种体系结构可能实现比一般网络更低的精度，或者可能简单地不适用于任何其他任务（例如图像描述生成或VQA）。我们引入了一种使用梯度信号组合特征映射的新方法，该方法不需要对网络架构进行任何修改。这使我们的方法可以应用于任何基于CNN的体系结构，包括图像描述生成和视觉问答。对于全卷积体系结构，Grad-CAM简化为CAM。因此，Grad-CAM是CAM的推广。</p>
+<p>其他方法通过分类输入图像的扰动来进行定位。 Zeiler和Fergus [49] 通过遮挡斑块和对遮挡图像进行分类来扰动输入，当这些对象被遮挡时，通常会导致相关对象的分类分数降低。这一原则适用于[4]中的定位。Oquab等人[38] 对包含一个像素的许多补丁进行分类，然后对这些补丁的分类分数进行平均，以提供像素的分类分数。与这些不同，我们的方法实现了一次性定位;它只需要对每个图像有一个前向和一个部分后向传递，因此在一个数量级上通常它更有效。在最近的工作中，张等人 [50] 引入了对比边际获胜概率（c-MWP），一种概率Winner-Take-All公式，用于模拟可突出区分区域的神经分类模型的自上而下的注意力。这比Grad-CAM和CAM更慢，它只适用于图像分类CNN。此外，定量和定性结果比Grad-CAM更差（参见第4.1节和补充4.1节）。</p>
+<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p>首先介绍一下导向反向传播（guided-backpropagation）：</p>
+<p><img src="http://image.rexking6.top/img/clip1531311900.png" alt=""></p>
+<p>注：图中粗略解释了几者的区别，虽说区别并不大，只是经过ReLU时对梯度的取舍方式不同，但这微小的改变却使得可视化的效果大有不同。</p>
+<p>以前的一些作品已经断言，CNN中的更深层次的表现可以捕捉到更高层次的视觉结构[5, 35]。 此外，卷积特征保留了在全连接层中丢失的空间信息，因此我们可以猜想最后的卷积层在高级语义和详细空间信息之间具有最佳折衷。这些图层中的神经元在图像中查找语义类特定的信息（比如对象部分）。Grad-CAM使用进入CNN最后一层卷积层的梯度信息来理解每个神经元对于目标决定的重要性。尽管我们的技术非常通用，并且可以用来可视化深层网络中的任何激活，但在这项工作中，我们专注于解释网络可能做出的决策。</p>
+<p>如图2所示，为了获得任意类别$c$的宽度$u$和高度$v$的类别鉴别定位图 Grad-CAM $L_{Grad-CAM}^c \in \mathbb{R}^{u×v}$，我们首先计算类别$c$的得分梯度，即$y^c$（在softmax之前）与卷积层的特征映射$A^k$，即$\frac{\partial y^c}{\partial A^k}$。这些梯度以全局平均池化的反馈，获得神经元重要性的权重$\alpha_k^c$：</p>
+<p><img src="http://image.rexking6.top/img/clip1531297966.png" alt=""></p>
+<p>该权重$\alpha_k^c$表示$A$下游的神经网络的部分线性化，并且得到目标类别$c$的特征映射$k$的重要性。</p>
+<p><img src="http://image.rexking6.top/img/clip1531298272.png" alt=""><br>图2：Grad-CAM概述：给定一个图像和一个目标类（例如，’虎猫’或任何其他类型的可微分输出）作为输入，我们将图像传播通过模型的CNN部分，然后通过特定任务的计算来获得该类别的原始分数。对于所有类，除了所需的类（虎猫）的梯度设置为1，其余的梯度设置为零。然后将该信号反向传播到所关注的整形卷积特征图，其中我们结合起来计算粗糙的Grad-CAM定位（蓝色热力图），它表明了模型需要看哪里去做出精确决定。最后，我们将热力图与导向反向传播逐点相乘，获得高分辨率和特定概念的Guided Grad-CAM可视化。</p>
+<p>我们执行前向激活图的加权组合，并通过ReLU函数来获取，</p>
+<p><img src="http://image.rexking6.top/img/clip1531313454.png" alt=""></p>
+<p>请注意，这导致了与卷积特征映射相同大小的粗略的热力图（在VGG [45] 和 AlexNet [27]网络的最后卷积层的情况下为14×14）。我们将ReLU应用于图谱的线性组合，因为我们只关注对目标类别具有正面影响的特征，即增加像素的强度是为了增加$y^c$。负像素可能属于图像中的其他类别。正如所料，如果没有这个ReLU，定位图谱有时会突出显示不仅仅是所需的类别，而且这样会降低定位的性能。图1c，1f和1i，1l分别显示了“虎猫”和“拳师犬”的Grad-CAM可视化。融合研究和更多的Grad-CAM的可视化可以在附录找到。一般来说，$y^c$不一定是图像分类CNN产生的类的分数。它可以是任何可鉴别的激活，包括标题中的单词或问题的答案。</p>
+<p><strong>作为CAM的推广的Grad-CAM</strong><br>回想一下，CAM [51] 为一类具有特定类型结构的图像分类CNN产生定位图谱，这类CNN的全局平均池化的卷积特征映射直接输入到softmax中。具体而言，让倒数第二层产生$K$特征映射，$A^k \in R^{u×v}$。然后使用全局平均池化（GAP）将这些特征图谱进行空间池化并且线性变换以产生每个类$c$的分数$S^c$，</p>
+<p><img src="http://image.rexking6.top/img/clip1531319981.png" alt=""></p>
+<p> 为了产生修改后的图像分类体系结构的定位图，如上所述，求和的顺序可以互换以获得$L_{CAM}^c$，</p>
+<p> <img src="http://image.rexking6.top/img/clip1531320247.png" alt=""></p>
+<p>请注意，对体系结构进行修改需要重新训练，因为并非所有体系结构都具有将特征映射与输出连接出来的权重$w_k^c$。当Grad-CAM应用于这些架构$\alpha_k^c=w_k^c$时，使得Grad-CAM成为CAM的一个严格泛化（详见附录A）。</p>
+<p>上面的推广也使我们能够从将卷积层级联成更复杂的相互作用的CNN模型生成视觉解释。事实上，我们将Grad-CAM应用于’超越分类’的任务，包括利用CNN进行图像描述生成和视觉问答（VQA）（第8.2节）的模型。</p>
+<p><strong>Guided Grad-CAM</strong><br>尽管Grad-CAM可视化具有类别判别能力，并能很好地定位相关图像区域，但它们缺乏像像素空间梯度可视化方法（导向反向传播和反卷积）那样显示细粒度重要性的能力。例如在图1c中，Grad-CAM可以轻松定位猫区域；然而，从低分辨率的热力图上看，为什么网络预测这个特殊情况是“虎猫”还不清楚。为了结合两者的最佳方面，我们通过逐点乘法（首先使用双线性插值对输入图像分辨率进行上采样）将导向反向传播和Grad-CAM可视化融合在一起。图2左下方说明了这种融合。这种可视化既有高分辨率（当目标类别是’老虎 猫’，它识别重要的’虎猫’的特征，如条纹，尖的耳朵和眼睛）又有类别判别能力（它显示’虎猫’，但不是’拳师犬’）。上面用反卷积代替引导反向传播给出了类似的结果，但是我们发现反卷积具有伪像（并且导向反向传播可视化通常噪声较少），所以我们选择了导向反向传播而不是反卷积。</p>
+<h1 id="定位能力评估"><a href="#定位能力评估" class="headerlink" title="定位能力评估"></a>定位能力评估</h1><h2 id="弱监督定位"><a href="#弱监督定位" class="headerlink" title="弱监督定位"></a>弱监督定位</h2><p>在本节中，我们将评估Grad-CAM在图像分类环境下的定位能力。 ImageNet定位挑战 [10] 要求竞争方法除了分类标签外还要提供边界框。与分类相似，对于前1类和前5类预测类别都进行评估。给定一个图像，我们首先从我们的网络中获得类别预测，然后为每个预测类别生成Grad-CAM图，并以15％的最大强度阈值进行二值化。这导致了连接的像素段，我们围绕单个最大的段绘制边界框。</p>
+<p>我们评估了来自Caffe [21] Model Zoo的预训练的VGG-16 [45] 模型。在使用ILSVRC15评估之后，我们在表1中报告数据集的top-1和top-5定位误差。Grad-CAM定位误差显著低于c-MWP [50] 和Simonyan等人 [44] 对VGG-16模型所实现的误差，该模型使用grabcut将图像空间梯度后处理成热力图。Grad-CAM也实现了比CAM更好的top-1定位误差 [51]，CAM需要改变模型架构，需要重新训练，从而导致更低的分类误差（top-1增加2.98％），而Grad-CAM 不影响分类性能。</p>
+<p><img src="http://image.rexking6.top/img/clip1531322065.png" alt=""><br>表1：ILSVRC-15 val的分类和定位（越低越好）。</p>
+<p><strong>弱监督分割</strong><br>我们使用Grad-CAM定位作为弱监督来训练SEC的分割架构[26]。 我们在附录E节中提供了更多细节以及定性结果。</p>
+<h2 id="Pointing-Game"><a href="#Pointing-Game" class="headerlink" title="Pointing Game"></a>Pointing Game</h2><p>Zhang等人 [50] 引入了Pointing Game实验来评估不同注意力图在场景中定位目标对象的鉴别性。他们的评估协议将每个竞争可视化技术与真实标签对象标签联系起来，并提取生成的热力图上的最大点，并评估它是否位于提示对象类别的一个标注的实例中，从而计算命中或未命中。</p>
+<p>然后计算定位精度为$Acc=\frac{\sharp Hits}{\sharp Hits+\sharp Misses}$，但是，此评估仅测量定位方法的精确度方面。 因此，我们如下修改协议以测量召回率。我们计算来自CNN分类器的 top-5 预测的可视化，并使用 Pointing Game 设置评估它们，并附加选项：如果可视化中的最大值低于阈值，则可视化可以拒绝来自模型的 top-5 预测中的任何一个。即可视化正确地拒绝了真实标签类别中缺少的预测，它将其作为命中。我们发现我们的方法Grad-CAM的表现优于c-MWP [50]（70.58％对60.30％）。 在COCO，imageNet和PASCAL类别上比较c-MWP [50]和Grad-CAM的定性实例可以在附录的F3节中找到。</p>
+<h1 id="可视化评估"><a href="#可视化评估" class="headerlink" title="可视化评估"></a>可视化评估</h1><p>我们的第一项人类研究评估了我们方法的主要前提：Grad-CAM可视化是否比以前的技术更具有类别判别能力？ 确定之后，我们转向了解是否可以让最终用户适当地信任可视化模型。对于这些实验，我们比较VGG-16和AlexNet CNNs，并将其用于PASCAL VOC2007训练集，并使用验证集生成可视化图。</p>
+<h2 id="评估分类鉴别能力"><a href="#评估分类鉴别能力" class="headerlink" title="评估分类鉴别能力"></a>评估分类鉴别能力</h2><p>为了测量Grad-CAM是否有助于鉴别类别，我们从VOC 2007数据集中选择包含两个标注类别的图像，并为它们中的每一个创建可视化。对于VGG-16和AlexNet CNN，我们使用四种方法获得特定类别的可视化：反卷积，导向反向传播和每种这些方法的Grad-CAM版本（Deconvolution Grad-CAM和Guided Grad-CAM）。 我们向亚马逊MechanicalTurk（AMT）上的43名工作人员展示可视化，并询问他们“图像中描述了哪两个对象类别？”，如图3所示。</p>
+<p><img src="http://image.rexking6.top/img/clip1531378852.png" alt=""><br>图3：用于评估类别鉴别能力（左）和可信度（右）的不同可视化的AMT界面。 Guided Grad-CAM优于基准方法（导向反向传播和反卷积），表明我们的可视化更具类别鉴别能力，并有助于人们选择更精确的分类器。</p>
+<p>直观地说，一个好的预测解释是为目标类别产生有区别的可视化。使用全部4个可视化对90个图像类别对（即360个可视化）进行实验；对每幅图像收集9个评级，根据实际情况进行评估并取平均值以获得准确性。当观察Guided Grad-CAM时，人类受试者可以在61.23％的病例中正确识别正在显现的类别（相比之下，导向反向传播为44.44％；因此，Grad-CAM将人类表现提高了16.79％）。同样，我们还发现Grad-CAM有助于使反卷积更具类别判别能力（从53.33％到61.23％）。Guided Grad-CAM在所有方法中表现最好。有趣的是，我们的结果似乎表明反卷积比导向反向传播更具有类别判别能力，但引导反向传播比反卷积更具美感。据我们所知，我们的评估是第一次量化这种微妙的差异。</p>
+<h2 id="信任度评估"><a href="#信任度评估" class="headerlink" title="信任度评估"></a>信任度评估</h2><p>给出两个预测解释，我们评估哪些看起来更可信。我们使用AlexNet和VGG-16来比较导向反向传播和Guided Grad-CAM可视化，并指出在对PASCAL进行分类上，VGG-16比AlexNet更可靠，精确度为79.09 mAP（vs. 69.20 mAP）。为了从可视化模型的准确性中分离出可视化的效果，我们只考虑那些两个模型都与真实标签做出相同预测的实例。从给出的AlexNet和VGG-16的一个可视化以及预测的对象类别中，指导54名AMT工作人员以显著更高/更不可靠（+/- 2），稍微可靠（+/- 1），同样可靠（0）这样的等级评估模型相对于彼此的可靠性。这个界面如图3所示。为了消除任何偏差，VGG和AlexNet被以几乎相等的概率分配为模型1。值得注意的是，我们发现，尽管有相同的预测，但人类受试者能够从不同的解释中识别出更精确的分类器（VGG 比AlexNet精确）。通过导向反向传播，人类将VGG的平均分数设为1.00，这意味着它比AlexNet更可靠，而Guided Grad-CAM得分更高，为1.27，这更说明了VGG显然更可靠。因此，我们的可视化可以帮助用户将信任置于可以更好地推广的模型中，只要基于单独的预测解释即可。</p>
+<h2 id="忠实性与可解释性"><a href="#忠实性与可解释性" class="headerlink" title="忠实性与可解释性"></a>忠实性与可解释性</h2><p>模型可视化的忠实性是它能够准确解释模型学到的功能的能力。当然，在可视化的忠实性与可解释性之间存在一种权衡：更忠实的可视化通常不太可解释，反之亦然。事实上，人们可能会争辩说，一个完全忠实的解释是对模型的整个描述，如果是深层模型就是不可解释/不易于可视化的。在之前的章节中我们已经验证了我们的可视化是合理的可解释的。我们现在评估他们对潜在模型的忠实性。一个期望是我们的解释应该是局部准确的，即在输入数据点附近，我们的解释应忠实于模型[42]。</p>
+<p>为了比较，我们需要一个具有很高的局部可信度的参考解释。对这种可视化，一个直接的选择是图像遮挡[49]，我们测量输入图像的patch被掩盖时CNN得分的差异。有趣的是，改变CNN得分的patch，同时也是Grad-CAM和Guided Grad-CAM分配了高强度的patch，在PASCAL 2007数据集超过2510张图像中得到的平均等级相关性为0.254和0.261（通过导向反向传播，c-MWP和CAM得到0.168,0.220和0.208）。这表明，与所有现有方法相比，Grad-CAM可视化对原始模型更忠实。通过定位、Pointing Game、分割和人类研究，我们发现Grad-CAM可视化更具可解释性，通过与遮挡图的相关性，我们可以看到Grad-CAM更加忠实于模型，这是可视化方法的两个重要特征。</p>
+<h1 id="诊断图像分类CNN"><a href="#诊断图像分类CNN" class="headerlink" title="诊断图像分类CNN"></a>诊断图像分类CNN</h1><h2 id="分析VGG-16的失效模式"><a href="#分析VGG-16的失效模式" class="headerlink" title="分析VGG-16的失效模式"></a>分析VGG-16的失效模式</h2><p><img src="http://image.rexking6.top/img/clip1531381058.png" alt=""><br>图4：在这些情况下，模型（VGG-16）未能预测出其前1（a和d）和前5（b和c）预测中的正确类别。人类发现不看可视化的预测的类别很难解释这些预测。但是对于Grad-CAM，这些错误似乎是合理的。</p>
+<p>我们使用Guided Grad-CAM来分析在ImageNet分类中VGG-16 CNN的失效模式 [10] 。 为了查看网络正在发生什么错误，我们首先得到一个网络（VGG-16）无法正确分类的例子列表。对于错误分类的例子，我们使用Guided Grad-CAM将正确的和预测的类别可视化。Guided Grad-CAM可视化优于其他允许进行此分析的方法的一个主要优点是其高分辨率和高类别鉴别能力。如图4所示，某些故障是由于ImageNet分类中固有的模糊性造成的。我们还可以看到，看似不合理的预测是有合理的解释的，这也是HOGgles [48] 中的一个观察结果。</p>
+<h2 id="对抗性噪声对VGG-16的影响"><a href="#对抗性噪声对VGG-16的影响" class="headerlink" title="对抗性噪声对VGG-16的影响"></a>对抗性噪声对VGG-16的影响</h2><p>Goodfellow等人[17]证明了当前深层网络对于对抗性例子的脆弱性，这些例子是输入图像的轻微不可察觉的扰动，这使得网络误以为是高度可信地对它们进行错误分类。 我们为ImageNet训练的VGG-16模型生成对抗图像，使得它为图像中不存在的类别分配高概率（&gt; 0.9999），并且对存在的类别的概率非常低。然后，我们为存在的类别计算Grad-CAM可视化。 从图5可以看出，尽管网络完全确定缺少这些类别（虎猫和拳师犬），Grad-CAM可视化可以正确地定位类别。 这表明Grad-CAM对对抗性噪声的鲁棒性。</p>
+<p><img src="http://image.rexking6.top/img/clip1531381434.png" alt=""><br>图5：（a-b）原始图像和类别“客机”生成的对抗图像。 （c-d）原始类别“虎猫”和“拳师犬”的Grad-CAM可视化以及它们的置信度。 尽管网络完全被欺骗认为图像属于具有高置信度的“客机”类别（&gt;0.9999），但Grad-CAM可以准确地定位原始类别。</p>
+<h2 id="识别数据集中的偏差"><a href="#识别数据集中的偏差" class="headerlink" title="识别数据集中的偏差"></a>识别数据集中的偏差</h2><p>在本节中，我们将演示Grad-CAM的另一种用法：识别并减少训练数据集中的偏差。有偏差的数据集训练的模型可能不会推广到现实世界的场景，或者更糟糕，可能使偏见和刻板观念（比如性别，种族，年龄等）长期存在 [6, 37]。我们将微调的ImageNet训练的VGG-16模型用于“医生”与“护士”的分类任务。我们使用流行的图像搜索引擎中的前250个相关图像（针对每个类）构建我们的训练数据集。虽然训练好的模型达到了很好的验证准确性，但它并没有被推广（82％）。</p>
+<p>模型预测的Grad-CAM可视化表明，该模型学会了看人的面部/发型以区分护士和医生，从而学习了性别的刻板观念。事实上，这个模型把几名女医生错误地归类为护士，男护士分类成医生。显然，这是有问题的。结果发现图像搜索结果存在性别偏见（78%的医生图像是男性，93%的护士图像是女性）。</p>
+<p>通过从我们的可视化中获得的直观结果，我们通过将男护士和女医生添加到训练集中，减少了训练集中的偏差，同时保持每个类跟之前是相同数量的图像。重新训练的模型现在更好地推广到更平衡的测试集（90％）。对两种模型的Grad-CAM可视化的附加分析可以在附录中找到。该实验表明，在社会中做出更多算法决策的时候，Grad-CAM可以帮助检测和消除数据集中的偏见，这不仅对于泛化非常重要，而且对于公平和道德的结果也很重要。</p>
+<h1 id="反事实的解释"><a href="#反事实的解释" class="headerlink" title="反事实的解释"></a>反事实的解释</h1><p>我们提出了一种新的解释方式 - 反事实解释。 通过对Grad-CAM的略微修改，我们获得了这些反事实的解释，突出了对使网络改变决策的区域的支持。 删除在这些区域中发生的概念将使模型对给定的目标决策更有信心。具体地说，我们相对于卷积层的特征映射$A$对$y^c$的梯度（类$c$的分数）取反。 因此，重要性权重$α_k^c$现在变为，</p>
+<p><img src="http://image.rexking6.top/img/clip1531382111.png" alt=""></p>
+<p>如在（2）中，我们对用权重$\alpha_k^c$的前向激活图$A$加权求和，并且通过ReLU对其进行加权以获得反事实解释，如图6所示。</p>
+<p><img src="http://image.rexking6.top/img/clip1531382328.png" alt=""><br>图6：使用Grad-CAM的否定解释</p>
+<h1 id="图像标题和VQA"><a href="#图像标题和VQA" class="headerlink" title="图像标题和VQA"></a>图像标题和VQA</h1><p>最后，我们将Grad-CAM技术应用于图像标题 [7, 23, 47] 和视觉问题应答（VQA） [3, 15, 36, 41] 任务。 我们发现Grad-CAM导致这些任务的解释性视觉解释与基准可视化相比，这些视觉化在不同的预测中并没有明显改变。 请注意，现有的可视化技术或者不是类别鉴别（导向反向传播，反卷积），不能用于这些任务或体系结构，或者两者兼而有之（CAM或c-MWP）。</p>
+<h2 id="图像标题"><a href="#图像标题" class="headerlink" title="图像标题"></a>图像标题</h2><p>在本节中，我们使用Grad-CAM可视化图像描述模型的空间支持。 我们建立在公开可用的’neuraltalk2’ [25] 实现之上，该实现使用微调的VGG-16 CNN用于图像和基于LSTM的语言模型。 请注意，此模型没有明确的注意机制。 给定一个标题，我们计算其对数概率的梯度关于CNN的最后一个卷积层中的单位（VGG-16的conv5_3）并生成Grad-CAM可视化，如第3节所述。参见图7a。 在第一个示例中，生成的标题的Grad-CAM映射定位了风筝和人的每次出现，尽管它们的尺寸相对较小。 在下一个例子中，注意Grad-CAM如何正确地突出披萨和男人，但忽略了附近的女人，因为标题中没有提到“女人”。 更多定性的例子可以在附录B节中找到。</p>
+<p><img src="http://image.rexking6.top/img/clip1531382805.png" alt=""><br>图7：解释图像描述模型：我们使用我们的类判别定位技术Grad-CAM来查找图像中描述的空间支持区域。 图7a来自图像描述模型[25]的视觉解释突出显示被认为对于制作描述很重要的图像区域。 图7b用于标题左侧标记的三个候选边界框的密集描述模型[23]生成的描述的全局或整体描述模型的Grad-CAM定位。 我们可以看到，我们得到了与那些边界框一致的Grad-CAM定位（右） - 即使描述模型和Grad-CAM技术不使用任何边界框标注。</p>
+<p><strong>比较密集描述</strong><br>Johnson等人[23]最近介绍了密集描述（DenseCap）任务，该任务要求系统在给定图像中共同定位和标题显着区域。 他们的模型由完全卷积定位网络（FCLN）和基于LSTM的语言模型组成，该模型在单个前向传递中产生感兴趣区域和相关描述的边界框。 使用DenseCap模型，我们生成特定于区域的标题。 接下来，我们使用前面描述的整体描述模型（neuraltalk2）可视化这些区域特定描述的Grad-CAM定位。 有趣的是，我们观察到Grad-CAM局部化对应于DenseCap模型描述的图像中的区域，即使整体描述模型没有用任何区域或边界框级别注释进行训练（参见图7b）。</p>
+<h2 id="视觉问答"><a href="#视觉问答" class="headerlink" title="视觉问答"></a>视觉问答</h2><p>典型的VQA流程 [3, 15, 36, 41] 由CNN模型图像和RNN语言模型组成。 图像和问题表示融合在一起来预测答案，通常采用1000路分类。 由于这是一个分类问题，我们选择一个答案（（3）中的分数$y^c$）并使用它的分数计算Grad-CAM，以显示支持答案的图像证据。 尽管任务复杂，涉及视觉和语言两个组成部分，但图8中描述的（来自 [32] 的VQA模型的解释）令人惊讶地直观且信息丰富。</p>
+<p><img src="http://image.rexking6.top/img/clip1531383309.png" alt=""><br>图6：我们的VQA实验的定性结果：（a）给出左侧的图像和“什么颜色是消防栓？”的问题，我们将Grad-CAM和GuidedGrad-CAM视为“红色”，“黄色“和”黄色和红色“，Grad-CAM可视化具有高度的可解释性，并有助于解释任何目标预测 - 对于”红色“，模型侧重于消防栓的红色部分；当被迫回答”黄色“时，模型集中在顶部黄色的帽子上，当被迫回答“黄色和红色”时，它会看到整个消防栓！（b）即使对于复杂的模型，我们的方法也能够提供可解释的解释。</p>
+<p><strong>与人类关注的比较</strong><br>Das等人 [9] 为收集了VQA数据集子集的人类注意力图 [3]。 这些地图具有很高的强度，人类在图像中查看以回答视觉问题。 使用 [9]中 开发的等级相关评估协议，将来自 [3] 的1374 验证问题图像（QI）对的人类注意力图与来自 [32] 的VQA模型的Grad-CAM可视化进行比较。 Grad-CAM和人类关注地图的相关系数为0.136，统计上高于偶然或随机注意力地图（零相关）。 这表明尽管未接受基于图像文本对的训练，即使基于CNN + LSTM的非基于注意力的VQA模型在定位输出特定答案所需的区分区域方面也出人意料地出色。</p>
+<p><strong>关注基于ResNet的VQA模型的可视化</strong><br>Lu等人 [33] 使用200层ResNet [18] 对图像进行编码，并共同学习问题和图像的层次注意力机制。 图6b显示了该网络的Grad-CAM可视化。 当我们对ResNet的更深层次进行可视化时，我们发现Grad-CAM中大部分相邻层次的微小变化以及涉及降维的层次之间的较大变化。 ResNet中各层的可视化可以在附录H中找到。 据我们所知，我们是第一个可视化基于ResNet架构的决策。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>在这项工作中，我们提出了一种新颖的类别判别定位技术 - 梯度加权类激活映射（Grad-CAM） - 通过产生视觉解释使任何基于CNN的模型更加透明。此外，我们将Grad-CAM定位与现有的高分辨率可视化相结合，以获得高分辨率的类鉴别式Guided-Grad-CAM可视化。我们的可视化优于所有现有的方法：弱监督定位，Pointing Game和原始模型的忠实度。广泛的人体研究表明，我们的可视化可以更准确地区分类，更好地揭示分类器的可信度，并帮助识别数据集中的偏差。最后，我们展示了Grad-CAM对各种现成可用架构的广泛适用性，包括图像分类，图像描述和VQA，为可能的模型决策提供忠实的视觉解释。我们相信真正的人工智能系统不仅应该是智能的，而且还应该能够推断出人类信任它的信念和行动。未来的工作包括解释深层网络在强化学习，自然语言处理和视频应用等领域所做出的决策。</p>
+<h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><p>[1] A. Agrawal, D. Batra, and D. Parikh. Analyzing the Behavior of Visual Question Answering Models. In EMNLP, 2016. 1<br>[2] H. Agrawal, C. S. Mathialagan, Y. Goyal, N. Chavali, P. Banik, A. Mohapatra, A. Osman, and D. Batra. CloudCV: Large Scale Distributed Computer Vision as a Cloud Service. In Mobile Cloud Visual Media Computing, pages 265–290. Springer, 2015. 1<br>[3] S. Antol, A. Agrawal, J. Lu, M. Mitchell, D. Batra, C. Lawrence Zitnick, and D. Parikh. VQA: Visual Question Answering. In ICCV, 2015. 1, 7, 8<br>[4] L. Bazzani, A. Bergamo, D. Anguelov, and L. Torresani. Self-taught object localization with deep networks. In WACV, 2016. 3<br>[5] Y. Bengio, A. Courville, and P. Vincent. Representation learning: A review and new perspectives. IEEE transactions on pattern analysis and machine intelligence, 35(8):1798–1828, 2013. 3<br>[6] T. Bolukbasi, K.-W. Chang, J. Y. Zou, V. Saligrama, and A. T. Kalai. Man is to computer programmer as woman is to homemaker? debiasing word embeddings. In NIPS, 2016. 7<br>[7] X. Chen, H. Fang, T.-Y. Lin, R. Vedantam, S. Gupta, P. Dollár, and C. L. Zitnick. Microsoft COCO captions: Data Collection and Evaluation Server. arXiv preprint arXiv:1504.00325, 2015. 1, 7<br>[8] R. G. Cinbis, J. Verbeek, and C. Schmid. Weakly supervised object localization with multi-fold multiple instance learning. IEEE transactions on pattern analysis and machine intelligence, 2016. 3<br>[9] A. Das, H. Agrawal, C. L. Zitnick, D. Parikh, and D. Batra. Human Attention in Visual Question Answering: Do Humans and Deep Networks Look at the Same Regions? In EMNLP, 2016. 8<br>[10] J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li, and L. Fei-Fei. ImageNet: A Large-Scale Hierarchical Image Database. In CVPR, 2009. 2, 5, 6, 17<br>[11] A. Dosovitskiy and T. Brox. Inverting Convolutional Networks with Convolutional Networks. In CVPR, 2015. 3<br>[12] D. Erhan, Y. Bengio, A. Courville, and P. Vincent. Visualizing Higherlayer Features of a Deep Network. University of Montreal, 1341, 2009. 3<br>[13] H. Fang, S. Gupta, F. Iandola, R. K. Srivastava, L. Deng, P. Dollár, J. Gao, X. He, M. Mitchell, J. C. Platt, et al. From Captions to Visual Concepts and Back. In CVPR, 2015. 1<br>[14] C. Gan, N. Wang, Y. Yang, D.-Y. Yeung, and A. G. Hauptmann. Devnet: A deep event network for multimedia event detection and evidence recounting. In CVPR, 2015. 3<br>[15] H. Gao, J. Mao, J. Zhou, Z. Huang, L. Wang, and W. Xu. Are You Talking to a Machine? Dataset and Methods for Multilingual Image Question Answering. In NIPS, 2015. 1, 7, 8<br>[16] R. Girshick, J. Donahue, T. Darrell, and J. Malik. Rich Feature Hierarchies for Accurate Object Detection and Semantic Segmentation. In CVPR, 2014. 1<br>[17] I. J. Goodfellow, J. Shlens, and C. Szegedy. Explaining and harnessing adversarial examples. stat, 2015. 7<br>[18] K. He, X. Zhang, S. Ren, and J. Sun. Deep residual learning for image recognition. In CVPR, 2016. 1, 2, 8, 21<br>[19] D. Hoiem, Y. Chodpathumwan, and Q. Dai. Diagnosing Error in Object Detectors. In ECCV, 2012. 1<br>[20] P. Jackson. Introduction to Expert Systems. Addison-Wesley Longman Publishing Co., Inc., Boston, MA, USA, 3rd edition, 1998. 1<br>[21] Y. Jia, E. Shelhamer, J. Donahue, S. Karayev, J. Long, R. Girshick, S. Guadarrama, and T. Darrell. Caffe: Convolutional Architecture for Fast Feature Embedding. In ACM MM, 2014. 5<br>[22] E. Johns, O. Mac Aodha, and G. J. Brostow. Becoming the Expert - Interactive Multi-Class Machine Teaching. In CVPR, 2015. 1<br>[23] J. Johnson, A. Karpathy, and L. Fei-Fei. DenseCap: Fully Convolutional Localization Networks for Dense Captioning. In CVPR, 2016. 1, 7, 8<br>[24] A. Karpathy. What I learned from competing against a ConvNet on ImageNet. <a target="_blank" rel="noopener" href="http://karpathy.github.io/2014/09/02/what-i-learned-fromcompeting-against-a-convnet-on-imagenet/">http://karpathy.github.io/2014/09/02/what-i-learned-fromcompeting-against-a-convnet-on-imagenet/</a>, 2014. 1<br>[25] A. Karpathy and L. Fei-Fei. Deep visual-semantic alignments for generating image descriptions. In CVPR, 2015. 7, 8<br>[26] A. Kolesnikov and C. H. Lampert. Seed, expand and constrain: Three principles for weakly-supervised image segmentation. In ECCV, 2016. 5, 11, 19, 21<br>[27] A. Krizhevsky, I. Sutskever, and G. E. Hinton. Imagenet classification with deep convolutional neural networks. In NIPS, 2012. 1, 4, 13<br>[28] M. Lin, Q. Chen, and S. Yan. Network in network. In ICLR, 2014. 3<br>[29] T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Dollár, and C. L. Zitnick. Microsoft coco: Common objects in context. In ECCV. 2014. 12<br>[30] Z. C. Lipton. The Mythos of Model Interpretability. ArXiv e-prints, June 2016. 1, 3<br>[31] J. Long, E. Shelhamer, and T. Darrell. Fully convolutional networks for semantic segmentation. In CVPR, 2015. 1<br>[32] J. Lu, X. Lin, D. Batra, and D. Parikh. Deeper LSTM and normalized CNN Visual Question Answering model. <a target="_blank" rel="noopener" href="https://github.com/VT-vision-lab/VQA_LSTM_CNN">https://github.com/VT-vision-lab/VQA_LSTM_CNN</a>, 2015. 8, 13<br>[33] J. Lu, J. Yang, D. Batra, and D. Parikh. Hierarchical question-image co-attention for visual question answering. In NIPS, 2016. 8<br>[34] A. Mahendran and A. Vedaldi. Salient deconvolutional networks. In European Conference on Computer Vision, 2016. 3<br>[35] A. Mahendran and A. Vedaldi. Visualizing deep convolutional neural networks using natural pre-images. International Journal of Computer Vision, pages 1–23, 2016. 3[36] M. Malinowski, M. Rohrbach, and M. Fritz. Ask your neurons: A neural-based approach to answering questions about images. In ICCV, 2015. 1, 7, 8<br>[37] I. Misra, C. Lawrence Zitnick, M. Mitchell, and R. Girshick. Seeing through the human reporting bias: Visual classifiers from noisy human-centric labels. In CVPR, 2016. 7<br>[38] M. Oquab, L. Bottou, I. Laptev, and J. Sivic. Learning and transferring mid-level image representations using convolutional neural networks. In CVPR, 2014. 3<br>[39] M. Oquab, L. Bottou, I. Laptev, and J. Sivic. Is object localization for free? – weakly-supervised learning with convolutional neural networks. In CVPR, 2015. 3<br>[40] P. O. Pinheiro and R. Collobert. From image-level to pixel-level labeling with convolutional networks. In CVPR, 2015. 3<br>[41] M. Ren, R. Kiros, and R. Zemel. Exploring models and data for image question answering. In NIPS, 2015. 1, 7, 8<br>[42] M. T. Ribeiro, S. Singh, and C. Guestrin. “Why Should I Trust You?”: Explaining the Predictions of Any Classifier. In SIGKDD, 2016. 3, 6<br>[43] D. Silver, A. Huang, C. J. Maddison, A. Guez, L. Sifre, G. Van Den Driessche, J. Schrittwieser, I. Antonoglou, V. Panneershelvam, M. Lanctot, et al. Mastering the game of go with deep neural networks and tree search. Nature, 529(7587):484–489, 2016. 1<br>[44] K. Simonyan, A. Vedaldi, and A. Zisserman. Deep inside convolutional networks: Visualising image classification models and saliency maps. CoRR, abs/1312.6034, 2013. 3, 5<br>[45] K. Simonyan and A. Zisserman. Very Deep Convolutional Networks for Large-Scale Image Recognition. In ICLR, 2015. 4, 5, 12, 13, 18<br>[46] J. T. Springenberg, A. Dosovitskiy, T. Brox, and M. A. Riedmiller. Striving for Simplicity: The All Convolutional Net. CoRR, abs/1412.6806, 2014. 2, 3, 19<br>[47] O. Vinyals, A. Toshev, S. Bengio, and D. Erhan. Show and tell: A neural image caption generator. In CVPR, 2015. 1, 7<br>[48] C. Vondrick, A. Khosla, T. Malisiewicz, and A. Torralba. HOGgles: Visualizing Object Detection Features. ICCV, 2013. 7<br>[49] M. D. Zeiler and R. Fergus. Visualizing and understanding convolutional networks. In ECCV, 2014. 2, 3, 6, 19<br>[50] J. Zhang, Z. Lin, J. Brandt, X. Shen, and S. Sclaroff. Top-down Neural Attention by Excitation Backprop. In ECCV, 2016. 3, 5, 20<br>[51] B. Zhou, A. Khosla, L. A., A. Oliva, and A. Torralba. Learning Deep Features for Discriminative Localization. In CVPR, 2016. 2, 3, 4, 5, 20</p>
+<h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><p>在本补充文件中，我们提供</p>
+<ul>
+<li>A部分：推导说明Grad-CAM是对任何基于CNN的体系结构的CAM的推广，因此不需要任何体系结构更改或重新训练。</li>
+<li>B部分：显示用于图像分类，图像描述和视觉问答（VQA）的Grad-CAM和Guided Grad-CAM可视化的定性结果。对于图像描述和VQA，我们的可视化（Grad-CAM和Guided Grad-CAM）揭示了一些令人惊讶的见解，即使不基于非注意的CNN + LSTM模型通常也能很好地定位有区别的输入图像区域，即使没有接受过接地训练图像文本对。</li>
+<li>C部分：我们为第6.3节中描述的两种模型提供了Grad-CAM解释。</li>
+<li>D部分：模块研究，探索和验证我们用于计算Grad-CAM可视化的设计选择。</li>
+<li>E部分：通过使用Grad-CAM的弱定位线索作为SEC的种子，对PASCAL VOC 2012进行了弱监督分割[26]。</li>
+<li>F部分：Pointing Game设置的更多细节。</li>
+<li>G部分：与PASCAL和COCO上现有的可视化技术，CAM和c-MWP的比较，我们发现我们的可视化效果更好，同时计算速度更快，同时可以显示各种各样的CNN-基于模型，包括但不限于具有全连接层的CNN，与递归神经网络（RNN）堆叠的CNN，ResNets等。</li>
+<li>H部分：200层ResNet网络的Grad-CAM可视化分析。</li>
+</ul>
+<h2 id="Grad-CAM作为CAM的推广"><a href="#Grad-CAM作为CAM的推广" class="headerlink" title="Grad-CAM作为CAM的推广"></a>Grad-CAM作为CAM的推广</h2><p>在本节中，我们正式证明了Grad-CAM是CAM的推广，正如正文第3节所述。</p>
+<p>回想一下，CAM架构由全卷积的CNN组成，其次是全局平均池化，以及具有softmax的线性分类层。</p>
+<p>让最终的卷积层产生$K$个特征映射$A^k$，每个元素由$i$和$j$索引。 因此，$A_{ij}^k$指的是特征图$A^k$的位置$(i,j)$处的激活。</p>
+<p>CAM计算$A_{ij}^k$上的全局平均池化（GAP）。让我们将$F^k$定义为全局平均池化输出。</p>
+<p>所以，</p>
+<script type="math/tex; mode=display">F^k=\frac{1}{Z}\sum_i \sum_j A_{ij}^k</script><p>CAM计算最终得分，</p>
+<script type="math/tex; mode=display">Y^c=\sum_k w_k^c·F^k</script><p>其中$w_k^c$是连接第$k$个特征映射与第$c$类的权重。</p>
+<p>根据我们得到的特征映射$F^k$，得到第$c$类（$Y^c$）得分的梯度，（根据链式法则）</p>
+<script type="math/tex; mode=display">\frac{\partial Y^c}{\partial F^k}=\frac{\frac{\partial Y^c}{\partial A_{ij}^k}}{\frac{\partial F^k}{\partial A_{ij}^k}}</script><p>考虑（6）关于$A_{ij}^k$的偏导数，我们可以看出$\frac{\partial F^k}{\partial A_{ij}^k}=\frac{1}{Z}$。 用（8）代替，我们得到，</p>
+<script type="math/tex; mode=display">\frac{\partial Y^c}{\partial F^k}=\frac{\partial Y^c}{\partial A_{ij}^k}·Z</script><p>从（7）我们得到，$\frac{\partial Y^c}{\partial F^k}=w_k^c$。因此，</p>
+<script type="math/tex; mode=display">w_k^c=Z·\frac{\partial Y^c}{\partial A_{ij}^k}</script><p>现在，我们可以在（5）中对所有像素$(i,j)$的此表达式的两边求和，得到：</p>
+<script type="math/tex; mode=display">\sum_i \sum_j w_k^c=\sum_i \sum_j Z·\frac{\partial Y^c}{\partial A_{ij}^k}</script><p>能够被写成，</p>
+<script type="math/tex; mode=display">w_k^c=Z\sum_i \sum_j \frac{\partial Y^c}{\partial A_{ij}^k}</script><p>因为$Z$和$w_k^c$都不依赖于$(i,j)$。（这里应该是原文写错了，式子左边没有$Z$）</p>
+<p>注意，$Z$是特征图中的像素数（或$Z=\sum_i \sum_j 1$）。 因此，我们可以重新修改项，并看到：</p>
+<script type="math/tex; mode=display">w_k^c=\sum_i \sum_j \frac{\partial Y^c}{\partial A_{ij}^k}</script><p>我们可以看到，直到在可视化期间归一化的比例常数（$1/Z$），$w_k^c$的表达式与Grad-CAM使用的$α_k^c$相同（如正文中所述）。</p>
+<p>因此，Grad-CAM是CAM到任意基于CNN的体系结构的推广，同时保持CAM的计算效率。</p>
+<h2 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h2><p>在本节中，我们为Grad-CAM和Guided Grad CAM提供更多定性结果，应用于图像分类，图像描述和VQA任务。</p>
+<h3 id="图像分类"><a href="#图像分类" class="headerlink" title="图像分类"></a>图像分类</h3><p>我们使用Grad-CAM和Guided Grad-CAM来可视化图像中为特定预测提供支持的区域。 图A1中报告的结果对应于在ImageNet上训练的VGG-16 [45]网络。</p>
+<p><img src="http://image.rexking6.top/img/clip1531406759.png" alt=""><br>图A1：来自COCO验证数据集的随机采样图像的可视化。 每列顶部都提到了预测类。</p>
+<p>图A1显示了来自COCO [29]验证集的随机抽样实例。 COCO图像通常每个图像具有多个对象，Grad-CAM可视化显示精确定位以支持模型的预测。</p>
+<p>Guided Grad-CAM甚至可以定位微小物体。 例如，我们的方法正确地定位了预测的类“火炬”（图A1.a），尽管它的大小和图像中的奇怪位置。 我们的方法也是类别鉴别性 - 即使图像中存在常见的ImageNet类别“狗”，它也只关注“马桶座”（图A1.e）。</p>
+<p>我们还可以显示Grad-CAM，Guided Backpropagation（GB），Deconvolution（DC），GB + Grad-CAM（Guided Grad-CAM），DC + Grad-CAM（Deconvolution Grad-CAM），用于ILSVRC13检测验证设置的图像，每个至少有2个唯一对象类别。 可以在以下链接中找到所提及类的可视化。</p>
+<p>“电脑键盘，键盘”类：<a target="_blank" rel="noopener" href="http://i.imgur.com/QMhsRzf.jpg">http://i.imgur.com/QMhsRzf.jpg</a><br>“太阳镜，墨镜，深浅不一”课程：<a target="_blank" rel="noopener" href="http://i.imgur.com/a1C7DGh.jpg">http://i.imgur.com/a1C7DGh.jpg</a></p>
+<h3 id="图像描述"><a href="#图像描述" class="headerlink" title="图像描述"></a>图像描述</h3><p>我们使用公开的Neuraltalk2代码和模型进行图像描述实验。 该模型使用VGG-16对图像进行编码。 图像表示在第一时间步骤作为输入传递给LSTM，LSTM生成图像的描述。 使用COCO [29] 描述数据集对该模型进行端到端训练以及CNN微调。 我们将图像前馈到图像描述模型以获得标题。 我们使用Grad-CAM进行粗略定位并将其与Guided Backpropagation相结合，以获得高分辨率可视化，突出显示图像中为生成的描述提供支持的区域。</p>
+<p><img src="http://image.rexking6.top/img/clip1531407275.png" alt=""><br>图A2：采用导向反向传播，Grad-CAM和Guided Grad-CAM，由Neuraltalk2图像描述模型生成的描述的可视化。</p>
+<h3 id="视觉问答（VQA）"><a href="#视觉问答（VQA）" class="headerlink" title="视觉问答（VQA）"></a>视觉问答（VQA）</h3><p>我们使用Grad-CAM和Guided Grad-CAM解释为什么公开可用的VQA模型[32]回答了它的答案。</p>
+<p>Lu等人的VQA模型。 使用标准CNN，后跟全连接层，将图像转换为1024-dim，以匹配问题的LSTM嵌入。 然后将经变换的图像和LSTM嵌入逐点相乘以获得图像和问题的组合表示，并且在顶部训练多层感知器以预测1000个答案中的一个。 我们展示了使用3种不同CNN训练的VQA模型的可视化—AlexNet [27]，VGG-16和VGG-19 [45]。 尽管CNN并未针对VQA的任务进行微调，但有趣的是，通过提供模型所关注区域的定位高分辨率可视化，我们的方法可以作为更好地理解这些网络的工具。 请注意，这些网络在没有明确注意力机制的情况下进行了训练。</p>
+<p>请注意，在图A3的第一行中，对于“是否有人在冲浪？”这个问题，AlexNet和VGG-16的VQA模型回答“否”，因为他们主要集中在这个人身上，而不是波浪。另一方面，VGG-19正确回答“是”，并查看该男子周围的区域以回答这个问题。在第二行，对于问题“人打什么？”，用AlexNet训练的VQA模型仅根据背景回答“网球”而不看球。在现实生活中使用这种模型可能会有风险。仅基于预测的答案很难确定模型的可信度。我们的可视化提供了一种准确的方式来解释模型的预测，并帮助确定哪些模型可信任，而无需进行任何架构更改或牺牲准确性。注意在图A3的最后一行中，对于问题“这是一个完整的橙子吗？”，模型寻找橙子周围的区域来回答“否”。</p>
+<p><img src="http://image.rexking6.top/img/clip1531447390.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1531447425.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1531447455.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1531447520.png" alt=""></p>
+<p>图A3：来自VQA模型的答案的导向反向传播，Grad-CAM和Guided Grad-CAM可视化。 对于每个图像 - 问题对，我们显示了AlexNet，VGG-16和VGG-19的可视化。 请注意第3行中注意力的变化，因为我们将答案从黄色更改为绿色。</p>
+<h3 id="识别并消除数据集中的偏差"><a href="#识别并消除数据集中的偏差" class="headerlink" title="识别并消除数据集中的偏差"></a>识别并消除数据集中的偏差</h3><p>在本节中，我们提供了定性示例，显示了两个模型的解释，这两个模型是为了区分医生和护士 - 模型1，它是在一个流行的搜索引擎上训练的图像（具有固有的偏见），而模型2是在一个更平衡的集合上来自同一搜索引擎的图像训练的。</p>
+<p>如图A4所示，模型预测的Grad-CAM可视化显示模型已经学会了查看人的面部/发型以区分护士和医生，从而学习性别刻板印象。</p>
+<p><img src="http://image.rexking6.top/img/clip1531450770.png" alt=""><br>图A4：模型1和模型2的Grad-CAM解释。 在（a-c）中，我们可以看到，即使两个模型都做出了正确的决定，有偏见的模型（模型1）正在看人的面部来决定这个人是否是护士（b），而无偏见的模型，正在寻找短袖做出决定（c）。 例如图像（d）和示例（g）偏向模型通过观察面部和发型（e，h）做出错误的预测（将医生错误分类为护士），其中无偏模型使正确的预测看起来在白大褂和听诊器（f，i）。</p>
+<p>使用从Grad-CAM可视化中获得的见解，我们平衡了数据集并重新训练了模型。 新模型model2不仅可以很好地扩展为平衡测试集，而且还可以查看正确的区域。</p>
+<h2 id="模块研究"><a href="#模块研究" class="headerlink" title="模块研究"></a>模块研究</h2><p>在本节中，我们提供了我们进行的模块研究的详细信息。</p>
+<h3 id="遮挡的mask尺寸不同"><a href="#遮挡的mask尺寸不同" class="headerlink" title="遮挡的mask尺寸不同"></a>遮挡的mask尺寸不同</h3><p>图1(e, k)显示了“猫”和“狗”类的遮挡灵敏度的结果。我们通过重复遮挡图像的区域并向前传播每个遮挡图像来计算该遮挡图。在遮挡图的每个位置处，我们存储特定类的原始分数的差异和在向前传播掩蔽图像之后获得的分数。我们对mask尺寸的选择包括（10×10,15×15,25×25,35×35,45×45和90×90）。我们对图像进行零填充，以使得到的遮挡贴图与原始图像具有相同的尺寸。得到的遮挡图可以在图A5中找到。注意，当该像素周围的区域被遮挡时，蓝色区域对应于特定类别（在图A5的情况下为“虎猫”）的得分降低。因此它可以作为类别的证据。而红色区域对应于得分的增加，因为该像素周围的区域被遮挡。因此，这些区域可能表明存在其他令人困惑的类别。我们观察到35×35是锐利结果和光滑外观之间的良好折衷。</p>
+<p><img src="http://image.rexking6.top/img/clip1531451359.png" alt=""><br>图A5：“虎猫”类别的不同mask大小的遮挡贴图。</p>
+<h3 id="Guided-Grad-CAM在不同的层上"><a href="#Guided-Grad-CAM在不同的层上" class="headerlink" title="Guided Grad-CAM在不同的层上"></a>Guided Grad-CAM在不同的层上</h3><p>我们展示了在AlexNet和VGG-16 CNN的不同卷积层上对“虎猫”类别应用Grad-CAM的结果。 正如预期的那样，图A6的结果表明随着我们向较浅的卷积层移动，定位变得越来越差。 这是因为后来的卷积层捕获高级语义信息并同时保留空间信息，而较浅的层具有较小的感知域并且仅集中于对下一层重要的局部特征。</p>
+<p><img src="http://image.rexking6.top/img/clip1531451602.png" alt=""><br>图A6：“虎猫”类不同卷积层的Grad-CAM。 该图分析了当我们针对CNN中的不同特征图执行Grad-CAM时定位如何定性变化（VGG16 [45]）。 我们发现，通常在网络中最深的卷积层之后获得最佳外观可视化，并且在较浅层处局部化逐渐变得更糟。 这与我们在正文第3节中描述的直觉一致。</p>
+<p><img src="http://image.rexking6.top/img/clip1531451908.png" alt=""><br>图A7：针对AlexNet的不同修正卷积层特征映射的“虎猫”类别的Grad-CAM定位。</p>
+<h3 id="设计选择"><a href="#设计选择" class="headerlink" title="设计选择"></a>设计选择</h3><p><img src="http://image.rexking6.top/img/clip1531451702.png" alt=""><br>表A1：用于模块研究的ILSVRC-15验证集的定位结果。 请注意，与正文中报告的10种结果评估相比，可视化是针对单一结果创建的。</p>
+<p>我们通过ILSVRC15验证集集上的 top-1 定位误差来评估设计选择[10]。</p>
+<h4 id="正文中ReLU在等式1中的重要性"><a href="#正文中ReLU在等式1中的重要性" class="headerlink" title="正文中ReLU在等式1中的重要性"></a>正文中ReLU在等式1中的重要性</h4><p>删除ReLU（正文中的等式1）会使错误增加15.3％。 见表A1。 Grad-CAM中的负值表示多个发生的类之间的混淆。 因此，当我们抑制它们时，定位得到改善（参见图A8）。</p>
+<p><img src="http://image.rexking6.top/img/clip1531452075.png" alt=""><br>图A8：“虎猫”类别的Grad-CAM可视化，说明了ReLU的重要性以及在正文的等式1中使用绝对梯度的效果。</p>
+<h4 id="正文中等式2中每个导数的绝对值"><a href="#正文中等式2中每个导数的绝对值" class="headerlink" title="正文中等式2中每个导数的绝对值"></a>正文中等式2中每个导数的绝对值</h4><p>取正文中的等式2中每个导数的绝对值。 误差将减少1.5％（参见表A1）。 但定性地图看起来有点差（见图A8），而且这种评估并不能完全获得类的鉴别性（大多数ImageNet图像只有1类）。</p>
+<h4 id="全局平均池化与全局最大池化"><a href="#全局平均池化与全局最大池化" class="headerlink" title="全局平均池化与全局最大池化"></a>全局平均池化与全局最大池化</h4><p>我们尝试使用全局最大池化（GMP）来代替全局平均池化（GAP）传入到卷积层的梯度。 我们观察到使用GMP降低了我们的Grad-CAM方法的定位能力。 在下面的图A9中可以看到一个例子。 该观察结果也总结在表A1。 这可能是由于与平均梯度相比，最大梯度在统计上对噪声的鲁棒性较差。</p>
+<p><img src="http://image.rexking6.top/img/clip1531452476.png" alt=""><br>图A9：具有全局平均池化和全局最大池化的“虎猫”类别的Grad-CAM可视化。</p>
+<h4 id="不同ReLU对Grad-CAM的影响"><a href="#不同ReLU对Grad-CAM的影响" class="headerlink" title="不同ReLU对Grad-CAM的影响"></a>不同ReLU对Grad-CAM的影响</h4><p>我们尝试对ReLU的反向传播进行不同的修改，即使用Guided-ReLU [46]和Deconv-ReLU [49]。</p>
+<p><strong>Guided-ReLU的影响</strong><br>Springenberg等人 [46] 引入了Guided Backprop，他们修改了ReLU的反向传递，只将正梯度传递给具有正激活的区域。 将这种变化应用于我们的Grad-CAM图的计算引入了Grad-CAM的类鉴别能力的下降，如图A10所示，但它对ILSVRC 14定位挑战的定位能力略有改善。（见表A1）。</p>
+<p><img src="http://image.rexking6.top/img/clip1531454741.png" alt=""><br>图A10：“虎猫”类别的Grad-CAM可视化，用于对ReLU向后传递的不同修改。 当我们在Grad-CAM的计算期间使用实际梯度时获得最佳结果。</p>
+<p><strong>Deconv-ReLU的影响</strong><br>Zeiler和Fergus [49]在他们的反卷积工作中引入了对ReLU反向传播的略微修改，仅通过较高层的正梯度。 将此修改应用于我们的Grad-CAM的计算会产生更糟糕的结果，如图A10所示。</p>
+<h2 id="弱监督分割"><a href="#弱监督分割" class="headerlink" title="弱监督分割"></a>弱监督分割</h2><p>在最近的工作中，Kolesnikov等人[26]引入了一种新的损失函数来训练弱监督的图像分割模型。 它们的损失函数基于三个原则：1. 用弱定位线索种子；2. 将对象种子扩展到合理大小的区域；3. 将分割约束到对象边界。 他们表明他们提出的损失函数可以带来更好的分割。</p>
+<p>他们表明他们的算法对种子丢失非常敏感，没有这种算法，分割网络就无法正确地定位对象[26]。 在他们的工作中，他们使用CAM来弱化定位前景类。我们用Grad-CAM取代了CAM，并在图A11中显示了结果。 最后一行显示了2个失败例子。 在左下方的图像中，2人的衣服未正确突出显示。 这可能是因为最具鉴别力的部分是他们的面部，因此Grad-CAM地图仅突出显示那些。 这导致分割仅突出显示2个人的面部。 在右下角的图像中，非常细薄的自行车没有高亮。 这可能是因为Grad-CAM图的分辨率很低（14×14），这使得难以捕获细薄区域。</p>
+<p><img src="http://image.rexking6.top/img/clip1531487796.png" alt=""><br>图A11：PASCAL VOC 2012以Grad-CAM作为SEC[26]的种子分割结果。</p>
+<h2 id="Pointing-Game的更多细节"><a href="#Pointing-Game的更多细节" class="headerlink" title="Pointing Game的更多细节"></a>Pointing Game的更多细节</h2><p>在[50]中，指向游戏被设置为评估不同注意力图的鉴别力以用于定位真实类别。 在某种意义上，这评估了可视化的精确度，即注意力图与真实类别的分割图相交的频率。 这不会评估可视化技术产生与感兴趣类别不对应的地图的频率。 例如，该评估不会影响图A13左上角的可视化，以便在可视化鸟类时突出显示斑马。</p>
+<p><img src="http://image.rexking6.top/img/clip1531488097.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1531488121.png" alt=""></p>
+<p>图A13：从COCO验证集中采样的图像，采用c-MWP和Grad-CAM的 top-5 预测类别（在每个图像上方显示）的可视化。</p>
+<p>因此，我们提出对 Pointing Game 的修改以评估 top-5 预测类别的可视化。 在这种情况下，可视化给出了额外的选项，以拒绝来自CNN分类器的任何 top-5 预测。 对于两个可视化中的每一个，Grad-CAM和c-MWP，我们在可视化的最大值上选择一个阈值，该阈值可用于确定图像中是否存在可视化的类别。</p>
+<p>我们计算 top-5 类别的映射，并根据映射中的最大值，我们尝试分类地图是GT标签还是图像中不存在的类别。正如正文第4.2节所述，我们发现我们的方法Grad-CAM的表现优于c-MWP（70.58％对60.30％）。 图A13显示了使用c-MWP和Grad-CAM为 top-5 类别计算的地图。</p>
+<h2 id="与激励反向传播（c-MWP）和CAM的定性比较"><a href="#与激励反向传播（c-MWP）和CAM的定性比较" class="headerlink" title="与激励反向传播（c-MWP）和CAM的定性比较"></a>与激励反向传播（c-MWP）和CAM的定性比较</h2><p>在本节中，我们提供了更多定性结果，比较了Grad-CAM与CAM [51]和c-MWP [50]。</p>
+<h3 id="PASCAL"><a href="#PASCAL" class="headerlink" title="PASCAL"></a>PASCAL</h3><p>我们比较了在PASCAL VOC 2012数据集上进行了微调的ImageNet训练的VGG-16模型的Grad-CAM，CAM和c-MWP可视化。 虽然可以从现有模型直接获得Grad-CAM和c-MWP可视化，但CAM需要进行架构更改，并且需要重新训练，这会导致精度损失。 此外，与Grad-CAM不同，c-MWP和CAM只能应用于图像分类网络。 真实类别的可视化可以在图A12中找到。</p>
+<p><img src="http://image.rexking6.top/img/clip1531488668.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1531488687.png" alt=""></p>
+<p>图A12：从PASCAL验证集中采样的图像的真实类别（在每个图像下方显示）的可视化。</p>
+<p>我们比较了经过ImageCO训练的VGG-16模型的Grad-CAM和c-MWP可视化，这些模型在COCO数据集上进行了微调。 前A个预测类别的可视化可以在图A13中找到。 可以看出，c-MWP突出了预测但不存在的类别的任意区域，与Grad-CAM不同，这似乎更合理。 我们通过指向实验对此进行定量评估。</p>
+<h3 id="COCO"><a href="#COCO" class="headerlink" title="COCO"></a>COCO</h3><p>我们比较了在COCO数据集上使用微调的ImageNet训练的VGG-16模型中的Grad-CAM和c-MWP可视化。前5个预测类别的可视化可以在图A13中找到。 可以看出，c-MWP突出了预测但不存在的类别的任意区域，与Grad-CAM不同，这似乎更合理。 我们通过 Pointing Game 对此进行定量评估。</p>
+<h2 id="分析残差网络"><a href="#分析残差网络" class="headerlink" title="分析残差网络"></a>分析残差网络</h2><p>在本节中，我们在残差网络（ResNets）上执行Grad-CAM。 特别是，我们分析了在ImageNet上训练的200层架构。</p>
+<p>当前ResNets [18]通常由残差块组成。一组块使用标识跳过连接（具有相同输出维度的两个层之间的快捷连接）。 这些残差块组散布有改变传播信号尺寸的下采样模块。 从图A14中可以看出，我们在最后一个卷积层上应用的可视化可以正确地定位猫和狗。 Grad-CAM还可以在最后一组的残差块中正确地显示猫和狗。 然而，当我们朝着具有不同空间分辨率的早期残差块集合时，我们看到Grad-CAM无法定位感兴趣的类别（参见图A14的最后一行）。 我们观察到其他ResNet架构（18层和50层ResNets）的类似趋势。</p>
+<p><img src="http://image.rexking6.top/img/clip1531489243.png" alt=""></p>
+<p>图A14：我们观察到Grad-CAM的鉴别能力随着我们遇到下采样层而显着降低。</p>
+<h1 id="一些总结"><a href="#一些总结" class="headerlink" title="一些总结"></a>一些总结</h1><p>它与CAM的主要区别在于求权重$w_k^c$的过程。CAM通过替换全连接层为GAP层，重新训练得到权重，而Grad-CAM另辟蹊径，用梯度的全局平均来计算权重。事实上，经过严格的数学推导，Grad-CAM与CAM计算出来的权重是等价的。</p>
+<p>第一次看这么长的文章，眼睛花了，有些实验的细节还不太清楚。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\05\CAM-Learning-Deep-Features-for-Discriminative-Localization-阅读笔记\" rel="bookmark">CAM-Learning Deep Features for Discriminative Localization 阅读笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\05\Visualizing-and-Understanding-Convolutional-Networks-阅读笔记\" rel="bookmark">Visualizing and Understanding Convolutional Networks 阅读笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\21\《Transferable-Semi-supervised-Semantic-Segmentation》笔记\" rel="bookmark">《Transferable Semi-supervised Semantic Segmentation》笔记</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/07/10/%E3%80%8AGrad-CAM-Visual-Explanations-from-Deep-Networks-via-Gradient-based-Localization%E3%80%8B%E7%AC%94%E8%AE%B0/" title="《Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization》笔记">https://blog.rexking6.top/2018/07/10/《Grad-CAM-Visual-Explanations-from-Deep-Networks-via-Gradient-based-Localization》笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2/" rel="tag"># 语义分割</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/07/08/%E3%80%8ALearning-Deep-Features-for-Discriminative-Localization%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="prev" title="《Learning Deep Features for Discriminative Localization》笔记">
+      <i class="fa fa-chevron-left"></i> 《Learning Deep Features for Discriminative Localization》笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/13/%E3%80%8AAdversarial-Complementary-Learning-for-Weakly-Supervised-Object-Localization%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="next" title="《Adversarial Complementary Learning for Weakly Supervised Object Localization》笔记">
+      《Adversarial Complementary Learning for Weakly Supervised Object Localization》笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">3.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">相关工作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%B9%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">方法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9A%E4%BD%8D%E8%83%BD%E5%8A%9B%E8%AF%84%E4%BC%B0"><span class="nav-number">6.</span> <span class="nav-text">定位能力评估</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%B1%E7%9B%91%E7%9D%A3%E5%AE%9A%E4%BD%8D"><span class="nav-number">6.1.</span> <span class="nav-text">弱监督定位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pointing-Game"><span class="nav-number">6.2.</span> <span class="nav-text">Pointing Game</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%AF%E8%A7%86%E5%8C%96%E8%AF%84%E4%BC%B0"><span class="nav-number">7.</span> <span class="nav-text">可视化评估</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E5%88%86%E7%B1%BB%E9%89%B4%E5%88%AB%E8%83%BD%E5%8A%9B"><span class="nav-number">7.1.</span> <span class="nav-text">评估分类鉴别能力</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E4%BB%BB%E5%BA%A6%E8%AF%84%E4%BC%B0"><span class="nav-number">7.2.</span> <span class="nav-text">信任度评估</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%A0%E5%AE%9E%E6%80%A7%E4%B8%8E%E5%8F%AF%E8%A7%A3%E9%87%8A%E6%80%A7"><span class="nav-number">7.3.</span> <span class="nav-text">忠实性与可解释性</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%8A%E6%96%AD%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BBCNN"><span class="nav-number">8.</span> <span class="nav-text">诊断图像分类CNN</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90VGG-16%E7%9A%84%E5%A4%B1%E6%95%88%E6%A8%A1%E5%BC%8F"><span class="nav-number">8.1.</span> <span class="nav-text">分析VGG-16的失效模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E6%8A%97%E6%80%A7%E5%99%AA%E5%A3%B0%E5%AF%B9VGG-16%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">8.2.</span> <span class="nav-text">对抗性噪声对VGG-16的影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%86%E5%88%AB%E6%95%B0%E6%8D%AE%E9%9B%86%E4%B8%AD%E7%9A%84%E5%81%8F%E5%B7%AE"><span class="nav-number">8.3.</span> <span class="nav-text">识别数据集中的偏差</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%8D%E4%BA%8B%E5%AE%9E%E7%9A%84%E8%A7%A3%E9%87%8A"><span class="nav-number">9.</span> <span class="nav-text">反事实的解释</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E6%A0%87%E9%A2%98%E5%92%8CVQA"><span class="nav-number">10.</span> <span class="nav-text">图像标题和VQA</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E6%A0%87%E9%A2%98"><span class="nav-number">10.1.</span> <span class="nav-text">图像标题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%86%E8%A7%89%E9%97%AE%E7%AD%94"><span class="nav-number">10.2.</span> <span class="nav-text">视觉问答</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">11.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-number">12.</span> <span class="nav-text">References</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%99%84%E5%BD%95"><span class="nav-number">13.</span> <span class="nav-text">附录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Grad-CAM%E4%BD%9C%E4%B8%BACAM%E7%9A%84%E6%8E%A8%E5%B9%BF"><span class="nav-number">13.1.</span> <span class="nav-text">Grad-CAM作为CAM的推广</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">13.2.</span> <span class="nav-text">实验结果</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB"><span class="nav-number">13.2.1.</span> <span class="nav-text">图像分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E6%8F%8F%E8%BF%B0"><span class="nav-number">13.2.2.</span> <span class="nav-text">图像描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%86%E8%A7%89%E9%97%AE%E7%AD%94%EF%BC%88VQA%EF%BC%89"><span class="nav-number">13.2.3.</span> <span class="nav-text">视觉问答（VQA）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%86%E5%88%AB%E5%B9%B6%E6%B6%88%E9%99%A4%E6%95%B0%E6%8D%AE%E9%9B%86%E4%B8%AD%E7%9A%84%E5%81%8F%E5%B7%AE"><span class="nav-number">13.2.4.</span> <span class="nav-text">识别并消除数据集中的偏差</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9D%97%E7%A0%94%E7%A9%B6"><span class="nav-number">13.3.</span> <span class="nav-text">模块研究</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%81%AE%E6%8C%A1%E7%9A%84mask%E5%B0%BA%E5%AF%B8%E4%B8%8D%E5%90%8C"><span class="nav-number">13.3.1.</span> <span class="nav-text">遮挡的mask尺寸不同</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Guided-Grad-CAM%E5%9C%A8%E4%B8%8D%E5%90%8C%E7%9A%84%E5%B1%82%E4%B8%8A"><span class="nav-number">13.3.2.</span> <span class="nav-text">Guided Grad-CAM在不同的层上</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E9%80%89%E6%8B%A9"><span class="nav-number">13.3.3.</span> <span class="nav-text">设计选择</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A3%E6%96%87%E4%B8%ADReLU%E5%9C%A8%E7%AD%89%E5%BC%8F1%E4%B8%AD%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7"><span class="nav-number">13.3.3.1.</span> <span class="nav-text">正文中ReLU在等式1中的重要性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A3%E6%96%87%E4%B8%AD%E7%AD%89%E5%BC%8F2%E4%B8%AD%E6%AF%8F%E4%B8%AA%E5%AF%BC%E6%95%B0%E7%9A%84%E7%BB%9D%E5%AF%B9%E5%80%BC"><span class="nav-number">13.3.3.2.</span> <span class="nav-text">正文中等式2中每个导数的绝对值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%A8%E5%B1%80%E5%B9%B3%E5%9D%87%E6%B1%A0%E5%8C%96%E4%B8%8E%E5%85%A8%E5%B1%80%E6%9C%80%E5%A4%A7%E6%B1%A0%E5%8C%96"><span class="nav-number">13.3.3.3.</span> <span class="nav-text">全局平均池化与全局最大池化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8D%E5%90%8CReLU%E5%AF%B9Grad-CAM%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">13.3.3.4.</span> <span class="nav-text">不同ReLU对Grad-CAM的影响</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%B1%E7%9B%91%E7%9D%A3%E5%88%86%E5%89%B2"><span class="nav-number">13.4.</span> <span class="nav-text">弱监督分割</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pointing-Game%E7%9A%84%E6%9B%B4%E5%A4%9A%E7%BB%86%E8%8A%82"><span class="nav-number">13.5.</span> <span class="nav-text">Pointing Game的更多细节</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8E%E6%BF%80%E5%8A%B1%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%EF%BC%88c-MWP%EF%BC%89%E5%92%8CCAM%E7%9A%84%E5%AE%9A%E6%80%A7%E6%AF%94%E8%BE%83"><span class="nav-number">13.6.</span> <span class="nav-text">与激励反向传播（c-MWP）和CAM的定性比较</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PASCAL"><span class="nav-number">13.6.1.</span> <span class="nav-text">PASCAL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#COCO"><span class="nav-number">13.6.2.</span> <span class="nav-text">COCO</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E6%AE%8B%E5%B7%AE%E7%BD%91%E7%BB%9C"><span class="nav-number">13.7.</span> <span class="nav-text">分析残差网络</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E6%80%BB%E7%BB%93"><span class="nav-number">14.</span> <span class="nav-text">一些总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

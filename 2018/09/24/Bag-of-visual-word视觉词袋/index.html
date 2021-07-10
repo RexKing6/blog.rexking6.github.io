@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Bag-of-visual word视觉词袋">
+<meta property="og:url" content="https://blog.rexking6.top/2018/09/24/Bag-of-visual-word%E8%A7%86%E8%A7%89%E8%AF%8D%E8%A2%8B/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537785521.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537784713.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537784726.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537784766.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537784830.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537784915.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1544423586.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537861016.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537861109.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537861261.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537861303.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537861336.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537861468.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537861481.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1537861494.png">
+<meta property="article:published_time" content="2018-09-24T10:14:02.000Z">
+<meta property="article:modified_time" content="2019-03-06T10:14:23.790Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="图像检索">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1537785521.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/09/24/Bag-of-visual-word%E8%A7%86%E8%A7%89%E8%AF%8D%E8%A2%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Bag-of-visual word视觉词袋 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/09/24/Bag-of-visual-word%E8%A7%86%E8%A7%89%E8%AF%8D%E8%A2%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Bag-of-visual word视觉词袋
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-09-24 18:14:02" itemprop="dateCreated datePublished" datetime="2018-09-24T18:14:02+08:00">2018-09-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 18:14:23" itemprop="dateModified" datetime="2019-03-06T18:14:23+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%9B%BE%E5%83%8F%E6%A3%80%E7%B4%A2/" itemprop="url" rel="index"><span itemprop="name">图像检索</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/09/24/Bag-of-visual-word%E8%A7%86%E8%A7%89%E8%AF%8D%E8%A2%8B/" class="post-meta-item leancloud_visitors" data-flag-title="Bag-of-visual word视觉词袋" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>4.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>继特征提取的第二个步骤，检索结构。</p>
+<p>综合转载以下文章：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://onlinelibrary.wiley.com/doi/10.1002/047134608X.W8255">Near‐Duplicate Image and Video Detection</a></li>
+<li><a target="_blank" rel="noopener" href="https://kushalvyas.github.io/BOV.html#BOV">Implementing Bag of Visual words for Object Recognition</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/junmuzi/article/details/54981017">Bag of visual words(Bag of Words(BOW)模型)</a></li>
+<li><a href="无链接">李飞飞cs223b</a></li>
+</ul>
+<p>Bag of words模型最初被用在文本分类中，将文档表示成特征矢量。它的基本思想是假定对于一个文本，忽略其词序和语法、句法，仅仅将其看做是一些词汇的集合，而文本中的每个词汇都是独立的。简单说就是讲每篇文档都看成一个袋子（因为里面装的都是词汇，所以称为词袋，Bag of words即因此而来）。</p>
+<p>同样地，BoVW模型的假设也是特征之间独立。</p>
+<p><img src="http://image.rexking6.top/img/clip1537785521.png" alt=""></p>
+<h1 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h1><h2 id="预处理"><a href="#预处理" class="headerlink" title="预处理"></a>预处理</h2><p>假设训练集有$M$幅图像，对训练图象集进行预处理。包括图像增强，分割，图像统一格式，统一规格等等。</p>
+<h2 id="提取SIFT特征"><a href="#提取SIFT特征" class="headerlink" title="提取SIFT特征"></a>提取SIFT特征</h2><p>对每一幅图像提取SIFT特征（每一幅图像提取多少个SIFT特征不定）。每一个SIFT特征用一个128维的描述子矢量表示，假设M幅图像共提取出N个SIFT特征。</p>
+<p><img src="http://image.rexking6.top/img/clip1537784713.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1537784726.png" alt=""></p>
+<h2 id="K-means聚类"><a href="#K-means聚类" class="headerlink" title="K-means聚类"></a>K-means聚类</h2><p>用K-means对2中提取的$N$个SIFT特征进行聚类，K-Means算法是一种基于样本间相似性度量的间接聚类方法，此算法以$K$为参数，把$N$个对象分为$K$个簇，以使簇内具有较高的相似度，而簇间相似度较低。聚类中心有$K$个（在BOW模型中聚类中心我们称它们为视觉词），码本的长度也就为$K$，计算每一幅图像的每一个SIFT特征到这$K$个视觉词的距离，并将其映射到距离最近的视觉词中（即将该视觉词的对应词频+1）。完成这一步后，每一幅图像就变成了一个与视觉词序列相对应的词频矢量。</p>
+<p><img src="http://image.rexking6.top/img/clip1537784766.png" alt=""></p>
+<h2 id="构造码本"><a href="#构造码本" class="headerlink" title="构造码本"></a>构造码本</h2><p>码本矢量归一化因为每一幅图像的SIFT特征个数不定，所以需要归一化。如上述例子，归一化后为$[1,0,0]$,$\frac{1}{12} \times [5,3,4]$。测试图像也需经过预处理，提取SIFT特征，将这些特征映射到为码本矢量，码本矢量归一化，最后计算其与训练码本的距离，对应最近距离的训练图像认为与测试图像匹配。</p>
+<p><img src="http://image.rexking6.top/img/clip1537784830.png" alt=""></p>
+<h2 id="预测"><a href="#预测" class="headerlink" title="预测"></a>预测</h2><p>一张测试图像，经过预处理，之后经过码本，生成词频矢量，归一化，寻找与它最近的训练样本所代表的类别即为预测类别，一种相似性衡量方法就是余弦距离：</p>
+<script type="math/tex; mode=display">Sim(u,v)=\frac{u^T·v}{||u||_2·||v||_2}</script><p>因为之前已经经过归一化，所以这里相当于两个向量进行内积。</p>
+<p>也可以寻找最近的$k$个训练样本，投票得到预测类别。</p>
+<p><img src="http://image.rexking6.top/img/clip1537784915.png" alt=""></p>
+<p>以上是检索的方法。</p>
+<p>如果是识别问题的话，可以把码本向量当成图像集更加高维的特征，维数更少，识别可以更加快速。</p>
+<h2 id="倒排"><a href="#倒排" class="headerlink" title="倒排"></a>倒排</h2><p>实际使用时，码本的词汇数量大约是数十万至数百万，所以造成最后每张图片得到的词频向量是稀疏的，这时使用倒排索引会加快很多。</p>
+<p><img src="http://image.rexking6.top/img/clip1544423586.png" alt=""></p>
+<h1 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h1><p>由于量化，引入了两种类型的误差，</p>
+<ol>
+<li>可能有两个特征$x$和$y$应该被匹配，但是已经被量化为不同的视觉单词。 这是匹配错误的来源；</li>
+<li>不应该匹配两个特征$x$和$y$的情况下，它们已被量化为相同的视觉单词，从而发生错误匹配。 </li>
+</ol>
+<p>对于第一类错误，将一个特征量化为多个视觉单词可以缓解该问题。 对于第二类错误，已经提出了视觉验证和几何验证来解决。</p>
+<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><p>代码是在github上找到的一个demo，简介中已经引用。</p>
+<p>原代码具有高度模块化的优点，很值得学习，我这里只是自己想对整个过程有个了解，自己简单地跟着做了一下。</p>
+<h2 id="1-引入需要的包"><a href="#1-引入需要的包" class="headerlink" title="1. 引入需要的包"></a>1. 引入需要的包</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">import cv2</span><br><span class="line">import numpy as np</span><br><span class="line">from sklearn.svm import SVC</span><br><span class="line">from sklearn.cluster import KMeans</span><br><span class="line">from sklearn.preprocessing import StandardScaler</span><br><span class="line">from matplotlib import pyplot as plt</span><br></pre></td></tr></table></figure>
+<h2 id="2-定义需要的参数"><a href="#2-定义需要的参数" class="headerlink" title="2. 定义需要的参数"></a>2. 定义需要的参数</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">train_path = &#x27;./images/train/&#x27;</span><br><span class="line">test_path = &#x27;./images/test/&#x27;</span><br><span class="line">n_clusters = 5</span><br></pre></td></tr></table></figure>
+<h2 id="3-定义读取图片的函数"><a href="#3-定义读取图片的函数" class="headerlink" title="3. 定义读取图片的函数"></a>3. 定义读取图片的函数</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">def imageloader(path):</span><br><span class="line">    imlist = &#123;&#125;</span><br><span class="line">    count = 0</span><br><span class="line">    for each in os.listdir(path):</span><br><span class="line">        word = each.split(&quot;/&quot;)[-1]</span><br><span class="line">        print(&quot; #### Reading image category &quot;, word, &quot; ##### &quot;)</span><br><span class="line">        imlist[word] = []</span><br><span class="line">        for imagefile in os.listdir(path+word):</span><br><span class="line">            print(&quot;Reading file &quot;, path+word+&#x27;/&#x27;+imagefile)</span><br><span class="line">            im = cv2.imread(path+word+&#x27;/&#x27;+imagefile, 0)</span><br><span class="line">            imlist[word].append(im)</span><br><span class="line">            count += 1</span><br><span class="line">    return imlist, count</span><br></pre></td></tr></table></figure>
+<h2 id="4-读取训练集图像"><a href="#4-读取训练集图像" class="headerlink" title="4. 读取训练集图像"></a>4. 读取训练集图像</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">trainImages, trainImageCount = imageloader(train_path)</span><br></pre></td></tr></table></figure>
+<p><img src="http://image.rexking6.top/img/clip1537861016.png" alt=""></p>
+<h2 id="5-提取SIFT特征"><a href="#5-提取SIFT特征" class="headerlink" title="5. 提取SIFT特征"></a>5. 提取SIFT特征</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">name_dict = &#123;&#125;</span><br><span class="line">label_count = 0</span><br><span class="line">descriptor_list = []</span><br><span class="line">trainLabels = np.array([])</span><br><span class="line">sift_object = cv2.xfeatures2d.SIFT_create()</span><br><span class="line">for word, imlist in trainImages.items():</span><br><span class="line">    name_dict[str(label_count)] = word</span><br><span class="line">    print(&quot;computing Features for &quot;, word)</span><br><span class="line">    for image in imlist:</span><br><span class="line">        trainLabels = np.append(trainLabels, label_count)</span><br><span class="line">        kp, des = sift_object.detectAndCompute(image, None)</span><br><span class="line">        descriptor_list.append(des)</span><br><span class="line">    label_count += 1</span><br><span class="line">    </span><br><span class="line">descriptor_vstack = np.array(descriptor_list[0])</span><br><span class="line">for remaining in descriptor_list[1:]:</span><br><span class="line">    descriptor_vstack = np.vstack((descriptor_vstack, remaining))</span><br></pre></td></tr></table></figure>
+<p><img src="http://image.rexking6.top/img/clip1537861109.png" alt=""></p>
+<h2 id="6-对特征进行聚类"><a href="#6-对特征进行聚类" class="headerlink" title="6. 对特征进行聚类"></a>6. 对特征进行聚类</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kmeans_obj = KMeans(n_clusters = n_clusters)</span><br><span class="line">kmeans_ret = kmeans_obj.fit_predict(descriptor_vstack)</span><br></pre></td></tr></table></figure>
+<h2 id="7-构建直方图"><a href="#7-构建直方图" class="headerlink" title="7. 构建直方图"></a>7. 构建直方图</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mega_histogram = np.array([np.zeros(n_clusters) for i in range(trainImageCount)])</span><br><span class="line">for i in range(trainImageCount):</span><br><span class="line">    l = len(descriptor_list[i])</span><br><span class="line">    for j in range(l):</span><br><span class="line">        idx = kmeans_ret[i+j]</span><br><span class="line">        mega_histogram[i][idx] += 1</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">mega_histogram</span><br><span class="line">x_scalar = np.arange(n_clusters)</span><br><span class="line">y_scalar = np.array([abs(np.sum(mega_histogram[:,h], dtype=np.int32)) for h in range(n_clusters)])</span><br><span class="line"></span><br><span class="line">print(y_scalar)</span><br><span class="line"></span><br><span class="line">plt.bar(x_scalar, y_scalar)</span><br><span class="line">plt.xlabel(&quot;Visual Word Index&quot;)</span><br><span class="line">plt.ylabel(&quot;Frequency&quot;)</span><br><span class="line">plt.title(&quot;Complete Vocabulary Generated&quot;)</span><br><span class="line">plt.xticks(x_scalar + 0.4, x_scalar)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<p><img src="http://image.rexking6.top/img/clip1537861261.png" alt=""></p>
+<h2 id="8-标准化"><a href="#8-标准化" class="headerlink" title="8. 标准化"></a>8. 标准化</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scale = StandardScaler().fit(mega_histogram)</span><br><span class="line">mega_histogram = scale.transform(mega_histogram)</span><br></pre></td></tr></table></figure>
+<p><img src="http://image.rexking6.top/img/clip1537861303.png" alt=""></p>
+<h2 id="9-用SVM训练模型"><a href="#9-用SVM训练模型" class="headerlink" title="9. 用SVM训练模型"></a>9. 用SVM训练模型</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">clf = SVC()</span><br><span class="line">print(&quot;Training SVM&quot;)</span><br><span class="line">print(&quot;Train labels&quot;, trainLabels)</span><br><span class="line">clf.fit(mega_histogram, trainLabels)</span><br><span class="line">print(&quot;Training completed&quot;)</span><br></pre></td></tr></table></figure>
+<p><img src="http://image.rexking6.top/img/clip1537861336.png" alt=""></p>
+<h2 id="10-读取测试图像，得到码本向量，标准化，进行预测"><a href="#10-读取测试图像，得到码本向量，标准化，进行预测" class="headerlink" title="10. 读取测试图像，得到码本向量，标准化，进行预测"></a>10. 读取测试图像，得到码本向量，标准化，进行预测</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">testImages, testImageCount = imageloader(test_path)</span><br><span class="line">predictions = []</span><br><span class="line">for word, imlist in testImages.items():</span><br><span class="line">    print(&quot;processing &quot;, word)</span><br><span class="line">    for image in imlist:</span><br><span class="line">        kp, des = sift_object.detectAndCompute(image, None)</span><br><span class="line">        vocab = np.array([[0 for i in range(n_clusters)]])</span><br><span class="line">        test_ret = kmeans_obj.predict(des)</span><br><span class="line">        for each in test_ret:</span><br><span class="line">             vocab[0][each] += 1</span><br><span class="line">        vocab = scale.transform(vocab)</span><br><span class="line">        lb = clf.predict(vocab)</span><br><span class="line">        print(lb)</span><br><span class="line">        predictions.append(&#123;</span><br><span class="line">            &#x27;image&#x27;:image,</span><br><span class="line">            &#x27;class&#x27;:lb,</span><br><span class="line">            &#x27;object_name&#x27;:name_dict[str(int(lb[0]))]</span><br><span class="line">        &#125;)</span><br><span class="line">for each in predictions:</span><br><span class="line">    plt.imshow(cv2.cvtColor(each[&#x27;image&#x27;], cv2.COLOR_GRAY2RGB))</span><br><span class="line">    plt.title(each[&#x27;object_name&#x27;])</span><br><span class="line">    plt.show()</span><br></pre></td></tr></table></figure>
+<p><img src="http://image.rexking6.top/img/clip1537861468.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1537861481.png" alt=""></p>
+<p><img src="http://image.rexking6.top/img/clip1537861494.png" alt=""></p>
+<p>可以看到总共八张图像，正确率有75%，这个是我通过调整聚类个数得到的最佳结果，原本作者使用的是20个聚类个数。另外，SVM分类器的参数没有调整。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\10\12\Fisher-Kernel-Fisher-Vector\" rel="bookmark">Fisher Kernel&Fisher Vector</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\28\Geometric-Verification几何验证\" rel="bookmark">Geometric Verification几何验证</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\09\27\Hamming-embedding汉明嵌入\" rel="bookmark">Hamming embedding汉明嵌入</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/09/24/Bag-of-visual-word%E8%A7%86%E8%A7%89%E8%AF%8D%E8%A2%8B/" title="Bag-of-visual word视觉词袋">https://blog.rexking6.top/2018/09/24/Bag-of-visual-word视觉词袋/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%9B%BE%E5%83%8F%E6%A3%80%E7%B4%A2/" rel="tag"># 图像检索</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/09/24/SURF%E7%89%B9%E5%BE%81%E8%AF%A6%E8%A7%A3/" rel="prev" title="SURF特征详解">
+      <i class="fa fa-chevron-left"></i> SURF特征详解
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/09/26/%E8%AF%8D%E6%B1%87%E6%A0%91Vocabulary-Tree/" rel="next" title="词汇树Vocabulary Tree">
+      词汇树Vocabulary Tree <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4"><span class="nav-number">2.</span> <span class="nav-text">步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E5%A4%84%E7%90%86"><span class="nav-number">2.1.</span> <span class="nav-text">预处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E5%8F%96SIFT%E7%89%B9%E5%BE%81"><span class="nav-number">2.2.</span> <span class="nav-text">提取SIFT特征</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#K-means%E8%81%9A%E7%B1%BB"><span class="nav-number">2.3.</span> <span class="nav-text">K-means聚类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E7%A0%81%E6%9C%AC"><span class="nav-number">2.4.</span> <span class="nav-text">构造码本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E6%B5%8B"><span class="nav-number">2.5.</span> <span class="nav-text">预测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%80%92%E6%8E%92"><span class="nav-number">2.6.</span> <span class="nav-text">倒排</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%BA%E7%82%B9"><span class="nav-number">3.</span> <span class="nav-text">缺点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81"><span class="nav-number">4.</span> <span class="nav-text">代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%BC%95%E5%85%A5%E9%9C%80%E8%A6%81%E7%9A%84%E5%8C%85"><span class="nav-number">4.1.</span> <span class="nav-text">1. 引入需要的包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%AE%9A%E4%B9%89%E9%9C%80%E8%A6%81%E7%9A%84%E5%8F%82%E6%95%B0"><span class="nav-number">4.2.</span> <span class="nav-text">2. 定义需要的参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%AE%9A%E4%B9%89%E8%AF%BB%E5%8F%96%E5%9B%BE%E7%89%87%E7%9A%84%E5%87%BD%E6%95%B0"><span class="nav-number">4.3.</span> <span class="nav-text">3. 定义读取图片的函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%AF%BB%E5%8F%96%E8%AE%AD%E7%BB%83%E9%9B%86%E5%9B%BE%E5%83%8F"><span class="nav-number">4.4.</span> <span class="nav-text">4. 读取训练集图像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%8F%90%E5%8F%96SIFT%E7%89%B9%E5%BE%81"><span class="nav-number">4.5.</span> <span class="nav-text">5. 提取SIFT特征</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E5%AF%B9%E7%89%B9%E5%BE%81%E8%BF%9B%E8%A1%8C%E8%81%9A%E7%B1%BB"><span class="nav-number">4.6.</span> <span class="nav-text">6. 对特征进行聚类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%9E%84%E5%BB%BA%E7%9B%B4%E6%96%B9%E5%9B%BE"><span class="nav-number">4.7.</span> <span class="nav-text">7. 构建直方图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E6%A0%87%E5%87%86%E5%8C%96"><span class="nav-number">4.8.</span> <span class="nav-text">8. 标准化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E7%94%A8SVM%E8%AE%AD%E7%BB%83%E6%A8%A1%E5%9E%8B"><span class="nav-number">4.9.</span> <span class="nav-text">9. 用SVM训练模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-%E8%AF%BB%E5%8F%96%E6%B5%8B%E8%AF%95%E5%9B%BE%E5%83%8F%EF%BC%8C%E5%BE%97%E5%88%B0%E7%A0%81%E6%9C%AC%E5%90%91%E9%87%8F%EF%BC%8C%E6%A0%87%E5%87%86%E5%8C%96%EF%BC%8C%E8%BF%9B%E8%A1%8C%E9%A2%84%E6%B5%8B"><span class="nav-number">4.10.</span> <span class="nav-text">10. 读取测试图像，得到码本向量，标准化，进行预测</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

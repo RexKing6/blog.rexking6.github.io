@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Discriminative Learning of Latent Features for Zero-Shot Recognition》笔记">
+<meta property="og:url" content="https://blog.rexking6.top/2018/03/29/%E3%80%8ADiscriminative-Learning-of-Latent-Features-for-Zero-Shot-Recognition%E3%80%8B%E7%AC%94%E8%AE%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1522285560.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1522294766.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1522336960.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1522368000.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1522368769.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1522369963.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1522370882.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1522370665.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1522376095.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1522383560.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1522460838.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1522385211.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1522386615.png">
+<meta property="article:published_time" content="2018-03-29T00:56:15.000Z">
+<meta property="article:modified_time" content="2019-03-06T10:21:09.072Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="零样本识别">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1522285560.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/03/29/%E3%80%8ADiscriminative-Learning-of-Latent-Features-for-Zero-Shot-Recognition%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《Discriminative Learning of Latent Features for Zero-Shot Recognition》笔记 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/03/29/%E3%80%8ADiscriminative-Learning-of-Latent-Features-for-Zero-Shot-Recognition%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Discriminative Learning of Latent Features for Zero-Shot Recognition》笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-03-29 08:56:15" itemprop="dateCreated datePublished" datetime="2018-03-29T08:56:15+08:00">2018-03-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 18:21:09" itemprop="dateModified" datetime="2019-03-06T18:21:09+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9B%B6%E6%A0%B7%E6%9C%AC%E8%AF%86%E5%88%AB/" itemprop="url" rel="index"><span itemprop="name">零样本识别</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/03/29/%E3%80%8ADiscriminative-Learning-of-Latent-Features-for-Zero-Shot-Recognition%E3%80%8B%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="《Discriminative Learning of Latent Features for Zero-Shot Recognition》笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>20k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>18 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>参考：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&amp;mid=2650739772&amp;idx=5&amp;sn=7be3ddaef15686974df6bb9cfcb49466&amp;chksm=871ad042b06d595499e663b25f6d5d743af4cccc195ab69f47eb4a0829330778b8dc586d1f05&amp;mpshare=1&amp;scene=23&amp;srcid=03286iiMYa93OJJiEZTrxB1A#rd">CVPR 2018 | 中国科学院大学Oral论文：使用判别性特征实现零样本识别</a></p>
+<h1 id="标题"><a href="#标题" class="headerlink" title="标题"></a>标题</h1><p>Discriminative Learning of Latent Features for Zero-Shot Recognition<br>使用判别性特征实现零样本识别</p>
+<h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>零样本学习（ZSL）的目标是通过学习图像和语义表征之间的嵌入空间来识别未见过的图像的类别。多年以来，在已有的研究成果中，都是学习视觉空间和语义空间的合适映射矩阵的中心任务，而学习用于 ZSL 的判别性表征的重要性却被忽视了。在本研究中，我们回顾了已有的方法，并表明了为 ZSL 的视觉和语义实例学习判别性表征的必要性。我们提出了一种端到端的网络，能够做到：1）通过一个放大网络自动发现判别性区域；2）在一个为人工定义属性和隐含属性引入的增强空间中学习判别性语义表征。我们提出的方法在两个有挑战性的 ZSL 数据集上进行了大量测试，实验结果表明我们提出的方法的表现显著优于之前最佳的方法。</p>
+<h1 id="1-引言"><a href="#1-引言" class="headerlink" title="1 引言"></a>1 引言</h1><p>近年来，零样本学习（ZSL：zero-shot learning）已经在目标识别任务中得到普及应用。传统的目标识别方法是通过将图像标签分配到训练集中一个可见类来预测目标实例的存在，ZSL则与传统方法不同，其目标是识别之前从未见过的新类别中的目标实例    。因此，在 ZSL 任务中，在训练集中可见类和测试集中不可见类是不相交的。通常而言，见过和没见过的类别都要提供类别描述信息（比如人工定义的属性标注、类别的文本描述、类别名的词向量等）；某些描述信息是各个类别共有的。这些描述信息通常被称为辅助信息或语义表征。在本研究中，我们关注的是使用属性的 ZSL 的学习。</p>
+<p>如图1所示，典型 ZSL 方法的一个通用假设是：存在一个共有的嵌入空间，其中有一个映射函数$F(x,y;W)=\psi(x)^TW\phi(y)$，定义这个函数的目的是对于见过或没见过的类别，衡量图像特征$\psi(x)$和语义表征$\phi(y)$之间的相容性（compatibility）。$W$是所要学习的视觉-语义映射矩阵。现有的 ZSL 方法主要侧重于引入线性或非线性的建模方法，使用各种目标和设计不同的特定正则化项来学习该视觉-语义映射，具体而言就是为 ZSL学习$W$。</p>
+<p><img src="http://image.rexking6.top/img/clip1522285560.png" alt=""><br>图 1：经典 ZSL 方法的目标是寻找一个嵌入了图像特征 $\psi(x)$ 和语义表征$\phi(y)$ 的嵌入空间</p>
+<p>到目前为止，映射矩阵$W$的学习（尽管对ZSL很重要）的主要推动力是视觉空间和语义空间之间对齐损失的最小化。但是，ZSL的最终目标是分类未见过的类别。视觉特征 $\psi(x)$ 和语义表征 $\phi(y)$ 为了识别不同的目标，应该可以具有辨识性。不幸的是，这个问题在 ZSL 领域一直都被忽视了，几乎所有方法都遵循着同一范式：1）通过人工定义或使用预训练的 CNN 模型来提取图像特征；2）使用人工定义属性作为语义表征。这种范式存在一些缺陷。</p>
+<p>第一，图像特征 $\psi(x)$ 要么是人工定义的，要么就是来自预训练的 CNN 模型，所以对ZSL而言可能不具有足够的辨识性。尽管来自预训练 CNN 模型的特征是学习到的，然而却受限于一个固定的图像集（比如 ImageNet），这对于特定的ZSL任务而言并不是最优的。</p>
+<p>第二，人工定义属性 $\phi(y)$ 是语义表征，但却并不详尽，因此限制了其在分类上的辨识性。也许在 ZSL 数据集中存在一些预定义属性没有反映出来的辨识性视觉线索，比如河马的大嘴巴。另一方面，如图1所示，”大”、”强壮”和”大地”等被标注的属性是很多目标类别都共有的。这是不同类别之间的知识迁移所需的，尤其是从见过的类别迁移到没见过的类别时。但是，如果两个类别（比如豹和虎）之间共有的（人工定义的）属性太多，它们在属性向量空间中将难以区分。</p>
+<p>第三，现有 ZSL 方法中的低层特征提取和嵌入空间构建是分开处理的，并且通常是独立进行的。因此，现有研究中很少在统一框架中考虑这两个组分。</p>
+<p>为了解决这些缺陷，我们提出了一种端到端的模型，可以同时在视觉空间和语义空间中学习用于 ZSL 的隐含的判别性特征（LDF）。具体而言，我们的贡献包括：</p>
+<ol>
+<li>一种级联式放大机制，可用于学习以目标为中心的区域的特征。我们的模型可以自动识别图像中最具判别性的区域，然后在一个级联式网络结构中将其放大以便学习。通过这种方式，我们的模型重点凡在从以目标为焦点的区域中学习特征。</li>
+<li>一种用于联合学习隐含属性和人工定义属性的框架。我们将隐含属性的学习问题形式化为了一个类别排序问题，以确保所学习到的属性是判别性的。同时，在我们模型中，判别性区域的发掘和隐含属性的建模是联合学习的，这两者会互相协助以实现进一步的提升。</li>
+<li>一种用于 ZSL 的端到端网络结构。所获得的图像特征可以调整得与语义空间更加兼容，该空间中既包含人工定义属性，也包含隐含的判别性属性。</li>
+</ol>
+<h1 id="2-相关工作"><a href="#2-相关工作" class="headerlink" title="2 相关工作"></a>2 相关工作</h1><p>ZSL的早期研究，为了识别物体，遵循着一个直观的方式：首先训练一个不同属性的分类器，然后通过比较一张图片的预测属性和不可见类的描述来识别它。在这些研究中，直接属性预测模型（DAP）预测每个属性的后验，然后通过最大化一个后验来计算图像的类的后验。同时，在间接属性预测模型（IAP）属性后验是从可见类的类后验中计算出来的。在这些方法中，每个属性分类器都是单独训练的，而类属性之间的关系没有经过考虑的。</p>
+<p>针对这个问题，最近ZSL的大部分研究都是基于嵌入的方法，它们试图对图像和它们的语义特征构建一个共同的嵌入空间。DeViSE模型和ALE模型基于双线性嵌入模型，通过合页排名损失来学习一个线性转换矩阵$W$。ESZSL模型在构建嵌入式空间里添加了一个弗罗贝尼乌斯范数的正则化。SJE模型联合几个相容函数线性组合成一个联合嵌入空间。 LatEM模型通过合并隐含变量用更多的非线性来改进SJE。最近，SCoRe模型为了使学习到的转换矩阵在测试图像上表现更好，添加了一个语义一致的正则化。 MFMR模型通过分解视觉特征矩阵来学习一个投影矩阵。到目前为止，ZSL的大部分方法都是用固定的预训练CNN模型从整张图像提取的图片特征。相反，我们模型的图像特征通过隐含区域的挖掘和端到端的训练风格，更具有代表性。</p>
+<p>在典型的嵌入空间构造方法中，只有人工定义属性的空间用于嵌入可见类和不可见类。与此不同，JSLA模型和LAD模型提出ZSL的模型隐含属性，这和我们的工作很相似。JSLA通过最小化属性之间的内部类距离来学习隐含的判别属性；但在LAD中，隐含属性的判别性是通过在隐含属性训练可见类分类器间接获得的。与它们不同，我们的模型提出在隐含属性之间直接调节类内和类间的距离来获得判别性。另外，JSLA和LAD仍然使用了固定的预提取图像特征，这个与我们的方法相比不太具有判别性。</p>
+<p>ZSL方法的另外一个分支是基于混合模型的。它的目的是使用可见类的组合对不可见图像进行分类。ConSE模型凸性地联合可见类的分类器概率来对不可见对象分类。SynC模型介绍了通过线性组合可见类的分类器得到的不可见类的合成分类器。在我们的方法中，当对ZSL预测使用了学习到的隐含属性，将通过组合可见类的原型获得不可见类的隐含属性原型。为此，我们的预测模型是混合模型家族之一。除此之外，我们的模型还对人工定义属性和隐含属性学习在一个网络中的嵌入。</p>
+<h1 id="3-任务定义"><a href="#3-任务定义" class="headerlink" title="3 任务定义"></a>3 任务定义</h1><p>在ZSL学习任务中，训练集，即可见类被定义为$S=\{(x_i^s,y_i^s)\}_{i=1}^{n_s}$，其中$x_i^s \in X_S$是可见类的第$i$张图像，$y_i^s \in Y_S$是相应的类标签。测试集，即不可见类被定义为$U=\{(x_j^u,y_j^u)\}_{j=1}^{n_u}$，其中$x_j^u \in X_U$是不可见类的第$j$张图像，$y_j^u \in Y_U$是相应的类标签。可见类和不可见类是不相交的。此外，可见类和不可见类的人工定义属性被表示为$A_S=\{a_i^s\}_{i=1}^{c_s}$和$A_U=\{a_j^u\}_{j=1}^{c_u}$，其中$a_i^s$和$a_j^u$分别表示第$i$个可见类和第$j$个不可见类的属性向量。在测试阶段，给定一张测试图像$x^u$和测试类$A_U$的属性注释，ZSL的目标是预测$x^u$相应的类别。</p>
+<h1 id="4-我们的方法"><a href="#4-我们的方法" class="headerlink" title="4 我们的方法"></a>4 我们的方法</h1><p>我们提出的方法的框架如图2所示。注意，该框架一般包含多个图像尺度，但为描述清楚，这里仅给出了有 2 个图像尺度的情况作为示例。在每个图像尺度中，网络都由三个不同组分构成：1）图像特征网络（FNet），用于提取图像表征；2）放大网络（ZNet），用于定位最具判别性的区域，然后将其放大；3）嵌入网络（ENet），用于构建视觉信息和语义信息关联在一起的嵌入空间。对于第一个尺度，FNet 的输入是原始尺寸的图像，ZNet 负责生成放大后的区域。然后到第二个尺度，放大后的图像区域成为 FNet 的输入，以获得更具判别性的图像特征。</p>
+<p><img src="http://image.rexking6.top/img/clip1522294766.png" alt=""><br>图 2：我们提出的隐含判别性特征（LDF）学习模型的框架。从粗略到精细到图像特征被同时投射到人工定义属性和隐含属性中。人工定义属性通常是不同类别共有的，而隐含属性是为区分而通过调整类间和类内距离而学习到的。</p>
+<h2 id="4-1-图像特征网络（FNet）"><a href="#4-1-图像特征网络（FNet）" class="headerlink" title="4.1 图像特征网络（FNet）"></a>4.1 图像特征网络（FNet）</h2><p>跟已有的工作不同，我们为了ZSl将通过嵌入学习图像特征。因此，我们的框架第一部分是一个由卷积网络负责学习图像特征的区域，也就是所谓的FNet。FNet架构的选择是灵活的；在我们的方法中考虑了两个可能的变体，是VGG19和GoogleNet。对于VGG19，FNet是从卷积层1到全连接层7；对于GoogleNet，它从卷积层1到池化层（汇合层）5。给定一张图像或一个放大的区域$x$，图像表征表示为：</p>
+<script type="math/tex; mode=display">\phi(x)=W_{IF} * x \tag 1</script><p>其中$W_{IF}$表示FNet的所有参数，而$*$表示FNet的一系列操作。与传统的ZSL方法不同，FNet的参数是我们框架的其他部分联合训练的。因此，获得的特征与嵌入组件有良好的调节。我们证明了这能够改进性能。</p>
+<h2 id="4-2-放大网络（ZNet）"><a href="#4-2-放大网络（ZNet）" class="headerlink" title="4.2 放大网络（ZNet）"></a>4.2 放大网络（ZNet）</h2><p>ZSL的最终目标是对不同的物体进行分类。有研究表明，从对象区域学习可以使对象分类在图像级别上受益。受这些研究的启发，我们假设，在图像中可能存在一些对ZSL有利的判别区域。这样一个区域可以只包含对象实例或对象部分。另一方面，为了ZSL，候选区域还需要反映人工定义属性，其中一些描述了背景，比如游泳、树和山脉。因此，预期目标区域为了增强属性潜入将包含一些背景。我们将这类区域命名为以对象为中心的区域。为了识别它们，我们引入放大网络（ZNet），它采用增量放大的方法，让网络由粗到细自动搜索一个适当的判别区域。ZSL任务的正确性意味着目标区域对于分类有区别性，同时与注释的属性相匹配。</p>
+<p>特别地，我们的ZNet将FNet最后一层卷积层的输出（例如，VGG19的conv5-4层）作为输入。为了高效率计算，候选区域被假设为一个正方形，它的位置可以用这三个参数来表示：</p>
+<script type="math/tex; mode=display">[z_x,z_y,z_s]=W_Z * \phi(x)_{conv} \tag 2</script><p>其中，$z_x$和$z_y$分别表示搜索正方形中心的x轴坐标和y轴坐标。$z_s$表示为正方形的边长。$\phi(x)_{conv}$表示FNet最后一个卷积层的输出。ZNet是一个堆叠了两层全连接层（1024-3）之后是sigmoid激活函数的网络，$W_Z$表示ZNet的参数。</p>
+<p>在获得正方形的位置后，搜索区域能直接从原始图像中裁剪获得。但是，在反向传播时优化不连续裁剪操作是很不方便的。受[8]的启发，sigmoid函数首先被用来产生一个二维连续掩模 $M(x,y)$。形式如下：</p>
+<script type="math/tex; mode=display">M_x = f(x-z_x+0.5z_s)-f(x-z_x-0.5z_s)  \tag 3</script><script type="math/tex; mode=display">M_y = f(y-z_y+0.5z_s)-f(y-z_y-0.5z_s)</script><p>其中$f(x)=1/(1+exp(-kx))$，$k$在所有实验中被设置为10。</p>
+<p>之后裁剪区域能够通过在原始图像$x$和连续掩模$M$之间 执行元素乘积$\odot$获得：</p>
+<script type="math/tex; mode=display">x^{crop}=x \odot M \tag 4</script><p>最后，为了获得裁剪区域更好的局部化表示，我们进一步使用双线性插值，以自适应地将裁剪区域放大到与原始图像相同的大小。之后，为了获得更具代表性的表征，放大区域在接下来的规模被输入到FNet的副本。</p>
+<h2 id="4-3-嵌入网络（ENet）"><a href="#4-3-嵌入网络（ENet）" class="headerlink" title="4.3 嵌入网络（ENet）"></a>4.3 嵌入网络（ENet）</h2><h3 id="4-3-1-基础嵌入网络"><a href="#4-3-1-基础嵌入网络" class="headerlink" title="4.3.1 基础嵌入网络"></a>4.3.1 基础嵌入网络</h3><p>ENet的目标是为了学习一个嵌入空间。其中，视觉和语义信息是相关的。在本节中，我们首先引入一个基础嵌入网络。其中，语义表示$\psi(y)$被定义为人工定义属性$A$。在这个模型中，要学习的映射函数被定义为：$F(x,y;W)=\psi(x)^TWa^y$。</p>
+<p>属性空间被用作嵌入空间，相容性得分是由内积定义的：</p>
+<script type="math/tex; mode=display">s=<W^T\phi(x),a^y> \tag 5</script><p>其中$\phi(x)$是通过FNet得到的$d$维的图像特征，$a^y$是$k$维的类别为$y$的注释属性向量。$W \in \mathbb {R}^{d \times k}$是在全连接层学习的权重，它可以被看作是一个将$\phi(x)$映射到属性空间$A$线性映射矩阵。</p>
+<p>相容性得分测量图像与类属性注释之间的相似性。它与传统的对象识别任务中的分类得分相似。因此，为了学习矩阵$W$，我们使用一个标准的softmax损失：</p>
+<script type="math/tex; mode=display">L=-\frac{1}{N}\sum_i^nlog\frac{exp(s)}{\sum_c exp(s^c)},c \in Y_S \tag 6</script><h3 id="4-3-2-增强嵌入网络"><a href="#4-3-2-增强嵌入网络" class="headerlink" title="4.3.2 增强嵌入网络"></a>4.3.2 增强嵌入网络</h3><p>基础嵌入网络，被大多数现有的ZSL方法所采用，取得了有前景的性能。但是，它基于人工定义属性。它的大小是有限制的，而且通常没有判别性。为了解决这个问题，我们引入了一个增强属性空间。其中，一张图象被映射到人工定义属性（UA）和隐含识别属性（LA）。</p>
+<p>特别地，我们的嵌入网络（ENet）学习一个矩阵$W_{aug} \in  \mathbb {R}^{d \times 2k}$，它把图像特征映射到一个$2k$维增强空间，嵌入图像特征$\phi_e(x)$的计算如下：</p>
+<script type="math/tex; mode=display">\phi_e(x)=W_{aug}^T \phi(x), \phi_e(x) \in \mathbb R^{2k} \tag 7</script><p>目标是将嵌入图像特征$\phi_e(x)$和UA、LA联合。为了简单起见，我们把$\phi_e(x)$等分为两个$k$维的部分：</p>
+<script type="math/tex; mode=display">\phi_e(x)=[\phi_{att}(x);\phi_{lat}(x)], \phi_{att}(x),\phi_{lat}(x) \in \mathbb R^k \tag 8</script><p>之后，我们将第一个$k$维的嵌入特征$\phi_{att}(x)$与UA对应，将第二个$k$维的嵌入特征$\phi_{lat}(x)$与LA对应。基于这样的假设，对于$\phi_{att}(x)$，类似于基础模型，softmax损失被用来训练ZSL模型。形式如下：</p>
+<script type="math/tex; mode=display">L_{att}=-\frac{1}{N}\sum_i^nlog\frac{exp(<\phi_{att}(x),a>)}{\sum_c exp(<\phi_{att}(x),a^c>)},c \in Y_S \tag 9</script><p>对于第二个嵌入特征$\phi_{lat}(x)$，目标是让学习到的特征对物体识别来说是有辨识性的。我们打算采用三元组损失，通过调节隐含属性特征之间的类间/类内距离来学习隐含的判别属性。</p>
+<script type="math/tex; mode=display">L_{lat} = max(0, m+d(\phi_{lat}(x_i), \phi_{lat}(x_k))-d(\phi_{lat}(x_i),\phi_{lat}(x_j)))\tag {10}</script><p>其中，$x_i$，$x_k$是同一个类里的图片，$x_j$是来自一个不同的类。$d(x,y)$是$x$和$y$之间的欧式距离的平方。$m$是三元组损失的边界，在所有实验中被设置为1.0。</p>
+<p>从（7）和（8）可以看出，UA和LA表征从相同的图片特征征映射而来，但是是两个不同的矩阵：</p>
+<script type="math/tex; mode=display">\phi_{att}(x)=W_{att}^T\phi(x),</script><script type="math/tex; mode=display">\phi_{lat}(x)=W_{lat}^T\phi(x), \tag {11}</script><script type="math/tex; mode=display">[W_{att};W_{lat}]=W_{aug}</script><p>值得注意的是，$W_{att}$和$W_{lat}$与不同的损失函数相关。通过具体地在（10）里利用类别信息，$\phi_{lat}$可以被学习为有辨识性的。</p>
+<p>对每一种规模，网络使用softmax损失和三元组损失训练。对于一个双规模的网络（例如s1和s2），整个LDF模型都是由以下损失函数来训练的：</p>
+<script type="math/tex; mode=display">L=L_{att}^{s1}+L_{lat}^{s1}+L_{att}^{s2}+L_{lat}^{s2} \tag {12}</script><p>一个多规模网络的最终目标函数可以通过聚集所有规模的所有损失函数来构造类似的方法。</p>
+<h2 id="4-4-ZSL预测"><a href="#4-4-ZSL预测" class="headerlink" title="4.4 ZSL预测"></a>4.4 ZSL预测</h2><p>在提出的LDF模型中，测试图片能够被映射到人工定义属性和隐含属性里。因此，ZSL预测可以在UA空间和LA空间里执行。</p>
+<p><strong>用UA预测</strong><br>给定一张测试图$x$，它能够被映射成UA表征$\phi_{att}(x)$。为了预测它的类标签，相容性得分被用来选择一个最匹配的不可见类：</p>
+<script type="math/tex; mode=display">y^* = {arg \space max}_{c \in Y_U}(S^c)={arg \space max}_{c \in Y_U}<\phi_{att}(x),a^c> \tag {13}</script><p><strong>用LA预测</strong><br>测试图$x$也被映射为LA表征$\phi_{lat}(x)$。为了在LA空间进行ZSL，不可见类的LA原型是必需的。</p>
+<p>首先，可见类的LA原型可计算。具体地，可见类$s$里的所有样本$x_i$被映射到它们的LA表征，特征的平均值用类的LA原型计算，即$\overline {\phi_{lat}^s}=\frac{1}{N}\sum_i\phi_{lat}(x_i)$。</p>
+<p>然后，对于一个不可见类$u$，我们计算类$u$和UA空间中所有可见类$S$之间的关系。</p>
+<p>通过解决以下岭回归问题，可以获得这种关系：</p>
+<script type="math/tex; mode=display">\beta_c^u=arg \space min ||a^u-\sum \beta_c^ua^c||_2^2+\lambda||\beta_c^u||_2^2,c \in Y_S \tag {14}</script><p>通过将相同的关系映射到LA空间，不可见类$u$的原型可以由此获得：</p>
+<script type="math/tex; mode=display">\overline {\phi_{lat}^u}=\sum \beta_c^u \overline{\phi_{lat}^c}, c \in Y_S \tag {15}</script><p>最后，测试图像$x$通过LA表征$\phi_{lat}(x)$得到的分类结果能够由以下得到：</p>
+<script type="math/tex; mode=display">y^*={arg \space max}_{c \in Y_U}<\phi_{lat}(x), \overline {\phi_{lat}^c}> \tag {16}</script><p><strong>联合多空间</strong><br>我们为了进行ZSL预测，同时考虑了UA和LA空间，采用了连接UA-LA表征$[\phi_{att}(x);\phi_{lat}(x)]$。形式如下：</p>
+<script type="math/tex; mode=display">\begin{align*}
+y^* &= {arg \space max}_{c \in Y_U}(<[\phi_{att}(x);\phi_{lat}(x)],[a^c;\overline {\phi_{lat}^c}]>) \\
+&= {arg \space max}_{c \in Y_U}(<\phi_{att}(x),a^c>+<\phi_{lat}(x),\overline {\phi_{lat}^c}]>) 
+\end{align*} \tag {17}</script><p><strong>联合多规模</strong><br>对于一个双规模的LDF模型（即$s1$和$s2$）。UA表征和LA表征在每种规模里获得，得到的多规模表征能够结合起来取得进一步的改进。</p>
+<p>对于多规模UA表征，即$\phi_{att}^{s1}$，$\phi_{att}^{s2}$，我们首先连接两个表征$[\phi_{att}^{s1};\phi_{att}^{s2}] \in \mathbb R^{2k}$，之后为了得到联合UA表征，即$\phi_{att}^{com}=W_{com}^T[\phi_{att}^{s1};\phi_{att}^{s2}]$，训练一个新的映射矩阵$W_{com} \in \mathbb R^{2k \times k}$。对于多规模LA表征，即$\phi_{lat}^{s1}$，$\phi_{lat}^{s2}$，联合表征能够从直接连接两个标准化表征得到，即$\phi_{lat}^{com}=[\widehat {\phi_{lat}^{s1}};\widehat {\phi_{lat}^{s2}}]$。</p>
+<p>最后，ZSL预测能够用联合UA表征$\phi_{att}^{com}$和联合LA表征$\phi_{lat}^{com}$执行。</p>
+<h1 id="5-实验"><a href="#5-实验" class="headerlink" title="5 实验"></a>5 实验</h1><h2 id="5-1-数据集"><a href="#5-1-数据集" class="headerlink" title="5.1 数据集"></a>5.1 数据集</h2><p>提出的LDF模型是基于两个具有代表性的ZSL标准：Animals with Attributes（AwA）和and Caltech-UCSD Birds 200-2011（CUB）。AwA的图片来自50个常见的动物类别，包括30475张图片。在我们的实验中采用了85个类的属性（连续的）和标准的“40/10”的ZSL分法。CUB是一个细粒度的鸟类数据集，有200种不同的鸟类和11788张图片。遵循SYnC，我们使用了“150/50”的分法来进行ZSL，并在类别上使用312维属性向量。</p>
+<h3 id="5-2-实现细节"><a href="#5-2-实现细节" class="headerlink" title="5.2 实现细节"></a>5.2 实现细节</h3><p>FNet为了学习$\phi(x)$使用两种不同的CNN模型进行初始化，即在ImageNet上进行预训练，即分别为GoogLeNet和VGG19。对AwA来说，只有一个放大操作被执行，LDF模型包含两个尺度，因为AwA图像中的对象通常是大的和居中的。对于CUB来说，LDF模型包括三个放大操作（即有两个ZNet)。在每个规模中，每个输入图像或放大区域的大小是224x224，与现有的ZSL方法相同。</p>
+<p>在训练过程中，LDF模型在AwA用5个时期训练，在CUB用20个时期训练。</p>
+<p>在所有的实验中，GoogleNet和VGG19的学习速率分别设置为0.0005和0.0001。在测试阶段，（14）的$\lambda$，在所有数据集都设置为1.0。</p>
+<p><strong>训练策略</strong><br>我们首先采用（8）的策略来初始化ZNet。然后学习LDF模型中的其他部分。详细的过程如下：</p>
+<p><strong>第一步</strong><br>每个规模的FNet都是使用相同的在ImageNet上预训练的GoogLeNet（或VGG19）。请注意，在接下来的训练步骤中，每个规模的参数都不共享。</p>
+<p><strong>第二步</strong><br>在每个规模上，初始化的FNet被用于搜索一个有辨识性的正方形，然后用它来预训练ZNet。被搜索的正方形的大小被假定为原始图像的一半大小（即$z_s = 0.5$)。然后我们在FNet的最后一个卷积层上滑动，选择具有最高激活率的区域。最后，搜索区域的坐标（$[z_x,z_y,z_s]$）被用于和L2损失来训练放大网络。</p>
+<p><strong>第三步</strong><br>我们把ZNet的参数固定下来，并同时训练FNet和ENet。</p>
+<p><strong>第四步</strong><br>最后，整个LDF模型的参数在端到端方法中进行了微调。</p>
+<h3 id="5-3-基础"><a href="#5-3-基础" class="headerlink" title="5.3 基础"></a>5.3 基础</h3><p>为了验证LDF模型中不同组件的有效性，设计了4个基础来与所提出的LDF模型进行比较。</p>
+<ul>
+<li><p><strong>SS-BE-Fixed</strong><br>（单规模和基础嵌入模型和固定图像表示）。在这个基础中，ZNet被移除，并且只有全尺寸的图像被用来提取图像特征。此外，在训练期间，FNet是固定的。对于语义表示，只考虑人工定义的属性（第4.3.1节）。</p>
+</li>
+<li><p><strong>SS-BE-Learned</strong><br>（单规模和基础嵌入模型和学习图像表示）。与SS-BE-Fixed相比，唯一的区别是FNet可以在此基础中学习。</p>
+</li>
+<li><p><strong>SS-AE-Learned</strong><br>（单规模及增强嵌入模型及学习图像表示）。与SS-BE-Fixed相比，该基础的目标是构建增强的嵌入空间（第4.3.2节），同时考虑到UA和LA。</p>
+</li>
+<li><p><strong>MS-BE-Learned</strong><br>（多规模和基础嵌入模型和学习图像表示）。与SS-BE-Fixed相比，唯一的区别是ZNet被添加到这个模型中（第4.2节）。</p>
+</li>
+</ul>
+<h3 id="5-4-实验结果"><a href="#5-4-实验结果" class="headerlink" title="5.4 实验结果"></a>5.4 实验结果</h3><p><img src="http://image.rexking6.top/img/clip1522336960.png" alt=""><br>表 1：使用 VGG19 和 GoogLeNet（括号中的数字）的深度特征在两个数据集上的 ZSL 结果（MCA，%）</p>
+<p>多路分类精度（MCA）用于评价ZSL模型。使用两种不同的CNN模型进行结果比较，如表1所示。</p>
+<p><strong>特征学习的影响</strong><br>从表1开始，我们首先注意到，没有任何经过特别设计的正则化项，SS-BE-Learned已经达到了与最先进方法相当的性能，并且略微超过了SS-BE-Fixed。现有的大多数ZSL方法都使用固定的图像特征，并且只关注于学习视觉语义的映射，并使用各种人为设计的正则化项。结果表明，在图像特征提取过程中被忽略的特征学习过程对ZSL也很重要，应该引起重视。通过在端到端框架中对FNet进行简单地微调，可以使图像特征与不同ZSL任务的属性语义信息相关联，从而获得更好的性能。</p>
+<p><strong>ZNet的影响</strong><br>MS-BE-Learned目标是使用ZNet自动发现来自全尺寸图像的判别区域，利用从粗到细的表示来获得更好的性能。我们可以看到MS-BE-Learned的性能比SE-BE-Learned和大多数最先进的方法都要出色（表1，81.80%的AwA、64.85%的CUB）。</p>
+<p>我们进一步分析了在MS-BE-Learned模型中每个规模的性能，并在表2中显示结果。可以看到，第一个规模的性能，也就是 MS-BE-Learned (Scale 1)，与单规模基础模型相比，即SS-BE-Learned。第二规模和第三规模利用了更多的识别图像特征，性能不断提高。</p>
+<p><img src="http://image.rexking6.top/img/clip1522368000.png" alt=""><br>表 2：在每个图像规模上的详细 ZSL 结果（%）</p>
+<p><strong>隐含属性模型的影响</strong><br>SS-AELearned目标是构建一个增强嵌入空间。在我们的增强空间中，将图像特征与人工定义的和隐含的属性联系起来更加合理。从表1可以看出，SS-AE-Learned的性能在AwA（81.36%）和CUB（66.96%）上都比SE-BE-Learned出色。</p>
+<p><img src="http://image.rexking6.top/img/clip1522368769.png" alt=""><br>表 3：只使用 UA 特征或 LA 特征所得到的 ZSL 结果（%）</p>
+<p>我们相信，在增强属性空间中，LA的学习将有助于UA的学习。进一步的实验验证了这一点。结果如表3所示。对于SS-AE-Learned，我们只用已获得的UA表征$\phi_{att}(x)$来进行ZSL预测，如（13），表示为SS-AE-Learned (UA)。我们可以看到，当只使用UA表征时，SS-AE-Learned (UA)的性能要比SS -BE-Learned要高。(例如80.97%比79.35%)。它证明了在增强属性空间中获得的UA表示会更好。</p>
+<p><strong>目前最先进方法的比较</strong><br>在表1中与以前的方法相比，LDF模型改进了这两个数据集的最先进的性能。总的来说，基于VGG19的模型在AwA上表现的更好，而基于GoogleNet的模型显示了对CUB的优越性。在AwA，我们的LDF达到83.40%，略高于JLSA（82.81%）。对于需要分类的50种鸟类的更具挑战性的CUB数据集，我们的模型得到了更明显的改进。在CUB上，LDF模型达到了70.37%，在最先进的得分上取得了令人印象深刻的改进（从58.4%到70.37%）。</p>
+<p>此外，在提出的LDF模型中，还结合隐含的判别区域挖掘（ZNet）和隐含判别属性模型（ENet）的组成部分。我们相信这两个部分能够在联合学习框架中互相促进。为了验证这个假设，对LDF模型进行进一步的分析，结果如表4所示。可以看到，当只使用联合的UA表征时，进行ZSL的预测，也就是LDF(UA)，性能要比MS-BE-Learned高。当只使用组合LA表征时，LDF(LA)的性能也超过了SS-AE-Learned (LA)。它证实了联合学习方法的优点。</p>
+<p><img src="http://image.rexking6.top/img/clip1522369963.png" alt=""><br>表 4：对于 ZNet 和 ENet，联合训练和分开训练之间的结果比较。</p>
+<p><strong>LA的判别性</strong><br>LA表征是通过利用类别信息学习到判别性的，而且我们相信学习到的LA空间比UA空间更有判别性。为了说明这一点，我们在图6中展示了一些关于AwA的例子。测试图像通过（11）被投射为它们的UA表征和LA表征。然后对于一个UA元素或一个LA元素，展示了组件的最大和最小激活的图像。可以看到，对于LA表征，具有较大激活的图像属于同一类别，而具有较小激活的图像则属于另一类。相反，人工定义的属性通常在多个类别中共享。它证实了学习隐含属性有明显的判别性。</p>
+<p><img src="http://image.rexking6.top/img/clip1522370882.png" alt=""><br>图6：在AwA上的隐含识别属性（LA）的可视化例子。$LAX$表示为LA表征的第$X$个元素。LA表征是通过VGG19 SS-AE-Learned获得的。前5个图像是该元素上有最大激活值的前5个，后5个图像是该元素上有最小激活值的前5个。</p>
+<p>此外，为了定量地比较学习到的LA空间与UA空间，我们用LA和UA原型计算了不可见类之间的余弦相似性，结果如图3所示。</p>
+<p><img src="http://image.rexking6.top/img/clip1522370665.png" alt=""><br>图3：在10个看不见的AwA类中，用UA（左面板）和LA（右面板）计算出的余弦相似点。</p>
+<p>LA原型是通过直接对LA表征进行平均来获得的，即$\overline {\phi_{lat}}=\frac{1}{N}\sum_i \phi_{lat}(x_i)$。对于每一个看不见的类，UA原型都是类级别的属性注释，即$a^c$。可以看出，与UA原型相比，不同的LA原型之间的余弦相似度明显要小一些，除了猪和河马。与专家注释的属性相比，我们的LA原型只从图像中学习。因此，有着相似的外貌的类别，例如，猪和河马，在LA空间更近。</p>
+<p>值得注意的是，当我们使用LA表征进行ZSL预测时，需要一个测试类别的LA表征（原型），但在数据集中却没有。因此，用于不可见类的原型必须用（15）利用关系$\beta_c$来计算。</p>
+<p>然而，$\beta_c$是在UA空间计算的，它不能准确地反映出LA原型之间的真实关系。当原型被用于预测时（16），这种偏差最终会降低ZSL的性能。这种偏见解释了尽管学习的LA空间实际上比UA空间更有判别性，为什么在表3中，SS-AE-Learned (LA)的性能比在AwA上的SS-AELearned (UA)要低。</p>
+<p><strong>判别性区域的可视化</strong><br>在图5中，我们使用LDF模型显示已发现的区域。左三列显示了从AwA选取的例子。我们可以看到，对于只有一个实例的图像，LDF模型会逐步搜索更细的区域，直到找到主要对象；对于具有多个实例的图像，模型趋向于找到一个大的正方形，包括多个对象。在AwA的另一个有趣发现是，对于某些特定的类别，例如鲸鱼，判别区域与其他相比将包含更多明显的背景元素。原因是座头鲸的搜索区域必须与它们的人工定义的属性相匹配，其中一些区域，如游泳、水和海洋，与图像中的背景高度相关。<br>右三列显示了从CUB选取的例子。我们知道，幼崽的数据集提供了边界框注解，然而，我们的模型可以自动发现没有这些注释的以对象为中心的区域，这显示了我们的框架的另一个优势。值得注意的是，文献8中的网络执行细粒度的对象识别，这是与我们不同的一个任务；它可以发现一些物体的部分。与此相反，在我们的ZSL模型中，搜索区域应该与人工定义的属性相关联，例如，它与鸟的整个身体相呼应，喙到尾巴。因此，预测模型将关注包含整个对象的区域，而不是它的各个部分；我们的分析证实了这一点。</p>
+<p><img src="http://image.rexking6.top/img/clip1522376095.png" alt=""><br>图5：在不同规模下学习到的区域的样例</p>
+<h1 id="6-结论"><a href="#6-结论" class="headerlink" title="6 结论"></a>6 结论</h1><p>本文提出了一种端对端模型，以学习ZSL在视觉和语义空间中隐含识别特征。对于视觉空间，我们引入放大网络来自动搜索判别区域。对于语义空间，我们提出一个带有人工定义属性和隐含属性的增强属性空间。这些隐含的属性是通过分类信息来识别的。最后，这两个部分可以在端到端联合学习框架中相互促进。</p>
+<h1 id="7-感谢"><a href="#7-感谢" class="headerlink" title="7 感谢"></a>7 感谢</h1><p>这项工作是由中国国家重点研究和发展项目（Grant 2016YFB1001004和Grant 2016YFB1001005）资助的，中国国家自然科学基金（Grant61673375、Grant61721004和Grant61403383）和中国科学院（Grant QYZDB-SSW-JSC006和Grant 173211KYSB20160008）的项目。</p>
+<h1 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h1><p>[1] Z. Akata, F. Perronnin, Z. Harchaoui, and C. Schmid.Label-embedding for image classification. IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI),38(7):1425–1438, 2016.<br>[2] Z. Akata, S. Reed, D. Walter, H. Lee, and B. Schiele. Evaluation of output embeddings for fine-grained image classification. In CVPR, pages 2927–2936, 2015.<br>[3] S. Changpinyo, W.-L. Chao, B. Gong, and F. Sha. Synthesized classifiers for zero-shot learning. In CVPR, pages<br>5327–5336, 2016.<br>[4] W.-L. Chao, S. Changpinyo, B. Gong, and F. Sha. An empirical study and analysis of generalized zero-shot learning for object recognition in the wild. In ECCV, pages 52–68, 2016.<br>[5] Z. Ding, M. Shao, and Y. Fu. Low-rank embedded ensemble semantic dictionary for zero-shot learning. In CVPR, pages 2050–2058, 2017.<br>[6] A. Farhadi, I. Endres, D. Hoiem, and D. Forsyth. Describing objects by their attributes. In CVPR, pages 1778–1785, 2009.<br>[7] A. Frome, G. S. Corrado, J. Shlens, S. Bengio, J. Dean, T. Mikolov, et al. Devise: A deep visual-semantic embedding model. In NIPS, pages 2121–2129, 2013.<br>[8] J. Fu, H. Zheng, and T. Mei. Look closer to see better: recurrent attention convolutional neural network for fine-grained image recognition. In CVPR, pages 4438–4446, 2017.<br>[9] Y. Fu, T. M. Hospedales, T. Xiang, Z. Fu, and S. Gong. Transductive multi-view embedding for zero-shot recognition and annotation. In ECCV, pages 584–599, 2014.<br>[10] Y. Fu, T. M. Hospedales, T. Xiang, and S. Gong. Transductive multi-view zero-shot learning. IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI), 37(11):2332–2345, 2015.<br>[11] R. Girshick. Fast r-cnn. In ICCV, pages 1440–1448, 2015.<br>[12] C. Huang, C. C. Loy, and X. Tang. Local similarity-aware deep feature embedding. In NIPS, pages 1262–1270, 2016.<br>[13] H. Jiang, R. Wang, S. Shan, Y. Yang, and X. Chen. Learning discriminative latent attributes for zero-shot classification. In ICCV, pages 4223–4232, 2017.<br>[14] N. Karessli, Z. Akata, A. Bulling, and B. Schiele. Gaze embeddings for zero-shot image classification. In CVPR, pages 4525–4534.<br>[15] C. H. Lampert, H. Nickisch, and S. Harmeling. Learning to detect unseen object classes by between-class attribute transfer. In CVPR, pages 951–958, 2009.<br>[16] C. H. Lampert, H. Nickisch, and S. Harmeling. Attributebased classification for zero-shot visual object categorization. IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI), 36(3):453–465, 2014.<br>[17] Y. Li, D. Wang, H. Hu, Y. Lin, and Y. Zhuang. Zero-shot recognition using dual visual-semantic mapping paths. In CVPR, pages 3279–3287, 2017.<br>[18] P. Morgado and N. Vasconcelos. Semantically consistent regularization for zero-shot recognition. In CVPR, pages 6060–6069, 2017.<br>[19] M. Norouzi, T. Mikolov, S. Bengio, Y. Singer, J. Shlens, A. Frome, G. S. Corrado, and J. Dean. Zero-shot learning by convex combination of semantic embeddings. arXiv preprint arXiv:1312.5650, 2013.<br>[20] P. Peng, Y. Tian, T. Xiang, Y. Wang, and T. Huang. Joint learning of semantic and latent attributes. In ECCV, pages 336–353, 2016.<br>[21] P. Peng, Y. Tian, T. Xiang, Y. Wang, M. Pontil, and T. Huang. Joint semantic and latent attribute modelling for cross-class<br>transfer learning. IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI), 2017.<br>[22] S. Reed, Z. Akata, H. Lee, and B. Schiele. Learning deep representations of fine-grained visual descriptions. In CVPR, pages 49–58, 2016.<br>[23] B. Romera-Paredes and P. Torr. An embarrassingly simple approach to zero-shot learning. In ICML, pages 2152–2161, 2015.<br>[24] O. Russakovsky, J. Deng, H. Su, J. Krause, S. Satheesh, S. Ma, Z. Huang, A. Karpathy, A. Khosla, M. Bernstein, et al. Imagenet large scale visual recognition challenge. International Journal of Computer Vision (IJCV), 115(3):211– 252, 2015.<br>[25] K. Simonyan and A. Zisserman. Very deep convolutional networks for large-scale image recognition. arXiv preprint arXiv:1409.1556, 2014.<br>[26] C. Szegedy, W. Liu, Y. Jia, P. Sermanet, S. Reed, D. Anguelov, D. Erhan, V. Vanhoucke, and A. Rabinovich. Going deeper with convolutions. In CVPR, pages 1–9, 2015.<br>[27] C. Wah, S. Branson, P. Welinder, P. Perona, and S. Belongie. The caltech-ucsd birds-200-2011 dataset. 2011.<br>[28] K. Q. Weinberger and L. K. Saul. Distance metric learning for large margin nearest neighbor classification. Journal of Machine Learning Research (JMLR), 10(Feb):207–244, 2009.<br>[29] Y. Xian, Z. Akata, G. Sharma, Q. Nguyen, M. Hein, and B. Schiele. Latent embeddings for zero-shot classification. In CVPR, pages 69–77, 2016.<br>[30] Y. Xian, C. H. Lampert, B. Schiele, and Z. Akata. Zeroshot learning-a comprehensive evaluation of the good, the bad and the ugly. arXiv preprint arXiv:1707.00600, 2017.<br>[31] X. Xu, F. Shen, Y. Yang, D. Zhang, H. T. Shen, and J. Song. Matrix tri-factorization with manifold regularizations for zero-shot learning. In CVPR, pages 3798–3807, 2017.<br>[32] J. Zhang, M. Marszałek, S. Lazebnik, and C. Schmid. Local features and kernels for classification of texture and object categories: A comprehensive study. International journal of computer vision (IJCV), 73(2):213–238, 2007.<br>[33] Z. Zhang and V. Saligrama. Zero-shot learning via joint latent similarity embedding. In CVPR, pages 6034–6042, 2016.<br>[34] C. L. Zitnick and P. Dollar. Edge boxes: Locating object proposals from edges. In ECCV, pages 391–405, 2014.</p>
+<h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><h2 id="A-如何在一张图像中找到判别区域？"><a href="#A-如何在一张图像中找到判别区域？" class="headerlink" title="A  如何在一张图像中找到判别区域？"></a>A  如何在一张图像中找到判别区域？</h2><p>为了从ZSL中的图像中搜索判别区，可以考虑两种弱监督学习方法:1）直接回归判别区域的位置（例如，我们的LDF模型中提议的放大方案）；2）为图像提取多个区域的提议（例如EdgeBox），然后选择最具判别性的一个。在本文中，我们基于如下考虑，没有采用后一种方法。首先，区域算法的目标是识别“对象”。然而，如图5所示，并在4.2小节中声明，在ZSL中，判别区域可能包含匹配其人工定义属性的上下文元素。这样的区域并不完全等同于“物体”区域，并且很难被EdgeBox搜索到。其次，对每个图像处理多个提议（通常为2000个）是非常低效的，在弱监督的环境中选择合适的区域也很困难。我们进行了一项试验，以测试ZSL的区域提议方法。</p>
+<p>特别地，我们首先为每张图片提取2000个EdgeBox的提议。然后，我们用Fast RCNN中提出的RoI池化层替换了SS-BE-baseline (VGG19)中的池化层5。将图像的提议区域输入模型中，模型可以输出每个区域的相容性得分。在标准的多实例学习（MIL）设置之后，选择最高相容性得分的区域来计算损失函数。在AwA数据集上，网络最终取得72.67%的效果。这一结果甚至比直接从全尺寸图像中提取图像特征的SS-BE-Learned（表1，78.35%）还要低。</p>
+<h2 id="B-双线性插值操作"><a href="#B-双线性插值操作" class="headerlink" title="B 双线性插值操作"></a>B 双线性插值操作</h2><p>在4.2节中，为了更好地代表更精细的局部裁剪区域$x^{crop}$。双线性插值用于自适应地将裁剪区域放大到与原始图像相同的大小。具体地说，对于放大区域的点$(i,j)$，它的值$x_{(i,j)}^{zoom}$能够通过线性组合裁剪区域最近四个点的值计算出来。</p>
+<script type="math/tex; mode=display">x_{(i,j)}^{zoom}=\sum_{\alpha,\beta} |1-\alpha-\{i/\lambda\}||1-\beta-\{j/\lambda\}|x_{(m,n)}^{crop},</script><script type="math/tex; mode=display">m=[i/\lambda]+\alpha+z_x-z_s, \alpha=0,1</script><script type="math/tex; mode=display">m=[j/\lambda]+\beta+z_y-z_s, \beta=0,1</script><p>其中，$\lambda$是上采样因子，即$\lambda=1/z_s$。$[·]$和$\{·\}$分别是整数部分和小数部分。</p>
+<h2 id="C-在AwA三个规模的实验"><a href="#C-在AwA三个规模的实验" class="headerlink" title="C 在AwA三个规模的实验"></a>C 在AwA三个规模的实验</h2><p>正如我们在5.2小节中提到的，对于AwA数据集，只执行了一个放大操作，采用了双规模模型。我们认为原因是在AwA图像中的物体通常都是大的和居中的。为了验证这一点，我们在这一节中分析了在AwA的基础上，三个规模MS-BE-Learned的性能。这个实验是用GoogLeNet进行的，所有的实验设置都和我们在第2节中描述的一样。表5展示了每个单独的规模的性能。</p>
+<p><img src="http://image.rexking6.top/img/clip1522383560.png" alt=""><br>每种规模的详细的ZSL结果（%），以及$z_s$参数的平均值。</p>
+<p>此外，（2）的参数$z_s$代表了裁剪区域的边长。在规模1和规模2中，我们分别计算了所有未见图像的$z_s$值，并显示了表5中$z_s$的平均值。可以看出，当三个规模模型在AwA上被采用时，规模2的表现要比规模1（77.12%比75.47%）更高。然而，规模3的性能并没有展现出进一步的改进（77.05%比77.12%）。当我们检查规模2的$z_s$，可以发现，裁剪区域的规模大小几乎是1(0.98)，也就是说,规模2的ZNet实际上不执行任何裁剪操作，直接将原始图像发送到规模3。正如我们所说的那样，在AwA图像中的物体是大的和居中的。通过一次放大操作，网络可以捕获主对象，而在模型中第三个规模实际上是无用的。</p>
+<h2 id="D-隐含属性的维数的影响"><a href="#D-隐含属性的维数的影响" class="headerlink" title="D 隐含属性的维数的影响"></a>D 隐含属性的维数的影响</h2><p>正如我们在第4.3.2节中提到的，隐含属性（LA）的维数设置为$k$，与人工定义属性（UA）相同。在这一节中，我们将探讨隐含属性的维数，并利用GoogLeNet对AwA数据集进行实验。特别地，我们用LA不同的维度（$k$，$2k$，$3k$）来训练SS-AE-Learned，之后只用隐含属性进行ZSL预测。结果如表6所示可以看出，随着LA维度的增加，ZSL的性能得到了改善。但是这种改进是微小的，总体性能对LA维数来说是变化微小的。</p>
+<p><img src="http://image.rexking6.top/img/clip1522460838.png" alt=""><br>表6：不同维数的隐含属性的ZSL结果。</p>
+<h2 id="E-学习的隐含属性的辨识性"><a href="#E-学习的隐含属性的辨识性" class="headerlink" title="E 学习的隐含属性的辨识性"></a>E 学习的隐含属性的辨识性</h2><p>在本节中，我们将展示更多的可视化例子来说明隐含属性的辨识性。对于一个隐含属性元素，图6中显示了对该元素具有最大和最小激活值的图像。与此同时，为了做比较，用学习的UA表征选择的例子如图7所示。从图7可以看出，人工定义的属性在许多对象中共享。另一个发现是，人工定义的属性的预测结果将会受到中层提示的影响，例如颜色。例如，对于UDA5元素，由于包含了橙色背景，黑猩猩、鲸鱼和猪的物体被错误地预测为橙色。对于UDA64元素，波斯猫和猪的图像被错误地预测为北极。这两种动物有可能会出现白色的身影。</p>
+<p><img src="http://image.rexking6.top/img/clip1522385211.png" alt=""><br>图7：在AwA上的人工定义属性（UA）的可视化例子。$UDAX$指的是UA表征的第$X$元素。UA表征是通过VGG19 SS-AE-Learned获得的。前5个图像是该元素上有最大激活值的前5个，后5个图像是该元素上有最小激活值的前5个。</p>
+<h2 id="F-广义ZSL"><a href="#F-广义ZSL" class="headerlink" title="F 广义ZSL"></a>F 广义ZSL</h2><p>在传统的cZSL中，ZSL方法在可见类上进行训练，并在不可见类上进行评估。在cZSL中，基本的假设是，测试实例总是来自于不可见类（表示为$U \rightarrow U$），这在实际应用中是不现实的。在此基础上，最近ZSL工作的目标是，计算广义ZSL（gZSL）设置中的ZSL性能。</p>
+<p>类似于[4]，20%的图像是从可见类提取的，然后与不可见类的图像合并成新的测试集。我们把含有可见类和不可见类的联合标签空间表示为$T=S\cup U$，用在$U \rightarrow T$和$S \rightarrow T$上的准确率来评估提出的LDF模型，它们分别表示为$A_{U \rightarrow T}$和$A_{S \rightarrow T}$。$A_{U \rightarrow T}$表示将测试图像从不可见类分类到联合标签空间的精确度。$A_{S \rightarrow T}$表示将可见对象识别为联合标签空间的精度。此外，类似于[30]，调和平均值的计算，同时考虑到可见类的准确性和不可见的类的准确性，它被用来评估ZSL方法。形式如下：</p>
+<script type="math/tex; mode=display">H=\frac{2A_{U \rightarrow T}A_{S \rightarrow T}}{A_{U \rightarrow T}+A_{S \rightarrow T}}</script><p>实验是在AwA和CUB的数据集上进行的。使用了GoogLeNet模型，结果如表7所示。可以看到，在两个数据集中，提出的LDF模型在所有三个指标上明显优于以前的方法，这证实了我们在gZSL环境下的方法的优点。</p>
+<p><img src="http://image.rexking6.top/img/clip1522386615.png" alt=""><br>表7：广义ZSL结果。所有的结果都是用GoogleNet的。因为原论文没有报告gZSL的结果，$*$意味着从[4]引用的的方法的数量。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\04\05\Zero-shot-Learning-入门\" rel="bookmark">Zero-shot Learning 入门</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\05\22\《Learning-Discriminative-Latent-Attributes-for-Zero-Shot-Classification》笔记\" rel="bookmark">《Learning Discriminative Latent Attributes for Zero-Shot Classification》笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\04\09\《Look-Closer-to-See-Better-Recurrent-Attention-Convolutional-Neural-Network-for-Fine-grained-Image-Recognition》笔记\" rel="bookmark">《Look-Closer-to-See-Better-Recurrent-Attention-Convolutional-Neural-Network-for-Fine-grained-Image-Recognition》笔记</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/03/29/%E3%80%8ADiscriminative-Learning-of-Latent-Features-for-Zero-Shot-Recognition%E3%80%8B%E7%AC%94%E8%AE%B0/" title="《Discriminative Learning of Latent Features for Zero-Shot Recognition》笔记">https://blog.rexking6.top/2018/03/29/《Discriminative-Learning-of-Latent-Features-for-Zero-Shot-Recognition》笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%9B%B6%E6%A0%B7%E6%9C%AC%E8%AF%86%E5%88%AB/" rel="tag"># 零样本识别</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/03/28/AMPC-1080Ti%E6%9C%BA%E5%99%A8-%E6%B7%B1%E5%BA%A6%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" rel="prev" title="AMPC-1080Ti机器-深度环境搭建">
+      <i class="fa fa-chevron-left"></i> AMPC-1080Ti机器-深度环境搭建
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/04/05/Zero-shot-Learning-%E5%85%A5%E9%97%A8/" rel="next" title="Zero-shot Learning 入门">
+      Zero-shot Learning 入门 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A0%87%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">标题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E5%BC%95%E8%A8%80"><span class="nav-number">3.</span> <span class="nav-text">1 引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">2 相关工作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E4%BB%BB%E5%8A%A1%E5%AE%9A%E4%B9%89"><span class="nav-number">5.</span> <span class="nav-text">3 任务定义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%E6%88%91%E4%BB%AC%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">6.</span> <span class="nav-text">4 我们的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-%E5%9B%BE%E5%83%8F%E7%89%B9%E5%BE%81%E7%BD%91%E7%BB%9C%EF%BC%88FNet%EF%BC%89"><span class="nav-number">6.1.</span> <span class="nav-text">4.1 图像特征网络（FNet）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-%E6%94%BE%E5%A4%A7%E7%BD%91%E7%BB%9C%EF%BC%88ZNet%EF%BC%89"><span class="nav-number">6.2.</span> <span class="nav-text">4.2 放大网络（ZNet）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-%E5%B5%8C%E5%85%A5%E7%BD%91%E7%BB%9C%EF%BC%88ENet%EF%BC%89"><span class="nav-number">6.3.</span> <span class="nav-text">4.3 嵌入网络（ENet）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-1-%E5%9F%BA%E7%A1%80%E5%B5%8C%E5%85%A5%E7%BD%91%E7%BB%9C"><span class="nav-number">6.3.1.</span> <span class="nav-text">4.3.1 基础嵌入网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-2-%E5%A2%9E%E5%BC%BA%E5%B5%8C%E5%85%A5%E7%BD%91%E7%BB%9C"><span class="nav-number">6.3.2.</span> <span class="nav-text">4.3.2 增强嵌入网络</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-4-ZSL%E9%A2%84%E6%B5%8B"><span class="nav-number">6.4.</span> <span class="nav-text">4.4 ZSL预测</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%E5%AE%9E%E9%AA%8C"><span class="nav-number">7.</span> <span class="nav-text">5 实验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">7.1.</span> <span class="nav-text">5.1 数据集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82"><span class="nav-number">7.1.1.</span> <span class="nav-text">5.2 实现细节</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-%E5%9F%BA%E7%A1%80"><span class="nav-number">7.1.2.</span> <span class="nav-text">5.3 基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">7.1.3.</span> <span class="nav-text">5.4 实验结果</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-%E7%BB%93%E8%AE%BA"><span class="nav-number">8.</span> <span class="nav-text">6 结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-%E6%84%9F%E8%B0%A2"><span class="nav-number">9.</span> <span class="nav-text">7 感谢</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">10.</span> <span class="nav-text">引用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%99%84%E5%BD%95"><span class="nav-number">11.</span> <span class="nav-text">附录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#A-%E5%A6%82%E4%BD%95%E5%9C%A8%E4%B8%80%E5%BC%A0%E5%9B%BE%E5%83%8F%E4%B8%AD%E6%89%BE%E5%88%B0%E5%88%A4%E5%88%AB%E5%8C%BA%E5%9F%9F%EF%BC%9F"><span class="nav-number">11.1.</span> <span class="nav-text">A  如何在一张图像中找到判别区域？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#B-%E5%8F%8C%E7%BA%BF%E6%80%A7%E6%8F%92%E5%80%BC%E6%93%8D%E4%BD%9C"><span class="nav-number">11.2.</span> <span class="nav-text">B 双线性插值操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E5%9C%A8AwA%E4%B8%89%E4%B8%AA%E8%A7%84%E6%A8%A1%E7%9A%84%E5%AE%9E%E9%AA%8C"><span class="nav-number">11.3.</span> <span class="nav-text">C 在AwA三个规模的实验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#D-%E9%9A%90%E5%90%AB%E5%B1%9E%E6%80%A7%E7%9A%84%E7%BB%B4%E6%95%B0%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">11.4.</span> <span class="nav-text">D 隐含属性的维数的影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#E-%E5%AD%A6%E4%B9%A0%E7%9A%84%E9%9A%90%E5%90%AB%E5%B1%9E%E6%80%A7%E7%9A%84%E8%BE%A8%E8%AF%86%E6%80%A7"><span class="nav-number">11.5.</span> <span class="nav-text">E 学习的隐含属性的辨识性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#F-%E5%B9%BF%E4%B9%89ZSL"><span class="nav-number">11.6.</span> <span class="nav-text">F 广义ZSL</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="快速傅立叶变换补0">
+<meta property="og:url" content="https://blog.rexking6.top/2020/09/23/%E5%BF%AB%E9%80%9F%E5%82%85%E7%AB%8B%E5%8F%B6%E5%8F%98%E6%8D%A2%E8%A1%A50/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1600855802.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1600855846.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1600856408.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1600856469.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1600856936.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1600856985.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1600857192.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1600857340.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1600857442.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1600857462.png">
+<meta property="article:published_time" content="2020-09-23T09:01:54.000Z">
+<meta property="article:modified_time" content="2020-09-23T10:44:55.717Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1600855802.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2020/09/23/%E5%BF%AB%E9%80%9F%E5%82%85%E7%AB%8B%E5%8F%B6%E5%8F%98%E6%8D%A2%E8%A1%A50/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>快速傅立叶变换补0 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2020/09/23/%E5%BF%AB%E9%80%9F%E5%82%85%E7%AB%8B%E5%8F%B6%E5%8F%98%E6%8D%A2%E8%A1%A50/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          快速傅立叶变换补0
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-09-23 17:01:54 / 修改时间：18:44:55" itemprop="dateCreated datePublished" datetime="2020-09-23T17:01:54+08:00">2020-09-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2020/09/23/%E5%BF%AB%E9%80%9F%E5%82%85%E7%AB%8B%E5%8F%B6%E5%8F%98%E6%8D%A2%E8%A1%A50/" class="post-meta-item leancloud_visitors" data-flag-title="快速傅立叶变换补0" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>8.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>8 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/85863024">快速傅里叶变换(FFT)中为什么要“补零”？</a>和<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/a82976562fb9">内积，卷积，傅里叶变换</a>。</p>
+<p>说明一下，用MATLAB做FFT并不要求数据点个数必须为以2为基数的整数次方。之所以很多资料上说控制数据点数为以2为基数的整数次 方，是因为这样就能采用以2为基的FFT算法，提升运算性能。</p>
+<p>如果数据点数不是以2为基数的整数次方，处理方法有两种，一种是在原始数据开头或末尾补零，即将数据补到以2为基数的整数次方，<strong>这是“补零”的一个用处</strong>；第二种是采用以任意数为基数的FFT算法。</p>
+<p>MATLAB的FFT并非使用的是蝶形算法。对于非2的幂指数的长度，它使用Cooley-Tukey算法分解因数，再利用现有的库分别计算最后合成。</p>
+<h1 id="快速傅里叶变换FFT"><a href="#快速傅里叶变换FFT" class="headerlink" title="快速傅里叶变换FFT"></a>快速傅里叶变换FFT</h1><p>比如，现在我有一个信号，这个信号中仅包含两个正（余）弦波，一个是 $1MHz$，一个是 $1.05MHz$，即 $x=\cos(2\pi\times1000000t)+\cos(2\pi\times1050000t)$。设定采样频率为 $F_s=100MHz$，如果采 $1000$ 个点，那么时域信号的时长就有 $10\mu s$。</p>
+<p><img src="http://image.rexking6.top/img/clip1600855802.png" alt=""></p>
+<p><em>图1. 1000个数据点</em></p>
+<p>如果，直接对这1000个数据点其做快速傅里叶变换，将得到频谱图：</p>
+<p><img src="http://image.rexking6.top/img/clip1600855846.png" alt=""></p>
+<p><em>图2. 1000个数据点做FFT的频谱</em></p>
+<p>可以发现，频谱点稀疏，在1MHz附近根本无法将1MHz 和1.05MHz 的两个频率分开。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">clear;clc</span><br><span class="line">close all</span><br><span class="line"><span class="comment">%% FFT</span></span><br><span class="line">Fs = <span class="number">100e6</span>;		    <span class="comment">% 采样频率 Hz</span></span><br><span class="line">T = <span class="number">1</span>/Fs;		    <span class="comment">% 采样周期 s</span></span><br><span class="line">L0 = <span class="number">1000</span>;                  <span class="comment">% 信号长度</span></span><br><span class="line">L = <span class="number">1000</span>;                   <span class="comment">% 数据长度</span></span><br><span class="line">t0 = (<span class="number">0</span>:L0<span class="number">-1</span>)*T;            <span class="comment">% 信号时间序列</span></span><br><span class="line">x = <span class="built_in">cos</span>(<span class="number">2</span>*<span class="built_in">pi</span>*<span class="number">1e6</span>*t0) + <span class="built_in">cos</span>(<span class="number">2</span>*<span class="built_in">pi</span>*<span class="number">1.05e6</span>*t0); <span class="comment">% 信号函数</span></span><br><span class="line">t = (<span class="number">0</span>:L<span class="number">-1</span>)*T;              <span class="comment">% 数据时间序列</span></span><br><span class="line"><span class="comment">%% Plot</span></span><br><span class="line"><span class="built_in">figure</span>(<span class="number">1</span>)</span><br><span class="line"><span class="built_in">plot</span>(t*<span class="number">1e6</span>,x,<span class="string">&#x27;b-&#x27;</span>,<span class="string">&#x27;linewidth&#x27;</span>,<span class="number">1.5</span>)</span><br><span class="line">title (<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;Time domain signal&#x27;</span>)</span><br><span class="line">xlabel(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;\it t /\rm \mus&#x27;</span>)</span><br><span class="line">ylabel(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;\it y\rm(\itt\rm)&#x27;</span>)</span><br><span class="line">grid on;</span><br><span class="line">axis([<span class="number">0</span> <span class="number">10</span> <span class="number">-2</span> <span class="number">2</span>])</span><br><span class="line">set(gca,<span class="string">&#x27;FontSize&#x27;</span>, <span class="number">10</span> ,<span class="string">&#x27;FontName&#x27;</span>, <span class="string">&#x27;Times New Roman&#x27;</span>)</span><br><span class="line">set(gcf,<span class="string">&#x27;unit&#x27;</span>,<span class="string">&#x27;centimeters&#x27;</span>,<span class="string">&#x27;position&#x27;</span>,[<span class="number">15</span> <span class="number">10</span> <span class="number">13.53</span> <span class="number">9.03</span>],<span class="string">&#x27;color&#x27;</span>,<span class="string">&#x27;white&#x27;</span>)</span><br><span class="line"><span class="comment">%% FFT</span></span><br><span class="line">Y = fft(x);                   <span class="comment">% 快速傅里叶变换</span></span><br><span class="line"><span class="comment">% 计算双侧频谱 P2。然后基于 P2 和偶数信号长度 L 计算单侧频谱 P1。</span></span><br><span class="line">P2 = <span class="built_in">abs</span>(Y/L0);</span><br><span class="line">P1 = P2(<span class="number">1</span>:L/<span class="number">2</span>+<span class="number">1</span>);</span><br><span class="line">P1(<span class="number">2</span>:<span class="keyword">end</span><span class="number">-1</span>) = <span class="number">2</span>*P1(<span class="number">2</span>:<span class="keyword">end</span><span class="number">-1</span>);</span><br><span class="line">f = Fs*(<span class="number">0</span>:(L/<span class="number">2</span>))/L;<span class="comment">% Rfft</span></span><br><span class="line"><span class="built_in">figure</span>(<span class="number">2</span>)</span><br><span class="line"><span class="built_in">plot</span>(f, P1,<span class="string">&#x27;r-&#x27;</span>,<span class="string">&#x27;Marker&#x27;</span>,<span class="string">&#x27;.&#x27;</span>,<span class="string">&#x27;markersize&#x27;</span>,<span class="number">10</span>,<span class="string">&#x27;linewidth&#x27;</span>,<span class="number">1.5</span>)</span><br><span class="line">axis([<span class="number">0.5e6</span> <span class="number">1.5e6</span> <span class="number">0</span> <span class="number">1.5</span>])</span><br><span class="line">title(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;Power Spectrum&#x27;</span>)</span><br><span class="line">xlabel(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;\it f /\rm Hz&#x27;</span>)</span><br><span class="line">ylabel(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;\it y\rm(\itf\rm)&#x27;</span>)</span><br><span class="line">grid on;</span><br><span class="line">set(gca,<span class="string">&#x27;FontSize&#x27;</span>, <span class="number">10</span> ,<span class="string">&#x27;FontName&#x27;</span>, <span class="string">&#x27;Times New Roman&#x27;</span>)</span><br><span class="line">set(gcf,<span class="string">&#x27;unit&#x27;</span>,<span class="string">&#x27;centimeters&#x27;</span>,<span class="string">&#x27;position&#x27;</span>,[<span class="number">15</span> <span class="number">10</span> <span class="number">13.53</span> <span class="number">9.03</span>],<span class="string">&#x27;color&#x27;</span>,<span class="string">&#x27;white&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<h1 id="频率分辨率"><a href="#频率分辨率" class="headerlink" title="频率分辨率"></a>频率分辨率</h1><p>发现频率成分无法被区分开来，第一反应应该就是：<strong>频率分辨率不够</strong>。那么，如何提高频率分辨率呢？首先要清楚，这里存在两种类型的频率分辨率。</p>
+<p>一种叫<strong>波形分辨率</strong>，其由<strong>原始数据</strong>的时间长度决定：</p>
+<script type="math/tex; mode=display">
+\Delta R_{w}=\frac{1}{T}</script><p>另一种可以称之为<strong>视觉分辨率</strong>或<strong>FFT分辨率</strong>，其由采样频率和参与FFT的数据点数决定：</p>
+<script type="math/tex; mode=display">
+\Delta R_{f f t}=\frac{F_{s}}{N_{f f t}}</script><p>之所以要区分，就是因为后面要进行“补零”的操作。如果不补零，直接对原始数据做FFT，那么这两种分辨率是相等的。</p>
+<p>例如上面，有：</p>
+<script type="math/tex; mode=display">
+\Delta R_{w}=\frac{1}{10 \mu s}=\Delta R_{f f t}=\frac{100 M H z}{1000}=100 k H z</script><h1 id="补零"><a href="#补零" class="headerlink" title="补零"></a>补零</h1><p>那么，如果现在在原始数据点后补零会有什么效果呢？假设在这1000个原始数据点后面再补充零达到7000个点，那么数据变成了：</p>
+<p><img src="http://image.rexking6.top/img/clip1600856408.png" alt=""></p>
+<p><em>图3. 7000个补零后数据点</em></p>
+<p>此时对其做快速傅里叶变换，结果如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1600856469.png" alt=""></p>
+<p><em>图4. 7000个补零后数据点做FFT的频谱</em></p>
+<p>可以发现，频谱点密集了不少，但是在$1MHz$附近依然无法将$1MHz$和$1.05MHz$的两个频率成分分开。这是因为从式(1)可以看出，<strong>波形分辨率只与原始数据的时长</strong> $T$ <strong>有关</strong>，而与参与FFT的数据点数无关。所以，虽然补了很多零，但波形分辨率依然为：$\Delta R_{w}=\frac{1}{10 \mu s}=100 k H z$，该分辨率大于$1MHz$和$1.05MHz$成分之间的距离 $50kHz$。这就好比用筛子分黄豆和大米，分辨率就好像是筛子上孔的大小，如果筛子的孔太大了，就没有办法把这两者分开。</p>
+<p>而“时域补零相当于频域插值”，也就是说，补零操作增加了频域的插值点数，让频域曲线看起来更加光滑，也就是增加了FFT频率分辨率，注意式(2)所示，<strong>这是“补零”的另一个原因</strong>。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">clear;clc</span><br><span class="line">close all</span><br><span class="line"><span class="comment">%% FFT</span></span><br><span class="line">Fs = <span class="number">100e6</span>;		    <span class="comment">% 采样频率 Hz</span></span><br><span class="line">T = <span class="number">1</span>/Fs;		    <span class="comment">% 采样周期 s</span></span><br><span class="line">L0 = <span class="number">1000</span>;                  <span class="comment">% 信号长度</span></span><br><span class="line">L = <span class="number">7000</span>;                   <span class="comment">% 数据长度</span></span><br><span class="line">t0 = (<span class="number">0</span>:L0<span class="number">-1</span>)*T;            <span class="comment">% 信号时间序列</span></span><br><span class="line">x = <span class="built_in">cos</span>(<span class="number">2</span>*<span class="built_in">pi</span>*<span class="number">1e6</span>*t0) + <span class="built_in">cos</span>(<span class="number">2</span>*<span class="built_in">pi</span>*<span class="number">1.05e6</span>*t0); <span class="comment">% 信号函数</span></span><br><span class="line">t = (<span class="number">0</span>:L<span class="number">-1</span>)*T;              <span class="comment">% 数据时间序列</span></span><br><span class="line">y = <span class="built_in">zeros</span>(<span class="number">1</span>,L);</span><br><span class="line">y(<span class="number">1</span>:L0) = x;</span><br><span class="line"><span class="comment">%% Plot</span></span><br><span class="line"><span class="built_in">figure</span>(<span class="number">1</span>)</span><br><span class="line"><span class="built_in">plot</span>(t*<span class="number">1e6</span>,y,<span class="string">&#x27;b-&#x27;</span>,<span class="string">&#x27;linewidth&#x27;</span>,<span class="number">1.5</span>)</span><br><span class="line">title(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;Time domain signal with Zero Padding&#x27;</span>)</span><br><span class="line">xlabel(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;\it t /\rm \mus&#x27;</span>)</span><br><span class="line">ylabel(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;\it y\rm(\itt\rm)&#x27;</span>)</span><br><span class="line">grid on;</span><br><span class="line">axis([<span class="number">0</span> <span class="number">70</span> <span class="number">-2</span> <span class="number">2</span>])</span><br><span class="line">set(gca,<span class="string">&#x27;FontSize&#x27;</span>, <span class="number">10</span> ,<span class="string">&#x27;FontName&#x27;</span>, <span class="string">&#x27;Times New Roman&#x27;</span>)</span><br><span class="line">set(gcf,<span class="string">&#x27;unit&#x27;</span>,<span class="string">&#x27;centimeters&#x27;</span>,<span class="string">&#x27;position&#x27;</span>,[<span class="number">15</span> <span class="number">10</span> <span class="number">13.53</span> <span class="number">9.03</span>],<span class="string">&#x27;color&#x27;</span>,<span class="string">&#x27;white&#x27;</span>)</span><br><span class="line"><span class="comment">%% FFT</span></span><br><span class="line">Y = fft(y);                   <span class="comment">% 快速傅里叶变换</span></span><br><span class="line"><span class="comment">% 计算双侧频谱 P2。然后基于 P2 和偶数信号长度 L 计算单侧频谱 P1。</span></span><br><span class="line">P2 = <span class="built_in">abs</span>(Y/L0);</span><br><span class="line">P1 = P2(<span class="number">1</span>:L/<span class="number">2</span>+<span class="number">1</span>);</span><br><span class="line">P1(<span class="number">2</span>:<span class="keyword">end</span><span class="number">-1</span>) = <span class="number">2</span>*P1(<span class="number">2</span>:<span class="keyword">end</span><span class="number">-1</span>);</span><br><span class="line">f = Fs*(<span class="number">0</span>:(L/<span class="number">2</span>))/L;<span class="comment">% Rfft</span></span><br><span class="line"><span class="built_in">figure</span>(<span class="number">2</span>)</span><br><span class="line"><span class="built_in">plot</span>(f, P1,<span class="string">&#x27;r-&#x27;</span>,<span class="string">&#x27;Marker&#x27;</span>,<span class="string">&#x27;.&#x27;</span>,<span class="string">&#x27;markersize&#x27;</span>,<span class="number">10</span>,<span class="string">&#x27;linewidth&#x27;</span>,<span class="number">1.5</span>)</span><br><span class="line">axis([<span class="number">0.5e6</span> <span class="number">1.5e6</span> <span class="number">0</span> <span class="number">1.5</span>])</span><br><span class="line">title(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;Power Spectrum&#x27;</span>)</span><br><span class="line">xlabel(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;\it f /\rm Hz&#x27;</span>)</span><br><span class="line">ylabel(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;\it y\rm(\itf\rm)&#x27;</span>)</span><br><span class="line">grid on;</span><br><span class="line">set(gca,<span class="string">&#x27;FontSize&#x27;</span>, <span class="number">10</span> ,<span class="string">&#x27;FontName&#x27;</span>, <span class="string">&#x27;Times New Roman&#x27;</span>)</span><br><span class="line">set(gcf,<span class="string">&#x27;unit&#x27;</span>,<span class="string">&#x27;centimeters&#x27;</span>,<span class="string">&#x27;position&#x27;</span>,[<span class="number">15</span> <span class="number">10</span> <span class="number">13.53</span> <span class="number">9.03</span>],<span class="string">&#x27;color&#x27;</span>,<span class="string">&#x27;white&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<h1 id="频谱泄露"><a href="#频谱泄露" class="headerlink" title="频谱泄露"></a>频谱泄露</h1><p>显然，根据上面的分析可知，在采样频率不变的情况下，要想将$1MHz$和$1.05MHz$这两个频率成分分析出来，光靠“补零”是不够的，必须要改变波形分辨率，也就是要延长原始数据的时长。现在以相同的采样频率对信号采7000个点作为原始信号：</p>
+<p><img src="http://image.rexking6.top/img/clip1600856936.png" alt=""></p>
+<p><em>图5. 7000个数据点</em></p>
+<p>对其做快速傅里叶变换，结果如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1600856985.png" alt=""></p>
+<p><em>图6. 7000个数据点做FFT的频谱</em></p>
+<p>因为此时的波形分辨率为：$\Delta R_{w}=\frac{1}{70 \mu s} \approx 14 k H z$，小于$1MHz$和$1.05MHz$这两个频率成分之间的距离 $50kHz$ ，所以可以看出有两个明显的峰值。</p>
+<p>但是会发现$1MHz$ 对应的幅值为1，与原始信号中该频率成分的幅值一致，但  $1.05MHz$对应的幅值明显低于1，但是其周边的点上却都有不小的幅值，这就是所谓的<strong>频谱泄露</strong>，因为数据点的个数影响，使得在$1MHz$ 处有谱线存在，但在$1.05MHz$ 处没有谱线存在，使测量结果偏离实际值 ,同时在实际频率点的能量分散到两侧的其它频率点上，并出现一些幅值较小的假谱。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">clear;clc</span><br><span class="line">close all</span><br><span class="line"><span class="comment">%% FFT</span></span><br><span class="line">Fs = <span class="number">100e6</span>;		    <span class="comment">% 采样频率 Hz</span></span><br><span class="line">T = <span class="number">1</span>/Fs;		    <span class="comment">% 采样周期 s</span></span><br><span class="line">L0 = <span class="number">7000</span>;                  <span class="comment">% 信号长度</span></span><br><span class="line">L = <span class="number">7000</span>;                   <span class="comment">% 数据长度</span></span><br><span class="line">t0 = (<span class="number">0</span>:L0<span class="number">-1</span>)*T;            <span class="comment">% 信号时间序列</span></span><br><span class="line">x = <span class="built_in">cos</span>(<span class="number">2</span>*<span class="built_in">pi</span>*<span class="number">1e6</span>*t0) + <span class="built_in">cos</span>(<span class="number">2</span>*<span class="built_in">pi</span>*<span class="number">1.05e6</span>*t0); <span class="comment">% 信号函数</span></span><br><span class="line">t = (<span class="number">0</span>:L<span class="number">-1</span>)*T;              <span class="comment">% 数据时间序列</span></span><br><span class="line"><span class="comment">%% Plot</span></span><br><span class="line"><span class="built_in">figure</span>(<span class="number">1</span>)</span><br><span class="line"><span class="built_in">plot</span>(t*<span class="number">1e6</span>,x,<span class="string">&#x27;b-&#x27;</span>,<span class="string">&#x27;linewidth&#x27;</span>,<span class="number">1.5</span>)</span><br><span class="line">title(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;Time domain signal&#x27;</span>)</span><br><span class="line">xlabel(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;\it t /\rm \mus&#x27;</span>)</span><br><span class="line">ylabel(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;\it y\rm(\itt\rm)&#x27;</span>)</span><br><span class="line">grid on;</span><br><span class="line">axis([<span class="number">0</span> <span class="number">70</span> <span class="number">-2</span> <span class="number">2</span>])</span><br><span class="line">set(gca,<span class="string">&#x27;FontSize&#x27;</span>, <span class="number">10</span> ,<span class="string">&#x27;FontName&#x27;</span>, <span class="string">&#x27;Times New Roman&#x27;</span>)</span><br><span class="line">set(gcf,<span class="string">&#x27;unit&#x27;</span>,<span class="string">&#x27;centimeters&#x27;</span>,<span class="string">&#x27;position&#x27;</span>,[<span class="number">15</span> <span class="number">10</span> <span class="number">13.53</span> <span class="number">9.03</span>],<span class="string">&#x27;color&#x27;</span>,<span class="string">&#x27;white&#x27;</span>)</span><br><span class="line"><span class="comment">%% FFT</span></span><br><span class="line">Y = fft(x);                   <span class="comment">% 快速傅里叶变换</span></span><br><span class="line"><span class="comment">% 计算双侧频谱 P2。然后基于 P2 和偶数信号长度 L 计算单侧频谱 P1。</span></span><br><span class="line">P2 = <span class="built_in">abs</span>(Y/L0);</span><br><span class="line">P1 = P2(<span class="number">1</span>:L/<span class="number">2</span>+<span class="number">1</span>);</span><br><span class="line">P1(<span class="number">2</span>:<span class="keyword">end</span><span class="number">-1</span>) = <span class="number">2</span>*P1(<span class="number">2</span>:<span class="keyword">end</span><span class="number">-1</span>);</span><br><span class="line">f = Fs/<span class="number">2</span>*<span class="built_in">linspace</span>(<span class="number">0</span>,<span class="number">1</span>,L/<span class="number">2</span>+<span class="number">1</span>);<span class="comment">% Rfft</span></span><br><span class="line"><span class="built_in">figure</span>(<span class="number">2</span>)</span><br><span class="line"><span class="built_in">plot</span>(f, P1,<span class="string">&#x27;r-&#x27;</span>,<span class="string">&#x27;Marker&#x27;</span>,<span class="string">&#x27;.&#x27;</span>,<span class="string">&#x27;markersize&#x27;</span>,<span class="number">10</span>,<span class="string">&#x27;linewidth&#x27;</span>,<span class="number">1.5</span>)</span><br><span class="line">axis([<span class="number">0.5e6</span> <span class="number">1.5e6</span> <span class="number">0</span> <span class="number">1.5</span>])</span><br><span class="line">title(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;Power Spectrum&#x27;</span>)</span><br><span class="line">xlabel(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;\it f /\rm Hz&#x27;</span>)</span><br><span class="line">ylabel(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;\it y\rm(\itf\rm)&#x27;</span>)</span><br><span class="line">grid on;</span><br><span class="line">set(gca,<span class="string">&#x27;FontSize&#x27;</span>, <span class="number">10</span> ,<span class="string">&#x27;FontName&#x27;</span>, <span class="string">&#x27;Times New Roman&#x27;</span>)</span><br><span class="line">set(gcf,<span class="string">&#x27;unit&#x27;</span>,<span class="string">&#x27;centimeters&#x27;</span>,<span class="string">&#x27;position&#x27;</span>,[<span class="number">15</span> <span class="number">10</span> <span class="number">13.53</span> <span class="number">9.03</span>],<span class="string">&#x27;color&#x27;</span>,<span class="string">&#x27;white&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>为了解决这个问题，可以设法使得谱线同时经过$1MHz$和$1.05MHz$这两个频率点，找到他们的公约数。</p>
+<p>如果原始数据不变，在后面再补充1000个零点：</p>
+<p><img src="http://image.rexking6.top/img/clip1600857192.png" alt=""></p>
+<p><em>图7. 8000个补零后数据点</em></p>
+<p>那么FFT分辨率就是 $12.5kHz$ ，是这两个频率的公约数 $1 M H z=80 \times 12.5 k H z$ ，$1.05 M H z=84 \times 12.5 k H z$，所以谱线同时经过 $1MHz$和$1.05MHz$ 这两个频率点。</p>
+<p>对其做快速傅里叶变换，结果如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1600857340.png" alt=""></p>
+<p><em>图8. 8000个补零后数据点做FFT的频谱</em></p>
+<p>会发现$1MHz$和$1.05MHz$对应的幅值均为1，与原始信号一致。<strong>这也是一种补零操作带来的影响</strong>。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">clear;clc</span><br><span class="line">close all</span><br><span class="line"><span class="comment">%% FFT</span></span><br><span class="line">Fs = <span class="number">100e6</span>;	            <span class="comment">% 采样频率 Hz</span></span><br><span class="line">T = <span class="number">1</span>/Fs;		    <span class="comment">% 采样周期 s</span></span><br><span class="line">L0 = <span class="number">7000</span>;                  <span class="comment">% 信号长度</span></span><br><span class="line">L = <span class="number">8000</span>;                   <span class="comment">% 数据长度</span></span><br><span class="line">t0 = (<span class="number">0</span>:L0<span class="number">-1</span>)*T;            <span class="comment">% 信号时间序列</span></span><br><span class="line">x = <span class="built_in">cos</span>(<span class="number">2</span>*<span class="built_in">pi</span>*<span class="number">1e6</span>*t0) + <span class="built_in">cos</span>(<span class="number">2</span>*<span class="built_in">pi</span>*<span class="number">1.05e6</span>*t0); <span class="comment">% 信号函数</span></span><br><span class="line">t = (<span class="number">0</span>:L<span class="number">-1</span>)*T;              <span class="comment">% 数据时间序列</span></span><br><span class="line">y = <span class="built_in">zeros</span>(<span class="number">1</span>,L);</span><br><span class="line">y(<span class="number">1</span>:L0) = x;</span><br><span class="line"><span class="comment">%% Plot</span></span><br><span class="line"><span class="built_in">figure</span>(<span class="number">1</span>)</span><br><span class="line"><span class="built_in">plot</span>(t*<span class="number">1e6</span>,y,<span class="string">&#x27;b-&#x27;</span>,<span class="string">&#x27;linewidth&#x27;</span>,<span class="number">1.5</span>)</span><br><span class="line">title(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;Time domain signal&#x27;</span>)</span><br><span class="line">xlabel(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;\it t /\rm \mus&#x27;</span>)</span><br><span class="line">ylabel(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;\it y\rm(\itt\rm)&#x27;</span>)</span><br><span class="line">grid on;</span><br><span class="line">axis([<span class="number">0</span> <span class="number">80</span> <span class="number">-2</span> <span class="number">2</span>])</span><br><span class="line">set(gca,<span class="string">&#x27;FontSize&#x27;</span>, <span class="number">10</span> ,<span class="string">&#x27;FontName&#x27;</span>, <span class="string">&#x27;Times New Roman&#x27;</span>)</span><br><span class="line">set(gcf,<span class="string">&#x27;unit&#x27;</span>,<span class="string">&#x27;centimeters&#x27;</span>,<span class="string">&#x27;position&#x27;</span>,[<span class="number">15</span> <span class="number">10</span> <span class="number">13.53</span> <span class="number">9.03</span>],<span class="string">&#x27;color&#x27;</span>,<span class="string">&#x27;white&#x27;</span>)</span><br><span class="line"><span class="comment">%% FFT</span></span><br><span class="line">Y = fft(y);                   <span class="comment">% 快速傅里叶变换</span></span><br><span class="line"><span class="comment">% 计算双侧频谱 P2。然后基于 P2 和偶数信号长度 L 计算单侧频谱 P1。</span></span><br><span class="line">P2 = <span class="built_in">abs</span>(Y/L0);</span><br><span class="line">P1 = P2(<span class="number">1</span>:L/<span class="number">2</span>+<span class="number">1</span>);</span><br><span class="line">P1(<span class="number">2</span>:<span class="keyword">end</span><span class="number">-1</span>) = <span class="number">2</span>*P1(<span class="number">2</span>:<span class="keyword">end</span><span class="number">-1</span>);</span><br><span class="line">f = Fs/<span class="number">2</span>*<span class="built_in">linspace</span>(<span class="number">0</span>,<span class="number">1</span>,L/<span class="number">2</span>+<span class="number">1</span>);<span class="comment">% Rfft</span></span><br><span class="line"><span class="built_in">figure</span>(<span class="number">2</span>)</span><br><span class="line"><span class="built_in">plot</span>(f, P1,<span class="string">&#x27;r-&#x27;</span>,<span class="string">&#x27;Marker&#x27;</span>,<span class="string">&#x27;.&#x27;</span>,<span class="string">&#x27;markersize&#x27;</span>,<span class="number">10</span>,<span class="string">&#x27;linewidth&#x27;</span>,<span class="number">1.5</span>)</span><br><span class="line">axis([<span class="number">0.5e6</span> <span class="number">1.5e6</span> <span class="number">0</span> <span class="number">1.5</span>])</span><br><span class="line">title(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;Power Spectrum&#x27;</span>)</span><br><span class="line">xlabel(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;\it f /\rm Hz&#x27;</span>)</span><br><span class="line">ylabel(<span class="string">&#x27;\fontsize&#123;10&#125;\fontname&#123;Times New Roman&#125;\it y\rm(\itf\rm)&#x27;</span>)</span><br><span class="line">grid on;</span><br><span class="line">set(gca,<span class="string">&#x27;FontSize&#x27;</span>, <span class="number">10</span> ,<span class="string">&#x27;FontName&#x27;</span>, <span class="string">&#x27;Times New Roman&#x27;</span>)</span><br><span class="line">set(gcf,<span class="string">&#x27;unit&#x27;</span>,<span class="string">&#x27;centimeters&#x27;</span>,<span class="string">&#x27;position&#x27;</span>,[<span class="number">15</span> <span class="number">10</span> <span class="number">13.53</span> <span class="number">9.03</span>],<span class="string">&#x27;color&#x27;</span>,<span class="string">&#x27;white&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>图8中会有一些旁瓣出现，这是因为补零影响了原始信号，如果，直接采8000个点作为原始数据，即将程序中的L0改为8000，那么有：</p>
+<p><img src="http://image.rexking6.top/img/clip1600857442.png" alt=""></p>
+<p><em>图9. 8000个数据点</em></p>
+<p>并对其做FFT，结果如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1600857462.png" alt=""></p>
+<p><em>图10. 8000个数据点做FFT的频谱</em></p>
+<p>这样就不存在补零带来的误差了。</p>
+<h1 id="FFT与卷积"><a href="#FFT与卷积" class="headerlink" title="FFT与卷积"></a>FFT与卷积</h1><p>时域卷积相当于FFT乘积。卷积的离散定义：</p>
+<script type="math/tex; mode=display">
+(f * g)(n)=\sum_{\tau=-\infty}^{\infty} f(\tau) g(n-\tau)</script><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ol>
+<li>Zero Padding <a target="_blank" rel="noopener" href="http://www.bitweenie.com/listings/fft-zero-padding/">http://www.bitweenie.com/listings/fft-zero-padding/</a></li>
+<li>Zero Padding Theorem <a target="_blank" rel="noopener" href="https://ccrma.stanford.edu/~jos/dft/Zero_Padding_Theorem_Spectral.html">https://ccrma.stanford.edu/~jos/dft/Zero_Padding_Theorem_Spectral.html</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\03\21\Fisher线性判别\" rel="bookmark">Fisher线性判别</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\02\13\cs229中文笔记-一二\" rel="bookmark">cs229中文笔记(一二)</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\02\18\cs229中文笔记-七\" rel="bookmark">cs229中文笔记(七)</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2020/09/23/%E5%BF%AB%E9%80%9F%E5%82%85%E7%AB%8B%E5%8F%B6%E5%8F%98%E6%8D%A2%E8%A1%A50/" title="快速傅立叶变换补0">https://blog.rexking6.top/2020/09/23/快速傅立叶变换补0/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/20/%E7%8B%AC%E7%AB%8B%E6%88%90%E5%88%86%E5%88%86%E6%9E%90%EF%BC%88Independent-Component-Analysis%EF%BC%89/" rel="prev" title="独立成分分析（Independent Component Analysis）">
+      <i class="fa fa-chevron-left"></i> 独立成分分析（Independent Component Analysis）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/10/%E5%8D%A1%E5%B0%94%E6%9B%BC%E6%BB%A4%E6%B3%A2%E5%8F%8A%E5%BA%94%E7%94%A8%E4%BA%8E%E6%97%B6%E5%BA%8F/" rel="next" title="卡尔曼滤波及应用于时序">
+      卡尔曼滤波及应用于时序 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BF%AB%E9%80%9F%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2FFT"><span class="nav-number">2.</span> <span class="nav-text">快速傅里叶变换FFT</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A2%91%E7%8E%87%E5%88%86%E8%BE%A8%E7%8E%87"><span class="nav-number">3.</span> <span class="nav-text">频率分辨率</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A1%A5%E9%9B%B6"><span class="nav-number">4.</span> <span class="nav-text">补零</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A2%91%E8%B0%B1%E6%B3%84%E9%9C%B2"><span class="nav-number">5.</span> <span class="nav-text">频谱泄露</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FFT%E4%B8%8E%E5%8D%B7%E7%A7%AF"><span class="nav-number">6.</span> <span class="nav-text">FFT与卷积</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Learning Discriminative Latent Attributes for Zero-Shot Classification》笔记">
+<meta property="og:url" content="https://blog.rexking6.top/2018/05/22/%E3%80%8ALearning-Discriminative-Latent-Attributes-for-Zero-Shot-Classification%E3%80%8B%E7%AC%94%E8%AE%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1526954504.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1527128611.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1527210285.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1527212155.png">
+<meta property="article:published_time" content="2018-05-22T01:05:33.000Z">
+<meta property="article:modified_time" content="2019-03-06T10:20:05.594Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="零样本识别">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1526954504.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/05/22/%E3%80%8ALearning-Discriminative-Latent-Attributes-for-Zero-Shot-Classification%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《Learning Discriminative Latent Attributes for Zero-Shot Classification》笔记 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/05/22/%E3%80%8ALearning-Discriminative-Latent-Attributes-for-Zero-Shot-Classification%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Learning Discriminative Latent Attributes for Zero-Shot Classification》笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-05-22 09:05:33" itemprop="dateCreated datePublished" datetime="2018-05-22T09:05:33+08:00">2018-05-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 18:20:05" itemprop="dateModified" datetime="2019-03-06T18:20:05+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9B%B6%E6%A0%B7%E6%9C%AC%E8%AF%86%E5%88%AB/" itemprop="url" rel="index"><span itemprop="name">零样本识别</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/05/22/%E3%80%8ALearning-Discriminative-Latent-Attributes-for-Zero-Shot-Classification%E3%80%8B%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="《Learning Discriminative Latent Attributes for Zero-Shot Classification》笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>8.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>8 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>ZSL的目标是将知识从可见类转移到不可见类，基于这样的假设：可见类和不可见类共享一个共有的语义空间。其中，属性非常受欢迎。然而，很少有研究表明，人工定义属性是否具有足够的鉴别能力，能够识别不同的类。此外，属性通常是相互关联的，这使得独立地学习每个属性变得不那么可取。本文提出了一种潜在的属性空间，它不仅具有识别性，而且具有语义性，可以执行ZSL任务。具体地说，利用字典学习框架将潜在属性空间与属性空间和相似性空间联系起来。对四个基准数据集进行了大量的实验，展示了所提出的方法的有效性。</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在过去的几年中，随着数据规模的快速增长和分类方法的进步，视觉识别已经取得了巨大的进步。然而，传统的视觉识别方法主要是基于监督学习，需要大量的标签样本才能获得高性能的分类模型。众所周知，收集大量的标签样本是很困难的，特别是当需要的标签是细粒度的时候，这就阻碍了视觉识别的进一步发展。因此，开发识别系统，能够识别很少或没有标记的样本，因此，在过去的几年中，ZSL的方法吸引了越来越多的关注，这是非常重要和可取的。</p>
+<p>受到人类识别不可见物体的能力的启发，ZSL的目标是识别以前从未见过的类别。ZSL的一个普遍假设是，可见的和看不见的类都共享一个共有的语义空间，在那里，样本和类原型被投影，以执行识别任务。在学习过程中被利用的不同的中间层代表，当前的ZSL方法可以分为四种。第一种是基于属性的方法，它使用属性来建立可见的和不可见的类之间的关系。例如，在不同的动物中，诸如黑色和毛茸茸的属性是共享的。属性的跨类别属性使得将知识从可见类转移到不可见类成为可能。第二种是基于文本的方法，它通过大量的文本语料库自动挖掘不同类的关系。这些方法减少了用于定义属性的人工劳动，因此ZSL可以应用于大型设置。第三种是基于类相似性，它直接挖掘出可见类和不可见类之间的相似性来建立它们之间的关系。相似之处可以从层次分类结构或每个类的语义描述中派生出来。最后一种是将不同的中间层表示组合起来，以学习更健壮的关系。这些工作建立在一个共同的观点之上，即不同的中间层表示将捕获数据的补充信息，这些信息可以用来减少可见和不可见类之间的域差异。</p>
+<p>在本文中，我们将重点放在基于属性的方法上。这种方法的传统过程主要集中在如何学习语义嵌入或如何使用策略来执行识别任务。然而，在以前的工作中只考虑了三个方面，如图1所示。首先，人工定义属性是否具有足够的识别能力来识别不同的类。其次，是否有理由独立地学习每个属性，因为属性通常是相互关联的。第三，每个属性中的变体可能非常大，因此很难学习属性分类器。对于第一个方面，43建议学习区分分类的属性。然而，这些属性是在固定的类别中学习的，并且不关心语义的含义。当新的类出现时，类的表示必须重新学习。对于第二个方面，14将属性关系融入到学习过程中。然而，这种关系是人类定义的，在现实世界中，它们通常过于复杂，无法预先定义。对于第三个方面，15利用域适应方法来确定属性模型。然而，对于这些模型，需要目标域的样本。</p>
+<p><img src="http://image.rexking6.top/img/clip1526954504.png" alt=""><br>图1.学习潜在属性的动机。红色字体的属性没有区别。矩形的属性有很大的变化。由双箭头连接的属性相互关联。</p>
+<p>为了解决上述问题，我们建议学习潜在的属性。具体地说，该方法自动探索不同属性的区别组合，其中每个组合都被视为一个潜在的属性。一方面，潜在的属性被要求具有足够的鉴别能力，从而更可靠地对不同的类进行分类。另一方面，潜在的属性应该是语义保留的，这样就可以建立不同类之间的关系。此外，属性相关性也在潜在属性中隐式地考虑。例如，毛绒绒经常与黑色和白色相关联，因此不适合独自学习。与此相反，我们的潜在属性有能力找到毛茸茸的+黑色和毛茸茸的+白色的组合，因此每个潜在属性中的变化都比每个属性中的变化小。</p>
+<p>为了学习执行ZSL任务的潜在属性空间，我们利用字典学习框架直接建模潜在的属性空间，其中可以通过一些潜在的属性字典条目来重构图像。为了保护语义信息，利用线性变换来建立属性和潜在属性之间的关系，因此潜在的属性可以被看作是属性的不同组合。此外，为了使潜在的属性具有区别性，可以使用类分类器对不同的类进行分类，其中的概率输出可以被看作是与所看到的类的相似性。因此，我们可以将图像表示从潜在属性空间转换为相似性空间。</p>
+<p>本文的其余部分按以下方式组织：第2部分讨论相关的工作。第3节详细描述了我们提议的潜在属性字典（LAD）方法的制定和优化。第4节广泛地评估了4个基准ZSL数据集的方法。第5节作结论。</p>
+<h1 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h1><p>在本节中，我们简要回顾了有关属性和ZSL学习的相关工作。</p>
+<h2 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h2><p>属性是图像的一般描述，近年来在不同的计算机视觉任务中得到了广泛的关注，如图像描述、图像字幕、图像检索和图像分类等。早期关于属性学习的工作通常认为它是一个二进制分类问题，并独立地学习每个属性。由于属性通常是相互关联的，所以14将属性关系合并到学习框架中。此外，属性与类别相关，21和1建议共同学习属性和类标签。随着深度学习在近年来越来越流行，8对视觉属性和不同层次的卷积网络之间的关系进行了分析。为了使属性具有鉴别性，43、29利用鉴别属性进行分类任务。然而，这些属性没有语义。</p>
+<h2 id="ZSL"><a href="#ZSL" class="headerlink" title="ZSL"></a>ZSL</h2><p>ZSL解决了识别以前从未见过的类的问题。随着数据规模的增长和图像注释的困难，这个应用在最近几年变得越来越流行。ZSL首先由17和9并行提出，它是由属性完成的，它利用属性的跨类别属性来建立可见和不可见类之间的关系。然后，提出了其他的中间层语义描述来解决这类问题，如单词矢量7、10、3和类相似性23、22、24、44。</p>
+<p>一种直观的方法是对不同的属性分类器进行训练，并通过属性预测结果和不可见的类描述来识别图像。考虑到属性分类器的不可靠性，13提出了一种随机的森林方法来做出更健壮的预测，41、21、40考虑模型之间的属性和类之间的关系，以改进属性预测结果。为了利用语义上的丰富的内在结构，12提出了语义的多重距离来识别未知的类样本。另一种被广泛使用的方法是标签嵌入，它将图像和标签投射到一个公共语义空间中，并通过最近的邻居方法执行分类任务。为了将ZSL扩展到大型设置，25、10、37、3使用神经网络来学习更复杂的非线性嵌入。其他一些研究使用迁移学习技术将知识从可见类转移到不可见类。最近，45提出在相似空间中捕捉可见类和不可见类之间的潜在关系。提出通过在语义空间和特征空间之间的表示来直接合成看不见的类分类器。提出了一种解决ZSL问题的度量学习方法。将传统的ZSL问题扩展到广义的ZSL问题，在测试过程中也考虑了可见类。</p>
+<p>ZSL的另一个流行假设是，不可见类样本在问题设置中是可用的。为了利用不同语义描述之间的互补信息，11提出了一种多视图嵌入方法，在这种方法中，使用可见的和不可见的类样本构造图形模型，以减少可见和不可见类之间的域差异。提出一个半监督的框架，直接学习不可见的分类器，在那里语义信息可以被合并为次要信息。利用领域的适应方法来解决看不见的和看不见的类之间的领域转移问题。受一个类别中样本的聚类特性的启发，46利用结构化预测方法来识别未见的类样本。需要指出的是，我们的方法不是在这样的设定中。</p>
+<h1 id="提出的方法"><a href="#提出的方法" class="headerlink" title="提出的方法"></a>提出的方法</h1><p>我们为ZSL提出一个潜在的属性字典（LAD）学习过程。设计目标函数有一些动机。首先，潜在的属性应该保留语义信息，从而能够将可见的和不可见的类联系起来。其次，隐属性空间中的表示应该是有区别的，以识别不同的类。基于这些考虑，图2中显示了一个为LAD提出的框架。</p>
+<p><img src="http://image.rexking6.top/img/clip1527128611.png" alt=""><br>ZSL的潜在属性字典学习框架。所提出的潜在属性空间与属性空间和相似性空间相关联。属性空间使潜在属性的语义保留和相似空间使潜在属性具有鉴别性。</p>
+<h2 id="问题定义"><a href="#问题定义" class="headerlink" title="问题定义"></a>问题定义</h2><p>假设有$c_s$个可见类，它有$n_s$个标签样本$\Phi_s=\{X_s,A_s,Z_s\}$。有$c_u$个不可见类，它有$n_u$个无标签样本$\Phi_u=\{X_u,A_u,Z_u\}$。每个样本$x_i$用$d$维特征向量表示。之后，我们有了$X_s\in \mathbb {R}^{d×n_s}$和$X_u\in \mathbb {R}^{d×n_u}$，其中$X_s=[x_1,…,x_{n_s}]$，$X_u=[x_1,…,x_{n_u}]$。$Z_s$和$Z_u$是可见类与不可见类的样本标签。在ZSL设置中，可见类与不可见类是不相交的，$Z_s\cap Z_u=\emptyset$。$A_s$与$A_u$是可见类样本与不可见类样本的$m$维语义表达（即属性注释），其中$A_s \in \mathbb{R}^{m×n_s}$和$A_u \in \mathbb{R}^{m×n_u}$。可见类样本$A_s$的语义信息是提供的，而不可见类$A_u$的语义信息是不提供的。给定类别的语义描述$P \in \mathbb{R}^{m×(c_s+c_u)}$，ZSL的目标是预测$Z_u$。</p>
+<h2 id="潜在属性字典学习"><a href="#潜在属性字典学习" class="headerlink" title="潜在属性字典学习"></a>潜在属性字典学习</h2><p>执行ZSL任务的关键点是找到一个共有空间，可以建立起可见类和不可见类之间的关系。传统方法选择属性空间来执行识别任务。例如，15建议直接学习属性字典：</p>
+<script type="math/tex; mode=display">arg \space min_{D,Y_s}||X_s-DY_s||_F^2,\space s.t. \space ||d_i||_2^2 \le1, \forall i</script><p>其中，$||·||_F$表示弗罗贝尼乌斯范数，$d_i$表示学习的字典$D$的第$i$列，$Y_s$是重建系数。为了使$Y_s$等于$A_s$，学习的字典被视为属性的表示。但是，这个约束太强了，如果我们放松这个语义约束，则目标函数可以被定义为：</p>
+<script type="math/tex; mode=display">arg\space min_{D,Y_s} ||X_s-DY_s||_F^2+\alpha||Y_s-A_s||_F^2,</script><script type="math/tex; mode=display">s.t. \space ||d_i||_2^2 \le 1, \forall i.</script><p>式子的第二项会使$Y_s$与属性表示$A_s$，因此，要确保学习的基础描述属性字典条目。</p>
+<p>尽管属性在识别任务中被广泛使用，但有两件事需要考虑。首先，用户定义的属性对于鉴别来说并不总是相同的，因此直接学习每个属性可能不太理想。第二，属性之间存在相关性。因此不适合独立地学习每个属性。为了解决这些问题，我们建议学习潜在属性。具体地说，我们使用字典学习框架直接对潜在属性空间进行建模。为了保护语义信息，一个线性变换矩阵$W$被用来建立潜在属性和属性之间的关系，如图2所示：</p>
+<script type="math/tex; mode=display">arg \space min_{D,Y_s,W}||X_s-DY_s||_F^2+\alpha||Y_s-WA_s||_F^2,</script><script type="math/tex; mode=display">s.t. \space ||d_i||_2^2 \le 1, ||w_i||_2^2 \le 1, \forall i</script><p>其中，$w_i$是$W$的第$i$列。它可以从上式中推断出，潜在属性可以被看作是语义属性的线性组合，它将隐式地组合强相关的属性。</p>
+<script type="math/tex; mode=display">arg \space min_{D,Y_s,W}||X_s-DY_s||_F^2+\alpha||Y_s-WA_s||_F^2+\beta||H-UY_s||_F^2,</script><script type="math/tex; mode=display">s.t. \space ||d_i||_2^2 \le 1, ||w_i||_2^2 \le 1, ||u_i||_2^2 \le 1,\forall i</script><p>其中$H=[h_1,h_2,…h_{n_s}] \in \mathbb {R}^{c_s×n_s}$，$h_i=[0…010…0]^T]$是一个one hot向量，是样本$x_i$的类别标签。$H$的列向量$h_i$形成相似性空间$\mathbb {R}^{c_s}$，其中每一维表示了样本与一个可见类的相似性。$U$被视为潜在属性空间的可见类分类器。上式的第三项的目标是使潜在属性表示有足够的区别来对不同的类进行分类。它隐式地将来自同一类的样本拉到一起，并将来自不同类的样本从另一个类中分开。</p>
+<p>总之，该方法所学习的潜在属性不仅对分到不同的分类有鉴别性，而且对语义的保留也有鉴别性。如图2所示，产生的潜在属性空间与两种语义空间相连接。首先，利用一个线性变换矩阵$W$来将潜在属性空间与语义属性空间相连接。通过这个变换矩阵，我们可以通过潜在属性来恢复属性表示，因此潜在属性具有语义性。其次，在潜在属性空间中，类别分类器$U$可以看作是潜在属性空间和相似性空间之间的连接。这种约束鼓励潜在属性是有鉴别性的。</p>
+<h2 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h2><p>很明显，对于$D$、$Y_s$、$W$和$U$来说，上式不是凸的，但它们分别是凸的。因此，我们采用了一种交替优化方法来解决它。特别是，我们在以下子问题之间交替：</p>
+<p>(1) 固定住$D$，$W$，$U$，更新潜在属性表示$Y_s$。子问题可以表示为：</p>
+<script type="math/tex; mode=display">arg \space min_{Y_s}||\tilde{X}-\tilde{D}Y_s||_F^2</script><p>其中</p>
+<script type="math/tex; mode=display">\tilde{X}=\begin{bmatrix} X_s \\ \alpha W A_s \\ \beta H\end{bmatrix}\quad,\tilde{D}=\begin{bmatrix} D_s \\ \alpha I\\ \beta U\end{bmatrix}\quad,</script><p>而且，$I$是单位矩阵。使上式的导数为0，且$Y_s$的闭式解是</p>
+<script type="math/tex; mode=display">Y_s=(\tilde{D}^T\tilde{D})^{-1}\tilde{D}^T\tilde{X}</script><p>(2) 固定住$Y_s$，$W$，$U$，更新潜在属性字典$D$。子问题可以表示为：</p>
+<script type="math/tex; mode=display">arg \space min_D ||X_s-DY_s||_F^2, \space s.t. \space ||d_i||_2^2 \le 1.</script><p>这个问题能够被拉格朗日对偶优化。因此，上式的解析解是</p>
+<script type="math/tex; mode=display">D=(X_sY_s^T)(Y_sY_s^T+ \Lambda )^{-1}</script><p>其中，$\Lambda$是一个由拉格朗日对偶变量构成的对角矩阵。</p>
+<p>(3) 固定住$D$，$Y_s$，$U$，更新嵌入矩阵$W$。子问题可以表示为：</p>
+<script type="math/tex; mode=display">arg \space min_W ||Y_s-WA_s||_F^2, \space s.t. \space ||w_i||_2^2 \le 1</script><p>这个问题能够被同样的方式解。$W$的解析解为：</p>
+<script type="math/tex; mode=display">W=(Y_sA_s^T)(A_sA_s^T+ \Lambda )^{-1}</script><p>其中，$\Lambda$是一个由拉格朗日对偶变量构成的对角矩阵。</p>
+<p>(4) 固定住$D$，$Y_s$，$W$，更新嵌入矩阵$U$，子问题可以表示为：</p>
+<script type="math/tex; mode=display">arg \space min_U ||H-UY_s||_F^2, \space s.t. \space ||u_i||_2^2 \le 1</script><p>这个问题能够被同样的方式解。$U$的解析解为：</p>
+<script type="math/tex; mode=display">U=(HY_s^T)(Y_sY_s^T+\Lambda)^{-1}</script><p>其中，$\Lambda$是一个由拉格朗日对偶变量构成的对角矩阵。</p>
+<p>在算法1中总结了完整的算法。在我们的实验中，优化过程总是在几十次迭代之后收敛，通常小于50。</p>
+<blockquote>
+<p>算法1<br>输入：$X_s$，$A_s$，$\alpha$，$\beta$<br>输出：$D$，$Y_s$，$W$，$U$<br>1: 随机初始化$D$，$W$，$U$<br>2: 当不收敛时，执行：<br>3:         更新$Y_s$<br>4:         更新$D$<br>5:         更新$W$<br>6:         更新$U$<br>7: 终止循环</p>
+</blockquote>
+<h2 id="ZSL识别"><a href="#ZSL识别" class="headerlink" title="ZSL识别"></a>ZSL识别</h2><p>由于我们的潜在属性空间与属性空间和相似性空间相关联，所以我们可以在多个空间中执行ZSL。</p>
+<p><strong>在潜在属性空间识别</strong><br>为了在潜在属性空间中执行ZSL，我们必须获得测试样本的潜在属性表示和不可见类原型。给定一个测试样本$x_u$，我们通过以下获得它的隐含属性表示$y^u$：</p>
+<script type="math/tex; mode=display">y^u=min_{y_u}||x^u-Dy^u||_F^2+\gamma||y^u||_2^2</script><p>其中，$D$是从训练集数据中学习到的潜在属性字典。$\gamma$是正则化项的权重。关于不可见类的原型，我们使用转换矩阵$W$将它们的属性表示投影潜在属性空间。这样，测试样本与不可见类之间的距离就能够计算出来。最后，我们使用余弦距离来执行ZSL识别。</p>
+<p><strong>在相似性空间识别</strong><br>如上所述，我们可以使用$U$将潜在属性表示$y^u$转换为相似性空间，其中每个维度表示与一个可见类的相似性。因此，每个图像都可以用一个相似性向量$h$来表示。此外，我们还可以通过将类别属性向量映射到可见类比例的直方图表示来获得一个看不见的类原型的相似表示，就像在44中一样。因此，可以执行最近邻方法将测试样本分类为一个看不见的类。</p>
+<p><strong>在属性空间识别</strong><br>我们可以通过它的潜在属性表示$y_u$来恢复图像的属性表示$a^u$。</p>
+<script type="math/tex; mode=display">a^u=min_{a_u}||y^u-Wa^u||_F^2+\gamma||a^u||_2^2</script><p>因此，可以获得每个图像的属性。然后，我们可以通过属性表示将测试图像分类为一个不可见类。</p>
+<p><strong>结合多个空间</strong><br>由于不同的空间可能包含不可见类的补充信息，所以我们可以组合不同的空间来执行ZSL任务。在本文中，我们简单地将图像的不同矢量表示连接起来，形成最终的表示形式，并且为不可见类原型完成了相同的过程。然后，ZSL任务可以由上面提出的相同方法执行。</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p><strong>与其他工作的不同</strong><br>我们的方法主要受JLSE和JSLA的启发。JLSE提出了潜在相似性空间来建立特征空间与相似性空间的关系，同时利用相似性空间使我们的潜在属性更具鉴别性。JSLA建议单独学习人工定义属性和鉴别属性，其中也会对背景信息进行建模。但是，它不是为ZSL任务设计的，因为在ZSL设置中不能使用背景信息。与此相反，我们从ZSL任务中存在的实际问题出发，将语义和鉴别信息合并到潜在属性中，以获得更有效的识别。</p>
+<p><strong>进一步改进</strong><br>所提出的方法是基于线性模型的。众所周知，基于深度学习的非线性模型将更加强大。因此，我们使用深度网络来提取图像表示，并在很大程度上确保良好的性能。人们相信，通过一个深度模型直接学习语义转换将有助于提高性能，这对于我们未来的工作来说仍然是一个很有前途的方向。</p>
+<h1 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h1><p>在本节中，我们将在4个基准数据集上对这个方法进行评估，然后分析该方法的有效性。</p>
+<h2 id="数据集与设置"><a href="#数据集与设置" class="headerlink" title="数据集与设置"></a>数据集与设置</h2><p><strong>数据集</strong><br>我们在四个基准的ZSL数据集上进行实验，以验证所提议的方法的有效性。即aP&amp;Y，AwA，CUB-200，SUN-A。这些数据集的统计数据如表1所示。（a) aP&amp;Y由两种属性数据集组成，aPascal有12695张图片，aYahoo有2644张图片。每张图像有64维属性。 aPascal有20个物体的类别，aYahoo有12个物体的类别。为了进行ZSL，aPascal数据集的类别被用于可见类，aYahoo数据集的类别被用于不可见类。（b) AwA是一个动物数据集，它包含50个动物类别，有30475张图片。每个类有85个属性。ZSL的标准分割是使用40个类别作为可见类和其他10个类别作为看不见的类。(c) CUB-200是一个鸟类数据集，用于细粒度的识别。它包含了200个类，有11788张图片，其中为每个图像提供了312个二进制属性。与1相同的设置，我们将150个类别作为可见类，另外50个是不可见类。(d) SUN-A是为高级场景理解和细粒度场景识别而创建的，其中包含717个类和14,340个图像。每个图像都有102个实数值属性注释，它们是由投票过程生成的。在13之后，我们选择了相同的10个类作为不可见类。</p>
+<p><img src="http://image.rexking6.top/img/clip1527210285.png" alt=""><br>表1.不同数据集的统计数据，分别是“b”和“c”代表二进制值和连续值。</p>
+<p><strong>参数设置</strong><br>对于所有的数据集，我们采用了imagenet vgg-verydeep-19预训练的模型所提取的4096维的CNN特征向量。我们使用多类精度作为评估指标。AwA的字典大小被选为300，其他三个数据集的大小是500到800。其他参数$\alpha$与$\beta$，并使用五折交叉验证获得。也可以调优$\gamma$与$\lambda$，我们把它们设为1。更多的细节可以在补充材料中找到。</p>
+<h2 id="提出的框架的有效性"><a href="#提出的框架的有效性" class="headerlink" title="提出的框架的有效性"></a>提出的框架的有效性</h2><p>所提出的潜在属性空间与属性空间和相似性空间相关联，这使得它不仅具有语义保护，而且具有足够的鉴别能力，可以对不同的类进行分类。为了演示每个组件的有效性，我们比较了五种不同的方法，并且在aP&amp;Y上的结果如图3所示。(1) (A)仅仅通过在属性空间像式子2直接学习属性字典；(2) (S)在相似性空间中的识别，通过删除式子4中的第二项；(3) (LA-)在潜在属性空间中的识别，但没有鉴别性约束，通过删除式子4中的第三项；(4) (LA)在潜在属性空间中有鉴别性约束的识别，与式子4提出的一样。(5) (LAD)联合潜在属性空间与相似性空间进行识别，同3.4小节提出的一样。</p>
+<p><img src="http://image.rexking6.top/img/clip1527212155.png" alt=""><br>图3. 对aP&amp;Y的5种方法进行比较。</p>
+<p>通过比较A、S和LA的性能，我们可以推断出潜在的属性在ZSL任务中更成功。此外，通过在目标函数中施加鉴别约束，识别精度得到提高，正如LA的表现所显示的那样。此外，潜在属性和可见类相似性的组合也提高了最终的识别性能，正如LAS的结果所显示的那样。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\04\05\Zero-shot-Learning-入门\" rel="bookmark">Zero-shot Learning 入门</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\04\09\《Look-Closer-to-See-Better-Recurrent-Attention-Convolutional-Neural-Network-for-Fine-grained-Image-Recognition》笔记\" rel="bookmark">《Look-Closer-to-See-Better-Recurrent-Attention-Convolutional-Neural-Network-for-Fine-grained-Image-Recognition》笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\29\《Discriminative-Learning-of-Latent-Features-for-Zero-Shot-Recognition》笔记\" rel="bookmark">《Discriminative Learning of Latent Features for Zero-Shot Recognition》笔记</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/05/22/%E3%80%8ALearning-Discriminative-Latent-Attributes-for-Zero-Shot-Classification%E3%80%8B%E7%AC%94%E8%AE%B0/" title="《Learning Discriminative Latent Attributes for Zero-Shot Classification》笔记">https://blog.rexking6.top/2018/05/22/《Learning-Discriminative-Latent-Attributes-for-Zero-Shot-Classification》笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%9B%B6%E6%A0%B7%E6%9C%AC%E8%AF%86%E5%88%AB/" rel="tag"># 零样本识别</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/05/17/%E4%B8%89%E5%85%83%E7%BB%84%E6%8D%9F%E5%A4%B1%E4%B8%8ETensorFlow%E5%9C%A8%E7%BA%BF%E4%B8%89%E5%85%83%E7%BB%84%E6%8C%96%E6%8E%98/" rel="prev" title="三元组损失与TensorFlow在线三元组挖掘">
+      <i class="fa fa-chevron-left"></i> 三元组损失与TensorFlow在线三元组挖掘
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/06/10/MATLAB%E4%B8%8D%E5%90%AF%E5%8A%A8%E5%9B%BE%E5%BD%A2%E7%95%8C%E9%9D%A2%E8%BF%90%E8%A1%8C/" rel="next" title="MATLAB不启动图形界面运行">
+      MATLAB不启动图形界面运行 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">2.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">3.</span> <span class="nav-text">相关工作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%9E%E6%80%A7"><span class="nav-number">3.1.</span> <span class="nav-text">属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ZSL"><span class="nav-number">3.2.</span> <span class="nav-text">ZSL</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E5%87%BA%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">提出的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E5%AE%9A%E4%B9%89"><span class="nav-number">4.1.</span> <span class="nav-text">问题定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BD%9C%E5%9C%A8%E5%B1%9E%E6%80%A7%E5%AD%97%E5%85%B8%E5%AD%A6%E4%B9%A0"><span class="nav-number">4.2.</span> <span class="nav-text">潜在属性字典学习</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%8C%96"><span class="nav-number">4.3.</span> <span class="nav-text">优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ZSL%E8%AF%86%E5%88%AB"><span class="nav-number">4.4.</span> <span class="nav-text">ZSL识别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">4.5.</span> <span class="nav-text">结论</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C"><span class="nav-number">5.</span> <span class="nav-text">实验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86%E4%B8%8E%E8%AE%BE%E7%BD%AE"><span class="nav-number">5.1.</span> <span class="nav-text">数据集与设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E5%87%BA%E7%9A%84%E6%A1%86%E6%9E%B6%E7%9A%84%E6%9C%89%E6%95%88%E6%80%A7"><span class="nav-number">5.2.</span> <span class="nav-text">提出的框架的有效性</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

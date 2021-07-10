@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="语义分割入门">
+<meta property="og:url" content="https://blog.rexking6.top/2018/07/03/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E5%85%A5%E9%97%A8/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530602175.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530604767.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530605111.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530619044.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530619184.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530621917.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530621954.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530624077.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530628302.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530628349.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530628559.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530628601.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530630633.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530630680.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530630907.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530631183.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530631373.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530667044.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530670408.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530670494.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530670791.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530676042.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530676606.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530676839.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530678205.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530678239.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530686423.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530686534.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530686867.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530677709.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530677835.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530677256.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1530675008.png">
+<meta property="article:published_time" content="2018-07-03T05:13:33.000Z">
+<meta property="article:modified_time" content="2019-06-10T11:19:05.367Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="语义分割">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1530602175.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/07/03/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E5%85%A5%E9%97%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>语义分割入门 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/07/03/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E5%85%A5%E9%97%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          语义分割入门
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-07-03 13:13:33" itemprop="dateCreated datePublished" datetime="2018-07-03T13:13:33+08:00">2018-07-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-06-10 19:19:05" itemprop="dateModified" datetime="2019-06-10T19:19:05+08:00">2019-06-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2/" itemprop="url" rel="index"><span itemprop="name">语义分割</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/07/03/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E5%85%A5%E9%97%A8/" class="post-meta-item leancloud_visitors" data-flag-title="语义分割入门" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>7.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>最近在跟踪论文《Tell Me Where to Look: Guided Attention Inference Network》，主要工作是attention map，最终用语义分割验证其有效性。因为之前没接触过语义分割，在知乎和机器之心上看了几篇综述，整理一下。</p>
+<p>转载：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/21824299">从特斯拉到计算机视觉之「图像语义分割」</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/37801090">图像语义分割综述</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/37618829">语义分割 发展综述</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jiqizhixin.com/articles/2018-06-04-17">一文了解什么是语义分割及常用的语义分割方法有哪些</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/38236530">图像语义分割准确率度量方法总结</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jiqizhixin.com/articles/2017-07-14-10">从全卷积网络到大型卷积核：深度学习的语义分割全指南</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/31981866">图像语义分割经典论文推荐</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/22308032">【总结】图像语义分割之FCN和CRF</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/37803719">语义分割之FCN</a></li>
+</ul>
+<h1 id="什么是语义分割"><a href="#什么是语义分割" class="headerlink" title="什么是语义分割"></a>什么是语义分割</h1><p>图像语义分割可以说是图像理解的基石性技术，在自动驾驶系统（具体为街景识别与理解）、无人机应用（着陆点判断）以及穿戴式设备应用中举足轻重。</p>
+<p>图像是由许多像素（Pixel）组成，而「语义分割」顾名思义就是将像素按照图像中表达语义含义的不同进行分组（Grouping）／分割（Segmentation）。下图取自图像分割领域的标准数据集之一<a target="_blank" rel="noopener" href="http://host.robots.ox.ac.uk:8080/leaderboard/main_bootstrap.php">PASCAL VOC</a>。其中，左图为原始图像，右图为分割任务的真实标记（Ground truth）：红色区域表示语义为“person”的图像像素区域，蓝绿色代表“motorbike”语义区域，黑色表示“background”，白色（边）则表示未标记区域。注意语义分割不同于实例分割，举例来说，如果一张照片中有多个人，对于语义分割来说，只要将所由人的像素都归为一类，但是实例分割还要将不同人的像素归为不同的类。也就是说实例分割比语义分割更进一步。因此，图像语义分割也称为“图像语义标注”（Image semantic labeling）、“像素语义标注”（Semantic pixel labeling）或“像素语义分组”（Semantic pixel grouping）。</p>
+<p>显然，在图像语义分割任务中，其输入为一张$H×W×3$的三通道彩色图像。而输出有两种形式：</p>
+<ol>
+<li>一个$H×W$的矩阵，矩阵的每一个元素表明了原图中对应位置像素所表示的语义类别（Semantic label）；</li>
+<li>一个$H×W×(class+1)$的矩阵，可以看为图片上每个点的one-hot表示，每一个channel对应一个class，对每一个pixel位置，都有$(class+1)$个channel,每个channel的值对应那个像素属于该class的预测概率。$class+1$是因为还要加上背景。</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1530602175.png" alt=""></p>
+<p>在真实图像中，表达某一语义的同一物体常由不同部件组成（如，building，motorbike，person等），同时这些部分往往有着不同的颜色、纹理甚至亮度（如building），这给图像语义的精确分割带来了困难和挑战。</p>
+<h1 id="训练集"><a href="#训练集" class="headerlink" title="训练集"></a>训练集</h1><p>常用于训练语义分割模型的数据集：</p>
+<ul>
+<li><p>Pascal VOC 2012：有 20 类目标，这些目标包括人类、机动车类以及其他类，可用于目标类别或背景的分割</p>
+</li>
+<li><p>MSCOCO：微软团队获取的一个可以用来图像recognition+segmentation+captioning 数据集，从复杂的日常场景中截取，图像中的目标通过精确的segmentation进行位置的标定。图像包括91类目标，328,000影像和2,500,000个label。</p>
+</li>
+<li><p>Cityscapes：50 个城市的城市场景语义理解数据集</p>
+</li>
+<li><p>Pascal Context：有 400 多类的室内和室外场景</p>
+</li>
+<li><p>Stanford Background Dataset：至少有一个前景物体的一组户外场景。</p>
+</li>
+</ul>
+<p><img src="http://image.rexking6.top/img/clip1530604767.png" alt=""><br><em>来自 Stanford Background Dataset 的示例图像，该数据集的图像大致为 320\</em>240 像素，还包括指向每块像素所属类别的整数矩阵。*</p>
+<h1 id="评价指标"><a href="#评价指标" class="headerlink" title="评价指标"></a>评价指标</h1><p>先说明一些符号表示的意义。</p>
+<p>$k$ ：类别总数，如果包括背景的话就是 $k+1$</p>
+<p>$p_{ij}$ ：真实像素类别为 $i$ 的像素被预测为类别 $j$ 的总数量，换句话说，就是对于类别为 $i$ 的像素来说，被错分成类别 $j$ 的数量有多少。</p>
+<p>$P_{ii}$ ：真实像素类别为 $i$ 的像素被预测为类别 $i$ 的总数量，换句话说，就是对于真实类别为 $i$ 的像素来说，分对的像素总数有多少。</p>
+<ol>
+<li>像素精度（pixel accuracy, PA）：每一类像素正确分类的个数/ 每一类像素的实际个数<script type="math/tex; mode=display">PA=\frac{\sum_{i=0}^kp_{ii}}{\sum_{i=0}^k \sum_{j=0}^k p_{ij}}</script></li>
+<li>均像素精度（mean pixel accuracy, MPA）：每一类像素的精度的平均值<script type="math/tex; mode=display">MPA=\frac{1}{k+1}\sum_{i=0}^k\frac{p_{ii}}{\sum_{j=0}^kp_ij}</script></li>
+<li>平均交并比（Mean Intersection over Union, MIoU）：求出每一类的IoU取平均值</li>
+</ol>
+<p>IoU指的是两块区域相交的部分/两个部分的并集，如图中绿色部分/总面积。</p>
+<p><img src="http://image.rexking6.top/img/clip1530605111.png" alt=""></p>
+<script type="math/tex; mode=display">IoU=\frac {Area \space of \space Overlap} {Area\space of\space Union}=\frac{A_{pred}\cap A_{true}}{A_{pred}\cup A_{true}}</script><script type="math/tex; mode=display">MIoU=\frac{1}{k+1}\sum_{i=0}^k\frac{p_{ii}}{\sum_{j=0}^kp_{ii}+\sum_{j=0}^kp_{ij}-p_{ii}}</script><p>这样的评价指标可以判断目标的捕获程度（使预测标签与标注尽可能重合），也可以判断模型的精确程度（使并集尽可能重合）。</p>
+<ol>
+<li>权频交并比（Frequency Weight Intersection over Union）：将每一类出现的频率作为权重计算IoU</li>
+</ol>
+<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><h2 id="前DL时代"><a href="#前DL时代" class="headerlink" title="前DL时代"></a>前DL时代</h2><p>从最简单的像素级别“阈值法”（Thresholding methods）、基于像素聚类的分割方法（Clustering-based segmentation methods）到“图划分”的分割方法（Graph partitioning segmentation methods），在深度学习（Deep learning, DL）“一统江湖”之前，图像语义分割方面的工作可谓“百花齐放”。在此，我们仅以“Normalized cut” 和“Grab cut” 这两个基于图划分的经典分割方法为例，介绍一下前DL时代语义分割方面的研究。</p>
+<ul>
+<li>Normalized cut<br>论文地址：<a target="_blank" rel="noopener" href="https://ieeexplore.ieee.org/document/868688/">Normalized Cuts and Image Segmentation</a></li>
+</ul>
+<p>（N-cut）方法是基于图划分（Graph partitioning）的语义分割方法中最著名的方法之一，于2000年Jianbo Shi和Jitendra Malik发表于相关领域顶级期刊TPAMI。通常，传统基于图划分的语义分割方法都是将图像抽象为图（Graph）的形式$G=(V,E)$（$V$为图节点，$E$为图的边），然后借助图理论（Graph theory）中的理论和算法进行图像的语义分割。常用的方法为经典的最小割算法（Min-cut algorithm）。不过，在边的权重计算时，经典min-cut算法只考虑了局部信息。如下图所示，以二分图为例（将$G$分为不相交的$A，B$两部分），若只考虑局部信息，那么分离出一个点显然是一个min-cut，因此图划分的结果便是类似$n_1$或$n_2$这样离群点，而从全局来看，实际想分成的组却是左右两大部分。</p>
+<p><img src="http://image.rexking6.top/img/clip1530619044.png" alt=""><br>针对这一情形，N-cut则提出了一种考虑全局信息的方法来进行图划分（Graph partitioning），即，将两个分割部分$A$，$B$与全图节点的连接权重（${\rm assoc(A,V)}$和$\rm assoc(B,V$)）考虑进去：</p>
+<script type="math/tex; mode=display">N_{cut}(\bf{A},\bf{B})=\frac{cut(\bf{A},\bf{B})}{assoc(\bf{A},\bf{V})}+\frac{cut(\bf{A},\bf{B})}{assoc(\bf{B},\bf{V})}.</script><p>如此一来，在离群点划分中，$N_{cut}(\bf{A},\bf{B})$中的某一项会接近1，而这样的图划分显然不能使得$N_{cut}(\bf{A},\bf{B})$是一个较小的值，故达到考虑全局信息而摒弃划分离群点的目的。这样的操作类似于机器学习中特征的规范化（Normalization）操作，故称为Normalized cut。N-cut不仅可以处理二类语义分割，而且将二分图扩展为$K$路（$K$-way）图划分即可完成多语义的图像语义分割，如下图例。</p>
+<p><img src="http://image.rexking6.top/img/clip1530619184.png" alt=""></p>
+<ul>
+<li>Grab cut<br>论文地址：<a target="_blank" rel="noopener" href="https://www.researchgate.net/publication/220184077_GrabCut_Interactive_Foreground_Extraction_Using_Iterated_Graph_Cuts">“GrabCut”: interactive foreground extraction using iterated graph cuts</a></li>
+</ul>
+<p>Grab cut是微软剑桥研究院于2004年提出的著名交互式图像语义分割方法。与N-cut一样，grab cut同样也是基于图划分，不过grab cut是其改进版本，可以看作迭代式的语义分割算法。Grab cut利用了图像中的纹理（颜色）信息和边界（反差）信息，只要少量的用户交互操作即可得到比较好的前后背景分割结果。</p>
+<p>在Grab cut中，RGB图像的前景和背景分别用一个高斯混合模型（Gaussian mixture model, GMM）来建模。两个GMM分别用以刻画某像素属于前景或背景的概率，每个GMM高斯部件（Gaussian component）个数一般设为$k=5$。接下来，利用吉布斯能量方程（Gibbs energy function）对整张图像进行全局刻画，而后迭代求取使得能量方程达到最优值的参数作为两个GMM的最优参数。GMM确定后，某像素属于前景或背景的概率就随之确定下来。</p>
+<p>在与用户交互的过程中，Grab cut提供两种交互方式：一种以包围框（Bounding box）为辅助信息；另一种以涂写的线条（Scribbled line）作为辅助信息。以下图为例，用户在开始时提供一个包围框，grab cut默认的认为框中像素中包含主要物体／前景，此后经过迭代图划分求解，即可返回扣出的前景结果，可以发现即使是对于背景稍微复杂一些的图像，grab cut仍有不俗表现。</p>
+<p><img src="http://image.rexking6.top/img/clip1530621917.png" alt=""></p>
+<p>不过，在处理下图时，grab cut的分割效果则不能令人满意。此时，需要额外人为的提供更强的辅助信息：用红色线条／点标明背景区域，同时用白色线条标明前景区域。在此基础上，再次运行grab cut算法求取最优解即可得到较为满意的语义分割结果。Grab cut虽效果优良，但缺点也非常明显，一是仅能处理二类语义分割问题，二是需要人为干预而不能做到完全自动化。</p>
+<p><img src="http://image.rexking6.top/img/clip1530621954.png" alt=""></p>
+<h2 id="DL时代"><a href="#DL时代" class="headerlink" title="DL时代"></a>DL时代</h2><p>其实大家不难看出，前DL时代的语义分割工作多是根据图像像素自身的低阶视觉信息（Low-level visual cues）来进行图像分割。由于这样的方法没有算法训练阶段，因此往往计算复杂度不高，但是在较困难的分割任务上（如果不提供人为的辅助信息），其分割效果并不能令人满意。</p>
+<p>在计算机视觉步入深度学习时代之后，语义分割同样也进入了全新的发展阶段。语义分割任务最初流行的深度学习方法是图像块分类（patch classification），即图像是切成块喂给深度模型的，然后利用像素周围的图像块对每一个像素进行独立的分类。使用图像块分类的主要原因是分类网络通常是全连接层（full connected layer），且要求固定尺寸的图像。</p>
+<p>在此之后，以全卷积神经网络（Fully convolutional networks，FCN）为代表的一系列基于卷积神经网络“训练”的语义分割方法相继提出，屡屡刷新图像语义分割精度。而该系列的方法有一个通用的框架：</p>
+<p><img src="http://image.rexking6.top/img/clip1530624077.png" alt=""></p>
+<ul>
+<li>FCN-全卷积网络</li>
+<li>CRF-条件随机场</li>
+<li>MRF-马尔科夫随机场</li>
+</ul>
+<p>前端使用FCN进行特征粗提取，后端使用CRF/MRF优化前端的输出，最后得到分割图。</p>
+<h3 id="FCN"><a href="#FCN" class="headerlink" title="FCN"></a><strong>FCN</strong></h3><p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1411.4038v2">Fully Convolutional Networks for Semantic Segmentation</a><br>发表日期：14 Nov 2014</p>
+<p>三个创新点：</p>
+<ul>
+<li>卷积化（Convolutional）</li>
+</ul>
+<p>卷积化即是将普通的分类网络，比如VGG16，ResNet50/101等网络丢弃全连接层，换上对应的卷积层即可。</p>
+<p><img src="http://image.rexking6.top/img/clip1530628302.png" alt=""></p>
+<ul>
+<li>上采样（Upsample）</li>
+</ul>
+<p>此处的上采样即是反卷积（Deconvolution，叫Transposed Convolution也合适）。普通的池化会缩小图片的尺寸，比如VGG16 五次池化后图片被缩小了32倍。为了使得网络可以接受任意大小的图片且得到和原图等大的分割图，我们需要上采样/反卷积。</p>
+<p>反卷积和卷积类似，都是相乘相加的运算。只不过后者是多对一，前者是一对多。而反卷积的前向和后向传播，只用颠倒卷积的前后向传播即可。所以无论优化还是后向传播算法都是没有问题。图解如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1530628349.png" alt=""></p>
+<p>虽然文中说是可学习的反卷积，但是作者实际代码并没有让它学习，可能正是因为这个一对多的逻辑关系。</p>
+<ul>
+<li>跨层连接结构（Skip Architecture）</li>
+</ul>
+<p>这个结构的作用就在于优化结果，因为如果将全卷积之后的结果直接上采样得到的结果是很粗糙的，所以作者将低层的目标位置信息强但语义信息弱的特征图和高层目标位置信息弱但语义信息强的特征图进行融合，来优化输出。具体结构如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1530628559.png" alt=""></p>
+<p>下图是不同层作为输出的语义分割结果，可以明显看出，由于池化层的下采样倍数的不同导致不同的语义分割精细程度。如FCN-32s，由于是FCN的最后一层卷积和池化的输出，该模型的下采样倍数最高，其对应的语义分割结果最为粗略；而FCN-8s则因下采样倍数较小可以取得较为精细的分割结果。</p>
+<p><img src="http://image.rexking6.top/img/clip1530628601.png" alt=""></p>
+<h3 id="DeconvNet"><a href="#DeconvNet" class="headerlink" title="DeconvNet"></a><strong>DeconvNet</strong></h3><p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1505.04366">Learning Deconvolution Network for Semantic Segmentation</a><br>发表日期：17 May 2015<br>FCN引领了之后一系列语义分割的研究都是以其为基础，采用编码器-解码器结构的热潮。</p>
+<p><img src="http://image.rexking6.top/img/clip1530630633.png" alt=""></p>
+<p>DeconvNet的创新点是使用了上池化。上池化的实现主要在于池化时记住输出值的位置，在上池化时再将这个值填回原来的位置，其他位置填0即OK。</p>
+<p><img src="http://image.rexking6.top/img/clip1530630680.png" alt=""></p>
+<h3 id="U-Net"><a href="#U-Net" class="headerlink" title="U-Net"></a><strong>U-Net</strong></h3><p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1505.04597">U-Net: Convolutional Networks for Biomedical Image Segmentation</a><br>发表日期：18 May 2015</p>
+<p><img src="http://image.rexking6.top/img/clip1530630907.png" alt=""></p>
+<p>U-Net用于解决小样本的简单问题分割，比如医疗影片的分割。通过产生原始训练数据的扭曲版而增加训练数据。这一步使 CNN 编码器-解码器变得更加鲁棒以抵抗这些形变，并能从更少的训练图像中进行学习。当它在少于40张图的生物医学数据集上训练时，IoU值仍能达到 92%。</p>
+<p>它与FCN相比有更丰富的信息融合：如灰色剪头，更多的前后层之间的信息融合。这里是把前面层的输出和后面层concat(串联)到一起，区别于FCN的逐元素加和。不同Feature map串联到一起后，后面接卷积层，可以让卷积核在channel上自己做出选择。注意的是，在串联之前，需要把前层的feature map crop到和后层一样的大小。</p>
+<h3 id="SegNet"><a href="#SegNet" class="headerlink" title="SegNet"></a><strong>SegNet</strong></h3><p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1505.04366">Learning Deconvolution Network for Semantic Segmentation</a><br>发表日期：2 Nov 2015</p>
+<p><img src="http://image.rexking6.top/img/clip1530631183.png" alt=""></p>
+<p>创新点：将最大池化索引（Maxpooling indices）转移到解码器，从而改善分割分辨率。</p>
+<p>在 FCN 网络中，尽管使用了解卷积层和一些跨层连接，但输出的分割图仍然比较粗糙。因此，更多的跨层连接被引入 FCN 网络。但是，SegNet 没有复制 FCN 中的编码器特征，而是复制了最大池化索引。这使得 SegNet 比 FCN 更节省内存。</p>
+<p>maxpooling 的indices复制原理如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1530631373.png" alt=""></p>
+<h3 id="空洞卷积-Dilated-Convolution"><a href="#空洞卷积-Dilated-Convolution" class="headerlink" title="空洞卷积 - Dilated Convolution"></a><strong>空洞卷积 - Dilated Convolution</strong></h3><p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1511.07122">Multi-Scale Context Aggregation by Dilated Convolutions</a><br>发表日期：23 Nov 2015</p>
+<p><img src="http://image.rexking6.top/img/clip1530667044.png" alt=""></p>
+<p>创新点：</p>
+<ol>
+<li>使用空洞卷积，一种可进行稠密预测的卷积层。</li>
+<li>提出「背景模块」（context module），该模块可使用空洞卷积进行多尺度背景聚合。</li>
+</ol>
+<p>池化使感受野增大，因此对分类网络有所帮助。但池化会造成分辨率下降，不是语义分割的最佳方法。因此，论文作者使用空洞卷积层（dilated convolution layer）。空洞卷积层（DeepLab 将其称为带孔卷积）可使感受野呈指数级增长，而空间维度不至于下降。</p>
+<p>从预训练好的分类网络（此处指 VGG）中移除最后两个池化层，之后的卷积层都使用空洞卷积。尤其是，pool-3 和 pool-4 之间的卷积是空洞卷积 2，pool-4 后面的卷积是空洞卷积 4。使用这个模块（论文中称为前端模块 frontend module）之后，无需增加参数即可实现稠密预测。另一个模块（论文中称为背景模块 context module）将使用前端模块的输出作为输入进行单独训练。该模块是多个不同扩张程度的空洞卷积级联而成，因此该模块可聚合多尺度背景，并改善前端模块获取的预测结果。</p>
+<h3 id="DeepLab"><a href="#DeepLab" class="headerlink" title="DeepLab"></a><strong>DeepLab</strong></h3><h4 id="v1"><a href="#v1" class="headerlink" title="v1"></a><strong>v1</strong></h4><p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1412.7062">Semantic Image Segmentation with Deep Convolutional Nets and Fully Connected CRFs</a><br>发表日期：22 Dec 2014</p>
+<p>创新点：</p>
+<ol>
+<li>提出带孔卷积（Atrous Convolution），同空洞卷积（Dilated Convolution）。</li>
+<li>后端采用CRF（条件随机场）优化，利用像素之间的关连信息：相邻的像素，或者颜色相近的像素有更大的可能属于同一个类别。</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1530670408.png" alt=""></p>
+<p>在许多语义分割架构中，CNN 旨在最小化的损失函数是交叉熵损失。该目标函数度量的是预测像素概率分布（在所有类上）和实际的概率分布的差异。</p>
+<p>然而，对语义分割来说，交叉熵损失并不理想。因为对一张图来说，交叉熵损失是每一个像素损失的和，它并不鼓励邻近像素保持一致。因为交叉熵损失无法在像素间采用更高级的结构，所以交叉熵最小化的标签预测一般都是不完整或者是模糊的，它们都需要进行后续处理。</p>
+<p>来自 CNN 的原始标签一般都是「缺失（patchy）」图像，在图像中有一些小区域的标签可能不正确，因此无法匹配其周围的像素标签。为了解决这种不连续性，我们可以用一种平滑的形式。我们需要确保目标占据图片中的连续区域，这样给定的像素和其周围像素的标签就是一样的。</p>
+<p><img src="http://image.rexking6.top/img/clip1530670494.png" alt=""></p>
+<p>对于每个像素$i$具有类别标签$x_i$还有对应的观测值$y_i$，这样每个像素点作为节点，像素与像素间的关系作为边，即构成了一个条件随机场。而且我们通过观测变量$y_i$来推测像素$i$对应的类别标签$x_i$,条件随机场如上。</p>
+<p>条件随机场符合吉布斯分布：(此处的$x$即上面说的观测值)</p>
+<script type="math/tex; mode=display">P(\mathbf{X=x|I})=\frac{1}{Z(\mathbf{I})}\exp(-E(\mathbf{x|I}))</script><p>其中的$E(\mathbf{x|I})$是能量函数，为了简便，以下省略全局观测$\mathbf{I}$：</p>
+<script type="math/tex; mode=display">E(\mathbf{x})=\sum_i{\Psi_u(x_i)}+\sum_{i<j}\Psi_p(x_i, x_j)</script><p>其中的一元势函数$\sum_i{\Psi_u(x_i)}$即来自于前端FCN的输出。而二元势函数如下：</p>
+<script type="math/tex; mode=display">\Psi_p(x_i, x_j)=u(x_i, x_j)\sum_{m=1}^M{\omega^{(m)}k_G^{(m)}(\mathbf{f_i, f_j)}}</script><p>二元势函数就是描述像素点与像素点之间的关系，将像素之间的语义联系／关系考虑进去，鼓励相似像素分配相同的标签，而相差较大的像素分配不同标签，而这个“距离”的定义与颜色值和实际相对距离有关，例如，“天空”和“鸟”这样的像素在物理空间是相邻的概率，应该要比“天空”和“鱼”这样像素的相邻概率大。所以这样CRF能够使图片尽量在边界处分割。最后通过对CRF能量函数的优化求解，得到对FCN的图像语义预测结果进行优化，得到最终的语义分割结果。</p>
+<p>而全连接条件随机场的不同就在于，二元势函数描述的是每一个像素与其他所有像素的关系，所以叫“全连接”。</p>
+<p><img src="http://image.rexking6.top/img/clip1530670791.png" alt=""></p>
+<h4 id="v2"><a href="#v2" class="headerlink" title="v2"></a><strong>v2</strong></h4><p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1606.00915">DeepLab: Semantic Image Segmentation with Deep Convolutional Nets, Atrous Convolution, and Fully Connected CRFs</a><br>发表日期：2 Jun 2016</p>
+<p>创新点：引入了带洞空间金字塔池化（Atrous Spatial Pyramid Pooling，ASPP）的结构</p>
+<p><img src="http://image.rexking6.top/img/clip1530676042.png" alt=""></p>
+<p>v1使用带孔卷积扩大感受野之后，没有融合不同层之间的信息。ASPP层就是为了融合不同级别的语义信息：选择不同扩张率的带孔卷积去处理Feature Map，由于感受野不同，得到的信息的Level也就不同，ASPP层把这些不同层级的feature map concat到一起，进行信息融合。</p>
+<h4 id="v3"><a href="#v3" class="headerlink" title="v3"></a><strong>v3</strong></h4><p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1706.05587v1">Rethinking Atrous Convolution for Semantic Image Segmentation</a><br>发表日期：17 Jun 2017</p>
+<p>改动处：</p>
+<ol>
+<li>改进了ASPP模块</li>
+<li>引入Resnet Block</li>
+<li>丢弃CRF</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1530676606.png" alt=""></p>
+<p>新的ASPP模块：</p>
+<ol>
+<li>加入了Batch Normalization；</li>
+<li>加入特征的全局平均池化（在扩张率很大的情况下，有效权重会变小）。全局平均池化是对全局特征的强调、加强。</li>
+</ol>
+<p>在旧的ASPP模块中：我们以为在扩张率足够大的时候，感受野足够大，所以获得的特征倾向于全局特征。但实际上，扩张率过大的情况下，空洞卷积出现了“权值退化”的问题，感受野过大，都已近扩展到了图像外面，大多数的权重都和图像外围的零填充进行了点乘，这样并没有获取图像中的信息。有效的权值个数很少，往往就是1。于是我们加了全局平均池化，强行利用全局信息。</p>
+<h4 id="v3-1"><a href="#v3-1" class="headerlink" title="v3+"></a><strong>v3+</strong></h4><p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1802.02611">Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation</a><br>发表日期：7 Feb 2018</p>
+<p><img src="http://image.rexking6.top/img/clip1530676839.png" alt=""></p>
+<p>可以看成是把Deeplab v3作为编码器（上半部分）。后面再进行解码，并且在解码的过程中在此运用了不同层级特征的融合。此外，在encoder部分加入了Xception的结构减少了参数量，提高运行速递。</p>
+<h3 id="RefineNet"><a href="#RefineNet" class="headerlink" title="RefineNet"></a><strong>RefineNet</strong></h3><p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1611.06612">RefineNet: Multi-Path Refinement Networks for High-Resolution Semantic Segmentation</a><br>发表日期：20 Nov 2016</p>
+<p>创新点：所有组件遵循残差连接设计</p>
+<p><img src="http://image.rexking6.top/img/clip1530678205.png" alt=""></p>
+<p>使用空洞/带孔卷积的方法也有弊端。由于空洞卷积需要大量高分辨率特征图，因此其计算成本高昂，且占用大量内存。这妨碍了高分辨率预测的计算。例如，DeepLab 的预测结果大小是原始输入图像的 1/8。</p>
+<p>因此，这篇论文提出使用编码器-解码器结构。编码器是 ResNet-101 模块，解码器是 RefineNet 模块，该模块融合了编码器中的高分辨率特征和先前 RefineNet 模块中的低分辨率特征。</p>
+<p><img src="http://image.rexking6.top/img/clip1530678239.png" alt=""></p>
+<p>RefineNet包括以下几种小模块：</p>
+<ol>
+<li>Residual convolution unit ：对ResNet block进行2层的卷积操作。注意这里有多个ResNet block作为输入。</li>
+<li>Multi-resolution fusion：将1中得到的feature map进行加和融合。</li>
+<li>Chained residual pooling ：该模块用于从一个大图像区域中捕捉背景上下文。注意：pooling的stride为1。</li>
+<li>Output convolutions：由三个RCUs构成。</li>
+</ol>
+<h3 id="PSPNet"><a href="#PSPNet" class="headerlink" title="PSPNet"></a><strong>PSPNet</strong></h3><p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1612.01105">Pyramid Scene Parsing Network</a><br>发表日期：4 Dec 2016</p>
+<p>创新点：</p>
+<ol>
+<li>全局/空间金字塔池化（Global Pyramid Pooling）</li>
+<li>使用辅助损失（auxiliary loss）</li>
+</ol>
+<p><img src="http://image.rexking6.top/img/clip1530686423.png" alt=""></p>
+<p>语义分割中常见问题：</p>
+<ul>
+<li><p>关系不匹配（Mismatched Relationship）<br>场景中存在着可视模式的共现。比如，飞机更可能在天上或者在跑道上，而不是公路上。</p>
+</li>
+<li><p>易混淆的类别（Confusion Categories）<br>许多类别具有高度相似的外表。</p>
+</li>
+<li><p>不显眼的类别（Inconspicuous Classes）<br>场景中包括任意尺寸的物体，小尺寸的物体难以被识别但是有时候对于场景理解很重要。</p>
+</li>
+</ul>
+<p>这些大多数错误都部分或者完全和上下文关系以及全局信息有关系，而 PSPNet 就是为了整合不同区域的 context 来获取全局的 context 信息。它的骨架网络使用ResNet，之后使用了空间金字塔池化，得到一组感受野大小不同的feature map,将这些感受野不同的map concat到一起，完成多层次的语义特征融合。</p>
+<p><img src="http://image.rexking6.top/img/clip1530686534.png" alt=""></p>
+<p>在 ResNet 的第四阶段之后（即输入到金字塔池化模块），在主分支损失之外又增加了附加损失。这个想法在其他研究中也被称为中间监督（intermediate supervision）。</p>
+<h3 id="Large-Kernel-Matters"><a href="#Large-Kernel-Matters" class="headerlink" title="Large Kernel Matters"></a><strong>Large Kernel Matters</strong></h3><p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1703.02719">Large Kernel Matters — Improve Semantic Segmentation by Global Convolutional Network</a><br>发表日期：8 Mar 2017</p>
+<p>创新点：提出使用带有大型卷积核的编码器-解码器结构</p>
+<p><img src="http://image.rexking6.top/img/clip1530686867.png" alt=""></p>
+<p>语义分割不仅需要分割，同时还需要对分割目标进行分类。由于分割结构中无法使用全连接层，因此带有大核函数的卷积可以替代全连接层得到应用。</p>
+<p>使用大型核的另一个原因是，尽管 ResNet 等更深层的网络拥有较大的感受野，但相关研究显示这样的网络更易收集较小范围（即有效感受野）内的信息。大型核的计算成本高昂，且拥有大量参数。因此，$k×k$ 卷积可近似成 $1 × k + k × 1$、$k × 1$ 和 $1 × k$。这篇论文中将该模块称为全局卷积网络（GCN）。</p>
+<p>再来看结构，ResNet（没有空洞卷积）构成该结构的编码器部分，而 GCN 和反卷积构成了解码器部分。该结构还采用了一个叫做边界细化（BR）的简单残差块。</p>
+<h3 id="后端：用CRF-MRF优化"><a href="#后端：用CRF-MRF优化" class="headerlink" title="后端：用CRF/MRF优化"></a>后端：用CRF/MRF优化</h3><p>作为语义分割的后端优化部分，除了DeepLab引入的CRF外，还有MRF和G-CRF。</p>
+<h4 id="马尔科夫随机场（MRF）"><a href="#马尔科夫随机场（MRF）" class="headerlink" title="马尔科夫随机场（MRF）"></a><strong>马尔科夫随机场（MRF）</strong></h4><p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1509.02634">Semantic Image Segmentation via Deep Parsing Network</a><br>发表日期：9 Sep 2015</p>
+<p>在Deep Parsing Network中使用的是MRF，它的公式具体的定义和CRF类似，只不过作者对二元势函数进行了修改：</p>
+<script type="math/tex; mode=display">\Psi(y_i^u, y_i^v)=\sum_{k=1}^K\lambda_ku_k(i, u, j, v)\sum_{\forall{z\in{N_j}}}d(j, z)p_z^v</script><p>其中，作者加入的$\lambda_k$为label context，因为$u_k$只是定义了两个像素同时出现的频率，而$\lambda_k$可以对一些情况进行惩罚，比如，人可能在桌子旁边，但是在桌子下面的可能性就更小一些。所以这个量可以学习不同情况出现的概率。而原来的距离$d(i,j)$只定义了两个像素间的关系，作者在这儿加入了个triple penalty，即还引入了$j$附近的$z$，这样描述三方关系便于得到更充足的局部上下文。具体结构如下：</p>
+<p><img src="http://image.rexking6.top/img/clip1530677709.png" alt=""></p>
+<p>这个结构的优点在于：</p>
+<ul>
+<li>将平均场构造成了CNN</li>
+<li>联合训练并且可以one-pass inference，而不用迭代</li>
+</ul>
+<h4 id="高斯条件随机场（G-CRF）"><a href="#高斯条件随机场（G-CRF）" class="headerlink" title="高斯条件随机场（G-CRF）"></a><strong>高斯条件随机场（G-CRF）</strong></h4><p>这个结构使用CNN分别来学习一元势函数和二元势函数。这样的结构是我们更喜欢的：</p>
+<p><img src="http://image.rexking6.top/img/clip1530677835.png" alt=""></p>
+<p>而此中的能量函数又不同于之前：</p>
+<script type="math/tex; mode=display">E(\mathbf{x})=\frac{1}{2}\mathbf{x}^T(\mathbf{A+\lambda I)x}-\mathbf{Bx}</script><p>而当$(\mathbf{A+\lambda I)}$是对称正定时，求$E(\mathbf{x})$的最小值等于求解：</p>
+<script type="math/tex; mode=display">(\mathbf{A+\lambda I)x}=\mathbf{B}</script><p>而G-CRF的优点在于：</p>
+<ul>
+<li>二次能量有明确全局</li>
+<li>解线性简便很多 </li>
+</ul>
+<h3 id="端到端方法：CRFasRNN"><a href="#端到端方法：CRFasRNN" class="headerlink" title="端到端方法：CRFasRNN"></a>端到端方法：CRFasRNN</h3><p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1502.03240v2">Conditional Random Fields as Recurrent Neural Networks</a><br>发表时间：11 Feb 2015</p>
+<p><img src="http://image.rexking6.top/img/clip1530677256.png" alt=""></p>
+<p>最开始使用DenseCRF是直接加在FCN的输出后面，可想这样是比较粗糙的。而且在深度学习中，我们都追求end-to-end的系统，所以CRFasRNN这篇文章将DenseCRF真正结合进了FCN中。</p>
+<p>这篇文章也使用了平均场近似的方法，因为分解的每一步都是一些相乘相加的计算，和普通的加减（具体公式还是看论文吧），所以可以方便的把每一步描述成一层类似卷积的计算。这样即可结合进神经网络中，并且前后向传播也不存在问题。</p>
+<p>当然，这里作者还将它进行了迭代，不同次数的迭代得到的结果优化程度也不同（一般取10以内的迭代次数），所以文章才说是as RNN。</p>
+<h3 id="对抗训练"><a href="#对抗训练" class="headerlink" title="对抗训练"></a>对抗训练</h3><p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1611.08408.pdf">Semantic Segmentation using Adversarial Networks</a><br>发表时间：25 Nov 2016</p>
+<p><img src="http://image.rexking6.top/img/clip1530675008.png" alt=""></p>
+<p>近期的另一个工作重点是使用对抗性训练获得更高阶的一致性。受生成对抗网络（GAN）的启发，Luc 等人训练了用于语义分割的标准 CNN 以及试着学习区分真实图分割和预测图分割的对抗网络。分割网络旨在产生对抗网络无法从真实分割中区别出来的预测分割。</p>
+<p>这个方法的直观想法是希望我们的分割看起来尽可能真是。如果其它网络可以从真实分割中简单地将我们的预测结果区别出来，那么就说明我们的预测结果不够好。</p>
+<h1 id="Future-Work"><a href="#Future-Work" class="headerlink" title="Future Work"></a>Future Work</h1><p>可以看到目前的工作主要从两个方向发展：</p>
+<ol>
+<li><p>特征整合（Feature Ensembling）</p>
+<ol>
+<li><p>多尺度（multi-scale） 特征整合<br>例如：PSPNet</p>
+</li>
+<li><p>多级（multi-level）特征整合<br>例如：RefineNet</p>
+</li>
+</ol>
+</li>
+<li><p>结构预测（Structure Prediction）<br>例如：条件随机场等。</p>
+</li>
+</ol>
+<p>感觉谷歌在深度学习方面的领域都是按系列搞的……Inception和DeepLab，看到别人好的方法就弄成一个组件和原本的组合起来，然后更新一下版本号……</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\05\CAM-Learning-Deep-Features-for-Discriminative-Localization-阅读笔记\" rel="bookmark">CAM-Learning Deep Features for Discriminative Localization 阅读笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\05\Visualizing-and-Understanding-Convolutional-Networks-阅读笔记\" rel="bookmark">Visualizing and Understanding Convolutional Networks 阅读笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\21\《Transferable-Semi-supervised-Semantic-Segmentation》笔记\" rel="bookmark">《Transferable Semi-supervised Semantic Segmentation》笔记</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/07/03/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E5%85%A5%E9%97%A8/" title="语义分割入门">https://blog.rexking6.top/2018/07/03/语义分割入门/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2/" rel="tag"># 语义分割</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/06/10/MATLAB%E4%B8%8D%E5%90%AF%E5%8A%A8%E5%9B%BE%E5%BD%A2%E7%95%8C%E9%9D%A2%E8%BF%90%E8%A1%8C/" rel="prev" title="MATLAB不启动图形界面运行">
+      <i class="fa fa-chevron-left"></i> MATLAB不启动图形界面运行
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/04/%E5%BC%B1%E7%9B%91%E7%9D%A3%E8%A7%86%E8%A7%89%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2/" rel="next" title="弱监督视觉语义分割">
+      弱监督视觉语义分割 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2"><span class="nav-number">2.</span> <span class="nav-text">什么是语义分割</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E9%9B%86"><span class="nav-number">3.</span> <span class="nav-text">训练集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87"><span class="nav-number">4.</span> <span class="nav-text">评价指标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%B9%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8DDL%E6%97%B6%E4%BB%A3"><span class="nav-number">5.1.</span> <span class="nav-text">前DL时代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DL%E6%97%B6%E4%BB%A3"><span class="nav-number">5.2.</span> <span class="nav-text">DL时代</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#FCN"><span class="nav-number">5.2.1.</span> <span class="nav-text">FCN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DeconvNet"><span class="nav-number">5.2.2.</span> <span class="nav-text">DeconvNet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#U-Net"><span class="nav-number">5.2.3.</span> <span class="nav-text">U-Net</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SegNet"><span class="nav-number">5.2.4.</span> <span class="nav-text">SegNet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF-Dilated-Convolution"><span class="nav-number">5.2.5.</span> <span class="nav-text">空洞卷积 - Dilated Convolution</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DeepLab"><span class="nav-number">5.2.6.</span> <span class="nav-text">DeepLab</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#v1"><span class="nav-number">5.2.6.1.</span> <span class="nav-text">v1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#v2"><span class="nav-number">5.2.6.2.</span> <span class="nav-text">v2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#v3"><span class="nav-number">5.2.6.3.</span> <span class="nav-text">v3</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#v3-1"><span class="nav-number">5.2.6.4.</span> <span class="nav-text">v3+</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RefineNet"><span class="nav-number">5.2.7.</span> <span class="nav-text">RefineNet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PSPNet"><span class="nav-number">5.2.8.</span> <span class="nav-text">PSPNet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Large-Kernel-Matters"><span class="nav-number">5.2.9.</span> <span class="nav-text">Large Kernel Matters</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%8E%E7%AB%AF%EF%BC%9A%E7%94%A8CRF-MRF%E4%BC%98%E5%8C%96"><span class="nav-number">5.2.10.</span> <span class="nav-text">后端：用CRF&#x2F;MRF优化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A9%AC%E5%B0%94%E7%A7%91%E5%A4%AB%E9%9A%8F%E6%9C%BA%E5%9C%BA%EF%BC%88MRF%EF%BC%89"><span class="nav-number">5.2.10.1.</span> <span class="nav-text">马尔科夫随机场（MRF）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%AB%98%E6%96%AF%E6%9D%A1%E4%BB%B6%E9%9A%8F%E6%9C%BA%E5%9C%BA%EF%BC%88G-CRF%EF%BC%89"><span class="nav-number">5.2.10.2.</span> <span class="nav-text">高斯条件随机场（G-CRF）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%88%B0%E7%AB%AF%E6%96%B9%E6%B3%95%EF%BC%9ACRFasRNN"><span class="nav-number">5.2.11.</span> <span class="nav-text">端到端方法：CRFasRNN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E6%8A%97%E8%AE%AD%E7%BB%83"><span class="nav-number">5.2.12.</span> <span class="nav-text">对抗训练</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Future-Work"><span class="nav-number">6.</span> <span class="nav-text">Future Work</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

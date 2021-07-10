@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux知识点">
+<meta property="og:url" content="https://blog.rexking6.top/2017/09/05/Linux%E7%9F%A5%E8%AF%86%E7%82%B9/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-09-05T08:20:08.000Z">
+<meta property="article:modified_time" content="2018-03-25T05:32:51.524Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="笔试面试">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.rexking6.top/2017/09/05/Linux%E7%9F%A5%E8%AF%86%E7%82%B9/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux知识点 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2017/09/05/Linux%E7%9F%A5%E8%AF%86%E7%82%B9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux知识点
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-09-05 16:20:08" itemprop="dateCreated datePublished" datetime="2017-09-05T16:20:08+08:00">2017-09-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2018-03-25 13:32:51" itemprop="dateModified" datetime="2018-03-25T13:32:51+08:00">2018-03-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AF%95%E9%9D%A2%E8%AF%95/" itemprop="url" rel="index"><span itemprop="name">笔试面试</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2017/09/05/Linux%E7%9F%A5%E8%AF%86%E7%82%B9/" class="post-meta-item leancloud_visitors" data-flag-title="Linux知识点" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line">pwd</span><br><span class="line">显示当前路径，-p显示真实路径</span><br><span class="line"></span><br><span class="line">cd</span><br><span class="line">切换当前目录</span><br><span class="line"></span><br><span class="line">ls</span><br><span class="line">显示目录与文件信息</span><br><span class="line"></span><br><span class="line">touch</span><br><span class="line">创建或修改文件时间</span><br><span class="line"></span><br><span class="line">mkdir</span><br><span class="line">创建目录，-p创建多级目录</span><br><span class="line"></span><br><span class="line">cp</span><br><span class="line">复制，-r递归，-a保留属性</span><br><span class="line"></span><br><span class="line">rm</span><br><span class="line">删除，-f强制，-i询问，-r递归</span><br><span class="line"></span><br><span class="line">mv</span><br><span class="line">移动/重命名</span><br><span class="line"></span><br><span class="line">find</span><br><span class="line">-empty 查找空白文件或目录</span><br><span class="line">-group 按组查找</span><br><span class="line">-size 按容量大小查找</span><br><span class="line">-type 按文档类型查找，文件(f)、目录(d)、设备(b, c)、链接(l)等</span><br><span class="line">-user 按用户查找</span><br><span class="line">-exec 对找到的档案执行特定的命令</span><br><span class="line">-a 并且</span><br><span class="line">-o 或者</span><br><span class="line">find -name hello.doc</span><br><span class="line">find / -name &quot;*.log&quot;</span><br><span class="line">find / -mtime -3 查看计算机中所有3天内被修改的文档</span><br><span class="line">find / -mtime +4 查看计算机中所有4天前被修改过的文档</span><br><span class="line">find / -mtime 2 查看计算机中2天前的当天被修改过的文档</span><br><span class="line">find ./ -size +1M -exec ls -l &#123;&#125; \;</span><br><span class="line"></span><br><span class="line">du</span><br><span class="line">计算文件或目录的容量</span><br><span class="line">-h 人性化显示容量信息</span><br><span class="line">-a 查看所有目录以及文件的容量信息</span><br><span class="line">-s 仅显示总容量</span><br><span class="line"></span><br><span class="line">df</span><br><span class="line">通过查看文件系统磁盘块分配图得出总块数与剩余块数</span><br><span class="line"></span><br><span class="line">文件系统分配其中的一些磁盘块用来记录它自身的一些数据，如i节点，磁盘分</span><br><span class="line">布图，间接块，超级块等。这些数据对大多数用户级的程序来说是不可见的，</span><br><span class="line">通常称为Meta Data。du命令是用户级的程序，它不考虑Meta Data，而df命令</span><br><span class="line">则查看文件系统的磁盘分配图并考虑Meta Data。因此正常情况下，df计算的</span><br><span class="line">USED空间会比du计算的结果要稍大。</span><br><span class="line"></span><br><span class="line">简单的说，某个或者某些进程在没有释放掉删除了的文件而导致的。</span><br><span class="line"></span><br><span class="line">cat</span><br><span class="line">查看文件内容</span><br><span class="line"></span><br><span class="line">more/less</span><br><span class="line">分页查看</span><br><span class="line"></span><br><span class="line">head/tail</span><br><span class="line">-c nK 显示前KB/后KB的内容</span><br><span class="line">-n 显示前n行/后n行的内容</span><br><span class="line">-f 动态查看</span><br><span class="line"></span><br><span class="line">wc</span><br><span class="line">-c 显示字节统计信息</span><br><span class="line">-l 显示行数统计信息</span><br><span class="line">-w 显示单词统计信息</span><br><span class="line"></span><br><span class="line">grep</span><br><span class="line">查找关键词并打印匹配的行</span><br><span class="line"></span><br><span class="line">ln</span><br><span class="line">硬链接</span><br><span class="line">-s 软链接</span><br><span class="line"></span><br><span class="line">gzip</span><br><span class="line">压缩与解压缩</span><br><span class="line">-d 解压</span><br><span class="line"></span><br><span class="line">bzip2</span><br><span class="line">压缩与解压缩</span><br><span class="line">-d 解压</span><br><span class="line"></span><br><span class="line">tar</span><br><span class="line">打包与解包</span><br><span class="line">-c 打包</span><br><span class="line">-x 解包</span><br><span class="line">-z 用gzip压缩解压</span><br><span class="line">-j 用bzip2压缩解压</span><br></pre></td></tr></table></figure>
+<h1 id="cut"><a href="#cut" class="headerlink" title="cut"></a>cut</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">cut 从一个文本文件或者文本流中提取文本列。</span><br><span class="line"></span><br><span class="line">-d  ：后面接分隔字符。与 -f 一起使用；</span><br><span class="line">-f  ：依据 -d 的分隔字符将一段信息分割成为数段，用 -f 取出第几段的意思；</span><br><span class="line">-c  ：以字符 (characters) 的单位取出固定字符区间；</span><br><span class="line"> </span><br><span class="line">echo $PATH</span><br><span class="line">/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/X11R6/bin:/usr/games</span><br><span class="line"># 1 | 2       | 3   | 4       | 5            | 6            | 7</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">找出第五个路径</span><br><span class="line">#echo $PATH | cut -d &#x27;:&#x27; -f 5</span><br><span class="line">/usr/local/bin</span><br><span class="line"> </span><br><span class="line">找出第三和第五个路径</span><br><span class="line">#echo $PATH | cut -d &#x27;:&#x27; -f 3,5</span><br><span class="line">/sbin:/usr/local/bin</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">找出第三到最后一个路径</span><br><span class="line">echo $PATH | cut -d &#x27;:&#x27; -f 3-</span><br><span class="line">/sbin:/usr/sbin:/usr/local/bin:/usr/X11R6/bin:/usr/games</span><br><span class="line"> </span><br><span class="line">找出第一到第三个路径</span><br><span class="line">#echo $PATH | cut -d &#x27;:&#x27; -f 1-3</span><br><span class="line">/bin:/usr/bin:/sbin:</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">找出第一到第三，还有第五个路径</span><br><span class="line">echo $PATH | cut -d &#x27;:&#x27; -f 1-3,5</span><br><span class="line">/bin:/usr/bin:/sbin:/usr/local/bin</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h1 id="sort和uniq"><a href="#sort和uniq" class="headerlink" title="sort和uniq"></a>sort和uniq</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">sort</span><br><span class="line">-b   忽略每行前面开始出的空格字符。</span><br><span class="line">-c   检查文件是否已经按照顺序排序。</span><br><span class="line">-f   排序时，忽略大小写字母。</span><br><span class="line">-n   依照数值的大小排序。</span><br><span class="line">-o &lt;输出文件&gt;   将排序后的结果存入指定的文件。</span><br><span class="line">-r   以相反的顺序来排序。</span><br><span class="line">-t &lt;分隔字符&gt;   指定排序时所用的栏位分隔字符。  </span><br><span class="line">  </span><br><span class="line">排序文件，默认是去重</span><br><span class="line">#cat words | sort |uniq</span><br><span class="line">friend</span><br><span class="line">hello</span><br><span class="line">world</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">排序之后删除了重复行，同时在行首位置输出该行重复的次数</span><br><span class="line">#sort testfile | uniq -c</span><br><span class="line">1 friend</span><br><span class="line">3 hello</span><br><span class="line">2 world</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">仅显示存在重复的行，并在行首显示该行重复的次数</span><br><span class="line">#sort testfile | uniq -dc</span><br><span class="line">3 hello</span><br><span class="line">2 world</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">仅显示不重复的行</span><br><span class="line">sort testfile | uniq -u</span><br><span class="line">friend  </span><br></pre></td></tr></table></figure>
+<h1 id="单词计数"><a href="#单词计数" class="headerlink" title="单词计数"></a>单词计数</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat a | tr -s &#x27; &#x27; &#x27;\n&#x27; | tr -d &#x27;[,.&quot;]&#x27; | sort | uniq -c | sort -nr</span><br></pre></td></tr></table></figure>
+<h1 id="用户权限"><a href="#用户权限" class="headerlink" title="用户权限"></a>用户权限</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">useradd</span><br><span class="line">创建新账号</span><br><span class="line"></span><br><span class="line">groupadd</span><br><span class="line">创建组账户</span><br><span class="line"></span><br><span class="line">id</span><br><span class="line">显示账户及组信息</span><br><span class="line"></span><br><span class="line">passwd</span><br><span class="line">改密码</span><br><span class="line">-l 锁定用户</span><br><span class="line">-u 解锁</span><br><span class="line"></span><br><span class="line">usermod</span><br><span class="line">修改账户信息</span><br><span class="line"></span><br><span class="line">userdel</span><br><span class="line">删除用户</span><br><span class="line"></span><br><span class="line">groupdel</span><br><span class="line">删除组账户</span><br><span class="line"></span><br><span class="line">/etc/passwd 账户信息文件</span><br><span class="line">/etc/shadow 账户密码文件</span><br><span class="line">/etc/group 组账户信息文件</span><br><span class="line">/etc/gshadow 组账户密码文件</span><br><span class="line"></span><br><span class="line">chmod</span><br><span class="line">改变文件或目录权限</span><br><span class="line"></span><br><span class="line">chown</span><br><span class="line">修改文件或目录的所有者与所属组</span><br></pre></td></tr></table></figure>
+<h1 id="服务任务"><a href="#服务任务" class="headerlink" title="服务任务"></a>服务任务</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">systemctl</span><br><span class="line">start 启动</span><br><span class="line">stop 关闭服务</span><br><span class="line">restart 重启</span><br><span class="line">enable 设置默认开机启动</span><br><span class="line">disable 设置服务开机禁用</span><br><span class="line"></span><br><span class="line">at</span><br><span class="line">一次性计划任务，首先要systemctl start atd和systemctl enable atd</span><br><span class="line">-l 查看用户计划任务</span><br><span class="line">-d 删除用户计划任务</span><br><span class="line">-c 查看at计划任务具体内容</span><br><span class="line"></span><br><span class="line">crontab</span><br><span class="line">周期性计划人</span><br><span class="line">-u 指定用户</span><br><span class="line">-l 查看计划任务</span><br><span class="line">-r 删除计划任务</span><br><span class="line">-e 编辑计划任务</span><br><span class="line">-i 删除时询问</span><br><span class="line">格式:</span><br><span class="line">分 时 日 月 周 命令</span><br><span class="line">23 23 * * 5 命令 每周五晚23点23分</span><br><span class="line">00 */3 * * * 命令 每3个小时</span><br><span class="line">00 10 * * 3,5 命令 每周三、周五10点</span><br></pre></td></tr></table></figure>
+<h1 id="监控"><a href="#监控" class="headerlink" title="监控"></a>监控</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">uptime</span><br><span class="line">监控CPU使用情况</span><br><span class="line"></span><br><span class="line">free</span><br><span class="line">监控内存和交换分区使用情况</span><br><span class="line"></span><br><span class="line">ip</span><br><span class="line">查看网卡情况</span><br><span class="line"></span><br><span class="line">netstat</span><br><span class="line">查看网络连接、路由表、网络接口统计等信息</span><br><span class="line"></span><br><span class="line">-s 显示各种协议数据统计信息</span><br><span class="line">-n 使用数字形式的IP、端口号、用户ID代替主机、协议、用户等信息</span><br><span class="line">-p 显示进程及对应的PID</span><br><span class="line">-l 仅显示正在监听的sockets接口信息</span><br><span class="line">-u 查看udp</span><br><span class="line">-t 查看tcp</span><br><span class="line"></span><br><span class="line">ps</span><br><span class="line">axu 查看当前进程信息</span><br><span class="line"></span><br><span class="line">Linux上进程有五种状态</span><br><span class="line">1. 运行</span><br><span class="line">2. 中断</span><br><span class="line">3. 不可中断</span><br><span class="line">4. 僵死</span><br><span class="line">5. 停止</span><br><span class="line"></span><br><span class="line">ps标识5种状态码</span><br><span class="line">1. D不可中断</span><br><span class="line">2. R运行</span><br><span class="line">3. S中断</span><br><span class="line">4. T停止</span><br><span class="line">5. Z僵死</span><br><span class="line"></span><br><span class="line">top</span><br><span class="line">动态查看进程信息</span><br><span class="line"></span><br><span class="line">lsof </span><br><span class="line">列出当前系统打开文件的工具</span><br><span class="line">-a 两个条件都满足</span><br><span class="line">-c string COMMAND里包含string</span><br><span class="line">-u username</span><br><span class="line">-g gid GID</span><br><span class="line">+d/D /DIR/ 该目录下打开的</span><br><span class="line">-d FD 指定文件描述符</span><br><span class="line">-n 不讲IP转换为hostname</span><br><span class="line">-i 显示符合条件的进程情况</span><br><span class="line"></span><br><span class="line">ifconfig</span><br><span class="line">网络接口参数</span><br><span class="line"></span><br><span class="line">route</span><br><span class="line">路由参数</span><br><span class="line"></span><br><span class="line">网络故障排错</span><br><span class="line">1. ping</span><br><span class="line">顺序: 本地回环、本地IP、网关IP、外网IP</span><br><span class="line"></span><br><span class="line">2. traceroute</span><br><span class="line">跟踪包转发</span><br><span class="line"></span><br><span class="line">3. nslookup</span><br><span class="line">查看DNS解析</span><br><span class="line"></span><br><span class="line">4. dig</span><br><span class="line">查询域名与IP地址之间的对应关系</span><br><span class="line"></span><br><span class="line">5. netstat</span><br><span class="line">查看端口情况</span><br></pre></td></tr></table></figure>
+<h1 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h1><h2 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h2><p>所有操作系统在内核都有一些内建的函数，用来完成一些系统级别的功能，称为系统调用，代表了用户空间到内核空间的一种转换。在用户空间调用open函数，在内核空间则会调用sys_open。<br>系统调用的错误码：系统调用并不直接返回错误码，而是将错误码放入一个名为errno的全局变量中。如果一个系统调用失败，你可以读出errno的值来确定问题的所在。另外，在处理errno前最好先把它的值存入另一个变量，因为在错误处理过程中，即使像printf()这样的函数出错时也会改变errno的值。</p>
+<h2 id="strace"><a href="#strace" class="headerlink" title="strace"></a>strace</h2><h3 id="让开发者知道一个程序在后台所做事情"><a href="#让开发者知道一个程序在后台所做事情" class="headerlink" title="让开发者知道一个程序在后台所做事情"></a>让开发者知道一个程序在后台所做事情</h3><p><code>strace ./test.out</code></p>
+<h3 id="跟踪信号传递"><a href="#跟踪信号传递" class="headerlink" title="跟踪信号传递"></a>跟踪信号传递</h3><p>strace时，能监测到系统对该程序发送的信号</p>
+<h3 id="统计系统调用"><a href="#统计系统调用" class="headerlink" title="统计系统调用"></a>统计系统调用</h3><p><code>strace -c ./test.out</code><br>将进程所有的系统调用做一个统计分析并返回</p>
+<h3 id="统计每个系统调用花费的时间"><a href="#统计每个系统调用花费的时间" class="headerlink" title="统计每个系统调用花费的时间"></a>统计每个系统调用花费的时间</h3><p><code>strace -T ./test.out</code></p>
+<h3 id="跟踪现有进程"><a href="#跟踪现有进程" class="headerlink" title="跟踪现有进程"></a>跟踪现有进程</h3><p><code>strace -p pid</code></p>
+<h2 id="gdb"><a href="#gdb" class="headerlink" title="gdb"></a>gdb</h2><p>编译时<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gcc -g hello.c -o hello</span><br><span class="line">g++ -g hello.cpp -o hello</span><br></pre></td></tr></table></figure><br>启动gdb<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. gdb program</span><br><span class="line">2. gdb program core</span><br><span class="line">用gdb同时调试一个运行程序和core文件，core是程序非法执行后core dump后产生的文件</span><br><span class="line">3. gdb program 1234</span><br><span class="line">指定PID</span><br></pre></td></tr></table></figure><br>指令<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">l 列出源码</span><br><span class="line">Enter 重复上一条命令</span><br><span class="line">b 15 在15行设置断点</span><br><span class="line">r 运行</span><br><span class="line">n 单步执行</span><br><span class="line">p i 打印变量</span><br><span class="line">bt 查看函数堆栈</span><br><span class="line">finish 退出函数</span><br><span class="line">q 结束调试</span><br></pre></td></tr></table></figure></p>
+<h2 id="Valgrind"><a href="#Valgrind" class="headerlink" title="Valgrind"></a>Valgrind</h2><p>内存分析工具</p>
+<h1 id="Linux程序内存空间布局"><a href="#Linux程序内存空间布局" class="headerlink" title="Linux程序内存空间布局"></a>Linux程序内存空间布局</h1><p>高地址</p>
+<p>命令行参数和环境变量<br>栈 stack<br>堆 heap<br>未初始化的数据段 .bss segment<br>未初始化的数据段 .data segment<br>代码段 .text segment</p>
+<p>低地址</p>
+<h1 id="堆和栈的区别"><a href="#堆和栈的区别" class="headerlink" title="堆和栈的区别"></a>堆和栈的区别</h1><ol>
+<li><p>申请方式不同<br>栈：由系统自动分配<br>堆：程序员自己申请，并指明大小</p>
+</li>
+<li><p>申请后的系统的响应不同<br>栈：只要大于申请空间，否则栈溢出<br>堆：链表实现，记录空闲地址</p>
+</li>
+<li><p>申请大小限制不同<br>栈：向低地址扩展，连续的内存区域<br>堆：向高地址扩展，不连续的内存区域，存在碎片</p>
+</li>
+<li><p>申请效率不同<br>栈：快<br>堆：慢</p>
+</li>
+<li><p>存储内容不同<br>栈：函数调用时，首先进栈的是下一条指令的地址，之后是各个参数从右往左，之后是局部变量。静态变量不入栈。<br>堆：头部用一个字节存放堆的大小</p>
+</li>
+</ol>
+<h1 id="内存错误种类"><a href="#内存错误种类" class="headerlink" title="内存错误种类"></a>内存错误种类</h1><ol>
+<li>使用未初始化的内存</li>
+<li>内存读写越界</li>
+<li>内存覆盖</li>
+<li><p>动态内存管理错误<br>1.申请和释放不一致<br>2.申请和释放不匹配<br>3.释放后仍然读写</p>
+</li>
+<li><p>内存泄漏</p>
+</li>
+</ol>
+<h1 id="RAID磁盘阵列"><a href="#RAID磁盘阵列" class="headerlink" title="RAID磁盘阵列"></a>RAID磁盘阵列</h1><h2 id="RAID-0"><a href="#RAID-0" class="headerlink" title="RAID 0"></a>RAID 0</h2><p>不含校验与冗余的条带存储</p>
+<h2 id="RAID-1"><a href="#RAID-1" class="headerlink" title="RAID 1"></a>RAID 1</h2><p>不含校验的镜像存储，磁盘利用率最低</p>
+<h2 id="RAID-2"><a href="#RAID-2" class="headerlink" title="RAID 2"></a>RAID 2</h2><p>位级别的校验式条带存储，使用海明码，至少三块，有一个校验盘。</p>
+<h2 id="RAID-3"><a href="#RAID-3" class="headerlink" title="RAID 3"></a>RAID 3</h2><p>字节级别的校验式条带存储</p>
+<h2 id="RAID-4"><a href="#RAID-4" class="headerlink" title="RAID 4"></a>RAID 4</h2><p>数据块级别的校验式条带存储</p>
+<h2 id="RAID-5"><a href="#RAID-5" class="headerlink" title="RAID 5"></a>RAID 5</h2><p>数据块级别的分布式校验条带存储，海明码被写入不同的磁盘</p>
+<h2 id="RAID-10"><a href="#RAID-10" class="headerlink" title="RAID 10"></a>RAID 10</h2><p>镜像与条带存储，RAID 0与RAID 1结合</p>
+<h1 id="Vim"><a href="#Vim" class="headerlink" title="Vim"></a>Vim</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">gg 移动到首行</span><br><span class="line">G 移动到末尾</span><br><span class="line">nG n为行数，移动到第n行</span><br><span class="line">fx 移动到下一个x字符</span><br><span class="line">Fx 移动到上一个x字符</span><br><span class="line">ndd 删除n行</span><br><span class="line">d$ 删除当前至行尾</span><br><span class="line">u 撤销上一步操作</span><br><span class="line">yy 复制当前行</span><br><span class="line">p 粘贴当前之后</span><br><span class="line">P 粘贴当前之前</span><br><span class="line"></span><br><span class="line">:s/root/admin/ 将当前行第一个出现的root替换为admin</span><br><span class="line">:s/root/admin/g 将当前行所有root替换为admin</span><br><span class="line">:3,5 s/sbin/bin/g 将3到5行所有sbin替换为bin</span><br><span class="line">: % s/sbin/bin/g 所有行</span><br><span class="line"></span><br><span class="line">! 执行shell命令</span><br></pre></td></tr></table></figure>
+<h1 id="Shell"><a href="#Shell" class="headerlink" title="Shell"></a>Shell</h1><p>后台作业<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">命令 &amp;</span><br><span class="line">放后台运行</span><br><span class="line"></span><br><span class="line">jobs</span><br><span class="line">查看后台作业</span><br><span class="line"></span><br><span class="line">fg n</span><br><span class="line">从后台拉取序号n的作业到前台来</span><br></pre></td></tr></table></figure></p>
+<p>变量<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><span class="line">NAME=tomcat</span><br><span class="line">echo $NAME</span><br><span class="line"></span><br><span class="line">typeset -r NAME</span><br><span class="line">设置只读属性</span><br><span class="line"></span><br><span class="line">declare INT_NUMBER</span><br><span class="line">定义变量不赋值</span><br><span class="line"></span><br><span class="line">typeset -i INT_NUMBER</span><br><span class="line">设置int整数变量</span><br><span class="line"> </span><br><span class="line">read INT_NUMBER</span><br><span class="line">从标准输入中读取值并且赋值</span><br><span class="line"></span><br><span class="line">unset INT_NUMBER</span><br><span class="line">删除变量</span><br><span class="line"></span><br><span class="line">export NAME[=value]</span><br><span class="line">定义环境变量或者将变量提升为环境变量</span><br><span class="line"></span><br><span class="line">位置变量</span><br><span class="line">$0 文件名</span><br><span class="line">$1 第一个参数</span><br><span class="line">$# 参数个数</span><br><span class="line">$* 所有参数，看成一个整体</span><br><span class="line">$@ 所有参数，每个看成一个整体</span><br><span class="line">$$ 当前进程的ID号码</span><br><span class="line">$? 退出代码</span><br><span class="line"></span><br><span class="line">变量展开替换</span><br><span class="line">$&#123;varname:-word&#125; 否则返回word</span><br><span class="line">$&#123;varname:=word&#125; 否则设置为word</span><br><span class="line">$&#123;varname:?message&#125; 否则显示varname:message</span><br><span class="line">$&#123;varname:+word&#125; 如varname存在且非null，则返回word；否则返回null</span><br><span class="line">$&#123;variable#key&#125; 从头删除关键词，最短匹配</span><br><span class="line">$&#123;variable##key&#125; 从头删除关键词，最长匹配</span><br><span class="line">$&#123;variable%key&#125; 从尾删除关键词，最短匹配</span><br><span class="line">$&#123;variable%%key&#125; 从尾删除关键词，最长匹配</span><br><span class="line">$&#123;variable/old/new&#125; 替换第一个</span><br><span class="line">%&#123;variable//old/new&#125; 替换所有</span><br><span class="line"></span><br><span class="line">定义数组</span><br><span class="line">name[subscript]=value</span><br><span class="line">name=(value1 value2 value3)</span><br><span class="line"></span><br><span class="line">索引数组</span><br><span class="line">$&#123;name[*]&#125;</span><br><span class="line">$&#123;name[@]&#125;</span><br><span class="line">所有成员</span><br><span class="line"></span><br><span class="line">$&#123;#name[subscript]&#125;</span><br><span class="line">$&#123;#name[*]&#125;</span><br><span class="line">$&#123;#name[@]&#125;</span><br><span class="line">返回长度/个数</span><br><span class="line"></span><br><span class="line">算术运算</span><br><span class="line">$((x+y))</span><br><span class="line">expr arg1 + arg2</span><br><span class="line"></span><br><span class="line">判断</span><br><span class="line">-e FILE 文件是否存在</span><br><span class="line">-d FILE FILE是否存在且为目录</span><br><span class="line">-f FILE FILE是否存在且为普通文件</span><br><span class="line">-w FILE 文件是否存在且可写</span><br><span class="line">-s FILE 文件是否存在且非空</span><br><span class="line">-r FILE 文件是否存在且可读</span><br><span class="line">-x FILE 文件是否存在且可执行</span><br><span class="line">-h FILE 文件是否为链接文件</span><br><span class="line"></span><br><span class="line">-n STRING 字符串长度非0</span><br><span class="line">-z STRING 字符串长度为0 </span><br><span class="line"></span><br><span class="line">INT1 -eq INT2 相等</span><br><span class="line">INT1 -gt INT2 大于</span><br><span class="line">INT1 -lt INT2 小于</span><br><span class="line">INT1 -ge INT2 大于或等于</span><br><span class="line">INT1 -le INT2 小于或等于</span><br><span class="line">INT1 -ne INT2 不等于</span><br><span class="line"></span><br><span class="line">echo &#x27;$HOME&#x27;</span><br><span class="line">$HOME</span><br><span class="line">echo &quot;$HOME&quot;</span><br><span class="line">/root</span><br><span class="line">echo &quot;\$HOME&quot;</span><br><span class="line">$HOME</span><br><span class="line"></span><br><span class="line">运行命令</span><br><span class="line">echo `shell命令`</span><br><span class="line">$(shell命令)</span><br><span class="line"></span><br><span class="line">运行脚本三种方式:</span><br><span class="line">chmod a+x print.sh</span><br><span class="line">/root/print.sh</span><br><span class="line"></span><br><span class="line">bash print.sh</span><br><span class="line">sh print.sh</span><br><span class="line"></span><br><span class="line">source print.sh</span><br><span class="line">. print.sh</span><br></pre></td></tr></table></figure></p>
+<h1 id="正则"><a href="#正则" class="headerlink" title="正则"></a>正则</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[^] 对括号中的集合取反</span><br><span class="line">\n 通过\1到\9调用()里的内容</span><br></pre></td></tr></table></figure>
+<h1 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sed &#x27;2a TYPE=Ethernet&#x27; test.txt 第二行后追加......</span><br><span class="line">sed &#x27;3i TYPE=Ethernet&#x27; test.txt 第三行前追加......</span><br><span class="line">sed &#x27;s/yes/no/g&#x27; test.txt 所有yes替换no</span><br><span class="line">sed &#x27;3,4d&#x27; test.txt 删除第3,4行</span><br></pre></td></tr></table></figure>
+<h1 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">awk &#x27;&#123;print $1&#125;&#x27; 输出第一列</span><br><span class="line">awk &#x27;&#123;print $0&#125;&#x27; 输出该行</span><br><span class="line">awk &#x27;&#123;print NF&#125;&#x27; 输出字段个数</span><br><span class="line">awk &#x27;&#123;print $NF&#125;&#x27; 输出最后一列</span><br><span class="line">-F 指定分隔符</span><br></pre></td></tr></table></figure>
+<h1 id="if"><a href="#if" class="headerlink" title="if"></a>if</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">if 条件</span><br><span class="line">then</span><br><span class="line">命令</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">if 条件</span><br><span class="line">then</span><br><span class="line">命令</span><br><span class="line">elif 条件</span><br><span class="line">then</span><br><span class="line">命令</span><br><span class="line">else</span><br><span class="line">命令</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+<h1 id="case"><a href="#case" class="headerlink" title="case"></a>case</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">case $变量 in</span><br><span class="line">模式1)</span><br><span class="line">	命令序列</span><br><span class="line">	;;</span><br><span class="line">模式2|模式3)</span><br><span class="line">	命令序列</span><br><span class="line">	;;</span><br><span class="line">*)</span><br><span class="line">esac</span><br></pre></td></tr></table></figure>
+<h1 id="for"><a href="#for" class="headerlink" title="for"></a>for</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">for 变量 in 值1 值2</span><br><span class="line">do</span><br><span class="line">命令</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">for ((i=0;i&lt;=n;i++))</span><br><span class="line">do</span><br><span class="line">命令</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+<h1 id="while"><a href="#while" class="headerlink" title="while"></a>while</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">while [条件]</span><br><span class="line">do</span><br><span class="line">命令</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">while read -r line</span><br><span class="line">do</span><br><span class="line">命令</span><br><span class="line">done &lt; file</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\09\13\Django知识点\" rel="bookmark">Django知识点</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\09\02\Redis知识点\" rel="bookmark">Redis知识点</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\03\16\南京拓界笔试-一面\" rel="bookmark">南京拓界笔试+一面</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2017/09/05/Linux%E7%9F%A5%E8%AF%86%E7%82%B9/" title="Linux知识点">https://blog.rexking6.top/2017/09/05/Linux知识点/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AF%95%E9%9D%A2%E8%AF%95/" rel="tag"># 笔试面试</a>
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/09/05/C%E7%9F%A5%E8%AF%86%E7%82%B9/" rel="prev" title="C知识点">
+      <i class="fa fa-chevron-left"></i> C知识点
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/09/11/Python%E7%9F%A5%E8%AF%86%E7%82%B9/" rel="next" title="Python知识点">
+      Python知识点 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4"><span class="nav-number">1.</span> <span class="nav-text">命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cut"><span class="nav-number">2.</span> <span class="nav-text">cut</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#sort%E5%92%8Cuniq"><span class="nav-number">3.</span> <span class="nav-text">sort和uniq</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%95%E8%AF%8D%E8%AE%A1%E6%95%B0"><span class="nav-number">4.</span> <span class="nav-text">单词计数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E6%9D%83%E9%99%90"><span class="nav-number">5.</span> <span class="nav-text">用户权限</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E4%BB%BB%E5%8A%A1"><span class="nav-number">6.</span> <span class="nav-text">服务任务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%91%E6%8E%A7"><span class="nav-number">7.</span> <span class="nav-text">监控</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B0%83%E8%AF%95"><span class="nav-number">8.</span> <span class="nav-text">调试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">8.1.</span> <span class="nav-text">系统调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#strace"><span class="nav-number">8.2.</span> <span class="nav-text">strace</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A9%E5%BC%80%E5%8F%91%E8%80%85%E7%9F%A5%E9%81%93%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F%E5%9C%A8%E5%90%8E%E5%8F%B0%E6%89%80%E5%81%9A%E4%BA%8B%E6%83%85"><span class="nav-number">8.2.1.</span> <span class="nav-text">让开发者知道一个程序在后台所做事情</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%9F%E8%B8%AA%E4%BF%A1%E5%8F%B7%E4%BC%A0%E9%80%92"><span class="nav-number">8.2.2.</span> <span class="nav-text">跟踪信号传递</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%9F%E8%AE%A1%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">8.2.3.</span> <span class="nav-text">统计系统调用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%9F%E8%AE%A1%E6%AF%8F%E4%B8%AA%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E8%8A%B1%E8%B4%B9%E7%9A%84%E6%97%B6%E9%97%B4"><span class="nav-number">8.2.4.</span> <span class="nav-text">统计每个系统调用花费的时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%9F%E8%B8%AA%E7%8E%B0%E6%9C%89%E8%BF%9B%E7%A8%8B"><span class="nav-number">8.2.5.</span> <span class="nav-text">跟踪现有进程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gdb"><span class="nav-number">8.3.</span> <span class="nav-text">gdb</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Valgrind"><span class="nav-number">8.4.</span> <span class="nav-text">Valgrind</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux%E7%A8%8B%E5%BA%8F%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%E5%B8%83%E5%B1%80"><span class="nav-number">9.</span> <span class="nav-text">Linux程序内存空间布局</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A0%86%E5%92%8C%E6%A0%88%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">10.</span> <span class="nav-text">堆和栈的区别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E9%94%99%E8%AF%AF%E7%A7%8D%E7%B1%BB"><span class="nav-number">11.</span> <span class="nav-text">内存错误种类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RAID%E7%A3%81%E7%9B%98%E9%98%B5%E5%88%97"><span class="nav-number">12.</span> <span class="nav-text">RAID磁盘阵列</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RAID-0"><span class="nav-number">12.1.</span> <span class="nav-text">RAID 0</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RAID-1"><span class="nav-number">12.2.</span> <span class="nav-text">RAID 1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RAID-2"><span class="nav-number">12.3.</span> <span class="nav-text">RAID 2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RAID-3"><span class="nav-number">12.4.</span> <span class="nav-text">RAID 3</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RAID-4"><span class="nav-number">12.5.</span> <span class="nav-text">RAID 4</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RAID-5"><span class="nav-number">12.6.</span> <span class="nav-text">RAID 5</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RAID-10"><span class="nav-number">12.7.</span> <span class="nav-text">RAID 10</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Vim"><span class="nav-number">13.</span> <span class="nav-text">Vim</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Shell"><span class="nav-number">14.</span> <span class="nav-text">Shell</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A3%E5%88%99"><span class="nav-number">15.</span> <span class="nav-text">正则</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#sed"><span class="nav-number">16.</span> <span class="nav-text">sed</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#awk"><span class="nav-number">17.</span> <span class="nav-text">awk</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#if"><span class="nav-number">18.</span> <span class="nav-text">if</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#case"><span class="nav-number">19.</span> <span class="nav-text">case</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#for"><span class="nav-number">20.</span> <span class="nav-text">for</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#while"><span class="nav-number">21.</span> <span class="nav-text">while</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

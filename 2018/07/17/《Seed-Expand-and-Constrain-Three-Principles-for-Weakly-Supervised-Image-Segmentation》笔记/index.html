@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Seed, Expand and Constrain Three Principles for Weakly-Supervised Image Segmentation》笔记">
+<meta property="og:url" content="https://blog.rexking6.top/2018/07/17/%E3%80%8ASeed-Expand-and-Constrain-Three-Principles-for-Weakly-Supervised-Image-Segmentation%E3%80%8B%E7%AC%94%E8%AE%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531925882.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531926413.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531978983.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531979669.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531980046.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531980544.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531980599.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531980939.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531981101.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531981736.png">
+<meta property="og:image" content="http://image.rexking6.top/img/clip1531989256.png">
+<meta property="article:published_time" content="2018-07-17T10:27:47.000Z">
+<meta property="article:modified_time" content="2019-03-06T10:17:54.093Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="语义分割">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://image.rexking6.top/img/clip1531925882.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2018/07/17/%E3%80%8ASeed-Expand-and-Constrain-Three-Principles-for-Weakly-Supervised-Image-Segmentation%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>《Seed, Expand and Constrain Three Principles for Weakly-Supervised Image Segmentation》笔记 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2018/07/17/%E3%80%8ASeed-Expand-and-Constrain-Three-Principles-for-Weakly-Supervised-Image-Segmentation%E3%80%8B%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Seed, Expand and Constrain Three Principles for Weakly-Supervised Image Segmentation》笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-07-17 18:27:47" itemprop="dateCreated datePublished" datetime="2018-07-17T18:27:47+08:00">2018-07-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-03-06 18:17:54" itemprop="dateModified" datetime="2019-03-06T18:17:54+08:00">2019-03-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2/" itemprop="url" rel="index"><span itemprop="name">语义分割</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/07/17/%E3%80%8ASeed-Expand-and-Constrain-Three-Principles-for-Weakly-Supervised-Image-Segmentation%E3%80%8B%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="《Seed, Expand and Constrain Three Principles for Weakly-Supervised Image Segmentation》笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>18k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>16 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>种子，扩展和约束：弱监督图像分割的三个原则</p>
+<p>16年的ECCV，代表性的弱监督语义分割方法。</p>
+<p>在GAIN中，使用到了它，主要想看一下SEC是怎么使用作为先验的注意力图的。</p>
+<h1 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h1><p>我们基于三个指导原则为语义图像分割模型的弱监督训练引入了一种新的损失函数：利用弱定位线索来种子，基于图像中可能出现的类的信息来扩展对象，并约束分割与对象边界重合。 我们通过实验证明，使用所提出的损失函数训练深度卷积神经网络导致比具有挑战性的PASCAL VOC 2012数据集的先前最先进方法更好的分割。 我们通过详细的实验研究深入了解了我们方法的工作机制，该实验研究说明了分割质量如何受到所提出的损失函数的每个项以及它们的组合的影响。</p>
+<p>关键词：弱监督语义分割，深度学习</p>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>计算机视觉研究最近取得了巨大进展。 现在可以高精度地解决许多具有挑战性的视觉任务，假设有足够多的注释数据可用于训练。 不幸的是，收集大型标记数据集非常耗时，并且通常需要大量的金融投资。 因此，训练数据的构建已成为计算机视觉方法进一步发展的瓶颈。 然而，可以以相对快速和廉价的方式大量收集未标记的视觉数据。 因此，计算机视觉研究中一个有希望的方向是开发可以从未标记或部分标记的数据中学习的方法。</p>
+<p>在本文中，我们专注于语义图像分割的任务。 图像分割是一种重要的视觉任务，为此创建的标注是特别昂贵的一个突出例子：如 [29,4] 报告，每个图像手动产生分割mask需要几个工人分钟。 因此，大量先前的研究研究如何从较弱的注释形式训练分割模型。</p>
+<p>一个特别吸引人的设置是使用仅具有每个图像标签的训练集来学习图像分割模型，因为这种弱监督形式可以非常有效地收集。 然而，目前在按照每个图像标签训练的模型和从完全分割mask训练的模型之间仍存在很大的性能差距。 在本文中，我们证明与先前的最先进技术相比，这种差距可以大大减少。</p>
+<p>我们提出了一种新的复合损失函数，用于训练卷积神经网络，来用于弱监督图像分割的任务。 我们的方法依赖于以下三个见解：</p>
+<ul>
+<li><p>图像分类神经网络，例如AlexNet [19] 或VGG [33]，可用于生成可靠的对象定位线索（种子），但无法预测对象的确切空间范围。 我们通过使用种子损失来结合这一方面，该种子损失鼓励分割网络匹配定位提示，但是对于图像的其余部分是不可知的。</p>
+</li>
+<li><p>为了从每个图像标注训练分割网络，可以使用全局池化层将分割mask聚合成图像级标签分数。该层的选择对分割的质量有很大影响。 例如，最大池化倾向于低估对象的大小，而平均池化往往会高估它[26]。 我们提出了一个全球加权等级池化，它通过扩展损失来利用，将对象种子扩展到合理规模的区域。 它扩展了最大池化和平均池化，并在我们的实证研究中表现优于它们。</p>
+</li>
+<li><p>从图像级标签训练的网络很少捕获图像中对象的精确边界。 在测试时通过全连接条件随机场（CRF）进行后处理通常不足以克服这种影响，因为一旦网络经过训练，他们就会对错误分类的区域产生信心。 我们提出了一种新的约束到边界损失，可以在训练时缓解不精确边界的问题。 它努力约束预测的分割mask以重视低级图像信息，特别是对象边界。</p>
+</li>
+</ul>
+<p>我们将我们的方法命名为SEC，因为它基于三个原则：种子，扩展和约束。 我们在第3节中正式定义和讨论了SEC损失函数的各个组成部分。在第4节中，我们通过PASCAL VOC 2012图像分割基准对其进行了实验评估，结果表明它在相同的实验设置下基本上优于先前的最先进技术。我们还通过额外的实验分别讨论和评估每项贡献的影响，从而提供进一步的见解。</p>
+<h1 id="相关研究"><a href="#相关研究" class="headerlink" title="相关研究"></a>相关研究</h1><p>语义图像分割，即为图像的每个像素分配语义类标签，是计算机视觉研究中相对较新兴趣的主题，因为它需要现代机器学习技术的可用性，例如鉴别分类器 [31, 5] 或概率图模型 [28, 21]。 由于完全标注的训练数据的创建是进一步改进这些系统的主要瓶颈，因此很快提出了弱监督的训练方法以节省标注工作。 特别是，开发了一些竞争方法，它们只需要部分分割 [37, 11] 或对象边界框 [20, 52, 8] 作为训练数据。</p>
+<p>然而，剩下的挑战是从图像级标签中学习分割模型 [35, 36]。 现有方法分为三大类。 基于图的模型基于图像内或图像之间的相似性来推断片段或超像素的标签 [47, 48, 46, 43, 27]。 多实例学习[1]的变体训练具有每图像的损失函数，同时在内部维持图像的空间表示，可用于产生分割mask [38, 39, 40]。 自我训练传统中的方法 [30] 训练一个全监督的模型，但在类似EM的过程中使用模型本身创建必要的像素级注释 [44, 45, 49]。 我们的SEC方法包含后两种方法的各个方面，因为它使用了每个图像损失项以及每像素损失项。</p>
+<p>在分割质量方面，目前只有基于深度卷积网络的方法 [19, 33] 才足以解决与全监督方法可以处理的难度相似的分割数据集，例如PASCAL VOC 2012 [9]，我们利用这项工作。特别是，MIL-FCN [25]，MIL-ILP [26] 和 [4, 18] 的方法在多实例学习环境中利用深度网络，主要区别在于它们的池化策略，即它们如何转换其内部空间表示到每图像标签。 EM-Adapt [23] 和CCNN [24] 依赖于自我训练框架，并且它们在如何强制每个图像注释和预测的分割mask之间的一致性方面存在差异。SNB [41] 增加了创建和组合多个候选对象的附加步骤。 我们尽可能在第4节中对这些方法进行实验比较。</p>
+<h1 id="从图像级标签中进行弱监督分割"><a href="#从图像级标签中进行弱监督分割" class="headerlink" title="从图像级标签中进行弱监督分割"></a>从图像级标签中进行弱监督分割</h1><p>在本节中，我们将介绍我们的方法的技术说明。 我们用$\mathcal{X}$表示图像的空间。 对于任何图像$X \in \mathcal{X}$，分割掩模$Y$是$n$个空间位置处的语义标签的集合$(y_1,…,y_n)$。语义标签属于大小为$k$的集合$\mathcal{C}=\mathcal{C}’ \cup \{c^{bg}\}$，其中$C’$是所有前景标签的集合，而$c^{bg}$是背景标签。我们假设训练数据$\mathcal{D}=\{(X_i,T_i)\}_{i=1}^N$，由$N$个图像组成，$X_i\in \mathcal {X}$其中每个图像由存在于图像中的前景标签集合$T_i \subset \mathcal{C}’$进行弱标注。</p>
+<p>我们的目标是训练一个深度卷积神经网络$f(X;θ)$，用$θ$参数化，对在任何位置$u \in \{1,2,…,n\}$观察任何标记$c \in \mathcal{C}$的条件概率进行建模，即$f_{u,c}(X;θ)=p(y_u=c|X)$。 为简洁起见，我们经常省略符号中的参数$θ$，并将$f(X;θ)$简单地写为$f(X)$。</p>
+<h2 id="弱监督图像分割的SEC损失"><a href="#弱监督图像分割的SEC损失" class="headerlink" title="弱监督图像分割的SEC损失"></a>弱监督图像分割的SEC损失</h2><p>我们用于学习分割神经网络的参数$θ$的方法依赖于最小化具有三个项的损失函数。 第一个项$L_{seed}$为网络提供定位提示，第二个项$L_{expand}$惩罚网络以预测具有太小或错误对象的分割mask，第三个项$L_{constrain}$鼓励尊重图像的空间和颜色结构的分割。总的来说，我们提出为参数学习解决以下优化问题：</p>
+<script type="math/tex; mode=display">min_\theta \sum_{(X,T) \in \mathcal {D}}[L_{seed}(f(X;\theta),T)+L_{expand}(f(X;\theta),T)+L_{constrain}(X, f(X;\theta))]</script><p>在本节的其余部分，我们将详细解释每个损失项。 设置的示意图可以在图1中找到。</p>
+<p><img src="http://image.rexking6.top/img/clip1531925882.png" alt=""></p>
+<p>图1：SEC的示意图，其基于最小化由三个项组成的复合损失函数：种子损失，扩展损失和约束-边界损失。 详见第3节。</p>
+<p><strong>种子损失与定位提示</strong><br>图像级标签未明确提供有关图像中语义对象位置的任何信息。 然而，正如许多最近的研究论文 [22, 50, 32, 3] 所指出的那样，仅从图像级标签训练的深度图像分类网络可以成功地用于检索对象定位的提示。 我们将此过程称为弱定位，并在图2中对其进行说明。</p>
+<p><img src="http://image.rexking6.top/img/clip1531926413.png" alt=""></p>
+<p>图2：弱定位程序的示意图。</p>
+<p>不幸的是，定位提示通常不够精确，不能用作完整和准确的分割mask。 然而，这些线索对于指导弱监督的分割网络非常有用。 我们建议使用种子损失来鼓励神经网络的预测仅匹配弱定位程序给出的“标志”而忽略图像的其余部分。假设$S_c$是一组由弱定位程序标记$c$类的位置。然后种子损失$L_{seed}$具有以下形式：</p>
+<script type="math/tex; mode=display">L_{seed}(f(X),T,S_c)=-\frac{1}{\sum_{c \in T} |S_c|} \sum_{c \in T} \sum_{u \in S_c}log \space f_{u,c}(X)</script><p>请注意，对于计算$L_{seed}$，需要弱定位集$S_c$，因此文献中的许多现有技术基本上可以用作黑盒子。 在这项工作中，我们依靠 [50] 来弱定位前景类。 然而，这种方法没有提供选择置信背景区域的直接方法，因此我们使用[32]中基于梯度的显着性检测方法来实现此目的。 我们在第4节中提供了有关弱定位程序的更多详细信息。</p>
+<p><strong>全局加权等级池化的扩展损失</strong><br>为了测量分割mask是否与图像级标签一致，可以将分割分数聚合到分类分数中并将标准损失函数应用于多标签图像分类。 在弱监督分割/检测的背景下，研究使用各种技术将分数图聚合成分类分数。 最突出的是全局最大池化（GMP）[22]，它在任何图像$X$中分配任何类别$c$得分为$max_{u \in \{1,…,n\}}f_{u,c}(X)$和全球平均池化 [50] 的得分为$\frac{1}{n} \sum_{u=1}^n f_{u,c}(X)$。</p>
+<p>两种池化方式都已成功应用于实践中。 但是，它们有其自身的缺点。 对于图像中存在的类，GMP仅鼓励单个位置的响应较高，而GAP鼓励所有响应都很高。 因此，GMP导致分割网络经常低估对象的大小，而使用GAP训练的网络相反，往往高估它们。 我们在第4节中的实验凭经验支持这一主张。</p>
+<p>为了克服这些缺点，我们提出了一种全局加权等级池化（GWRP），一种新的池化方法，可以看作是GMP和GAP的扩展。 GWRP计算每个类别的加权平均分数，其中权重更高的会更有希望的位置。 这样，它会鼓励对象占据图像的某一部分，但与GAP不同，它不太容易过高估计对象大小。</p>
+<p>形式上，让索引设置为$I^c=\{i_1,…,i_n\}$定义任何类$c\in \mathcal{C}$的预测分数的降序，即$f_{i_1,c}(x)≥f_{i_2,c}(x)≥···≥f_{i_n,c}(x)$和让 $0&lt;d_c \le 1$是$c$类的衰减参数。 然后我们为图像$X$定义GWRP分类分数$G_c(f(X),d_c)$，如下所示：</p>
+<script type="math/tex; mode=display">G_c=(f(X);d_c)=\frac{1}{Z(d_c)}\sum_{j=1}^n (d_c)^{j-1}f_{i_j,c}(X),其中Z(d_c)=\sum_{j=1}^n(d_c)^{j-1}</script><p>注意，对于$d_c=0$，GWRP变为GMP（采用$0^0=1$的约定），对于$d_c=1$，它与GAP相同。 因此，GWRP推广了两种方法，并且衰减参数可用于在两个极端的行为之间进行插值。</p>
+<p>原则上，可以为每个类和每个图像单独设置衰减参数。 然而，这需要关于每个类的大对象通常是大量的先验知识，这在弱监督设置中是不可用的。 因此，我们只区分三组：对于在图像中出现的对象类，我们使用衰减参数$d_+$，对于没有出现的对象类，我们使用$d_-$ ，对于背景，我们使用$d_{bg}$。 我们将在第4节讨论如何选择它们的值。</p>
+<p>总之，扩展损失项是：</p>
+<script type="math/tex; mode=display">\begin{align*}
+L_{expand}(f(X),T)=&-\frac{1}{|T|} \sum_{c\in T} log \space G_c(f(X);d_+) \\
+&-\frac{1}{|\mathcal{C}' \backslash T|} \sum_{c \in \mathcal{C}' \backslash T} log \space (1-G_c(f(X);d_-))-log \space G_{c^{bg}}(f(X);d_{bg})
+\end{align*}</script><p><strong>约束到边界的损失</strong><br>约束到边界损失的高级概念是惩罚神经网络以产生相对于输入图像中的空间和颜色信息不连续的分割。 因此，它鼓励网络学习产生与对象边界匹配的分割mask。</p>
+<p>具体来说，我们构造一个完全连通的CRF，$Q(X,f(X))$，如[17]所示，一元势由分割网络预测的概率分数的对数给出，固定参数形式的对势仅依赖于图像像素。 我们缩小图像$X$的尺寸，使其与网络产生的分割mask的分辨率相匹配。 关于CRF参数选择的更多细节在第4节中给出。然后我们将约束到边界损失定义为网络输出和CRF输出之间的平均KL-偏差，即：</p>
+<script type="math/tex; mode=display">L_{constrain}(X,f(X))=\frac{1}{n}\sum_{u=1}^n\sum_{c \in \mathcal{C}}Q_{u,c}(X,f(X))log\frac{Q_{u,c}(X,f(X))}{f_{u,c}(X)}</script><p>这种结构实现了期望的效果，因为它鼓励网络输出与CRF输出一致，CRF输出本身已知产生尊重图像边界的分割。 这种效果的例证可以在图1中看到。</p>
+<h2 id="训练"><a href="#训练" class="headerlink" title="训练"></a>训练</h2><p>如果所有层的各个梯度都可用，则可以使用反向传播以端到端的方式训练所提出的网络。 为了计算完全连接的CRF的梯度，我们采用了[34]中的程序，该程序成功地用于语义图像分割的上下文中。 图1显示了带有灰色箭头的反向传播过程的梯度流。</p>
+<h1 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h1><p>在本节中，我们通过实验验证了我们提出的损失函数，包括详细研究其不同项的影响。</p>
+<h1 id="实验设置"><a href="#实验设置" class="headerlink" title="实验设置"></a>实验设置</h1><p><strong>数据集和评价指标</strong><br>我们在PASCAL VOC 2012图像分割基准上评估我们的方法，该基准有21个语义类，包括背景[9]。数据集图像分为三个部分：训练（train，1464图像），验证（val，1449图像）和测试（test，1456图像）。按照惯例，我们通过[10]中的其他图像来增加训练部分。由此产生的训练集有10,582个弱注释图像，我们用它来训练我们的模型。我们将我们的方法与验证集和测试集的其他方法进行比较。对于验证集，可以使用真实情况分割mask，因此我们可以评估不同实验的结果。因此，我们也使用这些数据来详细研究我们方法中不同组件的影响。测试集的真实情况分割mask不公开，因此我们使用官方的PASCAL VOC评估服务器来获得定量结果。作为评估指标，我们使用标准的PASCAL VOC 2012细分度量：平均交叉联合（mIoU）。</p>
+<p><strong>分割网络</strong><br>作为分割结构的特殊选择，在本文中我们使用[6]中的DeepLab-CRF-LargeFOV，它是16层VGG网络的略微修改版本[33]。 网络具有大小为321x321的输入并产生大小为41x41的分段掩码，有关该体系结构的更多详细信息，请参见[6]。 我们从具有均值0和方差0.01的正态分布中随机初始化最后（预测）层的权重。 所有其他卷积层都是从公开的VGG模型中初始化的[33]。 注意，原则上，我们的损失函数可以与任何深度卷积神经网络结合。</p>
+<p><strong>定位网络</strong><br>前景类和背景类的定位网络也来自标准VGG架构。 为了提高定位性能，我们对这些网络进行了微调，以解决对于训练数据的多标签分类问题。 由于篇幅限制，我们在补充材料中提供有关这些网络和优化参数的确切详细信息。</p>
+<p>注意，为了减少训练SEC所需的计算工作量和内存消耗，可以预先计算定位提示。 如果预先计算的提示可用，则SEC不会在训练时评估和存储定位网络时产生额外的开销。</p>
+<p><strong>优化</strong><br>为了训练网络，我们使用随机梯度下降（SGD），使用的参数在[6]中成功使用。 我们运行SGD 8000次迭代，批量大小为15（从30减少到允许同时训练两个网络），失活率为0.5，权重衰减参数为0.0005。 初始学习率为0.001，每2000次迭代减少10倍。 总体而言，GeForce TITAN-X GPU的训练需要7-8小时，与其他型号的培训时间相当，例如在[23,24]中报告。</p>
+<p><strong>衰变参数</strong><br>GWRP聚合需要指定衰减参数$d_-$，$d_+$和$d_{bg}$，它们控制权重以聚合网络产生的分数。 受先前研究 [23, 24] 的启发，我们使用以下经验法则来表达对自然图像的先验信念：</p>
+<ul>
+<li><p>对于我们想要预测尽可能少像素的图像中不存在的语义类。 因此，我们设置$d_-=0$，这对应于GMP。</p>
+</li>
+<li><p>对于图像中存在的语义类，我们建议前10％的得分代表总聚合得分的50％。 对于我们的$41x41$mask，这大致对应于$d_+=0.996$。</p>
+</li>
+<li><p>对于背景，我们建议前30％的得分代表总总得分的50％，结果$d_{bg}=0.999$。</p>
+</li>
+</ul>
+<p><strong>训练时的全连接CRF</strong><br>为了强制分割网络在训练时已经考虑对象的边界，我们使用全连接的CRF [17]。 作为成对交互的参数，我们使用作者公开实现中的默认值，除了我们将所有空间距离项乘以12以反映我们缩小原始图像以匹配预测分割mask的大小这一事实。</p>
+<p><strong>测试时的推断</strong><br>训练我们的分割神经网络以产生所有类别和位置的概率分数，但是预测分割掩模的空间分辨率低于原始图像。 因此，我们增大预测的分割mask的规模以匹配输入图像的大小，然后应用全连接的CRF [17]来细化分割。 这是一种常见的做法，以前曾在[23,24,6]中使用过。 图3显示了我们在测试时的推理过程的示意图。</p>
+<p><img src="http://image.rexking6.top/img/clip1531978983.png" alt=""><br>图3：我们在测试时的方法的示意图。</p>
+<p><strong>复现性</strong><br>在我们的实验中，我们依赖于caffe深度学习框架[13]结合SEC损失的python实现。 代码和预训练模型是公开的。</p>
+<p><strong>数值结果</strong><br>表1比较了我们的弱监督方法与在相同设置中训练的先前方法的性能，即仅使用来自PASCAL VOC 2012的图像和仅使用图像级标签。 它表明SEC基本上优于以前的技术。 在测试数据上，评估由独立的第三方PASCAL VOC评估服务器执行，其平均交叉联合得分比最先进的方法高出13.5％，最佳得分为21个语义类中的20个。在验证集上，研究人员可以自己计算得分，SEC比现有技术提高了14.1％，并在21个类别中的19个中获得了新的最佳分数。</p>
+<p><img src="http://image.rexking6.top/img/clip1531979669.png" alt=""></p>
+<p>表1：仅使用每个图像标签的弱监督语义分割的PASCAL VOC 2012结果（mIoU％）。</p>
+<p>PASCAL VOC和全监督的DeepLab变体的其他弱监督方法的结果总结在表2中。我们提供这些结果供参考，但强调它们不应简单地与表1进行比较，因为基础方法是在不同（和更大）的训练集或给予其他形式的弱监督，例如用户点击。在这方面，有些条目需要进一步解释：[23]报告了EM-Adapt模型在使用弱注释进行多种图像输出训练时的结果。在 [24] 中仅对每个图像监督重新实现和训练相同的模型，因此这些是我们在表1中报告的值。报告的SN_B [41] 和MIL+ILP+SP的seg变体的结果 [ 26] 是其他人无法比拟的，因为它们是在MCG候选地区[2]的帮助下获得的，这些提案是在PASCAL VOC数据上以完全监督的方式进行训练的。类似地，MIL+ILP+SP-bb利用由使用PASCAL VOC标注边界框训练的BING方法[7]生成的候选边界框。</p>
+<p><img src="http://image.rexking6.top/img/clip1531980046.png" alt=""></p>
+<p>表2：PASCAL VOC 2012上其他方法的总结果（mIoU％）。注意：该表中的值与表1不能直接比较，因为它们是在不同的实验条件下获得的。</p>
+<p>请注意，我们在表1中包含了MIL + ILP + SP的sppxl变体。虽然它在ImageNet数据集的大约760.000个图像上进行了训练，但与我们和其他方法相比，我们认为这不是一个不公平的优势，因为这些隐含有益在使用预训练分类网络进行初始化时，也可以从ImageNet图像中获取。</p>
+<p><strong>定性结果</strong><br>图4显示了典型的成功分割。它表明，即使对于不普通的图像，我们的方法也可以产生精确的分割，并恢复边界的精细细节。图5说明了一些失败情况。正如弱监督系统的典型情况一样，SEC在分割几乎总是出现在同一背景前面的物体时存在问题，例如，船上的水，或轨道上的火车。我们最近在后续工作中解决了这个问题[15]。第二种失败模式是对象区域可以正确分割，但分配了错误的类标签。对于SEC来说，这实际上是非常罕见的，我们认为DeepLab网络具有大视野，因此在分配标签时可以使用完整图像。最后，还可能发生分段仅覆盖对象的一部分。这可能是由于弱定位线索的缺陷，这些线索倾向于可靠地仅检测物体的最具鉴别力的部分，例如，面对一个人。但是，这可能不足以分割整个对象，尤其是当对象彼此重叠或由多个外观非常不同的组件组成时。</p>
+<p><img src="http://image.rexking6.top/img/clip1531980544.png" alt=""></p>
+<p>图4：预测分割的示例（验证集，成功情况）。</p>
+<p><img src="http://image.rexking6.top/img/clip1531980599.png" alt=""></p>
+<p>图5：预测分割的示例（验证集，失败情况）。</p>
+<h2 id="详细讨论"><a href="#详细讨论" class="headerlink" title="详细讨论"></a>详细讨论</h2><p>为了进一步了解SEC损失函数的工作机制，我们对验证集进行了另外两组实验。 首先，我们分析不同的全局池化策略，其次，我们进行模块研究，在视觉上和数字上说明所提出的损失函数中三个项中的每一个的影响。</p>
+<p><strong>全局池化策略的影响</strong><br>如前所述，分割的质量取决于使用哪种全局池化策略将分割掩码转换为每图像分类分数。为了量化这种影响，我们从弱监督训练三个分段网络，使用GMP，GAP或GWRP作为图像中存在的类的聚合方法。对于不存在的类，我们总是使用GMP，即我们惩罚这些类的任何出现。在图6中，我们演示了每个合并策略的可视化结果，并报告了两个数量：预测属于前景（fg）类的像素分数，以及通过mIoU测量的分割性能。我们观察到GWRP在分割质量方面优于其他方法，预测前景像素的分数支持我们早期的假设：用GMP训练的模型倾向于低估对象大小，而用GAP训练的模型平均高估它们。相反，使用GWRP训练的模型产生分割，其中对象平均接近正确的大小。</p>
+<p><img src="http://image.rexking6.top/img/clip1531980939.png" alt=""></p>
+<p>图6：验证集的结果和使用不同池化策略训练的模型的分割mask的示例。</p>
+<p><strong>不同损失项的影响</strong><br>为了研究每个项在我们的复合损失函数中的贡献，我们训练具有损失函数的分割网络，其中省略了SEC损失的不同项。 图7提供了数值结果，并说明了省略某些损失项时出现的典型分割错误。 当存在所有三个损失项时，获得最佳结果。 然而，实验还允许我们得出关于损失项之间相互作用的两个有趣的额外结论。</p>
+<p><img src="http://image.rexking6.top/img/clip1531981101.png" alt=""></p>
+<p>图7：验证集的结果和用不同损失函数训练的模型的分割mask的例子。</p>
+<p><strong>半监督损失和大视野</strong></p>
+<p>首先，我们观察到，在损失函数中具有$L_{seed}$对于实现强力性能至关重要。 如果没有这个损失项，我们的分割网络就无法反映其预测中对象的定位，即使网络确实与全局标签统计数据匹配得相当好。 有关此效果的说明，请参见图7的第三列。</p>
+<p>我们相信这种效果可以通过分割网络的大视野（378x378）来解释：如果图像中存在对象，那么大多数预测得分可能会受到此对象的影响，无论物体位于何处。这有助于预测正确的类标签，但可能会对定位能力产生负面影响。其他研究人员通过明确改变网络架构来解决这个问题，以减少其视野[23]。但是，具有小视野的网络功能较弱，并且通常无法识别图像上存在哪些语义标签。我们进行了一项额外的实验（详见补充材料），确认具有小型（211x211）视野网络的SEC的性能明显低于大型（378x378）视野网络，见图8数字结果和可视化示例。因此，我们得出结论，种子损失提供了必要的定位指导，使大型视野网络仍能可靠地定位对象。</p>
+<p><img src="http://image.rexking6.top/img/clip1531981736.png" alt=""></p>
+<p>图8：验证集的结果和具有小视野或大视野的模型的分割mask的示例。</p>
+<p><strong>扩展和约束到边界损失的影响。</strong><br>通过构造，约束到边界的损失促使相邻颜色的区域具有相同的标签。 然而，这通常不足以将弱定位线索变成覆盖整个物体的分割掩模，特别是如果物体由视觉上不相似的部分组成，例如穿着不同颜色的衣服的人。 有关此效果的说明，请参见图7的第六列。</p>
+<p>基于GWRP的扩展损失抑制了不在图像中的类的预测，并且它鼓励图像中的类具有合理的大小。 当与种子损失相结合时，扩展损失实际上导致性能下降。 图7的第五列示出了对此的解释：通常增加对象大小，但是另外预测的区域与图像边界不匹配。</p>
+<p>结合起来，种子损失提供了可靠的种子位置，扩展损失充当将分割mask扩大到合理尺寸的驱动力，并且约束到边界的损失限制了分割mask与图像边界对齐，从而整合低级图像信息。结果是显着改进的分割mask，如图7的最后一列所示。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>我们提出了一种新的损失函数，用于在只有图像级标签可用时训练深度分割网络。 我们证明，当在相同的实验条件下使用时，我们的方法优于以前最先进的方法，并提供详细的模块研究。</p>
+<p>我们还确定了可能有助于进一步改善弱监督细分性能的潜在方向。 我们的实验表明，有关对象大小的知识可以显着提高分割性能。 SEC容易允许通过衰减参数合并尺寸信息，但是需要自动估计物体尺寸的程序。 提高性能的第二种方法是更强的分割先验，例如关于形状或材料。 这可以提供一种方法来避免目前典型的弱监督分割网络的错误，包括我们的错误，例如船只与背景中的水混淆。</p>
+<h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ol>
+<li>Andrews, S., Tsochantaridis, I., Hofmann, T.: Support vector machines for multiple-instance learning. In: NIPS (2002)</li>
+<li>Arbel´aez, P., Pont-Tuset, J., Barron, J., Marques, F., Malik, J.: Multiscale combinatorial grouping. In: CVPR (2014)</li>
+<li>Bazzani, L., Bergamo, A., Anguelov, D., Torresani, L.: Self-taught object localization with deep networks. In: WACV (2016)</li>
+<li>Bearman, A., Russakovsky, O., Ferrari, V., Fei-Fei, L.: What’s the point: Semantic segmentation with point supervision. ECCV (2016)</li>
+<li>Carreira, J., Sminchisescu, C.: CPMC: Automatic object segmentation using constrained parametric min-cuts. IEEE T-PAMI 34(7) (2012)</li>
+<li>Chen, L.C., Papandreou, G., Kokkinos, I., Murphy, K., Yuille, A.L.: Semantic image segmentation with deep convolutional nets and fully connected CRFs. In: ICLR (2015)</li>
+<li>Cheng, M.M., Zhang, Z., Lin, W.Y., Torr, P.H.S.: BING: Binarized normed gradients for objectness estimation at 300fps. In: CVPR (2014)</li>
+<li>Dai, J., He, K., Sun, J.: BoxSup: Exploiting bounding boxes to supervise convolutional networks for semantic segmentation. In: ICCV (2015)</li>
+<li>Everingham, M., Van Gool, L., Williams, C.K., Winn, J., Zisserman, A.: The PASCAL visual object classes (VOC) challenge. IJCV 88(2) (2010)</li>
+<li>Hariharan, B., Arbelaez, P., Bourdev, L., Maji, S., Malik, J.: Semantic contours from inverse detectors. In: ICCV (2011)</li>
+<li>He, X., Zemel, R.S.: Learning hybrid models for image annotation with partially labeled data. In: NIPS (2009)</li>
+<li>Hong, S., Oh, J., Lee, H., Han, B.: Learning transferrable knowledge for semantic segmentation with deep convolutional neural network. CVPR (2016)</li>
+<li>Jia, Y., Shelhamer, E., Donahue, J., Karayev, S., Long, J., Girshick, R., Guadarrama, S., Darrell, T.: Caffe: Convolutional architecture for fast feature embedding. arXiv preprint arXiv:1408.5093v1 (2014)</li>
+<li>Kim, H., Hwang, S.: Scale-invariant feature learning using deconvolutional neural networks for weakly-supervised semantic segmentation. arXiv preprint arXiv:1602.04984v2 (2016), <a target="_blank" rel="noopener" href="http://arxiv.org/abs/1602.04984v2">http://arxiv.org/abs/1602.04984v2</a></li>
+<li>Kolesnikov, A., Lampert, C.H.: Improving weakly-supervised object localization by micro-annotation. BMVC (2016)</li>
+<li>Kolesnikov, A., Lampert, C.H.: Seed, expand and constrain: Three principles for weakly-supervised image segmentation. arXiv preprint arXiv:1603.06098 (2016), <a target="_blank" rel="noopener" href="http://arxiv.org/abs/1603.06098">http://arxiv.org/abs/1603.06098</a></li>
+<li>Kr¨ahenb¨uhl, P., Koltun, V.: Efficient inference in fully connected CRFs with gaussian edge potentials. In: NIPS (2011)</li>
+<li>Krapac, J., Segvic, S.: Weakly-supervised semantic segmentation by redistributing ˇ region scores to pixels. GCPR (2016)</li>
+<li>Krizhevsky, A., Sutskever, I., Hinton, G.E.: ImageNet classification with deep convolutional neural networks. In: NIPS (2012)</li>
+<li>Liu, S., Yan, S., Zhang, T., Xu, C., Liu, J., Lu, H.: Weakly supervised graph propagation towards collective image parsing. IEEE T-MM 14(2) (2012)</li>
+<li>Nowozin, S., Gehler, P.V., Lampert, C.H.: On parameter learning in CRF-based approaches to object class image segmentation. In: ECCV (2010)</li>
+<li>Oquab, M., Bottou, L., Laptev, I., Sivic, J.: Is object localization for free? { weaklysupervised learning with convolutional neural networks. In: CVPR. pp. 685{694 (2015)</li>
+<li>Papandreou, G., Chen, L.C., Murphy, K.P., Yuille, A.L.: Weakly- and semisupervised learning of a deep convolutional network for semantic image segmentation. In: ICCV (2015)</li>
+<li>Pathak, D., Kr¨ahenb¨uhl, P., Darrell, T.: Constrained convolutional neural networks for weakly supervised segmentation. In: ICCV (2015)</li>
+<li>Pathak, D., Shelhamer, E., Long, J., Darrell, T.: Fully convolutional multi-class multiple instance learning. In: ICLR (2015)</li>
+<li>Pinheiro, P.O., Collobert, R.: From image-level to pixel-level labeling with convolutional networks. In: CVPR (2015)</li>
+<li>Pourian, N., Karthikeyan, S., Manjunath, B.: Weakly supervised graph based semantic segmentation by learning communities of image-parts. In: CVPR (2015)</li>
+<li>Rabinovich, A., Vedaldi, A., Galleguillos, C., Wiewiora, E., Belongie, S.: Objects in context. In: ICCV (2007)</li>
+<li>Russakovsky, O., Deng, J., Su, H., Krause, J., Satheesh, S., Ma, S., Huang, Z., Karpathy, A., Khosla, A., Bernstein, M., Berg, A.C., Fei-Fei, L.: ImageNet large scale visual recognition challenge. IJCV 115(3) (2015)</li>
+<li>Scudder, H.J.: Probability of error of some adaptive pattern-recognition machines. IEEE T-IT 11(3) (1965)</li>
+<li>Shotton, J., Winn, J., Rother, C., Criminisi, A.: Textonboost: Joint appearance, shape and context modeling for multi-class object recognition and segmentation. In: ECCV (2006)</li>
+<li>Simonyan, K., Vedaldi, A., Zisserman, A.: Deep inside convolutional networks: Visualising image classification models and saliency maps. In: ICLR (2014)</li>
+<li>Simonyan, K., Zisserman, A.: Very deep convolutional networks for large-scale image recognition. In: ICLR (2015)</li>
+<li>Toyoda, T., Hasegawa, O.: Random field model for integration of local information and global information. IEEE T-PAMI 30(8) (2008)</li>
+<li>Vasconcelos, M., Vasconcelos, N., Carneiro, G.: Weakly supervised top-down image segmentation. In: CVPR (2006)</li>
+<li>Verbeek, J., Triggs, B.: Region classification with Markov field aspect models. In: CVPR (2007)</li>
+<li>Verbeek, J., Triggs, W.: Scene segmentation with CRFs learned from partially labeled images. In: NIPS (2008)</li>
+<li>Vezhnevets, A., Buhmann, J.M.: Towards weakly supervised semantic segmentation by means of multiple instance and multitask learning. In: CVPR (2010)</li>
+<li>Vezhnevets, A., Ferrari, V., Buhmann, J.M.: Weakly supervised semantic segmentation with a multi-image model. In: ICCV (2011)</li>
+<li>Vezhnevets, A., Ferrari, V., Buhmann, J.M.: Weakly supervised structured output learning for semantic segmentation. In: CVPR (2012)</li>
+<li>Wei, Y., Liang, X., Chen, Y., Jie, Z., Xiao, Y., Zhao, Y., Yan, S.: Learning to segment with image-level annotations. Pattern Recognition (2016)</li>
+<li>Wei, Y., Liang, X., Chen, Y., Shen, X., Cheng, M., Zhao, Y., Yan, S.: STC: a simple to complex framework for weakly-supervised semantic segmentation. arXiv preprint arXiv:1509.03150v1 (2015), <a target="_blank" rel="noopener" href="http://arxiv.org/abs/1509.03150">http://arxiv.org/abs/1509.03150</a></li>
+<li>Xie, W., Peng, Y., Xiao, J.: Weakly-supervised image parsing via constructing semantic graphs and hypergraphs. In: Multimedia (2014)</li>
+<li>Xu, J., Schwing, A.G., Urtasun, R.: Tell me what you see and I will show you where it is. In: CVPR (2014)</li>
+<li>Xu, J., Schwing, A.G., Urtasun, R.: Learning to segment under various forms of weak supervision. In: CVPR (2015)</li>
+<li>Zhang, L., Gao, Y., Xia, Y., Lu, K., Shen, J., Ji, R.: Representative discovery of structure cues for weakly-supervised image segmentation. IEEE T-MM 16(2) (2014)</li>
+<li>Zhang, L., Song, M., Liu, Z., Liu, X., Bu, J., Chen, C.: Probabilistic graphlet cut: Exploiting spatial structure cue for weakly supervised image segmentation. In: CVPR (2013)</li>
+<li>Zhang, L., Yang, Y., Gao, Y., Yu, Y., Wang, C., Li, X.: A probabilistic associative model for segmenting weakly supervised images. IEEE T-IP 23(9) (2014)</li>
+<li>Zhang, W., Zeng, S., Wang, D., Xue, X.: Weakly supervised semantic segmentation for social images. In: CVPR (2015)</li>
+<li>Zhou, B., Khosla, A., A., L., Oliva, A., Torralba, A.: Learning deep features for discriminative localization. In: CVPR (2016)</li>
+<li>Zhou, B., Khosla, A., Lapedriza, A., Oliva, A., Torralba, A.: Object detectors emerge in deep scene CNNs. In: ICLR (2015)</li>
+<li>Zhu, J., Mao, J., Yuille, A.L.: Learning from weakly supervised data by the expectation loss SVM (e-SVM) algorithm. In: NIPS (2014)</li>
+</ol>
+<h1 id="补充材料"><a href="#补充材料" class="headerlink" title="补充材料"></a>补充材料</h1><p>在本节中，我们提供弱定位过程的技术细节（第3.1节），并指定如何导出具有小视野的网络（第4.3节）。</p>
+<h2 id="定位网络"><a href="#定位网络" class="headerlink" title="定位网络"></a>定位网络</h2><p>种子损失SEC依赖于弱的定位提示。 正如在最近的许多论文 [22, 50, 32, 3] 中所指出的，可以通过利用训练用于解决图像分类任务的深度卷积神经网络来产生定位提示。 我们使用两种不同的方法，一种用于定位前景类，另一种用于背景类。</p>
+<p>具体来说，为了定位前景类，我们采用了[50]中的技术。 作为一个基础分类网络，我们使用标准的VGG网络，从公开的模型[33]初始化。 VGG架构略有修改，以使[50]的方法适用。 特别是，我们对VGG实施了以下更改：</p>
+<ul>
+<li><p>最后两个全连接层fc6和fc7由随机初始化的卷积层代替，其具有1024个输出通道和大小为3的内核。</p>
+</li>
+<li><p>最后一个卷积层的输出后跟一个全局平均池化层，然后是一个带有20个输出的全连接的预测层（PASCAL VOC中的前景语义类的数量）</p>
+</li>
+</ul>
+<p>另外，为了增加网络的最后一个卷积层的空间分辨率，我们将输入大小增加到321x321并省略最后两个最大池化层pool4和pool5。在PASCAL VOC 2012数据集的trainaug部分上使用多标记logistic损失对得到的网络进行微调（我们使用与第4节中相同的优化参数）。然后，网络用于提供特定于类的定位热力图。为了为每个前景类产生定位提示，我们将相应的热力图阈值限制为其最大值的20％，如 [50] 中所提出的那样。结果定位提示被堆叠在一起形成一个弱的定位mask，如图2所示。当不同的类被分配到同一位置时，可能会发生定位提示冲突。我们使用简单的规则来解决这些冲突：在堆叠过程中，占据图像较小部分的类优先于占据图像较大部分的类。</p>
+<p>对于定位背景，我们依赖于[32]中的替代技术。 我们还使用VGG作为底层网络。 它被修改为具有大小为321x321的输入分辨率并具有具有20个输出的预测层。 类似于[6]，我们还将全连接层fc6和fc7中的输出通道数从4096更改为1024。我们使用与用于定位前景类的网络相同的过程来微调网络。 遵循[32]中基于梯度的程序，我们利用精细网络生成与类无关的显着图。 显着图可能非常嘈杂，因此我们通过中值滤波器使用3×3的窗口使它们平滑。最后，选择每个图像中10％的最不显着位置作为背景提示。</p>
+<h2 id="小视野"><a href="#小视野" class="headerlink" title="小视野"></a>小视野</h2><p>Deeplab-Large-FOV神经网络通过利用带洞卷积实现了特别宽的视野，这是最近在[23]中的语义图像分割的背景下提出的。为了得到最接近的架构，但是在一个小视野中，我们用标准卷积层替换了带洞卷积。 这导致视野大小的可测量下降：从378x378到211x211。</p>
+<p><img src="http://image.rexking6.top/img/clip1531989256.png" alt=""></p>
+<p>图9：SEC产生的分割的随机例子（验证集）。</p>
+<h1 id="自己的看法"><a href="#自己的看法" class="headerlink" title="自己的看法"></a>自己的看法</h1><p>其实一开始想看看SEC的原因是，因为18年的GAIN没有直接得到分割的mask，而是在得到弱定位的热力图之后，将其作为SEC的seed，再训练分割网络。所以当时很奇怪为什么前面看的几篇CAM、Grad-CAM、AE和ACoL没有提到将定位热力图加入到后续分割网络的训练当中。后来回去翻了一下，发现CAM、Grad-CAM和ACoL尽管有些提到弱监督语义分割，但是实验主要还是做的分类和弱监督物体定位，而AE做的语义分割实验是将DeepLab作为基本网络，最终自己得到的分割mask。</p>
+<p>然后本文的SEC的想法符合直觉，但是因为我随机场方面没有学习多少，约束到边界的损失就没有怎么看懂。</p>
+<p>下面应该是看看两篇弱监督语义分割可能能与GAIN相结合的新方向。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\05\CAM-Learning-Deep-Features-for-Discriminative-Localization-阅读笔记\" rel="bookmark">CAM-Learning Deep Features for Discriminative Localization 阅读笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\05\Visualizing-and-Understanding-Convolutional-Networks-阅读笔记\" rel="bookmark">Visualizing and Understanding Convolutional Networks 阅读笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\21\《Transferable-Semi-supervised-Semantic-Segmentation》笔记\" rel="bookmark">《Transferable Semi-supervised Semantic Segmentation》笔记</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2018/07/17/%E3%80%8ASeed-Expand-and-Constrain-Three-Principles-for-Weakly-Supervised-Image-Segmentation%E3%80%8B%E7%AC%94%E8%AE%B0/" title="《Seed, Expand and Constrain Three Principles for Weakly-Supervised Image Segmentation》笔记">https://blog.rexking6.top/2018/07/17/《Seed-Expand-and-Constrain-Three-Principles-for-Weakly-Supervised-Image-Segmentation》笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2/" rel="tag"># 语义分割</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/07/15/%E3%80%8ATell-Me-Where-to-Look-Guided-Attention-Inference-Network%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="prev" title="《Tell Me Where to Look: Guided Attention Inference Network》笔记">
+      <i class="fa fa-chevron-left"></i> 《Tell Me Where to Look: Guided Attention Inference Network》笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/19/%E3%80%8ARevisiting-Dilated-Convolution-A-Simple-Approach-for-Weakly-and-Semi-Supervised-Semantic-Segmentation%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="next" title="《Revisiting Dilated Convolution: A Simple Approach for Weakly- and Semi- Supervised Semantic Segmentation》笔记">
+      《Revisiting Dilated Convolution: A Simple Approach for Weakly- and Semi- Supervised Semantic Segmentation》笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">3.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E7%A0%94%E7%A9%B6"><span class="nav-number">4.</span> <span class="nav-text">相关研究</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%8E%E5%9B%BE%E5%83%8F%E7%BA%A7%E6%A0%87%E7%AD%BE%E4%B8%AD%E8%BF%9B%E8%A1%8C%E5%BC%B1%E7%9B%91%E7%9D%A3%E5%88%86%E5%89%B2"><span class="nav-number">5.</span> <span class="nav-text">从图像级标签中进行弱监督分割</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%B1%E7%9B%91%E7%9D%A3%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84SEC%E6%8D%9F%E5%A4%B1"><span class="nav-number">5.1.</span> <span class="nav-text">弱监督图像分割的SEC损失</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83"><span class="nav-number">5.2.</span> <span class="nav-text">训练</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C"><span class="nav-number">6.</span> <span class="nav-text">实验</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="nav-number">7.</span> <span class="nav-text">实验设置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%A6%E7%BB%86%E8%AE%A8%E8%AE%BA"><span class="nav-number">7.1.</span> <span class="nav-text">详细讨论</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">8.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#References"><span class="nav-number">9.</span> <span class="nav-text">References</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A1%A5%E5%85%85%E6%9D%90%E6%96%99"><span class="nav-number">10.</span> <span class="nav-text">补充材料</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E4%BD%8D%E7%BD%91%E7%BB%9C"><span class="nav-number">10.1.</span> <span class="nav-text">定位网络</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E8%A7%86%E9%87%8E"><span class="nav-number">10.2.</span> <span class="nav-text">小视野</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%87%AA%E5%B7%B1%E7%9A%84%E7%9C%8B%E6%B3%95"><span class="nav-number">11.</span> <span class="nav-text">自己的看法</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">175</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">30:33</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
