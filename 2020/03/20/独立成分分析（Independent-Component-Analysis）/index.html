@@ -43,7 +43,7 @@
 <meta property="og:image" content="http://image.rexking6.top/img/201104191634454652.png">
 <meta property="og:image" content="http://image.rexking6.top/img/201104191634478390.png">
 <meta property="article:published_time" content="2020-03-20T04:21:48.000Z">
-<meta property="article:modified_time" content="2020-05-18T13:52:33.243Z">
+<meta property="article:modified_time" content="2021-07-10T11:39:16.997Z">
 <meta property="article:author" content="Run-Qing Chen">
 <meta property="article:tag" content="机器学习">
 <meta name="twitter:card" content="summary">
@@ -233,7 +233,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-18 21:52:33" itemprop="dateModified" datetime="2020-05-18T21:52:33+08:00">2020-05-18</time>
+                <time title="修改时间：2021-07-10 19:39:16" itemprop="dateModified" datetime="2021-07-10T19:39:16+08:00">2021-07-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -288,8 +288,8 @@
 <p> 将第二个问题细化一下，有 $n$ 个信号源 $\text{s}(s_1,s_2,\dots,s_n)^T$，$s\in \mathbb R^n$，每一维都是一个人的声音信号，每个人发出的声音信号独立。$\rm A$ 是一个未知的混合矩阵（mixing matrix），用来组合叠加信号 $\rm s$，那么</p>
 <script type="math/tex; mode=display">
 \rm x=As</script><p>$\rm x$ 的意义在上文解释过，这里的 $\rm x$ 不是一个向量，是一个矩阵。其中每个列向量是 $x^{(i)}$，$x^{(i)}=\text{A}s^{(i)}$ 表示成图就是</p>
-<p><img src="http://image.rexking6.top/img/201104191610509840.jpg" alt="clip_image014"></p>
-<p><img src="http://image.rexking6.top/img/20110419161051264.png" alt="clip_image033"></p>
+<p><img src="http://image.rexking6.top/img/201104191610509840.jpg" alt=""></p>
+<p><img src="http://image.rexking6.top/img/20110419161051264.png" alt=""></p>
 <p>$x^{(i)}$ 的每个分量都由 $s^{(i)}$ 的分量线性表示。$\rm A$ 和 $\rm s$ 都是未知的，$\rm x$ 是已知的，我们要想办法根据 $\rm x$ 来推出 $\rm s$。这个过程也称作为盲信号分离。</p>
 <p>令 $\rm W=A^{-1}$，那么 $s^{(i)}=\text A^{-1}x^{(i)}=\rm Wx^{(i)}$，将 $\rm W$ 表示成</p>
 <p><img src="http://image.rexking6.top/img/clip1589275707.png" alt=""></p>
@@ -325,14 +325,14 @@ l(\text W)=\sum_{i=1}^m\Big(\sum_{j=1}^n\log g'(w_j^Tx^{(i)})+\log|\text W|\Big)
 <p>接下来就是对 $\rm W$ 求导了，这里牵涉一个问题是对行列式 $|\rm W| $ 进行求导的方法，属于矩阵微积分。这里先给出结果，在文章最后再给出推导公式。</p>
 <script type="math/tex; mode=display">
 \rm \nabla_W|W|=|W|(W^{-1})^T</script><p>最终得到的求导后公式如下，$\log g’(s)$ 的导数为 $1-2g(s)$：</p>
-<p><img src="http://image.rexking6.top/img/20110419161115263.png" alt="clip_image110"></p>
+<p><img src="http://image.rexking6.top/img/20110419161115263.png" alt=""></p>
 <p>其中 $\alpha$ 是梯度上升速率，人为指定。</p>
 <p>当迭代求出 $\rm W$ 后，便可得到 $s^{(i)} = \text Wx^{(i)}$ 来还原出原始信号。</p>
 <p><strong>注意：</strong>我们计算最大似然估计时，假设了 $x^{(i)}$ 与 $x^{(j)}$ 之间是独立的，然而对于语音信号或者其他具有时间连续依赖特性（比如温度）上，这个假设不能成立。但是在数据足够多时，假设独立对效果影响不大，同时如果事先打乱样例，并运行随机梯度上升算法，那么能够加快收敛速度。</p>
 <p>回顾一下鸡尾酒宴会问题，$\rm s$ 是人发出的信号，是连续值，不同时间点的s不同，每个人发出的信号之间独立（$s_i$ 和 $s_j$ 之间独立）。$\rm s$ 的累计概率分布函数是 sigmoid 函数，但是所有人发出声音信号都符合这个分布。 $\rm A$ 代表了 $\rm s$ 相对于 $\rm x$ 的位置变化，$\rm x$ 是 $\rm s$ 和 $\rm A$ 变化后的结果。</p>
-<h1 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h1><p><img src="http://image.rexking6.top/img/201104191611205208.jpg" alt="clip_image122"></p>
+<h1 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h1><p><img src="http://image.rexking6.top/img/201104191611205208.jpg" alt=""></p>
 <p>$\rm s =2$ 时的原始信号</p>
-<p><img src="http://image.rexking6.top/img/2011041916112227.jpg" alt="clip_image124"></p>
+<p><img src="http://image.rexking6.top/img/2011041916112227.jpg" alt=""></p>
 <p>观察到的 $\rm x$ 信号</p>
 <p><img src="http://image.rexking6.top/img/clip1589365272.png" alt=""></p>
 <p>使用ICA还原后的 $\rm s$ 信号</p>
@@ -365,7 +365,7 @@ E(y_1,y_2) = E(y_1)E(y_2)=0</script><p>因此 $y_1$ 和 $y_2$ 不相关，但是
 E(y_1^2y_2^2)=0\neq \frac{1}{4}=E(y_1^2)E(y_2^2)</script><p>因此 $y_1$ 和 $y_2$ 不满足上面的积分公式，$y_1$ 和 $y_2$ 不是独立的。</p>
 <p>上面提到过，如果 $s^{(i)}$ 是高斯分布的，$\rm A$ 是正交的，那么 $x^{(i)}$ 也是高斯分布的，且 $x^{(i)}$ 与 $x^{(j)}$ 之间是独立的。那么无法确定 $\rm A$，因为任何正交变换都可以让 $x^{(i)}$ 达到同分布的效果。但是如果 $s^{(i)}$ 中只有一个分量是高斯分布的，仍然可以使用ICA。</p>
 <p>那么ICA要解决的问题变为：如何从 $\rm x$ 中推出 $\rm s$ ，使得 $\rm s$ 最不可能满足高斯分布？中心极限定理告诉我们：大量独立同分布随机变量之和满足高斯分布。</p>
-<p><img src="http://image.rexking6.top/img/201104191632562969.png" alt="clip_image023"></p>
+<p><img src="http://image.rexking6.top/img/201104191632562969.png" alt=""></p>
 <p>我们一直假设的是 $x^{(i)}$ 是由独立同分布的主元 $s^{(i)}$ 经过混合矩阵 $\rm A$ 生成。那么为了求 $s^{(i)}$，我们需要计算 $s^{(i)}$ 的每个分量 $y_j^{(i)}=w_j^Tx^{(i)}$。定义 $z_j=A^Tw_j$，那么 $y_j^{(i)}=w_j^Tx^{(i)}=w_j^T\text A s^{(i)}=z_j^Ts^{(i)}$，之所以这么麻烦再定义 $\rm z$ 是想说明一个关系，我们想通过整出一个 $w_j$ 来对 $x^{(i)}$ 进行线性组合，得出 $\rm y$ 。而我们不知道得出的 $\rm y$ 是否是真正的 $\rm s$ 的分量，但我们知道 $\rm y$ 是 $\rm s$ 的真正分量的线性组合。由于我们不能使 $\rm s$ 的分量成为高斯分布，因此我们的目标求是让 $\rm y$（也就是 $w_j^Tx^{(i)}$）最不可能是高斯分布时的 $\rm w$。那么问题递归到如何度量 $\rm y$ 是否是高斯分布的了。</p>
 <p>一种度量方法是kurtosis方法，公式如下：</p>
 <script type="math/tex; mode=display">
@@ -385,7 +385,7 @@ J(y)\approx \sum_{i=1}^p k_i[E\{G_i(y)\}-E\{G_i(v)\}]^2</script><p>之后的Fast
 I(y_1,y_2,\dots,y_m)=\sum_{i=1}^mH(y_i)-H(\rm y)</script><p>这个公式可以这样解释，前一个 $H$ 是 $y_i$ 的编码长度（以信息编码的方式理解），第二个 $H$ 是 $\rm y$ 成为随机变量时的平均编码长度。之后的内容包括FastICA就不再介绍了，我也没看懂。</p>
 <h1 id="ICA的投影追踪解释"><a href="#ICA的投影追踪解释" class="headerlink" title="ICA的投影追踪解释"></a>ICA的投影追踪解释</h1><p>投影追踪在统计学中的意思是去寻找多维数据的“interesting”投影。这些投影可用在数据可视化、密度估计和回归中。比如在一维的投影追踪中，我们寻找一条直线，使得所有的数据点投影到直线上后，能够反映出数据的分布。然而我们最不想要的是高斯分布，最不像高斯分布的数据点最interesting。这个与我们的ICA思想是一致的，寻找独立的最不可能是高斯分布的 $\rm s$。</p>
 <p>在下图中，主元是纵轴，拥有最大的方差，但最interesting的是横轴，因为它可以将两个类分开（信号分离）。</p>
-<p><img src="http://image.rexking6.top/img/201104191633061498.png" alt="clip_image043"></p>
+<p><img src="http://image.rexking6.top/img/201104191633061498.png" alt=""></p>
 <h1 id="ICA算法的前处理步骤"><a href="#ICA算法的前处理步骤" class="headerlink" title="ICA算法的前处理步骤"></a>ICA算法的前处理步骤</h1><ol>
 <li><p><strong>中心化：</strong>也就是求 $\rm x$ 均值，然后让所有 $\rm x$ 减去均值，这一步与PCA一致。</p>
 </li>
@@ -397,12 +397,12 @@ E\{\tilde {\text x}\tilde {\text x}^T\}=I</script><p>我们只需用下面的变
 <script type="math/tex; mode=display">
 E\{\text x\text x^T\}=\text E\text D\text E^T</script><p>下面用个图来直观描述一下：</p>
 <p>假设信号源 $s_1$ 和 $s_2$ 是独立的，比如下图横轴是 $s_1$，纵轴是 $s_2$，根据 $s_1$ 得不到 $s_2$。</p>
-<p><img src="http://image.rexking6.top/img/201104191634444227.png" alt="clip_image051"></p>
+<p><img src="http://image.rexking6.top/img/201104191634444227.png" alt=""></p>
 <p>我们只知道他们合成后的信号 $\rm x$，如下</p>
-<p><img src="http://image.rexking6.top/img/201104191634454652.png" alt="image"></p>
+<p><img src="http://image.rexking6.top/img/201104191634454652.png" alt=""></p>
 <p>此时 $x_1$ 和 $x_2$ 不是独立的（比如看最上面的尖角，知道了 $x_1$ 就知道了 $x_2$ ）。那么直接代入我们之前的极大似然概率估计会有问题，因为我们假定 $\rm x$ 是独立的。</p>
 <p>因此，漂白这一步为了让 $\rm x$ 独立。漂白结果如下：</p>
-<p><img src="http://image.rexking6.top/img/201104191634478390.png" alt="clip_image053"></p>
+<p><img src="http://image.rexking6.top/img/201104191634478390.png" alt=""></p>
 <p>可以看到数据变成了方阵，在 $\tilde {\text x}$ 的维度上已经达到了独立。</p>
 <p>然而这时 $\text x$ 分布很好的情况下能够这样转换，当有噪音时怎么办呢？可以先使用前面提到的PCA方法来对数据进行降维，滤去噪声信号，得到k维的正交向量，然后再使用ICA。</p>
 </li>
@@ -726,7 +726,7 @@ J F(\mathbf{w})=E\left\{\mathbf{x} \mathbf{x}^{\mathrm{T}} g^{\prime}\left(\math
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">30:33</span>
+    <span title="站点阅读时长">30:30</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
   </div>

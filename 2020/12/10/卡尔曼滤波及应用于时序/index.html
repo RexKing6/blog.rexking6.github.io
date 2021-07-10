@@ -54,7 +54,7 @@
 <meta property="og:image" content="http://image.rexking6.top/img/20200414050721958.png">
 <meta property="og:image" content="http://image.rexking6.top/img/20200414051556155.png">
 <meta property="article:published_time" content="2020-12-10T06:32:41.000Z">
-<meta property="article:modified_time" content="2020-12-10T07:41:14.287Z">
+<meta property="article:modified_time" content="2021-07-10T11:40:01.928Z">
 <meta property="article:author" content="Run-Qing Chen">
 <meta property="article:tag" content="机器学习">
 <meta name="twitter:card" content="summary">
@@ -236,10 +236,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-12-10 14:32:41 / 修改时间：15:41:14" itemprop="dateCreated datePublished" datetime="2020-12-10T14:32:41+08:00">2020-12-10</time>
+              <time title="创建时间：2020-12-10 14:32:41" itemprop="dateCreated datePublished" datetime="2020-12-10T14:32:41+08:00">2020-12-10</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-10 19:40:01" itemprop="dateModified" datetime="2021-07-10T19:40:01+08:00">2021-07-10</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -290,12 +296,12 @@
 <p>在<strong>连续变化的系统</strong>中使用卡尔曼滤波是非常理想的，它具有占用内存小的优点（除了前一个状态量外，不需要保留其它历史数据），并且速度很快，很适合应用于实时问题和嵌入式系统。</p>
 <p>在Google上找到的大多数关于实现卡尔曼滤波的数学公式看起来有点晦涩难懂，这个状况有点糟糕。实际上，如果以正确的方式看待它，卡尔曼滤波是非常简单和容易理解的，下面我将用漂亮的图片和色彩清晰的阐述它，你只需要懂一些基本的概率和矩阵的知识就可以了。</p>
 <h1 id="我们能用卡尔曼滤波做什么？"><a href="#我们能用卡尔曼滤波做什么？" class="headerlink" title="我们能用卡尔曼滤波做什么？"></a>我们能用卡尔曼滤波做什么？</h1><p>用玩具举例：你开发了一个可以在树林里到处跑的小机器人，这个机器人需要知道它所在的确切位置才能导航。</p>
-<p><img src="http://image.rexking6.top/img/20170318140159668" alt="这里写图片描述"></p>
+<p><img src="http://image.rexking6.top/img/20170318140159668" alt=""></p>
 <p>我们可以说机器人有一个状态 $\vec{x_k}$，表示位置和速度：</p>
 <script type="math/tex; mode=display">
 \vec{x_k} = (\vec{p}, \vec{v})</script><p>注意这个状态只是关于这个系统基本属性的一堆数字，它可以是任何其它的东西。在这个例子中是位置和速度，它也可以是一个容器中液体的总量，汽车发动机的温度，用户手指在触摸板上的位置坐标，或者任何你需要跟踪的信号。</p>
 <p>这个机器人带有GPS，精度大约为10米，还算不错，但是，它需要将自己的位置精确到10米以内。树林里有很多沟壑和悬崖，如果机器人走错了一步，就有可能掉下悬崖，所以只有GPS是不够的。</p>
-<p><img src="http://image.rexking6.top/img/robot_ohnoes-300x283.png" alt="这里写图片描述"></p>
+<p><img src="http://image.rexking6.top/img/robot_ohnoes-300x283.png" alt=""></p>
 <p>或许我们知道一些机器人如何运动的信息：例如，机器人知道发送给电机的指令，知道自己是否在朝一个方向移动并且没有人干预，在下一个状态，机器人很可能朝着相同的方向移动。当然，机器人对自己的运动是一无所知的：它可能受到风吹的影响，轮子方向偏了一点，或者遇到不平的地面而翻倒。所以，轮子转过的长度并不能精确表示机器人实际行走的距离，预测也不是很完美。</p>
 <p>GPS <strong>传感器</strong>告诉了我们一些状态信息，我们的<strong>预测</strong>告诉了我们机器人会怎样运动，但都只是间接的，并且伴随着一些不确定和不准确性。但是，如果使用所有对我们可用的信息，我们能得到一个比任何依据自身估计更好的结果吗？回答当然是YES，这就是卡尔曼滤波的用处。</p>
 <h1 id="卡尔曼滤波是如何看待你的问题的"><a href="#卡尔曼滤波是如何看待你的问题的" class="headerlink" title="卡尔曼滤波是如何看待你的问题的"></a>卡尔曼滤波是如何看待你的问题的</h1><p>下面我们继续以只有位置和速度这两个状态的简单例子做解释。</p>
@@ -304,14 +310,14 @@
 p\\ 
 v 
 \end{bmatrix}</script><p>我们并不知道实际的位置和速度，它们之间有很多种可能正确的组合，但其中一些的可能性要大于其它部分：</p>
-<p><img src="http://image.rexking6.top/img/gauss_0.png" alt="img"></p>
+<p><img src="http://image.rexking6.top/img/gauss_0.png" alt=""></p>
 <p>卡尔曼滤波假设两个变量（位置和速度，在这个例子中）都是随机的，并且<strong><em>服从高斯分布</em></strong>。每个变量都有一个<strong>均值</strong> $\mu$，表示随机分布的中心（最可能的状态），以及<strong>方差</strong> $\sigma^2$，表示不确定性。</p>
-<p><img src="http://image.rexking6.top/img/gauss_1.png" alt="img"></p>
+<p><img src="http://image.rexking6.top/img/gauss_1.png" alt=""></p>
 <p>在上图中，位置和速度是<strong>不相关</strong>的，这意味着由其中一个变量的状态无法推测出另一个变量可能的值。下面的例子更有趣：位置和速度是<strong>相关</strong>的，观测特定位置的可能性取决于当前的速度：</p>
-<p><img src="http://image.rexking6.top/img/gauss_3.png" alt="img"></p>
+<p><img src="http://image.rexking6.top/img/gauss_3.png" alt=""></p>
 <p>这种情况是有可能发生的，例如，我们基于旧的位置来估计新位置。如果速度过高，我们可能已经移动很远了。如果缓慢移动，则距离不会很远。跟踪这种关系是非常重要的，因为它带给我们<strong>更多的信息</strong>：其中一个测量值告诉了我们其它变量可能的值，这就是卡尔曼滤波的目的，尽可能地在包含不确定性的测量数据中提取更多信息！</p>
 <p>这种相关性用<strong><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Covariance_matrix">协方差矩阵</a></strong>来表示，简而言之，矩阵中的每个元素 $\Sigma_{ij}$ 表示第 $i$ 个和第 $j$ 个状态变量之间的相关度。（你可能已经猜到协方差矩阵是一个<strong><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Symmetric_matrix">对称矩阵</a></strong>，这意味着可以任意交换 $i$ 和 $j$）。协方差矩阵通常用 $\mathbf{\Sigma}$  来表示，其中的元素则表示为 $\Sigma_{ij}$。</p>
-<p><img src="http://image.rexking6.top/img/gauss_2.png" alt="img"></p>
+<p><img src="http://image.rexking6.top/img/gauss_2.png" alt=""></p>
 <h1 id="使用矩阵来描述问题"><a href="#使用矩阵来描述问题" class="headerlink" title="使用矩阵来描述问题"></a>使用矩阵来描述问题</h1><p>我们基于高斯分布来建立状态变量，所以在时刻 $k$ 需要两个信息：最佳估计 $\mathbf{\hat{x}_k}$ （即均值，其它地方常用 $\mu$ 表示），以及协方差矩阵 $\mathbf{P_k}$。</p>
 <script type="math/tex; mode=display">
 \begin{equation} \label{eq:statevars} 
@@ -327,9 +333,9 @@ v
 \end{bmatrix} 
 \end{aligned} 
 \end{equation}</script><p>（当然，在这里我们只用到了位置和速度，实际上这个状态可以包含多个变量，代表任何你想表示的信息）。接下来，我们需要根据<strong>当前状态</strong>（$k-1$ 时刻）来<strong>预测下一状态</strong>（$k$ 时刻）。记住，我们并不知道对下一状态的所有预测中哪个是“真实”的，但我们的预测函数并不在乎。它对所有的可能性进行预测，并给出新的高斯分布。</p>
-<p><img src="http://image.rexking6.top/img/gauss_7.jpg" alt="img"></p>
+<p><img src="http://image.rexking6.top/img/gauss_7.jpg" alt=""></p>
 <p>我们可以用矩阵 $\mathbf{F_k}$ 来表示这个预测过程：</p>
-<p><img src="http://image.rexking6.top/img/gauss_8.jpg" alt="img"></p>
+<p><img src="http://image.rexking6.top/img/gauss_8.jpg" alt=""></p>
 <p>它将我们原始估计中的每个点都移动到了一个新的预测位置，如果原始估计是正确的话，这个新的预测位置就是系统下一步会移动到的位置。那我们又如何用矩阵来预测下一个时刻的位置和速度呢？下面用一个基本的运动学公式来表示：</p>
 <script type="math/tex; mode=display">
 \begin{split} 
@@ -378,11 +384,11 @@ Cov(\color{firebrick}{\mathbf{A}}x) &= \color{firebrick}{\mathbf{A}} \Sigma \col
 <h1 id="外部干扰"><a href="#外部干扰" class="headerlink" title="外部干扰"></a>外部干扰</h1><p>如果这些状态量是基于系统自身的属性或者已知的外部控制作用来变化的，则不会出现什么问题。</p>
 <p>但是，如果存在未知的干扰呢？例如，假设我们跟踪一个四旋翼飞行器，它可能会受到风的干扰，如果我们跟踪一个轮式机器人，轮子可能会打滑，或者路面上的小坡会让它减速。这样的话我们就不能继续对这些状态进行跟踪，如果没有把这些外部干扰考虑在内，我们的预测就会出现偏差。</p>
 <p>在每次预测之后，我们可以添加一些新的不确定性来建立这种与“外界”（即我们没有跟踪的干扰）之间的不确定性模型：</p>
-<p><img src="http://image.rexking6.top/img/gauss_9.jpg" alt="img"></p>
+<p><img src="http://image.rexking6.top/img/gauss_9.jpg" alt=""></p>
 <p>原始估计中的每个状态变量更新到新的状态后，仍然服从高斯分布。我们可以说 $\color{royalblue}{\mathbf{\hat{x}}_{k-1}}$ 的每个状态变量移动到了一个新的服从高斯分布的区域，协方差为 $\color{mediumaquamarine}{\mathbf{Q}_k}$ 。换句话说就是，我们将这些没有被跟踪的干扰当作协方差为 $\color{mediumaquamarine}{\mathbf{Q}_k}$ 的<strong>噪声</strong>来处理。</p>
-<p><img src="http://image.rexking6.top/img/gauss_10a.jpg" alt="img"></p>
+<p><img src="http://image.rexking6.top/img/gauss_10a.jpg" alt=""></p>
 <p>这产生了具有不同协方差（但是具有相同的均值）的新的高斯分布。</p>
-<p><img src="http://image.rexking6.top/img/gauss_10b.jpg" alt="img"></p>
+<p><img src="http://image.rexking6.top/img/gauss_10b.jpg" alt=""></p>
 <p>我们通过简单地添加 ${\color{mediumaquamarine}{\mathbf{Q}_k}}$ 得到扩展的协方差，下面给出预测步骤的完整表达式：</p>
 <script type="math/tex; mode=display">
 \begin{equation} 
@@ -394,9 +400,9 @@ Cov(\color{firebrick}{\mathbf{A}}x) &= \color{firebrick}{\mathbf{A}} \Sigma \col
 \end{equation}</script><p>由上式可知，<strong>新的最优估计</strong>是根据<strong>上一最优估计</strong>预测得到的，并加上<strong>已知外部控制量</strong>的修正。而<strong>新的不确定性</strong>由<strong>上一不确定</strong>性<strong>预测</strong>得到，并加上<strong>外部环境的干扰</strong>。</p>
 <p>好了，我们对系统可能的动向有了一个模糊的估计，用 $\color{deeppink}{\mathbf{\hat{x}}_k}$ 和 $\color{deeppink}{\mathbf{P}_k}$ 来表示。如果再结合传感器的数据会怎样呢？</p>
 <h1 id="用测量值来修正估计值"><a href="#用测量值来修正估计值" class="headerlink" title="用测量值来修正估计值"></a>用测量值来修正估计值</h1><p>我们可能会有多个传感器来测量系统当前的状态，哪个传感器具体测量的是哪个状态变量并不重要，也许一个是测量位置，一个是测量速度，每个传感器间接地告诉了我们一些状态信息。</p>
-<p><img src="http://image.rexking6.top/img/gauss_12-624x287.jpg" alt="img"></p>
+<p><img src="http://image.rexking6.top/img/gauss_12-624x287.jpg" alt=""></p>
 <p>注意，传感器读取的数据的单位和尺度有可能与我们要跟踪的状态的单位和尺度不一样，我们用矩阵 $\mathbf{H}_k$ 来表示传感器的数据。</p>
-<p><img src="http://image.rexking6.top/img/gauss_13.jpg" alt="gauss_12"></p>
+<p><img src="http://image.rexking6.top/img/gauss_13.jpg" alt=""></p>
 <p>我们可以计算出传感器读数的分布，用之前的表示方法如下式所示：</p>
 <script type="math/tex; mode=display">
 \begin{equation} 
@@ -405,24 +411,24 @@ Cov(\color{firebrick}{\mathbf{A}}x) &= \color{firebrick}{\mathbf{A}} \Sigma \col
 \mathbf{\Sigma}_{\text{expected}} &= \mathbf{H}_k \color{deeppink}{\mathbf{P}_k} \mathbf{H}_k^T 
 \end{aligned} 
 \end{equation}</script><p>卡尔曼滤波的一大优点就是能处理传感器噪声，换句话说，我们的传感器或多或少都有点不可靠，并且原始估计中的每个状态可以和一定范围内的传感器读数对应起来。</p>
-<p><img src="http://image.rexking6.top/img/gauss_14.jpg" alt="gauss_12"></p>
+<p><img src="http://image.rexking6.top/img/gauss_14.jpg" alt=""></p>
 <p>从测量到的传感器数据中，我们大致能猜到系统当前处于什么状态。但是由于存在不确定性，某些状态可能比我们得到的读数更接近真实状态。</p>
-<p><img src="http://image.rexking6.top/img/gauss_11.jpg" alt="img"></p>
+<p><img src="http://image.rexking6.top/img/gauss_11.jpg" alt=""></p>
 <p>我们将这种不确定性（例如：传感器噪声）用<strong>协方差</strong> $\color{mediumaquamarine}{\mathbf{R}_k}$ 表示，该分布的<strong>均值</strong>就是我们读取到的传感器数据，称之为 $\color{yellowgreen}{\vec{\mathbf{z}_k}}$ 。现在我们有了两个高斯分布，一个是在预测值附近，一个是在传感器读数附近。</p>
-<p><img src="http://image.rexking6.top/img/gauss_4.jpg" alt="img"></p>
+<p><img src="http://image.rexking6.top/img/gauss_4.jpg" alt=""></p>
 <p>我们必须在<strong>预测值</strong>（<strong>粉红色</strong>）和<strong>传感器测量值</strong>（<strong>绿色</strong>）之间找到最优解。</p>
 <p>那么，我们最有可能的状态是什么呢？对于任何可能的读数 $(z_1,z_2)$，有两种情况：（1）传感器的测量值；（2）由前一状态得到的预测值。如果我们想知道这两种情况都可能发生的概率，将这两个高斯分布相乘就可以了。</p>
-<p><img src="http://image.rexking6.top/img/gauss_6a.png" alt="img"></p>
+<p><img src="http://image.rexking6.top/img/gauss_6a.png" alt=""></p>
 <p>剩下的就是重叠部分了，这个重叠部分的均值就是两个估计最可能的值，也就是给定的所有信息中的<strong>最优估计</strong>。</p>
 <p>瞧！这个重叠的区域看起来像另一个高斯分布。</p>
-<p><img src="http://image.rexking6.top/img/gauss_6.png" alt="img"></p>
+<p><img src="http://image.rexking6.top/img/gauss_6.png" alt=""></p>
 <p>如你所见，把两个具有不同均值和方差的高斯分布相乘，你会得到一个新的具有独立均值和方差的高斯分布！下面用公式讲解。</p>
 <h1 id="融合高斯分布"><a href="#融合高斯分布" class="headerlink" title="融合高斯分布"></a>融合高斯分布</h1><p>先以一维高斯分布来分析比较简单点，具有方差 $\sigma^2$ 和 $\mu$ 的高斯曲线可以用下式表示：</p>
 <script type="math/tex; mode=display">
 \begin{equation} \label{gaussformula} 
 \mathcal{N}(x, \mu,\sigma) = \frac{1}{ \sigma \sqrt{ 2\pi } } e^{ -\frac{ (x – \mu)^2 }{ 2\sigma^2 } } 
 \end{equation}</script><p>如果把两个服从高斯分布的函数相乘会得到什么呢？</p>
-<p><img src="http://image.rexking6.top/img/20170318174028764" alt="这里写图片描述"></p>
+<p><img src="http://image.rexking6.top/img/20170318174028764" alt=""></p>
 <p>将式（9）代入到式（10）中（注意重新归一化，使总概率为1）可以得到：</p>
 <script type="math/tex; mode=display">
 \begin{equation} \label{fusionformula} 
@@ -475,7 +481,7 @@ Cov(\color{firebrick}{\mathbf{A}}x) &= \color{firebrick}{\mathbf{A}} \Sigma \col
 \color{purple}{\mathbf{K}’} = \color{deeppink}{\mathbf{P}_k \mathbf{H}_k^T} ( \color{deeppink}{\mathbf{H}_k \mathbf{P}_k \mathbf{H}_k^T} + \color{mediumaquamarine}{\mathbf{R}_k})^{-1} 
 \label{kalgainfull} 
 \end{equation}</script><p>上式给出了完整的<strong>更新步骤</strong>方程。$\color{royalblue}{\mathbf{\hat{x}}_k’}$ 就是新的最优估计，我们可以将它和 $\color{royalblue}{\mathbf{P}_k’}$ 放到下一个<strong>预测</strong>和<strong>更新</strong>方程中不断迭代。</p>
-<p><img src="http://image.rexking6.top/img/kalflow.png" alt="img"></p>
+<p><img src="http://image.rexking6.top/img/kalflow.png" alt=""></p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>以上所有公式中，你只需要用到式（7）、（18）、（19）。（如果忘了的话，你可以根据式（4）和（15）重新推导一下）</p>
 <p>我们可以用这些公式对任何线性系统建立精确的模型，对于非线性系统来说，我们使用<strong>扩展卡尔曼滤波</strong>，区别在于EKF多了一个把预测和测量部分进行线性化的过程。</p>
 <h1 id="应用于时序"><a href="#应用于时序" class="headerlink" title="应用于时序"></a>应用于时序</h1><p>假设我们有100个时间点的数据，这个数据就是分别在100个点观测出来的结果。</p>
@@ -517,11 +523,11 @@ Cov(\color{firebrick}{\mathbf{A}}x) &= \color{firebrick}{\mathbf{A}} \Sigma \col
 <li><code>transition_matrices</code> 就是上面公式中的大写字母 $A$，为 $1$。</li>
 </ul>
 <h1 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h1><p>从上面的那个函数中，可以看到<code>transition_covariance</code>是0.1，也就是预测偏差是0.1，所以假设观测偏差很小，那么可以想象，滤波器后的结果应该与观测值非常接近，这里选取观测偏差为0.001：</p>
-<p><img src="http://image.rexking6.top/img/2020041405063744.png" alt="在这里插入图片描述"></p>
+<p><img src="http://image.rexking6.top/img/2020041405063744.png" alt=""></p>
 <p>然后假设观测误差很大，那么可以想想，平滑的力度会很大，结果就是：</p>
-<p><img src="http://image.rexking6.top/img/20200414050721958.png" alt="在这里插入图片描述"></p>
+<p><img src="http://image.rexking6.top/img/20200414050721958.png" alt=""></p>
 <p>最后看一下在某次比赛中的利用kalman滤波器来平滑数据的前后对比图：</p>
-<p><img src="http://image.rexking6.top/img/20200414051556155.png" alt="在这里插入图片描述"></p>
+<p><img src="http://image.rexking6.top/img/20200414051556155.png" alt=""></p>
 
     </div>
 
@@ -785,7 +791,7 @@ Cov(\color{firebrick}{\mathbf{A}}x) &= \color{firebrick}{\mathbf{A}} \Sigma \col
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">30:33</span>
+    <span title="站点阅读时长">30:30</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
   </div>

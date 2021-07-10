@@ -49,7 +49,7 @@
 <meta property="og:image" content="http://image.rexking6.top/img/clip1557475592.png">
 <meta property="og:image" content="http://image.rexking6.top/img/clip1557476475.png">
 <meta property="article:published_time" content="2019-05-10T09:03:09.000Z">
-<meta property="article:modified_time" content="2019-09-03T12:25:48.320Z">
+<meta property="article:modified_time" content="2021-07-10T11:30:39.770Z">
 <meta property="article:author" content="Run-Qing Chen">
 <meta property="article:tag" content="AIOps">
 <meta name="twitter:card" content="summary">
@@ -239,7 +239,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-09-03 20:25:48" itemprop="dateModified" datetime="2019-09-03T20:25:48+08:00">2019-09-03</time>
+                <time title="修改时间：2021-07-10 19:30:39" itemprop="dateModified" datetime="2021-07-10T19:30:39+08:00">2021-07-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -379,7 +379,7 @@
 <p>在图10中，我们给出了非监督Donut在不同 $K$ 值下的平均最佳F-score。这并不能帮助我们选择最好的 $K$ （因为我们不能使用测试集来选择 $K$)，但是可以表明我们的实证选择 $8,3,3$ 是相当好的。最好的F-score在 $\cal A$ 中取5，$\cal B$ 中取4，$\cal C$ 中取3。换句话说，最好的F-score可以用很小的 $K$ 来达到。最后，我们注意到更平滑的KPI似乎需要更大的 $K$，这一现象在本文中并没有得到充分的研究，我们将其留作以后的工作。根据图10中的观察，对于KPI类似于 $\cal A$、$\cal B$ 或 $\cal C$，我们建议 $K$ 在5到10之间的经验选择。</p>
 <h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><h2 id="KDE的解释"><a href="#KDE的解释" class="headerlink" title="KDE的解释"></a>KDE的解释</h2><p>虽然重建概率 $\mathbb E_{q_ϕ(\textbf z |\textbf x)}[\log p_θ(\textbf x |\textbf z)]$ 被采用于[2,36]，它实际上是如何运作尚未明确。有些人可能认为这是一个变种的 $\mathbb E_{q_ϕ(\textbf z|\textbf x)} [p_θ(\textbf x |\textbf z)]$，但 $\mathbb E_{q_ϕ(\textbf z |\textbf x)}[p_θ(\textbf x |\textbf z)] = \int p_θ(\textbf x |\textbf z) q_ϕ (\textbf z |\textbf x)$，这不是明确的概率（一般来说它不应该通过使用一个潜在异常 $\bf x$ 来计算在后验 $q_ϕ(\textbf z |\textbf x)$ 的 $\log p_θ(\textbf x |\textbf z)$ 的期望，来给出有用的信息）。因此，这两个[2,36]都不能用概率框架来解释。在此，我们提出了重建概率的KDE（核密度估计）解释，以及整个Donut算法。</p>
 <p>正常的 $\bf x$ 的后验 $q_\phi(\textbf z |\textbf x)$ 表现出时间梯度，如图11a所示。连续时间的 $\bf x$ 窗口（以下简称连续 $\bf x$）映射到附近的 $q_\phi(\textbf z |\textbf x)$，大多数较小的方差 $\pmb σ_{\textbf z}$（参见图12）。</p>
-<p><img src="http://image.rexking6.top/img/clip1557402929.png" alt="s"></p>
+<p><img src="http://image.rexking6.top/img/clip1557402929.png" alt=""></p>
 <p><em>图11. 数据集 $\cal B$ 的 $\bf z$ 空间，(a)Donut，(b)未经训练的VAE，(c)训练损失使用 $\mathbb E[\log p_θ(\textbf z)]+H[\textbf z|\textbf x]$ 的VAE。从 $q_\phi(\textbf z|\textbf x)$ 抽样出 $\bf z$ 数据绘制出图，相应地，正常的 $\bf x$ 从测试集中随机选取。$K$ 选为2，所以 $x$ 轴和 $y$ 轴是采样得到的 $\bf z$ 的两个维度。我们绘制 $q_\phi(\textbf z|\textbf x)$ 的 $\pmb \mu_{\textbf z}$ 来替代 $\bf z$ ，因为我们要考虑图中 $\pmb \sigma_{\textbf z}$ 的影响。样本 $\bf z$ 的颜色表示它在一天中的时间。</em></p>
 <p><img src="http://image.rexking6.top/img/clip1557404165.png" alt=""></p>
 <p><em>图12. KDE解释说明。对于给定的含有潜在异常的 $\bf x$，Donut试图识别它遵循的正常模式，编码为 $q_ϕ(\textbf z |\textbf x)$。中间的黑色椭圆表示 $q_ϕ(\textbf z|\textbf x)$ 的 $3-\pmb \sigma_{\textbf z}$ 区域。从 $q_\phi(\textbf z|\textbf x)$ 抽样的 $L$ 个 $\bf z$ 样本，用图中的圈表示。每个 $\bf z$ 与核密度估计 $\log p_θ(\textbf x |\textbf z)$。右边的两张图中的蓝色曲线是每个核的 $\pmb \mu_{\textbf x}$ ，周围的条纹是 $\pmb \sigma_{\textbf x}$。最后，$\log p_θ(\textbf x|\textbf z)$ 的值由每个核计算，并进一步取平均作为重建概率。</em></p>
@@ -731,7 +731,7 @@
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">30:33</span>
+    <span title="站点阅读时长">30:30</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
   </div>
