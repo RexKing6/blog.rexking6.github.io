@@ -302,10 +302,10 @@
       <div class="popular-posts-title"><a href="\2017\03\30\hexo主题和添加评论、打赏、搜索、阅读量等功能\" rel="bookmark">hexo主题和添加评论、打赏、搜索、阅读量等功能</a></div>
     </li>
     <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\2017\03\27\hexo搭建github技术博客\" rel="bookmark">hexo搭建github技术博客</a></div>
+      <div class="popular-posts-title"><a href="\2021\07\10\hexo升级\" rel="bookmark">hexo升级</a></div>
     </li>
     <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\2017\12\19\hexo改用图床、添加MathJax等功能\" rel="bookmark">hexo改用图床、添加MathJax等功能</a></div>
+      <div class="popular-posts-title"><a href="\2017\03\27\hexo搭建github技术博客\" rel="bookmark">hexo搭建github技术博客</a></div>
     </li>
   </ul>
 
@@ -587,9 +587,14 @@
                 console.error('Failed to save visitor count', error);
               });
           } else {
-              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
-              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
-            
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
           }
         })
         .catch(error => {
@@ -616,7 +621,7 @@
         });
     }
 
-    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":false};
     function fetchData(api_server) {
       var Counter = (method, url, data) => {
         return fetch(`${api_server}/1.1${url}`, {

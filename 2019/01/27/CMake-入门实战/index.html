@@ -450,7 +450,7 @@
 <li><a target="_blank" rel="noopener" href="http://www.cmake.org/Bug">bug tracker</a></li>
 <li>邮件列表：<ul>
 <li><a target="_blank" rel="noopener" href="http://dir.gmane.org/gmane.comp.programming.tools.cmake.user">cmake on Gmane</a></li>
-<li><a href="&#x6d;&#97;&#105;&#x6c;&#116;&#111;&#x3a;&#104;&#x74;&#x74;&#112;&#58;&#x2f;&#x2f;&#119;&#119;&#119;&#x2e;&#109;&#97;&#x69;&#x6c;&#45;&#97;&#114;&#99;&#104;&#x69;&#x76;&#x65;&#x2e;&#x63;&#111;&#x6d;&#47;&#x63;&#109;&#x61;&#107;&#x65;&#x40;&#99;&#x6d;&#x61;&#107;&#101;&#46;&#x6f;&#x72;&#x67;&#47;">&#104;&#x74;&#x74;&#112;&#58;&#x2f;&#x2f;&#119;&#119;&#119;&#x2e;&#109;&#97;&#x69;&#x6c;&#45;&#97;&#114;&#99;&#104;&#x69;&#x76;&#x65;&#x2e;&#x63;&#111;&#x6d;&#47;&#x63;&#109;&#x61;&#107;&#x65;&#x40;&#99;&#x6d;&#x61;&#107;&#101;&#46;&#x6f;&#x72;&#x67;&#47;</a></li>
+<li><a href="&#x6d;&#97;&#105;&#108;&#x74;&#x6f;&#58;&#104;&#116;&#116;&#x70;&#58;&#47;&#x2f;&#119;&#x77;&#119;&#46;&#x6d;&#97;&#x69;&#108;&#45;&#x61;&#114;&#x63;&#104;&#105;&#x76;&#101;&#46;&#x63;&#111;&#x6d;&#47;&#x63;&#x6d;&#97;&#107;&#x65;&#x40;&#x63;&#109;&#x61;&#107;&#101;&#46;&#111;&#114;&#103;&#47;">&#104;&#116;&#116;&#x70;&#58;&#47;&#x2f;&#119;&#x77;&#119;&#46;&#x6d;&#97;&#x69;&#108;&#45;&#x61;&#114;&#x63;&#104;&#105;&#x76;&#101;&#46;&#x63;&#111;&#x6d;&#47;&#x63;&#x6d;&#97;&#107;&#x65;&#x40;&#x63;&#109;&#x61;&#107;&#101;&#46;&#111;&#114;&#103;&#47;</a></li>
 <li><a target="_blank" rel="noopener" href="http://www.mail-archive.com/cmake@cmake.org/">http://marc.info/?l=cmake</a></li>
 </ul>
 </li>
@@ -751,9 +751,14 @@
                 console.error('Failed to save visitor count', error);
               });
           } else {
-              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
-              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
-            
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
           }
         })
         .catch(error => {
@@ -780,7 +785,7 @@
         });
     }
 
-    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":true};
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":false};
     function fetchData(api_server) {
       var Counter = (method, url, data) => {
         return fetch(`${api_server}/1.1${url}`, {
