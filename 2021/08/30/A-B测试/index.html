@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A&#x2F;B测试">
+<meta property="og:url" content="https://blog.rexking6.top/2021/08/30/A-B%E6%B5%8B%E8%AF%95/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/640">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20210904103139291.png">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-2d115fa245e5a02de0c43493d5ce83ae_r.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-904493aa00ea672009a77ed8cd118fdc_r.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-5682b6ffa0f8e4c041887cfe5a806b28_r.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-d1f3c385b10c83e531c868127f8e74ff_720w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-b5bb6320b3b305a49eeca20ba26801dd_720w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-acce82082c3cc826ff12106d6e225839_r.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-2bd797d4955194b8708f2b555c7a9a02_r.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-111ba79131a2e295d643f9d8591a8ecf_r.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/one_experiment.png">
+<meta property="og:image" content="https://image.rexking6.top/img/nine_experiments.png">
+<meta property="og:image" content="https://image.rexking6.top/img/14_experiments_two_layers.png">
+<meta property="og:image" content="https://image.rexking6.top/img/experiments_domains_layers.png">
+<meta property="og:image" content="https://image.rexking6.top/img/experiments_with_conditions.png">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-631b3c12cd6e7c9e11fb3a55c875d8fc_r.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-bfa559a524319b4c70293641b37cead7_r.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20210904103237265.png">
+<meta property="article:published_time" content="2021-08-30T15:30:44.000Z">
+<meta property="article:modified_time" content="2021-09-04T03:48:38.855Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/640">
+
+<link rel="canonical" href="https://blog.rexking6.top/2021/08/30/A-B%E6%B5%8B%E8%AF%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>A/B测试 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2021/08/30/A-B%E6%B5%8B%E8%AF%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          A/B测试
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-08-30 23:30:44" itemprop="dateCreated datePublished" datetime="2021-08-30T23:30:44+08:00">2021-08-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-09-04 11:48:38" itemprop="dateModified" datetime="2021-09-04T11:48:38+08:00">2021-09-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/08/30/A-B%E6%B5%8B%E8%AF%95/" class="post-meta-item leancloud_visitors" data-flag-title="A/B测试" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>21k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>19 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>学习一下A/B测试，综合转载于：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://zhangtielei.com/posts/blog-ab-test.html">科学精神与互联网A/B实验</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/20045543/answer/1103961403">什么是 A/B 测试？ - 腾讯技术工程的回答 - 知乎</a></li>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/PatFgf7c8QSi0MIAhFuY5A">没有最好，只有A/B测试！</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/102287944">数据分析必备技能之——正确解读你的AB实验</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.appadhoc.com/blog/ab-test-in-dianrong/">关于AB测试那些事儿</a></li>
+</ul>
+<h1 id="科学精神"><a href="#科学精神" class="headerlink" title="科学精神"></a>科学精神</h1><h2 id="小故事"><a href="#小故事" class="headerlink" title="小故事"></a>小故事</h2><p>我们先讲两个历史上真实发生过的小故事。</p>
+<p>第一个故事是关于黄热病。</p>
+<p>黄热病是一种严重的传染病，曾在1793年袭击美国费城。当时，费城有一位著名的人物，他叫本杰明·拉什[1]。拉什曾经签署过《独立宣言》，是美国的开国元勋之一。同时，他还是著名的教育家和出色的外科医生。在费城的黄热病爆发的时候，他坚信放血疗法可以治疗这种疾病。于是，他用手术刀或水蛭吸血的办法给病人放血。当拉什自己染上这种疾病的时候，他也采用同样的方法给自己治疗。</p>
+<p>第二个故事是关于坏血病。</p>
+<p>坏血病在历史上曾是严重威胁人类健康的一种疾病，尤其在远洋航行的水手中尤为严重。在18世纪，一位英国船长发现，在一些地中海国家的海军舰艇上服役的船员没有坏血病。他注意到，这些船员的食物配给中含有柑橘类(citrus)水果。于是，为了弄清真正的原因，这位船长将他的船员们随机分为两组：其中一组在日常饮食中加入酸橙(limes)，而另外一组维持原来的食谱不变。结果通过对比发现，定期食用酸橙的一组船员，真的防止了坏血病的发生。后来，定期食用柑橘类水果就变成了英国水手必须遵循的一种规定。这种做法越来越普遍，以至于在后来的美国英语中产生了一个新的词汇——limeys，用来代指任何一个英国人。这个词翻译成中文称为「英国佬」。</p>
+<p>现在让我们来比较一下这两个故事有什么不同。</p>
+<p>在第一个故事中，本杰明·拉什坚信他的放血疗法可以治疗黄热病。实际上，他确实「治」好了一些病人。当然，也有一些病人死掉了。事情的解释就演变成这样：如果病人情况好转，那么就被作为放血疗法有效的证据；反之，如果病人死掉了，拉什就解释说是病情太严重，已经无药可救了。后来，有评论家指出，他的疗法甚至比疾病本身更加危险。</p>
+<p>而在第二个故事中，船长将船员分成了两组，进行了<strong>对照实验</strong> (controlled experiment)。现代医学已经证实，这位船长通过对照实验得到的结论确实是有效的。坏血病的致病原因是由于缺乏维生素C，而柑橘类水果中含有大量的维生素C。</p>
+<p>在这两个故事中，当事人都试图在寻找事物之间的一种<strong>因果关系</strong> (causal relationship)。本杰明·拉什相信放血疗法和治愈黄热病之间存在因果关系；而第二个故事中的船长则发现了食用酸橙和防止坏血病之间的因果关系。那为什么拉什没有找到真正的因果关系，而那位英国船长找到了？关键就在于对照实验。</p>
+<p>进一步追问，为什么使用对照实验就能得到真正的因果关系？这本质上是一个哲学问题，涉及到「科学」之所以成为科学的本质原因。接下来，我们就先展开来聊一聊，什么是真正的因果关系以及这个问题所涉及到的科学本质；然后再回到现实，跟大家讨论一下在互联网的业务中关于如何进行对照实验的各种技术。</p>
+<h2 id="因果律的陷阱"><a href="#因果律的陷阱" class="headerlink" title="因果律的陷阱"></a>因果律的陷阱</h2><p>每当我们得出一个因果性结论的时候，都应该倍加小心。比如，看到苹果落地，怎么就能得出万有引力是导致苹果落地的原因的？为什么不是其它原因导致的？想一想我们可以考虑的别的因素还有很多啊，比如天气啊，地理位置啊，苹果的品种啊，等等，它们为什么就不能是苹果落地的「原因」呢？为什么我们不能得出结论说：因为今天天气晴朗，所以苹果就落到地上了，而明天可能一下雨，苹果就自己飞到天上去了？为什么我们不能得出结论说：我们看到的这个苹果因为它生长在河北省，所以就落到地上了，而对于生长在湖南省的苹果，也许就未必了？</p>
+<p>你肯定会说，这样想问题太荒谬了。没错，是很荒谬。但那是因为现在我们已经很清楚苹果落地的原因了，我们对科学给出的「万有引力」这个解释已经深信不疑了，所以才会认为这些想法很荒谬。试想一下，在人们发现「万有引力」之前，是不是考虑「天气」、「地理位置」这些现有的因素也许是更自然的想法呢？</p>
+<p>上面苹果落地的例子表明，找到真正的因果关系，并不容易。在牛顿时代之前，人们对于苹果落地这一司空见惯的现象已经观察了成百上千年，也没能得出现象背后的真正原因到底是什么。而弄错了因果关系，就会得到很荒谬的结论。</p>
+<p>实际上，这还不是最糟的。当我们在讨论苹果落地的「原因是什么」的时候，已经首先假定了苹果落地是「存在一个因」的。而在科学和哲学的发展史上，因果关系本身存在的合理性甚至都被怀疑过。苏格兰历史上有一位怀疑一切的哲学家，名叫休谟。他比较极端，认为世界上根本不存在因果律这种东西。还是以苹果落地为例，按照休谟的观点，就算你观察到苹果离开树枝后落到地上的这一事实发生了一万次，也不能说明第一万零一次苹果离开树枝就一定会落到地上。换句话说，他根本不相信苹果落到地上是存在某种「必然」的原因的，而只能看成是偶然事件，哪怕它发生了再多次也是一样。结论听起来仍然很荒谬。但哲学家都是聪明人，绝不是头脑混乱才胡言乱语（实际上休谟是个天才，人家12岁就上大学了）。休谟是沿着怀疑主义前后一贯的逻辑进行推论的。罗素就曾经评论说：“他把洛克和贝克莱的经验主义哲学发展到了它的逻辑终局，由于把这种哲学作得自相一致，使它成了难以相信的东西。”</p>
+<p>《三体》小说中提到过一个「农场主假说」，跟休谟的这种观点类似。这个假说是这样描述的：</p>
+<blockquote>
+<p>一个农场里有一群火鸡，农场主每天中午十一点来给它们喂食。火鸡中的一名科学家观察这个现象，一直观察了近一年都没有例外，于是它发现了自己宇宙中的伟大定律：“每天上午十一点，就有食物降临。”它在感恩节早晨向火鸡们公布了这个定律，但这天上午十一点食物没有降临，农场主进来把它们都捉去杀了。</p>
+</blockquote>
+<p>这只可怜的火鸡认为自己发现了一个「因果律」：每天上午十一点（这是因），就有食物降临（这是果）。但最后事实证明，「上午十一点」和「食物降临」这两个事件之间并没有必然的因果关系，它们只是在过去一年内恰好同时发生（最后在感恩节这天发生了变化）。这个故事含有一丝神秘的意味，它暗示了，我们人类发现的一些「因果规律」，也许是某个更高等级的文明或者某个神秘力量随意设置的。</p>
+<p>我们很快就发现了，按照这样的方式思考问题，完全不承认这个世界上有因果律存在，那么科学就没法玩了。科学研究要进行下去，就必须承认因果律是普遍存在的，因为科学定律基本都是对因果规律的总结。我们之所以应该承认和尊重科学，是因为科学「有用」，它在过去几个世纪内深入地影响了人类的生活。我们必须转向实用主义的观点，否则就会陷入虚无的诡辩。总而言之，我们应当及时放弃休谟的极端观点，回过头来相信因果规律的存在。</p>
+<p>关键的一点是，科学必须有一套行之有效的方法和标准，来验证科学定律的正确性，来检验它是否真正反映了事物的因果关系。实际上，科学定律都不是「空中楼阁」，都是被实践验证过的理论。牛顿的三大定律，被无数的实验和观察验证过；爱因斯坦的相对论，也被很多天文观测所验证。这种「科学的」验证方法就是前面提过的「对照实验」。</p>
+<p>什么是对照实验呢？通俗来说，对照实验就是将实验的物体或人群随机分成两个组，一个实验组 (treatment group)，一个对照组 (control group)。对实验组人为地修改某个控制变量（也就是实施实验），而对照组只是用来做对比（维持它原来的状态）。以文章开头提到的坏血病故事为例，英国船长就是实施了一组对照实验。他将船员们随机分为两组：在日常饮食中加入酸橙的一组是实验组，食谱维持不变的一组是对照组。最终实验结果是：实验组的船员发生坏血病的比率减少了。这个结果的「因」，也就是在实验组和对照组之间有差异的那个因素——酸橙。至此，船长得到了结论：酸橙可防止坏血病。</p>
+<p>我们再来看一个对照实验的例子。</p>
+<p>《哲学家们都干了些什么》这本书中描写了一个案例。有人调查了大学生的体重和交友数据之后发现，越是胖的人，身边的朋友就越多。然后就得出了一个结论：身体胖是朋友多的原因，也就是说，身体越胖，越有魅力。这个调查其实也可以设想成一组对照实验：我们找两组大学生，一组体重超标（实验组），一组体重正常（对照组）。然后我们对比两个组的交友数据，发现实验组的学生朋友比较多。于是，我们这样分析，「朋友多」是一个结果，它的「因」就是在实验组和对照组之间有差异的那个因素——身体胖。</p>
+<p>仔细的读者一定已经发现了这里的一个陷阱。在做对照实验的时候，一定要保证实验组和对照组除了实施实验所必需的那个控制变量之外，其它所有特征均相同。刚才这个案例的陷阱就在于，实验组和对照组的选择是有问题的，两个组除了体重不同之外，还可能有很多其它不同的特征。这些其它的不同特征，也都有可能是造成两组朋友多寡的原因。这个案例的真正答案可能是这样的，身体胖的人喜欢参加饭局，而喜欢参加饭局是因为他们社交范围比较广，社交范围比较广的表现就是朋友比较多。这是一个典型的「第三变量」问题。「身体胖」和「朋友多」都和第三变量「喜欢参加饭局」有关，所以「身体胖」和「朋友多」之间并不存在直接的因果关系，它们之间只是具有「相关性」。</p>
+<p>统计学上有一个经典的结论：相关性不代表因果性。我们在做数据分析时，很容易发现两个变量之间的相关性，比如一个变量随着另一个变量的增大而增大，或者一个变量随着另一个变量的增大而减小，但具有相关性的两个变量之间是否具有因果关系，决不能草率地下结论。</p>
+<p>我们再分析一下为什么会陷入把相关性当成因果性的陷阱。刚才提到，在分析大学生体重和交友数据的例子中，实验组和对照组的选择是有问题的，我们把这个问题称为「选择性偏差」。我们对于实验组（也就是胖子组）的选择，掺杂了太多人为的因素，导致实验组和对照组之间差异巨大，根本不存在可比性。也许，胖子组里面有钱的学生更多，或者胖子组里面女生比男生更多（或者反过来），照这样分析，我们也许会认为「有钱金多」或「性别」都是「朋友多」的原因呢。那为什么文章开头坏血病的对照实验是成功的呢？那是因为船长对于船员进行分组时有一个很关键的细节：是「随机」分组的。首先，两个组的船员都来自同一艘船，他们平常的生活条件大体相同。如果不是来自同一艘船，就会引入额外的干扰因素，比如船员的航线不同，出身不同，整体健康状况可能也不同，最终导致实验失败。其次，两个组是随机分派的，这样就避免了「选择性偏差」。</p>
+<p>说了这么多，无非就是为了告诫我们自己，当我们设计实验来探索或验证因果律的时候，需要加倍小心。不管是科学实验本身就经常遭遇的相关性陷阱和选择性偏差，还是来自哲学意义上的对于因果律根本性的挑战，都说明对于事物之间因果关系的分析是一个非常棘手的课题。而科学正是由于它的这种「谨慎」，才让它在近现代历史的发展中大放异彩。</p>
+<h1 id="A-B测试"><a href="#A-B测试" class="headerlink" title="A/B测试"></a>A/B测试</h1><p>在程序开发的领域，严格的对照实验，我们一般称之为A/B实验。实际上，在不同的场合，它至少有半打以上不同的名字。下面的列表列出了这些名字：</p>
+<ul>
+<li>Controlled experiments（对照实验）</li>
+<li>Randomized experiments（随机实验）</li>
+<li>A/B tests（A/B测试，A/B实验）</li>
+<li>Split tests</li>
+<li>Control/Treatment tests</li>
+<li>MultiVariable Tests（MVT）</li>
+<li>Parallel flights</li>
+</ul>
+<p>假设我们做了一个 A/B 实验，然后我们会想知道自己的实验是否能得到显著的效果。你可以通过经验判断，但更严谨的方法是通过统计学公式计算 p 值是否小于设定的显著性水平 ，从而判断实验结果是否显著。</p>
+<p>举个例子，我们有以下四格表：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left">对照组</th>
+<th style="text-align:left">实验组</th>
+<th style="text-align:left">合计</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">转换</td>
+<td style="text-align:left">15</td>
+<td style="text-align:left">8</td>
+<td style="text-align:left">23</td>
+</tr>
+<tr>
+<td style="text-align:left">不转换</td>
+<td style="text-align:left">35</td>
+<td style="text-align:left">42</td>
+<td style="text-align:left">77</td>
+</tr>
+<tr>
+<td style="text-align:left">合计</td>
+<td style="text-align:left">50</td>
+<td style="text-align:left">50</td>
+<td style="text-align:left">100</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>通过以上统计结果我们来尝试计算一下 p 值。</p>
+<p>z 值的计算公式：</p>
+<script type="math/tex; mode=display">
+z=\frac{\frac{x_1}{n_1}-\frac{x_2}{n_2}}{\sqrt{\frac{x_1+x_2}{n_1+n_2}\cdot \left(1-\frac{x_1+x_2}{n_1+n_2}\right)\cdot \left(\frac{1}{n_1}+\frac{1}{n_2}\right)}}</script><p>其中，$x_1, x_2, n_1,n _2$ 分别为转换 A/B 测试的转换数和样本总数。</p>
+<p>然后将统计值（$x_1=15,x_2=8,n_1=n_2=50$）带入到公式中并计算出 z 值为 1.66，</p>
+<p>然后用excel来计算：$p=2\times (1-\text{NORMSDIST(abs(}z\text{))})=0.096$，大于0.05不显著。</p>
+<blockquote>
+<p>NORMSDIST 可以计算标准正态分布的累积概率。</p>
+</blockquote>
+<p>以上便完成了 A/B 测试的计算。</p>
+<p>如果事情到此就结束，那岂不是太浅薄了。</p>
+<p>这边问几个简单的问题：</p>
+<ul>
+<li>A/B 测试不是基于假设检验的吗？假设在哪儿呢？检验在哪儿？</li>
+<li>这个 z 值公式哪来的？</li>
+</ul>
+<p>为了搞清楚这些问题，我们继续探究。</p>
+<h2 id="A-B测试原理"><a href="#A-B测试原理" class="headerlink" title="A/B测试原理"></a>A/B测试原理</h2><h3 id="假设检验"><a href="#假设检验" class="headerlink" title="假设检验"></a>假设检验</h3><p>假设检验是研究如何根据抽样后获得的样本来检查抽样前所作假设是否合理，<strong>A/B测试从本质上来说是一个基于统计的假设检验过程</strong>，它首先对实验组和对照组的关系提出了某种假设，然后计算这两组数据的差异和确定该差异是否存在统计上的显著性，最后根据上述结果对假设做出判断。</p>
+<p>我们再用上面的数据走下流程。</p>
+<p>首先，我们做一个<strong>假设</strong>：</p>
+<ul>
+<li>原假设$H_0$：实验组和对照组无显著差异；</li>
+<li>备择假设$H_1$：实验组和对照组存在显著差异。</li>
+</ul>
+<p>假设检验的核心是<strong>证伪</strong>，所以原假设是统计者想要拒绝的假设，无显著差异我们也可以理解为：实验组和对照组的统计差异是由抽样误差引起的（误差服从正态分布）。</p>
+<p>然后，我们需要选一个<strong>检验</strong>方法来对我们做的假设进行验证。</p>
+<p>常用的假设检验方法有 z 检验、t 检验和卡方检验等，不同的方法有不同的适用条件和检验目标。比如我们常说 z 检验适用大样本而 t 检验适用于小样本。实验组的样本容量 &gt; 30，所以我们这里采用 z 检验。又由于我们检验的目标是两组样本（区别于单组样本），所以其 z 值的计算公式为：</p>
+<script type="math/tex; mode=display">
+Z=\frac{\overline{X}_1-\overline{X}_2}{\sqrt{\frac{S_1^2}{n_1}+\frac{S_2^2}{n_2}}}</script><p>由于我们的数据是转换/不转换，所以我们可以令转换的样本为 1，不转换的样本为 0，从而算出$z=1.67$，（通过正态分布的累积概率分布）得到单边概率 $P(0&lt;x&lt;1.67)=0.4525$。我们的是双侧检验，所以 $p=1-2\times 0.4525=0.095$。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">x1 = np.array([<span class="number">1</span>]*<span class="number">15</span> + [<span class="number">0</span>]*<span class="number">35</span>)</span><br><span class="line">x2 = np.array([<span class="number">1</span>]*<span class="number">8</span> + [<span class="number">0</span>]*<span class="number">42</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ddof = 1 用于计算样本标准差，区别于总体标准差</span></span><br><span class="line">z = (x1.mean() - x2.mean()) / np.sqrt(x1.var(ddof = <span class="number">1</span>)/<span class="number">50</span> + x2.var(ddof = <span class="number">1</span>)/<span class="number">50</span>)</span><br><span class="line">z</span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">1.6699</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br></pre></td></tr></table></figure>
+<p>以上便是假设检验的基本步骤。我可能还会有一些疑问，比如说：</p>
+<ul>
+<li>什么是双侧检验？</li>
+<li>为什么 z 检验适用大样本，而 t 检验适用小样本？</li>
+<li>四格表不是应该用卡方检验的吗？</li>
+</ul>
+<h3 id="检验方式"><a href="#检验方式" class="headerlink" title="检验方式"></a>检验方式</h3><p>检验方式分为两种：双侧检验和单侧检验。单侧检验又分为两种：左侧检验和右侧检验。</p>
+<p>这几种检验方式的划分很简单：</p>
+<ul>
+<li>双侧检验：备择假设没有特定的方向性，形式为“≠”这种检验假设称为双侧检验；</li>
+<li>单侧检验：备择假设带有特定的方向性 形式为”&gt;””&lt;”的假设检验，称为单侧检验 “&lt;”称为左侧检验 “&gt;”称为右侧检验。</li>
+</ul>
+<p>我们的备择假设：实验组和对照组存在显著差异。其实就是在说是实验组 ≠ 对照组。所以是双侧检验（此时原假设也称为零假设）。</p>
+<p>然后我们根据检验方式不同，得到不同的 p 值计算方式。（p 值其实就是计算拒绝域的概率值，放一张图，方便大家更好的理解）</p>
+<p><img src="https://image.rexking6.top/img/640" alt=""></p>
+<h3 id="检验统计量"><a href="#检验统计量" class="headerlink" title="检验统计量"></a>检验统计量</h3><p>我们来看下假设检验的原假设：实验组和对照组无显著差异。那么该怎么去描述两组实验有差异呢？我们需要一个统计量来描述两组实验。</p>
+<p>在 A/B 测试中我们关注的两组实验转换率的差异，所以我们可以通过样本的转换率 $\rho$ 来衡量两组实验的差异。所以原假设可以翻译为： $\rho_1-\rho_2=0$（两者转换率没差别）。</p>
+<blockquote>
+<p>转换率是样本统计量的一种，此外还可以用均值、方差等作为样本统计量。</p>
+</blockquote>
+<p>我们引入<strong>检验统计量</strong>的概念：根据样本观测结果计算得到的，并据以对原假设和备择假设做出决策的某个样本统计量，称为检验统计量。所以本次 A/B 测试中检验统计量为 $\rho_1-\rho_2$。</p>
+<p>检验统计量是用于假设检验计算的统计量，实际上是对总体参数的点估计量，但点估计量不能直接作为检验统计量，只有将其标准化后，才能用于度量它与原假设的参数值之间的差异程度。所以我们将检验统计量标准化：</p>
+<script type="math/tex; mode=display">
+检验统计量(标准化)=\frac{点估计量-总体均值}{总体标准差}=\frac{检验统计量}{\sqrt{\frac{\sigma_1^2}{n_1}+\frac{\sigma_2^2}{n_2}}}</script><blockquote>
+<p>$\bar X_i$ 为独自地抽自总体 $X_i\sim N(\mu_i, \sigma_i)$ 的一个容量为 $n_i$ 的样本的均值。则变量 $\bar X_1-\bar X_2$的均值和方差为：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+&E\left(\bar{X}_{1}-\bar{X}_{2}\right)=E\left(\bar{X}_{1}\right)-E\left(\bar{X}_{2}\right) \\
+&\operatorname{Var}\left(\bar{X}_{1}-\bar{X}_{2}\right)=\operatorname{Var}\left(\bar{X}_{1}\right)+\operatorname{Var}\left(\bar{X}_{2}\right)=\frac{\sigma_{1}^{2}}{n_{1}}+\frac{\sigma_{2}^{2}}{n_{2}}
+\end{aligned}</script><p>样本均值的方差：</p>
+<script type="math/tex; mode=display">
+\operatorname{Var}\left(\bar{X}_{1}\right)=\operatorname{Var}\left(\frac{1}{n_{1}}\left(X_{1}+X_{2}+\ldots+X_{n}\right)\right)=\frac{1}{n_{1}^{2}} \operatorname{Var}\left(X_{1}+X_{2}+\ldots+X_{n}\right)=\frac{1}{n_{1}} \operatorname{Var}\left(X_{1}\right)=\frac{\sigma_{1}^{2}}{n_{1}}</script></blockquote>
+<p>总体的均值为我们的原假设，即为 0（$\rho_{1}-\rho_{2}=0$），当样本容量较大（n&gt;30）时，我们可以用样本标准差 $s$ 来表示总体标准差 $\sigma$，此时我们便得到了 z 检验统计量：</p>
+<script type="math/tex; mode=display">
+Z=\frac{\bar{X}_{1}-\bar{X}_{2}}{\sqrt{\frac{\sigma_{1}^{2}}{n_{1}}+\frac{\sigma_{2}^{2}}{n_{2}}}}=\frac{\bar{X}_{1}-\bar{X}_{2}}{\sqrt{\frac{s_{1}^{2}}{n_{1}}+\frac{s_{2}^{2}}{n_{2}}}}</script><p>z 检验虽然能够进行样本统计量的差异性检验，但是它要求样本容量足够大，这是不一定能够做到。</p>
+<p>这时候 t 检验就粉墨登场了，在两独立样本均值检验中，t 值计算公式如下（推导略）：</p>
+<script type="math/tex; mode=display">
+T=\frac{\bar{X}_{1}-\bar{X}_{2}}{\sqrt{\frac{\sum\left(X_{1}-\bar X_{1}\right)^{2}+\sum\left(X_{2}-\bar X_{2}\right)^{2}}{n_{1}+n_{2}-2} \times \frac{n_{1} + n_{2}}{n_{1} \times n_{2}}}}</script><p>根据自由度 $\text{df} = n-1$，查 t 值表，找出规定的 t 理论值并进行比较，然后确定显著性水平。</p>
+<p>t 检验在使用前需要注意三点：</p>
+<ol>
+<li>分析的数据对象需要满足正态分布或近似正态分布；</li>
+<li>得知样本均值和样本标准差；</li>
+<li>已知总体均值（由原假设可知总体均值为 0）；</li>
+</ol>
+<p>t 检验统计量较 z 检验统计量多了一个自由度的变量，用来惩罚小样本，增加其拒绝 $H_0$ 的难度，因而小样本下采用 t 检验，优于 z 检验。</p>
+<p>当样本数量增加时，t 检验会快速收敛于 z 检验。（所以这里用 t 检验算出来也是 1.67）</p>
+<h3 id="置信区间与统计误差"><a href="#置信区间与统计误差" class="headerlink" title="置信区间与统计误差"></a>置信区间与统计误差</h3><p>我们再看下假设检验的原假设：实验组和对照组无显著差异。这一小节我们来讲下显著的概念。</p>
+<p>我们统计出的实验组的转化率为 0.3，而对照组的转换率为 0.16。我们是否可以说明实验组比对照组的转换效果要好 0.14？其实更准确的说法是：<strong>实验组比对照组的转换效果要好 0～0.28 （</strong>$0.14 \pm 0.14$<strong>），置信度为 90%</strong>。</p>
+<p>[0, 0.28] 是我们所说的置信区间 $\left[\left(\bar{X}_{1}-\bar{X}_{2}\right) \pm Z_{\frac{\alpha}{2}} \times \sqrt{\frac{S_{1}^{2}}{n_{1}}+\frac{S_{2}^{2}}{n_{2}}}\right]$，这里的第一个 0.14 是两组样本的均值 $\left(\bar{X}_{1}-\bar{X}_{2}\right)$，第二个 0.14 是统计误差，计算方式为 $Z_{\frac{\alpha}{2}} \times \sqrt{\frac{S_{1}^{2}}{n_{1}}+\frac{S_{2}^{2}}{n_{2}}}$，置信度是我们的算出接受域的概率值 90%。我们可以说：我们有 90% 的把握实验组比对照组的转换效果要好 0～0.28。从概率的角度来解释：我们做 100 次实验，有 90 次的转换率差异是在 0～0.28 之间。</p>
+<p>置信区间是一个区间，使得重复实验 n 次具有一定概率（这个概率就是置信度）的结果都落在此区间内。根据置信区间的不同表现，我们可以来判断试验结果显著与否：如果置信区间的上下限同为正/负，则说明试验结果是统计显著的；如果置信区间为一正一负，则说明版本间差异不大。</p>
+<p>值得注意的是，置信区间同为正或负时，只能说明试验是统计显著的（也就是试验组和对照组有差异），但是这个差异有可能是非常小，在实际应用中微不足道的。因此，只有兼备统计显著和效果显著两个特征的结果，才能说明该实验是可用，并且值得发布的。</p>
+<h3 id="中心极限定律"><a href="#中心极限定律" class="headerlink" title="中心极限定律"></a>中心极限定律</h3><p><strong>中心极限定理</strong>是概率论的重要定理，我们来复习下：</p>
+<p>中心极限定理指的是：给定一个任意分布的总体。每次从这些总体中随机抽取 n 个抽样，一共抽 m 次。然后把这 m 组抽样分别求出平均值，这些平均值的分布接近正态分布。</p>
+<p>我们注意总体本身的分布不要求正态分布，下图很形象的表达这个点：</p>
+<p><img src="https://image.rexking6.top/img/image-20210904103139291.png" alt=""></p>
+<p>从上图我们看到：随着抽样次数增多，样本均值的抽样分布趋向于服从正态分布，且其均值越接近于总体的平均值。</p>
+<p>所以正是因为有了中心极限定律，我们才能使用 A/B 测试：通过样本均值来估计总体均值。</p>
+<p>而检验统计量这块，我们可以看到当抽样次数达到 30 时，样本均值可以视为总体均值。这也是为什么 z 检验和 t 检验以样本量为 30 做个分界。（当然划分界线没那么严格，29 次也可以用 z 检验）</p>
+<blockquote>
+<p>补充学习大数定律：在无数次独立同分布的随机事件中，事件的频率趋于一个稳定的概率值，这是大数定律。两者在不同的维度上。</p>
+</blockquote>
+<h3 id="z-检验的计算方式"><a href="#z-检验的计算方式" class="headerlink" title="z 检验的计算方式"></a>z 检验的计算方式</h3><p>上面是通过手算检验统计量，更简单的方法是写个 python 脚本：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">x1 = 15</span><br><span class="line">x2 = 8</span><br><span class="line">n1 = n2 = 50</span><br><span class="line"></span><br><span class="line">import numpy as np</span><br><span class="line">from statsmodels.stats.proportion import proportions_ztest as ztest</span><br><span class="line">ztest(np.array([x1, x2]), np.array([n1, n2]))</span><br><span class="line"></span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line"># 源代码计算方式，和评估组同学给出的计算方式一致</span><br><span class="line">输出：(1.663369597, 0.09623847)</span><br><span class="line">&quot;&quot;&quot;</span><br></pre></td></tr></table></figure>
+<p><code>x1</code> <code>x2</code> 顺序倒过来只影响 z 值（相反数），不影响 p 值。</p>
+<h1 id="互联网中的A-B测试"><a href="#互联网中的A-B测试" class="headerlink" title="互联网中的A/B测试"></a>互联网中的A/B测试</h1><p>互联网产品通常是逐渐迭代、慢慢进化的，而通常情况下选择都是比较多的。那么自然就产生了一个问题，产品在每一步到底应该选择向着什么方向迭代，才是最有利于业务发展的？在互联网业务的开发和运营当中，我们经常需要面对这样的问题进行决策。比如，对产品首页进行改版，可能有不同的方案，那么到底应该选择哪个方案？再比如，对推荐算法进行新版本升级，能不能保证提高数据指标？又比如，在商业化的过程中，想在产品中投放广告，怎样做能够收益最大而对用户体验的影响最小？</p>
+<p>这些事情本质上也是在寻找事物之间的因果关系。我们发布了某个新的产品feature，或者对产品进行了优化，这是「因」；然后我们观察到了数据指标的变化，比如用户留存率或活跃度变高了，这是「果」。根据上一节的讨论，我们已经知道了，分析因果关系需要加倍小心，否则很容易陷入思维的陷阱。通常产品持续在迭代，当我们对产品进行某个更改之后，其它的变化也在发生（比如另一个团队也对产品进行了修改），周围的环境也在发生变化（比如节假日和社会热点事件的影响），我们就很难分析出最后数据指标变化的原因到底是来源于哪些变化因素。</p>
+<p>在一个缺乏完善的对照实验机制的环境中，人们通常会对照不同的时间段进行数据分析。人们经常会这样宣称，你看，之前的某段时间内，用户留存率是这样的，但从某天开始，我们做了一个实验（发布了一个产品改动，或者改变了某个运营策略），结果留存率提升了1个百分点。这样的分析在很多情况下都是比较危险的。这相当于在时间维度上先后选取了「对照组」和「实验组」，它们未必就有可比性。首先，当产品每天都在迭代更新，甚至多个改动同时并存的时候，你很难将留存率的提升归因于某个具体的产品改变。其次，就算你在做实验的时候确定没有别的干扰因素了，但某些隐藏的因素的变化，你根本没办法识别出来，比如群体的统计特征也很可能在随着时间变化。这样得到的结论，未必反映了真实的因果关系，也许换一个时间、换一个环境就不适用了。这时候我们能做的，也只有对数据进行各种各样的解释，如果解释不通，就叠加更多的补充因素和假定条件来解释。</p>
+<p>A/B测试实验一般有 2 个目的：</p>
+<ol>
+<li>判断哪个更好：例如，有 2 个 UI 设计，究竟是 A 更好一些，还是 B 更好一些，我们需要实验判定； </li>
+<li>计算收益：例如，最近新上线了一个直播功能，那么直播功能究竟给平台带了来多少额外的 DAU，多少额外的使用时长，多少直播以外的视频观看时长等。</li>
+</ol>
+<p>我们一般比较熟知的是上述第 1 个目的，对于第 2 个目的，<strong>对于收益的量化，计算 ROI，往往对数据分析师和管理者非常重要</strong>。</p>
+<blockquote>
+<p>ROI（Return On Investment）：投资回报率</p>
+</blockquote>
+<p>对于一般的 A/B测试实验，其实本质上就是把平台的流量均匀分为几个组，每个组添加不同的策略，然后根据这几个组的用户数据指标，例如：留存、人均观看时长和基础互动率等等核心指标，最终选择一个最好的组上线。</p>
+<p>实验的几个基本步骤一般如下：</p>
+<p><img src="https://image.rexking6.top/img/v2-2d115fa245e5a02de0c43493d5ce83ae_r.jpg" alt=""></p>
+<h2 id="流量分配"><a href="#流量分配" class="headerlink" title="流量分配"></a>流量分配</h2><p>实验设计时有两个目标：</p>
+<ul>
+<li>希望尽快得到实验结论，尽快决策</li>
+<li>希望收益最大化，用户体验影响最小</li>
+</ul>
+<p>因此经常需要在流量分配时有所权衡，一般有以下几个情况：</p>
+<ul>
+<li>不影响用户体验：如 UI 实验、文案类实验等，一般可以均匀分配流量实验，可以快速得到实验结论</li>
+<li>不确定性较强的实验：如产品新功能上线，一般需小流量实验，尽量减小用户体验影响，在允许的时间内得到结论</li>
+<li>希望收益最大化的实验：如运营活动等，尽可能将效果最大化，一般需要大流量实验，留出小部分对照组用于评估 ROI</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-904493aa00ea672009a77ed8cd118fdc_r.jpg" alt=""></p>
+<p>根据实验的预期结果，大盘用户量，确定实验所需最小流量，可以通过一个<strong><a target="_blank" rel="noopener" href="https://www.evanmiller.org/ab-testing/sample-size.html">网站</a></strong>专门计算所需样本量：</p>
+<ul>
+<li>以次日留存率为例，目前大盘次日留存率 80%，预期实验能够提升 0.2pp（这里的留存率可以转换为点击率、渗透率等等，只要是比例值就可以，<strong>如果估不准，为了保证实验能够得到结果，此处可低估，不可高估，也就是 0.2pp 是预期能够提升地最小值</strong>）</li>
+<li>网站计算，最少样本量就是 63W（<strong>这里的最少样本量，指的是最少流量实验组的样本量</strong>）</li>
+<li>如果我们每天只有 5W 的用户可用于实验（5W 的用户，指最少流量实验组是 5W 用户），63/ 5 = 13 天，我们需要至少 13 天才能够得到实验结论</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-5682b6ffa0f8e4c041887cfe5a806b28_r.jpg" alt=""></p>
+<p>如果我们预期提升的指标是人均时长、人均 VV 等，可能就比较复杂了，我们需要运用 t 检验反算，需要的<strong><a target="_blank" rel="noopener" href="https://www.evanmiller.org/ab-testing/t-test.html">样本量</a></strong>：</p>
+<p><img src="https://image.rexking6.top/img/v2-d1f3c385b10c83e531c868127f8e74ff_720w.jpg" alt="img"></p>
+<h2 id="实验效果"><a href="#实验效果" class="headerlink" title="实验效果"></a>实验效果</h2><p>我们以一个稍复杂点的运营活动实验为例，活动有方案 1、方案 2，同时为了量化 ROI，对照组没有运营活动。</p>
+<p><img src="https://image.rexking6.top/img/v2-b5bb6320b3b305a49eeca20ba26801dd_720w.jpg" alt="img"></p>
+<p><strong>需要回答几个问题：</strong></p>
+<ol>
+<li>方案 1 和方案 2，哪个效果更好？</li>
+<li>哪个 ROI 更高？</li>
+<li>长期来看哪个更好？</li>
+<li>不同群体有差异吗？</li>
+</ol>
+<h3 id="1-方案-1-和方案-2，哪个效果更好？"><a href="#1-方案-1-和方案-2，哪个效果更好？" class="headerlink" title="1. 方案 1 和方案 2，哪个效果更好？"></a>1. 方案 1 和方案 2，哪个效果更好？</h3><p>还是要运用假设检验，对于留存率、渗透率等漏斗类指标，采用<strong><a target="_blank" rel="noopener" href="https://www.evanmiller.org/ab-testing/chi-squared.html">卡方检验</a></strong>：</p>
+<p><img src="https://image.rexking6.top/img/v2-acce82082c3cc826ff12106d6e225839_r.jpg" alt=""></p>
+<p>对于人均时长类等均值类指标，采用<strong><a target="_blank" rel="noopener" href="https://www.evanmiller.org/ab-testing/t-test.html">t 检验</a></strong>：</p>
+<p><img src="https://image.rexking6.top/img/v2-2bd797d4955194b8708f2b555c7a9a02_r.jpg" alt=""></p>
+<p>通过上假设检验，如果结论置信，我们就能够得到方案 1 和方案 2 在哪像指标更好（有显著性差异）， 对于不置信的结论，尽管方案 1 和方案 2 的指标可能略有差异，但可能是数据正常波动产生。</p>
+<h3 id="2-哪个-ROI-更高？"><a href="#2-哪个-ROI-更高？" class="headerlink" title="2. 哪个 ROI 更高？"></a>2. 哪个 ROI 更高？</h3><p>一般有活动相比无活动，留存、人均时长等各项指标均会显著，我们不再重复上述的假设检验过程。</p>
+<p>对于 ROI 的计算，成本方面，每个实验组成本可以直接计算，对于收益方面，就要和对照组相比较，假定以总日活跃天（即 DAU 按日累计求和）作为收益指标，需要假设不做运营活动，DAU 会是多少，可以通过对照组计算，即：</p>
+<ul>
+<li>实验组假设不做活动日活跃天 = 对照组日活跃天 * （实验组流量 / 对照组流量）</li>
+<li>实验组收益 = 实验组日活跃天 - 实验组假设不做活动日活跃天</li>
+</ul>
+<p>这样就可以量化出每个方案的 ROI。</p>
+<h3 id="3-长期来看哪个更好？"><a href="#3-长期来看哪个更好？" class="headerlink" title="3. 长期来看哪个更好？"></a>3. 长期来看哪个更好？</h3><p>这里就要考虑新奇效应的问题了，一般在实验上线前期，用户因为新鲜感，效果可能都不错，因此在做评估的时候，需要观测指标到稳定态后，再做评估。</p>
+<p><img src="https://image.rexking6.top/img/v2-111ba79131a2e295d643f9d8591a8ecf_r.jpg" alt=""></p>
+<p>例如有的时候出现，刚刚上线前期，实验组效果更好，但是经过一段时间，用户的新鲜感过去了，实验组的效果可能更差，因此，从长远收益来看，我们应该选择对照组，是实验组的新奇效应欺骗了我们，在做实验分析时，应剔除新奇效应的部分，待平稳后，再做评估。</p>
+<h3 id="4-不同用户群体有差异吗？"><a href="#4-不同用户群体有差异吗？" class="headerlink" title="4. 不同用户群体有差异吗？"></a>4. 不同用户群体有差异吗？</h3><p>很多情况下，对新用户可能实验组更好，老用户对照组更好；对年轻人实验组更好，中年人对照组更好，</p>
+<p>作为数据分析师，分析实验结论时，还要关注用户群体的差异。</p>
+<h2 id="实验结束"><a href="#实验结束" class="headerlink" title="实验结束"></a>实验结束</h2><p>实验结束后需要：</p>
+<ul>
+<li>反馈实验结论，包括直接效果（渗透、留存、人均时长等）、ROI</li>
+<li>充分利用实验数据，进一步探索分析不同用户群体，不同场景下的差异，提出探索性分析</li>
+<li>对于发现的现象，进一步提出假设，进一步实验论证</li>
+</ul>
+<h2 id="高级实验"><a href="#高级实验" class="headerlink" title="高级实验"></a>高级实验</h2><p>关于互联网业务中的A/B实验，有两篇论文做过详尽的论述：</p>
+<ul>
+<li>《Overlapping Experiment Infrastructure: More, Better, Faster Experimentation》，作者是谷歌的Diane Tang, Ashish Agarwal, Deirdre O’Brien, Mike Meyer。</li>
+<li>《Controlled experiments on the web: survey and practical guide》，作者是微软的Ron Kohavi, Roger Longbotham, Dan Sommerfield, Randal M. Henne。</li>
+</ul>
+<p>现在我们就逐步展开来看看这两篇论文给出的A/B实验方案是怎样的。</p>
+<p>假设，最开始整个系统里就只有两个实验（1个实验组和1个对照组）。注意，我们统一下词汇，不管是实验组还是对照组，我们都称为1个实验。虽然对照组只是用来做对比，分配到对照组的用户看不到任何产品或运营策略改动，但我们也把它称为1个「实验」。</p>
+<p>我们随机分出了10%的流量作为对照组，又随机分出了10%的流量作为实验组。这时剩下了80%的流量是空闲的，没有进行任何实验。从用户的角度来看，在实验组内的这10%的用户，能够看到正在进行的实验（产品或运营策略改动），而在对照组和剩下的空闲流量中的用户（总共90%），是看不到产品或运营策略改动的。如下图：</p>
+<p><img src="https://image.rexking6.top/img/one_experiment.png" alt=""></p>
+<p>一般情况下，我们需要保持用户体验的前后一致。也就是说，一旦一个用户被分到了实验组，那么他发起的后续请求应该都落到实验组的流量里面。我们需要一种会话保持（session sticky）的机制，而这有很多种可能不同的方案。如果用户是有登录状态的，我们可以拿用户ID来取模，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mod = 用户ID % 1000</span><br></pre></td></tr></table></figure>
+<p>而如果用户是没有登录态的，就像谷歌的搜索服务一样，那么可以拿cookie变换成一个数值再取模，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mod = f(cookie) % 1000</span><br></pre></td></tr></table></figure>
+<p>当然还有很多计算<code>mod</code>的方案（关键是达到随机的效果）。但不管是上面哪一种取模的方式，我们只需要将<code>mod</code>在<code>[0, 99]</code>之间的请求分配到实验组，将<code>mod</code>在<code>[100, 199]</code>之间的请求分配到对照组，就分别获得了10%的随机流量。</p>
+<p>假设现在人们尝到了A/B实验的甜头，这种机制在公司内推广开来了，越来越多的项目开始进行A/B实验。于是我们将空闲的那80%流量也安排了实验。下图展示了10个实验（9个实验组和1个对照组）同时进行的情形：</p>
+<p><img src="https://image.rexking6.top/img/nine_experiments.png" alt=""></p>
+<p>这时，我们看到，所有的流量都被用光了。任何一个请求，都被分配到了某一个实验当中。假设我们现在要加入第11个实验，发现没有流量可用了。</p>
+<p>当我们建立起这样一套A/B实验系统之后，当然希望尽可能多的产品迭代都先经过A/B实验验证过数据效果之后，再推广给全量用户使用。于是，这个系统能同时容纳的实验个数，就决定了产品迭代和创新的速度。而流量是宝贵的，一部分实验把流量全部占用之后，其它实验就没法同时进行了（这个现象叫starvation）。容易想到的一个方法是，我们减少每个实验的流量占比是不是就行了。比如前面10个实验，每个组改为占用5%的流量，就能够总共容纳20个实验同时进行了。但是，每组的流量不能太少，否则就可能失去统计特性，得不到有效的数据结果了。每家公司的产品，它们各自的用户数也不尽相同，用户多的产品也许可以分的组多一点，用户少的产品，能够分的组就少一点。这显然不是我们想要的结果。</p>
+<p>仔细分析上面的情况，造成「流量不够用」这个问题的核心原因在于，每一个请求都最多只能被分配到一个实验当中。如果我们允许一个请求被同时分配到多个实验当中，也就能复用流量了，于是我们的系统能够同时容纳的实验数量也就没有上限了。</p>
+<p>为了做到流量复用，我们将实验进行分层(layer)，如下图所示，展示了14个实验（12个实验组和2个对照组）同时进行的情况（分布在两层）：</p>
+<p><img src="https://image.rexking6.top/img/14_experiments_two_layers.png" alt=""></p>
+<p>在上图的实验配置中，我们将14个实验分布在了两层之中（Layer A和Layer B）。这意味着，同一个请求，可能同时被分配到Layer A中的某个实验，同时又被分配到Layer B中的某个实验。显然，实验在两个层之间的分布是不能随意放置的，有依赖关系的两个实验就不能分布到两个不同的层中。</p>
+<p>对于完全独立的两个实验，比如对两个完全无关联的产品模块的改动，我们就可以把它们放到不同的层。这时候，来自不同层的两个实验是完全<strong>正交</strong>的。「正交」是什么意思呢？这个词本身来源于数学，表示两个向量互相垂直，或者说它们各自向对方的投影为零，这里引申过来可以理解为，两个实验互相没有影响。到底是怎么做到没有影响的呢？实际是从宏观统计上来看的。还是以上图为例，通过Layer A中某个实验的流量，会重新打散，随机地分配到Layer B的每个实验中。比如对于Layer B中的实验组10中的某个用户来说，他看到Layer A中每个实验的概率都是10%。换句话说，Layer A中的实验对于Layer B中的实验，不是说真的没有影响，而是在统计上来说，Layer A中的某个实验对于Layer B中的每个实验的影响都是均等的，所以相当于没有影响。结果就是，Layer B中的每个实验在统计特征上仍然是具有可比性的。</p>
+<p>那加入层的概念之后应该怎样分配流量，既能做到会话保持，又能做到层与层之间的影响正交呢？方法仍然不是唯一的，谷歌的论文中是这样计算<code>mod</code>的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mod = f(cookie, layer) % 1000</span><br></pre></td></tr></table></figure>
+<p>将层的编号放入计算当中，容易看出，这样可以保证在同一层内，会话是可以保持的，也就是说cookie值相同的不同请求会落到同一个实验组或对照组中；而不同层之间的流量又是随机打散的。</p>
+<p>我们前面说，只有相互没有依赖关系的两个实验，才能放到不同的层中。但在实际中，有时候实验之间是有依赖关系的。比如一个实验修改了页面背景颜色，而另一个实验修改了字体颜色，至少它们各自的颜色设置不能太接近，否则整个页面显示上就有问题了。再比如，一个实验给App的第一级页面增加了一个Tab，而第二个实验修改了某个二级页面，并且这个二级页面的入口是在第一个实验增加的那个Tab里面。这样第二个实验就依赖第一个实验。</p>
+<p>这时候我们应该怎么做呢？应该把有依赖关系的实验放到同一层当中，这样它们会被分配不同的流量（即流量没有交集），从而消除互相的影响。如果有必要的话，也可能需要对实验重新进行设计。</p>
+<p>在谷歌的论文中，一个实验被看成是对于系统参数（parameter）的修改，比如字体颜色是一个参数，再比如某个新feature的开关也是一个参数。按照这样来抽象概念的话，整个系统相当于有一个可修改（或者说可配置）的参数集合，而一个实验相当于在一部分流量上对于一个参数子集进行修改。每个层则相当于把整个的参数集合分成了若干个互不相交的子集，每个子集与一个层对应，而处于这个层中的所有实验都只能修改跟这个层对应的那个参数子集。</p>
+<p>有些读者应该已经在上面的图中注意到一个细节了：对照组和对应的实验组都在同一层。实际上这个要求是必须的，「对照组A」只能和Layer A中的各个实验组进行对比，「对照组B」只能和Layer B中的各个实验组进行对比。而且，实验组和相应的对照组的流量占比也应该相同。</p>
+<h3 id="分层嵌套"><a href="#分层嵌套" class="headerlink" title="分层嵌套"></a>分层嵌套</h3><p>这个分层实验模型还可以更加灵活，支持互相嵌套。比如系统中处于上下游的不同子系统，它们平常都是在不同层中进行各自的实验的（互相没有依赖）。但有一天，我们想做一个比较大的实验，需要同时修改来自多个子系统的参数。这就产生矛盾了，因为各个子系统的可修改参数集合在不同的层中，我们这个实验放在哪个层都不合适。</p>
+<p>这时候怎么办呢？谷歌的论文中提出了<strong>Domain</strong>的概念。下图是一个例子：</p>
+<p><img src="https://image.rexking6.top/img/experiments_domains_layers.png" alt=""></p>
+<p>Domain代表了一部分切分好的流量，里面可以针对这部分流量再进行分层Domain（域）、Layer（层）和实验（experiment）这三个概念的关系就演变成：Domain可以包含若干Layer，一个Layer可以包含若干个实验，一个Layer也可以包含Domain。于是，Domain和Layer就可以层层嵌套下去。</p>
+<p>总之，Domain和实验，与流量分配有关；Layer，与系统参数划分子集有关。</p>
+<p>以上图为例，整个100%的流量先分成了Domain 1和Domain 2，它们各占80%和20%的流量。Domain 1内部包含了两个层：Layer A和Layer B；Domain 2只包含了一个Layer C。我们前面提到的「比较大的实验」，就可以在Layer C中进行，它可以修改所有的系统参数。</p>
+<p>上图还有一个值得注意的点：Layer B中又嵌套了一个流量占比40%的Domain 3，Domain 3中可以继续分层，相当于把Layer B对应的参数子集再进一步划分子集。</p>
+<h3 id="condition和trigger"><a href="#condition和trigger" class="headerlink" title="condition和trigger"></a>condition和trigger</h3><p>有些特殊的实验，根据业务本身的要求，是不能曝光给所有用户的。比如，一个多语种的国际化互联网服务，根据用户语言设置的不同，给用户展示的页面内容也会不同。如果一个实验是只针对日语用户的，那么随机切分的一份流量就不能全部用于这个实验，因为随机切分的流量里面也包含了非日语用户的请求。这时候就需要一个条件，称为<strong>condition</strong>，用来在随机切分的这部分流量中把日语用户的流量过滤出来。下图展示了一个例子：</p>
+<p><img src="https://image.rexking6.top/img/experiments_with_conditions.png" alt=""></p>
+<p>在上图的实验配置中，注意一下Layer B中随机切分了两部分流量，各有20%，分别用于对照组和实验组。但这各自20%的随机流量里面，使用两个不同的condition分别过滤出来了英语流量和日语流量，并分别运行了针对英语用户和日语用户的两个实验（还有两个对应的对照组实验）。</p>
+<p>由于这一类实验对流量有特殊的要求，所以使用了condition在随机切分的流量中进一步切分流量。这种方式带来了一个好处，不同的若干个condition，只要它们的过滤条件互不相交，就可以共用同一份随机流量，从而提高了流量利用率。就像上图中的「英语流量实验组」和「日语流量实验组」一样，是分别使用「英语」和「日语」两个condition，在同一份20%的随机流量中进一步切分出了各自需要的流量。</p>
+<p>一般来说，针对部分用户进行的定向实验，都可以认为是根据一个condition来切分流量。常见的condition包括：地域、人群、浏览器类型、客户端版本等等，只要经过合理的抽象，它们都可以在一个A/B实验系统中统一支持。</p>
+<p>使用condition会对流量分配带来一个重要的影响：一份随机流量被condition切分出去一部分流量后剩余的流量，不能再分配给别的实验了。以上图为例，起初切分出来的20%的随机流量，除去「英语流量实验组」和「日语流量实验组」用掉的流量之外，剩余的空闲流量（即上图中浅粉色的部分）不能再分配给别的实验组了，因为这部分流量已经失去了随机特性了（缺少了英语和日语用户的请求）。否则就会产生前面提到过的<strong>选择性偏差</strong>。作为对比，我们注意一下上图中Layer B中那40%的空闲流量，它里面没有出现condition，所以是可以继续分配给别的实验（或Domain）的。</p>
+<p>除了condition这种方式之外，还有一种情况，也需要在一份随机流量之中再过滤出一部分流量。谷歌的论文中提到了一个例子，假设有一个实验是为了测试一个搜索请求何时应该返回天气信息。这种情况下，A/B实验系统并不知道如何把需要返回天气信息的请求过滤出来，分配给这个实验，因为是否返回天气信息是由这个实验本身的逻辑来决定的。这是一个非常动态的过滤条件，A/B实验系统只能把切分出来的一份完整的随机流量都分配给这个实验，然后由这个实验本身的逻辑再来决定要不要「触发」天气信息的返回。这里的触发过程，称为<strong>trigger</strong>。trigger是需要实验本身的逻辑来动态决策的，因此无法用condition的方式由A/B实验系统统一支持。</p>
+<p>trigger会引发一个非常微妙的问题：为了进行实验分析，我们必须把「触发」的请求记录（logging）下来。由于分配到实验组的所有请求，除了「触发」的请求，剩下的「未触发」的请求都是没有产品改动的（即跟对照组一样，用户感受不到实验），所以如果基于整个实验组和对照组的流量进行实验对比分析，会对实验结果的度量产生稀释。正确的做法肯定是对比实验组中真正「触发」的流量和对照组中「本应触发」的流量。什么叫「本应触发」呢？就是说按照实验本身的逻辑，本来一个请求应该触发，但由于当前是对照组，所以才没有触发。</p>
+<p>最后需要说明的一点是，上面的例子中，我们的实验都是10%或20%的流量，这只是为了方便举例，实际中的一个实验可能用不了这么大的流量比例，可能1%就够了（针对具体情况而定）。</p>
+<h3 id="几个例子"><a href="#几个例子" class="headerlink" title="几个例子"></a>几个例子</h3><p><img src="https://image.rexking6.top/img/v2-631b3c12cd6e7c9e11fb3a55c875d8fc_r.jpg" alt=""></p>
+<p>类似与上面这种层次设计，在推荐系统中较为常见，<strong>在某一些产品或系统中，贯穿层不能够完全没有策略，那么采用去年或上个季度的策略，代表着基准值，从而量化新一个周期的增量贡献</strong>。</p>
+<p>我们可以量化：</p>
+<ul>
+<li>每个小迭代对整个系统的贡献：实验层中的实验组 VS 对照组</li>
+<li>周期内，系统全部迭代与上个周期的比较：实验填充层 VS 贯穿层 1（或贯穿层 2）</li>
+<li>同时，可以量化去年策略的自然增长或下降，以衡量旧有系统是否具有<strong>长期的适用性</strong>（作为系统设计者，更应鼓励设计具有长期适应性的系统）：贯穿层 1（上个季度的策略）VS 贯穿层 2（去年的策略）</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-bfa559a524319b4c70293641b37cead7_r.jpg" alt=""></p>
+<p>我们可以：</p>
+<ul>
+<li>量化<strong>每一个实验迭代</strong>为系统带来的增量贡献</li>
+<li>量化<strong>每一类迭代</strong>（如 UI 迭代、策略迭代），在一个阶段的增量贡献</li>
+<li>量化系统整体在上一个<strong>周期</strong>（季度、年）的<strong>增量贡献</strong></li>
+<li>量化任务福利中心的<strong>整体 ROI</strong>（本质上，是给用户一些激励，促进用户活跃，获得更多商业化收益，所以和推荐系统不同的是，需要有完全没有任务福利中心的对照组，用户量化 ROI）</li>
+</ul>
+<h1 id="A-B测试的两类错误"><a href="#A-B测试的两类错误" class="headerlink" title="A/B测试的两类错误"></a>A/B测试的两类错误</h1><p>我们知道假设检验的有两类错误：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left">H0 正确（真实情况）</th>
+<th style="text-align:left">H0 错误（真实情况）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">拒绝 H0（研究结论）</td>
+<td style="text-align:left">I 类错误</td>
+<td style="text-align:left">正确</td>
+</tr>
+<tr>
+<td style="text-align:left">接受 H0（研究结论）</td>
+<td style="text-align:left">正确</td>
+<td style="text-align:left">II 类错误</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>I 类错误称之为<strong>弃真</strong>：实验组和对照组没有显著差异，但我们接受了方案推了全量。减少这种错误的方法就是提高显著性水平，比如 p 值小于 0.05 才算显著，而不是小于 0.1，显著性水平是人为给定的犯一类错误的可以接受的上限（p 值为犯 I 类错误的概率$\alpha$ ）。</p>
+<p>如果在实验刚开始时，统计显著性的波动非常明显，这可能受到<strong>新奇效应（Novelty Effect）</strong>的影响。对于用户有感知的 A/B 测试，如 UI 改版、新的运营方案、新功能上线等，实验组做的任何改变都可能引起用户的注意，好奇心驱使他们先体验一番，从而导致 A/B 测试中实验组效果一开始优于对照组，p 值极小，实验效果非常显著。但是一段时间过去后，用户对于新的改版不再敏感，实验组效果回落，显著性可能会下降，最后趋于稳定。所以我们可以通过增加实验周期从而避免这种新奇效应的影响。</p>
+<p>II 类错误称之为<strong>存伪</strong>：实验组和对照组有显著差异，但我们没有接受方案。</p>
+<p>II 类错误和<strong>统计功效（power）</strong> 有关，统计功效可以简单理解为真理能被发现的可能性。统计功效 = $1-\beta$，而 $\beta$ 为犯第二类错误的概率。影响统计功效的因素有很多，主要的有三个：统计量、样本量和 I 类错误的概率 $\alpha$。</p>
+<ul>
+<li>统计量好理解，比如上面的实验统计量为：[0, 0.28]，如果你的实验的统计量为 [0.2, 0.48]，自然犯 II 类错误的概率会小很多；</li>
+<li>增加样本容量可以同时减少两类错误，这个也很好理解；</li>
+<li>与 I 类错误有关是因为，显著性水平越高，对统计量的要求就越高。</li>
+</ul>
+<p>下图展示了两类错误的联系（这里的 $\alpha$ 为单边假设，区别于 AB 测试中的双边假设）：</p>
+<p><img src="https://image.rexking6.top/img/image-20210904103237265.png" alt=""></p>
+<p>一般来说，I 类错误的危害要比 II 类错误的危害要大。</p>
+<p>增加样本容量可以同时减少两类错误，那么我们应该需要多少样本容量呢？</p>
+<p>统计学里给出了最小样本量计算的公式：</p>
+<script type="math/tex; mode=display">
+n=\frac{\sigma^{2}}{\Delta^{2}}\left(Z_{\alpha / 2}+Z_{\beta}\right)^{2}</script><p>其中，$\beta$ 为 II 类错误的概率，$\alpha$ 为 I 类错误的概率，$Z$ 为正态分布的分位数函数，$\sigma$ 为标准差，$\Delta$ 为两组数值的差异 $(\rho_1-\rho_2)$。从这个公式可以知道，在其他条件不变的情况下，如果实验两组数值差异越大或者数值的波动性越小，所需要的样本量就越小。</p>
+<p>实际 A/B 测试中，我们关注的较多的一类是比例类的数值，如点击率、转化率、留存率等，也就是说结果非 A 即 B。比例类数值的假设检验在统计学中叫做两样本比例假设检验。其最小样本量计算的公式为：</p>
+<script type="math/tex; mode=display">
+n=\frac{\left(Z_{\alpha / 2} \cdot \sqrt{2 \cdot \frac{\left(\rho_{1}+\rho_{2}\right)}{2} \cdot\left(1-\frac{\left(\rho_{1}+\rho_{2}\right)}{2}\right)}+Z_{\beta} \cdot \sqrt{\rho_{1} \cdot\left(1-\rho_{1}\right)+\rho_{2} \cdot\left(1-\rho_{2}\right)}\right)^{2}}{\left|\rho_{1}-\rho_{2}\right|^{2}}</script><p>通常设定 $\alpha$ 为 0.05，$\beta$ 为 0.2。</p>
+<p>用 python 算一下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">from statsmodels.stats.power import zt_ind_solve_power</span><br><span class="line">from statsmodels.stats.proportion import proportion_effectsize as es</span><br><span class="line"> </span><br><span class="line">zt_ind_solve_power(effect_size=es(prop1=0.3, prop2=0.16), alpha=0.05, power=0.8, alternative=&quot;two-sided&quot;)</span><br><span class="line"></span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">138.8426</span><br><span class="line">&quot;&quot;&quot;</span><br></pre></td></tr></table></figure>
+<p>可以看到，我们应该需要准备 139 个样本。</p>
+<h1 id="A-B测试的一些误区"><a href="#A-B测试的一些误区" class="headerlink" title="A/B测试的一些误区"></a>A/B测试的一些误区</h1><p>最后，讲一下关于AB测试的一些误区，通过对这些误区的理解希望能够恰如其分的应用AB测试提升网站和产品的转化等指标。</p>
+<ol>
+<li><p>AB测试运用成本过高，可以通过灰度发布的方式来进行AB测试，进而避免同时维护不同版本的情况。</p>
+<p>灰度发布是应用发布通常采用的方式，即对一个pool的部分服务器发布新版本的代码，而其余的服务器采用老版本代码，在确认应用正常的情况下逐步将新版本发布到pool的全部服务器。这样的方式的确可以起到分流的作用，但是这样的分流是不稳定的，用户的两次访问很有可能会被分到新老两个版本上。同时，灰度发布的分流单位通常是以服务器的流量为最小单位的，不能做到对测试流量的精确分配。</p>
+</li>
+<li><p>用参加实验的部分用户的体验质疑AB实验结果的正确性。</p>
+<p>经常碰到产品经理或是业务人员提出某些用户在新版本的实验中没有转化，而实际实验数据体现新版本效果好于老版本的情况，从而质疑实验的结果。AB实验是基于统计的结果，是基于大样本量的有效统计结果，实验结果的好坏是针对参与实验的大多数样本而言的，个例不具备代表性。</p>
+</li>
+<li><p>AB测试是优化Web应用的利器，应该在所有场合都应用AB测试进行优化。</p>
+<p>AB测试从实验的设计、实施和实验结果的收集通常需要一个不短的阶段，且进行AB实验需要在线上维护多个不同的版本，所以不应该所有场景下都采用AB测试对Web应用进行优化迭代。对于那些明显的bug修复，或者对于那些能够明显改善用户体验的功能，应该采用尽快上线并监控关键数据指标的方式。此外，AB测试也不是silver bullet, 通常AB测试的时间不会延续很长时间，对于一些长期效果很难做到有效的监测和对比。例如，某OTA对机票进行捆绑销售产生的收益进行了为期一年的多版本AB测试，测试的目标是在用户转化率没有显著下降的情况下提升用户客单价。在实验中，通过对价格非敏感用户的个性化展示、默认勾选等方式的确客单价有了很显著的提升，同时用户的线上转化率并没有显著变化甚至有了略微的提升。但是，这种捆绑销售的方式从长远来看可能对用户是有伤害的，这种情况在低频消费的场景下很难在实验的结果上有所体现。而且，这种捆绑销售的产品为媒体和公众所诟病，这些都不是AB测试能够体现的。</p>
+</li>
+<li><p>产品要求开AABB实验</p>
+<ul>
+<li>首先，不科学。抽样产生的误差本身就已经在我们的计算概率里了。为啥还要专门开4组实验对比？</li>
+<li>其次，不聪明。多样本进行对比更可能犯错。比如说，一次抽样有5%的可能犯错，四次抽样，产生6组对比（A1A2,A1B1,A1B2,A2B1,A2B2,B1B2），一组对比时不犯错的概率95%，‍假设各组对比结果相互独立，至少一组犯错的概率[1 -(1-0.05)^6] =0.265，远大于0.05。多来几次抽样，犯错的概率增加。更别提评估成本了——本来只用评估两组，现在需要看6组。</li>
+<li>最后，不好使。AABB实验可能会影响实验的灵敏度。流量不变则意味着各组样本流量减少一半，灵敏度下降；加大流量则更多用户进组，有可能引入风险。因此不管怎么说都是加大成本的。</li>
+</ul>
+</li>
+<li><p>实验做了有效果，上线没有效果</p>
+<p>有可能犯第一类错误。你看到的显著可能不是真的，只是抽样的随机误差带来的。</p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\03\21\Fisher线性判别\" rel="bookmark">Fisher线性判别</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\02\13\cs229中文笔记-一二\" rel="bookmark">cs229中文笔记(一二)</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\02\18\cs229中文笔记-七\" rel="bookmark">cs229中文笔记(七)</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2021/08/30/A-B%E6%B5%8B%E8%AF%95/" title="A&#x2F;B测试">https://blog.rexking6.top/2021/08/30/A-B测试/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/07/25/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="prev" title="图数据库">
+      <i class="fa fa-chevron-left"></i> 图数据库
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A7%91%E5%AD%A6%E7%B2%BE%E7%A5%9E"><span class="nav-number">2.</span> <span class="nav-text">科学精神</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E6%95%85%E4%BA%8B"><span class="nav-number">2.1.</span> <span class="nav-text">小故事</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%A0%E6%9E%9C%E5%BE%8B%E7%9A%84%E9%99%B7%E9%98%B1"><span class="nav-number">2.2.</span> <span class="nav-text">因果律的陷阱</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#A-B%E6%B5%8B%E8%AF%95"><span class="nav-number">3.</span> <span class="nav-text">A&#x2F;B测试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#A-B%E6%B5%8B%E8%AF%95%E5%8E%9F%E7%90%86"><span class="nav-number">3.1.</span> <span class="nav-text">A&#x2F;B测试原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%81%87%E8%AE%BE%E6%A3%80%E9%AA%8C"><span class="nav-number">3.1.1.</span> <span class="nav-text">假设检验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A3%80%E9%AA%8C%E6%96%B9%E5%BC%8F"><span class="nav-number">3.1.2.</span> <span class="nav-text">检验方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A3%80%E9%AA%8C%E7%BB%9F%E8%AE%A1%E9%87%8F"><span class="nav-number">3.1.3.</span> <span class="nav-text">检验统计量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%AE%E4%BF%A1%E5%8C%BA%E9%97%B4%E4%B8%8E%E7%BB%9F%E8%AE%A1%E8%AF%AF%E5%B7%AE"><span class="nav-number">3.1.4.</span> <span class="nav-text">置信区间与统计误差</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AD%E5%BF%83%E6%9E%81%E9%99%90%E5%AE%9A%E5%BE%8B"><span class="nav-number">3.1.5.</span> <span class="nav-text">中心极限定律</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#z-%E6%A3%80%E9%AA%8C%E7%9A%84%E8%AE%A1%E7%AE%97%E6%96%B9%E5%BC%8F"><span class="nav-number">3.1.6.</span> <span class="nav-text">z 检验的计算方式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%92%E8%81%94%E7%BD%91%E4%B8%AD%E7%9A%84A-B%E6%B5%8B%E8%AF%95"><span class="nav-number">4.</span> <span class="nav-text">互联网中的A&#x2F;B测试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E9%87%8F%E5%88%86%E9%85%8D"><span class="nav-number">4.1.</span> <span class="nav-text">流量分配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E6%95%88%E6%9E%9C"><span class="nav-number">4.2.</span> <span class="nav-text">实验效果</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%96%B9%E6%A1%88-1-%E5%92%8C%E6%96%B9%E6%A1%88-2%EF%BC%8C%E5%93%AA%E4%B8%AA%E6%95%88%E6%9E%9C%E6%9B%B4%E5%A5%BD%EF%BC%9F"><span class="nav-number">4.2.1.</span> <span class="nav-text">1. 方案 1 和方案 2，哪个效果更好？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%93%AA%E4%B8%AA-ROI-%E6%9B%B4%E9%AB%98%EF%BC%9F"><span class="nav-number">4.2.2.</span> <span class="nav-text">2. 哪个 ROI 更高？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E9%95%BF%E6%9C%9F%E6%9D%A5%E7%9C%8B%E5%93%AA%E4%B8%AA%E6%9B%B4%E5%A5%BD%EF%BC%9F"><span class="nav-number">4.2.3.</span> <span class="nav-text">3. 长期来看哪个更好？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E4%B8%8D%E5%90%8C%E7%94%A8%E6%88%B7%E7%BE%A4%E4%BD%93%E6%9C%89%E5%B7%AE%E5%BC%82%E5%90%97%EF%BC%9F"><span class="nav-number">4.2.4.</span> <span class="nav-text">4. 不同用户群体有差异吗？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9D%9F"><span class="nav-number">4.3.</span> <span class="nav-text">实验结束</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E7%BA%A7%E5%AE%9E%E9%AA%8C"><span class="nav-number">4.4.</span> <span class="nav-text">高级实验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%B1%82%E5%B5%8C%E5%A5%97"><span class="nav-number">4.4.1.</span> <span class="nav-text">分层嵌套</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#condition%E5%92%8Ctrigger"><span class="nav-number">4.4.2.</span> <span class="nav-text">condition和trigger</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%A0%E4%B8%AA%E4%BE%8B%E5%AD%90"><span class="nav-number">4.4.3.</span> <span class="nav-text">几个例子</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#A-B%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%A4%E7%B1%BB%E9%94%99%E8%AF%AF"><span class="nav-number">5.</span> <span class="nav-text">A&#x2F;B测试的两类错误</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#A-B%E6%B5%8B%E8%AF%95%E7%9A%84%E4%B8%80%E4%BA%9B%E8%AF%AF%E5%8C%BA"><span class="nav-number">6.</span> <span class="nav-text">A&#x2F;B测试的一些误区</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">177</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备16049735号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">2.6m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">39:29</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"dOMRIGavgWnKuSQ5IqJS3ckT-gzGzoHsz","app_key":"qMh3SHPhOGOhYa5GA251PGcy","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
