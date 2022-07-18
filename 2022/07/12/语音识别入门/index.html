@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="语音识别入门">
+<meta property="og:url" content="https://blog.rexking6.top/2022/07/12/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E5%85%A5%E9%97%A8/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-e249f22dc3931ca7b83744b07df6ac07_r.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/ADkldLe6ipDRPwXhtT9S.png">
+<meta property="og:image" content="https://image.rexking6.top/img/hnjkocBoeXhCejKFwudU.png">
+<meta property="og:image" content="https://image.rexking6.top/img/F8eUAjR3CLHrukhuWbEh.png">
+<meta property="og:image" content="https://image.rexking6.top/img/22bdDP4RpbbeEy02x1MT.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/DPhg9WpEIe5cFzK4AcCh.gif">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-2d013416fdc964832d1f9d005e6f597e_r.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-43333be9af35bc436aa25776b7b0f610_r.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-eee5e4eac3fb251f4b43915dba7da1a4_r.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-7e55cea76a13956b7222ceb5d47741a4_r.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-47facbc5f1731b36ed1fd6cf382e1f67_720w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/kiirT2hZpssnWM7UXvDA.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/eFUNR6pqbfpgUjDkFr4J.png">
+<meta property="og:image" content="https://image.rexking6.top/img/Ea96QVJvyEAmP2PUaT91.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/CABVSMTo8xt3itvxcLMx.png">
+<meta property="og:image" content="https://image.rexking6.top/img/wIylyhoMToWI9h3VVeNl.png">
+<meta property="og:image" content="https://image.rexking6.top/img/88dASxixx2gxVdtqVATN.jpeg">
+<meta property="og:image" content="https://image.rexking6.top/img/anDR2b2PLwrsDJvqpGxi.png">
+<meta property="og:image" content="https://image.rexking6.top/img/ehEBB8cTcsEZKSwCs08S.jpeg">
+<meta property="og:image" content="https://image.rexking6.top/img/vnOGMo5mqm4lxZow5s8K.png">
+<meta property="og:image" content="https://image.rexking6.top/img/ZyY1KJGCPdtVBy7hnS0z.png">
+<meta property="article:published_time" content="2022-07-11T16:34:26.000Z">
+<meta property="article:modified_time" content="2022-07-18T16:39:24.652Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="语音识别">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/v2-e249f22dc3931ca7b83744b07df6ac07_r.jpg">
+
+<link rel="canonical" href="https://blog.rexking6.top/2022/07/12/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E5%85%A5%E9%97%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>语音识别入门 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2022/07/12/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E5%85%A5%E9%97%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          语音识别入门
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-07-12 00:34:26" itemprop="dateCreated datePublished" datetime="2022-07-12T00:34:26+08:00">2022-07-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-07-19 00:39:24" itemprop="dateModified" datetime="2022-07-19T00:39:24+08:00">2022-07-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/" itemprop="url" rel="index"><span itemprop="name">语音识别</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2022/07/12/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E5%85%A5%E9%97%A8/" class="post-meta-item leancloud_visitors" data-flag-title="语音识别入门" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>24k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>22 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>简单了解下语音识别，综合转载于：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.woshipm.com/ai/4144034.html">语音交互：聊聊语音识别-ASR</a></li>
+<li><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/82872145">语音识别技术简史</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/380589078">语音识别(Speech Recognition)综述</a></p>
+</li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/31193859">如何成为一名全栈语音识别工程师？</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/349586567">WeNet - 面向工业落地的E2E语音识别工具</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/wenet-e2e/wenet">WeNet</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/nl8590687/ASRT_SpeechRecognition">ASRT_SpeechRecognition</a></li>
+</ul>
+<h1 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h1><p>语音识别，通常称为自动语音识别，英文是Automatic Speech Recognition，缩写为ASR，主要是将人类语音中的词汇内容转换为计算机可读的输入，一般都是可以理解的文本内容，也有可能是二进制编码或者字符序列。但是，我们一般理解的语音识别其实都是狭义的语音转文字的过程，简称语音转文本识别（Speech To Text, STT）更合适，这样就能与语音合成(Text To Speech, TTS)对应起来。</p>
+<p>语音识别是一项融合多学科知识的前沿技术，覆盖了数学与统计学、声学与语言学、计算机与人工智能等基础学科和前沿学科，是人机自然交互技术中的关键环节。但是，语音识别自诞生以来的半个多世纪，一直没有在实际应用过程得到普遍认可，一方面这与语音识别的技术缺陷有关，其识别精度和速度都达不到实际应用的要求；另一方面，与业界对语音识别的期望过高有关，实际上语音识别与键盘、鼠标或触摸屏等应是融合关系，而非替代关系。</p>
+<p>深度学习技术自2009年兴起之后，已经取得了长足进步。语音识别的精度和速度取决于实际应用环境，但在安静环境、标准口音、常见词汇场景下的语音识别率已经超过95%，意味着具备了与人类相仿的语言识别能力，而这也是语音识别技术当前发展比较火热的原因。</p>
+<p>随着技术的发展，现在口音、方言、噪声等场景下的语音识别也达到了可用状态，特别是远场语音识别已经随着智能音箱的兴起成为全球消费电子领域应用最为成功的技术之一。由于语音交互提供了更自然、更便利、更高效的沟通形式，语音必定将成为未来最主要的人机互动接口之一。</p>
+<p>当然，当前技术还存在很多不足，如对于强噪声、超远场、强干扰、多语种、大词汇等场景下的语音识别还需要很大的提升；另外，多人语音识别和离线语音识别也是当前需要重点解决的问题。虽然语音识别还无法做到无限制领域、无限制人群的应用，但是至少从应用实践中我们看到了一些希望。</p>
+<h1 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h1><p>语音识别的应用非常广泛，常见的有语音交互、语音输入。随着技术的逐渐成熟和5G的普及，未来的应用范围只会更大。</p>
+<p>语音识别技术的应用往往按照应用场景进行划分，会有私人场景、车载场景、儿童场景、家庭场景等，不同场景的产品形态会有所不同，但是底层的技术都是一样的。</p>
+<h2 id="私人场景"><a href="#私人场景" class="headerlink" title="私人场景"></a>私人场景</h2><p>私人场景常见的是手机助手、语音输入法等，主要依赖于我们常用的设备—手机。</p>
+<p>如果你的手机内置手机助手，你可以方便快捷的实现设定闹钟，打开应用等，大大的提高了效率。语音输入法也有非常明显的优势，相较于键盘输入，提高了输入的效率，每分钟可以输入300字左右。</p>
+<h2 id="车载场景"><a href="#车载场景" class="headerlink" title="车载场景"></a>车载场景</h2><p>车载场景的语音助手是未来的趋势，现在国产电动车基本上都有语音助手，可以高效的实现对车内一些设施的控制，比如调低座椅、打开空调、播放音乐等。</p>
+<p>开车是需要高度集中注意力的事情，眼睛和手会被占用，这个时候使用语音交互往往会有更好的效果。</p>
+<h2 id="儿童场景"><a href="#儿童场景" class="headerlink" title="儿童场景"></a>儿童场景</h2><p>语音识别在儿童场景的应用也很多，因为儿童对于新鲜事物的接受能力很高，能够接受现在技术的不成熟。常见的儿童学习软件中的跟读功能，识别孩子发音是否准确，这就应用的是语音识别能力。</p>
+<p>还有一些可以语音交互的玩具，也有ASR识别的部分。</p>
+<h2 id="家庭场景"><a href="#家庭场景" class="headerlink" title="家庭场景"></a>家庭场景</h2><p>家庭场景最常见的就是智能音箱和智能电视了，我们通过智能音箱，可以语音控制家里面的所有电器的开关和状态；通过语音控制电视切换节目，搜索我们想要观看的内容。</p>
+<h1 id="知识体系"><a href="#知识体系" class="headerlink" title="知识体系"></a>知识体系</h1><h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="数学与统计学"><a href="#数学与统计学" class="headerlink" title="数学与统计学"></a>数学与统计学</h3><p>数学是所有学科的基础，其中的高等数学、数理方程、泛函分析等课程是必要的基础知识，概率论与数理统计也是语音识别的基础学科。</p>
+<h3 id="声学与语言学"><a href="#声学与语言学" class="headerlink" title="声学与语言学"></a>声学与语言学</h3><p>声学基础、理论声学、声学测量等是声学方面的基础课程，有助于了解更多声学领域的知识。语言学概论、语言哲学、语义最小论与语用多元论、语法化与语义图等知识对于理解语言模型和语音交互UI设计非常有帮助。</p>
+<h3 id="计算机学"><a href="#计算机学" class="headerlink" title="计算机学"></a>计算机学</h3><p>信号系统、数字信号处理、语音信号处理、离散数学、数据结构、算法导论、并行计算、C语言概论、Python语言、语音识别、深度学习等课程也是必备的基础知识。</p>
+<h3 id="基本单位"><a href="#基本单位" class="headerlink" title="基本单位"></a>基本单位</h3><ul>
+<li><p>Phoneme（音位，音素）</p>
+<p>a unit of sound, 是声音的最基本单位，每个词语token的声音由多个 phoneme 组成</p>
+</li>
+<li><p>Grapheme（字位）</p>
+<p>smallest unot of a writing system 每个单词书写最基本的单位，简单来说：</p>
+<p>英文的grapheme可以认为是词缀， 由 ［26个英文字母 + 空格 + 标点符号］组成</p>
+<p>中文的Grapheme是汉字</p>
+</li>
+<li><p>Word（词）</p>
+<p>英文可以用单词作为语音识别的最基本单位，但包括中文在内的很多语言无法使用word作为最基本的单位（word数量太过于庞大，word之间难于分隔等）</p>
+</li>
+<li><p>Morpheme（词素）</p>
+<p>the smallest meaningful unit 类似英文单词中词缀</p>
+</li>
+<li><p>bytes</p>
+<p>用byte的序列来表示计算机中的每个字符（比如使用utf-8对字符编码），用用byte作为语音识别的基本单位可以让是识别系统将不同的语言统一处理，和语言本身无关，英文上叫 The system can be language independent</p>
+</li>
+</ul>
+<h2 id="专业知识"><a href="#专业知识" class="headerlink" title="专业知识"></a>专业知识</h2><p>语音识别的知识体系可以划分为三个大的部分：专业基础、支撑技能和应用技能。语音识别的专业基础又包括了算法基础、数据知识和开源平台，其中算法基础是语音识别系统的核心知识，包括了声学机理、信号处理、声学模型、语言模型和解码搜索等。</p>
+<h3 id="专业基础"><a href="#专业基础" class="headerlink" title="专业基础"></a>专业基础</h3><h4 id="算法基础"><a href="#算法基础" class="headerlink" title="算法基础"></a>算法基础</h4><ul>
+<li><strong>声学机理</strong>：包括发音机理、听觉机理和语言机理，发音机理主要探讨人类发声器官和这些器官在发声过程中的作用，而听觉机理主要探讨人类听觉器官、听觉神经及其辨别处理声音的方式，语言机理主要探究人类语言的分布和组织方式。这些知识对于理论突破和模型生成具有重要意义。</li>
+<li><p><strong>信号处理</strong>：包括语音增强、噪声抑制、回声抵消、混响抑制、波束形成、声源定位、声源分离、声源追踪等。具体如下：</p>
+<ol>
+<li><strong>语音增强</strong>：这里是狭义定义，指自动增益或者阵列增益，主要是解决拾音距离的问题，自动增益一般会增加所有信号能量，而语音增强只增加有效语音信号的能量。</li>
+<li><strong>噪声抑制</strong>：语音识别不需要完全去除噪声，相对来说通话系统中则必须完全去除噪声。这里说的噪声一般指环境噪声，比如空调噪声，这类噪声通常不具有空间指向性，能量也不是特别大，不会掩盖正常的语音，只是影响了语音的清晰度和可懂度。这种方法不适合强噪声环境下的处理，但是足以应付日常场景的语音交互。</li>
+<li><strong>混响消除</strong>：混响消除的效果很大程度影响了语音识别的效果。一般来说，当声源停止发声后，声波在房间内要经过多次反射和吸收，似乎若干个声波混合持续一段时间，这种现象叫做混响。混响会严重影响语音信号处理，并且降低测向精度。</li>
+<li><strong>回声抵消</strong>：严格来说，这里不应该叫回声，应该叫“自噪声”。回声是混响的延伸概念，这两者的区别就是回声的时延更长。一般来说，超过100毫秒时延的混响，人类能够明显区分出，似乎一个声音同时出现了两次，就叫做回声。实际上，这里所指的是语音交互设备自己发出的声音，比如Echo音箱，当播放歌曲的时候若叫Alexa，这时候麦克风阵列实际上采集了正在播放的音乐和用户所叫的Alexa声音，显然语音识别无法识别这两类声音。回声抵消就是要去掉其中的音乐信息而只保留用户的人声，之所以叫回声抵消，只是延续大家的习惯，其实是不恰当的。</li>
+<li><strong>声源测向</strong>：这里没有用声源定位，测向和定位是不太一样的，而消费级麦克风阵列做到测向就可以，定位则需要更多的成本投入。声源测向的主要作用就是侦测到与之对话人类的声音以便后续的波束形成。声源测向可以基于能量方法，也可以基于谱估计，阵列也常用TDOA技术。声源测向一般在语音唤醒阶段实现，VAD技术其实就可以包含到这个范畴，也是未来功耗降低的关键因素。</li>
+<li><strong>波束形成</strong>：波束形成是通用的信号处理方法，这里是指将一定几何结构排列的麦克风阵列的各麦克风输出信号经过处理（例如加权、时延、求和等）形成空间指向性的方法。波束形成主要是抑制主瓣以外的声音干扰，这里也包括人声，比如几个人围绕Echo谈话的时候，Echo只会识别其中一个人的声音。</li>
+</ol>
+</li>
+<li><p><strong>端点检测</strong>：端点检测，英语是Voice Activity Detection，简称VAD，主要作用是区分一段声音是有效的语音信号还是非语音信号。VAD是语音识别中检测句子之间停顿的主要方法，同时也是低功耗所需要考虑的重要因素。VAD通常都用信号处理的方法来做，之所以这里单独划分，因为现在VAD的作用其实更加重要，而且通常VAD也会基于机器学习的方法来做。</p>
+</li>
+<li><strong>特征提取</strong>：声学模型通常不能直接处理声音的原始数据，这就需要把时域的声音原始信号通过某类方法提取出固定的特征序列，然后将这些序列输入到声学模型。事实上深度学习训练的模型不会脱离物理的规律，只是把幅度、相位、频率以及各个维度的相关性进行了更多的特征提取。</li>
+<li><strong>声学模型</strong>：声学模型是语音识别中最为关键的部分，是将声学和计算机学的知识进行整合，以特征提取部分生成的特征作为输入，并为可变长的特征序列生成声学模型分数。声学模型核心要解决特征向量的可变长问题和声音信号的多变性问题。事实上，每次所提到的语音识别进展，基本上都是指声学模型的进展。声学模型迭代这么多年，已经有很多模型，我们把每个阶段应用最为广泛的模型介绍一下，其实现在很多模型都是在混用，这样可以利用各个模型的优势，对于场景的适配更加鲁棒。<ol>
+<li><strong>GMM</strong>：Gaussian Mixture Model，即高斯混合模型，是基于傅立叶频谱语音特征的统计模型，可以通过不断迭代优化求取GMM中的加权系数及各个高斯函数的均值与方差。GMM模型训练速度较快，声学模型参数量小，适合离线终端应用。深度学习应用到语音识别之前，GMM-HMM混合模型一直都是优秀的语音识别模型。但是GMM不能有效对非线性或近似非线性的数据进行建模，很难利用语境的信息，扩展模型比较困难。</li>
+<li><strong>HMM</strong>：Hidden Markov Model，即隐马尔可夫模型，用来描述一个含有隐含未知参数的马尔可夫过程，从可观察的参数中确定该过程的隐含参数，然后利用这些参数来进一步分析。HMM是一种可以估计语音声学序列数据的统计学分布模型，尤其是时间特征，但是这些时间特征依赖于HMM的时间独立性假设，这样对语速、口音等因素与声学特征就很难关联起来。HMM还有很多扩展的模型，但是大部分还只适应于小词汇量的语音识别，大规模语音识别仍然非常困难。</li>
+<li><strong>DNN</strong>：Deep Neural Network，即深度神经网络，是较早用于声学模型的神经网络，DNN可以提高基于高斯混合模型的数据表示的效率，特别是DNN-HMM混合模型大幅度地提升了语音识别率。由于DNN-HMM只需要有限的训练成本便可得到较高的语音识别率，目前仍然是语音识别工业领域常用的声学模型。</li>
+<li><strong>RNN&amp;CNN</strong>：Recurrent Neural Networks，即循环神经网络，CNN，Convolutional NeuralNetworks，即卷积神经网络，这两种神经网络在语音识别领域的应用，主要是解决如何利用可变长度语境信息的问题，CNN/RNN比DNN在语速鲁棒性方面表现的更好一些。其中，RNN模型主要包括LSTM（多隐层长短时记忆网络）、highway LSTM、Residual LSTM、双向LSTM等。CNN模型包括了时延神经网络（TDNN）、CNN-DNN、CNN-LSTM-DNN（CLDNN）、CNN-DNN-LSTM、Deep CNN等。其中有些模型性能相近，但是应用方式不同，比如双向LSTM和Deep CNN性能接近，但是双向LSTM需要等一句话结束才能识别，而Deep CNN则没有时延更适合实时语音识别。</li>
+</ol>
+</li>
+<li><strong>语言模型</strong>：通过训练语料学习词之间的关系来估计词序列的可能性，最常见的语言模型是N-Gram模型。近年，深度神经网络的建模方式也被应用到语言模型中，比如基于CNN及RNN的语言模型。</li>
+<li><strong>解码搜索</strong>：解码是决定语音识别速度的关键因素，解码过程通常是将声学模型、词典以及语言模型编译成一个网络，基于最大后验概率的方法，选择一条或多条最优路径作为语音识别结果。解码过程一般可以划分动态编译和静态编译，或者同步与异步的两种模式。目前比较流行的解码方法是基于树拷贝的帧同步解码方法。</li>
+</ul>
+<h4 id="数据知识"><a href="#数据知识" class="headerlink" title="数据知识"></a>数据知识</h4><ul>
+<li><strong>数据采集</strong>：主要是将用户与机器对话的声音信息收集起来，一般分为近场和远场两个部分，近场采集一般基于手机就可完成，远场采集一般需要麦克风阵列。数据采集同时还有关注采集环境，针对不同数据用途，语音采集的要求也很不一样，比如人群的年龄分布、性别分布和地域分布等。</li>
+<li><strong>数据清洗</strong>：主要是将采集的数据进行预处理，剔除不合要求的语音甚至是失效的语音，为后面的数据标注提供精确的数据。</li>
+<li><strong>数据标注</strong>：主要是将声音的信息翻译成对应的文字，训练一个声学模型，通常要标注数万个小时，而语音是时序信号，所以需要的人力工时相对很多，同时由于人员疲惫等因素导致标注的错误率也比较高。如何提高数据标注的成功率也是语音识别的关键问题。</li>
+<li><strong>数据管理</strong>：主要是对标注数据的分类管理和整理，这样更利于数据的有效管理和重复利用。</li>
+<li><strong>数据安全</strong>：主要是对声音数据进行安全方便的处理，比如加密等，以避免敏感信息泄露。</li>
+</ul>
+<h4 id="开源平台"><a href="#开源平台" class="headerlink" title="开源平台"></a>开源平台</h4><p>目前主流的开源平台包括CMU Sphinx、HTK、Kaldi、Julius、iATROS、CNTK、TensorFlow等，CMU Sphinx是离线的语音识别工具，支持DSP等低功耗的离线应用场景。由于深度学习对于语音识别WER的下降具有明显的作用，所以Kaldi、CNTK、TensorFlow等支持深度学习的工具目前比较流行，Kaldi的优势就是集成了很多语音识别的工具，包括解码搜索等。具体的开源平台汇总如表1所示。</p>
+<p><img src="https://image.rexking6.top/img/v2-e249f22dc3931ca7b83744b07df6ac07_r.jpg" alt=""></p>
+<h3 id="支撑技能"><a href="#支撑技能" class="headerlink" title="支撑技能"></a>支撑技能</h3><h4 id="声学器件"><a href="#声学器件" class="headerlink" title="声学器件"></a>声学器件</h4><ul>
+<li>传声器，通常称为麦克风，是一种将声音转换成电子信号的换能器，即把声信号转成电信号，其核心参数是灵敏度、指向性、频率响应、阻抗、动态范围、信噪比、最大声压级（或AOP，声学过载点）、一致性等。传声器是语音识别的核心器件，决定了语音数据的基本质量。</li>
+<li>扬声器，通常称为喇叭，是一种把电信号转变为声信号的换能器件，扬声器的性能优劣对音质的影响很大，其核心指标是TS参数。语音识别中由于涉及到回声抵消，对扬声器的总谐波失真要求稍高。</li>
+<li>激光拾声，这是主动拾声的一种方式，可以通过激光的反射等方法拾取远处的振动信息，从而还原成为声音，这种方法以前主要应用在窃听领域，但是目前来看这种方法应用到语音识别还比较困难。</li>
+<li>微波拾声，微波是指波长介于红外线和无线电波之间的电磁波，频率范围大约在 300MHz至300GHz之间，同激光拾声的原理类似，只是微波对于玻璃、塑料和瓷器几乎是穿越而不被吸收。</li>
+<li>高速摄像头拾声，这是利用高速摄像机来拾取振动从而还原声音，这种方式需要可视范围和高速摄像机，只在一些特定场景里面应用。</li>
+</ul>
+<h4 id="计算芯片"><a href="#计算芯片" class="headerlink" title="计算芯片"></a>计算芯片</h4><ul>
+<li>DSP，Digital Signal Processor，数字信号处理器，一般采用哈佛架构，具有低功耗运算快等优点，主要应用在低功耗语音识别领域。</li>
+<li>ARM，Acorn RISC Machine，是英国公司设计的一种RISC处理器架构，具有低功耗高性能的特点，在移动互联网领域广泛应用，目前IOT领域，比如智能音箱也是以ARM处理器为主。</li>
+<li>FPGA，Field－Programmable Gate Array，现场可编程门阵列，是ASIC领域中的一种半定制电路，既解决了固定定制电路的不足，又克服了可编程器件门电路有限的缺点。FPGA在并行计算领域也非常重要，大规模的深度学习也可以基于FPGA计算实现。</li>
+<li>GPU，Graphics Processing Unit，图形处理器，是当前深度学习领域最火的计算架构，事实上深度学习领域用到的是GPGPU，主要是进行大规模计算的加速，GPU通常的问题就是功耗过大，所以一般应用到云端的服务器集群。</li>
+<li>另外，还有NPU、TPU等新兴的处理器架构，主要为深度学习算法进行专门的优化，由于还没有大规模使用，这里先不详叙。</li>
+</ul>
+<h4 id="声学结构"><a href="#声学结构" class="headerlink" title="声学结构"></a>声学结构</h4><ul>
+<li>阵列设计，主要是指麦克风阵列的结构设计，麦克风阵列一般来说有线形、环形和球形之分，严谨的应该说成一字、十字、平面、螺旋、球形及无规则阵列等。至于麦克风阵列的阵元数量，也就是麦克风数量，可以从2个到上千不等，因此阵列设计就要解决场景中的麦克风阵列阵型和阵元数量的问题，既保证效果，又控制成本。</li>
+<li>声学设计，主要是指扬声器的腔体设计，语音交互系统不仅需要收声，还需要发声，发声的质量也特别重要，比如播放音乐或者视频的时候，音质也是非常重要的参考指标，同时，音质的设计也将影响语音识别的效果，因此声学设计在智能语音交互系统也是关键因素。</li>
+</ul>
+<h3 id="应用技能"><a href="#应用技能" class="headerlink" title="应用技能"></a>应用技能</h3><ul>
+<li>语音识别的应用将是语音交互时代最值得期待的创新，可以类比移动互联时代，最终黏住用户的还是语音应用程序，而当前的人工智能主要是基础建设，AI的应用普及还是需要一段时间。虽然Amazon的Alexa已经有上万个应用，但是从用户反馈来看，目前主要还是以下几个核心技术点的应用。</li>
+<li>语音控制，事实上是当前最主要的应用，包括了闹钟、音乐、地图、购物、智能家电控制等等功能，语音控制的难度相对也比较大，因为语音控制要求语音识别更加精准、速度更快。</li>
+<li>语音转录，这在比如会议系统、智能法院、智能医疗等领域具有特殊应用，主要是实时将用户说话的声音转录成文字，以便形成会议纪要、审判记录和电子病历等。</li>
+<li>语言翻译，主要是在不同语言之间进行切换，这在语音转录的基础上增加了实时翻译，对于语音识别的要求更高。</li>
+</ul>
+<p>下面这三种识别，可以归为语音识别的范畴，也可以单独列成一类，这里我们还是广义归纳到语音识别的大体系，作为语音识别的功能点更容易理解。</p>
+<ul>
+<li>声纹识别，声纹识别的理论基础是每一个声音都具有独特的特征，通过该特征能将不同人的声音进行有效的区分。声纹的特征主要由两个因素决定，第一个是声腔的尺寸，具体包括咽喉、鼻腔和口腔等，这些器官的形状、尺寸和位置决定了声带张力的大小和声音频率的范围。第二个决定声纹特征的因素是发声器官被操纵的方式，发声器官包括唇、齿、舌、软腭及腭肌肉等，他们之间相互作用就会产生清晰的语音。而他们之间的协作方式是人通过后天与周围人的交流中随机学习到的。声纹识别常用的方法包括模板匹配法、最近邻方法、神经元网络方法、VQ聚类法等。</li>
+<li>情感识别，主要是从采集到的语音信号中提取表达情感的声学特征，并找出这些声学特征与人类情感的映射关系。情感识别当前也主要采用深度学习的方法，这就需要建立对情感空间的描述以及形成足够多的情感语料库。情感识别是人机交互中体现智能的应用，但是到目前为止，技术水平还没有达到产品应用的程度。</li>
+<li>哼唱识别，主要是通过用户哼唱歌曲的曲调，然后通过其中的旋律同音乐库中的数据进行详细分析和比对，最后将符合这个旋律的歌曲信息提供给用户。目前这项技术在音乐搜索中已经使用，识别率可以达到80%左右。</li>
+</ul>
+<h1 id="整体流程"><a href="#整体流程" class="headerlink" title="整体流程"></a>整体流程</h1><p>整个从语音识别的过程，先从本地获取音频，然后传到云端，最后识别出文本，就是一个声学信号转换成文本信息的过程。整个识别的过程如下图：</p>
+<p><img src="https://image.rexking6.top/img/ADkldLe6ipDRPwXhtT9S.png" alt=""></p>
+<h2 id="VAD技术"><a href="#VAD技术" class="headerlink" title="VAD技术"></a>VAD技术</h2><p>在开始语音识别之前，有时需要把首尾端的静音切除，降低对后续步骤造成干扰，这个切除静音的炒作一般称为VAD。</p>
+<p>这个步骤一般是在本地完成的，这部分需要用到信号处理的一些技术。</p>
+<p>VAD（Voice Activity Detection）：也叫语音激活检测，或者静音抑制。其目的是检测当前语音信号中是否包含话音信号存在，即对输入信号进行判断，将话音信号与各种背景噪声信号区分出来，分别对两种信号采用不同的处理方法。</p>
+<p>算法方面，VAD算法主要用了2-3个模型来对语音建模，并且分成噪声类、语音类还有静音类。目前大多数还是基于信噪比的算法，也有一些基于深度学习（DNN）的模型。</p>
+<p>一般在产品设计的时候，会固定一个VAD截断的时间，但面对不同的应用场景，可能会要求这个时间是可以自定义的，主要是用来控制多长时间没有声音进行截断。</p>
+<p>比如小孩子说话会比较慢，常常会留尾音，那么我们就需要针对儿童场景，设置比较长的VAD截断时间；而成人就可以相对短一点，一般会设置在400ms-1000ms之间。</p>
+<h2 id="本地上传（压缩）"><a href="#本地上传（压缩）" class="headerlink" title="本地上传（压缩）"></a>本地上传（压缩）</h2><p>人的声音信息首先要经过麦克风阵列收集和处理，然后再把处理好的音频文件传到云端，整个语音识别模型才开始工作。</p>
+<p>这里的上传并不是直接把收音到的音频丢到云端，而是要进行压缩的，主要考虑到音频太小，网络等问题，会影响整体的响应速度。从本地到云端是一个压缩-&gt;上传-&gt;解压的过程，数据才能够到达云端。</p>
+<p>整个上传的过程也是实时的，是以数据流的形式进行上传，每隔一段时间上传一个包。</p>
+<p>你可以理解为每说一个字，就要上传一次，这也就对应着我们常常看到的一个字一个字的往屏幕上蹦的效果。一般一句“明天天气怎么样？”，会上传大约30多个包到云端。</p>
+<p>一般考虑我们大部分设备使用的都是Wi-Fi和4G网络，每次上传的包的大小在128个字节的大小，整个响应还是非常及时的。</p>
+<h2 id="信号处理"><a href="#信号处理" class="headerlink" title="信号处理"></a>信号处理</h2><p>这里的信号处理一般指的是降噪，有些麦克风阵列本身的降噪算法受限于前端硬件的限制，会把一部分降噪的工作放在云端。</p>
+<p>像专门提供云端语音识别能力的公司，比如科大讯飞、谷歌，自己的语音识别模型都是有降噪能力的，因为你不知道前端的麦克风阵列到底是什么情况。</p>
+<p>除了降噪以外可能还涉及到数据格式的归一化等，当然有些模型可能不需要这些步骤，比如自研的语音识别模型，只给自己的机器用，那么我解压完了就是我想要的格式。</p>
+<p><img src="https://image.rexking6.top/img/hnjkocBoeXhCejKFwudU.png" alt=""></p>
+<h2 id="特征提取"><a href="#特征提取" class="headerlink" title="特征提取"></a>特征提取</h2><p>特征提取是语音识别关键的一步，解压完音频文件后，就要先进行特征提取，提取出来的特征作为参数，为模型计算做准备。简单理解就是语音信息的数字化，然后再通过后面的模型对这些数字化信息进行计算。</p>
+<p>特征提取首先要做的是采样，前面我们说过音频信息是以数据流的形式存在，是连续不断的，对连续时间进行离散化处理的过程就是采样率，单位是Hz。</p>
+<p>可以理解为从一条连续的曲线上面取点，取的点越密集，越能还原这条曲线的波动趋势，采样率也就越高。理论上越高越好，但是一般10kHz以下就够用了，所以大部分都会采取16kHz的采样率。</p>
+<p>具体提取那些特征，这要看模型要识别那些内容，一般只是语音转文字的话，主要是提取<strong>音素</strong>；但是想要识别语音中的情绪，可能就需要提取<strong>响度</strong>、<strong>音高</strong>等参数。</p>
+<p>最常用到的语音特征就是梅尔倒谱系数（Mel-scale Frequency Cepstral Coefficients，简称MFCC），是在Mel标度频率域提取出来的倒谱参数，Mel标度描述了人耳频率的非线性特性。</p>
+<p><img src="https://image.rexking6.top/img/F8eUAjR3CLHrukhuWbEh.png" alt=""></p>
+<h2 id="声学模型（AM）"><a href="#声学模型（AM）" class="headerlink" title="声学模型（AM）"></a>声学模型（AM）</h2><p>声学模型将声学和发音学的知识进行整合，以特征提取模块提取的特征为输入，计算音频对应音素之间的概率。简单理解就是把从声音中提取出来的特征，通过声学模型，计算出相应的音素。</p>
+<p>声学模型目前的主流算法是混合高斯模型+隐马尔可夫模型（GMM-HMM），HMM模型对时序信息进行建模，在给定HMM的一个状态后，GMM对属于该状态的语音特征向量的概率分布进行建模。</p>
+<p>现在也有基于深度学习的模型，在大数据的情况下，效果要好于GMM-HMM。</p>
+<p>声学模型就是把声音转成音素，有点像把声音转成拼音的感觉，所以优化声学模型需要音频数据。</p>
+<p><img src="https://image.rexking6.top/img/22bdDP4RpbbeEy02x1MT.jpg" alt=""></p>
+<h2 id="语言模型（LM）"><a href="#语言模型（LM）" class="headerlink" title="语言模型（LM）"></a>语言模型（LM）</h2><p>语言模型是将语法和字词的知识进行整合，计算文字在这句话下出现的概率。一般自然语言的统计单位是句子，所以也可以看做句子的概率模型。简单理解就是给你几个字词，然后计算这几个字词组成句子的概率。</p>
+<p>语言模型中，基于统计学的有n-gram 语言模型，目前大部分公司用的也是该模型。</p>
+<p>还有基于深度学习的语言模型，语言模型就是根据一些可能的词（词典给的），然后计算出那些词组合成一句话的概率比较高，所以优化语言模型需要的是文本数据。</p>
+<p><img src="https://image.rexking6.top/img/DPhg9WpEIe5cFzK4AcCh.gif" alt=""></p>
+<h2 id="词典"><a href="#词典" class="headerlink" title="词典"></a>词典</h2><p>词典就是发音字典的意思，中文中就是拼音与汉字的对应，英文中就是音标与单词的对应。</p>
+<p>其目的是根据声学模型识别出来的音素，来找到对应的汉字（词）或者单词，用来在声学模型和语言模型建立桥梁，将两者联系起来——简单理解词典是连接声学模型和语言模型的月老。</p>
+<p>词典不涉及什么算法，一般的词典都是大而全的，尽可能地覆盖我们所有地字。词典这个命名很形象，就像一本“新华字典”，给声学模型计算出来的拼音配上所有可能的汉字。</p>
+<p>整个这一套组成了一个完整的语音识别模型，其中声学模型和语言模型是整个语音识别的核心，各家识别效果的差异也是这两块内容的不同导致的。</p>
+<p>一般我们更新的热词，更新的都是语言模型中的内容，后面会详细阐述。</p>
+<h1 id="技术历程"><a href="#技术历程" class="headerlink" title="技术历程"></a>技术历程</h1><p>现代语音识别可以追溯到1952年，Davis等人研制了世界上第一个能识别10个英文数字发音的实验系统，从此正式开启了语音识别的进程。语音识别发展到今天已经有70多年，但从技术方向上可以大体分为三个阶段。</p>
+<p>下图是从1993年到2017年在Switchboard上语音识别率的进展情况，从图中也可以看出1993年到2009年，语音识别一直处于GMM-HMM时代，语音识别率提升缓慢，尤其是2000年到2009年语音识别率基本处于停滞状态；2009年随着深度学习技术，特别是DNN的兴起，语音识别框架变为DNN-HMM，语音识别进入了DNN时代，语音识别精准率得到了显著提升；2015年以后，由于“端到端”技术兴起，语音识别进入了百花齐放时代，语音界都在训练更深、更复杂的网络，同时利用端到端技术进一步大幅提升了语音识别的性能，直到2017年微软在Swichboard上达到词错误率5.1%，从而让语音识别的准确性首次超越了人类，当然这是在一定限定条件下的实验结果，还不具有普遍代表性。</p>
+<p><img src="https://image.rexking6.top/img/v2-2d013416fdc964832d1f9d005e6f597e_r.jpg" alt=""></p>
+<h2 id="GMM-HMM时代"><a href="#GMM-HMM时代" class="headerlink" title="GMM-HMM时代"></a>GMM-HMM时代</h2><p>70年代，语音识别主要集中在小词汇量、孤立词识别方面，使用的方法也主要是简单的模板匹配方法，即首先提取语音信号的特征构建参数模板，然后将测试语音与参考模板参数进行一一比较和匹配，取距离最近的样本所对应的词标注为该语音信号的发音。该方法对解决孤立词识别是有效的，但对于大词汇量、非特定人连续语音识别就无能为力。因此，进入80年代后，研究思路发生了重大变化，从传统的基于模板匹配的技术思路开始转向基于统计模型（HMM）的技术思路。</p>
+<p>HMM的理论基础在1970年前后就已经由Baum等人建立起来，随后由CMU的Baker和IBM的Jelinek等人将其应用到语音识别当中。HMM模型假定一个音素含有3到5个状态，同一状态的发音相对稳定，不同状态间是可以按照一定概率进行跳转；某一状态的特征分布可以用概率模型来描述，使用最广泛的模型是GMM。因此GMM-HMM 框架中，HMM 描述的是语音的短时平稳的动态性，GMM 用来描述 HMM 每一状态内部的发音特征。</p>
+<p>基于 GMM-HMM 框架，研究者提出各种改进方法，如结合上下文信息的动态贝叶斯方法、区分性训练方法、自适应训练方法、HMM/NN 混合模型方法等。这些方法都对语音识别研究产生了深远影响，并为下一代语音识别技术的产生做好了准备。自上世纪 90 年代语音识别声学模型的区分性训练准则和模型自适应方法被提出以后，在很长一段内语音识别的发展比较缓慢，语音识别错误率那条线一直没有明显下降。</p>
+<h2 id="DNN-HMM时代"><a href="#DNN-HMM时代" class="headerlink" title="DNN-HMM时代"></a>DNN-HMM时代</h2><p>2006年，Hinton提出深度置信网络（DBN），促使了深度神经网络（DNN）研究的复苏。2009 年，Hinton 将 DNN 应用于语音的声学建模，在 TIMIT 上获得了当时最好的结果。2011 年底，微软研究院的俞栋、邓力又把 DNN 技术应用在了大词汇量连续语音识别任务上，大大降低了语音识别错误率。从此语音识别进入DNN-HMM时代。</p>
+<p>DNN-HMM主要是用DNN模型代替原来的GMM模型，对每一个状态进行建模，DNN带来的好处是不再需要对语音数据分布进行假设，将相邻的语音帧拼接又包含了语音的时序结构信息，使得对于状态的分类概率有了明显提升，同时DNN还具有强大环境学习能力，可以提升对噪声和口音的鲁棒性。</p>
+<p><img src="https://image.rexking6.top/img/v2-43333be9af35bc436aa25776b7b0f610_r.jpg" alt=""></p>
+<p>简单来说，DNN就是给出输入的一串特征所对应的状态概率。由于语音信号是连续的，不仅各个音素、音节以及词之间没有明显的边界，各个发音单位还会受到上下文的影响。虽然拼帧可以增加上下文信息，但对于语音来说还是不够。而递归神经网络（RNN）的出现可以记住更多历史信息，更有利于对语音信号的上下文信息进行建模。</p>
+<p>由于简单的RNN存在梯度爆炸和梯度消散问题，难以训练，无法直接应用于语音信号建模上，因此学者进一步探索，开发出了很多适合语音建模的RNN结构，其中最有名的就是LSTM。LSTM通过输入门、输出门和遗忘门可以更好的控制信息的流动和传递，具有长短时记忆能力。虽然LSTM的计算复杂度会比DNN增加，但其整体性能比DNN有相对20%左右稳定提升。</p>
+<p><img src="https://image.rexking6.top/img/v2-eee5e4eac3fb251f4b43915dba7da1a4_r.jpg" alt=""></p>
+<p>BLSTM是在LSTM基础上做的进一步改进，不仅考虑语音信号的历史信息对当前帧的影响，还要考虑未来信息对当前帧的影响，因此其网络中沿时间轴存在正向和反向两个信息传递过程，这样该模型可以更充分考虑上下文对于当前语音帧的影响，能够极大提高语音状态分类的准确率。BLSTM考虑未来信息的代价是需要进行句子级更新，模型训练的收敛速度比较慢，同时也会带来解码的延迟，对于这些问题，业届都进行了工程优化与改进，即使现在仍然有很多大公司使用的都是该模型结构。</p>
+<p><img src="https://image.rexking6.top/img/v2-7e55cea76a13956b7222ceb5d47741a4_r.jpg" alt="img"></p>
+<p>图像识别中主流的模型就是CNN，而语音信号的时频图也可以看作是一幅图像，因此CNN也被引入到语音识别中。要想提高语音识别率，就需要克服语音信号所面临的多样性，包括说话人自身、说话人所处的环境、采集设备等，这些多样性都可以等价为各种滤波器与语音信号的卷积。而CNN相当于设计了一系列具有局部关注特性的滤波器，并通过训练学习得到滤波器的参数，从而从多样性的语音信号中抽取出不变的部分，CNN本质上也可以看作是从语音信号中不断抽取特征的一个过程。CNN相比于传统的DNN模型，在相同性能情况下，前者的参数量更少。</p>
+<p>综上所述，对于建模能力来说，DNN适合特征映射到独立空间，LSTM具有长短时记忆能力，CNN擅长减少语音信号的多样性，因此一个好的语音识别系统是这些网络的组合。</p>
+<h2 id="端到端时代"><a href="#端到端时代" class="headerlink" title="端到端时代"></a>端到端时代</h2><p>语音识别的端到端方法主要是代价函数发生了变化，但神经网络的模型结构并没有太大变化。总体来说，端到端技术解决了输入序列的长度远大于输出序列长度的问题。端到端技术主要分成两类：一类是CTC方法，另一类是Sequence-to-Sequence方法。传统语音识别DNN-HMM架构里的声学模型，每一帧输入都对应一个标签类别，标签需要反复的迭代来确保对齐更准确。</p>
+<p>采用CTC作为损失函数的声学模型序列，不需要预先对数据对齐，只需要一个输入序列和一个输出序列就可以进行训练。CTC关心的是预测输出的序列是否和真实的序列相近，而不关心预测输出序列中每个结果在时间点上是否和输入的序列正好对齐。CTC建模单元是音素或者字，因此它引入了Blank。对于一段语音，CTC最后输出的是尖峰的序列，尖峰的位置对应建模单元的Label，其他位置都是Blank。</p>
+<p>Sequence-to-Sequence方法原来主要应用于机器翻译领域。2017年，Google将其应用于语音识别领域，取得了非常好的效果，将词错误率降低至5.6%。如下图所示，Google提出新系统的框架由三个部分组成：Encoder编码器组件，它和标准的声学模型相似，输入的是语音信号的时频特征；经过一系列神经网络，映射成高级特征henc，然后传递给Attention组件，其使用henc特征学习输入x和预测子单元之间的对齐方式，子单元可以是一个音素或一个字。最后，attention模块的输出传递给Decoder，生成一系列假设词的概率分布，类似于传统的语言模型。</p>
+<p><img src="https://image.rexking6.top/img/v2-47facbc5f1731b36ed1fd6cf382e1f67_720w.jpg" alt=""></p>
+<p>端到端技术的突破，不再需要HMM来描述音素内部状态的变化，而是将语音识别的所有模块统一成神经网络模型，使语音识别朝着更简单、更高效、更准确的方向发展。</p>
+<h1 id="技术现状"><a href="#技术现状" class="headerlink" title="技术现状"></a>技术现状</h1><p>目前，主流语音识别框架还是由3个部分组成：声学模型、语言模型和解码器，有些框架也包括前端处理和后处理。随着各种深度神经网络以及端到端技术的兴起，声学模型是近几年非常热门的方向，业界都纷纷发布自己新的声学模型结构，刷新各个数据库的识别记录。由于中文语音识别的复杂性，国内在声学模型的研究进展相对更快一些，主流方向是更深更复杂的神经网络技术融合端到端技术。</p>
+<p>2018年，科大讯飞提出深度全序列卷积神经网络（DFCNN），DFCNN使用大量的卷积直接对整句语音信号进行建模，主要借鉴了图像识别的网络配置，每个卷积层使用小卷积核，并在多个卷积层之后再加上池化层，通过累积非常多卷积池化层对，从而可以看到更多的历史信息。</p>
+<p>2018年，阿里提出LFR-DFSMN（Lower Frame Rate-Deep Feedforward Sequential Memory Networks）。该模型将低帧率算法和DFSMN算法进行融合，语音识别错误率相比上一代技术降低20%，解码速度提升3倍。FSMN通过在FNN的隐层添加一些可学习的记忆模块，从而可以有效的对语音的长时相关性进行建模。而DFSMN是通过跳转避免深层网络的梯度消失问题，可以训练出更深层的网络结构。</p>
+<p>2019年，百度提出了流式多级的截断注意力模型SMLTA，该模型是在LSTM和CTC的基础上引入了注意力机制来获取更大范围和更有层次的上下文信息。其中流式表示可以直接对语音进行一个小片段一个小片段的增量解码；多级表示堆叠多层注意力模型；截断则表示利用CTC模型的尖峰信息，把语音切割成一个一个小片段，注意力模型和解码可以在这些小片段上展开。在线语音识别率上，该模型比百度上一代Deep Peak2模型提升相对15%的性能。</p>
+<p>开源语音识别Kaldi是业界语音识别框架的基石。Kaldi的作者Daniel Povey一直推崇的是Chain模型。该模型是一种类似于CTC的技术，建模单元相比于传统的状态要更粗颗粒一些，只有两个状态，一个状态是CD Phone，另一个是CD Phone的空白，训练方法采用的是Lattice-Free MMI训练。该模型结构可以采用低帧率的方式进行解码，解码帧率为传统神经网络声学模型的三分之一，而准确率相比于传统模型有非常显著的提升。</p>
+<p>远场语音识别技术主要解决真实场景下舒适距离内人机任务对话和服务的问题，是2015年以后开始兴起的技术。由于远场语音识别解决了复杂环境下的识别问题，在智能家居、智能汽车、智能会议、智能安防等实际场景中获得了广泛应用。目前国内远场语音识别的技术框架以前端信号处理和后端语音识别为主，前端利用麦克风阵列做去混响、波束形成等信号处理，以让语音更清晰，然后送入后端的语音识别引擎进行识别。</p>
+<p>语音识别另外两个技术部分：语言模型和解码器，目前来看并没有太大的技术变化。语言模型主流还是基于传统的N-Gram方法，虽然目前也有神经网络的语言模型的研究，但在实用中主要还是更多用于后处理纠错。解码器的核心指标是速度，业界大部分都是按照静态解码的方式进行，即将声学模型和语言模型构造成WFST网络，该网络包含了所有可能路径，解码就是在该空间进行搜索的过程。由于该理论相对成熟，更多的是工程优化的问题，所以不论是学术还是产业目前关注的较少。</p>
+<h1 id="技术趋势"><a href="#技术趋势" class="headerlink" title="技术趋势"></a>技术趋势</h1><p>语音识别主要趋于远场化和融合化的方向发展，但在远场可靠性还有很多难点没有突破，比如多轮交互、多人噪杂等场景还有待突破，还有需求较为迫切的人声分离等技术。新的技术应该彻底解决这些问题，让机器听觉远超人类的感知能力。这不能仅仅只是算法的进步，需要整个产业链的共同技术升级，包括更为先进的传感器和算力更强的芯片。</p>
+<p>单从远场语音识别技术来看，仍然存在很多挑战，包括：</p>
+<ol>
+<li>回声消除技术。由于喇叭非线性失真的存在，单纯依靠信号处理手段很难将回声消除干净，这也阻碍了语音交互系统的推广，现有的基于深度学习的回声消除技术都没有考虑相位信息，直接求取的是各个频带上的增益，能否利用深度学习将非线性失真进行拟合，同时结合信号处理手段可能是一个好的方向。</li>
+<li>噪声下的语音识别仍有待突破。信号处理擅长处理线性问题，深度学习擅长处理非线性问题，而实际问题一定是线性和非线性的叠加，因此一定是两者融合才有可能更好地解决噪声下的语音识别问题。</li>
+<li>上述两个问题的共性是目前的深度学习仅用到了语音信号各个频带的能量信息，而忽略了语音信号的相位信息，尤其是对于多通道而言，如何让深度学习更好的利用相位信息可能是未来的一个方向。</li>
+<li>另外，在较少数据量的情况下，如何通过迁移学习得到一个好的声学模型也是研究的热点方向。例如方言识别，若有一个比较好的普通话声学模型，如何利用少量的方言数据得到一个好的方言声学模型，如果做到这点将极大扩展语音识别的应用范畴。这方面已经取得了一些进展，但更多的是一些训练技巧，距离终极目标还有一定差距。</li>
+<li>语音识别的目的是让机器可以理解人类，因此转换成文字并不是最终的目的。如何将语音识别和语义理解结合起来可能是未来更为重要的一个方向。语音识别里的LSTM已经考虑了语音的历史时刻信息，但语义理解需要更多的历史信息才能有帮助，因此如何将更多上下文会话信息传递给语音识别引擎是一个难题。</li>
+<li>让机器听懂人类语言，仅靠声音信息还不够，“声光电热力磁”这些物理传感手段，下一步必然都要融合在一起，只有这样机器才能感知世界的真实信息，这是机器能够学习人类知识的前提条件。而且，机器必然要超越人类的五官，能够看到人类看不到的世界，听到人类听不到的世界。</li>
+</ol>
+<h1 id="产业历程"><a href="#产业历程" class="headerlink" title="产业历程"></a>产业历程</h1><p>语音识别这半个多世纪的产业历程中，其中共有三个关键节点，两个和技术有关，一个和应用有关。第一个关键节点是1988年的一篇博士论文，开发了第一个基于隐马尔科夫模型（HMM）的语音识别系统——Sphinx，当时实现这一系统的正是现在的著名投资人李开复。</p>
+<p>从1986年到2010年，虽然混合高斯模型效果得到持续改善，而被应用到语音识别中，并且确实提升了语音识别的效果，但实际上语音识别已经遭遇了技术天花板，识别的准确率很难超过90%。很多人可能还记得，在1998年前后IBM、微软都曾经推出和语音识别相关的软件，但最终并未取得成功。</p>
+<p>第二个关键节点是2009年深度学习被系统应用到语音识别领域中。这导致识别的精度再次大幅提升，最终突破90%，并且在标准环境下逼近98%。有意思的是，尽管技术取得了突破，也涌现出了一些与此相关的产品，比如 Siri、Google Assistant 等，但与其引起的关注度相比，这些产品实际取得的成绩则要逊色得多。Siri 刚一面世的时候，时任 Google CEO 的施密特就高呼，这会对 Google 的搜索业务产生根本性威胁，但事实上直到 Amazon Echo 的面世，这种根本性威胁才真的有了具体的载体。</p>
+<p>第三个关键点正是 Amazon Echo 的出现，纯粹从语音识别和自然语言理解的技术乃至功能的视角看这款产品，相对于 Siri 等并未有什么本质性改变，核心变化只是把近场语音交互变成了远场语音交互。Echo 正式面世于2015年6月，到2017年销量已经超过千万，同时在 Echo 上扮演类似 Siri 角色的 Alexa 渐成生态，其后台的第三方技能已经突破10000项。借助落地时从近场到远场的突破，亚马逊一举从这个赛道的落后者变为行业领导者。</p>
+<p>但自从远场语音技术规模落地以后，语音识别领域的产业竞争已经开始从研发转为应用。研发比的是标准环境下纯粹的算法谁更有优势，而应用比较的是在真实场景下谁的技术更能产生优异的用户体验，而一旦比拼真实场景下的体验，语音识别便失去独立存在的价值，更多作为产品体验的一个环节而存在。</p>
+<p>所以到2019年，语音识别似乎进入了一个相对平静期，全球产业界的主要参与者们，包括亚马逊、谷歌、微软、苹果、百度、科大讯飞、阿里、腾讯、云知声、思必驰、声智等公司，在一路狂奔过后纷纷开始反思自己的定位和下一步的打法。</p>
+<p>语音赛道里的标志产品——智能音箱，以一种大跃进的姿态出现在大众面前。2016年以前，智能音箱玩家们对这款产品的认识还都停留在：亚马逊出了一款叫Echo的产品，功能和Siri类似。先行者科大讯飞叮咚音箱的出师不利，更是加重了其它人的观望心态。真正让众多玩家从观望转为积极参与的转折点是逐步曝光的 Echo销量，2016年底，Echo 近千万的美国销量让整个世界震惊。这是智能设备从未达到过的高点，在Echo以前除了Apple Watch与手环，像恒温器、摄像头这样的产品突破百万销量已是惊人表现。这种销量以及智能音箱的AI属性促使2016年下半年，国内各大巨头几乎是同时转变态度，积极打造自己的智能音箱。</p>
+<p>未来，回看整个发展历程，2019年是一个明确的分界点。在此之前，全行业是突飞猛进，但2019年之后则开始进入对细节领域渗透和打磨的阶段，人们关注的焦点也不再是单纯的技术指标，而是回归到体验，回归到一种“新的交互方式到底能给我们带来什么价值”这样更为一般的、纯粹的商业视角。技术到产品再到是否需要与具体的形象进行交互结合，比如人物形象；流程自动化是否要与语音结合；酒店场景应该如何使用这种技术来提升体验，诸如此类最终都会一一呈现在从业者面前。而此时行业的主角也会从原来的产品方过渡到平台提供方，AIoT纵深过大，没有任何一个公司可以全线打造所有的产品。</p>
+<h1 id="产业趋势"><a href="#产业趋势" class="headerlink" title="产业趋势"></a>产业趋势</h1><p><strong><em>可以重点理解</em></strong></p>
+<p>当语音产业需求四处开花的同时，行业的发展速度反过来会受限于平台服务商的供给能力。跳出具体案例来看，行业下一步发展的本质逻辑是：在具体每个点的投入产出是否达到一个普遍接受的界限。</p>
+<p>离这个界限越近，行业就越会接近滚雪球式发展的临界点，否则整体增速就会相对平缓。不管是家居、酒店、金融、教育或者其他场景，如果解决问题都是非常高投入并且长周期的事情，那对此承担成本的一方就会犹豫，这相当于试错成本过高。如果投入后，没有可感知的新体验或者销量促进，那对此承担成本的一方也会犹豫，显然这会影响值不值得上的判断。而这两个事情，归根结底都必须由平台方解决，产品方或者解决方案方对此无能为力，这是由智能语音交互的基础技术特征所决定。</p>
+<p>从核心技术来看，整个语音交互链条有五项单点技术：唤醒、麦克风阵列、语音识别、自然语言处理、语音合成，其它技术点比如声纹识别、哭声检测等数十项技术通用性略弱，但分别出现在不同的场景下，并会在特定场景下成为关键。看起来关联的技术已经相对庞杂，但切换到商业视角我们就会发现，找到这些技术距离打造一款体验上佳的产品仍然有绝大距离。</p>
+<p>所有语音交互产品都是端到端打通的产品，如果每家厂商都从这些基础技术来打造产品，那就每家都要建立自己云服务稳定，确保响应速度，适配自己所选择的硬件平台，逐项整合具体的内容（比如音乐、有声读物）。这从产品方或者解决方案商的视角来看是不可接受的。这时候就会催生相应的平台服务商，它要同时解决技术、内容接入和工程细节等问题，最终达成试错成本低、体验却足够好的目标。</p>
+<p>平台服务并不需要闭门造车，平台服务的前提是要有能屏蔽产品差异的操作系统，这是AI+IOT的特征，也是有所参照的，亚马逊过去近10年里是同步着手做两件事：一个是持续推出面向终端用户的产品，比如Echo，Echo Show等；一个是把所有产品所内置的系统Alexa进行平台化，面向设备端和技能端同步开放SDK和调试发布平台。虽然Google Assistant号称单点技术更为领先，但从各方面的结果来看Alexa是当之无愧的最为领先的系统平台，可惜的是Alexa并不支持中文以及相应的后台服务。</p>
+<p>国内则缺乏亚马逊这种统治力的系统平台提供商，当前的平台提供商分为两个阵营：一类是以百度、阿里、讯飞、小米、腾讯为代表的传统互联网或者上市公司；一类是以声智等为代表的新兴人工智能公司。新兴的人工智能公司相比传统公司产品和服务上的历史包袱更轻，因此在平台服务上反倒是可以主推一些更为面向未来、有特色的基础服务，比如兼容性方面新兴公司做的会更加彻底，这种兼容性对于一套产品同时覆盖国内国外市场是相当有利的。</p>
+<p>类比过去的Android，语音交互的平台提供商们其实面临更大的挑战，发展过程可能会更加的曲折。过去经常被提到的操作系统的概念在智能语音交互背景下事实上正被赋予新的内涵，它日益被分成两个不同但必须紧密结合的部分。</p>
+<p>过去的Linux以及各种变种承担的是功能型操作系统的角色，而以Alexa为代表的新型系统则承担的则是智能型系统的角色。前者完成完整的硬件和资源的抽象和管理，后者则让这些硬件以及资源得到具体的应用，两者相结合才能输出最终用户可感知的体验。功能型操作系统和智能型操作系统注定是一种一对多的关系，不同的AIoT硬件产品在传感器（深度摄像头、雷达等）、显示器上（有屏、无屏、小屏、大屏等）具有巨大差异，这会导致功能型系统的持续分化（可以和Linux的分化相对应）。这反过来也就意味着一套智能型系统，必须同时解决与功能型系统的适配以及对不同后端内容以及场景进行支撑的双重责任。</p>
+<p>这两边在操作上，属性具有巨大差异。解决前者需要参与到传统的产品生产制造链条中去，而解决后者则更像应用商店的开发者。这里面蕴含着巨大的挑战和机遇。在过去功能型操作系统的打造过程中，国内的程序员们更多的是使用者的角色，但智能型操作系统虽然也可以参照其他，但这次必须自己来从头打造完整的系统。（国外巨头不管在中文相关的技术上还是内容整合上事实上都非常薄弱，不存在侵略国内市场的可能性）</p>
+<p>随着平台服务商两边的问题解决的越来越好，基础的计算模式则会逐渐发生改变，人们的数据消费模式会与今天不同。个人的计算设备（当前主要是手机、笔记本、Pad）会根据不同场景进一步分化。比如在车上、家里、酒店、工作场景、路上、业务办理等会根据地点和业务进行分化。但分化的同时背后的服务则是统一的，每个人可以自由的根据场景做设备的迁移，背后的服务虽然会针对不同的场景进行优化，但在个人偏好这样的点上则是统一的。</p>
+<p>人与数字世界的接口，在现在越来越统一于具体的产品形态（比如手机），但随着智能型系统的出现，这种统一则会越来越统一于系统本身。作为结果这会带来数据化程度的持续加深，我们越来越接近一个百分百数据化的世界。</p>
+<h1 id="扩展场景"><a href="#扩展场景" class="headerlink" title="扩展场景"></a>扩展场景</h1><h2 id="方言识别-外语识别"><a href="#方言识别-外语识别" class="headerlink" title="方言识别/外语识别"></a>方言识别/外语识别</h2><p>这里把方言和外语一起讨论，是因为训练一个方言的语音识别模型，和训练一个外语的模型差不多，毕竟有些方言听起来感觉和外语一样。</p>
+<p>所以方言和外语识别，就需要重新训练的语音识别模型，才能达到一个基本可用的状态。</p>
+<p>这里就会遇到两个问题：</p>
+<ol>
+<li>从零开始训练一个声学模型需要大量的人工标注数据，成本高，时间长，对于一些数据量有限的小语种，就更是难上加难。所以选择新语种（方言）的时候要考虑投入产出，是否可以介入第三方的先使用，顺便积累数据；</li>
+<li>除了单独的外语（方言）识别之外，还有混合语言的语音识别需求，比如在香港，英文词汇经常会插入中文短语中。如果把每种语言的语言模型分开构建，会阻碍识别的平滑程度，很难实现混合识别。</li>
+</ol>
+<p><img src="https://image.rexking6.top/img/kiirT2hZpssnWM7UXvDA.jpg" alt=""></p>
+<h2 id="语种识别（LID）"><a href="#语种识别（LID）" class="headerlink" title="语种识别（LID）"></a>语种识别（LID）</h2><p>语种识别（LID）是用来自动区分不同语言的能力，将识别结果反馈给相应语种的语音识别模型，从而实现自动化的多语言交互体验。简单理解就是计算机知道你现在说的是中文，它就用中文回复你，如果你用英文和计算机说话，计算机就用英文回复你。</p>
+<p>语种识别主要分三个过程：首先根据语音信号进行特征提取；然后进行语种模型的构建；最后是对测试语音进行语种判决。</p>
+<p>算法层面目前分为两类：一类是基于传统的语种识别，一种是基于神经网络的语种识别。</p>
+<p>传统的语种识别包括基于HMM的语种识别、基于音素器的语种识别、基于底层声学特征的语种识别等。神经网络的语种识别主要基于融合深度瓶颈特征的DNN语种识别，深度神经网络中，有的隐层的单元数目被人为地调小，这种隐层被称为瓶颈层。</p>
+<p>目前基于传统的语种识别，在复杂语种之间的识别率，只有80%左右；而基于深度学习的语种识别，理论上效果会更好。当然这和语种的多样性强相关，比如两种语言的语种识别，和十八种语言的语种识别，之间的难度是巨大的。</p>
+<p><img src="https://image.rexking6.top/img/eFUNR6pqbfpgUjDkFr4J.png" alt=""></p>
+<h2 id="声纹识别（VPR）"><a href="#声纹识别（VPR）" class="headerlink" title="声纹识别（VPR）"></a>声纹识别（VPR）</h2><p>声纹识别也叫做说话人识别，是生物识别技术的一种，通过声音判别说话人身份的技术。其实和人脸识别的应用有些相似，都是根据特征来判断说话人身份的，只是一个是通过声音，一个是通过人脸。</p>
+<p>声纹识别的原理是借助不同人的声音，在语谱图中共振峰的分布情况不同这一特征，去对比两个人的声音，在相同音素上的发声来判断是否为同一个人。</p>
+<p>主要是借助的特征有：音域特征、嗓音纯度特征、共鸣方式特征等，而对比的模型有高斯混合模型（GMM）、深度神经网络（DNN）等。</p>
+<p>注：</p>
+<ul>
+<li>共振峰：共振峰是指在声音的频谱中能量相对集中的一些区域，共振峰不但是音质的决定因素，而且反映了声道（共振腔）的物理特征。提取语音共振峰的方法比较多，常用的方法有倒谱法、LPC（线性预测编码）谱估计法、LPC倒谱法等。</li>
+<li>语谱图：语谱图是频谱分析视图，如果针对语音数据的话，叫语谱图。语谱图的横坐标是时间，纵坐标是频率，坐标点值为语音数据能量。由于是采用二维平面表达三维信息，所以能量值的大小是通过颜色来表示的，颜色深，表示该点的语音能量越强。</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/Ea96QVJvyEAmP2PUaT91.jpg" alt=""></p>
+<p>声纹识别也会有1to1、1toN、Nto1三种模式：</p>
+<ol>
+<li>1to1：是判断当前发声和预存的一个声纹是否一致，有点像苹果手机的人脸解锁，判断当前人脸和手机录的人脸是否一致；</li>
+<li>1toN：是判断当前发声和预存的多个声纹中的哪一个一致，有点像指纹识别，判断当前的指纹和手机里面录入的五个指纹中的哪一个一致；</li>
+<li>Nto1：就比较难了，同时有多个声源一起发声，判断其中那个声音和预存的声音一致，简单理解就是所有人在一起拍照，然后可以精确的找到其中某一个人。当然也有NtoN，逻辑就是所有人一起拍照，每个人都能认出来。</li>
+</ol>
+<p>除了以上的分类，声纹识别还会区分为：</p>
+<ol>
+<li>固定口令识别，就是给定你文字，你照着念就行，常见于音箱付款的验证；</li>
+<li>随机口令识别，这个就比较厉害了，他不会限制你说什么，自动识别出你是谁。</li>
+</ol>
+<p>声纹识别说到底就是身份识别，和我们常见的指纹识别、人脸识别、虹膜识别等都一样，都是提取特征，然后进行匹配。只是声纹的特征没有指纹等特征稳定，会受到外部条件的影响，所以没有其他的身份识别常见。</p>
+<h2 id="情绪识别"><a href="#情绪识别" class="headerlink" title="情绪识别"></a>情绪识别</h2><p>目前情绪识别方式有很多，比如检测生理信号（呼吸、心率、肾上腺素等）、检测人脸肌肉变化、检测瞳孔扩张程度等。通过语音识别情绪也是一个维度，但是所能参考的信息有限，相较于前面谈到的方法，目前效果一般。</p>
+<p>通过语音的情绪识别，首先要从语音信息中获取可以判断情绪的特征，然后根据这些特征再进行分类；这里主要借助的特征有：能量（energy）、音高（pitch）、梅尔频率倒谱系数（MFCC）等语音特征。</p>
+<p>常用的分类模型有：高斯混合模型（GMM）、隐马尔可夫模型（HMM）长短时记忆模型（LSTM）等。</p>
+<p>语音情绪识别一般会有两种方法：一种是依据情绪的不同表示方式进行分类，常见的有难过、生气、害怕、高兴等等，使用的是分类算法；还有一种是将情绪分为正面和负面两种，一般会使用回归算法。</p>
+<p>具体使用以上哪种方法，要看实际应用情况。</p>
+<p>如果需要根据不同的情绪，伴随不同的表情和语气进行回复，那么需要使用第一种的分类算法；如果只是作为一个参数进行识别，判断当前说话人是消极还是积极，那么第二种的回归算法就够了。</p>
+<h1 id="测试流程"><a href="#测试流程" class="headerlink" title="测试流程"></a>测试流程</h1><p>由于语言文字的排列组合是无限多的，测试语音识别的效果要有大数据思维，就是基于统计学的测试方法，最好是可以多场景、多人实际测试，具体要看产品的使用场景和目标人群。</p>
+<p>另外一般还要分为模型测试和实际测试，我们下面谈到的都是实际测试的指标。</p>
+<h2 id="测试环境"><a href="#测试环境" class="headerlink" title="测试环境"></a>测试环境</h2><p>人工智能产品由于底层逻辑是计算概率，天生就存在一定的不确定性，这份不确定性就是由外界条件的变化带来的，所以在测试语音识别效果的时候，一定要控制测试环境的条件。</p>
+<p>往往受到以下条件影响：</p>
+<ol>
+<li><p><strong>环境噪音</strong></p>
+<p>最好可以在实际场景中进行测试，如果没有条件，可以模拟场景噪音，并且对噪音进行分级处理。</p>
+<p>比如车载场景，我们需要分别测试30km/h、60km/h、90km/h、120km/h的识别效果，甚至需要加入车内有人说话和没人说话的情况，以及开关车窗的使用情况——这样才能反应真是的识别情况，暴露出产品的不足。</p>
+</li>
+<li><p><strong>发音位置</strong></p>
+<p>发音位置同样需要根据场景去定义 ，比如车载场景：我们需要分别测试主驾驶位置、副驾驶位置、后排座位的识别效果，甚至面向不同方向的发音，都需要考虑到。</p>
+</li>
+<li><p><strong>发音人（群体、语速、口音、响度）</strong></p>
+<p>发音人就是使用我们产品的用户，如果我们产品覆盖的用户群体足够广，我们需要考虑不同年龄段，不同地域的情况，比如你的车载语音要卖给香港人，就要考虑粤语的测试。</p>
+<p>这里不可控的因素会比较多，有些可能遇到之后才能处理。</p>
+</li>
+</ol>
+<p><img src="https://image.rexking6.top/img/CABVSMTo8xt3itvxcLMx.png" alt=""></p>
+<h2 id="测试数据"><a href="#测试数据" class="headerlink" title="测试数据"></a>测试数据</h2><p>整个测试过程中，一般我们会先准备好要测试的数据（根据测试环境），当然测试数据越丰富，效果会越好。</p>
+<p>首先需要准备场景相关的发音文本，一般需要准备100-10000条；其次就是在对应的测试环境制造相应的音频数据，需要在实际的麦克风阵列收音，这样可以最好的模拟实际体验；最后就是将音频和文字一一对应，给到相应的同学进行测试。</p>
+<p>关于测试之前有过一些有趣的想法， 就是准备一些文本，然后利用TTS生成音频，再用ASR识别，测试识别的效果。这样是行不通的，根本没有实际模拟用户体验，机器的发音相对人来说太稳定了。</p>
+<p><img src="https://image.rexking6.top/img/wIylyhoMToWI9h3VVeNl.png" alt=""></p>
+<h2 id="词错率"><a href="#词错率" class="headerlink" title="词错率"></a>词错率</h2><p>词错率（WER）：也叫字错率，计算识别错误的字数占所有识别字数的比例，就是词错率，是语音识别领域的关键性评估指标。无论多识别，还是少识别，都是识别错误。</p>
+<p>公式如下：</p>
+<p><img src="https://image.rexking6.top/img/88dASxixx2gxVdtqVATN.jpeg" alt=""></p>
+<ul>
+<li>Substitutions是替换数；</li>
+<li>Deletions是删除数；</li>
+<li>Insertions是插入次数；</li>
+<li>Total Words in Correct Transcript是单词数目。</li>
+</ul>
+<p>这里需要注意的是，因为有插入词的存在，所以词错率可能会大于100%的，不过这种情况比较少见。</p>
+<p>一般测试效果会受到测试集的影响，之前有大神整理过不同语料库，识别的词错率情况，数据比较老，仅供参考：</p>
+<p><img src="https://image.rexking6.top/img/anDR2b2PLwrsDJvqpGxi.png" alt=""></p>
+<h2 id="句错率"><a href="#句错率" class="headerlink" title="句错率"></a>句错率</h2><p>句错率（SWR）：表示句子中如果有一个词识别错误，那么这个句子被认为识别错误，句子识别错误的个数占总句子个数的比例，就是句错率。</p>
+<p><img src="https://image.rexking6.top/img/ehEBB8cTcsEZKSwCs08S.jpeg" alt=""></p>
+<ul>
+<li># of sentences with at least one word error是句子识别错误的个数；</li>
+<li>total # of sentences是总句子的个数。</li>
+</ul>
+<p>一般单纯测模型的话，主要以词错率为关键指标；用户体验方面的测试，则更多偏向于句错率。因为语音交互时，ASR把文本传给NLP，我们更关注这句话是否正确。</p>
+<p>在实际体验中，句子识别错误的标准也会有所不同，有些场景可能需要识别的句子和用户说的句子完全一样才算正确，而有些场景可能语意相近就算正确，这取决于产品的定位，以及接下来的处理逻辑。</p>
+<p>比如语音输入法，就需要完全一样才算正确，而一般闲聊的语音交互，可能不影响语意即可。</p>
+<h1 id="后期运营维护"><a href="#后期运营维护" class="headerlink" title="后期运营维护"></a>后期运营维护</h1><p>在实际落地中，会频繁的出现ASR识别不对的问题，比如一些生僻词，阿拉伯数字的大小写，这个时候就需要通过后期运营来解决。</p>
+<p>一句话或者一个词识别不对，可能存在多种原因；首先需要找到识别不对的原因，然后再利用现有工具进行解决。一般会分为以下几种问题：</p>
+<h2 id="VAD截断"><a href="#VAD截断" class="headerlink" title="VAD截断"></a>VAD截断</h2><p>这属于比较常见的问题，就是机器只识别了用户一部分的语音信息，另一部分没有拾到音。</p>
+<p>这个和用户的语速有很大关系，如果用户说话比较慢的，机器就容易以为用户说完了，所以会产生这样的问题。</p>
+<p>一般的解决方案分为两种：第一种是根据用户群体的平均语速，设置截断的时间，一般400ms差不多；第二种是根据一些可见的细节去提示用户，注意说话的语速。</p>
+<h2 id="语言模型修改"><a href="#语言模型修改" class="headerlink" title="语言模型修改"></a>语言模型修改</h2><p>这类问题感知最强，表面上看就是我说了一句话，机器给我识别成了一句不想相关的内容：这种问题一方面和用户想要识别的词相关，一方面和用户的发音有关，我们先不考虑用户的发音。</p>
+<p>一般生僻词会遇到识别错误的问题，这主要是模型在训练的时候没有见过这类的内容，所以在识别的时候会比较吃力。遇到这种问题，解决方案是在语言模型里面加入这个词。</p>
+<p>比如说：我想看魑魅魍魉，训练的时候没有“魑魅魍魉”这四个字，就很可能识别错误，我们只需要在语言模型中加入这个词就可以。一般工程师会把模型做成热更新的方式，方便我们操作。</p>
+<p>有的虽然不是生僻字，但还是会出现竞合问题，竞合就是两个词发音非常像，会互相冲突。一般我们会把想要识别的这句话，都加到语言模型。</p>
+<p>比如：带我去宜家商场，这句话里面的“宜家”可能是“一家”，两个词之间就会出现竞合。如果客户希望识别的是“宜家”，那我们就把 “带我去宜家商场”整句话都加入到语言模型之中。</p>
+<p><img src="https://image.rexking6.top/img/vnOGMo5mqm4lxZow5s8K.png" alt=""></p>
+<h2 id="干预解决"><a href="#干预解决" class="headerlink" title="干预解决"></a>干预解决</h2><p>还有一类识别错误的问题，基本上没有解决方法。</p>
+<p>虽然我们上面说了在语言模型中加词，加句子，但实际操作的时候，你就会发现并不好用；有些词就算加在语言模型里面，还是会识别错误，这其实就是一个概率问题。</p>
+<p>这个时候我们可以通过一些简单粗暴的方式解决。</p>
+<p>我们一般会ASR模型识别完成之后，再加入一个干预的逻辑，有点像NLP的预处理。在这步我们会将识别错误的文本强行干预成预期的识别内容，然后再穿给NLP。</p>
+<p>比如：我想要一个switch游戏机，而机器总是识别成“我想要一个思维词游戏机”，这个时候我们就可以通过干预来解决，让“思维词”=“switch”，这样识别模型给出的还是“我想要一个思维词游戏机”。</p>
+<p>我们通过干预，给NLP的文本就是“我想要一个switch游戏机”。</p>
+<p><img src="https://image.rexking6.top/img/ZyY1KJGCPdtVBy7hnS0z.png" alt="img"></p>
+<h1 id="未来展望"><a href="#未来展望" class="headerlink" title="未来展望"></a>未来展望</h1><p>目前在理想环境下，ASR的识别效果已经非常好了，已经超越人类速记员了。但是在复杂场景下，识别效果还是非常大的进步空间，尤其鸡尾酒效应、竞合问题等。</p>
+<h2 id="强降噪发展"><a href="#强降噪发展" class="headerlink" title="强降噪发展"></a>强降噪发展</h2><p>面对复杂场景的语音识别，还是会存在问题，比如我们常说的鸡尾酒效应，目前仍然是语音识别的瓶颈。针对复杂场景的语音识别，未来可能需要端到端的深度学习模型，来解决常见的鸡尾酒效应。</p>
+<h2 id="语音链路整合"><a href="#语音链路整合" class="headerlink" title="语音链路整合"></a>语音链路整合</h2><p>大部分公司会把ASR和NLP分开来做研发，认为一个是解决声学问题，一个是解决语言问题。其实对用户来讲，体验是一个整体。</p>
+<p>未来可以考虑两者的结合，通过NLP的回复、或者反馈，来动态调整语言模型，从而实现更准确的识别效果，避免竞合问题。</p>
+<h2 id="多模态结合"><a href="#多模态结合" class="headerlink" title="多模态结合"></a>多模态结合</h2><p>未来有可能结合图像算法的能力，比如唇语识别、表情识别等能力，辅助提高ASR识别的准确率。比如唇语识别+语音识别，来解决复杂场景的，声音信息混乱的情况。</p>
+<p>目前很多算法的能力都是一个一个的孤岛，需要产品经理把这些算法能力整合起来，从而作出更准确的判断。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>语音识别就是把声学信号转化成文本信息的一个过程，中间最核心的算法是声学模型和语言模型，其中声学模型负责找到对应的拼音，语言模型负责找到对应的句子。</p>
+<p>后期运营我们一般会对语言模型进行调整，来解决识别过程中的badcase。</p>
+<p>通过声音，我们可以做语种识别、声纹识别、情绪识别等，主要是借助声音的特征进行识别，其中常用的特征有能量（energy）、音高（pitch）、梅尔频率倒谱系数（MFCC）等。</p>
+<p>未来语音识别必将会和自然语言处理相结合，进一步提高目前的事变效果，对环境的依赖越来越小。</p>
+
+    </div>
+
+    
+    
+    
+      
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2022/07/12/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E5%85%A5%E9%97%A8/" title="语音识别入门">https://blog.rexking6.top/2022/07/12/语音识别入门/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/" rel="tag"># 语音识别</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/09/VSCode-SumatraPDF%E6%AD%A3%E5%8F%8D%E5%90%91%E6%90%9C%E7%B4%A2/" rel="prev" title="VS Code+Sumatra PDF正反向搜索">
+      <i class="fa fa-chevron-left"></i> VS Code+Sumatra PDF正反向搜索
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89"><span class="nav-number">2.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">3.</span> <span class="nav-text">应用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A7%81%E4%BA%BA%E5%9C%BA%E6%99%AF"><span class="nav-number">3.1.</span> <span class="nav-text">私人场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BD%A6%E8%BD%BD%E5%9C%BA%E6%99%AF"><span class="nav-number">3.2.</span> <span class="nav-text">车载场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%84%BF%E7%AB%A5%E5%9C%BA%E6%99%AF"><span class="nav-number">3.3.</span> <span class="nav-text">儿童场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%B6%E5%BA%AD%E5%9C%BA%E6%99%AF"><span class="nav-number">3.4.</span> <span class="nav-text">家庭场景</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9F%A5%E8%AF%86%E4%BD%93%E7%B3%BB"><span class="nav-number">4.</span> <span class="nav-text">知识体系</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="nav-number">4.1.</span> <span class="nav-text">基础知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E5%AD%A6%E4%B8%8E%E7%BB%9F%E8%AE%A1%E5%AD%A6"><span class="nav-number">4.1.1.</span> <span class="nav-text">数学与统计学</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A3%B0%E5%AD%A6%E4%B8%8E%E8%AF%AD%E8%A8%80%E5%AD%A6"><span class="nav-number">4.1.2.</span> <span class="nav-text">声学与语言学</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6"><span class="nav-number">4.1.3.</span> <span class="nav-text">计算机学</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E5%8D%95%E4%BD%8D"><span class="nav-number">4.1.4.</span> <span class="nav-text">基本单位</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%93%E4%B8%9A%E7%9F%A5%E8%AF%86"><span class="nav-number">4.2.</span> <span class="nav-text">专业知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%93%E4%B8%9A%E5%9F%BA%E7%A1%80"><span class="nav-number">4.2.1.</span> <span class="nav-text">专业基础</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80"><span class="nav-number">4.2.1.1.</span> <span class="nav-text">算法基础</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%9F%A5%E8%AF%86"><span class="nav-number">4.2.1.2.</span> <span class="nav-text">数据知识</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%80%E6%BA%90%E5%B9%B3%E5%8F%B0"><span class="nav-number">4.2.1.3.</span> <span class="nav-text">开源平台</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%AF%E6%92%91%E6%8A%80%E8%83%BD"><span class="nav-number">4.2.2.</span> <span class="nav-text">支撑技能</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A3%B0%E5%AD%A6%E5%99%A8%E4%BB%B6"><span class="nav-number">4.2.2.1.</span> <span class="nav-text">声学器件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E8%8A%AF%E7%89%87"><span class="nav-number">4.2.2.2.</span> <span class="nav-text">计算芯片</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A3%B0%E5%AD%A6%E7%BB%93%E6%9E%84"><span class="nav-number">4.2.2.3.</span> <span class="nav-text">声学结构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E6%8A%80%E8%83%BD"><span class="nav-number">4.2.3.</span> <span class="nav-text">应用技能</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%B5%81%E7%A8%8B"><span class="nav-number">5.</span> <span class="nav-text">整体流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#VAD%E6%8A%80%E6%9C%AF"><span class="nav-number">5.1.</span> <span class="nav-text">VAD技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E4%B8%8A%E4%BC%A0%EF%BC%88%E5%8E%8B%E7%BC%A9%EF%BC%89"><span class="nav-number">5.2.</span> <span class="nav-text">本地上传（压缩）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86"><span class="nav-number">5.3.</span> <span class="nav-text">信号处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%B9%E5%BE%81%E6%8F%90%E5%8F%96"><span class="nav-number">5.4.</span> <span class="nav-text">特征提取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A3%B0%E5%AD%A6%E6%A8%A1%E5%9E%8B%EF%BC%88AM%EF%BC%89"><span class="nav-number">5.5.</span> <span class="nav-text">声学模型（AM）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%EF%BC%88LM%EF%BC%89"><span class="nav-number">5.6.</span> <span class="nav-text">语言模型（LM）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%8D%E5%85%B8"><span class="nav-number">5.7.</span> <span class="nav-text">词典</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8A%80%E6%9C%AF%E5%8E%86%E7%A8%8B"><span class="nav-number">6.</span> <span class="nav-text">技术历程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#GMM-HMM%E6%97%B6%E4%BB%A3"><span class="nav-number">6.1.</span> <span class="nav-text">GMM-HMM时代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DNN-HMM%E6%97%B6%E4%BB%A3"><span class="nav-number">6.2.</span> <span class="nav-text">DNN-HMM时代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AB%AF%E5%88%B0%E7%AB%AF%E6%97%B6%E4%BB%A3"><span class="nav-number">6.3.</span> <span class="nav-text">端到端时代</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8A%80%E6%9C%AF%E7%8E%B0%E7%8A%B6"><span class="nav-number">7.</span> <span class="nav-text">技术现状</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8A%80%E6%9C%AF%E8%B6%8B%E5%8A%BF"><span class="nav-number">8.</span> <span class="nav-text">技术趋势</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%A7%E4%B8%9A%E5%8E%86%E7%A8%8B"><span class="nav-number">9.</span> <span class="nav-text">产业历程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%A7%E4%B8%9A%E8%B6%8B%E5%8A%BF"><span class="nav-number">10.</span> <span class="nav-text">产业趋势</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%89%A9%E5%B1%95%E5%9C%BA%E6%99%AF"><span class="nav-number">11.</span> <span class="nav-text">扩展场景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E8%A8%80%E8%AF%86%E5%88%AB-%E5%A4%96%E8%AF%AD%E8%AF%86%E5%88%AB"><span class="nav-number">11.1.</span> <span class="nav-text">方言识别&#x2F;外语识别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E7%A7%8D%E8%AF%86%E5%88%AB%EF%BC%88LID%EF%BC%89"><span class="nav-number">11.2.</span> <span class="nav-text">语种识别（LID）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A3%B0%E7%BA%B9%E8%AF%86%E5%88%AB%EF%BC%88VPR%EF%BC%89"><span class="nav-number">11.3.</span> <span class="nav-text">声纹识别（VPR）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%83%85%E7%BB%AA%E8%AF%86%E5%88%AB"><span class="nav-number">11.4.</span> <span class="nav-text">情绪识别</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B"><span class="nav-number">12.</span> <span class="nav-text">测试流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83"><span class="nav-number">12.1.</span> <span class="nav-text">测试环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E6%95%B0%E6%8D%AE"><span class="nav-number">12.2.</span> <span class="nav-text">测试数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%8D%E9%94%99%E7%8E%87"><span class="nav-number">12.3.</span> <span class="nav-text">词错率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%A5%E9%94%99%E7%8E%87"><span class="nav-number">12.4.</span> <span class="nav-text">句错率</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%90%8E%E6%9C%9F%E8%BF%90%E8%90%A5%E7%BB%B4%E6%8A%A4"><span class="nav-number">13.</span> <span class="nav-text">后期运营维护</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#VAD%E6%88%AA%E6%96%AD"><span class="nav-number">13.1.</span> <span class="nav-text">VAD截断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BF%AE%E6%94%B9"><span class="nav-number">13.2.</span> <span class="nav-text">语言模型修改</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B2%E9%A2%84%E8%A7%A3%E5%86%B3"><span class="nav-number">13.3.</span> <span class="nav-text">干预解决</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%AA%E6%9D%A5%E5%B1%95%E6%9C%9B"><span class="nav-number">14.</span> <span class="nav-text">未来展望</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%BA%E9%99%8D%E5%99%AA%E5%8F%91%E5%B1%95"><span class="nav-number">14.1.</span> <span class="nav-text">强降噪发展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E9%9F%B3%E9%93%BE%E8%B7%AF%E6%95%B4%E5%90%88"><span class="nav-number">14.2.</span> <span class="nav-text">语音链路整合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E6%A8%A1%E6%80%81%E7%BB%93%E5%90%88"><span class="nav-number">14.3.</span> <span class="nav-text">多模态结合</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">15.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">185</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">3.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">49:09</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
