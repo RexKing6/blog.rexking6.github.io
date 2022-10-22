@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="聊天机器人ChatBot入门">
+<meta property="og:url" content="https://blog.rexking6.top/2022/09/24/%E8%81%8A%E5%A4%A9%E6%9C%BA%E5%99%A8%E4%BA%BAChatBot%E5%85%A5%E9%97%A8/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20221016171121058.png">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-02e7680cbc48bafc76fcc4cc816e77a0_r.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-010a80d721c4dd1befb02636a3bdd6cf_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-cfe6de194dd1b3be0fa8d4bca090abc7_r.jpg">
+<meta property="article:published_time" content="2022-09-24T12:40:30.000Z">
+<meta property="article:modified_time" content="2022-10-22T13:40:26.115Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/image-20221016171121058.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2022/09/24/%E8%81%8A%E5%A4%A9%E6%9C%BA%E5%99%A8%E4%BA%BAChatBot%E5%85%A5%E9%97%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>聊天机器人ChatBot入门 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2022/09/24/%E8%81%8A%E5%A4%A9%E6%9C%BA%E5%99%A8%E4%BA%BAChatBot%E5%85%A5%E9%97%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          聊天机器人ChatBot入门
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-09-24 20:40:30" itemprop="dateCreated datePublished" datetime="2022-09-24T20:40:30+08:00">2022-09-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-10-22 21:40:26" itemprop="dateModified" datetime="2022-10-22T21:40:26+08:00">2022-10-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2022/09/24/%E8%81%8A%E5%A4%A9%E6%9C%BA%E5%99%A8%E4%BA%BAChatBot%E5%85%A5%E9%97%A8/" class="post-meta-item leancloud_visitors" data-flag-title="聊天机器人ChatBot入门" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>20k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>18 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>综合转载于：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/Y2cnH7MfGDPPi2zzjVJzrA">当我们在谈论聊天机器人时，到底在谈论什么（一）</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.woshipm.com/ai/4240188.html/comment-page-1">对话机器人：ChatBot概况详解</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/529872810">IoT机器人三部曲——聊天机器人chatbot</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/88546909">【NLP-ChatBot】能干活的聊天机器人-对话系统</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/88546521">【NLP-ChatBot】搜索引擎的最终形态之问答系统（FAQ）详述</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/33088748">深度学习对话系统理论篇—数据集和评价指标介绍</a></li>
+</ul>
+<h1 id="生态"><a href="#生态" class="headerlink" title="生态"></a>生态</h1><p>近年来，各种各样的聊天机器人已经出现在我们的生活。最为著名的是苹果公司的Siri，她是ios里自带的个人助理，可以让她帮我们看短信，打电话，甚至讲笑话，唱歌。另外微软推出了Cortana（小娜），是Windows生态下的个人助理，Amazon的Alexa，Google的Google Assistant。在国内，微软中国团队推出的微软小冰，小米公司在其智能音箱产品里有小爱同学，百度在小度音箱下有小度，阿里的天猫精灵。此外在垂直领域，阿里和京东在各自的电商领域推出了阿里小蜜和京东JIMI，北京龙泉寺推出了“贤二机器僧”，甚至腾讯的企鹅极光电视盒子和阿里的天猫魔盒里都嵌入了语音助手这一语言交互的机器人。可以看到，聊天机器人对于我们并不陌生，她们早已走进了我们的生活。</p>
+<h1 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h1><p>我们刚刚提到了的那一系列聊天机器人都是怎么实现的呢？在回答这个问题前，我们需要思考下，那些聊天机器人都是同一种类型的机器人吗？如果不是，那么他们可不可以通过同一种技术来实现呢？如果不是，那么聊天相关的技术又有哪几种呢？</p>
+<p>我们再回过头来，从应用场景和对话性质的角度来看待诸多的聊天机器人，他们到底可以分成哪几类呢？</p>
+<ul>
+<li><p>任务型机器人</p>
+<p>首先一类是执行一些任务指令的场景，比如让Siri帮我们读短信打电话，让小爱同学打开空气净化器等。我们把这一类系统成为“任务型对话”（Task-oriented or Goal-oriented bot）。他的主要特点是最终目的是执行某个操作，比如打车，问天气，调空调温度等等，由于执行某个操作所需要的条件用户可能不能通过一句话表达完，所以这种对话系统通常是需要多轮交互才能完成某个操作。比如打车这样的场景，当我们对机器人说“我要打车”，机器人可能会回复你“请问你从哪里出发”，你这时回复他“地点A”，然后他会继续追问你目的地和用车时间，等触发条件全部满足了之后，才会执行打车这个操作。</p>
+</li>
+<li><p>问答型机器人</p>
+<p>第二类是获取信息类，有点类似于搜索引擎对于我们的存在，即我们需要获取某种信息，搜索引擎给了我们一堆相关的材料，我们需要从里面找答案，而对话机器人直接把答案给我们了，就像你问机器人“中国的首都是哪里”，他可以直接告诉你“北京”。我们把这一类系统称为“问答系统” （Question Answering Bot or Info Bot），问答系统旨在回答用户提出的一些知识性的问题。相较于任务型系统，问答系统在对话中通常是单轮的。问答型机器人根据对应的语料不同，又可以分布几种不同的技术方向。如果语料是知识图谱，那么便是Knowledge based Question Answering，简称KBQA；如果数据是表格或数据库，那么这种问答便是Table QA；如果数据是预定义的问答对，即FAQ，那么这种问答便是Information Retrieval based Question Answering, 简称IRQA；如果数据是普通的纯文本，那么便要用到机器阅读理解，即Machine Reading Comprehension。数据的结构化程度越高，做出的问答系统准确性越高，越能支持复杂的问题。</p>
+</li>
+<li><p>闲聊型机器人</p>
+<p>第三类便是闲聊类，我们既不想让他执行某个指令，又不想获得某个信息，只是纯粹的闲聊，可以是情绪的宣泄这种，带起极强的不确定性和个人情感因素，比如你跟微软小冰倾诉自己失恋了，她或许会安慰你。我们称这一类系统为“闲聊系统”（ChitChat）。闲聊是一个极其开放的话题，没有任何的目的性，就跟好朋友之间的聊天一样，他通常存在的形式都是多轮对话。</p>
+</li>
+</ul>
+<p>事实上，目前市面上产品级的聊天机器人都不是仅仅属于其中的某一类，而是一种包含了多种对话技术（任务型，问答型，闲聊型）和多种对话技能（打电话，问天气，查股价，拉家常等）的复杂的对话系统。以Siri为例，我们既可以在Siri里让她帮我们读短信，也能问她一些知识性的问题。尽管如此，我们还是可以从产品的倾向性和它最初的产品定位来给他们分个类。比如Siri，Cortana，Google Assistant，他们最初的产品定位便是各自生态里的个人助手，即便他们发展到今天已经变得异常复杂，我们依然认为他们是任务型机器人的代表。同样的还有微软小冰，小冰最初的定位便是一个有着极强人设（未成年少女）的闲聊机器人，所以我们现在还是会认为她是闲聊型机器人的代表。</p>
+<h2 id="为什么这么划分？"><a href="#为什么这么划分？" class="headerlink" title="为什么这么划分？"></a>为什么这么划分？</h2><p>这样的划分方式，相信大家已经见得很多了。但是为什么这么划分呢？主要有两个原因。</p>
+<ol>
+<li><p>对话的本质</p>
+<p>对话的本质是：对话双方的信息同步。（此刻停留10秒钟可回想下你接触过的各种对话）</p>
+<p>对话只是工具，在对话中的信息传递，即对话双方想通过对话传递的信息，才是对话的意义。</p>
+<p>举个例子：你跟你的朋友说：“我们去玩吧！”你的朋友接收到这个信息的时候，他心里会有几个问题想问你：“为啥突然要去玩”、“啥时候去玩”、“去哪里玩”。因为这些信息，你没告诉他，他需要获得这些信息，以达到与你同步的阶段，才能进行下一步：去完成“去玩”这件事。而对话，就是达成信息同步的工具。（难道他跟你眼对眼对视下就可以知道嘛？）</p>
+</li>
+<li><p>AI现有的技术发展限制</p>
+<p>虽然AI迎来了新的一春（相对于以前的发展），但是基于机器学习/深度学习的NLP技术，目前只能解决一部分问题，或者说，一小部分问题。一个对话系统中，真正用到AI技术的，目前是基于【意图】【实体】框架的识别体系，而这部分，也仅仅占对话系统10%-20%。</p>
+<p>而基于【意图】【实体】识别框架，目前最容易达成的，就是“指令式”的对话（没错，这里是我给它取的名字）。比如，你对机器人说：“帮我订张火车票”（抱歉我还是用这个快被说烂的例子）。“订张火车票”这是一个非常明确的指令。机器人通过识别意图“订张火车票”，马上可进行相应信息的填充（词槽填充追问），帮访客完成“订火车票”的任务目标。</p>
+<p>相反的，一些“非指令式”的对话，对话系统很难通过现有的AI技术处理。比如，在医疗营销机器人中，访客问“我最近肚子有点痛”。这是一个很模糊的指令，机器人并不知道访客的意图是什么，甚至人也很难知道。“肚子痛”很可能是肠胃的问题，可能是女性疾病问题，等等。现有的NLP技术无法识别，因为无法做逻辑推理。</p>
+<p>所以，现有的ChatBot能处理的，且擅长处理的问题，是那些指令式的问题，这就对应了我们刚才说的3种分类中的两种：问答型、任务型，这也是目前应用于商业中最广泛的两种类型的ChatBot。而另外一种闲聊型，是基于记忆神经网络模型的对话方式，是现有神经网络可支持的实现方式</p>
+</li>
+</ol>
+<h2 id="联系与区别是什么？"><a href="#联系与区别是什么？" class="headerlink" title="联系与区别是什么？"></a>联系与区别是什么？</h2><p>从访客的预期来看，可以分为2大类：任务达成（Get things done）与情感陪伴（Get company）。</p>
+<h3 id="任务达成（Get-things-done）"><a href="#任务达成（Get-things-done）" class="headerlink" title="任务达成（Get things done）"></a>任务达成（Get things done）</h3><p>问答型ChatBot与任务型ChatBot。</p>
+<p>识别角度上，二者机理一致。均是通过分类（相似度匹配）的方式。</p>
+<ul>
+<li>问答型（FAQ相似度计算）：通过访客问句与每条FAQ的问题，计算相似度匹配，从而回复问题相应的回答。</li>
+<li>任务型（意图识别）：通过访客问句与每个意图配置的对应query，计算相似度匹配。通过多轮的询问交互，最终解决访客的问题。</li>
+</ul>
+<p>应答功能上：任务型是升级版问答型</p>
+<ul>
+<li>问答型是针对访客query，直接给予答案回应</li>
+<li>任务型是针对访客query，收集query相关的信息（意图-词槽 机制），根据收集的情况给予答案回应（答案回应包括：富文本、链接跳转、外部资源调用），是以任务达成为目的的对话。</li>
+</ul>
+<h3 id="情感陪伴（Get-company）"><a href="#情感陪伴（Get-company）" class="headerlink" title="情感陪伴（Get company）"></a>情感陪伴（Get company）</h3><p>闲聊型ChatBot的对话宗旨在于，基于话题让对话延续。在对话理念上与前者有较大区别。其目的是让访客，通过对话得到情感上的支持与陪伴。比如你跟iPhone Siri 说“我想你”，她会回复你“我也想你”等之类的话，让你得到情感上的陪伴体验。</p>
+<p>但是从NLP现有的发展情况来看，闲聊型ChatBot的效果并不是太理想。因为对话没有一个主题，机器人是因访客问题回答而回答，是一种“被动式”的应答，并无主导对话的能力。所以通俗讲，目前的应用基本就是让访客“图个乐”的阶段。</p>
+<h1 id="问答型ChatBot"><a href="#问答型ChatBot" class="headerlink" title="问答型ChatBot"></a>问答型ChatBot</h1><h2 id="语料库"><a href="#语料库" class="headerlink" title="语料库"></a>语料库</h2><p>通常，一个问答系统，都是针对某一个领域的。例如，一个淘宝卖家的问答系统，针对的是买家常问的商品类型和价格信息问题作出回答。</p>
+<p>因此，要构建一个问答系统第一步就是整理FAQ库。一个FAQ库应该如下的内容：</p>
+<ol>
+<li><p>标准问</p>
+<p>标准问是问答系统设计者设计的标准问题，例如，“商品的价格是多少？”。标准问的个数，决定了问答系统的规模，通常由业务专家给定。</p>
+</li>
+<li><p>相似问</p>
+<p>一个标准问通常会对应多个相似问，与标准问表达相同的意思，但往往会不那么规范，较口语化，相似问通常要求覆盖面越广越好。例如，“商品多少钱呀？”。相似问早期由业务专家拟定，数据师扩写，后期会不断修缮、规整和增加。</p>
+</li>
+<li><p>答案</p>
+<p>一个标准问对应一个答案，返回给用户。由业务专家拟定。</p>
+</li>
+</ol>
+<p>FAQ库的质量，对于一个问答系统非常的重要，但是FAQ库的建立和维护往往都是一件极其费时费人力的事情。当一个FAQ库规模变大时，相似问之间的界限开始变的迷糊，会给算法带来非常大的挑战；另一方面，当FAQ库规模很大时，后期的维护也变得非常的困难。例如，当系统出现bad case，数据师很难判断bad case出现的原因，无法判断是哪条标准问对应的相似问加错了，从而很难修改。</p>
+<p>对于一个问答系统而言，高质量FAQ库需要建立的时候就异常用心，通常需要业务专家和算法工程师通力合作；在使用时也需要倍加用心的维护，这时，需要培养多位既了解算法特性，又熟悉业务场景的数据师。这大概是目前生产中大部分问答系统采用维护方案了。</p>
+<h2 id="匹配方式"><a href="#匹配方式" class="headerlink" title="匹配方式"></a>匹配方式</h2><p>在问答系统中，模型算法的任务其实就根据用户输入的问题匹配到相应的答案。这看起来是个简单的问题，实际上不然。一方面，一个标准问，用户可能的问法有很多，很多时候都无法预料，需要不断的完善；另一方面，FAQ库的规模通常很大，标问数目可以达到数万，相似问的数据可能就更多了。这么大数目的预料，长度不一，算法难度很大。</p>
+<p>模型的训练过程，其实就是让模型能够学习到问题-答案（Q-A）对之间的联系，或者Query集的特征。如下图所示，是QA中匹配用户query的模式。</p>
+<p><img src="https://image.rexking6.top/img/image-20221016171121058.png" alt=""></p>
+<p>由此可知，目前QA系统的实现，主要有以下三种方式：</p>
+<ol>
+<li><p>计算用户输入Query和Question的相似度</p>
+<p>通过计算用户输入Query与FAQ语料集中Question之间的相似度，选出相似度最高的Question，再通过Q-A map找到相应的答案返回给用户。</p>
+</li>
+<li><p>计算用户输入Query和Answer的之间的相关性</p>
+<p>通过计算用户输入Query与FAQ语料集中Answer之间的相关度，选出相关度最高的Answer，返回给用户。</p>
+</li>
+<li><p>结合用户输入Query和Answer的之间的相关性以及用户输入Query和Question的相似度</p>
+<p>通过结合相关性和相似度，选出最匹配的Answer，返回给用户。</p>
+</li>
+</ol>
+<h2 id="匹配算法"><a href="#匹配算法" class="headerlink" title="匹配算法"></a>匹配算法</h2><p>由上节可知，问答系统中的匹配可以归结为query与FAQ库中标问和相似问的相似度计算与query与FAQ库中答案的相关性计算。总的来说，目前相似度或相关性计算有下面的几种方式。</p>
+<ol>
+<li><p>规则匹配</p>
+<p>目前，很多机器人都有规则匹配的部分，它可控，高效、易于实现。这里介绍一种规则匹配的方式，也有人称为句式法。所谓句式法，就是针对FAQ库中的标问和相似问进行分词、提炼出大量的概念，并将上述概念组合，构成大量的句式，句式再进行组合形成标问。例如，标问“华为mate30现在的价格是多少？”，拆出来“华为mate30”是cellphone概念，“价格是多少”是askMoney概念，“现在”是time概念，那么“华为mate30现在的价格是多少？”就是cellphone+askMoney+time。用户输入”华为mate30现在卖多少钱？”进行分词，可以得到相同的句式和概念组合，就能够命中“华为mate30现在的价格是多少？”这个相似问了。</p>
+</li>
+<li><p>深度学习语义匹配</p>
+<p>语义匹配的技术，从早期的DSSM，利用词袋模型，计算句之间的相似度；到后面利用LSTM-DSSM来捕捉长时间序列的语义信息；再到现在的基于BERT的语义相似度计算与匹配。本质上，其实都是提取句子的语义特征，再通过数学运算计算相似度。</p>
+</li>
+</ol>
+<h2 id="KBQA"><a href="#KBQA" class="headerlink" title="KBQA"></a>KBQA</h2><p>Knowledge Based Question&amp;Answer（KBQA），是一种基于知识体系的问答系统，现在知识库更多的是指知识图谱了。KBQA回答用户问题的方式通常有如下两个步骤组成：</p>
+<ol>
+<li><p>利用NLU模块进行语义理解和解析，包括意图识别，实体识别，实体关系识别，实体匹配等</p>
+</li>
+<li><p>利用知识图谱进行查询、推理得出答案</p>
+</li>
+</ol>
+<p>搭建KBQA中最重要最关键的一步就在于知识图谱的搭建。知识图谱对于绝大部分NLP任务都有极大的加成，个人认为是当前最有价值的NLP方向。</p>
+<h1 id="任务型ChatBot"><a href="#任务型ChatBot" class="headerlink" title="任务型ChatBot"></a>任务型ChatBot</h1><h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p><img src="https://image.rexking6.top/img/v2-02e7680cbc48bafc76fcc4cc816e77a0_r.jpg" alt=""></p>
+<h3 id="NLU"><a href="#NLU" class="headerlink" title="NLU"></a>NLU</h3><p>NLU（Natural Language Understanding）可翻译成<strong>自然语言理解</strong>，也俗称<strong>人机对话</strong>，它是人工智能的一个分支学科，是指所有支持机器理解文本内容的方法模型或任务的总称。通俗一点讲，就是将用户发出的指令转换成机器可以理解的语言。</p>
+<p>因为同样的意思有很多种不同的表达方式，对机器而言，理解一句话里每个词的确切含义并不重要，重要的是理解这句话表达的意思，也就是意图识别。NLU还有一个重要的任务就是槽位提取，例如，接受订外卖的机器人，需要提取用户所订的餐馆的名字和所订食物的名称。</p>
+<p>举个例子，当用户说“我想订一份肯德基的外卖”。对话系统接受到这个输入之后，先进行意图识别，识别到用户的意图是定餐；然后再进行实体识别，识别到餐厅名字肯德基。因此，“我想订一份肯德基的外卖”可以转化为对话系统能处理的语义表示：{“intent”:”订餐”,”entity”:”肯德基”}</p>
+<p>意图识别的本质其实就是一种文本匹配，主要由两种实现方法：语义匹配和文本分类。</p>
+<h3 id="DM"><a href="#DM" class="headerlink" title="DM"></a>DM</h3><p>DM（Dialog Management）即<strong>对话管理</strong>，就是基于刚才翻译后的用户指令判断此时机器应该表达什么意思或采取什么动作。</p>
+<p>因为对话系统常常涉及多轮对话，因此需要对目前的对话状态进行管理，以决定系统下一步的动作和给用户的回应。本质上，对话管理实际上就是一个<strong>决策过程</strong>，系统在对话过程中不断根据当前状态决定下一步应该采取的最优动作（如：提供结果，询问特定限制条件，澄清或确认需求等），从而最有效的辅助用户完成信息或服务获取的任务。</p>
+<p>DM 的<strong>输入</strong>就是用户输入的<strong>语义表达</strong>（或者说是用户行为，是 NLU 的输出）和当前对话状态，<strong>输出</strong>就是下一步的系统行为和更新的对话状态。这是一个循环往复不断流转直至完成任务的过程。对话管理是对话系统中最<strong>独特</strong>的部分，是个很庞大的工程，涉及的知识又多又杂，在这里挑重点做一个引导性的介绍。总的来说，对话管理模块主要由以下功能：</p>
+<ol>
+<li><p>对话状态维护</p>
+<p>主要负责维护和更新对话状态，假设t时刻的对话状态为$s_t$，它依赖于前一时刻的状态$s_{t-1}$，和前一时刻系统行为$a_{t-1}$，以及当前时刻对应的用户行为$a_t$ ，即$s_t= f(s_{t-1},a_{t-1}, a_t)$。</p>
+</li>
+<li><p>生成系统决策</p>
+<p>根据当前的系统对话状态s_t，决定系统下一步的行为dialog act（da），即$da_t =g(s_t)$。</p>
+</li>
+<li><p>作为接口与后端/任务模型进行交互</p>
+</li>
+<li><p>生成有效的用户答复</p>
+</li>
+</ol>
+<p>对话管理的研究非常的多，其具体的实现方式，总结起来，大致分为三种：</p>
+<ol>
+<li><p>基于规则的对话管理</p>
+<p>总的来说，基于规则的对话管理就是把对话管理建模为有限状态机（Finite State Machine），把对话看做是在有限状态内跳转的过程，每个状态都有对应的动作和回复，如果能从开始节点顺利的流转到终止节点，任务就完成了。</p>
+<p><img src="https://image.rexking6.top/img/v2-010a80d721c4dd1befb02636a3bdd6cf_720w.webp" alt=""></p>
+</li>
+<li><p>基于统计的对话管理</p>
+<p>前面提到的方法是需要人工来制定规则和状态，然而人很难预测所有可能的场景，这种方法也并不能重用，换个任务就需要从头再来。这种情况下，强化学习的优势就凸显出来了，RL-Based DM 能够对系统理解用户输入的不确定性进行建模，让算法来自己学习最好的行为序列。</p>
+<p>简单来说，它将对话表示成一个部分可见的马尔可夫决策过程。所谓部分可见，是因为DM的输入是存在不确定性的，例如NLU的结果可能是错误的。因此，对话状态不再是特定的马尔可夫链中特定的状态，而是针对所有状态的概率分布。在每个状态下，系统执行某个动作都会有对应的回报（reward）。基于此，在每个对话状态下，选择下一步动作的策略即为选择期望回报最大的那个动作。</p>
+<p>这个方法有以下的特点：</p>
+<ol>
+<li><p>只需定义马尔可夫决策过程中的状态和动作，状态间的转移关系可以通过学习得到；</p>
+</li>
+<li><p>使用强化学习可以在线学习出最优的动作选择策略。</p>
+</li>
+<li><p>仍然需要人工定义状态，因此在不同的领域下该方法的通用性不强。</p>
+</li>
+</ol>
+</li>
+<li><p>基于数据的对话管理</p>
+<p>最后一种DM方法是基于神经网络的。它的基本思路是直接使用神经网络去学习动作选择的策略，即将NLU的输出等其他特征都作为神经网络的输入，将动作选择作为神经网络的输出，其中一个例子是rasa框架。</p>
+<p>这样做的好处是，对话状态直接被神经网络的隐向量所表征，不再需要人工去显式的定义对话状态。当然这种方法的问题时需要大量的数据去训练神经网络，其实际的效果也还有待大规模应用的验证。</p>
+</li>
+</ol>
+<h3 id="NLG"><a href="#NLG" class="headerlink" title="NLG"></a>NLG</h3><p>NLG（Natural Language Generation）即<strong>自然语言生成</strong>，这一步就是将DM生成的机器语言再翻译转化成人类可以理解的自然语言，我们可以把这一步看成是NLU的反向流程。</p>
+<p>大体流程就是用户首先发出指令，通过NLU翻译成机器可以识别的语句，这个语句经过DM计算后得出回复的内容，这个内容再经过NLG转化翻译成用户可理解的话。</p>
+<h2 id="要素"><a href="#要素" class="headerlink" title="要素"></a>要素</h2><p>ChatBot Skill 5要素（当然，也是我这么划分的）分别是：意图、实体、词槽、回复、上下文。为什么是这5个要素？这5个要素具体是什么作用？他们背后有什么具体逻辑呢？</p>
+<p>我们可以这么理解，ChatBot是要帮访客做事的（此处我们只讨论应用最广也最容易落地的任务型ChatBot）。这个“事”，有可能是回答问题（答疑解惑），也有可能是帮助访客完成一个任务（任务执行）。回答问题通常我们通过FAQ的问句相似度匹配即能完成。</p>
+<p>回到我们上文说的，对话的本质是信息的交换与同步。机器人要帮访客做一件事，首先得知道访客要做什么事（意图），所以，现有ChatBot系统的首要任务，就是确定访客想要干嘛，也就是 意图识别。只要当ChatBot信息与访客对等了（至少在访客想做的事情的维度），ChatBot才能帮访客做相应的任务。</p>
+<h3 id="意图"><a href="#意图" class="headerlink" title="意图"></a>意图</h3><p>意图描述的是某个访客query领域内的封闭问题。一次意图框架的完成（意图识别-词槽填充-回复），会完成一次对话闭环。</p>
+<p>相比于意图，上下文 描述的是对话上下文不同意图之间的问题。</p>
+<p>词槽、回复与意图挂钩。即：一个意图，对应特定的词槽、回复。</p>
+<h4 id="如何进行意图识别？"><a href="#如何进行意图识别？" class="headerlink" title="如何进行意图识别？"></a>如何进行意图识别？</h4><p>意图识别本质上是分类问题。目前行业主流的做法就是，将同类的句子做句子集合，相应的边成为一个意图。即：将所有相同含义的话，抽象为一个意图。比如【订火车票】这个意图，同类的句子是：“我要订火车票”、“给我订张火车票”、“火车票能订不”，等等。所以本质上讲，ChatBot是通过判断访客问句与意图中配置的问句是否相似，来判定是否属于该意图的，即进行归类。</p>
+<h4 id="意图的配置"><a href="#意图的配置" class="headerlink" title="意图的配置"></a>意图的配置</h4><p>意图配置的原理：通过预测访客会问的问题，与意图建立关系。在机器学习以前，这些类似的表述，是需要人工一句一句地去配置的，只有配置了某问法，机器才会做相应的匹配命中，触发相应的回答，即通过规则来判断。配置这么多问句，是不是现在想想都头皮发麻？</p>
+<p>而NLP的意图识别能力，就是可以通过配置少量的语料，进行自主地泛化。把那些未配置的，但是表述又相近的问句，也可识别到该意图中（当然，识别也是有准确率的，跟算法模型、训练数据相关）。</p>
+<p>举个例子：刚才【订火车票】这个意图，假如配置的几个问句：“我要订火车票”、“给我订张火车票”、“火车票能订不”。ChatBot不仅可以识别到这几个问句，也能识别到如“你能给我订个火车票么”、“给我来张火车票”，等等的表述，归为该意图。</p>
+<h3 id="实体"><a href="#实体" class="headerlink" title="实体"></a>实体</h3><h4 id="什么是实体？"><a href="#什么是实体？" class="headerlink" title="什么是实体？"></a>什么是实体？</h4><p>实体是对话（表现为访客query）中，有实际意义和指代的词。</p>
+<h4 id="为什么需要实体？"><a href="#为什么需要实体？" class="headerlink" title="为什么需要实体？"></a>为什么需要实体？</h4><ol>
+<li>通过定义实体，让系统去采集访客query中有用的、人想要采集的信息</li>
+<li>实体识别（NER）：相当于是使用AI技术的采集器</li>
+<li>枚举实体/规则实体： 相当于是使用人为规则的采集器</li>
+</ol>
+<h4 id="如何进行实体识别？"><a href="#如何进行实体识别？" class="headerlink" title="如何进行实体识别？"></a>如何进行实体识别？</h4><p>NER过程：从访客query–&gt;分词–&gt;实体识别 的过程</p>
+<h3 id="词槽"><a href="#词槽" class="headerlink" title="词槽"></a>词槽</h3><h4 id="词槽是什么？"><a href="#词槽是什么？" class="headerlink" title="词槽是什么？"></a>词槽是什么？</h4><p>词槽是与意图绑定的变量。</p>
+<h4 id="为什么需要词槽？"><a href="#为什么需要词槽？" class="headerlink" title="为什么需要词槽？"></a>为什么需要词槽？</h4><p>因为词槽是对话中信息传递的载体，对于对话的信息来说至关重要。</p>
+<h4 id="如何进行词槽的填充？"><a href="#如何进行词槽的填充？" class="headerlink" title="如何进行词槽的填充？"></a>如何进行词槽的填充？</h4><p>通过实体识别，将实体识别的值，赋值给词槽。</p>
+<p>回到刚才的例子，当识别到意图后，如：访客说“帮我订张火车票”（原谅我还是举这个被说烂的例子，谁让它通俗易懂呢），识别到意图为【订车票】，那么ChatBot需要知道你要定啥时候的票，从哪儿到哪儿，乘车人是谁，要几等票。对应的参数为：出发时间，出发地点，到达地点，乘车人，票类型。所以ChatBot接下来需要做什么？当然需要问访客这么些个信息呀。所以，这几个参数信息，就是【订车票】这个意图下，关联的几个词槽。</p>
+<p>这几个词槽该如何收集呢？没关系，交给NLP算法。现有NLP一个很重要的成就是就NER，即实体识别。通俗地说，就是可以把访客问句中的重要信息给抠出来，作为对话的关键信息（相当于机器人理解了访客的意思，虽然在人看来还是挺智障的程度，但是谁让它可以在某些领域应用的好呢）。所以回到刚才的问题，NLP算法可以把ChatBot想要的几个参数信息，通过发问的形式，从访客问句中提取出来：出发时间，出发地点，到达地点，乘车人，票类型。</p>
+<h3 id="回复"><a href="#回复" class="headerlink" title="回复"></a>回复</h3><p>一旦获取了这些信息，ChatBot就该干正事儿了所以ChatBot就应该基于收集到的信息，给出相应的回复。回复分为纯文本回复、调用接口回复、执行动作回复。“订火车票”的最终结果是帮助访客“订成功火车票”，所以需要执行“订票”的动作，并把订票信息返回给访客。</p>
+<h3 id="上下文"><a href="#上下文" class="headerlink" title="上下文"></a>上下文</h3><p>最后，上下文的意思是指不同意图间，可能存在继承信息与意图切换的情况。</p>
+<p>举个例子：访客问“今天北京的天气怎么样？”，ChatBot回复：“今天北京晴转多云，有阵风，25摄氏度”。访客接着又问“那上海呢”，那么ChatBot应该需要知道，“那上海呢”这句话，还是意指“查天气”这个意图，而不是在问“上海的空气质量”、“上海的限号是多少”其他意图的问题。所以需要用到【上下文】的概念来配置ChatBot。</p>
+<p>一个对话的进行，是跟对话进行中的信息继承与更新相关的。所以不同的意图之间，不止存在同等并列的关系，还存在嵌套关系（父意图、子意图、子子意图）、上下继承关系，等等。这些均需使用上下文这个对话元素来实现。</p>
+<h1 id="评价指标"><a href="#评价指标" class="headerlink" title="评价指标"></a>评价指标</h1><p>这里主要针对开放域生成式对话模型的评价指标进行总结。</p>
+<h2 id="词重叠评价指标"><a href="#词重叠评价指标" class="headerlink" title="词重叠评价指标"></a>词重叠评价指标</h2><p>首先来看词重叠评价指标，他们认为有效地回答应该和真实回答之间存在大量的词重叠（但是对话系统的答案空间往往是发散的，也就是一个问题的答案可能是完全不同的两句话，这种情况下该评价指标效果不好），也就是说这是一个非常强的假设。（以下环节中r表示真是响应，r^表示系统生成响应）</p>
+<h3 id="BLEU"><a href="#BLEU" class="headerlink" title="BLEU"></a>BLEU</h3><p>该评价指标有IBM在2002年提出，参考论文“<a target="_blank" rel="noopener" href="http://www.aclweb.org/anthology/P02-1040.pdf">BLEU: a Method for Automatic Evaluation of Machine Translation</a>”，常作为机器翻译系统评价指标。其实就是统计生成响应和真实响应中的n-gram词组在整个训练语料中出现次数。公式如下所示：</p>
+<script type="math/tex; mode=display">
+P_n(r, \hat{r})=\frac{\sum_k \min \left(h(k, r), h\left(k, \hat{r}_i\right)\right)}{\sum_k h\left(k, r_i\right)}</script><script type="math/tex; mode=display">
+\text { BLEU-N : }=b(r, \hat{r}) \exp \left(\sum_{n=1}^N \beta_n \log P_n(r, \hat{r})\right)</script><p>第一个公式 $P_n$ 用于计算n-gram短语词组在整个数据集中的准确度。$h(k,r)$ 表示每个n-gram词组在真实响应中出现的次数（因为对于每个n而言都会存在很多个n-gram词组，所以要有一个求和符号）。所以上式就是每个n-gram词组在真实和生成响应中出现次数的较小值求和除以其在生成响应中出现次数求和，表征了一种精确度度量。当然，我们需要考虑n的取值（一般取1-4），所以有了第二个公式，beta表示各个n-gram的权重（可以去均匀分布），也就是对1-4进行加权求和，而$b(r,\hat r)$表示长度惩罚因子，即我们不想让生成的答案长度太短，所以加一个惩罚因子来改善效果。</p>
+<p>可以参考这篇文章，结合一个实际的例子和代码进行理解BLEU的原理：<a target="_blank" rel="noopener" href="http://blog.csdn.net/guolindonggld/article/details/56966200">机器翻译评价指标之BLEU</a>。</p>
+<h3 id="ROUGE"><a href="#ROUGE" class="headerlink" title="ROUGE"></a>ROUGE</h3><p>该指标常用于文本摘要领域，包含 ROUGE-N，ROUGE-L（最长公共子句，Fmeasure），ROUGE-W（带权重的最长公共子句，Fmeasure），ROUGE-S（不连续二元组，Fmeasure）四种。这里以ROUGE-L为例进行介绍，更多可以参考<a target="_blank" rel="noopener" href="http://blog.csdn.net/lcj369387335/article/details/69845385">自动文档摘要评价方法—-Edmundson和ROUGE</a>一文。</p>
+<p>ROUGE-L，是计算最长公共子序列的长度，感觉像是在刷题一样。其实就是寻找真是响应和生成响应之间的最长公共子序列长度，然后计算其F-measure分数。其与BLEU相似，因为都可以反应词语顺序，但是ROUGE的词可以不是连续的，而BLEU的n-gram要求词语必须连续出现。比如两句话“我喜欢吃西瓜”和“我刚才吃了一个西瓜”的最长公共子串为“我 吃 西 瓜”。</p>
+<script type="math/tex; mode=display">
+R=\max _j \frac{l\left(c_i, s_{i j}\right)}{\left|s_{i j}\right|}</script><script type="math/tex; mode=display">
+P=\max _j \frac{l\left(c_i, s_{i j}\right)}{\left|c_{i j}\right|}</script><script type="math/tex; mode=display">
+\operatorname{ROUGE}_{\mathrm{L}}\left(c_i, s_i\right)=\frac{\left(1+\beta^2\right) R P}{R+\beta^2 P}</script><h3 id="METEOR"><a href="#METEOR" class="headerlink" title="METEOR"></a>METEOR</h3><p>METEOR是基于BLEU进行了一些改进，加入了生成响应和真实响应之间的对其关系。使用WordNet计算特定的序列匹配，同义词，词根和词缀，释义之间的匹配关系，改善了BLEU的效果，使其跟人工判别共更强的相关性。同样也是使用F-measure的计算方法，如下图所示，具体可以参考论文 METEOR: An automatic metric for mt evaluation with improved correlation with human judgments：</p>
+<script type="math/tex; mode=display">
+F_{\text {mean }}=\frac{P_m R_m}{\alpha P_m+(1-\alpha) R_m}</script><script type="math/tex; mode=display">
+\operatorname{Pen}=\gamma(\text { frag })^\theta</script><script type="math/tex; mode=display">
+\text { METEOR }=(1-\text { Pen }) F_{\text {mean }}</script><p>上面这三种评价指标在对话系统中使用的频率貌似是BLEU比较高一点，剩下两个都很少见到。</p>
+<h2 id="词向量评价指标"><a href="#词向量评价指标" class="headerlink" title="词向量评价指标"></a>词向量评价指标</h2><p>上面的词重叠评价指标基本上都是n-gram方式，去计算生成响应和真是响应之间的重合程度，共现程度等指标。而词向量则是通过Word2Vec、Sent2Vec等方法将句子转换为向量表示，这样一个句子就被映射到一个低维空间，句向量在一定程度上表征了其含义，在通过余弦相似度等方法就可以计算两个句子之间的相似程度。使用词向量的好处是，可以一定程度上增加答案的多样性，因为这里大多采用词语相似度进行表征，相比词重叠中要求出现完全相同的词语，限制降低了很多。</p>
+<h3 id="Greedy-Matching"><a href="#Greedy-Matching" class="headerlink" title="Greedy Matching"></a>Greedy Matching</h3><script type="math/tex; mode=display">
+G(r, \hat{r})=\frac{\sum_{w \in r ;} \max _{\hat{w} \in \hat{r}} \cos _{-} \operatorname{sim}\left(e_w, e_{\hat{w}}\right)}{|r|}</script><script type="math/tex; mode=display">
+G M(r, \hat{r})=\frac{G(r, \hat{r})+G(\hat{r}, r)}{2}</script><p>如上图所示，对于真实响应的每个词，寻找其在生成响应中相似度最高的词，并将其余弦相似度相加并求平均。同样再对生成响应再做一遍，并取二者的平均值。上面的相似度计算都是基于词向量进行的，可以看出本方法主要关注两句话之间最相似的那些词语，即关键词。</p>
+<h3 id="Embedding-Average"><a href="#Embedding-Average" class="headerlink" title="Embedding Average"></a>Embedding Average</h3><p>这种方法直接使用句向量计算真实响应和生成响应之间的相似度，而句向量则是每个词向量加权平均而来，如下图所示。然后使用余弦相似度来计算两个句向量之间的相似度。</p>
+<script type="math/tex; mode=display">
+\bar{e}_r=\frac{\sum_{w \in r} e_w}{\left|\sum_{w^{\prime} \in r} e_{w^{\prime}}\right|}</script><h3 id="Vector-Extrema"><a href="#Vector-Extrema" class="headerlink" title="Vector Extrema"></a>Vector Extrema</h3><p>跟上面的方法类似，也是先通过词向量计算出句向量，在使用句向量之间的余弦相似度表示二者的相似度。不过句向量的计算方法略有不同，这里采用向量极值法进行计算。</p>
+<h2 id="perplexity困惑度"><a href="#perplexity困惑度" class="headerlink" title="perplexity困惑度"></a>perplexity困惑度</h2><p>perplexity是语言模型中的指标，用于评价语言模型的好坏，其实就是估算一句话出现的概率，看一句话是否通顺。也经常会在对话系统中出现评价生成的响应是否符合语言规则，计算方法也很简单，如下图所示：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+P P(S) &=P\left(w_1 w_2 \ldots w_N\right)^{-\frac{1}{N}} \\
+&=\sqrt[N]{\frac{1}{p\left(w_1 w_2 \ldots w_N\right)}} \\
+&=\sqrt[N]{\prod_{i=1}^N \frac{1}{p\left(w_i \mid w_1 w_2 \ldots w_{i-1}\right)}}
+\end{aligned}</script><p>所以当我们使用tf.contrib.seq2seq.sequence_loss()函数计算模型loss的时候，perplexity的计算就显得很简单了，直接对计算出来的loss取个指数就行了，命令如下所示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">train_perp = math.exp(float(mean_loss)) if mean_loss &lt; 300 else math.inf</span><br></pre></td></tr></table></figure>
+<p>现在我训练的对话系统，一般都只是用了perplexity来评判模型的效果，最终perplexity可以降到20左右（越小越好，说明越接近于自然语言）。</p>
+<h2 id="人工指标"><a href="#人工指标" class="headerlink" title="人工指标"></a>人工指标</h2><p>最后说一下人工评价，首先来讲，上面说了这么多的评价指标，并没有一个可以很好的解决对话系统的问题，就像“How NOT To Evaluate Your Dialogue System”论文中说到的那样，当下的这些评价指标都跟人工评价成弱相关或者完全没有关系，相关程度跟具体的数据集有关。</p>
+<p>以下摘自徐阿衡的回答：</p>
+<ul>
+<li>在闲聊性质的数据集上，上述 metric 和人工判断有一定微弱的关联 (only a small positive correlation on chitchat oriented Twitter dataset)</li>
+<li>在技术类的数据集上，上述 metric 和人工判断完全没有关联 (no correlation at all on the technical UDC)</li>
+<li>当局限于一个特别具体的领域时，BLEU 会有不错的表现</li>
+</ul>
+<p>其实随着16/17这两年的发展，还逐渐有了一些别的评价方法，比如使用GAN网络来评价生成的回复是否跟人类回复相似等等。</p>
+<h1 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h1><p>这部分主要介绍一下当前使用比较广泛的对话系统数据集的细节构成。也会稍微介绍一下公开的中文数据集。可以参考“A Survey of Available Corpora for Building Data-Driven Dialogue Systems”这篇论文，而且作者把所有的数据集按照不同类别进行分类总结，里面涵盖了很多数据集，这里不会全部涉及，有兴趣的同学可以看这个<a target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1SJ4XV6NIEl_ReF1odYBRXs0q6mTkedoygY3kLMPjcP8/pubhtml">链接</a>。</p>
+<h2 id="英文数据集"><a href="#英文数据集" class="headerlink" title="英文数据集"></a>英文数据集</h2><ul>
+<li>Cornell Movie Dialogs：电影对话数据集，下载地址：<a href="https://link.zhihu.com/?target=http%3A//www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html">http://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html</a></li>
+<li>Ubuntu Dialogue Corpus：Ubuntu日志对话数据，下载地址：<a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/1506.08909">https://arxiv.org/abs/1506.08909</a></li>
+<li>OpenSubtitles：电影字幕，下载地址：<a href="https://link.zhihu.com/?target=http%3A//opus.lingfil.uu.se/OpenSubtitles.php">http://opus.lingfil.uu.se/OpenSubtitles.php</a></li>
+<li>Twitter：twitter数据集，下载地址：<a href="https://link.zhihu.com/?target=https%3A//github.com/Marsan-Ma/twitter_scraper">https://github.com/Marsan-Ma/twitter_scraper</a></li>
+<li>Papaya Conversational Data Set：基于Cornell、Reddit等数据集重新整理之后，好像挺干净的，下载链接：<a target="_blank" rel="noopener" href="https://github.com/bshao001/ChatLearner">https://github.com/bshao001/ChatLearner</a></li>
+</ul>
+<p>相关数据集的处理代码或者处理好的数据可以参见下面两个github项目：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/Conchylicultor/DeepQA">DeepQA</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Marsan-Ma/chat_corpus">chat_corpus</a></li>
+</ul>
+<h2 id="中文数据集"><a href="#中文数据集" class="headerlink" title="中文数据集"></a>中文数据集</h2><ul>
+<li>dgk_shooter_min.conv：中文电影台词数据集，下载链接：<a target="_blank" rel="noopener" href="https://github.com/rustch3n/dgk_lost_conv">https://github.com/rustch3n/dgk_lost_conv</a></li>
+<li>白鹭时代中文问答语料：白鹭时代论坛问答数据，一个问题对应一个最好的答案。下载链接：<a target="_blank" rel="noopener" href="https://github.com/Samurais/egret-wenda-corpus">https://github.com/Samurais/egret-wenda-corpus</a></li>
+<li>微博数据集：华为李航实验室发布，也是论文“Neural Responding Machine for Short-Text Conversation”使用的数据集下载链接：<a target="_blank" rel="noopener" href="http://61.93.89.94/Noah_NRM_Data/">http://61.93.89.94/Noah_NRM_Data/</a></li>
+<li>新浪微博数据集，评论回复短句，下载地址：<a target="_blank" rel="noopener" href="http://lwc.daanvanesch.nl/openaccess.php">http://lwc.daanvanesch.nl/openaccess.php</a></li>
+</ul>
+<h1 id="交互"><a href="#交互" class="headerlink" title="交互"></a>交互</h1><p>在对聊天机器人进行设计时，虽然视觉层面的设计很重要，但我们更需要把重点放在交互层面，即利用有限的技术条件来完善我们的聊天机器人，问题应该聚焦于我们的<strong>聊天机器人可以为用户做什么。</strong>并要时刻谨记，我们在设计「对话」，不能打破长期以来人与人对话的模式。</p>
+<h2 id="1-明确目标"><a href="#1-明确目标" class="headerlink" title="1.明确目标"></a>1.明确目标</h2><p>在进行对话设计之前，我们需要列出所有用户通过与机器人对话想要达到的目的，他们想通过聊天机器人的帮助想做哪些事情。</p>
+<p>比如，我们现在要设计一个英语App的聊天机器人。那么用户目标可以是：通过机器人的帮助，可以有效提高英语能力，从而达到用户的某目的（考托福、找工作等）。</p>
+<h2 id="2-想象对话场景"><a href="#2-想象对话场景" class="headerlink" title="2.想象对话场景"></a>2.想象对话场景</h2><p>当我们明确用户目标后，可以在脑海中想象一下，把用户的这种需求场景映射到线下，对话内容一般会包含哪些阶段模块，把他们都尽可能的罗列出来。</p>
+<p>还是以该英语App的聊天机器人为例，我们可以把这个机器人想象成我们准备请的一个线下英语家教，我们和这位“英语家教”的整个相处过程会经历哪些阶段：初识阶段、了解阶段、学习阶段、熟悉阶段、目标达成阶段。</p>
+<h2 id="3-编写剧本"><a href="#3-编写剧本" class="headerlink" title="3.编写剧本"></a>3.编写剧本</h2><p>在明确每个阶段之后，我们开始扮演一个导演的角色，开始为我们与机器人的对话编写剧本，这个过程是很有趣的。</p>
+<p>还是以英语App的聊天机器人为例，我们需要在脑海里尽可能的想象用户在各个阶段的场景中会说什么、做什么。这一步需要注意的一点就是，我们的尽可能设计我们的对话内容让用户更轻松、更有趣地完成他们想做的事。</p>
+<h2 id="4-细化剧本"><a href="#4-细化剧本" class="headerlink" title="4.细化剧本"></a>4.细化剧本</h2><p>在上一步，我们已经列出了所有阶段会发生的对话内容，而在这一步，我们就需要设想出每个阶段多种可能的情况。由于不同的用户，他们和机器人对话的路径也可能不同，所以我们需要尽可能多的列出这些不同的对话路径、对话方式、语句等。</p>
+<p>我们可以在纸上或者电脑中描绘出阶段的流程图，帮助我们进行整理归纳，比如以英语app的聊天机器人的某一分支为例，有的用户不想让你了解他，想直接开始学习，在机器人尝试挽回失败后，则直接跳过进入下一阶段。</p>
+<p><img src="https://image.rexking6.top/img/v2-cfe6de194dd1b3be0fa8d4bca090abc7_r.jpg" alt=""></p>
+<p>在这一步的流程图没有固定的形式，只需能清除表达和记录想法，让自己和团队成员看得懂即可。</p>
+<p>在这一步，我们同时还要列出用户表达不同但意思相同的话。</p>
+<p>比如上面例子中「不想做」，用户还可能会说「放弃」「我想放弃」「确定」「不做测试」「跳过」「马上学习」等等各种回答方式。</p>
+<h1 id="平台"><a href="#平台" class="headerlink" title="平台"></a>平台</h1><h2 id="解决什么问题？"><a href="#解决什么问题？" class="headerlink" title="解决什么问题？"></a>解决什么问题？</h2><p>由ChatBot 应运而生的就是ChatBot对话平台。什么是对话平台呢？对话平台即为了让机器人使用者可以配置自己想要的机器人而与之对应的机器人配置工具。在这个工具上，用户可以根据自己不同的业务需求，搭建与之对应的机器人，以实现自己的业务目标。</p>
+<p>举个栗子：比如A用户要搭建一个用于接待访客问题的客服机器人A，与B用户要搭建一个个人助理类的机器人B。</p>
+<p>二者的业务目标不同：A主要用于答疑解惑，比如解答“你们银行借记卡怎么办理”的问题；B主要用于任务执行，比如发出一个指令“帮我看看附近有什么适合约会的餐厅”，机器人会根据用户的需求做相应的任务动作。</p>
+<p>但是二者可以使用同一套ChatBot 平台，来搭建其相应的业务。因为二者基于的AI基础、对话基础是一致的（或者说是类似的）。</p>
+<p>So，ChatBot平台有几个特性：</p>
+<ul>
+<li>可实现不同类型的机器人搭建</li>
+<li>为用户不同业务诉求提供服务</li>
+</ul>
+<p>顺便说一句，现有的对话平台厂商，同质化相当严重。各家基于的对话框架可以说基本相同。不同点，也是商业落地突围点，在于如何落地，如何基于垂类行业的精细化设计与运营。</p>
+<h2 id="什么是好的平台？"><a href="#什么是好的平台？" class="headerlink" title="什么是好的平台？"></a>什么是好的平台？</h2><p>基于上述的几点，我们可以反推过来，什么样的ChatBot平台，才是好的对话平台呢？</p>
+<p>高度抽象：高度抽象ChatBot的基本元素，使之成为所有对话构建的基石。</p>
+<ul>
+<li>高度抽象意味着将ChatBot组块化，类似于“搭积木”进行搭建。每个积木，都需要做得具有高度通用性</li>
+<li>高度抽象其实是个“反推”的过程。即从业务侧反推，抽象各种业务的共性，得到适用于诸多场景的对话元素。如现有ChatBot平台框架，“意图”、“词槽”、“上下文”等对话元素。当然，最通用的部分，已经由国内外大厂ChatBot平台定义好了，并形成了行业内的规范，这部分对于从业者来说，更多的是沿用，而不是重复造一个轮子。</li>
+</ul>
+<p>拼装规律明确：明确与Highlight 组装拼接元素的规律，帮助ChatBot使用者快速理清思路，高效配置出符合自己业务需求的ChatBot。</p>
+<p>搭建机器人是有一套规律的，通俗讲叫做“套路”。比如从分析与划分机器人场景，到确定每个意图，再到意图内多轮对话、意图间多轮对话，都是可以有一套可复用的规范和配置规律的。在ChatBot中，这套规律应该是足够明确，有效帮助用户理清思路的。</p>
+<p>简单易用：简单、高效、易用，降低新手成本，尽可能预置通用的的对话原材料，开箱即用。</p>
+<ol>
+<li>简单，对于ChatBot平台来说，是个不简单的词。如果是一个新手小白，未受过AI训练师的培训，来配置一个机器人的话，学习成本是很高的。因为ChatBot本身就不是一个C端易用的产品。我们以行业标杆Google DialogFlow为例，即使Google已经做得足够易用了（交互体验较于其他B端产品），但是对于小白用户，还是需要参照操作手册学习上手。所以，尽量做得简单，对ChatBot来说是较难的事情。</li>
+<li>基于1，在“预置通用的对话原材料”的维度上，可作为的地方大得多。有资源的厂，可以利用自己的行业积累，为用户提供预置语料的服务。可别小看，在搭建机器人中，语料数据的重要性，可以说是重中之重。不仅影响的是冷启动的效率与质量，更影响机器人运营的效果好坏，直接或间接决定机器人产品的生命周期。</li>
+<li>基于2，目前行业的一个论调是，在【算法】【算力】【数据】这AI三驾马车中，【算法】已通过开源代码受到广为人知，且现有的深度学习的能力阈限大家也都了解一二，用深度学习可以实现的对话领域的巨大突破可能性极小；【算力】通过GPU等技术硬件的购买，花钱都能达到差不多的算力水平。现在的【数据】是各厂间做出产品差异化的重要点。因为【数据】以为着技术落地业务的关键桥梁，一个能解决业务问题的机器人，好过一百个用牛逼的技术堆出来但不解决业务问题的机器人。【数据】作为ChatBot的养料，至关重要。</li>
+</ol>
+<h2 id="评价指标-1"><a href="#评价指标-1" class="headerlink" title="评价指标"></a>评价指标</h2><p>当前市面上号称能做聊天机器人的公司多如牛毛，甚至随便抓几个相关专业的硕士生，都能搭建一个聊天机器人的系统出来。所用的方法也被吹得天花乱坠，各种神经网络能编出花儿出来，但是这些真的是最能落地的方法吗？如何去选择一个靠谱的聊天机器人解决方案呢？</p>
+<h3 id="性能"><a href="#性能" class="headerlink" title="性能"></a>性能</h3><p>这是最为直接的一个评价指标，一个好的聊天机器人系统，需要有较高的准确率和召回率，这样才能发挥到他降低人力成本的作用。如果一个聊天机器人回答的都是错的，或者说仅能回答非常有限的问题，那们他的价值就不大了，准确率相对于召回率更为重要，在某些场景下甚至需要做到100%，召回率的要求可以相对放低点，毕竟我们也没有指望机器人完全代替传统的人工。此外，除了准确率召回率这种性能，还有包括系统的稳定性，响应速度等多种工程层面的指标。总的来说，一个好的聊天机器人系统需要具备极高的准确率，相对高的召回率，高可靠性，高响应速度。</p>
+<h3 id="可维护性"><a href="#可维护性" class="headerlink" title="可维护性"></a>可维护性</h3><p>可维护性是指，系统能够提供一定的机制，支持热修复，支持Debug错误的case，支持模型的更新。简单来说，系统的运行过程一定是高度可控的，我们能够Debug到某个用户提问为什么没有被处理，或者为什么被错误的处理了，从而可以及时修复。当错误的案例积累到一定的规模，能够重新学习新的模型，更新线上模型。当需要修改对话逻辑，能有完善的基于配置的解决方案。这个时候，深度学习提供的端到端的解决方案在实际场景下就问题重重了。</p>
+<h3 id="可扩展性"><a href="#可扩展性" class="headerlink" title="可扩展性"></a>可扩展性</h3><p>上文提到，目前做聊天机器人的打法都是技能包打法，一开始只会有几个技能，然后后续可以添加更多的技能，一个优秀的聊天机器人，都是因为长期的积累，拥有了相当多的技能包，才能解决用户更多的问题。如何快速较为廉价得产生大量的技能包，也是衡量一个聊天机器人的重要标准。这些都需要大量的UI和流程管理来支持，底层也需要计算平台，数据采集平台的支持。所以，一个优秀的聊天机器人系统，应该能够支持快速的扩展技能。</p>
+<h1 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h1><p>近年来，人工智能已经渗透到各行各业，聊天机器人作为自然语言处理中的一个代表性的集大成应用，越来越引起了各行各业的重视。我们常常听到很多行业的客户说“我们要不要为自己的业务做一个聊天机器人？”，尤其是金融，电商，保险等行业。接下来，我给出几点建议，供各位想要“拥抱”聊天机器人的客户参考。</p>
+<p>目前做出一款靠谱的聊天机器人及全生命周期的维护工具，所耗费的资金至少百万级别。除非公司不差钱，或者纯粹为了宣传造势，不然任何想要自研或采购聊天机器人的公司都会仔细考量下，“聊天机器人真的有用吗？”。</p>
+<p>聊天机器人在行业内同行会以两种形态出现，一种是用来做售前售后的咨询，投诉，其地位相当于客服；另一种是更高级的查询，其地位相当于传统的搜索框，区别在于聊天机器人可以直接返回答案，而不是像搜索引擎那样返回一堆候选文档。总的来说，引入一个聊天机器人主要有以下好处：</p>
+<ol>
+<li>聊天机器人响应快速，回答精确，7*24h在岗，带来的是更好的用户体验；</li>
+<li>聊天机器人可以一定程度降低人力成本，具体的比例因具体行业而异，但一般来说，都能降低30%以上的人力；</li>
+<li>从心理学上讲，人们更倾向于相信机器人说的话，而不是人说的话，尤其在销售行业，大家会觉得机器人比较客观，而人的话里有“忽悠”的成分，因此，引入聊天机器人可以一定程度上取得用户的信任。</li>
+</ol>
+<p>那么聊天机器人有什么缺点呢？</p>
+<ol>
+<li>聊天机器人的研发成本较高，正如我刚刚说到，基本都在百万级别以上。</li>
+<li>聊天机器人的实际使用表现因具体行业和场景而异，需要专业的人员进行技术选型，否则做出不适合场景的系统，效果会很差。</li>
+<li>聊天机器人的使用从来都不是一锤子买卖，涉及到很多运维的工作，不仅仅是算法层面的更新，还有很多工程层面的管理，这些都会带来成本。</li>
+</ol>
+<h2 id="适合什么场景？"><a href="#适合什么场景？" class="headerlink" title="适合什么场景？"></a>适合什么场景？</h2><p>以上的优缺点分析，总结起来实际上很简单，优点是省人力，缺点是贵，一个能省钱，一个要花钱，这就需要对业务场景进行深入分析，在花了钱的情况下，尽量省更多的钱。所以，只要业务场景满足一下三要素，就可以考虑引入聊天机器人：</p>
+<ol>
+<li><p>客服的人力成本很高，采购一套聊天机器人，可以在短期内收回人力成本。</p>
+</li>
+<li><p>行业内已经积累了大量的高质量数据。这个非常重要，高质量的数据决定了做出来的机器人可以回答的更全面更准确，能节省更多的人力。这里的高质量数据指，结构化的文档、数据库、人工编辑的问答对、高质量的历史客服记录等。</p>
+</li>
+<li><p>用户的咨询的类型相对比较集中，这个决定了研发一个聊天机器人的成本。业界在研发聊天机器人时，通常是按照Skill为粒度进行划分的，即所谓的技能包，比如我需要这个机器人能查数据库，能接投诉，这些都是一个个的技能包，每个技能包都必须有一个相对比较清晰的定义。这样我们针对性的做出几个技能包，就能覆盖大部分的用户咨询的问题。</p>
+</li>
+</ol>
+<h2 id="选择什么类型？"><a href="#选择什么类型？" class="headerlink" title="选择什么类型？"></a>选择什么类型？</h2><p>如上文所述，聊天机器人分为任务型、问答型和闲聊型，闲聊型的机器人一半不会出现在行业机器人里，你不需要在一个金融类的聊天机器人里去对用户进行情感答疑。因此，在商用领域，任务型和问答型是最实用的。</p>
+<p>如果你需要让聊天机器人帮你完成某个操作，比如接投诉，下单等，那可以选择任务型的聊天机器人。需要注意的是，目前商用的任务型聊天机器人都是采用意图识别+槽填充进行语言理解，用一套流程引擎来进行对话状态的管理，因此任务型机器人的定制，需要同时搭配对应的运维工具，可以定制会话流程和一些基本话术。</p>
+<p>如果你需要让聊天机器人充当一个百事通，能够回答行业内的知识，那么可以选择问答型机器人。如上文所述，问答型机器人根据数据不同可以分成好几种。如果你有行业知识图谱或者数据库，可以选用KBQA或者TableQA，这类技术可以支持一些复杂的问题，并且在实际场景下准确率可以做到非常高，比如在金融领域，可以做股价查询（“2017-2018之间百度股价的涨幅”），在电商领域，可以做一些商品查询（“适合5口人出行的国产车”）。如果你没有这类知识库，仅有一些人工编辑的问答对，可以使用基于检索的问答，准确率也可以做到较高。如果你只有纯文本，那么劝你不要直接在纯文本上做问答，目前的机器阅读理解技术远没有达到可直接使用的地步。可以先人工进行结构化，再使用KBQA或IRQA的技术。</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><ul>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/bshao001/ChatLearner">ChatLearner</a>：英文开源，中文不开源</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://chatterbot.readthedocs.io/en/stable/">ChatterBot</a>：只有英文</p>
+<ul>
+<li><p>安装：</p>
+<p><code>pip install chatterbot</code></p>
+</li>
+<li><p>实现：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line">from chatterbot import ChatBot</span><br><span class="line"></span><br><span class="line"># Create a new chat bot named Charlie</span><br><span class="line">chatbot = ChatBot(</span><br><span class="line">    &#x27;Charlie&#x27;,</span><br><span class="line">    trainer=&#x27;chatterbot.trainers.ListTrainer&#x27;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">chatbot.train([</span><br><span class="line">    &quot;Hi, can I help you?&quot;,</span><br><span class="line">    &quot;Sure, I&#x27;d to book a flight to Iceland.&quot;,</span><br><span class="line">    &quot;Your flight has been booked.&quot;,</span><br><span class="line">    &quot;and you.&quot;</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line"># Get a response to the input text &#x27;How are you?&#x27;</span><br><span class="line">response = chatbot.get_response(&#x27;I would like to book a flight.&#x27;)</span><br><span class="line"></span><br><span class="line">print(response)</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Your flight has been booked.</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/340508567">【NLP】自己搭一个多轮对话聊天机器人（附实现源码）</a>：<a target="_blank" rel="noopener" href="https://github.com/ZJJHYM/chatbot_simbert">chatbot_simbert</a></p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\08\30\A-B测试\" rel="bookmark">A/B测试</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\03\21\Fisher线性判别\" rel="bookmark">Fisher线性判别</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\07\06\MobileNet\" rel="bookmark">MobileNet</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2022/09/24/%E8%81%8A%E5%A4%A9%E6%9C%BA%E5%99%A8%E4%BA%BAChatBot%E5%85%A5%E9%97%A8/" title="聊天机器人ChatBot入门">https://blog.rexking6.top/2022/09/24/聊天机器人ChatBot入门/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/09/11/%E9%98%BF%E9%87%8C%E4%BA%91%E5%A4%A7%E5%92%96%E8%AF%B4%E7%AC%94%E8%AE%B0/" rel="prev" title="阿里云大咖说笔记">
+      <i class="fa fa-chevron-left"></i> 阿里云大咖说笔记
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%9F%E6%80%81"><span class="nav-number">2.</span> <span class="nav-text">生态</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E7%B1%BB"><span class="nav-number">3.</span> <span class="nav-text">分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%99%E4%B9%88%E5%88%92%E5%88%86%EF%BC%9F"><span class="nav-number">3.1.</span> <span class="nav-text">为什么这么划分？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%94%E7%B3%BB%E4%B8%8E%E5%8C%BA%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">3.2.</span> <span class="nav-text">联系与区别是什么？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E8%BE%BE%E6%88%90%EF%BC%88Get-things-done%EF%BC%89"><span class="nav-number">3.2.1.</span> <span class="nav-text">任务达成（Get things done）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%83%85%E6%84%9F%E9%99%AA%E4%BC%B4%EF%BC%88Get-company%EF%BC%89"><span class="nav-number">3.2.2.</span> <span class="nav-text">情感陪伴（Get company）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E7%AD%94%E5%9E%8BChatBot"><span class="nav-number">4.</span> <span class="nav-text">问答型ChatBot</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E6%96%99%E5%BA%93"><span class="nav-number">4.1.</span> <span class="nav-text">语料库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E6%96%B9%E5%BC%8F"><span class="nav-number">4.2.</span> <span class="nav-text">匹配方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95"><span class="nav-number">4.3.</span> <span class="nav-text">匹配算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#KBQA"><span class="nav-number">4.4.</span> <span class="nav-text">KBQA</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E5%9E%8BChatBot"><span class="nav-number">5.</span> <span class="nav-text">任务型ChatBot</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">5.1.</span> <span class="nav-text">原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NLU"><span class="nav-number">5.1.1.</span> <span class="nav-text">NLU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DM"><span class="nav-number">5.1.2.</span> <span class="nav-text">DM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NLG"><span class="nav-number">5.1.3.</span> <span class="nav-text">NLG</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A6%81%E7%B4%A0"><span class="nav-number">5.2.</span> <span class="nav-text">要素</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%84%8F%E5%9B%BE"><span class="nav-number">5.2.1.</span> <span class="nav-text">意图</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E6%84%8F%E5%9B%BE%E8%AF%86%E5%88%AB%EF%BC%9F"><span class="nav-number">5.2.1.1.</span> <span class="nav-text">如何进行意图识别？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%84%8F%E5%9B%BE%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="nav-number">5.2.1.2.</span> <span class="nav-text">意图的配置</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E4%BD%93"><span class="nav-number">5.2.2.</span> <span class="nav-text">实体</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%AE%9E%E4%BD%93%EF%BC%9F"><span class="nav-number">5.2.2.1.</span> <span class="nav-text">什么是实体？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%AE%9E%E4%BD%93%EF%BC%9F"><span class="nav-number">5.2.2.2.</span> <span class="nav-text">为什么需要实体？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E5%AE%9E%E4%BD%93%E8%AF%86%E5%88%AB%EF%BC%9F"><span class="nav-number">5.2.2.3.</span> <span class="nav-text">如何进行实体识别？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%8D%E6%A7%BD"><span class="nav-number">5.2.3.</span> <span class="nav-text">词槽</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%8D%E6%A7%BD%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">5.2.3.1.</span> <span class="nav-text">词槽是什么？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E8%AF%8D%E6%A7%BD%EF%BC%9F"><span class="nav-number">5.2.3.2.</span> <span class="nav-text">为什么需要词槽？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E8%AF%8D%E6%A7%BD%E7%9A%84%E5%A1%AB%E5%85%85%EF%BC%9F"><span class="nav-number">5.2.3.3.</span> <span class="nav-text">如何进行词槽的填充？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9E%E5%A4%8D"><span class="nav-number">5.2.4.</span> <span class="nav-text">回复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="nav-number">5.2.5.</span> <span class="nav-text">上下文</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87"><span class="nav-number">6.</span> <span class="nav-text">评价指标</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%8D%E9%87%8D%E5%8F%A0%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87"><span class="nav-number">6.1.</span> <span class="nav-text">词重叠评价指标</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#BLEU"><span class="nav-number">6.1.1.</span> <span class="nav-text">BLEU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ROUGE"><span class="nav-number">6.1.2.</span> <span class="nav-text">ROUGE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#METEOR"><span class="nav-number">6.1.3.</span> <span class="nav-text">METEOR</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%8D%E5%90%91%E9%87%8F%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87"><span class="nav-number">6.2.</span> <span class="nav-text">词向量评价指标</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Greedy-Matching"><span class="nav-number">6.2.1.</span> <span class="nav-text">Greedy Matching</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Embedding-Average"><span class="nav-number">6.2.2.</span> <span class="nav-text">Embedding Average</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vector-Extrema"><span class="nav-number">6.2.3.</span> <span class="nav-text">Vector Extrema</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#perplexity%E5%9B%B0%E6%83%91%E5%BA%A6"><span class="nav-number">6.3.</span> <span class="nav-text">perplexity困惑度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%BA%E5%B7%A5%E6%8C%87%E6%A0%87"><span class="nav-number">6.4.</span> <span class="nav-text">人工指标</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">7.</span> <span class="nav-text">数据集</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8B%B1%E6%96%87%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">7.1.</span> <span class="nav-text">英文数据集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%AD%E6%96%87%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">7.2.</span> <span class="nav-text">中文数据集</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%A4%E4%BA%92"><span class="nav-number">8.</span> <span class="nav-text">交互</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%98%8E%E7%A1%AE%E7%9B%AE%E6%A0%87"><span class="nav-number">8.1.</span> <span class="nav-text">1.明确目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%83%B3%E8%B1%A1%E5%AF%B9%E8%AF%9D%E5%9C%BA%E6%99%AF"><span class="nav-number">8.2.</span> <span class="nav-text">2.想象对话场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E7%BC%96%E5%86%99%E5%89%A7%E6%9C%AC"><span class="nav-number">8.3.</span> <span class="nav-text">3.编写剧本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%BB%86%E5%8C%96%E5%89%A7%E6%9C%AC"><span class="nav-number">8.4.</span> <span class="nav-text">4.细化剧本</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B9%B3%E5%8F%B0"><span class="nav-number">9.</span> <span class="nav-text">平台</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="nav-number">9.1.</span> <span class="nav-text">解决什么问题？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%A5%BD%E7%9A%84%E5%B9%B3%E5%8F%B0%EF%BC%9F"><span class="nav-number">9.2.</span> <span class="nav-text">什么是好的平台？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87-1"><span class="nav-number">9.3.</span> <span class="nav-text">评价指标</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%A7%E8%83%BD"><span class="nav-number">9.3.1.</span> <span class="nav-text">性能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E7%BB%B4%E6%8A%A4%E6%80%A7"><span class="nav-number">9.3.2.</span> <span class="nav-text">可维护性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AF%E6%89%A9%E5%B1%95%E6%80%A7"><span class="nav-number">9.3.3.</span> <span class="nav-text">可扩展性</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">10.</span> <span class="nav-text">优缺点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%82%E5%90%88%E4%BB%80%E4%B9%88%E5%9C%BA%E6%99%AF%EF%BC%9F"><span class="nav-number">10.1.</span> <span class="nav-text">适合什么场景？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E4%BB%80%E4%B9%88%E7%B1%BB%E5%9E%8B%EF%BC%9F"><span class="nav-number">10.2.</span> <span class="nav-text">选择什么类型？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">11.</span> <span class="nav-text">实现</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">189</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">3.3m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">49:46</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
