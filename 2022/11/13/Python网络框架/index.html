@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python网络框架">
+<meta property="og:url" content="https://blog.rexking6.top/2022/11/13/Python%E7%BD%91%E7%BB%9C%E6%A1%86%E6%9E%B6/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/291731048886033.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/291731045756062.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/291732082474844.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/291731042784620.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/291731052313462.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/20200722140742_81015.png">
+<meta property="og:image" content="https://image.rexking6.top/img/20200722140731_54741.png">
+<meta property="og:image" content="https://image.rexking6.top/img/modb_20211018_218a6f96-2ffe-11ec-b482-fa163eb4f6be.png">
+<meta property="og:image" content="https://image.rexking6.top/img/20200722140704_53322.png">
+<meta property="og:image" content="https://image.rexking6.top/img/20200722140722_62993.png">
+<meta property="article:published_time" content="2022-11-13T02:18:35.000Z">
+<meta property="article:modified_time" content="2022-11-13T07:24:51.473Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="Python">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/291731048886033.jpg">
+
+<link rel="canonical" href="https://blog.rexking6.top/2022/11/13/Python%E7%BD%91%E7%BB%9C%E6%A1%86%E6%9E%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Python网络框架 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2022/11/13/Python%E7%BD%91%E7%BB%9C%E6%A1%86%E6%9E%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Python网络框架
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-11-13 10:18:35 / 修改时间：15:24:51" itemprop="dateCreated datePublished" datetime="2022-11-13T10:18:35+08:00">2022-11-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2022/11/13/Python%E7%BD%91%E7%BB%9C%E6%A1%86%E6%9E%B6/" class="post-meta-item leancloud_visitors" data-flag-title="Python网络框架" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>18k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>16 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>综合转载于：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.runoob.com/w3cnote/restful-architecture.html">RESTful 架构详解</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.modb.pro/db/138430">FastApi 简单入门，附生产级脚手架代码</a></li>
+<li><a target="_blank" rel="noopener" href="https://v3u.cn/a_id_167">2020年是时候更新你的技术武器库了:Asgi vs Wsgi(FastAPI vs Flask)</a></li>
+</ul>
+<h1 id="RESTful"><a href="#RESTful" class="headerlink" title="RESTful"></a>RESTful</h1><h2 id="什么是REST"><a href="#什么是REST" class="headerlink" title="什么是REST"></a>什么是REST</h2><p>REST全称是Representational State Transfer，中文意思是表述（编者注：通常译为表征）性状态转移。 它首次出现在2000年Roy Fielding的博士论文中，Roy Fielding是HTTP规范的主要编写者之一。 他在论文中提到：”我这篇文章的写作目的，就是想在符合架构原理的前提下，理解和评估以网络为基础的应用软件的架构设计，得到一个功能强、性能好、适宜通信的架构。REST指的是一组架构约束条件和原则。” 如果一个架构符合REST的约束条件和原则，我们就称它为RESTful架构。</p>
+<p>REST本身并没有创造新的技术、组件或服务，而隐藏在RESTful背后的理念就是使用Web的现有特征和能力， 更好地使用现有Web标准中的一些准则和约束。虽然REST本身受Web技术的影响很深， 但是理论上REST架构风格并不是绑定在HTTP上，只不过目前HTTP是唯一与REST相关的实例。 所以我们这里描述的REST也是通过HTTP实现的REST。</p>
+<h2 id="理解RESTful"><a href="#理解RESTful" class="headerlink" title="理解RESTful"></a>理解RESTful</h2><p>要理解RESTful架构，需要理解Representational State Transfer这个词组到底是什么意思，它的每一个词都有些什么涵义。</p>
+<p>下面我们结合REST原则，围绕资源展开讨论，从资源的定义、获取、表述、关联、状态变迁等角度，列举一些关键概念并加以解释。</p>
+<ul>
+<li>资源与URI</li>
+<li>统一资源接口</li>
+<li>资源的表述</li>
+<li>资源的链接</li>
+<li>状态的转移</li>
+</ul>
+<h3 id="资源与URI"><a href="#资源与URI" class="headerlink" title="资源与URI"></a>资源与URI</h3><p>REST全称是表述性状态转移，那究竟指的是什么的表述? 其实指的就是资源。任何事物，只要有被引用到的必要，它就是一个资源。资源可以是实体(例如手机号码)，也可以只是一个抽象概念(例如价值) 。下面是一些资源的例子：</p>
+<ul>
+<li>某用户的手机号码</li>
+<li>某用户的个人信息</li>
+<li>最多用户订购的GPRS套餐</li>
+<li>两个产品之间的依赖关系</li>
+<li>某用户可以办理的优惠套餐</li>
+<li>某手机号码的潜在价值</li>
+</ul>
+<p>要让一个资源可以被识别，需要有个唯一标识，在Web中这个唯一标识就是URI(Uniform Resource Identifier)。</p>
+<p>URI既可以看成是资源的地址，也可以看成是资源的名称。如果某些信息没有使用URI来表示，那它就不能算是一个资源， 只能算是资源的一些信息而已。URI的设计应该遵循可寻址性原则，具有自描述性，需要在形式上给人以直觉上的关联。这里以github网站为例，给出一些还算不错的URI：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/git">https://github.com/git</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/git/git">https://github.com/git/git</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/git/git/blob/master/block-sha1/sha1.h">https://github.com/git/git/blob/master/block-sha1/sha1.h</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/git/git/commit/e3af72cdafab5993d18fae056f87e1d675913d08">https://github.com/git/git/commit/e3af72cdafab5993d18fae056f87e1d675913d08</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/git/git/pulls">https://github.com/git/git/pulls</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/git/git/pulls?state=closed">https://github.com/git/git/pulls?state=closed</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/git/git/compare/master…next">https://github.com/git/git/compare/master…next</a></li>
+</ul>
+<p>下面让我们来看看URI设计上的一些技巧:</p>
+<ul>
+<li><p>使用_或-来让URI可读性更好</p>
+<p>曾经Web上的URI都是冰冷的数字或者无意义的字符串，但现在越来越多的网站使用_或-来分隔一些单词，让URI看上去更为人性化。 例如国内比较出名的开源中国社区，它上面的新闻地址就采用这种风格， 如<a target="_blank" rel="noopener" href="http://www.oschina.net/news/38119/oschina-translate-reward-plan。">http://www.oschina.net/news/38119/oschina-translate-reward-plan。</a></p>
+</li>
+<li><p>使用/来表示资源的层级关系</p>
+<p>例如上述/git/git/commit/e3af72cdafab5993d18fae056f87e1d675913d08就表示了一个多级的资源， 指的是git用户的git项目的某次提交记录，又例如/orders/2012/10可以用来表示2012年10月的订单记录。</p>
+</li>
+<li><p>使用?用来过滤资源</p>
+<p>很多人只是把?简单的当做是参数的传递，很容易造成URI过于复杂、难以理解。可以把?用于对资源的过滤， 例如/git/git/pulls用来表示git项目的所有推入请求，而/pulls?state=closed用来表示git项目中已经关闭的推入请求， 这种URL通常对应的是一些特定条件的查询结果或算法运算结果。</p>
+</li>
+<li><p>,或;可以用来表示同级资源的关系</p>
+<p>有时候我们需要表示同级资源的关系时，可以使用,或;来进行分割。例如哪天github可以比较某个文件在随意两次提交记录之间的差异，或许可以使用/git/git /block-sha1/sha1.h/compare/e3af72cdafab5993d18fae056f87e1d675913d08;bd63e61bdf38e872d5215c07b264dcc16e4febca作为URI。 不过，现在github是使用…来做这个事情的，例如/git/git/compare/master…next。</p>
+</li>
+</ul>
+<h3 id="统一资源接口"><a href="#统一资源接口" class="headerlink" title="统一资源接口"></a>统一资源接口</h3><p>RESTful架构应该遵循统一接口原则，统一接口包含了一组受限的预定义的操作，不论什么样的资源，都是通过使用相同的接口进行资源的访问。接口应该使用标准的HTTP方法如GET，PUT和POST，并遵循这些方法的语义。</p>
+<p>如果按照HTTP方法的语义来暴露资源，那么接口将会拥有安全性和幂等性的特性，例如GET和HEAD请求都是安全的， 无论请求多少次，都不会改变服务器状态。而GET、HEAD、PUT和DELETE请求都是幂等的，无论对资源操作多少次， 结果总是一样的，后面的请求并不会产生比第一次更多的影响。</p>
+<p>下面列出了GET，DELETE，PUT和POST的典型用法:</p>
+<h4 id="GET"><a href="#GET" class="headerlink" title="GET"></a>GET</h4><ul>
+<li>安全且幂等</li>
+<li>获取表示</li>
+<li><p>变更时获取表示（缓存）</p>
+</li>
+<li><p>200（OK） - 表示已在响应中发出</p>
+</li>
+<li><p>204（无内容） - 资源有空表示</p>
+</li>
+<li>301（Moved Permanently） - 资源的URI已被更新</li>
+<li>303（See Other） - 其他（如，负载均衡）</li>
+<li>304（not modified）- 资源未更改（缓存）</li>
+<li>400 （bad request）- 指代坏请求（如，参数错误）</li>
+<li>404 （not found）- 资源不存在</li>
+<li>406 （not acceptable）- 服务端不支持所需表示</li>
+<li>500 （internal server error）- 通用错误响应</li>
+<li>503 （Service Unavailable）- 服务端当前无法处理请求</li>
+</ul>
+<h4 id="POST"><a href="#POST" class="headerlink" title="POST"></a>POST</h4><ul>
+<li>不安全且不幂等</li>
+<li>使用服务端管理的（自动产生）的实例号创建资源</li>
+<li>创建子资源</li>
+<li>部分更新资源</li>
+<li><p>如果没有被修改，则不过更新资源（乐观锁）</p>
+</li>
+<li><p>200（OK）- 如果现有资源已被更改</p>
+</li>
+<li><p>201（created）- 如果新资源被创建</p>
+</li>
+<li>202（accepted）- 已接受处理请求但尚未完成（异步处理）</li>
+<li>301（Moved Permanently）- 资源的URI被更新</li>
+<li>303（See Other）- 其他（如，负载均衡）</li>
+<li>400（bad request）- 指代坏请求</li>
+<li>404 （not found）- 资源不存在</li>
+<li>406 （not acceptable）- 服务端不支持所需表示</li>
+<li>409 （conflict）- 通用冲突</li>
+<li>412 （Precondition Failed）- 前置条件失败（如执行条件更新时的冲突）</li>
+<li>415 （unsupported media type）- 接受到的表示不受支持</li>
+<li>500 （internal server error）- 通用错误响应</li>
+<li>503 （Service Unavailable）- 服务当前无法处理请求</li>
+</ul>
+<h4 id="PUT"><a href="#PUT" class="headerlink" title="PUT"></a>PUT</h4><ul>
+<li>不安全但幂等</li>
+<li>用客户端管理的实例号创建一个资源</li>
+<li>通过替换的方式更新资源</li>
+<li><p>如果未被修改，则更新资源（乐观锁）</p>
+</li>
+<li><p>200 （OK）- 如果已存在资源被更改</p>
+</li>
+<li><p>201 （created）- 如果新资源被创建</p>
+</li>
+<li>301（Moved Permanently）- 资源的URI已更改</li>
+<li>303 （See Other）- 其他（如，负载均衡）</li>
+<li>400 （bad request）- 指代坏请求</li>
+<li>404 （not found）- 资源不存在</li>
+<li>406 （not acceptable）- 服务端不支持所需表示</li>
+<li>409 （conflict）- 通用冲突</li>
+<li>412 （Precondition Failed）- 前置条件失败（如执行条件更新时的冲突）</li>
+<li>415 （unsupported media type）- 接受到的表示不受支持</li>
+<li>500 （internal server error）- 通用错误响应</li>
+<li>503 （Service Unavailable）- 服务当前无法处理请求</li>
+</ul>
+<h4 id="DELETE"><a href="#DELETE" class="headerlink" title="DELETE"></a>DELETE</h4><ul>
+<li>不安全但幂等</li>
+<li><p>删除资源</p>
+</li>
+<li><p>200 （OK）- 资源已被删除</p>
+</li>
+<li><p>301 （Moved Permanently）- 资源的URI已更改</p>
+</li>
+<li>303 （See Other）- 其他，如负载均衡</li>
+<li>400 （bad request）- 指代坏请求</li>
+<li>404 （not found）- 资源不存在</li>
+<li>409 （conflict）- 通用冲突</li>
+<li>500 （internal server error）- 通用错误响应</li>
+<li>503 （Service Unavailable）- 服务端当前无法处理请求</li>
+</ul>
+<p>下面我们来看一些实践中常见的问题:</p>
+<ul>
+<li><p>POST和PUT用于创建资源时有什么区别？</p>
+<p>POST和PUT在创建资源的区别在于，所创建的资源的名称(URI)是否由客户端决定。 例如为我的博文增加一个java的分类，生成的路径就是分类名/categories/java，那么就可以采用PUT方法。不过很多人直接把POST、GET、PUT、DELETE直接对应上CRUD，例如在一个典型的rails实现的RESTful应用中就是这么做的。</p>
+</li>
+<li><p>客户端不一定都支持这些HTTP方法吧？</p>
+<p>的确有这种情况，特别是一些比较古老的基于浏览器的客户端，只能支持GET和POST两种方法。在实践上，客户端和服务端都可能需要做一些妥协。例如rails框架就支持通过隐藏参数_method=DELETE来传递真实的请求方法， 而像Backbone这样的客户端MVC框架则允许传递_method传输和设置X-HTTP-Method-Override头来规避这个问题。</p>
+</li>
+<li><p>统一接口是否意味着不能扩展带特殊语义的方法？</p>
+<p>统一接口并不阻止你扩展方法，只要方法对资源的操作有着具体的、可识别的语义即可，并能够保持整个接口的统一性。</p>
+<p>像WebDAV就对HTTP方法进行了扩展，增加了LOCK、UPLOCK等方法。而github的API则支持使用PATCH方法来进行issue的更新，例如:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PATCH /repos/:owner/:repo/issues/:number</span><br></pre></td></tr></table></figure>
+<p>不过，需要注意的是，像PATCH这种不是HTTP标准方法的，服务端需要考虑客户端是否能够支持的问题。</p>
+</li>
+<li><p>统一资源接口对URI有什么指导意义？</p>
+<p>统一资源接口要求使用标准的HTTP方法对资源进行操作，所以URI只应该来表示资源的名称，而不应该包括资源的操作。</p>
+<p>通俗来说，URI不应该使用动作来描述。例如，下面是一些不符合统一接口要求的URI:</p>
+<ul>
+<li>GET /getUser/1</li>
+<li>POST /createUser</li>
+<li>PUT /updateUser/1</li>
+<li>DELETE /deleteUser/1</li>
+</ul>
+<p>如果GET请求增加计数器，这是否违反安全性？</p>
+<p>安全性不代表请求不产生副作用，例如像很多API开发平台，都对请求流量做限制。像github，就会限制没有认证的请求每小时只能请求60次。但客户端不是为了追求副作用而发出这些GET或HEAD请求的，产生副作用是服务端”自作主张”的。另外，服务端在设计时，也不应该让副作用太大，因为客户端认为这些请求是不会产生副作用的。</p>
+</li>
+</ul>
+<ul>
+<li><p>直接忽视缓存可取吗？</p>
+<p>即使你按各个动词的原本意图来使用它们，你仍可以轻易禁止缓存机制。 最简单的做法就是在你的HTTP响应里增加这样一个报头： Cache-control: no-cache。 但是，同时你也对失去了高效的缓存与再验证的支持(使用Etag等机制)。对于客户端来说，在为一个REST式服务实现程序客户端时，也应该充分利用现有的缓存机制，以免每次都重新获取表示。</p>
+</li>
+<li><p>响应代码的处理有必要吗？</p>
+<p>HTTP的响应代码可用于应付不同场合，正确使用这些状态代码意味着客户端与服务器可以在一个具备较丰富语义的层次上进行沟通。例如，201（”Created”）响应代码表明已经创建了一个新的资源，其URI在Location响应报头里。假如你不利用HTTP状态代码丰富的应用语义，那么你将错失提高重用性、增强互操作性和提升松耦合性的机会。如果这些所谓的RESTful应用必须通过响应实体才能给出错误信息，那么SOAP就是这样的了，它就能够满足了。</p>
+</li>
+</ul>
+<h3 id="资源的表述"><a href="#资源的表述" class="headerlink" title="资源的表述"></a>资源的表述</h3><p>上面提到，客户端通过HTTP方法可以获取资源，是吧? 不，确切的说，客户端获取的只是资源的表述而已。 资源在外界的具体呈现，可以有多种表述(或成为表现、表示)形式，在客户端和服务端之间传送的也是资源的表述，而不是资源本身。 例如文本资源可以采用html、xml、json等格式，图片可以使用PNG或JPG展现出来。</p>
+<p>资源的表述包括数据和描述数据的元数据，例如，HTTP头”Content-Type” 就是这样一个元数据属性。</p>
+<p>那么客户端如何知道服务端提供哪种表述形式呢？</p>
+<p>答案是可以通过HTTP内容协商，客户端可以通过Accept头请求一种特定格式的表述，服务端则通过Content-Type告诉客户端资源的表述形式。以github为例，请求某组织资源的json格式的表述形式:</p>
+<p><img src="https://image.rexking6.top/img/291731048886033.jpg" alt=""></p>
+<p>假如github也能够支持xml格式的表述格式，那么结果就是这样的：</p>
+<p><img src="https://image.rexking6.top/img/291731045756062.jpg" alt=""></p>
+<p>下面我们来看一些实践上常见的设计:</p>
+<h4 id="在URI里边带上版本号"><a href="#在URI里边带上版本号" class="headerlink" title="在URI里边带上版本号"></a>在URI里边带上版本号</h4><p>有些API在URI里边带上版本号，例如:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://api.example.com/1.0/foo">http://api.example.com/1.0/foo</a></li>
+<li><a target="_blank" rel="noopener" href="http://api.example.com/1.2/foo">http://api.example.com/1.2/foo</a></li>
+<li><a target="_blank" rel="noopener" href="http://api.example.com/2.0/foo">http://api.example.com/2.0/foo</a></li>
+</ul>
+<p>如果我们把版本号理解成资源的不同表述形式的话，就应该只是用一个URL，并通过Accept头部来区分，还是以github为例，它的Accept的完整格式是:application/vnd.github[.version].param[+json]</p>
+<p>对于v3版本的话，就是Accept: application/vnd.github.v3。对于上面的例子，同理可以使用使用下面的头部:</p>
+<ul>
+<li>Accept: vnd.example-com.foo+json; version=1.0</li>
+<li>Accept: vnd.example-com.foo+json; version=1.2</li>
+<li>Accept: vnd.example-com.foo+json; version=2.0</li>
+</ul>
+<h4 id="使用URI后缀来区分表述格式"><a href="#使用URI后缀来区分表述格式" class="headerlink" title="使用URI后缀来区分表述格式"></a>使用URI后缀来区分表述格式</h4><p>像rails框架，就支持使用/users.xml或/users.json来区分不同的格式。 这样的方式对于客户端来说，无疑是更为直观，但混淆了资源的名称和资源的表述形式。 我个人认为，还是应该优先使用内容协商来区分表述格式。</p>
+<h4 id="如何处理不支持的表述格式"><a href="#如何处理不支持的表述格式" class="headerlink" title="如何处理不支持的表述格式"></a>如何处理不支持的表述格式</h4><p>当服务器不支持所请求的表述格式，那么应该怎么办？若服务器不支持，它应该返回一个HTTP 406响应，表示拒绝处理该请求。下面以github为例，展示了一个请求XML表述资源的结果：</p>
+<p><img src="https://image.rexking6.top/img/291732082474844.jpg" alt=""></p>
+<h3 id="资源的链接"><a href="#资源的链接" class="headerlink" title="资源的链接"></a>资源的链接</h3><p>我们知道REST是使用标准的HTTP方法来操作资源的，但仅仅因此就理解成带CURD的Web数据库架构就太过于简单了。</p>
+<p>这种反模式忽略了一个核心概念：”超媒体即应用状态引擎（hypermedia as the engine of application state）”。 超媒体是什么?</p>
+<p>当你浏览Web网页时，从一个连接跳到一个页面，再从另一个连接跳到另外一个页面，就是利用了超媒体的概念：把一个个把资源链接起来.</p>
+<p>要达到这个目的，就要求在表述格式里边加入链接来引导客户端。在《RESTful Web Services》一书中，作者把这种具有链接的特性成为连通性。下面我们具体来看一些例子。</p>
+<p>下面展示的是github获取某个组织下的项目列表的请求，可以看到在响应头里边增加Link头告诉客户端怎么访问下一页和最后一页的记录。 而在响应体里边，用url来链接项目所有者和项目地址。</p>
+<p><img src="https://image.rexking6.top/img/291731042784620.jpg" alt=""></p>
+<p>又例如下面这个例子，创建订单后通过链接引导客户端如何去付款。</p>
+<p><img src="https://image.rexking6.top/img/291731052313462.jpg" alt=""></p>
+<p>上面的例子展示了如何使用超媒体来增强资源的连通性。很多人在设计RESTful架构时，使用很多时间来寻找漂亮的URI，而忽略了超媒体。所以，应该多花一些时间来给资源的表述提供链接，而不是专注于”资源的CRUD”。</p>
+<h3 id="状态的转移"><a href="#状态的转移" class="headerlink" title="状态的转移"></a>状态的转移</h3><p>有了上面的铺垫，再讨论REST里边的状态转移就会很容易理解了。不过，我们先来讨论一下REST原则中的无状态通信原则。初看一下，好像自相矛盾了，既然无状态，何来状态转移一说?</p>
+<p>其实，这里说的无状态通信原则，并不是说客户端应用不能有状态，而是指服务端不应该保存客户端状态。</p>
+<h4 id="应用状态与资源状态"><a href="#应用状态与资源状态" class="headerlink" title="应用状态与资源状态"></a>应用状态与资源状态</h4><p>实际上，状态应该区分应用状态和资源状态，客户端负责维护应用状态，而服务端维护资源状态。</p>
+<p>客户端与服务端的交互必须是无状态的，并在每一次请求中包含处理该请求所需的一切信息。</p>
+<p>服务端不需要在请求间保留应用状态，只有在接受到实际请求的时候，服务端才会关注应用状态。</p>
+<p>这种无状态通信原则，使得服务端和中介能够理解独立的请求和响应。</p>
+<p>在多次请求中，同一客户端也不再需要依赖于同一服务器，方便实现高可扩展和高可用性的服务端。但有时候我们会做出违反无状态通信原则的设计，例如利用Cookie跟踪某个服务端会话状态，常见的像J2EE里边的JSESSIONID。这意味着，浏览器随各次请求发出去的Cookie是被用于构建会话状态的。</p>
+<p>当然，如果Cookie保存的是一些服务器不依赖于会话状态即可验证的信息（比如认证令牌），这样的Cookie也是符合REST原则的。</p>
+<h4 id="应用状态的转移"><a href="#应用状态的转移" class="headerlink" title="应用状态的转移"></a>应用状态的转移</h4><p>状态转移到这里已经很好理解了， “会话”状态不是作为资源状态保存在服务端的，而是被客户端作为应用状态进行跟踪的。客户端应用状态在服务端提供的超媒体的指引下发生变迁。服务端通过超媒体告诉客户端当前状态有哪些后续状态可以进入。</p>
+<p>这些类似”下一页”之类的链接起的就是这种推进状态的作用——指引你如何从当前状态进入下一个可能的状态。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>现在广东XXX版本、XXX等项目中均使用传统的RPC、SOAP方式的Web服务，而移动南方基地XXXX项目的后台， 虽然采用了JSON格式进行交互，但还是属于RPC风格的。本文从资源的定义、获取、表述、关联、状态变迁等角度， 试图快速理解RESTful架构背后的概念。RESTful架构与传统的RPC、SOAP等方式在理念上有很大的不同，希望本文能对各位理解REST有所帮助。</p>
+<h1 id="Python的异步编程和协程"><a href="#Python的异步编程和协程" class="headerlink" title="Python的异步编程和协程"></a>Python的异步编程和协程</h1><p>Python 1.0 发布在 1994 年，当时对编程语言性能的要求并不像现在这么高，所以它在设计之初就更倾向于快速开发和便捷的语法。即便有性能的要求，多进程多线程也完全能够应付。但是随着现代互联网的发展，对编程语言自身的性能要求就越来越高。除了多进程和多线程模型，还逐渐演化出「协程」模型（协程，是一种用户态的更小力度的任务运行单元。基于线程，可实现多个任务的并行。）为代表的异步编程思想。</p>
+<p>在早期，Python 实现异步编程，需要地方的库，如 Twisted、Tornado 等。从 Python3 开始，加入了对异步编程的原生支持。</p>
+<ul>
+<li>python3.3 引入关键字<code>yield from</code>，用户可实现基于生成器的简易协程；</li>
+<li>python3.4 引入<code>asyncio</code>库，正式引入协程概念，使用关键字<code>@asyncio.coroutine</code>和<code>yield from</code>来表示协程调用；</li>
+<li>python3.5 引入关键字<code>async/await</code>代替<code>@asyncio.coroutine</code>和<code>yield from</code>，可以让我们使用同步的方式写出异步的代码；</li>
+</ul>
+<p>下面这种以<code>async def</code>定义函数，且用<code>await</code>关键字来调用函数的代码，便是协程相关的代码。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">import asyncio</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">async def compute(x, y):</span><br><span class="line">    print(&quot;Compute %s + %s ...&quot; % (x, y))</span><br><span class="line">    await asyncio.sleep(1.0)</span><br><span class="line">    return x + y</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">async def print_sum(x, y):</span><br><span class="line">    result = await compute(x, y)</span><br><span class="line">    print(&quot;%s + %s = %s&quot; % (x, y, result))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">loop = asyncio.get_event_loop()</span><br><span class="line">loop.run_until_complete(print_sum(1, 2))</span><br><span class="line">loop.close()</span><br></pre></td></tr></table></figure>
+<p>协程的运行有 3 种方式，</p>
+<ul>
+<li><code>aysncio.run()</code>用来运行最高层次的<code>main()</code>函数；</li>
+<li><code>await</code>调用协程函数；</li>
+<li><code>asyncio.create_task()</code>并发运行作为<code>asyncio</code>任务的多个协程；</li>
+</ul>
+<p>一些其他概念：</p>
+<ul>
+<li><strong>CGI</strong>（通用网关接口， Common Gateway Interface），简单来说就是解析浏览器等客户端发送给服务端的请求，并组装需要返回的 HTTP 请求的一种通用协议，处理这个过程的程序，我们就可以叫 CGI 脚本。互联网早期的动态网页都是基于 CGI 标准的。</li>
+<li><strong>WSGI</strong> 是一种 Python 专用的 Web 服务器网关接口，它分为两部分”服务器（或网关）“和”应用程序（或应用框架）”。「服务器」，一般独立于应用框架，为应用程序运行提供环境信息和一个回调函数（Callback Function）。当应用程序完成处理请求后，透过回调函数，将结果回传给服务器。常用的 WSGI 服务器有: uwsgi、gunicon。「应用程序」，是各种实现了 WSGI 标准的 Python web 框架了，常用的有 Django、Flask 等。</li>
+<li><strong>ASGI（Asynchronous Server Gateway Interface)</strong> 是 Django 团队提出的一种具有异步功能的 Python web 服务器网关接口协议。能够处理多种通用的协议类型，包括 HTTP，HTTP2 和 WebSocket。WSGI 是基于 HTTP 协议模式的，不支持 WebSocket，而 ASGI 的诞生则是为了解决 Python 常用的 WSGI 不支持当前 Web 开发中的一些新的协议标准(WebSocket、Http2 等)。同时，ASGI 向下兼容 WSGI 标准，可以通过一些方法跑 WSGI 的应用程序。常用的「服务器」有 Daphne、Uvicorn。</li>
+</ul>
+<h1 id="WSGI"><a href="#WSGI" class="headerlink" title="WSGI"></a>WSGI</h1><p> Wsgi是同步通信服务规范，客户端请求一项服务，并等待服务完成，只有当它收到服务的结果时，它才会继续工作。当然了，可以定义一个超时时间，如果服务在规定的时间内没有完成，则认为调用失败，调用方继续工作。</p>
+<p>Wsgi简单工作原理示意图：</p>
+<p><img src="https://image.rexking6.top/img/20200722140742_81015.png" alt=""></p>
+<p>简单实现：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#WSGI example </span><br><span class="line"></span><br><span class="line">def application(environ, start_response):</span><br><span class="line">    start_response(&#x27;200 OK&#x27;, [(&#x27;Content-Type&#x27;, &#x27;text/plain&#x27;)])</span><br><span class="line">    return b&#x27;Hello, Wsgi\n&#x27;</span><br></pre></td></tr></table></figure>
+<h1 id="ASGI"><a href="#ASGI" class="headerlink" title="ASGI"></a>ASGI</h1><p>Asgi是异步通信服务规范。客户端发起服务呼叫，但不等待结果。调用方立即继续其工作，并不关心结果。如果调用方对结果感兴趣，有一些机制可以让其随时被回调方法返回结果。</p>
+<p>Asgi简单工作原理示意图：</p>
+<p><img src="https://image.rexking6.top/img/20200722140731_54741.png" alt=""></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#Asgi example</span><br><span class="line"></span><br><span class="line">async def application(scope, receive, send):</span><br><span class="line">    event = await receive()</span><br><span class="line">    ...</span><br><span class="line">    await send(&#123;&quot;type&quot;: &quot;websocket.send&quot;, ...&#125;)</span><br></pre></td></tr></table></figure>
+<p>简单总结一下：Asgi是异步的，Wsgi是同步的，而基于Wsgi的Flask是同步框架，基于Asgi的FastAPI是异步框架，就这么简单。</p>
+<h1 id="FastAPI"><a href="#FastAPI" class="headerlink" title="FastAPI"></a>FastAPI</h1><h2 id="日常使用"><a href="#日常使用" class="headerlink" title="日常使用"></a>日常使用</h2><p>FastApi 要求 Python 在 3.6 以上，它应用了很多 Python3 的新特性。下面我们安装一下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install fastapi uvicorn</span><br></pre></td></tr></table></figure>
+<p>我们使用<code>uvicorn</code>来启动异步的 web server ，同时把<code>uvicorn</code>也安装上。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">from fastapi import FastAPI</span><br><span class="line"></span><br><span class="line">app = FastAPI()</span><br><span class="line"></span><br><span class="line">@app.get(&quot;/&quot;)</span><br><span class="line">async def root():</span><br><span class="line">    return &#123;&quot;message&quot;: &quot;Hello World&quot;&#125;</span><br></pre></td></tr></table></figure>
+<p>uvicorn 有两种启动方式：</p>
+<ul>
+<li>使用命令启动 <code>uvicorn main:app --reload</code>，生产推荐，生产中把 reload 去掉。</li>
+<li>使用 python 代码启动，<code>python main.py</code>，仅用于调试。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    import uvicorn</span><br><span class="line">    uvicorn.run(app, host=&quot;0.0.0.0&quot;, port=8000)</span><br></pre></td></tr></table></figure>
+<p>整体代码看下来，和 Flask 的 Hellow world 类似，有程序实例 app 用来启动程序，有路由和路由处理函数。</p>
+<p>接下来，让我们来看些复杂点的用法。</p>
+<p>使用 get 方法来请求数据：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@app.get(&#x27;/user&#x27;)</span><br><span class="line">async def user(user_id: int = Query(..., title=&quot;The ID of the user to get&quot;, gt=0)):</span><br><span class="line">    # do somethings</span><br><span class="line">    return &#123;&#x27;user_id&#x27;: user_id&#125;</span><br></pre></td></tr></table></figure>
+<p>QueryString 的传递使用了一个类<code>Query</code>来做参数的校验，Query 类继承了相关 pydandic 库的类，实现了对参数的类型校验，附默认值等功能。</p>
+<p>此处<code>...</code>是表示 user_id 参数时必须的。若此处为 None，则表示 user_id 可选。</p>
+<p>使用 put 方法来更新数据：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@app.put(&#x27;/user/&#123;user_id&#125;&#x27;)</span><br><span class="line">async def user(user_id: int = Path(..., title=&quot;The ID of the user to get&quot;, gt=0)):</span><br><span class="line">    # do somethings</span><br><span class="line">    return &#123;&#x27;user_id&#x27;: user_id&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的路径参数，可以使用类<code>Path</code>来做类型校验，功能和<code>Query</code>类似。</p>
+<p>使用 post 方法来创建数据：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">from pydantic import BaseModel</span><br><span class="line"></span><br><span class="line">class User(BaseModel):</span><br><span class="line">    name: str</span><br><span class="line">    age: int</span><br><span class="line"></span><br><span class="line">@app.post(&quot;/users/&quot;)</span><br><span class="line">async def create_user(user: User):</span><br><span class="line">    # do somethings</span><br><span class="line">    return user</span><br></pre></td></tr></table></figure>
+<p>这里定义了一个用户类，作为函数参数的类型。在请求时，FastApi 会自动的将参数注入到该类型的各对应属性字段。该类也起到了参数类型校验的作用。在函数参数类型这块，<code>User</code>类有点类似 Golang 中结构体定义的函数参数类型。</p>
+<p>使用 delete 方法来删除数据：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@app.delete(&#x27;/user/&#123;user_id&#125;&#x27;)</span><br><span class="line">async def user(user_id: int = Path(..., title=&quot;The ID of the user to get&quot;, gt=0)):</span><br><span class="line">    # do somethings</span><br><span class="line">    return &#123;&#x27;user_id&#x27;: user_id&#125;</span><br></pre></td></tr></table></figure>
+<p>同 put 方法的用法。</p>
+<p>看了这些基本的用法之后，我们对 FastApi 的使用有了一个初步的了解。我们从之前的代码中可以看到路由和路由函数在一块的，这种方式在路由少的情况下是非常方便的，但是随着项目复杂度的提升，路由逐渐增多，如果路由设计不合理，便会非常的不好维护。针对这种情况，FastApi 提供了 <code>APIRouter</code>类来规划设计路由，以便适应大型的项目架构。</p>
+<h2 id="路由分解和版本管理"><a href="#路由分解和版本管理" class="headerlink" title="路由分解和版本管理"></a>路由分解和版本管理</h2><p><code>APIRouter</code>类的基本用法如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 页面路由</span><br><span class="line">page_routes = APIRouter()</span><br><span class="line">page_routes.include_router(views.router, prefix=&quot;&quot;)</span><br><span class="line"></span><br><span class="line"># api 相关路由</span><br><span class="line">api_routes = APIRouter()</span><br><span class="line">api_routes.include_router(api_v1_views.router, prefix=&#x27;/v1&#x27;)</span><br><span class="line">api_routes.include_router(api_v2_views.router, prefix=&#x27;/v2&#x27;)</span><br></pre></td></tr></table></figure>
+<p>可以通过它来拆分管理路由，最后再将所有路由注册到根路由即可。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">app = FastAPI()</span><br><span class="line">app.include_router(page_routes)</span><br><span class="line">app.include_router(api_routes, prefix=config.API_PREFIX)</span><br></pre></td></tr></table></figure>
+<h2 id="一个真实的项目实例"><a href="#一个真实的项目实例" class="headerlink" title="一个真实的项目实例"></a>一个真实的项目实例</h2><p>接下来，让我们看一个真实的生产环境中的项目案例：</p>
+<p><img src="https://image.rexking6.top/img/modb_20211018_218a6f96-2ffe-11ec-b482-fa163eb4f6be.png" alt="img"></p>
+<p>我们从下边几点来详细说下这个项目案例：</p>
+<h3 id="1-ORM"><a href="#1-ORM" class="headerlink" title="1. ORM"></a>1. ORM</h3><p>首先在 ORM 选择方面，官方推荐了强大的<code>SQLAlchemy</code>，它可以说是 Python web 开发中最好用的第三方 ORM 了。在同步框架 Flask 中，应该说已经成为标配。</p>
+<p><code>SQLAlchemy</code>目前为止对异步的支持还不够完成，官方推荐使用 Encode 组织下的异步驱动 <code>databases</code><br>（目前支持 PostgreSQL/MySQL/SQLite），只所以叫他驱动没叫他 ORM，是因为它仅提供了和数据库的异步链接的管理，并没有对象模型。在使用的时候，可以结合<code>SQLAlchemy</code>或直接写 SQL。</p>
+<p>使用<code>SQLAlchemy</code>来处理同步的数据操作，使用<code>SQLAlchemy</code>加<code>databases</code>来实现异步的数据操作，完美实现了我们的需求。</p>
+<h3 id="2-数据库迁移"><a href="#2-数据库迁移" class="headerlink" title="2. 数据库迁移"></a>2. 数据库迁移</h3><p><code>SQLAlchemy</code>还有一个数据库迁移的问题，它自己不支持数据库表的变更迁移，只能删除重建。在 Flask 中可以使用插件<code>flask_migrate</code>来实现数据库表的变更迁移。</p>
+<p><code>SQLAlchemy</code>官方推荐使用<code>alembic</code>。一个迁移过程大概步骤如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># 1/ 初始化环境</span><br><span class="line">alembic init migrations</span><br><span class="line"></span><br><span class="line"># 2/ 修改配置参数</span><br><span class="line"></span><br><span class="line"># migrations/env.py</span><br><span class="line">import sys</span><br><span class="line">sys.path = [&#x27;&#x27;, &#x27;..&#x27;] + sys.path[1:]</span><br><span class="line"></span><br><span class="line">from core.config import DATABASE_URL</span><br><span class="line">config.set_main_option(&quot;sqlalchemy.url&quot;, str(DATABASE_URL))</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">from models.posts import PostsBase</span><br><span class="line">from models.posts2 import PostsBase2</span><br><span class="line">target_metadata = Base.metadata  # 一个app model</span><br><span class="line">target_metadata = [PostsBase.metadata, PostBase2.metadata]  # 多个app model</span><br><span class="line"></span><br><span class="line"># 3/ 生成迁移脚本</span><br><span class="line">alembic revision --autogenerate -m &quot;init&quot;</span><br><span class="line"></span><br><span class="line"># 4/ 应用迁移脚本到数据库</span><br><span class="line">alembic upgrade head</span><br></pre></td></tr></table></figure>
+<h3 id="3-service-拆分"><a href="#3-service-拆分" class="headerlink" title="3. service 拆分"></a>3. service 拆分</h3><p>从项目目录可以看到有个 service 目录，很显然，当业务逻辑服务度升高时，我们可以提取很多共用的逻辑作为底层的共用逻辑。这个就比较灵活了，完全由你自己控制。各种设计模式，就可以往上怼了。</p>
+<h3 id="4-Docker-化"><a href="#4-Docker-化" class="headerlink" title="4. Docker 化"></a>4. Docker 化</h3><p>最后我们来看下 docker 化，Dockerfile 如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"># 我们选择了官方 slim 镜像，体积相对小</span><br><span class="line">FROM python:3.9-slim-buster</span><br><span class="line"></span><br><span class="line">LABEL maintainer=&quot;DeanWu &lt;pyli.xm@gmail.com&gt;&quot;</span><br><span class="line"></span><br><span class="line"># stdout 无缓冲，直接输出</span><br><span class="line">ENV PYTHONUNBUFFERED 1</span><br><span class="line"></span><br><span class="line"># 复制代码，调整工作目录和脚本权限</span><br><span class="line">COPY . /app</span><br><span class="line"></span><br><span class="line">WORKDIR /app</span><br><span class="line"></span><br><span class="line">RUN chmod +x start.sh prestart.sh start-reload.sh</span><br><span class="line"></span><br><span class="line"># 安装用到的工具和python 包</span><br><span class="line">RUN apt-get update &amp;&amp; \</span><br><span class="line">    apt-get install -y --no-install-recommends default-libmysqlclient-dev gcc libffi-dev make &amp;&amp; \</span><br><span class="line">    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* &amp;&amp; \</span><br><span class="line">    pip install --no-cache-dir -r requirements.txt &amp;&amp; \</span><br><span class="line">    rm -rf requirements.txt &amp;&amp; \</span><br><span class="line">    pip install --no-cache-dir gunicorn</span><br><span class="line"></span><br><span class="line">ENV PYTHONPATH=/app</span><br><span class="line"></span><br><span class="line">EXPOSE 80</span><br><span class="line"></span><br><span class="line"># 启动命令 可添加也可不添加</span><br><span class="line">#CMD [&quot;sh&quot;, &quot;start.sh&quot;]</span><br></pre></td></tr></table></figure>
+<p>编译和启动，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker build -t fastapi-mysql:v1.0 .</span><br><span class="line"></span><br><span class="line">docker run -p 80:80 -d -e DB_CONNECTION=&quot;mysql://root:Root1024@xxxx/fastapi&quot; fastapi-mysql:v1.0 ./start.sh</span><br></pre></td></tr></table></figure>
+<h1 id="FastAPI与Flask比较"><a href="#FastAPI与Flask比较" class="headerlink" title="FastAPI与Flask比较"></a>FastAPI与Flask比较</h1><p>基于Wsgi的Flask是同步框架，基于Asgi的FastAPI是异步框架，就这么简单，那么同步框架和异步框架的区别到底在哪儿？为什么要把Flask换成FastAPI?</p>
+<p>不靠拍脑门儿、也不是道听途说、人云亦云。玩技术的应该用数据说话，论点永远依托论据，所以我们来简单对两款框架的性能做一个测试，首先分别安装依赖的库。</p>
+<p> Flask:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install gunicornpip geventpip flask</span><br></pre></td></tr></table></figure>
+<p>FastAPI:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install fastapipip uvicorn</span><br></pre></td></tr></table></figure>
+<p>我们首先干的一件事就是，看看Flask和FastAPI如何处理来自多个客户端的多个请求。特别是当代码存在效率问题时（比如数据库查询时间长这种耗时任务），这里故意使用<code>time.sleep()</code>来模拟耗时任务，为什么不用asyncio呢？因为众所周知的原因：<code>time.sleep</code>是阻塞的。</p>
+<p>Flask:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">from flask import Flask</span><br><span class="line">from flask_restful import Resource, Api</span><br><span class="line">from time import sleep</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line">api = Api(app)</span><br><span class="line"></span><br><span class="line">class Root(Resource):</span><br><span class="line">    def get(self):</span><br><span class="line">        print(&#x27;睡10秒&#x27;)</span><br><span class="line">        sleep(10)</span><br><span class="line">        print(&#x27;醒了&#x27;)</span><br><span class="line">        return &#123;&#x27;message&#x27;: &#x27;hello&#x27;&#125;</span><br><span class="line"></span><br><span class="line">api.add_resource(Root, &#x27;/&#x27;)</span><br><span class="line"></span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    app.run()</span><br></pre></td></tr></table></figure>
+<p>FastApi:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">import uvicorn</span><br><span class="line">from fastapi import FastAPI</span><br><span class="line">from time import sleep</span><br><span class="line">app = FastAPI()</span><br><span class="line"></span><br><span class="line">@app.get(&#x27;/&#x27;)</span><br><span class="line">async def root():</span><br><span class="line">    print(&#x27;睡10秒&#x27;)</span><br><span class="line">    sleep(10)</span><br><span class="line">    print(&#x27;醒了&#x27;)</span><br><span class="line">    return &#123;&#x27;message&#x27;: &#x27;hello&#x27;&#125;</span><br><span class="line"></span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    uvicorn.run(app, host=&quot;127.0.0.1&quot;, port=8000)</span><br></pre></td></tr></table></figure>
+<p>分别启动服务</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Flask:python3 manage.py</span><br><span class="line">FastAPI:uvicorn manage:app --reload</span><br></pre></td></tr></table></figure>
+<p>同时一时间内，开启多个浏览器，分别并发请求首页 。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Flask:http://localhost:5000</span><br><span class="line">FastAPI:http://localhost:8000</span><br></pre></td></tr></table></figure>
+<p>观察后台打印结果:</p>
+<p>Flask:</p>
+<p><img src="https://image.rexking6.top/img/20200722140704_53322.png" alt=""></p>
+<p>FastAPI:</p>
+<p><img src="https://image.rexking6.top/img/20200722140722_62993.png" alt="img"></p>
+<p>可以看到，同样的四次请求，Flask先是阻塞了40秒，然后依次返回结果，FastAPI则是第一次阻塞后直接返回，这代表了在FastAPI中阻塞了一个事件队列，证明FastAPI是异步框架，而在Flask中，请求可能是在新线程中运行的。将所有CPU绑定的任务移到单独的进程中，所以在FastAPI的例子中，只是在事件循环中sleep（所以异步框架这里最好不要使用time.sleep而是asyncio.sleep）。在FastAPI中，异步运行IO绑定的任务。</p>
+<p>当然这不能说明太多问题，我们继续使用鼎鼎有名的ApacheBench分别对两款框架进行压测。一共设置5000个请求，QPS是100(请原谅我的机器比较渣)。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ab -n 5000 -c 100 http://127.0.0.1:5000/</span><br><span class="line">ab -n 5000 -c 100 http://127.0.0.1:8000/</span><br></pre></td></tr></table></figure>
+<p>这里为了公平起见，Flask配合Gunicorn服务器，开3个worker，FastAPI配合Uvicorn服务器，同样开3个worker。</p>
+<p>Flask压测结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">liuyue:mytornado liuyue$ ab -n 5000 -c 100 http://127.0.0.1:5000/</span><br><span class="line">This is ApacheBench, Version 2.3 &lt;$Revision: 1826891 $&gt;</span><br><span class="line">Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/</span><br><span class="line">Licensed to The Apache Software Foundation, http://www.apache.org/</span><br><span class="line"></span><br><span class="line">Benchmarking 127.0.0.1 (be patient)</span><br><span class="line">Completed 500 requests</span><br><span class="line">Completed 1000 requests</span><br><span class="line">Completed 1500 requests</span><br><span class="line">Completed 2000 requests</span><br><span class="line">Completed 2500 requests</span><br><span class="line">Completed 3000 requests</span><br><span class="line">Completed 3500 requests</span><br><span class="line">Completed 4000 requests</span><br><span class="line">Completed 4500 requests</span><br><span class="line">Completed 5000 requests</span><br><span class="line">Finished 5000 requests</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Server Software:        gunicorn/20.0.4</span><br><span class="line">Server Hostname:        127.0.0.1</span><br><span class="line">Server Port:            5000</span><br><span class="line"></span><br><span class="line">Document Path:          /</span><br><span class="line">Document Length:        28 bytes</span><br><span class="line"></span><br><span class="line">Concurrency Level:      100</span><br><span class="line">Time taken for tests:   4.681 seconds</span><br><span class="line">Complete requests:      5000</span><br><span class="line">Failed requests:        0</span><br><span class="line">Total transferred:      1060000 bytes</span><br><span class="line">HTML transferred:       140000 bytes</span><br><span class="line">Requests per second:    1068.04 [#/sec] (mean)</span><br><span class="line">Time per request:       93.629 [ms] (mean)</span><br><span class="line">Time per request:       0.936 [ms] (mean, across all concurrent requests)</span><br><span class="line">Transfer rate:          221.12 [Kbytes/sec] received</span><br></pre></td></tr></table></figure>
+<p>FastAPI压测结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">liuyue:mytornado liuyue$ ab -n 5000 -c 100 http://127.0.0.1:8000/</span><br><span class="line">This is ApacheBench, Version 2.3 &lt;$Revision: 1826891 $&gt;</span><br><span class="line">Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/</span><br><span class="line">Licensed to The Apache Software Foundation, http://www.apache.org/</span><br><span class="line"></span><br><span class="line">Benchmarking 127.0.0.1 (be patient)</span><br><span class="line">Completed 500 requests</span><br><span class="line">Completed 1000 requests</span><br><span class="line">Completed 1500 requests</span><br><span class="line">Completed 2000 requests</span><br><span class="line">Completed 2500 requests</span><br><span class="line">Completed 3000 requests</span><br><span class="line">Completed 3500 requests</span><br><span class="line">Completed 4000 requests</span><br><span class="line">Completed 4500 requests</span><br><span class="line">Completed 5000 requests</span><br><span class="line">Finished 5000 requests</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Server Software:        uvicorn</span><br><span class="line">Server Hostname:        127.0.0.1</span><br><span class="line">Server Port:            8000</span><br><span class="line"></span><br><span class="line">Document Path:          /</span><br><span class="line">Document Length:        19 bytes</span><br><span class="line"></span><br><span class="line">Concurrency Level:      100</span><br><span class="line">Time taken for tests:   2.060 seconds</span><br><span class="line">Complete requests:      5000</span><br><span class="line">Failed requests:        0</span><br><span class="line">Total transferred:      720000 bytes</span><br><span class="line">HTML transferred:       95000 bytes</span><br><span class="line">Requests per second:    2426.78 [#/sec] (mean)</span><br><span class="line">Time per request:       41.207 [ms] (mean)</span><br><span class="line">Time per request:       0.412 [ms] (mean, across all concurrent requests)</span><br><span class="line">Transfer rate:          341.27 [Kbytes/sec] received</span><br></pre></td></tr></table></figure>
+<p>显而易见，5000个总请求，Flask花费4.681秒，每秒可以处理1068.04个请求，而FastAPI花费2.060秒，每秒可以处理2426.78个请求。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\11\20\7个Python数据分析工具\" rel="bookmark">7个Python数据分析工具</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\09\13\Django知识点\" rel="bookmark">Django知识点</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\11\20\Python-collections四种高性能数据类型\" rel="bookmark">Python collections四种高性能数据类型</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2022/11/13/Python%E7%BD%91%E7%BB%9C%E6%A1%86%E6%9E%B6/" title="Python网络框架">https://blog.rexking6.top/2022/11/13/Python网络框架/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Python/" rel="tag"># Python</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/09/24/%E8%81%8A%E5%A4%A9%E6%9C%BA%E5%99%A8%E4%BA%BAChatBot%E5%85%A5%E9%97%A8/" rel="prev" title="聊天机器人ChatBot入门">
+      <i class="fa fa-chevron-left"></i> 聊天机器人ChatBot入门
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RESTful"><span class="nav-number">2.</span> <span class="nav-text">RESTful</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFREST"><span class="nav-number">2.1.</span> <span class="nav-text">什么是REST</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%90%86%E8%A7%A3RESTful"><span class="nav-number">2.2.</span> <span class="nav-text">理解RESTful</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B5%84%E6%BA%90%E4%B8%8EURI"><span class="nav-number">2.2.1.</span> <span class="nav-text">资源与URI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%9F%E4%B8%80%E8%B5%84%E6%BA%90%E6%8E%A5%E5%8F%A3"><span class="nav-number">2.2.2.</span> <span class="nav-text">统一资源接口</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GET"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">GET</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#POST"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">POST</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PUT"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">PUT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DELETE"><span class="nav-number">2.2.2.4.</span> <span class="nav-text">DELETE</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B5%84%E6%BA%90%E7%9A%84%E8%A1%A8%E8%BF%B0"><span class="nav-number">2.2.3.</span> <span class="nav-text">资源的表述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A8URI%E9%87%8C%E8%BE%B9%E5%B8%A6%E4%B8%8A%E7%89%88%E6%9C%AC%E5%8F%B7"><span class="nav-number">2.2.3.1.</span> <span class="nav-text">在URI里边带上版本号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8URI%E5%90%8E%E7%BC%80%E6%9D%A5%E5%8C%BA%E5%88%86%E8%A1%A8%E8%BF%B0%E6%A0%BC%E5%BC%8F"><span class="nav-number">2.2.3.2.</span> <span class="nav-text">使用URI后缀来区分表述格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86%E4%B8%8D%E6%94%AF%E6%8C%81%E7%9A%84%E8%A1%A8%E8%BF%B0%E6%A0%BC%E5%BC%8F"><span class="nav-number">2.2.3.3.</span> <span class="nav-text">如何处理不支持的表述格式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B5%84%E6%BA%90%E7%9A%84%E9%93%BE%E6%8E%A5"><span class="nav-number">2.2.4.</span> <span class="nav-text">资源的链接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8A%B6%E6%80%81%E7%9A%84%E8%BD%AC%E7%A7%BB"><span class="nav-number">2.2.5.</span> <span class="nav-text">状态的转移</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E7%8A%B6%E6%80%81%E4%B8%8E%E8%B5%84%E6%BA%90%E7%8A%B6%E6%80%81"><span class="nav-number">2.2.5.1.</span> <span class="nav-text">应用状态与资源状态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E7%8A%B6%E6%80%81%E7%9A%84%E8%BD%AC%E7%A7%BB"><span class="nav-number">2.2.5.2.</span> <span class="nav-text">应用状态的转移</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">2.3.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Python%E7%9A%84%E5%BC%82%E6%AD%A5%E7%BC%96%E7%A8%8B%E5%92%8C%E5%8D%8F%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">Python的异步编程和协程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#WSGI"><span class="nav-number">4.</span> <span class="nav-text">WSGI</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ASGI"><span class="nav-number">5.</span> <span class="nav-text">ASGI</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FastAPI"><span class="nav-number">6.</span> <span class="nav-text">FastAPI</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A5%E5%B8%B8%E4%BD%BF%E7%94%A8"><span class="nav-number">6.1.</span> <span class="nav-text">日常使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%AF%E7%94%B1%E5%88%86%E8%A7%A3%E5%92%8C%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86"><span class="nav-number">6.2.</span> <span class="nav-text">路由分解和版本管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E7%9C%9F%E5%AE%9E%E7%9A%84%E9%A1%B9%E7%9B%AE%E5%AE%9E%E4%BE%8B"><span class="nav-number">6.3.</span> <span class="nav-text">一个真实的项目实例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-ORM"><span class="nav-number">6.3.1.</span> <span class="nav-text">1. ORM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB"><span class="nav-number">6.3.2.</span> <span class="nav-text">2. 数据库迁移</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-service-%E6%8B%86%E5%88%86"><span class="nav-number">6.3.3.</span> <span class="nav-text">3. service 拆分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Docker-%E5%8C%96"><span class="nav-number">6.3.4.</span> <span class="nav-text">4. Docker 化</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FastAPI%E4%B8%8EFlask%E6%AF%94%E8%BE%83"><span class="nav-number">7.</span> <span class="nav-text">FastAPI与Flask比较</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">190</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">3.3m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">50:02</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
