@@ -41,9 +41,10 @@
 <meta property="og:image" content="http://image.rexking6.top/img/clip1541320628.png">
 <meta property="og:image" content="http://image.rexking6.top/img/clip1541320933.png">
 <meta property="article:published_time" content="2018-11-05T03:39:05.000Z">
-<meta property="article:modified_time" content="2021-07-25T15:45:07.551Z">
+<meta property="article:modified_time" content="2023-03-10T00:55:26.567Z">
 <meta property="article:author" content="Run-Qing Chen">
 <meta property="article:tag" content="时间序列">
+<meta property="article:tag" content="异常检测">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://image.rexking6.top/img/clip1541314641.png">
 
@@ -231,7 +232,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-07-25 23:45:07" itemprop="dateModified" datetime="2021-07-25T23:45:07+08:00">2021-07-25</time>
+                <time title="修改时间：2023-03-10 08:55:26" itemprop="dateModified" datetime="2023-03-10T08:55:26+08:00">2023-03-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -255,13 +256,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>11k</span>
+              <span>12k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>10 分钟</span>
+              <span>11 分钟</span>
             </span>
 
         </div>
@@ -350,27 +351,27 @@
 <p><strong>定义1：基于密度的异常</strong></p>
 <p>异常就是那些在低密度区域的数据对象，一个数据对象的异常分就是该对象所在区域的密度的倒数，下面是基于密度的异常分的计算公式：</p>
 <script type="math/tex; mode=display">
-densitiy(x,k)=(\frac{\sum_{y\in N(x,k)}distance(x,y)}{|N(x,k)|})^{-1}</script><p>其中$N(x,k)$指的是$x$的$k$个最近的邻居的集合，$|N(x,k)|$表示该集合的大小，$y$是$x$最近的邻居。</p>
+\text{densitiy}(x,k)=(\frac{\sum_{y\in N(x,k)}\text{distance}(x,y)}{|N(x,k)|})^{-1}</script><p>其中$N(x,k)$指的是$x$的$k$个最近的邻居的集合，$|N(x,k)|$表示该集合的大小，$y$是$x$最近的邻居。</p>
 <p><strong>定义2：给定半径的邻域内的数据对象数</strong></p>
 <p>一个数据对象的密度等于半径为d的邻域内的数据对象数。</p>
 <p>d的选择很重要，若d太小，则会有很多正常的数据对象被认为是异常点；若d太大，则很多异常数据对象会被误判为正常点。事实上，当密度分布不均匀的时候，上述方法得到的异常点会不正确。为了克服密度不均匀的情况，我们使用下面的平均相对密度来作为异常分。</p>
 <p><strong>定义3：平均相对密度</strong></p>
 <script type="math/tex; mode=display">
-average\ relative\ densitiy(x,k)=(\frac{density(x,k)}{\Sigma _{y\in N(x,k)}density(y,k)/|N(x,k)| })</script><p><strong>基于相对密度的异常检测算法</strong></p>
+\text{average relative densitiy}(x,k)=(\frac{\text{density}(x,k)}{\Sigma _{y\in N(x,k)}\text{density}(y,k)/|N(x,k)| })</script><p><strong>基于相对密度的异常检测算法</strong></p>
 <ol>
 <li>{$k$是最近邻的个数}（类似KNN中的$k$）</li>
 <li>for 所有的数据对象$x$ do<ol>
 <li>计算$N(x,k)$</li>
-<li>计算$density(x,k)$</li>
+<li>计算$\text{density}(x,k)$</li>
 </ol>
 </li>
 <li>end for</li>
 <li>for 所有的数据对象x do<ol>
-<li>$outlier score(x) = average relative density(x,k)$</li>
+<li>$\text{outlier score}(x) = \text{average relative density}(x,k)$</li>
 </ol>
 </li>
 <li>end for</li>
-<li>取$outlier score$最大的$N$个数据对象作为异常</li>
+<li>取$\text{outlier score}$最大的$N$个数据对象作为异常</li>
 </ol>
 <h2 id="基于聚类的方法"><a href="#基于聚类的方法" class="headerlink" title="基于聚类的方法"></a>基于聚类的方法</h2><p>一种利用聚类检测离群点的方法是丢弃远离其他簇的小簇。这种方法可以与任何聚类方法一起使用，但是需要最小簇大小和小簇与其他簇之间距离的國值。通常，该过程可以简化为丢弃小于某个最小尺寸的所有簇。这种方案对簇个数的选择高度敏感。此外，使用这一方案，很难将离群点得分附加在对象上。注意，把一组对像看作离群点，将离群点的概念从个体对象扩展到对象组，但是本质上没有任何改变。</p>
 <p>一种更系统的方法是，首先聚类所有对象，然后评估对象属于簇的程度。对于基于原型的聚类，可以用对象到它的簇中心的距离来度量对象属于簇的程度。更一般地，对于基于目标函数的聚类方法，可以使用该目标函數来评估对象属于任意簇的程度。特殊情况下，如果删除一个对象导致该目标的显著改进，则我们可以将对象分类为离群点。如，对于K均值，脷除远离其相关簇中心的对象能够显著地改进簇的误差的平方和（SSE）。总而言之，聚类创建数据的模型，而异常扭曲模型。</p>
@@ -404,12 +405,12 @@ average\ relative\ densitiy(x,k)=(\frac{density(x,k)}{\Sigma _{y\in N(x,k)}densi
 <h1 id="基于时间序列的异常检测方法"><a href="#基于时间序列的异常检测方法" class="headerlink" title="基于时间序列的异常检测方法"></a>基于时间序列的异常检测方法</h1><p><strong>同比，是指在相邻时段中的某一相同时间点进行比较。</strong></p>
 <p><strong>环比，是指在同一时段中的相邻时间点进行比较。</strong></p>
 <h2 id="短期环比（SS）"><a href="#短期环比（SS）" class="headerlink" title="短期环比（SS）"></a>短期环比（SS）</h2><p>对于时间序列（是指将同一统计指标的数值按其发生的时间先后顺序排列而成的数列）来说，$T$时刻的数值对于$T-1$时刻有很强的依赖性。比如流量在8:00很多，在8:01时刻的概率是很大的，但是如果07:01时刻对于8:01时刻影响不是很大。</p>
-<p>首先，我们可以使用最近时间窗口（$T$）内的数据遵循某种趋势的现象来做文章。比如我们将$T$设置为7，则我们取检测值（$now_value$）和过去7个（记为$i$）点进行比较，如果大于阈值我们将$count$加1，如果$count$超过我们设置的$count_num$，则认为该点是异常点。</p>
+<p>首先，我们可以使用最近时间窗口（$T$）内的数据遵循某种趋势的现象来做文章。比如我们将$T$设置为7，则我们取检测值（$\text{now value}$）和过去7个（记为$i$）点进行比较，如果大于阈值我们将$\text{count}$加1，如果$\text{count}$超过我们设置的$\text{count num}$，则认为该点是异常点。</p>
 <script type="math/tex; mode=display">
-count(\sum_{i=0}^T(now\ value-i)>threshold)>count\_num</script><p>上面的公式涉及到$threshold$和$count_num$两个参数，$threshold$如何获取我们将在下节进行介绍，而$count_num$可以根据的需求进行设置，比如对异常敏感，可以设置$count_num$小一些，而如果对异常不敏感，可以将$count_num$设置的大一些。</p>
-<h3 id="动态阈值"><a href="#动态阈值" class="headerlink" title="动态阈值"></a>动态阈值</h3><p>业界关于动态阈值设置的方法有很多，这里介绍一种针对360的lvs流量异常检测的阈值设置方法。通常阈值设置方法会参考过去一段时间内的均值、最大值以及最小值，我们也同样应用此方法。取过去一段时间（比如$T$窗口）的平均值、最大值以及最小值，然后取$max-avg$和$avg-min$的最小值。之所以取最小值的原因是让筛选条件设置的宽松一些，让更多的值通过此条件，减少一些漏报的事件。</p>
+\text{count}(\sum_{i=0}^T(\text{now value}-i)>\text{threshold})>\text{count num}</script><p>上面的公式涉及到$\text{threshold}$和$\text{count num}$两个参数，$\text{threshold}$如何获取我们将在下节进行介绍，而$\text{count num}$可以根据的需求进行设置，比如对异常敏感，可以设置$\text{count num}$小一些，而如果对异常不敏感，可以将$\text{count num}$设置的大一些。</p>
+<h3 id="动态阈值"><a href="#动态阈值" class="headerlink" title="动态阈值"></a>动态阈值</h3><p>业界关于动态阈值设置的方法有很多，这里介绍一种针对360的lvs流量异常检测的阈值设置方法。通常阈值设置方法会参考过去一段时间内的均值、最大值以及最小值，我们也同样应用此方法。取过去一段时间（比如$T$窗口）的平均值、最大值以及最小值，然后取$\text{max-avg}$和$\text{avg-min}$的最小值。之所以取最小值的原因是让筛选条件设置的宽松一些，让更多的值通过此条件，减少一些漏报的事件。</p>
 <script type="math/tex; mode=display">
-threshold = min(max-avg, avg-min)</script><h3 id="窗口特征"><a href="#窗口特征" class="headerlink" title="窗口特征"></a>窗口特征</h3><h4 id="统计特征"><a href="#统计特征" class="headerlink" title="统计特征"></a>统计特征</h4><h5 id="3-sigma"><a href="#3-sigma" class="headerlink" title="3-sigma"></a>3-sigma</h5><p>一个很直接的异常判定思路是，拿最新3个datapoint的平均值（tail_avg方法）和整个序列比较，看是否偏离总体平均水平太多。怎样算“太多”呢，因为standard deviation表示集合中元素到mean的平均偏移距离，因此最简单就是和它进行比较。在normal distribution（正态分布）中，99.73%的数据都在偏离mean 3个σ (standard deviation 标准差) 的范围内。如果某些datapoint到mean的距离超过这个范围，则认为是异常的。</p>
+\text{threshold} = \text{min(max-avg, avg-min)}</script><h3 id="窗口特征"><a href="#窗口特征" class="headerlink" title="窗口特征"></a>窗口特征</h3><h4 id="统计特征"><a href="#统计特征" class="headerlink" title="统计特征"></a>统计特征</h4><h5 id="3-sigma"><a href="#3-sigma" class="headerlink" title="3-sigma"></a>3-sigma</h5><p>一个很直接的异常判定思路是，拿最新3个datapoint的平均值（tail_avg方法）和整个序列比较，看是否偏离总体平均水平太多。怎样算“太多”呢，因为standard deviation表示集合中元素到mean的平均偏移距离，因此最简单就是和它进行比较。在normal distribution（正态分布）中，99.73%的数据都在偏离mean 3个σ (standard deviation 标准差) 的范围内。如果某些datapoint到mean的距离超过这个范围，则认为是异常的。</p>
 <h5 id="z-score"><a href="#z-score" class="headerlink" title="z score"></a>z score</h5><p>标准分，一个个体到集合mean的偏离，以标准差为单位，表达个体距mean相对“平均偏离水平（std dev表达）”的偏离程度，常用来比对来自不同集合的数据。</p>
 <p>在模型中，z_score用来衡量窗口数据中，中间值的偏离程度。</p>
 <p><strong>算法流程：</strong></p>
@@ -438,11 +439,11 @@ CMA_i=\frac{x_1+...+x_i}{i}</script><p>当有新的值$x_{i+1}$，那么累积�
 CMA_{i+1} &= \frac{x_1+...+x_i+x_{i+1}}{i+1} \\
 & = \frac{x_{i+1}+n·CMA_i}{i+1}\\
 & = CMA_i + \frac{x_{i+1}-CMA_i}{i+1}
-\end{align*}</script><h5 id="weighted-moving-average（加权移动平均）"><a href="#weighted-moving-average（加权移动平均）" class="headerlink" title="weighted moving average（加权移动平均）"></a>weighted moving average（加权移动平均）</h5><p>加权移动平均值是先前$w$个数据的加权平均值。 假设$\sum_{j=0}^{w-1}weight_j=1$，其中$weight_j&gt;0$，则加权移动平均值为，</p>
+\end{align*}</script><h5 id="weighted-moving-average（加权移动平均）"><a href="#weighted-moving-average（加权移动平均）" class="headerlink" title="weighted moving average（加权移动平均）"></a>weighted moving average（加权移动平均）</h5><p>加权移动平均值是先前$w$个数据的加权平均值。 假设$\sum_{j=0}^{w-1}\text{weight}_j=1$，其中$\text{weight}_j&gt;0$，则加权移动平均值为，</p>
 <script type="math/tex; mode=display">
-WMA_i=\sum_{j=0}^{w-1}weight_j · x_{i-j}</script><p>一般，</p>
+WMA_i=\sum_{j=0}^{w-1}\text{weight}_j · x_{i-j}</script><p>一般，</p>
 <script type="math/tex; mode=display">
-weight_j = \frac{w-j}{w+(w-1)+...+1}, for\ 0\le j \le w-1</script><p>所以，</p>
+\text{weight}_j = \frac{w-j}{w+(w-1)+...+1}, for\ 0\le j \le w-1</script><p>所以，</p>
 <script type="math/tex; mode=display">
 WMA_i=\frac{wx_i+(w-1)x_{i-1}+...+2x_{i-w+2}+x_{i-w+1}}{w+(w-1)+...+1}</script><h5 id="exponential-weighted-moving-average（指数加权移动平均）"><a href="#exponential-weighted-moving-average（指数加权移动平均）" class="headerlink" title="exponential weighted moving average（指数加权移动平均）"></a>exponential weighted moving average（指数加权移动平均）</h5><p>指数移动与移动平均有些不同：</p>
 <ol>
@@ -468,9 +469,9 @@ b_1 = \frac{Y_n-Y_1}{n-1}</script><p>预测：</p>
 <li><p>multiplicative seasonality</p>
 <p>设$\{Y_t:t \ge 1\}$是观察到的数据序列，则三指数平滑为</p>
 <script type="math/tex; mode=display">
-S_t = \alpha \frac{Y_t}{c_{t-L}}+(1-\alpha)(S_{t-1}+b_{t-1}),overall\ smoothing \\
-b_t = \beta(S_t-S_{t-1})+(1-\beta)b_{t-1},trend\ smoothing\\
-c_t = \gamma\frac{Y_t}{S_t}+(1-\gamma)c_{t-L}, seasonal smoothing</script><p>其中$\alpha \in [0,1]$是数据平滑因子，$\beta \in [0,1]$是趋势平滑因子， $\gamma \in [0,1]$是季节变化平滑因子。</p>
+S_t = \alpha \frac{Y_t}{c_{t-L}}+(1-\alpha)(S_{t-1}+b_{t-1}), \text{overall smoothing} \\
+b_t = \beta(S_t-S_{t-1})+(1-\beta)b_{t-1}, \text{trend smoothing}\\
+c_t = \gamma\frac{Y_t}{S_t}+(1-\gamma)c_{t-L}, \text{seasonal smoothing}</script><p>其中$\alpha \in [0,1]$是数据平滑因子，$\beta \in [0,1]$是趋势平滑因子， $\gamma \in [0,1]$是季节变化平滑因子。</p>
 <p>预测$m$个时刻：$F_{t+m}=(S_t+mb_t)c_{(t-L+m) mod L}$</p>
 <p>初始值设定：</p>
 <script type="math/tex; mode=display">
@@ -481,13 +482,13 @@ A_j=\frac{\sum_{i=1}^LY_{L(j-1)+i}}{L}, \forall \in \{1,...,N\}</script></li>
 <li><p>additive seasonality</p>
 <p>设$\{Y_t:t \ge 1\}$是观察到的数据序列，则三指数平滑为</p>
 <script type="math/tex; mode=display">
-S_t = \alpha(Y_t-c_{t-L})+(1-\alpha)(S_{t-1}+b_{t-1}), overall \ smoothing \\
-b_t = \beta(S_t- S_{t-1})+(1-\beta)b_{t-1}, trend \ smoothing \\
-c_t = \gamma(Y_t-S_{t-1}-b_{t-1})+(1-\gamma)c_{t-L}, seasonal smoothing</script><p>其中$\alpha \in [0,1]$是数据平滑因子，$\beta \in [0,1]$是趋势平滑因子， $\gamma \in [0,1]$是季节变化平滑因子。</p>
+S_t = \alpha(Y_t-c_{t-L})+(1-\alpha)(S_{t-1}+b_{t-1}), \text{overall smoothing} \\
+b_t = \beta(S_t- S_{t-1})+(1-\beta)b_{t-1}, \text{trend smoothing} \\
+c_t = \gamma(Y_t-S_{t-1}-b_{t-1})+(1-\gamma)c_{t-L}, \text{seasonal smoothing}</script><p>其中$\alpha \in [0,1]$是数据平滑因子，$\beta \in [0,1]$是趋势平滑因子， $\gamma \in [0,1]$是季节变化平滑因子。</p>
 <p>预测$m$个时刻：$F_{t+m}=S_t+mb_t+c_{(t-L+m) mod  L}$</p>
 </li>
 </ul>
-<h5 id="stddev-from-average（平均值-标准差）"><a href="#stddev-from-average（平均值-标准差）" class="headerlink" title="stddev from average（平均值-标准差）"></a>stddev from average（平均值-标准差）</h5><p>该算法类似于3sigma准则。当数据服从高斯分布时，数值分布在$(μ-3σ,μ+3σ)$区间内的概率为99.74。所以，可以这么认为，当数据分布区间超过这个区间时，即可认为是异常数据。该算法使用$(t-mean)/std$ 作为特征，用于衡量中间三个值的平均值相对于$3σ$的距离。</p>
+<h5 id="stddev-from-average（平均值-标准差）"><a href="#stddev-from-average（平均值-标准差）" class="headerlink" title="stddev from average（平均值-标准差）"></a>stddev from average（平均值-标准差）</h5><p>该算法类似于3sigma准则。当数据服从高斯分布时，数值分布在$(μ-3σ,μ+3σ)$区间内的概率为99.74。所以，可以这么认为，当数据分布区间超过这个区间时，即可认为是异常数据。该算法使用$(t-\text{mean})/\text{std}$ 作为特征，用于衡量中间三个值的平均值相对于$3σ$的距离。</p>
 <p>该算法的特点是可以有效屏蔽“在一个点上突变到很大的异常值但在下一个点回落到正常水平”的情况，即屏蔽单点毛刺：因为它使用的是3个点的均值（有效缓和突变），和整个序列比较（均值可能被异常值拉大），导致判断正常。</p>
 <p><strong>算法流程：</strong></p>
 <ol>
@@ -497,7 +498,7 @@ c_t = \gamma(Y_t-S_{t-1}-b_{t-1})+(1-\gamma)c_{t-L}, seasonal smoothing</script>
 <li>使用$(t-mean)/std$作为特征。</li>
 </ol>
 <h5 id="stddev-from-moving-average（移动平均-标准差）"><a href="#stddev-from-moving-average（移动平均-标准差）" class="headerlink" title="stddev from moving average（移动平均-标准差）"></a>stddev from moving average（移动平均-标准差）</h5><p>先求出最后一个点处的指数加权移动平均值，然后再用最新的点和三倍方差方法求异常。</p>
-<h5 id="stddev-from-ewma（指数加权移动平均-标准差）"><a href="#stddev-from-ewma（指数加权移动平均-标准差）" class="headerlink" title="stddev from ewma（指数加权移动平均-标准差）"></a>stddev from ewma（指数加权移动平均-标准差）</h5><p>类似于特征3，不过在计算$(t-mean)/std$时，使用的mean，std分别为对窗口数据进行移动加权平均后的平均值以及方差。</p>
+<h5 id="stddev-from-ewma（指数加权移动平均-标准差）"><a href="#stddev-from-ewma（指数加权移动平均-标准差）" class="headerlink" title="stddev from ewma（指数加权移动平均-标准差）"></a>stddev from ewma（指数加权移动平均-标准差）</h5><p>类似于特征3，不过在计算$(t-\text{mean})/\text{std}$时，使用的mean，std分别为对窗口数据进行移动加权平均后的平均值以及方差。</p>
 <h5 id="histogram-bins"><a href="#histogram-bins" class="headerlink" title="histogram bins"></a>histogram bins</h5><p>该算法和以上都不同，它首先将timeseries划分成15个宽度相等的直方，然后判断tail_avg所在直方内的元素是否&lt;=20，如果是，则异常。</p>
 <p>直方的个数和元素个数判定需要根据自己的metrics调整，不然在数据量小的时候很容易就异常了。</p>
 <h5 id="median-absolute-deviation（中位数绝对偏差）"><a href="#median-absolute-deviation（中位数绝对偏差）" class="headerlink" title="median absolute deviation（中位数绝对偏差）"></a>median absolute deviation（中位数绝对偏差）</h5><p><strong>median：</strong>大部分情况下我们用mean来表达一个集合的平均水平（average），但是在某些情况下存在少数极大或极小的outlier，拉高或拉低了（skew）整体的mean，造成估计的不准确。此时可以用median（中位数）代替mean描述平均水平。Median的求法很简单，集合排序中间位置即是，如果集合总数为偶数，则取中间二者的平均值。</p>
@@ -525,7 +526,7 @@ c_t = \gamma(Y_t-S_{t-1}-b_{t-1})+(1-\gamma)c_{t-L}, seasonal smoothing</script>
 <p>提到时间序列的熵特征，一般来说有几个经典的例子，那就是 <strong>binned entropy</strong>，<strong>approximate entropy</strong>，<strong>sample entropy</strong>。下面来一一介绍时间序列中这几个经典的熵。</p>
 <h5 id="Binned-Entropy"><a href="#Binned-Entropy" class="headerlink" title="Binned Entropy"></a>Binned Entropy</h5><p>从熵的定义出发，可以考虑把时间序列 $X_{T}$的取值进行分桶的操作。例如，可以把$[\min(X_{T}), \max(X_{T})]$这个区间等分为十个小区间，那么时间序列的取值就会分散在这十个桶中。根据这个等距分桶的情况，就可以计算出这个概率分布的熵（entropy）。i.e. Binned Entropy 就可以定义为：</p>
 <script type="math/tex; mode=display">
-\text{binned entropy}(X) = -\sum_{k=0}^{\min(maxbin, len(X))} p_{k}\ln(p_{k})\cdot 1_{(p_{k}>0)},</script><p>其中 $p_{k}$ 表示时间序列 $X_{T}$ 的取值落在第 $k$ 个桶的比例（概率），$maxbin$ 表示桶的个数， $len(X_{T}) = T$ 表示时间序列 $X_{T}$ 的长度。</p>
+\text{binned entropy}(X) = -\sum_{k=0}^{\min(\text{maxbin}, \text{len}(X))} p_{k}\ln(p_{k})\cdot 1_{(p_{k}>0)},</script><p>其中 $p_{k}$ 表示时间序列 $X_{T}$ 的取值落在第 $k$ 个桶的比例（概率），$\text{maxbin}$ 表示桶的个数， $\text{len}(X_{T}) = T$ 表示时间序列 $X_{T}$ 的长度。</p>
 <p>如果一个时间序列的 Binned Entropy 较大，说明这一段时间序列的取值是较为均匀的分布在 $[\min(X_{T}), \max(X_{T})]$之间的；如果一个时间序列的 Binned Entropy 较小，说明这一段时间序列的取值是集中在某一段上的。</p>
 <h5 id="Approximate-Entropy"><a href="#Approximate-Entropy" class="headerlink" title="Approximate Entropy"></a>Approximate Entropy</h5><p>回到本节的问题，如何判断一个时间序列是否具备某种趋势还是随机出现呢？这就需要介绍 Approximate Entropy 的概念了，Approximate Entropy 的思想就是把一维空间的时间序列提升到高维空间中，通过高维空间的向量之间的距离或者相似度的判断，来推导出一维空间的时间序列是否存在某种趋势或者确定性。那么，我们现在可以假设时间序列 $X_{N}: \{x_{1},\cdots, x_{N}\}$ 的长度是 $N$ ，同时 Approximate Entropy 函数拥有两个参数， $m$ 与 $r$ ，下面来详细介绍 Approximate Entropy 的算法细节。</p>
 <ol>
@@ -610,14 +611,14 @@ B = \#\{ \text{vector pairs having } d(X_{i}(m), X_{j}(m))<r \text{ of length } 
 <p><img src="http://image.rexking6.top/img/clip1541172227.png" alt=""></p>
 <p><strong>自己理解：长期环比除了通过拟合、EWMA等方法，ARIMA和RNN也应该能适用</strong></p>
 <h2 id="同比-chain"><a href="#同比-chain" class="headerlink" title="同比(chain)"></a>同比(chain)</h2><p>很多监控项都具有一定的周期性，其中以一天为周期的情况比较常见，比如lvs流量在早上4点最低，而在晚上11点最高。为了将监控项的周期性考虑进去，我们选取了某个监控项过去14天的数据。对于某个时刻，将得到14个点可以作为参考值，我们记为$x_i$，其中$i=1,…,14$。</p>
-<p>我们先考虑静态阈值的方法来判断$input$是否异常（突增和突减）。如果$input$比过去14天同一时刻的最小值乘以一个阈值还小，就会认为该输入为异常点（突减）；而如果$input$比过去14天同一时刻的最大值乘以一个阈值还大，就会认为该输入为异常点（突增）。</p>
+<p>我们先考虑静态阈值的方法来判断$\text{input}$是否异常（突增和突减）。如果$\text{input}$比过去14天同一时刻的最小值乘以一个阈值还小，就会认为该输入为异常点（突减）；而如果$\text{input}$比过去14天同一时刻的最大值乘以一个阈值还大，就会认为该输入为异常点（突增）。</p>
 <p><img src="http://image.rexking6.top/img/clip1541172603.png" alt=""></p>
-<p>静态阈值的方法是根据历史经验得出的值，实际中如何给$max_threshold$和$min_threshold$是一个需要讨论的话题。根据目前动态阈值的经验规则来说，取平均值是一个比较好的思路。</p>
+<p>静态阈值的方法是根据历史经验得出的值，实际中如何给$\text{max threshold}$和$\text{min threshold}$是一个需要讨论的话题。根据目前动态阈值的经验规则来说，取平均值是一个比较好的思路。</p>
 <p><strong>自己的理解：同比的方法只能针对周期性的曲线使用，但是同比的方法个人认为只能用来辅助预测，更多的应该是用来检测异常。</strong></p>
 <h2 id="同比振幅-CA"><a href="#同比振幅-CA" class="headerlink" title="同比振幅(CA)"></a>同比振幅(CA)</h2><p>同比的方法遇到有些情况就不能检测出异常。比如今天是11.18日，过去14天的历史曲线必然会比今天的曲线低很多。那么今天出了一个小故障，曲线下跌了，相对于过去14天的曲线仍然是高很多的。这样的故障使用方法二就检测不出来，那么我们将如何改进我们的方法呢？一个直觉的说法是，两个曲线虽然不一样高，但是“长得差不多”。那么怎么利用这种“长得差不多”呢？那就是振幅了。</p>
-<p>怎么计算$t$时刻的振幅呢？ 我们使用$\frac{x(t) – x(t-1)}{x(t-1)}$来表示振幅。举个例子，例如$t$时刻的流量为900bit，$t-1$时刻的是1000bit，那么可以计算出掉线人数是10%。如果参考过去14天的数据，我们会得到14个振幅值。使用14个振幅的绝对值作为标准，如果$m$时刻的振幅$\frac{m(t) – m(t-1)}{m(t-1)}&gt;amplitude \ast threshold$并且$m$时刻的振幅大于0，则我们认为该时刻发生突增，而如果$m$时刻的振幅大于$amplitude\ast threshold$并且$m$时刻的振幅小于0，则认为该时刻发生突减。其中，</p>
+<p>怎么计算$t$时刻的振幅呢？ 我们使用$\frac{x(t) – x(t-1)}{x(t-1)}$来表示振幅。举个例子，例如$t$时刻的流量为900bit，$t-1$时刻的是1000bit，那么可以计算出掉线人数是10%。如果参考过去14天的数据，我们会得到14个振幅值。使用14个振幅的绝对值作为标准，如果$m$时刻的振幅$\frac{m(t) – m(t-1)}{m(t-1)}&gt;\text{amplitude} \times \text{threshold}$并且$m$时刻的振幅大于0，则我们认为该时刻发生突增，而如果$m$时刻的振幅大于$\text{amplitude}\times \text{threshold}$并且$m$时刻的振幅小于0，则认为该时刻发生突减。其中，</p>
 <script type="math/tex; mode=display">
-amplitude = max[|\frac{x_i(t)-x_i(t-1)}{x_i(t-1)}|],x=1,2,...,14</script><h2 id="算法组合"><a href="#算法组合" class="headerlink" title="算法组合"></a>算法组合</h2><p>上面介绍了四种方法，这四种方法里面，SS和LS是针对非周期性数据的验证方法，而chain和CA是针对周期性数据的验证方法。那这四种方法应该如何选择和使用呢？下面我们介绍两种使用方法：</p>
+\text{amplitude} = \text{max}[|\frac{x_i(t)-x_i(t-1)}{x_i(t-1)}|],x=1,2,...,14</script><h2 id="算法组合"><a href="#算法组合" class="headerlink" title="算法组合"></a>算法组合</h2><p>上面介绍了四种方法，这四种方法里面，SS和LS是针对非周期性数据的验证方法，而chain和CA是针对周期性数据的验证方法。那这四种方法应该如何选择和使用呢？下面我们介绍两种使用方法：</p>
 <p>一、根据周期性的不同来选择合适的方法。这种方法需要首先验证序列是否具有周期性，如果具有周期性则进入左边分支的检测方法，如果没有周期性，则选择进入右分支的检测方法。</p>
 <p><img src="http://image.rexking6.top/img/clip1541239974.png" alt=""></p>
 <p>上面涉及到了如何检测数据周期的问题，可以使用差分的方法来检测数据是否具有周期性。比如取最近两天的数据来做差分，如果是周期数据，差分后就可以消除波动，然后结合方差阈值判断的判断方法来确定数据的周期性。当然，如果数据波动范围比较大，可以在差分之前先对数据进行归一化（比如z-score）。</p>
@@ -712,7 +713,7 @@ amplitude = max[|\frac{x_i(t)-x_i(t-1)}{x_i(t-1)}|],x=1,2,...,14</script><h2 id=
       <div class="popular-posts-title"><a href="\2019\01\12\Facebook-时间序列预测算法-Prophet-的研究\" rel="bookmark">Facebook 时间序列预测算法 Prophet 的研究</a></div>
     </li>
     <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\2019\02\14\《Deep-and-Confident-Prediction-for-Time-Series-at-Uber》笔记\" rel="bookmark">《Deep and Confident Prediction for Time Series at Uber》笔记</a></div>
+      <div class="popular-posts-title"><a href="\2019\03\03\《Detecting-Spacecraf-Anomalies-Using-LSTMs-and-Nonparametric-Dynamic-Thresholding》笔记\" rel="bookmark">《Detecting Spacecraf Anomalies Using LSTMs and Nonparametric Dynamic Thresholding》笔记</a></div>
     </li>
   </ul>
 
@@ -757,6 +758,7 @@ amplitude = max[|\frac{x_i(t)-x_i(t-1)}{x_i(t-1)}|],x=1,2,...,14</script><h2 id=
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/" rel="tag"># 时间序列</a>
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
           </div>
 
         
@@ -855,20 +857,20 @@ amplitude = max[|\frac{x_i(t)-x_i(t-1)}{x_i(t-1)}|],x=1,2,...,14</script><h2 id=
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">192</span>
+          <span class="site-state-item-count">193</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-count">40</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -951,13 +953,13 @@ amplitude = max[|\frac{x_i(t)-x_i(t-1)}{x_i(t-1)}|],x=1,2,...,14</script><h2 id=
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">3.4m</span>
+    <span title="站点总字数">3.5m</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">51:11</span>
+    <span title="站点阅读时长">52:40</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
   </div>

@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="推荐算法：从FM到DeepFM">
+<meta property="og:url" content="https://blog.rexking6.top/2023/02/07/%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95%EF%BC%9A%E4%BB%8EFM%E5%88%B0DeepFM/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/640">
+<meta property="og:image" content="https://image.rexking6.top/img/640">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20230208235840637.png">
+<meta property="og:image" content="https://image.rexking6.top/img/9e3d27185215209c14094b6ad39de8eb.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/b97059111359b2b5e83ab88dfd46b900.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/b97059111359b2b5e83ab88dfd46b900.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/asdasdasaaa.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/qwe.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/ettw.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/werwe.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/retw.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/ret.jpg">
+<meta property="article:published_time" content="2023-02-07T15:58:23.000Z">
+<meta property="article:modified_time" content="2023-03-11T01:31:14.574Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="搜广推">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/640">
+
+<link rel="canonical" href="https://blog.rexking6.top/2023/02/07/%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95%EF%BC%9A%E4%BB%8EFM%E5%88%B0DeepFM/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>推荐算法：从FM到DeepFM | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2023/02/07/%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95%EF%BC%9A%E4%BB%8EFM%E5%88%B0DeepFM/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          推荐算法：从FM到DeepFM
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-02-07 23:58:23" itemprop="dateCreated datePublished" datetime="2023-02-07T23:58:23+08:00">2023-02-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-03-11 09:31:14" itemprop="dateModified" datetime="2023-03-11T09:31:14+08:00">2023-03-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%90%9C%E5%B9%BF%E6%8E%A8/" itemprop="url" rel="index"><span itemprop="name">搜广推</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2023/02/07/%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95%EF%BC%9A%E4%BB%8EFM%E5%88%B0DeepFM/" class="post-meta-item leancloud_visitors" data-flag-title="推荐算法：从FM到DeepFM" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>28k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>26 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>本来在看离散型特征的编码方式，看到了推荐算法的一系列方法，综合转载于：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=Mzg5NTYyMDgyNg==&amp;mid=2247489273&amp;idx=1&amp;sn=36d6c30a3538feb718385204d5675053&amp;source=41#wechat_redirect">原创 | 万字长文，剖析经典论文GBDT+LR</a></li>
+<li><a target="_blank" rel="noopener" href="https://jishuin.proginn.com/p/763bfbd4c480">小白都能懂的推荐算法入门（一），从上古时期的LR开始聊起</a></li>
+<li><a href="[原创 | 想做推荐算法？先把FM模型搞懂再说 (qq.com">原创 | 想做推荐算法？先把FM模型搞懂再说</a>](<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/YRdGRSPSlPfwXzylx4cRcA">https://mp.weixin.qq.com/s/YRdGRSPSlPfwXzylx4cRcA</a>))</li>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/IqdbM77SbmDkix5_uc3EIw">小白都能懂的推荐算法入门（二），FM为什么强大能代替LR？</a></li>
+<li><a target="_blank" rel="noopener" href="https://jishuin.proginn.com/p/763bfbd4ed30">小白都能懂的推荐算法入门（三），FM、类别特征以及Embedding</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/GFDGFHSDS/article/details/104782245">FM算法详解（因子分解机）</a></li>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/cXz-ljYrxf8U6oO9xoU8Bg">推荐领域又一经典paper，分分钟搞清楚Attention机制</a></li>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/9n8iIWaGfDkF9u22XL-aGw">浅谈推荐，从FM到深度学习</a></li>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/OOACq0LtuBu3_-baJyBiig">吃透论文——推荐算法不可不看的DeepFM模型</a></li>
+</ul>
+<h1 id="GBDT-LR"><a href="#GBDT-LR" class="headerlink" title="GBDT+LR"></a>GBDT+LR</h1><p>来剖析一篇经典的论文：Practial Lessons from Predicting Clicks on Ads at Facebook。从这篇paper的名称当中我们可以看得出来，这篇paper的作者是<strong>Facebook的广告团队</strong>。这是一篇将GBDT与LR模型结合应用在广告点击率预测的方法，虽然距今已经有好几年了，但是文中的方法仍然没有完全过时，至今依然有一些小公司还在使用。</p>
+<p>这篇paper非常非常经典，可以说是<strong>推荐、广告领域必读的文章</strong>，说是业内的常识也不为过。这篇文章的质量很高，内容也比较基础，非常适合作为大家的入门paper。</p>
+<h2 id="简介-1"><a href="#简介-1" class="headerlink" title="简介"></a>简介</h2><p>paper开头的部分简单介绍了一下当时互联网行业当中广告的地位以及当时Facebook的规模，当时Facebook有着7.5亿的日活（日活跃用户daily active users)，超过一百万有效的广告商，因此对于Facebook来说选择合适有效的广告投放给用户的重要性是非常巨大的。在此基础上引出了Facebook的创新性做法，即将GBDT与逻辑回归模型进行组合，在真实的数据场景当中获得了超过3%的收益。</p>
+<p>在2007年的时候Google和Yahoo就提出了在线竞价的广告收费机制，但是Facebook和搜索引擎的场景不一样，在搜索引擎的场景当中，用户会有明确的搜索意图。引擎会先根据用户的搜索意图去筛选广告，所以候选的广告集不会很大。但是Facebook不存在这样的强意图信息，所以<strong>Facebook候选的广告数量要大得多</strong>，因此对于系统的压力以及要求也要更高。</p>
+<p>但是本文（paper）并不会讨论系统相关的内容，<strong>仅仅关注最后一部分排序模型的做法</strong>。虽然paper里没说，但是我们看得出来，Google和Yahoo这类搜索引擎当中的广告是搜索广告，而Facebook当中的这些广告是推荐广告。后者和前者最大的区别就是召回广告的逻辑不一样，有点类似于推荐系统和搜索系统的区别。</p>
+<p>这其中的核心是用户意图，虽然用户登录Facebook的时候没有强意图，但是根据用户之前的浏览行为以及习惯，我们是可以提取出一些弱意图的。比如用户在哪类商品上停留的时间最长，点击什么样的内容的次数最多，还有类似协同过滤的把用户的行为抽象成向量的做法。其实这里面的内容很多，也非常有价值，可见Facebook在写论文的时候是留了一手的。</p>
+<h2 id="具体做法"><a href="#具体做法" class="headerlink" title="具体做法"></a>具体做法</h2><p>终于到了重头戏了，虽然这篇paper当中讲了很多其他方面的内容，但是我们都知道GBDT+LR才是它的重点。GBDT和LR我们都很熟悉，但是它们两个怎么combine在一起呢？</p>
+<p>其实这个问题本身就是错的，所谓<strong>GBDT+LR并不是两个模型的结合</strong>，而是一种特征的转化。也就是说这个问题我们需要从特征的角度去思考而不是从模型。</p>
+<p>paper当中先讲了两种常用的处理特征的方法，第一种是叫做bin，也就是<strong>分桶</strong>的意思。比如说收入，这是一个连续性特征。如果我们把它放入模型，模型学到的就是它的一个权重，也就说它是线性起作用的。然而在实际的场景当中，可能这完全不是线性的。比如有钱人喜欢的品牌和穷人可能完全不同，我们希望模型能够学到非线性的效果。一种比较好的办法就是<strong>人为将这个特征进行分桶</strong>，比如根据收入分成年收入3万以下的，3万到10万的，10万到50万的，和50万以上的。落到哪个桶里，哪个桶的值标为1，否则标为0。</p>
+<p>第二种方法叫做<strong>特征组合</strong>，这个也很好理解，比如性别是一个类别，是否是高收入群体是个类别。那我们排列组合一下，就可以得到男_低收入，男_高收入，女_低收入和女_高收入这四个类别。如果是连续性特征，可以使用像是kd-tree这类的数据结构进行离散化。我们把类别特征两两交叉就可以得到更多的特征，但这些特征并不一定都是有用的，有些可能没用，还有些可能有用但是数据很稀疏。所以虽然这样可以产生大量特征，但是<strong>需要一一手动筛选，很多是无效的</strong>。</p>
+<p>由于手动筛选特征的工作量实在是太大，收益也不高，所以工程师就开始思考一个问题：有没有办法可以自动筛选特征呢？现在我们都知道可以让神经网络来做自动的特征交叉和筛选，但是当时神经网络还没有兴起，所以还是只能手动进行。为了解决这个问题，当时的工程师们想到了GBDT。</p>
+<p>这才是会有GBDT+LR的原因，我们来看这张图：</p>
+<p><img src="https://image.rexking6.top/img/640" alt=""></p>
+<p>我们来简单回顾一下GBDT的模型，首先<strong>GBDT是由多棵树组成的森林模型</strong>。对于每一个样本，它在预测的时候都会落到每一棵子树的其中一个叶子节点上。这样我们就可以使用GBDT来进行特征的映射，我们来看个例子：</p>
+<p><img src="https://image.rexking6.top/img/640" alt=""></p>
+<p>在上图这个例子当中，GBDT一共有3棵子树，第一棵子树有3个叶子节点。我们的样本落到了第一个，所以第一棵子树对应的one-hot结果是[1, 0, 0]，第二棵子树也有3个节点，样本落到了第二个节点当中，所以one-hot的结果是[0, 1, 0]，同理可以得到第三棵子树的结果是[0, 0, 1, 0]。</p>
+<p>这样我们最后把这些树的向量合并在一起，就得到了一个新的向量：[1, 0, 0, 0, 1, 0, 0, 0, 1, 0]，<strong>这个向量就是我们LR模型的输入</strong>。</p>
+<p>我们来分析一下细节，首先明确一点，<strong>GBDT只是用来进行了特征转化和处理，它的预测结果并不重要</strong>。通过使用GBDT我们同时完成了刚才提到的两种操作，<strong>既把连续性特征转换成了离散型特征，也自动完成了特征的交叉</strong>。因为对于每一棵子树而言，其实本质上是一棵CART算法实现的决策树，也就是说从树根到叶子节点的链路代表了一种潜在的规则。所以我们可以近似看成使用了GBDT代替人工进行了规则的提取以及特征的处理。</p>
+<h2 id="为什么是LR"><a href="#为什么是LR" class="headerlink" title="为什么是LR"></a>为什么是LR</h2><p>什么是LR大家已经知道了，但还有一个问题却没有回答。那就是为什么早年的时候LR模型如此受欢迎呢？难道就不能使用其他一些看起来高级一些的模型吗，比如决策树、随机森林、GBDT？不是说XGBoost在各种比赛的效果都非常好吗？为什么业内不用来做推荐呢？</p>
+<p>尤其是当我读到2014年Facebook推出的GBDT+LR的paper的时候，这种困惑更是明显。</p>
+<p>这篇论文非常经典，在业内地位很重，甚至可以说是推荐领域必读的paper之一。深度学习兴起之前很多公司和厂商都沿用了这个做法，论文当中的做法倒是不难，说是创新的做法，其实本质上就是将GBDT预测的时候样本落到的节点作为multi-hot编码，然后将这个编码之后的01的数组看成是新的特征，然后用这个转换过的特征来训练LR。可以说它的本质仍然是训练LR，所谓的GBDT只不过是一个编码器。</p>
+<p>我当时看这篇paper的时候，里面的意思都已经理解了，但是有一个问题怎么也没想明白。既然都用GBDT了，结合其他模型不香吗，非得结合LR？</p>
+<p>我估计这个问题很多在推荐领域的从业者可能也未必答得上来，我先卖个关子，把问题记在这里，等会晚点来回答。</p>
+<h2 id="推荐领域的特征有什么特点？"><a href="#推荐领域的特征有什么特点？" class="headerlink" title="推荐领域的特征有什么特点？"></a>推荐领域的特征有什么特点？</h2><p>在算法领域，提及效果，特征和模型两者是一体两面，很难剥离。好的模型也需要好的特征支撑，好的特征需要好的模型才能充分表达。所以我们先把模型的问题放一放，来思考一下特征。</p>
+<p>推荐领域主要的特征只有三块，以电商为例，分别是item，user和context。也就是商品，用户以及环境信息，比如时间，地点，展示位置等等。context特征比较少，来来回回就那么几样，我们也先放一放。剩下的就是用户和商品，围绕用户和商品我们形成的特征主要又可以分成两个部分，一个是基础特征，另外一个是统计特征。</p>
+<p>以商品举例，基础特征就是品牌、价格、类目、评价，统计特征就是最近点击率、最近销售额、最近转化率等等。这些特征按照类别分又可以分为两种，一种是浮点型的连续型特征，一种是类别特征，比如商品的类目，品牌等等。到这里都很正常，没有什么难理解，或者是不可思议的部分。</p>
+<p>我们接着往下，再来看看模型要预测的目标——点击率。我们结合一下模型预测的目标再来观察一下前面列举的特征，你会发现，除了历史点击率、历史转化率等少数几个指标和最终的结果是强正相关之外，其他的浮点型的特征没有特别明显的正相关或者是负相关。可以说商品的价格和点击率负相关吗？其实不太行，商品越便宜可能质量越差，反而不会有人点。用户的购买力呢？越有钱点的商品越多吗？也不成立。</p>
+<p>正是因为上面说的这个原因，所以在推荐领域，效果很好的浮点型特征很少，大部分都是类别特征，也就是01特征。</p>
+<p>所以你说GBDT、随机森林、XGboost这些模型的效果会很好吗？很难说，因为这些模型的长处往往都在浮点型特征，也就是连续型特征。这些树模型会设计规则对这些连续特征进行分段，如果大部分特征都是01特征，那还怎么分段呢？</p>
+<p>所以，到这里也就回答了，为什么在深度学习模型兴起之前，推荐领域普遍都使用LR，而不是那些看着很牛的树模型。</p>
+<h2 id="LR模型的原理"><a href="#LR模型的原理" class="headerlink" title="LR模型的原理"></a>LR模型的原理</h2><p>LR模型也就是纯线性模型，它可以简单理解成若干个特征的加权和。每个特征的权重或大或小，最后累加在一起，得到一个预测的概率。这毫无毛病，也是学过的人都知道。</p>
+<p>但我们往下一层，有没有想过这一点在推荐领域意味着什么呢？</p>
+<p>意味着模型其实是”记住“了每个特征和最终结果的关系，我们把模型拟人化，把它看成一个机器人的话。机器人看到样本有特征A并且点击了，于是特征A的权重提升一点，样本有特征B但是没点击，于是把特征B的权重降低一些。模型就是在这样一个策略当中找到一个最佳的平衡。</p>
+<p>这就意味着，一些容易被记忆的特征往往会发挥比较好的效果。比如男士通常会买烟，女士通常买口红，那么我们就可以设计<strong>男士_烟</strong>和<strong>女士_口红</strong>的组合特征。当模型看到大部分男士看到烟都点击了之后，它就能学到这个组合是一个强特征并给与一个比较高的权重。这样只要我们尽可能地找出这些特征的组合，那么模型就可以得到很好的效果。</p>
+<p>所以到这里大家就明白了，LR模型在推荐领域发挥作用，本质上就是靠的“记性”。因为它可以记住那些类别特征以及类别特征的组合，所以它往往比  那些看起来更高端的树模型效果要好。这也是为什么到了LR时代的后期，算法工程师们的工作就是整天挖掘一些类别特征的组合，以期望模型达到很好的效果。</p>
+<h2 id="LR模型的优缺点"><a href="#LR模型的优缺点" class="headerlink" title="LR模型的优缺点"></a>LR模型的优缺点</h2><p>到这里，关于LR模型在推荐领域的应用就差不多说完了，我们做一个简单的总结，首先从它的优点开始说起。</p>
+<p>LR模型的优点教科书上已经说了很多了，比如训练速度快，由于参数空间比较小，LR模型可以迅速收敛，它的训练速度要比那些树模型以及后面的深度学习模型快得多。其次是可解释性强，由于我们可以查阅得到所有特征的权重，所以我们很容易解释究竟是什么特征发挥了作用，或者是什么特征拖了后腿。</p>
+<p>但是LR在推荐领域也有一个很大的缺点，是什么呢，就是<strong>脏活累活很多</strong>。</p>
+<p>因为几乎所有的特征组合都需要人工挖取，需要人工遍历很多特征组合，甚至是一一尝试找到最佳的组合。这个过程当中需要花费大量的人力，几乎可以说是纯堆人工。所以对于LR时代的算法工程师来说可能螺丝钉的感觉比现在还要严重得多，什么优化模型基本上是不用想了，LR这么简单的模型也没什么优化的空间，剩下的事情基本上就只有做特征做实验了。</p>
+<h1 id="FM"><a href="#FM" class="headerlink" title="FM"></a>FM</h1><p>介绍一个<strong>业内使用得更多</strong>的模型，它诞生于2010年，原作者是Steffen Rendle。虽然诞生得更早，但是它的活力更强，并且衍生出了多种版本。我们今天剖析的就是这篇2010年最经典的原版论文。</p>
+<p>说到推荐、广告的算法模型，几乎很难绕开FM，它是一个非常强的模型。<strong>理论简单、推导严谨、实现容易，并且效果不俗</strong>。即使是目前仍然在各大厂商当中发挥用场，在一些小厂当中甚至是主力模型。我们初看之前也许还有疑惑，但是相信当大家看完之后，必然会有全新的认识。</p>
+<h2 id="简介-2"><a href="#简介-2" class="headerlink" title="简介"></a>简介</h2><p>FM的全称是<strong>Factorization Machines</strong>，翻译过来就是因式分解机，这么翻译很拗口，不得其神也不得其形，所以我们一般都不翻译简称为FM模型。</p>
+<p>论文开篇就讲了FM模型的种种好处，比如和SVM对比，它能够<strong>在稀疏的特征当中仍然拥有很好的表现</strong>，并且FM的效率非常高，可以在线性时间内获得结果。并且不像非线性的SVM（核函数），FM并不需要将特征转换成对偶形式，并且模型的参数可以直接训练，也不用借助支持向量或者是其他的方法。</p>
+<p>除了SVM之外，FM模型和其他的因式分解模型比如SVD、PITF、FPMC比较起来都有非常明显的优势。这些模型往往只针对一个特定的场景或者是特定的数据集，并且它们的训练以及优化方案都是根据场景定制化的。<strong>FM模型不需要定制化就可以实现同样好的效果</strong>，可以非常简易地应用在各个预测问题当中。</p>
+<p>这段摘要其实没什么太多的内涵，主要就是吹嘘了一通FM。不过作者所言不虚，和他列举的这些模型比较起来，FM的确更加出色。</p>
+<p>总结一下，FM模型的优点有如下几点：</p>
+<ul>
+<li>FM模型的参数支持非常稀疏的特征，而SVM等模型不行</li>
+<li>FM的时间复杂度为$O(n)$，并且可以直接优化原问题的参数，而不需要依靠支持向量或者是转化成对偶问题解决</li>
+<li>FM是通用的模型，可以适用于任何实数特征的场景，其他的模型不行</li>
+</ul>
+<p>paper在一开始的时候就表明了FM模型的优点，给足了好处，之后才是对FM模型的深入分析，让大家明白这些优点是如何得到的，以及它的工作原理。</p>
+<h2 id="稀疏场景"><a href="#稀疏场景" class="headerlink" title="稀疏场景"></a>稀疏场景</h2><p>在有监督学习的场景当中，最常见的任务就是给定一个向量x，要求预测一个目标T。如果T是一个实数，那么这就是回归模型，如果T是一个类别的常量，就是一个分类模型。</p>
+<p>这些都是机器学习的基础知识，相信大家都了解，然而对于线上排序的功能来说，我们<strong>重要的是给商品排序，而不是分类</strong>。常规来说我们可以将impression和click看成是两个类别进行分类预测，也可以直接用回归模型预测商品的点击率，根据点击率进行排序。这两种其实本质上是一样的，都是针对商品本身进行学习。还有一种方法是更加侧重商品之间的排序，我们的模型学习的是商品之间的优劣关系。</p>
+<p>举个例子，比如我们用向量$x_i$表示i商品的特征向量，$x_j$表示j商品的特征向量，那么我们可以将这两个向量合并一起作为输入，进行分类预测。<strong>分类的结果表示的是i商品在j商品之前还是反之</strong>。这样我们可以通过多次预测，直接得到商品之间的排序关系，而不是根据一个分数进行排序。这样可以在只有正样本的情况下进行训练。这种方法直接训练的模型商品的优劣，业内叫做learning to rank。</p>
+<p>然而不论是哪一种做法，都有一个问题绕不开就是<strong>特征的稀疏</strong>。举个很简单的例子，比如我们对商品的类目进行one-hot处理，在电商场景下商品的类目动辄上万个，那么one-hot之后的结果就是一个长度上万的数组，并且这个数组当中只有一位为1，其他均为0。当然这只是一个例子，除此之外还有许多许多的特征有可能是非常稀疏的。</p>
+<p>我们用$m(x)$表示x向量当中非零的元素的个数，用$\hat{m}_D$表示所有x样本平均的非零元素的个数，在大多数真实数据场景下，我们都可以得到$\hat{m}_D \ll n$，这里的n是特征的维数。</p>
+<p>当我们交叉特征做到后面，能够覆盖的样本的数量会非常非常少，尤其是一些本来就很小众的特征之间的交叉。举个例子，比如说<code>高收入人群_房产</code>这个交叉特征。对于电商平台来说，房产本来就是很小众的领域，只有极少数人才会闲着没事在电商网站看房子。同样高收入人群可能也很小众，毕竟大部分人都是普通打工人，收入有限。这么一来，这样得到的交叉特征能够覆盖的样本就会非常非常稀疏。</p>
+<p>大家可以简单计算一下，假设房产在电商平台的商品当中的占比是1%，高收入群体在总用户占比是10%的话，那么两者交叉之后的占比就成了千分之一。那这样稀疏的样本在训练模型的时候，我们是很难保证这个特征对应的权重已经训练到了最佳程度。</p>
+<p>如果说只是脏活累活多对于大公司来说倒也不是不可以忍受，大不了多雇一点人手就是了。但现在摆明了做出来的特征很有可能因为覆盖率的问题没有效果，那么这就不是很能接受了。</p>
+<p>特征交叉的稀疏性以及大量的人力成本，这两个问题是LR模型绕不开的硬伤，也是它被FM代替的直接原因。</p>
+<h2 id="真实场景例子"><a href="#真实场景例子" class="headerlink" title="真实场景例子"></a>真实场景例子</h2><p>paper当中举了一个真实场景的例子，我们的问题是<strong>预测用户对于一部电影的评分</strong>。我们先来观察一下下图，下图是样本矩阵。</p>
+<p><img src="https://image.rexking6.top/img/image-20230208235840637.png" alt=""></p>
+<p>很明显上图的左边一大块是特征，右边的Target y表示的预测结果，也就是用户可能对电影做出的评价。这里一共有[1, 2, 3, 4, 5]这5种可能，也就是说这是一个多分类的问题。</p>
+<p>接着我们再来看特征，特征一共也有5个部分，其中蓝色的部分表示的用户的one-hot。那么这个数组的长度应该是用户的数量，只有代表当前用户的那一维为1，其他均为0。</p>
+<p>红色部分表示电影，同样是电影的one-hot，和用户的one-hot是一样的逻辑。代表当前电影的那一维度为1，其他为0。</p>
+<p>之后是黄色的部分，表示的之前用户对于电影的评分行为，维度同样是电影的数量。凡是用户评分过的电影分数大于0，没有评分的等于0。得分的计算逻辑是<strong>1除以用户评论过的电影数量</strong>。比如第一行当中，第一个用户评价过前三部电影，所以前三部电影每一部分到了的分数。</p>
+<p>绿色的部分只有1维，表示的是用户评论电影的时间。计算方法是将记录当中最早的日期作为基数（这里是2009年1月），之后每过一个月，增加1。比如2009年5就可以折算成5。</p>
+<p>最后棕色的部分表示的是用户最近一次评论的电影，这同样是一个one-hot的数组，它的维度和电影的数量是一致的。</p>
+<p>我们假设用户的数量是U，电影的数量是M，那么最后得到的整个特征的维度数应该是U+3M+1。即使是小众一些的电影评分网站，用户数也至少是以上百万起的，再加上电影的数量，这显然是一个非常庞大的数字。而<strong>在这么庞大的维度当中只有少数的一些维度是有值的</strong>，其余均为0。</p>
+<p>对于这样稀疏的特征矩阵而言，一般的模型是很难保证效果的。为什么FM模型可以置身其外呢？下面，我们就来看看FM模型的原理。</p>
+<h2 id="FM模型原理"><a href="#FM模型原理" class="headerlink" title="FM模型原理"></a>FM模型原理</h2><p>在我们介绍FM模型的方程之前，我们先来回顾一下线性回归的表达式，其实非常简单，只有一行：</p>
+<script type="math/tex; mode=display">
+Y=W^T X=w_0+\sum_{i=1}^n w_i x_i</script><p>也就是说$W=\left(w_0, w_1, w_2, \cdots, w_n\right)$，W是这样一个n+1维的向量，X是一个n x m的特征矩阵。这里的n是特征的维数，m是样本的数量。所以我们也经常把它写成$Y=X W$，不管怎么写，形式都是一样的。</p>
+<p>这个式子称为线性回归的原因也很简单，因为它就是一个简单的线性方程，<strong>只有一次项</strong>。但是一次项有时候效果不好，尤其是在特别稀疏的场景当中，刻画能力不够。我们做特征的时候经常会把两项特征组合起来做成新的组合特征，由于我们这样操作引入了新的特征，找到了新的特征组合，所以能够挖掘出之前无法得到的信息，因此模型也会有更好的效果。</p>
+<p>当我们把特征进行二项组合之后，会得到这样的式子：</p>
+<script type="math/tex; mode=display">
+\hat{y}=w_0+\sum_{i=1}^n w_i x_i+\sum_{i=1}^{n-1} \sum_{j=i+1}^n w_{i j} x_i x_j</script><p>这里的$x_i$和$x_j$分别表示两个不同的特征取值，对于n维的特征来说，这样的组合应该一共有$C_n^2$种，这个值是$\frac{n(n-1)}{2}$，也就意味着我们需要同样数量的权重参数。但是有一个小问题，我们前面已经说过了，由于特征可能非常稀疏，导致n非常大，比如上百万，这里<strong>两两特征组合的特征量级大约是n的平方</strong>，那么因此带来的参数数量就是一个天文数字。想想看对于一个上百亿甚至更多参数空间的模型来说，我们需要多少训练样本才可以保证完全收敛？这是不可想象的。</p>
+<p>既然如此，那么针对性的优化就是必不可少的。FM为人称道的也正是这一点，<strong>既引入了特征交叉，又解决了复杂度以及模型参数的问题</strong>，真的可以说是非常棒了。</p>
+<p>FM解决这个问题的方法非常简单，它不再是简单地为交叉之后的特征对设置参数，而是设置了一种计算特征参数的方法。FM模型引入了新的矩阵V，矩阵V是一个n x k的二维矩阵。这里的k是我们设置的参数，一般不会很大，比如16、32之类。对于特征每一个维度i，我们都可以找到一个$v_i$，它表示一个长度为k的向量。</p>
+<p>于是我们可以用$v_i$和$v_j$来计算得出上式当中的$w_{ij}$：</p>
+<script type="math/tex; mode=display">
+w_{i j}=v_i^T v_j</script><p>也就是说我们<strong>用向量的内积来计算得到了就交叉特征的系数</strong>，相比于原先$O\left(n^2\right)$量级的参数而言，我们将参数的量级降低到了n x k。由于k是一个常数值，所以可以看成我们的参数数量是$O(n)$。通过这种方式我们把参数的数量降低了一个数量级。</p>
+<p>有了V矩阵之后，刚才的公式可以改写成：</p>
+<script type="math/tex; mode=display">
+\hat{y}=w_0+\sum_{i=1}^n w_i x_i+\sum_{i=1}^{n-1} \sum_{j=1}^n v_i^T v_j x_i, x_j</script><p>我们很容易可以知道，当k这个参数足够大的时候，我们可以保证$W=V \cdot V^T$成立。所以我们<strong>引入的参数矩阵V可以看成是对W矩阵做了一个因子分解</strong>，这也是FM得名的由来。当然在实际的应用场景当中，我们并不需要设置非常大的K，因为特征矩阵往往非常稀疏，我们可能没有足够多的样本来训练这么大量的参数，并且<strong>限制K也可以一定程度上提升FM模型的泛化能力</strong>。</p>
+<p>此外这样做还有一个好处就是<strong>有利于模型训练</strong>，因为对于有些稀疏的特征组合来说，我们所有的样本当中可能都是空的。比如在刚才的例子当中用户A和电影B的组合，可能用户A在电影B上就没有过任何行为，那么这个数据就是空的，我们也不可能训练出任何参数来。但是引入了V之后，虽然这两项缺失，但是我们仍然可以得到一个参数。因为我们针对用户A和电影B训练出了一个向量参数，我们用这两个向量参数点乘，就得到了这个交叉特征的系数。</p>
+<p>这种做法有两种理解方式，一种就是刚才说的，我们对于一些稀疏的组合也可以很好地计算出系数。另外一种理解方式是<strong>这其实也是一种embedding的方式</strong>，将某一个id映射成向量。所以业内也有使用FM来做embedding的。</p>
+<h2 id="复杂度优化"><a href="#复杂度优化" class="headerlink" title="复杂度优化"></a>复杂度优化</h2><p>接下来我们来看另外一个很精髓的内容，就是关于FM模型的复杂度优化。我们观察一下刚才上面的式子，不难发现，目前对于预测一条样本的计算复杂度为$O\left(k n^2\right)$。</p>
+<p>n我们前文说过了是一个比较大的数字，那么显然$n^2$级的计算也是我们不能接受的。所以对它进行优化也是必须的，并且这里的优化非常简单，可以<strong>直接通过数学公式的变形推导</strong>得到。</p>
+<script type="math/tex; mode=display">
+\hat{y}=w_0+\sum_{i=1}^n w_i x_i+\sum_{i=1}^{n-1} \sum_{j=1}^n v_i^T v_j x_i, x_j</script><p>这个是它的原式，对于这个式子来说，前面两项的复杂度是$O(n)$，我们可以先忽略，重点来看最后一项。我们要做的就是通过数学公式的变形来对这一项进行化简：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\sum_{i=1}^n \sum_{j=i+1}^n v_i^T v_j x_i x_j & =\frac{1}{2} \sum_{i=1}^n \sum_{j=1}^n v_i^T v_j x_i x_j-\frac{1}{2} \sum_{i=1}^n v_i^T v_i x_i x_i \\
+& =\frac{1}{2}\left(\sum_{i=1}^n \sum_{j=1}^n \sum_{f=1}^k v_{i, f} v_{j, f} x_i x_j-\sum_{i=1}^n \sum_{f=1}^k v_{i, f} v_{i, f} x_i x_i\right) \\
+& =\frac{1}{2} \sum_{f=1}^k\left(\left(\sum_{i=1}^n v_{i, f} x_i\right)\left(\sum_{j=1}^n v_{j, f} x_j\right)-\sum_{i=1}^n v_{i, f}^2 x_i^2\right) \\
+& =\frac{1}{2} \sum_{f=1}^k\left(\left(\sum_{i=1}^n v_{i, f} x_i\right)^2-\sum_{i=1}^n v_{i, f}^2 x_i^2\right)
+\end{aligned}</script><p>简单来解释一下这个推导过程，第一行我想大家应该都能看懂，第二行也很好理解，其实就是把$v_i^T v_j$向量内积展开。第二行到第三行的转化也不难理解，这里有三个$\sum$，我们提取出的是最里面的$\sum$，因为是有限项求和，<strong>我们调换顺序并不会影响结果</strong>。提取出了公因式之后，得到的结果是两个平方项。我们观察一下可以发现，这两个平方项的计算复杂度都是$O(n)$，再加上外面一层$O(k)$的复杂度，整体的复杂度是$O(kn)$。</p>
+<p>这样我们就完成了FM模型预测的优化。</p>
+<h2 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h2><p>我们再来看下模型训练的过程，我们写出变形之后的原式：</p>
+<script type="math/tex; mode=display">
+\hat{y}=w_0+\sum_{i=1}^n w_i x_i+\frac{1}{2} \sum_{f=1}^k\left(\left(\sum_{i=1}^n v_{i, f} x_i\right)^2-\sum_{i=1}^n v_{i, f}^2 x_i^2\right)</script><p>针对FM模型我们一样可以使用梯度下降算法来进行优化，既然要使用梯度下降，那么我们就需要写出模型当中所有参数的偏导。</p>
+<p>我们可以把参数分成三个部分，第一个部分自然是$w_0$，$\frac{\partial \hat{y}}{\partial w_0}=1$。第二个部分是$\sum_{i=1}^n w_i x_i$，对于其中每一个$w_i$来说它的系数是$x_i$。由于样本是固定的，我们要把样本的特征值看成是常数。所以$\frac{\partial \hat{y}}{\partial w_i}=x_i$。最后一个部分就是$\frac{1}{2} \sum_{f=1}^k\left(\left(\sum_{i=1}^n v_{i, f} x_i\right)^2-\sum_{i=1}^n v_{i, f}^2 x_i^2\right)$$\frac{1}{2} \sum_{f=1}^k\left(\left(\sum_{i=1}^n v_{i, f} x_i\right)^2-\sum_{i=1}^n v_{i, f}^2 x_i^2\right)$看起来复杂很多，但其实偏导也不难求，我们首先明确这里要优化的参数是$v_{i, f}$，所以我们可以忽略最外层的一层$\sum_{f=1}^k$，直接对括号内的进行求导，得出的结果是$\left.\frac{\partial \hat{y}}{\partial v_{i, f}}=x_i \sum_{j=1}^n v_{j, f} x_j-v_{i, f} x_i^2\right)$。</p>
+<p>我们把这三种综合一下，就得到了：</p>
+<script type="math/tex; mode=display">
+\frac{\partial \hat{y}}{\partial \theta}=\left\{\begin{array}{lr}
+1, & \text { if } \theta \text { is } w_0 \\
+x_i, & \text { if } \theta \text { is } w_i \\
+\left.x_i \sum_{j=1}^n v_{j, f} x_j-v_{i, f} x_i^2\right) & \text { if } \theta \text { is } v_{i, f}
+\end{array}\right.</script><p>其中$\sum_{j=1}^n v_{j, f} x_j$和i是独立的，所以它是可以提前算好的，这样一来对于所有参数项，我们都可以在$O(1)$的时间内计算出它们的梯度。由于我们所有参数的量级是$O(k n)$，意味着我们可以在$O(k n)$时间内对所有的参数完成梯度下降的更新。</p>
+<h2 id="拓展到d维"><a href="#拓展到d维" class="headerlink" title="拓展到d维"></a>拓展到d维</h2><p>我们刚才介绍的FM模型专注的是二维特征交叉的情况，如果我们愿意<strong>也可以将它拓展到d维</strong>特征交叉的情况。这样的话我们的特征可以拟合任意$\tilde{d}(1 \leq \tilde{d} \leq d)$维特征交叉的相互关系。</p>
+<p>我们仿照刚才的公式，可以写出FM模型推广到d维的方程：</p>
+<script type="math/tex; mode=display">
+\hat{y}=w_0+\sum_{i=1}^n w_i x_i+\sum_{l=2}^d \sum_{i=1}^n \ldots \sum_{i_l=i_{l-1}+1}^n\left(\Pi_{j=1}^l x_{i_j}\right)\left(\sum_{f=1}^{k_l} \Pi_{j=1}^l v_{i_j, f}^{(l)}\right)</script><p>前面两项都很好理解，我们着重来看第三项。第三项当中包含了从2维到d维交叉特征的情况，我们以d=3为例，那么这一项当中应该包含二维的交叉项以及三维的交叉项，应该是这样的：</p>
+<script type="math/tex; mode=display">
+\sum_{i=1}^{n-1} \sum_{j=i+1}^n x_i x_j\left(\sum_{t=1}^k v_{i, t} v_{j, t}\right)+\sum_{i=1}^{n-2} \sum_{j=i+1}^{n-1} \sum_{l=j+1}^n x_i x_j x_l\left(\sum_{t=1}^k v_{i, t} v_{j, t} v_{l, t}\right)</script><script type="math/tex; mode=display">
+\sum_{i=1}^{n-1} \sum_{j=i+1}^n x_i x_j\left(\sum_{t=1}^k v_{i, t} v_{j, t}\right)+\sum_{i=1}^{n-2} \sum_{j=i+1}^{n-1} \sum_{l=j+1}^n x_i x_j x_l\left(\sum_{t=1}^k v_{i, t} v_{j, t} v_{l, t}\right)</script><p>这个式子<strong>整体上和之前的形式是一样的</strong>，我们不难分析出它的复杂度是$O\left(k n^d\right)$。当d=2的时候，我们通过一系列变形将它的复杂度优化到了$O(k n)$，而当d&gt;2的时候，没有很好的优化方法，而且三重特征的交叉往往没有意义，并且会过于稀疏，所以我们一般情况下只会使用d = 2的情况。</p>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><p>上面这段大家了解一下知道有这么回事就可以了，实际上意义不大。最后的时候paper还比较了FM和其他一些经典的模型的效果，比如SVD、SVM等，也没太多价值，因为<strong>现在在推荐领域已经几乎没有人直接使用这些模型了</strong>。最后我贴一下我用pytorch和TensorFlow两个框架分别实现的FM模型，给大家做一个参考。</p>
+<h3 id="Pytorch"><a href="#Pytorch" class="headerlink" title="Pytorch"></a>Pytorch</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">from</span> torch <span class="keyword">import</span> nn</span><br><span class="line"></span><br><span class="line">ndim = <span class="built_in">len</span>(feature_names)</span><br><span class="line">k = <span class="number">4</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FM</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, dim, k</span>):</span><br><span class="line">        <span class="built_in">super</span>(FM, self).__init__()</span><br><span class="line">        self.dim = dim</span><br><span class="line">        self.k = k</span><br><span class="line">        self.w = nn.Linear(self.dim, <span class="number">1</span>, bias=<span class="literal">True</span>)</span><br><span class="line">        <span class="comment"># 初始化V矩阵</span></span><br><span class="line">        self.v = nn.Parameter(torch.rand(self.dim, self.k) / <span class="number">100</span>)</span><br><span class="line">        </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        linear = self.w(x)</span><br><span class="line">        <span class="comment"># 二次项</span></span><br><span class="line">        quadradic = <span class="number">0.5</span> * torch.<span class="built_in">sum</span>(torch.<span class="built_in">pow</span>(torch.mm(x, self.v), <span class="number">2</span>) - torch.mm(torch.<span class="built_in">pow</span>(x, <span class="number">2</span>), torch.<span class="built_in">pow</span>(self.v, <span class="number">2</span>)))</span><br><span class="line">        <span class="comment"># 套一层sigmoid转成分类模型，也可以不加，就是回归模型</span></span><br><span class="line">        <span class="keyword">return</span> torch.sigmoid(linear + quadradic)</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">fm = FM(ndim, k)</span><br><span class="line">loss_fn = nn.BCELoss()</span><br><span class="line">optimizer = torch.optim.SGD(fm.parameters(), lr=<span class="number">0.005</span>, weight_decay=<span class="number">0.001</span>)</span><br><span class="line">iteration = <span class="number">0</span></span><br><span class="line">epochs = <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> epoch <span class="keyword">in</span> <span class="built_in">range</span>(epochs):</span><br><span class="line">    fm.train()</span><br><span class="line">    <span class="keyword">for</span> X, y <span class="keyword">in</span> data_iter:</span><br><span class="line">        output = fm(X)</span><br><span class="line">        l = loss_fn(output.squeeze(dim=<span class="number">1</span>), y)</span><br><span class="line">        optimizer.zero_grad()</span><br><span class="line">        l.backward()</span><br><span class="line">        optimizer.step()</span><br><span class="line">        iteration += <span class="number">1</span>        </span><br><span class="line">        <span class="keyword">if</span> iteration % <span class="number">200</span> == <span class="number">199</span>:</span><br><span class="line">            <span class="keyword">with</span> torch.no_grad():</span><br><span class="line">                fm.<span class="built_in">eval</span>()</span><br><span class="line">                output = fm(X_eva_tensor)</span><br><span class="line">                l = loss_fn(output.squeeze(dim=<span class="number">1</span>), y_eva_tensor)</span><br><span class="line">                acc = ((torch.<span class="built_in">round</span>(output).long() == y_eva_tensor.view(-<span class="number">1</span>, <span class="number">1</span>).long()).<span class="built_in">sum</span>().<span class="built_in">float</span>().item()) / <span class="number">1024</span></span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&#x27;Epoch: &#123;&#125;, iteration: &#123;&#125;, loss: &#123;&#125;, acc: &#123;&#125;&#x27;</span>.<span class="built_in">format</span>(epoch, iteration, l.item(), acc))</span><br><span class="line">            fm.train()</span><br></pre></td></tr></table></figure>
+<h3 id="TensorFlow"><a href="#TensorFlow" class="headerlink" title="TensorFlow"></a>TensorFlow</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> load_breast_cancer</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score, roc_auc_score</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FactorizationMachine</span>:</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, n_dim=<span class="number">1</span>, k=<span class="number">4</span>, learning_rate=<span class="number">0.05</span>, epochs=<span class="number">8</span></span>):</span><br><span class="line">        self._learning_rate = learning_rate</span><br><span class="line">        self._n_dim = n_dim</span><br><span class="line">        self._k = k</span><br><span class="line">        self._epochs = epochs</span><br><span class="line">        self.sess = tf.Session()</span><br><span class="line">        self.x_input = tf.placeholder(shape=[<span class="literal">None</span>, self._n_dim], dtype=tf.float32)</span><br><span class="line">        self.y_input = tf.placeholder(shape=[<span class="literal">None</span>, <span class="number">1</span>], dtype=tf.float32)</span><br><span class="line">        <span class="comment"># 初始化W和V</span></span><br><span class="line">        self.w = tf.Variable(tf.truncated_normal(shape=[self._n_dim, <span class="number">1</span>], dtype=tf.float32))</span><br><span class="line">        self.V = tf.Variable(tf.truncated_normal(shape=[self._n_dim, self._k], dtype=tf.float32))</span><br><span class="line">        self.b = tf.Variable(tf.truncated_normal(shape=[<span class="number">1</span>, <span class="number">1</span>]))</span><br><span class="line">        self.linear = tf.add(self.b, tf.matmul(self.x_input, self.w))</span><br><span class="line">        self.quadratic = <span class="number">1</span>/<span class="number">2</span> * tf.reduce_sum(tf.square(tf.matmul(self.x_input, self.V)) - tf.matmul(tf.square(self.x_input), tf.square(self.V)), axis=<span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        self.y_out = self.linear + self.quadratic</span><br><span class="line">        self.y_pred = tf.<span class="built_in">round</span>(tf.sigmoid(self.y_out))</span><br><span class="line">        self.loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.y_out, labels=self.y_input))</span><br><span class="line">        self.train_op = tf.train.GradientDescentOptimizer(self._learning_rate).minimize(self.loss)</span><br><span class="line">        self.accuracy = tf.reduce_mean(tf.cast(tf.equal(self.y_pred, self.y_input), tf.float32))</span><br><span class="line">        init = tf.global_variables_initializer()</span><br><span class="line">        self.sess.run(init)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">train</span>(<span class="params">self, X, Y, iterations=<span class="number">1000</span>, batch_size=<span class="number">16</span>, validation_size=<span class="number">0.1</span></span>):</span><br><span class="line">        x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=validation_size)</span><br><span class="line">        <span class="keyword">for</span> epoch <span class="keyword">in</span> <span class="built_in">range</span>(self._epochs):</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(iterations):</span><br><span class="line">                rand_idx = np.random.choice(x_train.shape[<span class="number">0</span>], size=batch_size)</span><br><span class="line">                rand_x = x_train[rand_idx]</span><br><span class="line">                rand_y = y_train[rand_idx]</span><br><span class="line">                self.sess.run(self.train_op, feed_dict=&#123;self.x_input: rand_x, self.y_input: rand_y&#125;)</span><br><span class="line">                <span class="keyword">if</span> i % <span class="number">100</span> == <span class="number">99</span>:</span><br><span class="line">                    loss = self.sess.run(self.loss, feed_dict=&#123;self.x_input: x_test, self.y_input: y_test&#125;)</span><br><span class="line">                    acc = self.sess.run(self.accuracy, feed_dict=&#123;self.x_input: x_test, self.y_input: y_test&#125;)</span><br><span class="line">                    <span class="built_in">print</span>(<span class="string">&#x27;epoch = &#123;&#125;, iteration =&#123;&#125;, loss = &#123;&#125;, accuracy =&#123;&#125;&#x27;</span>.<span class="built_in">format</span>(epoch, i, loss, acc))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">predict</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="keyword">return</span> self.sess.run(self.y_pred, feed_dict=&#123;self.x_input: x&#125;)</span><br></pre></td></tr></table></figure>
+<p>注：TensorFlow代码使用的1.0版本</p>
+<h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><p>对于FM模型来说，它最大的优点就是拟合能力很强，因为引入了二阶交叉的特征项，所以对于样本的表达能力大大提升。并且由于通过数学公式，我们将$O\left(n^2\right)$的复杂度降到了$O(n)$。它的训练以及预测速度都是非常快的，和LR旗鼓相当。</p>
+<p>我们再来回顾一下LR的两个问题，一个是需要人工制作大量的特征，第二个是样本稀疏对于模型的训练会有影响。</p>
+<p>第一个问题已经没有了，因为FM引入了自动交叉的机制，相当于默认帮助我们把所有的二阶交叉特征都做了一遍。但对于第二个问题我们还需要分析一下，为什么FM模型可以解决样本稀疏的问题呢？二阶交叉项不还是会面临样本很少的情况吗？</p>
+<p>原因很简单，因为FM把特征映射成了向量，在进行特征交叉的时候是通过向量的点乘来计算的交叉项的权重。对于特征i来说，它和其他所有特征交叉时使用的都是同一个向量$V_i$。这样即使特征i和j的组合在样本当中非常稀疏，但是由于$V_i$和$V_j$是单独训练的，所以我们仍然可以得到一个相对比较准确的权重。甚至即使i和j的组合在样本当中没有出现过，但是由于有了$V_i$和$V_j$向量，我们一样可以表达i和j的组合特征，这也是正是FM强大的地方。</p>
+<p>FM虽然强大但也不是没有缺点，我们随便想想也能找出来不少。比如说虽然模型自动做了二阶交叉，但是二阶交叉真的能表达所有的特征信息吗？会不会有一些三阶交叉的特征，甚至是四阶交叉的特征会更有效果呢？而且所有的特征交叉都进行了学习，会不会当中有很多无用信息被包含进来了呢？再比如FM当中设定了每个特征和其他所有特征交叉的时候使用的向量是同一个，这样一刀切真的效果最好吗？再比如FM模型很难对连续性特征进行交叉，基本上只能交叉01离散型的特征，这样真的不会丢失信息吗？</p>
+<h2 id="和SVM的区别"><a href="#和SVM的区别" class="headerlink" title="和SVM的区别"></a>和SVM的区别</h2><ul>
+<li>SVM的二元特征交叉参数是独立的，而FM的二元特征交叉参数是两个k维的向量$v_i$、$v_j$，交叉参数就不是独立的，而是相互影响的。</li>
+<li>FM可以在原始形式下进行优化学习，而基于kernel的非线性SVM通常需要在对偶形式下进行。</li>
+<li>FM的模型预测是与训练样本独立，而SVM则与部分训练样本有关，即支持向量</li>
+</ul>
+<p>为什么线性SVM在和多项式SVM在稀疏条件下效果会比较差呢？</p>
+<ul>
+<li>线性svm只有一维特征，不能挖掘深层次的组合特征在实际预测中并没有很好的表现</li>
+<li>多项式svn正如前面提到的，交叉的多个特征需要在训练集上共现才能被学习到，否则该对应的参数就为0，这样对于测试集上的case而言这样的特征就失去了意义，因此在稀疏条件下，SVM表现并不能让人满意。而FM不一样，通过向量化的交叉，可以学习到不同特征之间的交互，进行提取到更深层次的抽象意义。</li>
+</ul>
+<h2 id="延伸"><a href="#延伸" class="headerlink" title="延伸"></a>延伸</h2><h3 id="Embedding"><a href="#Embedding" class="headerlink" title="Embedding"></a>Embedding</h3><p>FM之所以效果很好，除了模型做了所有特征的二阶交叉之外，很重要的原因是它对类别特征做了<strong>embedding</strong>。</p>
+<p>还没入门的同学不要觉得蒙，embedding其实很好理解，我们就当做是向量理解就可以了，它可以理解成把一个单个的标量转化成一个向量的形式。大家如果对NLP有所了解的话，会知道在NLP当中有一个基础算法叫做Word2vec，这个Word2vec讲的就是单词到向量的转化。我们可以通过算法模型通过学习文本单词的上下文关系，从而学习到每一个单词的向量表达。有了向量表达之后，我们就可以利用向量的性质做很多事。</p>
+<p><img src="https://image.rexking6.top/img/9e3d27185215209c14094b6ad39de8eb.webp" alt=""></p>
+<p>我在网上找了一张示意图，当单词被表达成向量之后，意思相近的单词的向量也会非常接近。利用向量的性质我们可以做很多有意思的事情，比如近义词同义词分析，比如近义词召回，机器翻译等等。</p>
+<p>在推荐领域当中的embedding和NLP差不太多，本质上也是把一个特征转化成向量。当然推荐领域一般不会直接用这个向量来表达，而是将它作为模型的输入。</p>
+<p>到这里我们先暂停一下，先来思考一个问题：<strong>为什么把单个特征转化成向量效果会更好</strong>？</p>
+<p>这个其实可以有很直观的解释，比如我们有一个特征是性别。如果性别作为一个单个特征，对于模型来说就只有0和1两个意思。但对于我们人类，其实是有很多层含义的。比如说女性大概率会喜欢美妆用品，女性在电商平台的表现也会比男性活跃，女性对于折扣更加敏感……只要我们愿意思考，可以想出很多的这样的特性来。显然这么多复杂的特性只用简单的0和1是无法表达的，所以这就是为什么我们要把它转化成向量的原因，因为向量的维度更高，表达能力更强。</p>
+<p>第二个是当前的基于深度神经网络的模型有能力消化这些高维度的特征，神经网络当中有大量的神经元，神经元之间存在大量的信号传递，可以充分学习到高维度向量当中的含义。</p>
+<p>你可能还会有问题，那从哪里可以搞到特征的向量表达呢，我们怎么知道怎么表达特征才是正确的呢？这个问题很简单，我们并不需要额外去准备特征的embedding，我们只需要将它作为模型的参数的一部分，让它通过梯度下降自己学习即可。也就是说embedding本身就是模型参数的一部分，模型收敛了，embedding也就有了，并不需要我们额外操心。</p>
+<p>正是因为有了embedding，推荐、搜索等引擎的效果才有了大幅提升，而embedding的使用正是从FM模型开始的。FM模型用一个向量V来表示特征之间交叉权重的做法，其实就是一种embedding。</p>
+<h3 id="VIP类别特征"><a href="#VIP类别特征" class="headerlink" title="VIP类别特征"></a>VIP类别特征</h3><p>有了embedding之后，自然而然地带来了一个有趣的变化：推荐系统当中的类别特征逐渐都变成了VIP，而实数型特征则江河日下到了淘汰的边缘。</p>
+<p>我们如果来分析一下电商场景下的推荐，你会发现当中有一个很重要的环节就是“<strong>打标签</strong>”。也就是给用户给商品打上各种各样的标签，然后通过推荐引擎来通过这些标签进行推荐。</p>
+<p>比如说你喜欢电子产品，那你就是一个“电子达人”，她喜欢裙子，那她是“时尚女装”。这个商品很热销，那它是“当季爆款”，有个商品封面放了个大胸妹很吸引人，那它是“标题党”等等……</p>
+<p>有了标签之后，模型就可以很容易理解到这些标签之间的作用关系。比如一个电子达人多半是直男，是不会对洛丽塔感兴趣的。同样爆款商品往往也只能吸引那些对于折扣、促销比较敏感的人群，对于钢铁直男同样没有效果……并且由于系统可以拿到用户在平台上活动的所有数据，我们还可以根据用户之前的行为来进行分析。</p>
+<p>比如说用户在这一次登陆之前浏览的一直是女装商品，那即使他原本的标签是”钢铁直男“，那么系统也会因地制宜，实时了解到他兴趣的变化，给女装商品提升权重，增加曝光。</p>
+<p>正是有了标签一样的特征，模型才能有很好的泛化能力。如果我们把商品的标签转化成商品最近的点击率、最近的转化率、最近的成交额、最近的好评数等特征，你想想看模型还能做出这样神奇的推荐吗？显然不行，因为实数型的特征没有办法做成embedding， 模型表达的能力也会受到影响。</p>
+<p>除此之外一些实数型特征和推荐目标之间没有线性关系，比如年龄，你能说年龄越大越喜欢游戏机吗？显然不是，年龄太小或者年龄太大都不行，就只有某一个年龄段最喜欢。</p>
+<p>所以最好的办法是对这些实数型的特征分桶，将它强行转化成类别特征。比如18岁以下一个桶，18到30岁一个桶，30岁到50一个桶，50以上一个桶。这样模型拿到的才不会是一个简单的年龄值，而是一个分段，而是一个可以转化成向量的标签。</p>
+<p>正是因为以上一系列原因，在推荐系统当中类别特征成了VIP中的VIP，几乎统治一切，很多实数型特征也都会被强行转化成类别特征，沦落称为小弟。我们不仅要了解这些现象，更要透过现象看到本质，了解到变化产生的原因。</p>
+<h3 id="AFM和FFM"><a href="#AFM和FFM" class="headerlink" title="AFM和FFM"></a>AFM和FFM</h3><p>我们了解embedding和类别特征对于模型的意义之后，再回过头来看FM，会发现FM几乎都涉及到了。只不过FM毕竟还是机器学习时代提出的算法模型，对于神经网络超强的泛化和拟合能力没有很好地使用，所以在后来的深度学习时代有一点点落伍。这并不能说是FM模型设计得不好，相反，它已经是相当超前的设计，使得它横跨十几年即使到了神经网络时代依然能大展身手。</p>
+<p>今天我们来简单聊聊关于FM模型的两个演化版本，可以理解成1.1版本。</p>
+<h4 id="FFM"><a href="#FFM" class="headerlink" title="FFM"></a>FFM</h4><p>FFM模型非常简单，它只是在FM的基础上做了一个很小的优化，即增加了field的概念。原本的FM在做特征交叉的时候，所有特征交叉的权重都一样，也都使用同一个参数向量V。</p>
+<p>这样的好处是泛化能力比较强，但是缺点也是太单一了，x和所有的特征y交叉都用同一个向量，一刀切太过粗暴了。所以FFM提出了field的概念，即每个特征都会被映射成多个隐向量：$V_{i, 1}, V_{i, 2} \cdots V_{i, f}$。每个隐向量对应一个field，当两个特征$x_i, x_j$交叉组合的时候，用对方对应的场下对应的隐向量来做内积：</p>
+<script type="math/tex; mode=display">
+w_{i, j}=V_{i, f_j}^T V_{j, f_i}</script><p>引入了field之后，使得同一个特征x可以做到和不同的向量交叉时使用不同的向量$V$，从而提升了模型的的泛化能力。</p>
+<h4 id="AFM"><a href="#AFM" class="headerlink" title="AFM"></a>AFM</h4><p>AFM的模型结构和原理很简单，一点也不复杂，就是在FM两两特征交叉的地方加上了一个Attention网络。这个Attention网络用来学习两个向量的权重。</p>
+<p><img src="https://image.rexking6.top/img/b97059111359b2b5e83ab88dfd46b900.webp" alt=""></p>
+<p>这里的Attention网络其实就是一个多层神经网络，它的表达式如下</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+& a_{i j}^{\prime}=h^T \operatorname{ReLU}\left(W\left(v_i \odot v_j\right) x_i x_j+b\right) \\
+& a_{i j}=\frac{\exp \left(a_{i j}^{\prime}\right)}{\sum_{(i, j) \in R_x} \exp \left(a_{i j}^{\prime}\right)}
+\end{aligned}</script><p>本质上就是我们增加了一个模块专门用来学习交叉项的权重，进行加权求和而已。</p>
+<h1 id="AFM-1"><a href="#AFM-1" class="headerlink" title="AFM"></a>AFM</h1><p>论文是一篇FM的升级论文，叫做Attentional Factorization Machines: Learning the Weight of Feature Interactions via Attention Networks。翻译过来叫做注意力FM：通过Attention网络学习特征交互的权重。它是由浙大和新加坡国立大学的学生在2017年联合发表的，它是基于FM模型的一种优化。</p>
+<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>FM是我们比较熟悉的模型，它引入所有特征的二阶交叉，通过向量内积的方式来计算所有二阶项的系数，来达到提升效果的目的。但是FM也有缺点，虽然我们通过一些数学的方式对它的效率进行了提升，但仍然有些问题没有解决。比如，对于一个固定的特征而言，它和其他特征交叉的向量都是一样的。再比如并不是所有特征的二阶交叉组合都是有用的，有些反而是干扰项。</p>
+<p>在这篇paper当中我们通过消除不同特征组合之间的重要性来优化FM模型，我们把这种新的FM模型叫做AFM（Attentional Factorization Machine）。它最大的特性就是特征交叉的重要性是通过attention神经网络获得的。我们在两个实际的数据集上进行了完整的测试，测试结果显示AFM相比FM带来了8.6%的提升。和Wide &amp; Deep以及Deep Cross相比，AFM的参数空间也更小，结构更加简单。</p>
+<h2 id="简介-3"><a href="#简介-3" class="headerlink" title="简介"></a>简介</h2><p>众所周知，在机器学习以及数据挖掘当中，监督学习占据了很大的比重。监督学习某种程度上可以看成是学习一个函数，让它的output越来越接近我们实际想要的值。如果我们想要的值是浮点数，那么这个就是回归模型，如果是一个类别，那么则是分类模型。在推荐系统、在线广告以及图片识别等方面，监督模型起到了举足轻重的作用。</p>
+<p>当我们的特征以类别特征为主的时候，让模型学习特征之间的交叉信息会变得非常关键。我们举一个简单的例子，比如我们有职业和层级这两个不同的特征。职业有银行职员以及工程师，层级有初级和高级。其中初级的银行职员的收入要低于初级工程师，而高级的职员收入则要高于高级工程师。如果模型无法学习到交叉信息，是很难预测准确的。</p>
+<p>以LR模型举例，LR模型本质上是各个变量的加权求和的结果。无论是初级还是高级，工程师和银行职员这两个职业对应的权重都是一样的。显然，这个时候，模型很难预测准确。</p>
+<p>为了考虑特征之间的交叉信息，一种常用的方法是引入新的参数向量，通过向量的内积来计算出交叉的权重。比如polynomial regression（PR）模型，它所有交叉特征的权重都是通过学习得到的。然而这样的设计有一个比较大的问题，就是对于那些稀疏的数据集会有一些交叉特征的权重没有办法学习到。比如说如果是商品的类目和用户的职业交叉，对于某一个冷门的类目以及冷门的职业，我们很难保证训练集当中包含了足够的样本来训练这个权重。</p>
+<p>FM模型的提出正是为了解决这个问题，这个大家应该也都很熟悉了，我就不多说了。简而言之就是通过给每一个特征赋予一个向量的方式，当两个特征交叉的时候，通过计算它们向量的内积来代表它们交叉特征的权重。因为这种创新设计，FM取得了巨大的成功，在推荐系统以及NLP领域都有应用。但是FM模型仍然也有缺陷，比如在现实世界当中，不同的特征往往起到的效力不同，并不是所有特征都适合用来进行特征的交叉。所以一个改进思路是对于那些效力不高的交叉项进行降权，对不同的交叉特征进行自动升权或降权。</p>
+<p>在这篇paper当中我们通过对特征交叉的组合进行区别对待的方式来提升FM的效果，区别对待的方式就是引入Attention神经网络的机制。</p>
+<h2 id="AFM-2"><a href="#AFM-2" class="headerlink" title="AFM"></a>AFM</h2><h3 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h3><p>下图展示的就是AFM模型的结构，为了方便观看，我们去除了线性回归的部分。</p>
+<p><img src="https://image.rexking6.top/img/b97059111359b2b5e83ab88dfd46b900.webp" alt=""></p>
+<p>input层以及Embedding层都和FM模型一致，它的输入是一个sparse表示的特征，它会把非零项转化成float向量。接下来，我们会详细解释一下pair-wise interaction层也就是二维特征的交叉层以及Attention-based Pooling层，这些也是这篇paper的主要内容。</p>
+<h3 id="Pair-wise-interaction-Layer"><a href="#Pair-wise-interaction-Layer" class="headerlink" title="Pair-wise interaction Layer"></a>Pair-wise interaction Layer</h3><p>受到FM当中二阶特征交叉做法的启发，我们在神经网络当中也做同样的处理。它通过element-wise-product（哈达玛积）的方式将两两向量组合在一起，对于m个向量，这样的组合一共有m(m-1)/2种。我们来举个例子，假设在向量x当中非零的特征为$\chi$，它embedding之后的结果是$\epsilon=\left\{v_i x_i\right\}_{i \in \chi}$。对于这些特征，我们两两组合之后得到的结果为：</p>
+<script type="math/tex; mode=display">
+f_{P I}(\epsilon)=\left\{\left(v_i \odot v_j\right) x_i x_j\right\}_{(i, j) \in R_x}</script><p>其中$\odot$表示两个向量的哈达玛积，$R_x$表示$\{(i, j)\}_{i \in \chi, j \in \chi, j&gt;i}$，$f_{P I}$表示Pair-wise Interaction这一层的输出。通过定义pair-wise interaction层来提供权重，我们可以使用神经网络结构来表示FM。我们首先把$f_{P I}(\epsilon)$使用sum pooling（池化）来进行压缩，然后通过全连接层来预测分数：</p>
+<script type="math/tex; mode=display">
+\hat{y}=p^T \sum_{(i, j) \in R_x}\left(v_i \odot v_j\right) x_i x_j+b</script><p>这里的$P^T \in R^k$， $b \in R$分别表示权重和偏移量。如果我们固定p=1，b=0，那么上面这个式子和FM模型是完全一样的。pair-wise interaction layer可以简单地看成是权重层，用来给FM当中二阶交叉项提供权重。接下来我们来看Attention-based Pooling层。</p>
+<h3 id="Attention-based-Pooling-Layer"><a href="#Attention-based-Pooling-Layer" class="headerlink" title="Attention-based Pooling Layer"></a>Attention-based Pooling Layer</h3><p>Attention机制在神经网络模型当中广泛使用，它的主要思想是当我们把多项累加在一起的时候，允许每一项的权重不同。可以简单理解成一种自动加权的机制，它的权重也是通过神经网络来学习自动赋予的，而不是我们事先固定的。和FM结合起来之后，也就是说FM当中每一个二阶交叉项的权重都是通过Attention网络学习得到的：</p>
+<script type="math/tex; mode=display">
+f_{A t t r}\left(f_{P I}(\epsilon)\right)=\sum_{(i, j) \in R_x} a_{i j}\left(v_i \odot v_j\right) x_i x_j</script><p>其中$a_{i j}$是attention网络提供给i和j交叉项的权重，求这些权重最简单的方法就是把它也作为模型的参数，让模型自己来学习。但有一个问题是很多交叉项在样本当中很少或者是没有共同出现过，这样会导致模型学习不到它正确的分布。这个问题和直接拟合二阶交叉项的问题是一样的。为了解决这个问题我们专门设计了一个多层神经网络来学习这个参数值。这个神经网络的输入就是$v_i \odot v_j$，输出是一个浮点数表示权重，它的表达式为：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+& a_{i j}^{\prime}=h^T \operatorname{ReLU}\left(W\left(v_i \odot v_j\right) x_i x_j+b\right) \\
+& a_{i j}=\frac{\exp \left(a_{i j}^{\prime}\right)}{\sum_{(i, j) \in R_x} \exp \left(a_{i j}^{\prime}\right)}
+\end{aligned}</script><p>其中$a_{i j}^{\prime}$的表达式是一个多层神经网络，$a_{i j}$是$a_{i j}^{\prime}$经过softmax函数运算之后的结果，这也是normalized的一种常规方法。attention网络的输出结果是一个k维度的向量，它最后会把所有的特征交叉的结果加权压缩到一起。最后，我们可以写出整个AFM的表达式：</p>
+<script type="math/tex; mode=display">
+\hat{y}_{A F M}(x)=w_0+\sum_{i=1}^n w_i x_i+p^T \sum_{i=1}^n \sum_{j=i+1}^n a_{i j}\left(v_i \odot v_j\right) x_i x_j</script><h2 id="Learning"><a href="#Learning" class="headerlink" title="Learning"></a>Learning</h2><p>AFM相比FM直接在数据表达能力上进行了提升，因此它除了可以使用在一系列预测问题当中也可以使用在其他场景下。比如回归、分类和排序。问题的目标不同，使用的损失函数也不一样。比如对于回归问题，我们一般使用均方差，二分类问题我们则使用交叉熵。在这篇paper当中我们聚焦在回归问题上，并且使用均方差作为模型优化目标。</p>
+<p>为了使得优化目标最优，我们使用随机梯度下降算法（SGD）来进行参数的训练。SGD是机器学习当中广泛使用的优化方法之一，也被像是TensorFlow、Pytorch等深度学习框架所支持，因此就不过多赘述了。</p>
+<h2 id="预防过拟合"><a href="#预防过拟合" class="headerlink" title="预防过拟合"></a>预防过拟合</h2><p>过拟合是深度学习模型当中经常出现的问题，FM模型就经常遇到过拟合的问题，所以我们常常会引入$L_2$正则项来预防FM模型的过拟合。由于AFM对于数据的刻画能力比FM更强，因此AFM也比FM更容易陷入过拟合。这里我们引入dropout和$L_2$正则来解决过拟合问题。</p>
+<p>dropout方法经常使用在图像相关的模型当中，在训练过程当中，每次会随机让神经网络当中的一部分节点失效。从而逼迫网络更加专注在一些泛化能力更强的信息上，而不是被少数特殊点影响了全局。对于AFM模型来说，如果所有交叉特征都被用上，神经元很容易学到这些交叉特征之间的关系，因此而陷入过拟合。另外当测试的时候，dropout是关闭的，所以测试的时候模型可以更好地发挥出它的性能。</p>
+<p>虽然paper当中有这么一段，但是dropout一般在推荐领域很少使用，因为推荐领域的特征不像图像那么密集，很多都是空值。所以使用dropout不是一定可以带来提升或者是避免过拟合的，这里的说法有一点想当然。</p>
+<p>除了dropout之外，我们同样在Attention网络当中引入了$L_2$正则，所以最终的Loss可以写成：</p>
+<script type="math/tex; mode=display">
+L=\sum_{x \in \tau}\left(\hat{y}_{A F M}-y(x)\right)^2+\lambda\|W\|^2</script><p>这里的$\tau$表示的训练集，$\lambda$表示$L_2$正则的参数。</p>
+<h1 id="FNN"><a href="#FNN" class="headerlink" title="FNN"></a>FNN</h1><p>首先我们来介绍一下FNN，FNN的全称是Factorisation-machi supported Neural Network，即FM支撑的神经网络。其实这个名字当中信息量很大，我们来做个简单的词法分析，这个短语的主语是神经网络，FM支撑的是一个修饰的定语。也就是说这个模型的本质是神经网络，FM只是这个神经网络的一个特性。</p>
+<p>而如果回顾一下FFM以及AFM，你会发现这两个模型的主体还是FM，神经网络是FM的修饰。这里的一个潜在的主语的变化其实是有隐藏信息的，隐藏信息就是学界对于模型的认知正在逐渐变化，正从FM为主体悄然转化成神经网络为主体。这个悄然的变化说明了一个关键信息，以后推荐系统的相关模型，神经网络才是大头。</p>
+<p>了解完了这个潜在台词之后，我们再来看看FNN的网络结构。其实FNN的网络结构非常简单，就是FM与神经网络的一个串联。通过FM部分将特征转化成Embedding，之后全部拼接到一起之后，放入MLP（多层感知机）当中做训练。大家参考一下下图很容易就能搞明白。</p>
+<p><img src="https://image.rexking6.top/img/asdasdasaaa.jpg" alt=""></p>
+<h2 id="PNN"><a href="#PNN" class="headerlink" title="PNN"></a>PNN</h2><p>PNN和FNN类似它唯一的区别就是MLP的输入不仅仅是特征的Embedding，还加上了Embedding product的结果。它的模型结构是这样的：</p>
+<p><img src="https://image.rexking6.top/img/qwe.jpg" alt=""></p>
+<p>我们关注一下中间的Product Layer，这一层分成了左右两个部分，左边的部分就是特征Embedding，右边的部分是Embedding的两两product的结果，也就是特征之间两两内积的结果。而向量之间product的操作也有好几种，既可以内积也可以外积。但不管是内积还是外积都有一个问题，就是它的数量太多了。对于N维特征的模型来说，它的两两交叉一共有$N(N-1)$种，这是一个非常庞大的数字。</p>
+<h1 id="DeepFM"><a href="#DeepFM" class="headerlink" title="DeepFM"></a>DeepFM</h1><p>DeepFM: A Factorization-Machine based Neural Network for CTR Prediction，翻译过来就是DeepFM：一个基于深度神经网络的FM模型。这篇paper的作者来自<strong>哈工大和华为</strong>，不得不说在人工智能领域的很多论文都是国产的，作为从业者还是非常欣喜能看到这点的。通过名字我们也能看得出来，今天的这篇paper本质上其实是<strong>FM模型的一个进阶或者说是优化版本</strong>。</p>
+<h2 id="摘要-1"><a href="#摘要-1" class="headerlink" title="摘要"></a>摘要</h2><p>对于CTR预估的模型来说，一个很重要的点就是学习<strong>用户行为对应的特征背后的潜在联系</strong>。虽然目前在这个领域已经取得了一些进展（截止2017年），但是目前的做法要么在低维或者高维的特征上存在很大的偏差，要么需要大量的专家级的特征工程。</p>
+<p>在本篇paper当中，我们设计了一种新的模型DeepFM，从而找到了一种可能性，可以同时提升低维和高维的特征。它结合了FM和神经网络模型的长处，和Google最新的Wide &amp; Deep模型的做法相比，取得了更大的进步，并且还<strong>免去了特征工程的部分</strong>。</p>
+<p>摘要里面内容不多，主要是拉踩了一下同行。</p>
+<h2 id="简介-4"><a href="#简介-4" class="headerlink" title="简介"></a>简介</h2><p>对推荐场景来说，CTR是最关键的指标，除了广告系统会按照CTR x bid来进行排序之外，推荐系统一般都会<strong>严格地按照预估的CTR进行排序</strong>。所以这其中的关键问题就是准确地预估CTR。</p>
+<p>为了方便大家的理解，简单介绍一下目前常规的做法。一般来说常规的推荐系统当中的特征分为四个部分，第一个部分是<strong>用户特征</strong>，是关于用户的一些信息。比如是男是女，是否是高收入群体，是否是高消费群体，成为平台的用户多久了，偏好平台当中什么类目的商品等等。第二个部分是<strong>商品特征</strong>，就是关于item的一些信息，比如价格、类目、折扣、评价等等。第三个部分是<strong>上下文特征</strong>，比如当前的时间，是早上还是晚上，比如item展示的位置等等。最后一个部分是<strong>用户实时的行为</strong>，比如用户在浏览这个商品之前还看过哪些其他的商品，他登陆平台多久了，等等。</p>
+<p>显然用户是否会点击某一个item是由以上这四个部分的信息共同作用的，比如给一个高富帅推兰博基尼或者是百达翡丽就是有吸引力的，给一个连听都没听说过的屌丝推同样的内容显然就屁用没有。也就是说<strong>商品的特征和用户的特征之间是存在逻辑上的关联的</strong>，我们一般称为特征的交叉。</p>
+<p>这些交叉信息往往是隐式的，也就是我们不能直接描述和形容出来的。举个简单的例子，可能并不是所有富人都喜欢奢侈品，有些可能就喜欢电子消费品，还有些可能喜欢服装或者是旅行。<strong>人的喜好是很复杂的，我们很难用固定的规则去描述</strong>。所以这就需要模型能有这样的能力去学习这些特征之间的潜在联系，对这些潜在交叉信息把握越好的模型，一般也都拥有越好的效果。</p>
+<p>比如我们分析了主流的app store市场之后发现，在饭点的时候，用户经常会下载外卖类的app，这说明了app的类别和时间之间存在交叉关系。再比如我们发现年轻的男生往往喜欢设计类游戏，这说明了app的类别与用户的性别之间也存在交叉关系。像是这样的交叉信息还有很多，从Wide &amp; Deep模型的经验当中我们可以学到考虑低维和高维交叉特征之后，模型的效果会更好。</p>
+<p>这里面的一个关键挑战是<strong>如何高效地对特征之间的交叉信息进行建模</strong>，其中的一些比较容易理解，也比较容易做出特征来，然而大部分的交叉信息是隐式的，难以直观理解的，比如啤酒和尿布的例子就是一个，只有大数据挖掘才能发现。即使是直观上容易理解的部分，由于涉及的数量太大，也不可能通过手工来全部处理。</p>
+<p>之后paper当中拉踩了一下同行，首先说明了单纯的CNN以及RNN效果不好，这个比较容易想明白，RNN主要应用场景是序列场景，比如文本、音频等，用在CTR预估上并不合适。CNN也是一样，主要应用在图片等高维度的数据当中，也不太适合推荐场景。</p>
+<p>然后还比较了一下同年发表的其他三篇论文，FNN、PNN以及Wide &amp; Deep。也是一些常规套话，没有太多的分析，比如在低维高维特征的交叉上表现不足啦，比如需要过多的特征工程啦等等。其中Wide &amp; Deep我们之前写文章剖析过了，FNN和PNN大家感兴趣可以去读一下paper，在业内用的不多，应该是效果不太理想。经过了一番比较之后提出了本文的观点，我们可以设计出一种效果更好并且会自动学习特征之间交叉信息的模型。</p>
+<h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><p>我们假设训练集当中一共有n条样本，每一条样本可以写成$(\chi, y)$。其中的$\chi$是一个m个field组成的向量，包含了用户和item组成的特征。$y \in\{0,1\}$，y=0表示用户没有点击，相反，y=1表示用户点击。</p>
+<p>我们再来看样本的特征，这m维特征可以看成两部分组成，第一部分是<strong>类别特征</strong>，比如性别、地理位置、收入情况等等。第二种是<strong>连续性特征</strong>，比如平均花费、平均停留时间等等。类别特征（categorical feature）一般被表示成一个one-hot之后的向量，而一个连续特征，一般就是表示它自己，当然也可以离散化成one-hot向量。</p>
+<p>我们把这些特征全部处理完之后，整个向量会转化成$x=\left[x_{\text {field }_1}, x_{\text {field }_2}, \cdots, x_{\text {field }_m}\right]$，这里的每一个field和$\chi$向量一一对应。由于这当中做了一些离散化的处理，会使得x向量变得非常稀疏。所以我们要做的就是在这样特征比较稀疏的样本上建立一个CTR预测模型。</p>
+<h2 id="DeepFM-1"><a href="#DeepFM-1" class="headerlink" title="DeepFM"></a>DeepFM</h2><p>我们希望能够设计模型能够更好地学习低维和高维特征之间的交互，基于这点，我们在深度模型的基础上结合了FM，推出了DeepFM模型。它的整体结构如下图：</p>
+<p><img src="https://image.rexking6.top/img/ettw.jpg" alt=""></p>
+<p>这张图看起来可能会有点乱，我们可以先忽略一些局部的细节，先从整体上把握。这个模型可以分成两个部分，分别是<strong>FM部分以及Deep部分</strong>。这两个部分的输入是一样的，并没有像Wide &amp; Deep模型那样做区分。</p>
+<p>其实这个模型还是比较好理解的，神经网络也就是Deep的部分用来训练这些特征的一维的关联以及联系，而FM模型会通过隐藏向量V的形式来计算特征之间的二维交叉的信息。最后一维和二维的信息汇总到一起，进入sigmoid层，获得最终的结果。</p>
+<p>用公式来表达的话，大概是这样：</p>
+<script type="math/tex; mode=display">
+\hat{y}=\operatorname{sigmoid}\left(y_{F M}+y_{D N N}\right)</script><h2 id="FM部分"><a href="#FM部分" class="headerlink" title="FM部分"></a>FM部分</h2><p><img src="https://image.rexking6.top/img/werwe.jpg" alt=""></p>
+<p>FM部分其实就是因子分解机，我们在之前的文章当中曾经专门剖析过。FM会考虑所有特征之间两两交叉的情况，相当于人为对左右特征做了交叉。但是由于n个特征交叉的组合是$n^2$这个量级，所以FM设计了一种新的方案，对于每一个特征i训练一个向量$V_i$，当i和j两个特征交叉的时候，<strong>通过$V_i \cdot V_j$来计算两个特征交叉之后的权重</strong>。这样大大降低了计算的复杂度。</p>
+<p>这当中涉及一些公式的推导和计算，我们在之前的文章当中已经详细推导过了，这里就不多赘述了。</p>
+<p>最终我们可以得到这部分的公式：</p>
+<script type="math/tex; mode=display">
+y_{F M}=\langle w, x\rangle+\sum_{i=1}^d \sum_{j=i+1}^d<V_i, V_j> x_i \cdot x_j</script><h2 id="Deep部分"><a href="#Deep部分" class="headerlink" title="Deep部分"></a>Deep部分</h2><p>Deep部分就是经典的<strong>前馈网络</strong>，用来学习特征之间的高维交叉。</p>
+<p><img src="https://image.rexking6.top/img/retw.jpg" alt=""></p>
+<p>图3展示的就是模型当中Deep这个部分，从图中我们可以看到，<strong>所有的特征都会被转化成embedding向量</strong>作为Deep部分的输入。CTR预估的模型和图片以及音频处理的模型有一个很大的不同，就是它的维度会更大，并且特征会非常稀疏，还伴有类别连续、混合、聚合的特点。在这种情况下，使用embedding向量来把原始特征当中的信息压缩到低维的向量就是一种比较好的做法了，这样模型的泛化能力会更强，要比全是01组成的multi-hot输入好得多。</p>
+<p><img src="https://image.rexking6.top/img/ret.jpg" alt=""></p>
+<p>这张图展示了这个部分局部的结构，我们可以看到所有特征转成的embedding向量拥有相同的维度k。并且和FM模型当中的维度也是一样的，并且这个embedding的初始化也是<strong>借用FM当中的二维矩阵V来实现的</strong>。我们都知道V是一个d x k的二维矩阵，而模型原始输入是一个d维的01向量，那么和V相乘了之后，自然就转化成了d x k的embedding了。</p>
+<p>这里要注意的一点是，在一些其他DNN做CTR预估的论文当中，会使用预训练的FM模型来进行Deep部分的向量初始化。但这里的做法略有不同，它不是使用训练好的FM来进行初始化，而是和FM模型的部分共享同样的V。这样做会有两个非常重要的好处：</p>
+<ol>
+<li>它可以同时学习到低维以及高维的特征交叉信息，预训练的FM来进行向量初始化得到的embedding当中可能只包含了二维交叉的信息。</li>
+<li>这样可以避免像是Wide &amp; Deep那样多余的特征工程。</li>
+</ol>
+<p>从我了解到的实际情况来看，虽然DeepFM已经是4年前的提出的模型了，但是<strong>至今仍然还有非常多的公司还在使用它</strong>。所以如果有兴趣从事推荐领域的研究和工作的话，对这个模型的了解也是必不可少的。</p>
+
+    </div>
+
+    
+    
+    
+      
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2023/02/07/%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95%EF%BC%9A%E4%BB%8EFM%E5%88%B0DeepFM/" title="推荐算法：从FM到DeepFM">https://blog.rexking6.top/2023/02/07/推荐算法：从FM到DeepFM/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%90%9C%E5%B9%BF%E6%8E%A8/" rel="tag"># 搜广推</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/12/10/Protege%E5%9F%BA%E6%9C%AC%E6%95%99%E7%A8%8B/" rel="prev" title="Protégé基本教程">
+      <i class="fa fa-chevron-left"></i> Protégé基本教程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/02/22/ChatGPT%E8%83%8C%E5%90%8E%E7%9A%84%E7%BB%8F%E6%B5%8E%E8%B4%A6/" rel="next" title="ChatGPT 背后的经济账">
+      ChatGPT 背后的经济账 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GBDT-LR"><span class="nav-number">2.</span> <span class="nav-text">GBDT+LR</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B-1"><span class="nav-number">2.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E5%81%9A%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">具体做法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AFLR"><span class="nav-number">2.3.</span> <span class="nav-text">为什么是LR</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A8%E8%8D%90%E9%A2%86%E5%9F%9F%E7%9A%84%E7%89%B9%E5%BE%81%E6%9C%89%E4%BB%80%E4%B9%88%E7%89%B9%E7%82%B9%EF%BC%9F"><span class="nav-number">2.4.</span> <span class="nav-text">推荐领域的特征有什么特点？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LR%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%8E%9F%E7%90%86"><span class="nav-number">2.5.</span> <span class="nav-text">LR模型的原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LR%E6%A8%A1%E5%9E%8B%E7%9A%84%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">2.6.</span> <span class="nav-text">LR模型的优缺点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FM"><span class="nav-number">3.</span> <span class="nav-text">FM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B-2"><span class="nav-number">3.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%80%E7%96%8F%E5%9C%BA%E6%99%AF"><span class="nav-number">3.2.</span> <span class="nav-text">稀疏场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9C%9F%E5%AE%9E%E5%9C%BA%E6%99%AF%E4%BE%8B%E5%AD%90"><span class="nav-number">3.3.</span> <span class="nav-text">真实场景例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FM%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86"><span class="nav-number">3.4.</span> <span class="nav-text">FM模型原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%8D%E6%9D%82%E5%BA%A6%E4%BC%98%E5%8C%96"><span class="nav-number">3.5.</span> <span class="nav-text">复杂度优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83"><span class="nav-number">3.6.</span> <span class="nav-text">模型训练</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%93%E5%B1%95%E5%88%B0d%E7%BB%B4"><span class="nav-number">3.7.</span> <span class="nav-text">拓展到d维</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.8.</span> <span class="nav-text">代码实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Pytorch"><span class="nav-number">3.8.1.</span> <span class="nav-text">Pytorch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TensorFlow"><span class="nav-number">3.8.2.</span> <span class="nav-text">TensorFlow</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">3.9.</span> <span class="nav-text">优缺点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%92%8CSVM%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">3.10.</span> <span class="nav-text">和SVM的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%B6%E4%BC%B8"><span class="nav-number">3.11.</span> <span class="nav-text">延伸</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Embedding"><span class="nav-number">3.11.1.</span> <span class="nav-text">Embedding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VIP%E7%B1%BB%E5%88%AB%E7%89%B9%E5%BE%81"><span class="nav-number">3.11.2.</span> <span class="nav-text">VIP类别特征</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AFM%E5%92%8CFFM"><span class="nav-number">3.11.3.</span> <span class="nav-text">AFM和FFM</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#FFM"><span class="nav-number">3.11.3.1.</span> <span class="nav-text">FFM</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AFM"><span class="nav-number">3.11.3.2.</span> <span class="nav-text">AFM</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AFM-1"><span class="nav-number">4.</span> <span class="nav-text">AFM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">4.1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B-3"><span class="nav-number">4.2.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AFM-2"><span class="nav-number">4.3.</span> <span class="nav-text">AFM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Model"><span class="nav-number">4.3.1.</span> <span class="nav-text">Model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pair-wise-interaction-Layer"><span class="nav-number">4.3.2.</span> <span class="nav-text">Pair-wise interaction Layer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Attention-based-Pooling-Layer"><span class="nav-number">4.3.3.</span> <span class="nav-text">Attention-based Pooling Layer</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Learning"><span class="nav-number">4.4.</span> <span class="nav-text">Learning</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E9%98%B2%E8%BF%87%E6%8B%9F%E5%90%88"><span class="nav-number">4.5.</span> <span class="nav-text">预防过拟合</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FNN"><span class="nav-number">5.</span> <span class="nav-text">FNN</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PNN"><span class="nav-number">5.1.</span> <span class="nav-text">PNN</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DeepFM"><span class="nav-number">6.</span> <span class="nav-text">DeepFM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81-1"><span class="nav-number">6.1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B-4"><span class="nav-number">6.2.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%A1%88"><span class="nav-number">6.3.</span> <span class="nav-text">方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DeepFM-1"><span class="nav-number">6.4.</span> <span class="nav-text">DeepFM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FM%E9%83%A8%E5%88%86"><span class="nav-number">6.5.</span> <span class="nav-text">FM部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Deep%E9%83%A8%E5%88%86"><span class="nav-number">6.6.</span> <span class="nav-text">Deep部分</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">193</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">3.5m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">52:40</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
