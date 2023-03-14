@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="业界根因定位实践">
+<meta property="og:url" content="https://blog.rexking6.top/2023/03/12/%E4%B8%9A%E7%95%8C%E6%A0%B9%E5%9B%A0%E5%AE%9A%E4%BD%8D%E5%AE%9E%E8%B7%B5/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/wKioL1XRPnCQ_yjOAAA5u45NksQ190.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/wKioL1XRPpWRVEjFAABK4HeKHO4225.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/wKioL1XRPwjjrQJQAABUAMOn2EY984.jpg">
+<meta property="og:image" content="http://s5.51cto.com/wyfs02/M02/71/73/wKioL1XRP0qzBImNAABDvA5GP2s845.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/wKioL1XRP3bzwNa8AABHemZjNnA703.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/wKiom1XRPaeQq0VCAABSkBq1_Kc340.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/wKioL1XRP-CgquZTAABKX3WlBy0298.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/wKioL1XRQDDwasXWAABCcJSEWwk410.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/wKioL1XRQETwj5TrAABLHA7JmnY773.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/19ec5a6ca4c52414472567ee0f28165d.png">
+<meta property="og:image" content="https://image.rexking6.top/img/fd7e274e082ca4ab5825bf2yy3422523.png">
+<meta property="og:image" content="https://image.rexking6.top/img/yyb0a515578aa24af49faa1e2b409fc6.png">
+<meta property="og:image" content="https://image.rexking6.top/img/17b44b0495fd734b6ae31f142a29433e.png">
+<meta property="og:image" content="https://image.rexking6.top/img/3ee828eyy7c92caa05b30c748c12d644.png">
+<meta property="og:image" content="https://image.rexking6.top/img/259473f983b50d0cd02ddcc817e8f362.png">
+<meta property="og:image" content="https://image.rexking6.top/img/2933e5944d40b516437df1af1048f23b.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-arch.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-workflow.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-knowledge-graph.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-data-build.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-nebulagraph-studio.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-cause-ship-host.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-cause1.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-cause2.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-cause3.png">
+<meta property="og:image" content="https://www-cdn.nebula-graph.com.cn/nebula-website-5.0/images/blogs/suning-usecase/suning-cause4.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-algorithm1.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-algorithm2.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-algorithm3.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-algorithm4.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-cause-ship-host2.png">
+<meta property="og:image" content="https://image.rexking6.top/img/graph-database.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-alarm.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-system.png">
+<meta property="og:image" content="https://image.rexking6.top/img/suning-network.png">
+<meta property="og:image" content="https://image.rexking6.top/img/data-path.png">
+<meta property="article:published_time" content="2023-03-12T02:49:28.000Z">
+<meta property="article:modified_time" content="2023-03-12T05:57:22.485Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="根因定位">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/wKioL1XRPnCQ_yjOAAA5u45NksQ190.jpg">
+
+<link rel="canonical" href="https://blog.rexking6.top/2023/03/12/%E4%B8%9A%E7%95%8C%E6%A0%B9%E5%9B%A0%E5%AE%9A%E4%BD%8D%E5%AE%9E%E8%B7%B5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>业界根因定位实践 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2023/03/12/%E4%B8%9A%E7%95%8C%E6%A0%B9%E5%9B%A0%E5%AE%9A%E4%BD%8D%E5%AE%9E%E8%B7%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          业界根因定位实践
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-03-12 10:49:28 / 修改时间：13:57:22" itemprop="dateCreated datePublished" datetime="2023-03-12T10:49:28+08:00">2023-03-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%A0%B9%E5%9B%A0%E5%AE%9A%E4%BD%8D/" itemprop="url" rel="index"><span itemprop="name">根因定位</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2023/03/12/%E4%B8%9A%E7%95%8C%E6%A0%B9%E5%9B%A0%E5%AE%9A%E4%BD%8D%E5%AE%9E%E8%B7%B5/" class="post-meta-item leancloud_visitors" data-flag-title="业界根因定位实践" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>15k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>14 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>调研一下工业界的方案，综合转载于：</p>
+<ul>
+<li>百度：<a target="_blank" rel="noopener" href="https://www.51cto.com/article/488470.html">智能运维在百度日常业务监控中的探索</a></li>
+<li>微众银行：<a target="_blank" rel="noopener" href="https://www.infoq.cn/article/cUYWKqYxrBamV7GwVVjM">智能运维系列（五）| 浅析基于知识图谱的根因分析系统</a></li>
+<li>苏宁：<a target="_blank" rel="noopener" href="https://discuss.nebula-graph.com.cn/t/topic/11868">苏宁基于 NebulaGraph 构建知识图谱的大规模告警收敛和根因定位实践</a></li>
+</ul>
+<h1 id="百度：智能运维在百度日常业务监控中的探索"><a href="#百度：智能运维在百度日常业务监控中的探索" class="headerlink" title="百度：智能运维在百度日常业务监控中的探索"></a>百度：智能运维在百度日常业务监控中的探索</h1><h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>随着互联网产品规模的爆发式增长，大型分布式系统的监控复杂性也日益显现。工程师们发现：监控遗漏导致宕机的黑天鹅现象频繁发生；出现故障时很难从海量监控指标中迅速找到故障根因；报警风暴极大地干扰了工程师定位问题的速度；故障恢复速度基本依赖于工程师的操作速度。由此，我们尝试建立一个智能运维监控系统，希望用智能化的手段去帮助工程师解决这些问题。</p>
+<h2 id="百度数据情况"><a href="#百度数据情况" class="headerlink" title="百度数据情况"></a>百度数据情况</h2><p><img src="https://image.rexking6.top/img/wKioL1XRPnCQ_yjOAAA5u45NksQ190.jpg" alt=""></p>
+<p>随着百度各产品的蓬勃发展，百度的服务器数量也呈现出爆发式增长，最近5年增长了大概20倍的规模。与产品规模不断增长相对应地，运维人员每天会收到越来越多的监控报警，面对海量的运维指标，如何快速定位问题所发生的业务层面，达到精准化报警、快速解决问题的目标就成为运维监控常态化的需求。</p>
+<p>百度监控系统数据规模，单以时间序列数据为例，不包含日志类数据。</p>
+<ul>
+<li>服务器指标数量：&gt;1亿</li>
+<li>业务指标数量：&gt;8千万</li>
+<li>数据增长速度：50TB/日</li>
+</ul>
+<h2 id="运维中面临的监控问题"><a href="#运维中面临的监控问题" class="headerlink" title="运维中面临的监控问题"></a>运维中面临的监控问题</h2><p>当前，面对复杂的业务监控和问题诊断，运维人员想找到指标和事件之间的关联关系，进行因果关系推导，并最终定位故障，基本依靠人的经验来进行。但随着业务和监控规模的膨胀，运维也希望能够更加自动化、智能化地达成保证服务高可用性的目标，即快速的问题发现、分析定位或止损。</p>
+<p><img src="https://image.rexking6.top/img/wKioL1XRPpWRVEjFAABK4HeKHO4225.jpg" alt=""></p>
+<p>下面，我们可以从发现问题—分析问题—解决问题的思路出发，逐步给出递进的解决方案。</p>
+<h2 id="发现问题篇：异常自动检测"><a href="#发现问题篇：异常自动检测" class="headerlink" title="发现问题篇：异常自动检测"></a>发现问题篇：异常自动检测</h2><p><img src="https://image.rexking6.top/img/wKioL1XRPwjjrQJQAABUAMOn2EY984.jpg" alt=""></p>
+<p>日常运维的业务指标数据会出现一些环比昨日的明显异常、持续偏离的明显问题和随着时间周期漂移的指标数据等问题，以前这些监控的配置基本靠工程师经验或持续的迭代修正，甚至纯人工排查。随着监控系统的发展，可以通过制定监控标准和自动化监控部署实现运维的标准化和自动化，最终的目标，是希望用智能化的方法彻底解决这个问题。</p>
+<p>一般，在系统出现指标数据波动时，需要先判定是否确实为异常情况，确定异常后再实现精准报警。那么，怎么自动检测业务的异常指标，帮助运维工程师和开发工程师处理问题呢？</p>
+<p>这里主要有两个策略，自动恒定阈值设定与动态阈值设定：</p>
+<p>1.恒定阈值设定法</p>
+<p>对于普通数据，运维人员在服务器端设定服务器应用指标超过某合理数值自动报警，并对服务器异常的波动状态进行报警。这个可使用一些标准的统计学方法去自动计算这个阈值，取代人工配置成本。</p>
+<p>参考方式：</p>
+<ul>
+<li>基于历史数据统计</li>
+<li>假设正态分布</li>
+<li>3-sigma策略</li>
+</ul>
+<p>2.动态阈值设定法</p>
+<p>百度大多数业务数据的流量呈现很强的天周期特性，在某时刻出现数据波峰的骤降或波谷数据的骤增等变动情况时，恒定阈值法很难解决这类问题的精准异常判断。那么我们可以把上述方法衍变升级一下，采用动态时间窗口的阈值设定法来解决周期性数据的异常判断。</p>
+<p>参考方式：</p>
+<ul>
+<li>多分布形式：将数据分段</li>
+<li>按天同期计算统计阈值</li>
+<li>分段3-sigma策略</li>
+</ul>
+<p>3.恒定阈值和动态阈值的使用</p>
+<p>针对以上两种阈值划分方式，异常检测系统如何知道应该对每组数据进行什么样的异常检测策略呢?这就需要一种方法提前对数据进行分类，可以采用一种可判断数据是否具有周期性趋势的分类器方式来解决。如果数据具有很强的周期性特征，建议使用动态阈值设定法;如果数据分析后没有周期性特征，那么使用恒定阈值就可以了。</p>
+<p><img src="http://s5.51cto.com/wyfs02/M02/71/73/wKioL1XRP0qzBImNAABDvA5GP2s845.jpg" alt=""></p>
+<p>另外，我们还会遇到这种特殊的情况，数据会随时间出现漂移。比如某产品流量，会按照工作日、周末、传统长假等时间呈现出不同的数据特征，产生阶段性变化。这个时候要进行异常检测，就不仅要考虑数据的普通周期性，还要考虑季节性和趋势性的变化。监控系统可通过对日常数据进行分析，采用三次指数平滑等方法，对数据本身的趋势性进行学习。</p>
+<p>当然，上述方法都是基于从历史数据进行学习分析从而进行异常检测的，如果缺少历史数据，那么对于这些指标，基于历史数据进行同环比分析的意义就不大，核心就转化为检测数据有没有突升和突降异常。可采用类似于局部平滑的方法查看真实数据与局部平滑后数据有没有大的出入，如果差距较大，可判断为有大的突升和突降，可以标识数据异常。</p>
+<p>参考方式：</p>
+<ul>
+<li>局部平滑法</li>
+<li>速度法</li>
+</ul>
+<p>经过经验的积累，对于核心产品的流量变动，即使波动不大，监控系统也可以做到灵敏且精准的指标监控，能够快速发现异常情况。当然，全自动的异常检测系统难免会出现误报、漏报等情况，这就要求异常检测系统需要支持工程师的标注与反馈，百度监控系统的自学习能力可以根据工程师的需求进行动态调整，可同时支持人为调整和系统自动参数学习调整，系统可自动根据工程师的标注或报警量的多少，进行参数训练，把异常检测参数调整到合理的范围。</p>
+<p>综合上述方法，百度智能监控系统中的自动异常检测最终形成两种状态的结合：离线状态和在线状态，离线部分可根据历史数据进行分类学习、参数训练，而在线部分能够进行最终的异常检测和报警。</p>
+<p>具体的组成如图所示：</p>
+<p><img src="https://image.rexking6.top/img/wKioL1XRP3bzwNa8AABHemZjNnA703.jpg" alt=""></p>
+<h2 id="发现问题篇：精准报警"><a href="#发现问题篇：精准报警" class="headerlink" title="发现问题篇：精准报警"></a>发现问题篇：精准报警</h2><p>监控系统仅仅发现了问题还不够，由于指标数量太过繁杂，为了起到辅助工程师快速解决问题的效果，还需要做到精准化报警。百度的精准报警主要分成两个层面，一个是单个指标的报警是否足够精准;这里需要考虑两个问题，一是是否每次异常都应该报警?需要容忍系统毛刺的存在;二是异常过滤，把离散的异常点转化为异常事件或状态，找到指标和事件的关联关系。</p>
+<p>在单一指标的报警足够精准的基础上，另一个是把不同指标的报警结合起来做到足够精准。如何把多个指标的报警综合起来呢?简单策略是固定时间窗口来报警，时间相近的报警可进行一定的合并，只要将首先出现的指标报警送达给到运维人员即可。从整个监控策略来看，把报警综合起来，同类的报警进行合并来报给运维人员。复杂一些的策略是关联挖掘，把历史上产生的运维报警和事件关联起来报警，同时，某些报警经常频繁地一起出现，可以认为这是同一个报警，不再单独分别进行报警。</p>
+<p>采用的具体策略有：</p>
+<ol>
+<li><p>报警合并简单策略</p>
+<ul>
+<li><p>固定时间窗口</p>
+</li>
+<li><p>相同监控策略</p>
+</li>
+<li><p>相同监控对象　　</p>
+</li>
+</ul>
+</li>
+<li><p>报警合并复杂策略</p>
+<ul>
+<li><p>关联挖掘</p>
+</li>
+<li><p>合并置信度较高的频繁项集</p>
+</li>
+</ul>
+</li>
+<li><p>报警依赖</p>
+<ul>
+<li><p>策略依赖</p>
+</li>
+<li><p>异常依赖</p>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="分析问题篇：关联分析"><a href="#分析问题篇：关联分析" class="headerlink" title="分析问题篇：关联分析"></a>分析问题篇：关联分析</h2><p>监控系统不仅需要帮助工程师发现问题，同时还需要通过建立关联分析，进行辅助问题定位，甚至迅速找到相关的指标或影响。那么，如何为复杂多样的运维数据建立关联呢？</p>
+<p>产品服务层级的关联关系图：</p>
+<p><img src="https://image.rexking6.top/img/wKiom1XRPaeQq0VCAABSkBq1_Kc340.jpg" alt=""></p>
+<p>运维工程师可以把一些基础的关联关系配置到监控系统中，可以让监控系统明白一些常态化的运维指标与其它指标是否存在关联，比如多个模块的异常是否存在关联、服务器升级或者部署产生问题是否与数据中心或交换机异常有关等。</p>
+<p>具体的实现策略有：</p>
+<ol>
+<li><p>关联挖掘</p>
+<ul>
+<li><p>事件和事件间的关联</p>
+<ul>
+<li><p>频繁项集挖掘</p>
+</li>
+<li><p>所有运维事件</p>
+</li>
+</ul>
+</li>
+<li><p>事件和时序间的关联</p>
+<ul>
+<li><p>指标异常经常与部署升级事件相伴发生</p>
+</li>
+<li><p>问题诊断&amp;故障定位</p>
+</li>
+</ul>
+</li>
+<li><p>多时序间的关联</p>
+<p><img src="https://image.rexking6.top/img/wKioL1XRP-CgquZTAABKX3WlBy0298.jpg" alt=""></p>
+</li>
+</ul>
+</li>
+<li><p>关联可视化</p>
+<p>通过关联变动，帮助运维人员分析重点数据的变动情况。</p>
+<ul>
+<li>事件&amp;事件关联</li>
+<li>事件&amp;时序关联</li>
+</ul>
+</li>
+<li><p>服务透视定位问题</p>
+<p>运维事件多是与时间持续紧密关联，我们可以把运维事件按照时间轴演进顺序进行展示。同时，运维工程师常常接触的服务拓扑，本身也是一种运维模块的关联关系。把这些离散的运维数据通过模块关联、时间关联、数据流关联等紧密地联系起来，构成一个完整的服务透视图，如果异常发生在关系透视图中的某个部分，就可以按照周边关系的通路来快速定位问题。</p>
+<ul>
+<li>模块调用关系</li>
+<li>事件和模块关联</li>
+</ul>
+</li>
+</ol>
+<h2 id="分析问题篇：故障定位"><a href="#分析问题篇：故障定位" class="headerlink" title="分析问题篇：故障定位"></a>分析问题篇：故障定位</h2><p>仅仅找到关联还不够，真正分析业务问题解决问题才是关键。这里介绍两个常用的辅助定位问题策略。</p>
+<ol>
+<li><p>多维数据分析</p>
+<p>监控系统采集到的很多指标具备包含关系，很多情况下，一个总体指标是由许多子指标加和构成的，或者也可以说成是总体维度是由许多子维度组成的。监控系统可以计算出每个子指标或子维度占总指标总维度的百分比，并按照影响权重去进行分析，当某个子指标的变化幅度对总体指标影响权重，我们就倾向于认为这个指标可能是问题的原因。</p>
+<p>举个例子，百度的总体流量指标对应每个地域的流量之和，总体流量有问题有可能是某个地域流量出现问题，找到目前对总体流量变化影响的地域进行问题处理就可以解决问题。同样的道理也可以推广到其它情况。</p>
+</li>
+<li><p>故障诊断树</p>
+<p>运维人员可以通过数据可视化(热力图、多维报表)的形式，结合以前发现问题的经验沉淀模式，发现指标间的强相关，做出问题诊断。那我们是不是可以将运维人员的经验固化到监控系统中，通过不同指标的分析方向和下探方法可以形成树状结构，通过树上的某个节点进行逐级探查。最终形成故障诊断树，通过推导路径不仅可以帮助运维人员快速完成问题出现时的排查过程，节省这部分的定位时间，也很有可能达到直接定位问题或加速解决故障的目的。</p>
+<p>故障检测：</p>
+<ul>
+<li>领域专家知识</li>
+<li>逻辑推导引擎</li>
+<li>迅速找到问题根因</li>
+</ul>
+</li>
+</ol>
+<h2 id="解决问题篇"><a href="#解决问题篇" class="headerlink" title="解决问题篇"></a>解决问题篇</h2><ol>
+<li><p>单边故障自动止损</p>
+<p>单边故障指单个IDC故障、单个链路故障等。比如一个IDC或者某些IDC出现问题，解决办法是切走这部分流量，利用监控系统来做动态的部署调度。通过某个数据中心或链路的部署调整，帮助系统快速恢复，进而实现自动化决策和执行来实现单边故障止损。</p>
+<p>具体策略有：</p>
+<ol>
+<li>实现自动冗余与调度</li>
+<li>智能监控系统负责动态决策</li>
+<li>部署调度系统负责调度执行</li>
+</ol>
+</li>
+<li><p>灰度发布自动止损</p>
+<p>研发工程师做灰度发布时，可以先做小流量的发布，部署系统可以跟监控系统配合，如果出现问题，直接进行状态终止或回滚，把问题控制在灰度发布范围内。</p>
+<p><img src="https://image.rexking6.top/img/wKioL1XRQDDwasXWAABCcJSEWwk410.jpg" alt=""></p>
+</li>
+</ol>
+<h2 id="智能运维监控总结"><a href="#智能运维监控总结" class="headerlink" title="智能运维监控总结"></a>智能运维监控总结</h2><p>通过上述说明，百度的智能运维监控系统最终形成了一个监控闭环，包含问题发现、分析决策和问题的解决。具体的组成包括异常检测、报警收敛、关联分析、故障定位和自动处理五部分内容。</p>
+<p><img src="https://image.rexking6.top/img/wKioL1XRQETwj5TrAABLHA7JmnY773.jpg" alt=""></p>
+<h2 id="未来运维变被动为主动"><a href="#未来运维变被动为主动" class="headerlink" title="未来运维变被动为主动"></a>未来运维变被动为主动</h2><ol>
+<li><p>全方位覆盖</p>
+<p>在用户端(APP、浏览器等)、云端(机房、服务器、自身服务、第三方服务等)、管道(链路、运营商)等任何维度进行数据采集并进行异常自动检测。</p>
+</li>
+<li><p>让监控更聪明</p>
+<ul>
+<li><p>分析运用已有数据，并把服务状态、问题影响分析等可视化</p>
+</li>
+<li><p>自动学习并理解故障的趋势和模式</p>
+</li>
+<li><p>自动发现服务或依赖环境的变更</p>
+</li>
+</ul>
+</li>
+</ol>
+<p>当然，更进一步地，监控系统是不是可以先于故障发生而预测到故障，在故障发生之前就可以处理并解决故障，从而达成产品的超高可用性目标。未来的智能监控应该是这样的，运维工程师经过完善的监控部署，实现全方位的异常自动检测覆盖，同时，在系统刚出现故障征兆，有损之前就进行处理并解决，实现完整的智能化监控系统解决方案。</p>
+<h1 id="微众银行：浅析基于知识图谱的根因分析系统"><a href="#微众银行：浅析基于知识图谱的根因分析系统" class="headerlink" title="微众银行：浅析基于知识图谱的根因分析系统"></a>微众银行：浅析基于知识图谱的根因分析系统</h1><p>作为中国首家开业的民营银行和互联网银行，微众银行近年来业务发展非常迅速，海量客户和交易使 IT 系统的轻微抖动就可能影响众多用户金融交易体验。为了保证业务正常运转，全面提升 MTBF(平均故障间隔)和 MTTR(平均故障修复时间)这两个数字化运维的关键指标，除了需要迅速检测出异常，还需要快速、准确、有效地分析出异常的根因，迅速恢复。为了实现这一目标，微众银行运维团队在智能根因分析方面付诸了长期的努力，研发出了智能根因分析系统。目前基于该系统的根因分析准确率稳定维持在 80%左右。下文将具体阐述该系统的设计理念。</p>
+<h2 id="数据基础"><a href="#数据基础" class="headerlink" title="数据基础"></a>数据基础</h2><p>“不积跬步，无以至千里；不积小流，无以成江海”。不论是人类专家或者是计算机，在进行分析、推理、决策时都需要数据的支撑。因此数据的准确性、及时性和完整性在根因分析中非常重要。在实现智能根因分析的道路上没有捷径，基于配置管理系统的 IT 运维系统群为其提供了坚实的数据基础。长期投入 IT 基础工程的研发，构建了较为完整的运维体系，在此基础上开始了智能化运维实践，接下来简单介绍根因分析主要应用到的数据。</p>
+<h3 id="配置数据"><a href="#配置数据" class="headerlink" title="配置数据"></a>配置数据</h3><p>配置数据主要从 CMDB（配置管理）系统获取。CMDB 系统是众多运维工程师较为熟悉的系统，它包含了配置项全生命周期的信息以及配置项之间的关系(包括物理关系、逻辑关系和依赖关系)。从图 1 可以看出，从业务层到基础架构层，配置项与配置项间的关联关系都完整保存在配置管理系统内。智能根因分析可以从中获取到关联配置数据进行相关性分析。</p>
+<p><img src="https://image.rexking6.top/img/19ec5a6ca4c52414472567ee0f28165d.png" alt="图1 配置项分层"></p>
+<h3 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h3><p>日志主要包括 WEMQ 日志、业务流水日志和应用日志。WEMQ 日志是微众银行研发的消息总线系统所产生的日志，微众银行的系统间调用基本都要通过 WEMQ 系统来完成。业务流水日志是业务模块输出的日志（格式化的业务交易日志），它的内容跟产品和场景息息相关，记录了业务相关的信息。应用日志是应用程序输出的日志，包括一些异常堆栈信息。通过 WEMQ 消息的日志，我们可以分析出每一笔交易所经过的子系统及其调用情况，如下图所示：</p>
+<p><img src="https://image.rexking6.top/img/fd7e274e082ca4ab5825bf2yy3422523.png" alt="图2 交易调用树"></p>
+<h3 id="告警"><a href="#告警" class="headerlink" title="告警"></a>告警</h3><p>监控系统可以说是 IT 运维的生命线，它集中采集了业务和基础架构相关的指标数据，并支持指标的实时计算，通过监控策略可以从这些指标或用户上报的数据中发现异常并生成告警，为 IT 运维的故障诊断提供了完整的数据支持。</p>
+<p>监控系统提供了两部分的数据用于智能根因分析：一部分是实时采集的时间序列数据，即指标数据；另一部分是基于指标计算或者其他第三方系统上报的告警信息。</p>
+<h3 id="变更"><a href="#变更" class="headerlink" title="变更"></a>变更</h3><p>变更系统提供了数据库、系统版本发布、主机、网络等一系列的变更操作和记录，所有的运维操作都要求必须在该系统上完成，因此该系统记录了内部全量的变更数据。基于这些变更数据，智能根因分析系统能够获取到跟异常相关的运维操作数据，并结合其他数据来进行根因定位。</p>
+<p><img src="https://image.rexking6.top/img/yyb0a515578aa24af49faa1e2b409fc6.png" alt="图3 变更视图"></p>
+<h2 id="技术选择"><a href="#技术选择" class="headerlink" title="技术选择"></a>技术选择</h2><p>在根因分析技术的选择上，我们初期进行了探讨和调研。在异常检测方面，我们采用了深度学习、机器学习等技术，取得了不错的效果。但在根因分析方面，我们决定先采用专家系统的技术来实现，主要有以下原因：</p>
+<ul>
+<li><p>首先，“业务异常”的数据是“小数据”。正常的公司运营过程中，真正影响业务的异常事件数据本身就会很少，数据累积的速度会很慢。在“小数据”的基础上，机器学习在根因分析方面的应用相对有限。</p>
+</li>
+<li><p>其次，“根因分析”是需要有较强的解释性的，每次业务异常后，运维工程师都会有完整的异常事件分析报告，机器学习在可解释性上相对较弱，而专家系统能更好的解释根因是如何分析出来的，更符合人类的思考逻辑。</p>
+</li>
+<li><p>最后，利用人类专家“举一反三”的能力，可以短期内构建出根因分析系统。</p>
+</li>
+</ul>
+<p>因此我们先选择了专家系统的解决方案，将 IT 专家的经验总结起来形成推导规则。</p>
+<p><img src="https://image.rexking6.top/img/17b44b0495fd734b6ae31f142a29433e.png" alt=""></p>
+<h2 id="专家系统和知识图谱"><a href="#专家系统和知识图谱" class="headerlink" title="专家系统和知识图谱"></a>专家系统和知识图谱</h2><p>早期我们采用 Drools 规则引擎实现了基于规则的根因分析系统，通过不断丰富和完善推导规则，很快就使其具备了根因分析的能力。但在应用一段时间后，发现这个方案还存在不足的地方。主要有两个方面：</p>
+<ul>
+<li><p>首先是数据不透明。每一次异常发生过后，我们都需要检视根因分析是否正确。如果根因正确，那么就需要向团队内同步是基于什么样的数据和推理逻辑推导出根因的；如果根因错误，则需要检视是否存在数据缺失、推导规则错误等问题。团队把这一类工作叫做案例复盘。复盘就需要依赖当时获取到的异常数据来开展，原先我们把数据都放在 TDSQL 内，彼此之间相互不关联，所以复盘时这些数据都是碎片化的，数据透明程度差，复盘也相对困难。后来引入了图数据库，将异常数据以知识图谱的方式来存储，即方便查询，也方便展示。</p>
+</li>
+<li><p>最后是规则维护困难。在根因分析系统早期版本的时候，推理模块是采用了 Drools 来实现的规则引擎，虽然它解决了知识和代码的耦合问题，但规则越来越多以后，从单个规则来看也很难看出整体的推导逻辑，维护起来相对困难。经过调整，我们在图数据库的基础上，按照不同的异常类型编写了推导模型，通过模型就可以在图数据库中找到根因。这样只需要维护好模型即可，降低了规则的维护难度。</p>
+</li>
+</ul>
+<h2 id="根因分析设计"><a href="#根因分析设计" class="headerlink" title="根因分析设计"></a>根因分析设计</h2><p>根因分析的总体思路是在异常事件发生时，系统收集信息并生成该异常事件的知识图谱，在图的基础上运用演绎推理和归纳推理等方法来对事件根因进行分析。简单理解就是图 + 统计 + 规则。根因分析将针对四种指标类型的异常：时延、交易量、业务成功率、系统成功率，再经过三个步骤的处理和分析：信息收集、根因定位、根因补充，最终分析出根因。从这个思路来看，异常事件的知识图谱如何设计，是我们根因分析设计的关键。接下来将详细介绍该设计，进而阐述根因分析设计的细节。</p>
+<h3 id="异常事件的知识图谱设计"><a href="#异常事件的知识图谱设计" class="headerlink" title="异常事件的知识图谱设计"></a>异常事件的知识图谱设计</h3><p>异常事件的知识图谱是结合“动”态和“静”态数据来设计，“动”态数据包括业务流水相关的日志、证据数据，“静”态数据则来自于 CMDB 等配置系统。两类数据共同构建起一个完整的异常事件图谱。如下图所示，从图上可以看出，图谱是有方向的，从左到右进行根因的分析和推导，最终分析出根因。</p>
+<p><img src="https://image.rexking6.top/img/3ee828eyy7c92caa05b30c748c12d644.png" alt="图5 异常事件的知识图谱设计"></p>
+<p>一般来说，知识图谱设计及根因分析一般包括信息收集、根因定位、根因补充三个阶段。</p>
+<p>首先是信息收集阶段，该阶段将收集用于构建知识图谱的完整信息，主要收集以下几个维度的信息：</p>
+<ol>
+<li><p>事件：异常事件的起点，包含了异常事件的相关信息，例如事件的开始时间等。</p>
+</li>
+<li><p>指标：产品的关键指标，我们选择了四种类型的指标作为黄金指标，用于检测产品业务是否异常，每个场景都有其对应的黄金指标，其中包括：</p>
+<ul>
+<li>交易量：单位时间内的交易笔数。</li>
+<li>业务成功率：单位时间内的业务成功率，业务失败时该指标会下降。业务失败是指符合业务逻辑的失败，例如验证码未通过。</li>
+<li>系统成功率：单位时间内的系统成功率，系统失败时该指标会下降。系统失败时指系统内部的失败，例如连接数据库异常。</li>
+<li>时延：单位时间内完成交易的总耗时时间。</li>
+</ul>
+</li>
+<li><p>业务流水：用户在产品上操作所产生的编号，每一次操作都会产生一个唯一的编号，也称为一笔交易。这个编号可以关联出业务日志和实时树日志（WEMQ 日志）。</p>
+</li>
+<li><p>业务流水日志：每个系统按照规范打印的业务相关日志，可以从中查到具体的业务参数和相关调用信息。除了业务相关的信息外，日志中还有交易发生的子系统、主机、DCN 等信息。</p>
+</li>
+<li><p>实时树日志：之前提到的 WEMQ 日志，可以将交易的完整调用路径分析出来，其中还有经过的主机、耗时等明细数据。</p>
+</li>
+</ol>
+<p>其次是根因定位阶段，该阶段根据收集到的日志数据，对交易进行统计分析，并定位到哪个子系统、主机才是本次事件的根因。以系统成功率为例，在异常发生时，有多笔交易产生了错误日志，这时对异常时间点的交易信息进行提取，找到当时存在 n 笔交易是异常交易。对这 n 笔交易进行统计分析后，发现这些交易都在某个相同的子系统报错了，说明该子系统就是根因子系统。</p>
+<p>最后是根因补充阶段。这个阶段会采用告警、变更等数据来进行分析，并对根因进行补充。如果定位到一个子系统存在异常，该子系统如果还存在告警、变更等数据的话，就会进一步的补充到根因内，使得根因更加具体、明确。</p>
+<h2 id="实际案例"><a href="#实际案例" class="headerlink" title="实际案例"></a>实际案例</h2><p>整个系统的根因分析工作分三个阶段。接下来将以实际案例来简单介绍智能根因分析系统是如何工作的。</p>
+<h3 id="阶段一：信息收集"><a href="#阶段一：信息收集" class="headerlink" title="阶段一：信息收集"></a>阶段一：信息收集</h3><p>信息收集阶段以事件中心，关联查询异常相关的日志、告警、变更、配置等信息，用以构建该异常事件的完整知识图谱。</p>
+<ol>
+<li>以事件为起点，关联查询本次异常事件相关的指标信息。</li>
+<li>通过获取到异常时间点的业务流水信息，连带查询出对应业务流水号可以关联出来的业务流水日志和实时树日志。</li>
+<li>获取当前存在的证据。</li>
+<li>将所有数据写入到图数据库，生成知识图谱。</li>
+</ol>
+<p><img src="https://image.rexking6.top/img/259473f983b50d0cd02ddcc817e8f362.png" alt="图6 异常事件的知识图谱"></p>
+<h3 id="阶段二：根因定位"><a href="#阶段二：根因定位" class="headerlink" title="阶段二：根因定位"></a>阶段二：根因定位</h3><p>根因定位阶段是在异常事件知识图谱的基础上，应用推导模型，对存在异常的子系统，及其相关的、IP、DCN、服务信息进行提取，起到定位的作用，也对异常事件的知识图谱进行了裁剪。</p>
+<p>如图 7 所示，应用图分析的推导模型后，异常的子系统及其相关 IP、DCN 及其证据从知识图谱中提取出来。</p>
+<p><img src="https://image.rexking6.top/img/2933e5944d40b516437df1af1048f23b.png" alt="图7 应用了推导模型后的知识图谱"></p>
+<h3 id="阶段三：根因补充"><a href="#阶段三：根因补充" class="headerlink" title="阶段三：根因补充"></a>阶段三：根因补充</h3><p>根因补充是为异常事件进行最终根因定性的阶段，在阶段二的数据基础上，应用规则引擎最终推导出根因结论。</p>
+<p>从阶段二中已经可以清晰发现该事件的根因。所有高耗时实时树日志都指向的 APS 子系统，而此时高耗时实时树日志经过的主机和 APS 子系统都能关联到应用版本发布信息。通过该图获取到的信息，经过话术的加工，最终智能根因分析系统给的异常事件根因是：[应用版本发布]子系统 6009 AOMP 应用发布。影响:上游 DSFS 接口 激活,返回信息:激活成功(交易耗时异常升高)。</p>
+<p>上述是时延异常的一个案例，通过三个阶段的分析，最终定位到是应用版本正在发布，导致服务的耗时异常升高。整体思路是通过收集系统异常时的相关信息，构建异常事件的知识图谱，再应用推导模型对图谱进行信息提取，最后应用规则引擎对根因进行推导。</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>回顾这一年多的系统建设历程，我们最初梳理了根因分析的数据基础，在这些数据基础上确定了根因分析的方法，即以业务流水日志为抓手，将各纬度数据进行整合和分析；选择专家系统的方案来快速构建根因分析系统；还应用了图数据库和知识图谱的技术来解决数据透明和根因推导的问题。根因分析系统后继还会持续优化，历史上异常事件的知识图谱对我们也是宝贵的财富，记录了所有异常当时的全貌，为我们挖掘更多知识和优化推导逻辑提供了数据支持。</p>
+<h1 id="苏宁：基于-NebulaGraph-构建知识图谱的大规模告警收敛和根因定位实践"><a href="#苏宁：基于-NebulaGraph-构建知识图谱的大规模告警收敛和根因定位实践" class="headerlink" title="苏宁：基于 NebulaGraph 构建知识图谱的大规模告警收敛和根因定位实践"></a>苏宁：基于 NebulaGraph 构建知识图谱的大规模告警收敛和根因定位实践</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>知识图谱有较强的知识表达能力、直观的信息呈现能力和较好的推理可解释性，因此知识图谱在推荐系统、问答系统、搜索引擎、医疗健康、生物制药等领域有着广泛的应用。运维知识图谱构建相对于其他领域的知识图谱构建而言，具有天然的优势，网络设备固有的拓扑结构、系统应用的调用关系可以快速的构成软硬件知识图谱中的实体和关系。历史的告警数据蕴含着大量的相关、因果关系，使用因果发现算法，也可以有效的构建告警知识图谱。基于知识图谱上的权重进行路径搜索，可以给出根因的传播路径，便于运维人员快速的做出干预决策。</p>
+<p>苏宁通过 CMDB、调用链等数据构建软硬件知识图谱，在此基础上通过历史告警数据构建告警知识图谱，并最终应用知识图谱进行告警收敛和根因定位。本文主要包括运维知识图谱构建、知识图谱存储、告警收敛及根因定位等内容。</p>
+<h2 id="痛点及产品对策演进"><a href="#痛点及产品对策演进" class="headerlink" title="痛点及产品对策演进"></a>痛点及产品对策演进</h2><p>痛点：</p>
+<ol>
+<li><p>苏宁内部系统和服务的复杂性：</p>
+<ul>
+<li><p>6000+ 系统，数量还在增加</p>
+</li>
+<li><p>系统间调用方式复杂：大部分使用 RSF，也有 HTTP、HESSIAN 等</p>
+</li>
+<li>苏宁业务的复杂：既有线上新业务又有线下老业务，这些业务系统之间会有大量的关联</li>
+</ul>
+</li>
+<li><p>基础环境的复杂性：</p>
+<ul>
+<li>多数据中心，每个数据中心会划分多个逻辑机房和部署环境</li>
+<li>服务器规模 30w+，例如，缓存服务器就有可能有上千台服务器</li>
+<li>设备复杂性：多品牌的交换机，路由器，负载均衡，OpenStack，KVM，k8s 下 docker，swarm 下的 docker等</li>
+</ul>
+</li>
+</ol>
+<p>基础设施的复杂性导致每天平均产生 10w+ 的告警事件，峰值可达到 20w+ / 天。面对海量的运维监控数据，系统和指标间关联关系越来越复杂，一个节点出现故障，极易引发告警风暴，波及更广的范围，导致定位问题费时费力。此时，单纯依靠人肉和经验分析，越来越难以为继。迫切需要一个工具，可以辅助我们分析系统和指标间关联关系，可视化展示告警的传播路径和影响范围等。</p>
+<h2 id="产品对策演进"><a href="#产品对策演进" class="headerlink" title="产品对策演进"></a>产品对策演进</h2><p>针对上述痛点，我们采用领域知识结合 AI 的方法对告警进行收敛，以缓解告 警风暴。此外，为便于一线运维人员快速的作出干预决策，我们同时对告警的传播路径和影响范围进行分析。</p>
+<ol>
+<li><p>基于交叉熵的告警聚类(1.0 版本)</p>
+<p>按照告警的场景和规则，利用交叉熵对告警信息进行聚类，实现告警的收敛。 借鉴 moogsoft 的思想，将告警聚类结果生成 situation，同一个 situation 中包含同场景、有关联的告警。</p>
+<p><strong>缺点:</strong></p>
+<ul>
+<li><p>收敛效果有限，该方法只能减少 30% 左右的告警，无法有效解决告警风暴问题;</p>
+</li>
+<li><p>无法提供根告警以及根因链路</p>
+</li>
+<li><p>弱解释性</p>
+</li>
+<li><p>无法解决告警的根因问题。</p>
+</li>
+</ul>
+</li>
+<li><p>基于 GRANO 算法的根因定位(2.0 版本)</p>
+<p>根因定位是在告警收敛的基础上进行的，采用 GRANO[2] 算法，基于告警收敛结果生成 situation，计算 situation 中每个告警节点的得分，然后排序来确定根因。</p>
+<p><strong>缺点:</strong></p>
+<ul>
+<li>这种方法的缺点是不会给出一条完整的根因链路，因此根因的可解释性不强。</li>
+</ul>
+</li>
+<li><p>基于运维知识图谱的告警收敛和根因定位(3.0 版本)</p>
+<p>包括全局视角下的软硬件知识图谱和告警知识图谱，利用 NLP 技术对告警文 本信息进行分类，然后将告警收敛到软硬件知识图谱的相关节点上，再结合具 有因果关系的告警知识图谱，得出一条 “A –&gt; B –&gt; C –&gt; D”的根因链路。</p>
+<p><strong>优点:</strong></p>
+<ul>
+<li>由于结合了领域相关知识，该方法收敛效果更好，而且提供了一条完整的根因链路，所以解释性更强，可以更好的为 SRE / 运维人员提供指引。</li>
+</ul>
+</li>
+</ol>
+<h2 id="思路与架构"><a href="#思路与架构" class="headerlink" title="思路与架构"></a>思路与架构</h2><p>分层建设思路：</p>
+<p><img src="https://image.rexking6.top/img/suning-arch.png" alt=""></p>
+<p>流程架构：</p>
+<p><img src="https://image.rexking6.top/img/suning-workflow.png" alt=""></p>
+<h2 id="运维知识图谱构建"><a href="#运维知识图谱构建" class="headerlink" title="运维知识图谱构建"></a>运维知识图谱构建</h2><h3 id="软硬件知识图谱构建"><a href="#软硬件知识图谱构建" class="headerlink" title="软硬件知识图谱构建"></a>软硬件知识图谱构建</h3><p>软硬件知识图谱是以全局的视角展示系统内各应用、软件、虚拟机、物理机间 的内在逻辑，系统间的调用关系，网络设备的物理连接关系。图谱中的节点包 括系统、DU(部署单元)、group(主机实例组)、软件、虚拟机、物理机、接入交 换机、核心交换机、汇聚交换机、路由器等。关系包括 constitute(构成)、call (调用)、logical(逻辑连接)、cluster(汇聚)、ship(承载)、host(宿主)、connect(物 理连接)等。软硬件知识图谱的原型如下：</p>
+<p><img src="https://image.rexking6.top/img/suning-knowledge-graph.png" alt=""></p>
+<p>软硬件知识图谱构建的数据源主要有 CMDB 数据、调用链数据和物理设备网络连接数据。实践中首先基于离线数据初始化软硬件知识图谱，随着业务的变化和拓展会出现旧系统的下线和新系统的上线，然后根据变化定时或定期更新软硬件知识图谱。</p>
+<h4 id="CMDB-数据构建流程"><a href="#CMDB-数据构建流程" class="headerlink" title="CMDB 数据构建流程"></a>CMDB 数据构建流程</h4><p><img src="https://image.rexking6.top/img/suning-data-build.png" alt=""></p>
+<p>通过 CMDB 数据可以构建 HOST-&gt;VM-&gt;SOFTWARE-&gt;GROUP 及 GROUP (WildFly) → GROUP(Nginx)的关系图谱。</p>
+<h4 id="调用链-物理设备网络连接数据"><a href="#调用链-物理设备网络连接数据" class="headerlink" title="调用链 / 物理设备网络连接数据"></a>调用链 / 物理设备网络连接数据</h4><p>调用链数据主要用于获取 DU 间调用关系、系统间调用关系、DU / IP 映射关系、中间件间的逻辑连接关系等，数据主要通过内部的一些 API 接口获取。</p>
+<p>物理设备主要包括物理机、交换机、路由器等，数据主要通过运维平台获取。</p>
+<h4 id="合并图谱"><a href="#合并图谱" class="headerlink" title="合并图谱"></a>合并图谱</h4><p>将前面得到的 CMDB、调用链和物理设备图谱通过 networkx 合并，然后存入图数据库 NebulaGraph 中，最终得到的单系统和系统间图谱分别如下(NebulaGraph Studio 可视化呈现):</p>
+<p><img src="https://image.rexking6.top/img/suning-nebulagraph-studio.png" alt=""></p>
+<p>其中蓝色节点为系统，浅蓝色节点为 DU，绿色节点为 group，红色节点为软件，橙色节点为虚拟机，深蓝色节点为物理机，黄色节点为接入交换机，淡黄色节点为汇聚交换机。</p>
+<p>NebulaGraph Studio: <a target="_blank" rel="noopener" href="https://github.com/vesoft-inc/nebula-web-docker">https://github.com/vesoft-inc/nebula-web-docker</a></p>
+<h3 id="告警知识图谱构建"><a href="#告警知识图谱构建" class="headerlink" title="告警知识图谱构建"></a>告警知识图谱构建</h3><h4 id="告警数据分类"><a href="#告警数据分类" class="headerlink" title="告警数据分类"></a>告警数据分类</h4><p>原来的告警分类采用是交叉熵方法：告警信息、分词、统计词频、计算与各类别的相似度(交叉熵)，若相似度大于阈值，选择相似度最高的那一类归到该类，若相似度均小于阈值，则新增一个类别。</p>
+<p>缺点：</p>
+<ol>
+<li>无法控制分类的数量，比如如果阈值设的较大，就会出现好多类别；如果设置的较小，很多告警又会归到一类。</li>
+<li>无法控制类别的具体含义，分类依赖于交叉熵的计算结果以及阈值的设置，无法确切知道每个类别的真正含义。</li>
+</ol>
+<p>上述这种方法无法满足我们构建因果图的需要。</p>
+<p>为了让构建的因果图有更好的说服力和可解释性，我们需要对各种告警信息进行人工分类，比如有的告警是对应于基础设施，比如网卡流量，cpu 利用率，有的告警对应于具体软件，比如 mysql 延迟，wildfly 无法获取连接。这样，每个告警类别都有自己明确的含义。在此基础上构建的因果图才是有意义的。我们首先对 zabbix 六个月全量告警信息进行了整理，将所有告警分为了 183 类，然后使用有监督的方法，训练分类模型。这样新来的告警信息也可以按照 我们预先设定的类别进行分类。分类模型我们使用的是自然语言处理方法，先对告警信息进行分词，然后计算词向量，然后将词向量作为输入训练模型。我们分别训练的 cnn 和 bow(ngr ams)分类模型，整体而言，分类准确率都很高，能满足我们的要求。其中 cnn 效果好一点，但是预测时间也会比 bow 耗时长一点。</p>
+<ul>
+<li><p>cnn 模型(modelcnn20e__0813):</p>
+<ul>
+<li><p>train_list：predict total time= 12.386132</p>
+<p>总告警数量: 20620 错误个数: 0 准确率= 1.0</p>
+</li>
+<li><p>test_list：predict total time= 1.452978</p>
+<p>总告警数量: 3620 错误个数: 0 准确率= 1.0</p>
+</li>
+<li><p>全部六个月告警信息</p>
+<p>总告警数量: 733637 预测错误数量: 9 准确率: 0.99998</p>
+</li>
+</ul>
+</li>
+<li><p>n bow 模型(model__bow__20e__0813)</p>
+<ul>
+<li><p>train_list：predict total time= 1.687823</p>
+<p>总告警数量: 20620 错误个数: 1 准确率= 0.999952</p>
+</li>
+<li><p>test_list：predict total time= 0.272725</p>
+<p>总告警数量: 3620 错误个数: 1 准确率= 0.999724</p>
+</li>
+<li><p>全部六个月告警信息</p>
+<p>总告警数量: 733637 预测错误数量: 12 准确率: 0.99998</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="因果节点选取"><a href="#因果节点选取" class="headerlink" title="因果节点选取"></a>因果节点选取</h4><p>因果节点不具体指一个物理机或虚拟机 IP 上的告警，而是对所有告警类型的一个抽象总结，目前包含三层(结构如下)：物理机层面的告警、虚拟机层面的告警、软件层面的告警。比如任何一台物理机上的宕机告警都归类于因果图上【物理机-宕机】节点。</p>
+<p><img src="https://image.rexking6.top/img/suning-cause-ship-host.png" alt=""></p>
+<p>经过告警数据分类，我们初步将所有的告警分类都作为因果节点，在经过因果算法输出因果边并人工筛查确认之后，选取最终的因果节点。</p>
+<h4 id="构建因果发现样本"><a href="#构建因果发现样本" class="headerlink" title="构建因果发现样本"></a>构建因果发现样本</h4><p><img src="https://image.rexking6.top/img/suning-cause1.png" alt=""><br>基于 6 个月的 zabbix 告警数据(如上图，共 781288 条告警)构建样本。</p>
+<p><strong>构建目标:</strong></p>
+<p>根据告警分类，已将每一条告警记录归类为一种告警类型(告警类型：物理机- xx 告警、虚拟机-xx 告警、软件-xx 告警)。以每条虚拟机告警记录为中心，给定一个告警时间切片(1min、2min 等)，寻找每条虚拟机告警时间切片内的相关告警记录(相关告警包括：该虚拟机隶属的物理机上的告警，同隶属该台物理机上的其他虚拟机上的告警)集合作为一个因果发现样本。</p>
+<p><strong>举例说明:</strong></p>
+<p>下面是一台虚拟机在某一个时间点的告警，以该告警构建样本。</p>
+<p><img src="https://image.rexking6.top/img/suning-cause2.png" alt="告警构建样本"></p>
+<p>给定时间切片为 1 分钟，以上面一条虚拟机上的告警为例，寻找 1 分钟内与该虚拟机相关的物理机和虚拟机上的告警，所有告警如下图所示为一个因果样本。</p>
+<p><img src="https://image.rexking6.top/img/suning-cause3.png" alt="因果样本"></p>
+<p>最终转置每一个样本，将告警类型作为列名，集合所有的样本，若发生告警记为 1，不发生记为 0，生成最终的因果发现样本(因果算法的输入)，如下所示：<br><img src="https://www-cdn.nebula-graph.com.cn/nebula-website-5.0/images/blogs/suning-usecase/suning-cause4.png" alt="因果算法样本"></p>
+<h4 id="因果算法"><a href="#因果算法" class="headerlink" title="因果算法"></a>因果算法</h4><p>采用已有的因果发现算法工具包：CausalDiscoveryToolbox，其中包含的算法有：PC、GES、CCDr、LiNGAM 等。</p>
+<ul>
+<li>PC：是因果发现中最著名的基于分数的方法，该算法对变量和变量集的进行 条件测试，以获得可能的因果边。</li>
+<li>GES：Greedy Equivalence Search algorithm（贪婪干涉等价搜索算法），是一种 基于分数的贝叶斯算法，通过在数据上计算似然分数最小化来启发式地搜索 图，以获得因果边。</li>
+<li>CCDr：Concave penalized Coordinate Descent with reparametrization（参数化的凹点惩罚坐标下降法）， 这是一种基于分数的用来学习贝叶斯网络的快速结构学习算法，该方法使用稀疏正则化和块循环坐标下降。</li>
+</ul>
+<p><strong>目标:</strong></p>
+<p>采用多种因果发现算法训练告警数据，基于各个算法输出的因果边再结合人工审查筛选确定最终的因果边(包含因果节点)，边确定了，相应的因果节点也确定了。</p>
+<p>举例说明，以 PC 和 GES 两个算法为例：</p>
+<ul>
+<li><p>PC 算法输出的可能因果节点和边</p>
+<p><img src="https://image.rexking6.top/img/suning-algorithm1.png" alt="因果节点和边"></p>
+</li>
+<li><p>GES 算法输出的可能因果节点和边</p>
+<p><img src="https://image.rexking6.top/img/suning-algorithm2.png" alt="因果节点和边"></p>
+</li>
+</ul>
+<p>两个算法都发现了【host-服务器宕机】导致【vm-服务器宕机】和【host-服务 器宕机】导致【software-网页访问失败】等相同的因果边，经人工确认物理机宕机确实会导致其对应的虚拟机宕机和服务器上的软件访问失败，所以确定这两条边为因果边。</p>
+<h4 id="因果边的权重计算"><a href="#因果边的权重计算" class="headerlink" title="因果边的权重计算"></a>因果边的权重计算</h4><p>因果边的权重采用条件概率计算，即：基于因果发现样本数据和因果发现算法给出的因果边(包括两个因果节点)，【因节点发生告警的条件下果节点发生告警的次数】与【因节点总共发生的告警次数】的比值作为该因果边的权重。</p>
+<p>举例：<br><img src="https://image.rexking6.top/img/suning-algorithm3.png" alt=""></p>
+<p>截取部分的因果边及其权重：【host-服务器宕机】导致【vm-服务器宕机】的因果边权重为 0.99。</p>
+<h4 id="构建告警知识图谱"><a href="#构建告警知识图谱" class="headerlink" title="构建告警知识图谱"></a>构建告警知识图谱</h4><p>经过【告警的分类】–&gt;【构建因果发现样本】–&gt;【因果算法发现因果边】–&gt; 【因果边权重计算】，最终生成所有的因果边及其权重。</p>
+<p><img src="https://image.rexking6.top/img/suning-algorithm4.png" alt=""></p>
+<p>基于 zabbix 的 781288 条告警数据，最终确定了 213 条因果边(如上图所 示)，根据 213 条因果边的指向和权重，构建告警知识图谱(部分结构如下图所示)，并将告警知识图谱写入图数据库以便持久化读取，后续的根因定位需从图数据库读取所构建的告警知识图谱进行分析。</p>
+<p><img src="https://image.rexking6.top/img/suning-cause-ship-host2.png" alt=""></p>
+<h2 id="知识图谱存储"><a href="#知识图谱存储" class="headerlink" title="知识图谱存储"></a>知识图谱存储</h2><h3 id="图数据库引入"><a href="#图数据库引入" class="headerlink" title="图数据库引入"></a>图数据库引入</h3><p>图数据库是以图数据结构存储和查询数据，图包含节点和边。构建运维知识图谱做根因告警分析等场景时，为了实时查询知识图谱，我们引入了图数据库，并将知识图谱持久化存储到图数据库中。另外，引入图数据库还有以下优势</p>
+<ol>
+<li>图数据库在处理关联数据时的速度快，而关系型数据库在处理反向查询以及多层次关系查询的时候通常开销较大，无法满足我们的要求。</li>
+<li>图数据库可解释性好。图数据库基于节点和边，以一种直观的方式表示这些关系，具有天然可解释性。</li>
+<li>图数据库查询语句表达性好，比如查询一跳，两跳数据，不需要像关系型数据库那样做复杂的表关联。</li>
+<li>图数据库更灵活。图这种通用结构可以对各种场景进行建模，如社交网络、道路系统等。不管有什么新的数据需要存储，都只需要考虑节点属性和边属性。不像关系型数据库中，需要更新表结构，还要考虑和其他表的关联关系 等。</li>
+</ol>
+<h3 id="图数据库选型"><a href="#图数据库选型" class="headerlink" title="图数据库选型"></a>图数据库选型</h3><p><img src="https://image.rexking6.top/img/graph-database.png" alt="图数据库选型"></p>
+<ul>
+<li>Neo4j 开源版本不支持分布式，无法满足我们对多副本的需求</li>
+<li>ArangoDB 是 多模态数据库，支持 graph, document, key/value 和 search，支持分布式部署，查询速度快</li>
+<li>NebulaGraph 一款是国产的开源图数据库，支持分布式部署且部署方式比 ArangoDB 更轻便，查询速度快，腾讯、京东等公司内部也在使用。</li>
+</ul>
+<p>在充分比较了以上图数据库的性能，以及社区的活跃性以及开放性后，我们最终选择 NebulaGraph。针对上述的三个图数据库，我们做了一个详细的性能 Benchmark 对比：<a target="_blank" rel="noopener" href="https://discuss.nebula-graph.com.cn/t/topic/1466">https://discuss.nebula-graph.com.cn/t/topic/1466</a></p>
+<h2 id="告警收敛及根因定位"><a href="#告警收敛及根因定位" class="headerlink" title="告警收敛及根因定位"></a>告警收敛及根因定位</h2><h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><p>针对告警数据的收敛和根因定位，可以分为以下主要几个步骤。</p>
+<ol>
+<li><p>设置时间切片粒度：实时获取时间切片内(1min、5min 等)的告警数据</p>
+</li>
+<li><p>告警分类：针对原始的告警数据，结合具体的告警信息和监控项等信息，根据训练好的分类模型对原始的告警数据从 HOST、VM、SOFTW ARE 三个方面进行分类，例如: vm_网卡流量大、host_磁盘使用率过高、software_网页访问失败等</p>
+</li>
+<li><p>告警收敛：查询软硬件知识图谱将告警以系统为单位进行收敛，收敛格式如下，格式如下：</p>
+<p>系统 1: {软硬件知识图谱节点 1:[告警类型 1，告警类型 2…]， 软硬件知识图谱节点 2:[告警类型 1，告警类型 2…]</p>
+</li>
+<li><p>告警因果图构建：基于告警收敛结果，在图数据库中按照系统级别查询每个系统下的所有节点之间的连接子图，并将得到的结果输入到 networkx 中，得到某个系统下的各节点之间的最终连接关系，即告警因果图</p>
+</li>
+<li>根因路径：基于上述生成的告警因果图，以及权重来计算疑似路径，排序给出根因路径</li>
+</ol>
+<h3 id="告警收敛"><a href="#告警收敛" class="headerlink" title="告警收敛"></a>告警收敛</h3><p>基于上述的主要流程，我们现以时间粒度为前后 5min 内的告警数据创建时间切片样本，并取告警数量最多的前 100 个时间片的样本作为主要分析的内容，其中第一个时间切片中的各个系统下各节点的告警收敛结果如下：</p>
+<p><img src="https://image.rexking6.top/img/suning-alarm.png" alt="告警收敛"></p>
+<h3 id="根因定位"><a href="#根因定位" class="headerlink" title="根因定位"></a>根因定位</h3><p>对于上述第一个时间切片中的某个系统，在图数据库中查询该系统下的所有节点构成的子图，以 “苏宁 XXX 系统”这个系统为例，查询得到在“一跳”范围内与该系统下的所有节点之间有关联的节点的关系大致如下（红色表示物理机节点，棕色表示虚拟机节点，绿色表示软件节点）：</p>
+<p><img src="https://image.rexking6.top/img/suning-system.png" alt="子图"></p>
+<p>上图中出现的所有节点中，既包括有告警信息的，也包括没有告警消息的，因此将上述因果图输入到 netwokx 后，可以得到最终经过精简后的有告警消息发出的各节点的因果图，其中一部分的因果图展示如下：</p>
+<p><img src="https://image.rexking6.top/img/suning-network.png" alt="因果图"></p>
+<p>可以解释为：“192.168.xxx.xxx-host-服务器宕机”导致 “10.104.xxx.xxx-vm-服 务器宕机”，进而导致“software-网页访问失败”。</p>
+<p>进一步的，根据上述生成的因果图，再结合因果图中每条边的权重，就可以计算出该时间切片下的单个系统层面上的所有疑似根因路径，经过排序后即可得到最终的根因路径。本例中最终得到的几条根因路径如下：</p>
+<p><img src="https://image.rexking6.top/img/data-path.png" alt="根因路径"></p>
+<p>从上图可以看出，程序最终给出了几条疑似的根因路径，其中包括最长的一 条，可以解释为：ip 为 192.168.xxx.xxx 这台物理机由于网卡 overruns 的原因，导致了这台物理机的宕机，从而使得这台物理机上的 ip 为 10.104.xx x.xxx 的虚拟机宕机，最终导致这台虚拟机上的相关的网页访问失败。</p>
+<h2 id="效果及优化方向"><a href="#效果及优化方向" class="headerlink" title="效果及优化方向"></a>效果及优化方向</h2><ul>
+<li><p>在告警收敛方面，经过验证，基于运维知识图谱可缩减至少 50% 的告警量，最高可达到 60% 以上，有效率的缓解了告警风暴的压力; 另外，在时效性方面，基于 1、2、5min 不同长度的时间切片进行告警收敛，耗时可以控制在 6 s 以内，满足告警通知的时效性要求。</p>
+</li>
+<li><p>在根因定位方面，经一线运维人员验证，每个告警时间段提供的可能根因传播路径集合基本包含了真实的根因，有效缩短了运维人员的干预时间;另外在耗时上，根因定位可以控制在 3s 以内，速度较快，满足时效性要求。</p>
+</li>
+<li><p>但目前通过因果发现算法自动构建的告警知识图谱准确率有待进一步提升，继续调研评估其他告警知识图谱构建方式。继续完善软硬件和调用链告警知识图谱，当前仅是基于 CMDB 和 Zabbix 告警数据构建运维知识图谱进行告警收 敛和根因定位，基础设施层面的告警数据更简单、规范，后续还要扩展到更复杂的非基础设施层面的告警数据中。当前还没有利用知识图谱对异常检测(时间序列数据)结果做根因定位的应用实践，这需要对时间序列做因果关系的发现，构建时间序列之间的因果图，从而打通知识图谱与异常检测的壁垒，这也是知识图谱后续使用的扩展方向之一。</p>
+</li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>简单总结一下：</p>
+<ul>
+<li>百度和微众银行将专家规则做成知识图谱来完成推理定位</li>
+<li>苏宁将历史数据提炼成因果图来完成定位并给出故障传播链路</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2023/03/12/%E4%B8%9A%E7%95%8C%E6%A0%B9%E5%9B%A0%E5%AE%9A%E4%BD%8D%E5%AE%9E%E8%B7%B5/" title="业界根因定位实践">https://blog.rexking6.top/2023/03/12/业界根因定位实践/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%A0%B9%E5%9B%A0%E5%AE%9A%E4%BD%8D/" rel="tag"># 根因定位</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/03/11/%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1/" rel="prev" title="知识图谱">
+      <i class="fa fa-chevron-left"></i> 知识图谱
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/03/13/%E5%9B%BE%E8%A1%A8%E7%A4%BA%E5%AD%A6%E4%B9%A0/" rel="next" title="图表示学习">
+      图表示学习 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%99%BE%E5%BA%A6%EF%BC%9A%E6%99%BA%E8%83%BD%E8%BF%90%E7%BB%B4%E5%9C%A8%E7%99%BE%E5%BA%A6%E6%97%A5%E5%B8%B8%E4%B8%9A%E5%8A%A1%E7%9B%91%E6%8E%A7%E4%B8%AD%E7%9A%84%E6%8E%A2%E7%B4%A2"><span class="nav-number">2.</span> <span class="nav-text">百度：智能运维在百度日常业务监控中的探索</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">2.1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%99%BE%E5%BA%A6%E6%95%B0%E6%8D%AE%E6%83%85%E5%86%B5"><span class="nav-number">2.2.</span> <span class="nav-text">百度数据情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E7%BB%B4%E4%B8%AD%E9%9D%A2%E4%B8%B4%E7%9A%84%E7%9B%91%E6%8E%A7%E9%97%AE%E9%A2%98"><span class="nav-number">2.3.</span> <span class="nav-text">运维中面临的监控问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%91%E7%8E%B0%E9%97%AE%E9%A2%98%E7%AF%87%EF%BC%9A%E5%BC%82%E5%B8%B8%E8%87%AA%E5%8A%A8%E6%A3%80%E6%B5%8B"><span class="nav-number">2.4.</span> <span class="nav-text">发现问题篇：异常自动检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%91%E7%8E%B0%E9%97%AE%E9%A2%98%E7%AF%87%EF%BC%9A%E7%B2%BE%E5%87%86%E6%8A%A5%E8%AD%A6"><span class="nav-number">2.5.</span> <span class="nav-text">发现问题篇：精准报警</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E9%97%AE%E9%A2%98%E7%AF%87%EF%BC%9A%E5%85%B3%E8%81%94%E5%88%86%E6%9E%90"><span class="nav-number">2.6.</span> <span class="nav-text">分析问题篇：关联分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E9%97%AE%E9%A2%98%E7%AF%87%EF%BC%9A%E6%95%85%E9%9A%9C%E5%AE%9A%E4%BD%8D"><span class="nav-number">2.7.</span> <span class="nav-text">分析问题篇：故障定位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E9%97%AE%E9%A2%98%E7%AF%87"><span class="nav-number">2.8.</span> <span class="nav-text">解决问题篇</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%99%BA%E8%83%BD%E8%BF%90%E7%BB%B4%E7%9B%91%E6%8E%A7%E6%80%BB%E7%BB%93"><span class="nav-number">2.9.</span> <span class="nav-text">智能运维监控总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AA%E6%9D%A5%E8%BF%90%E7%BB%B4%E5%8F%98%E8%A2%AB%E5%8A%A8%E4%B8%BA%E4%B8%BB%E5%8A%A8"><span class="nav-number">2.10.</span> <span class="nav-text">未来运维变被动为主动</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BE%AE%E4%BC%97%E9%93%B6%E8%A1%8C%EF%BC%9A%E6%B5%85%E6%9E%90%E5%9F%BA%E4%BA%8E%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E7%9A%84%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E7%B3%BB%E7%BB%9F"><span class="nav-number">3.</span> <span class="nav-text">微众银行：浅析基于知识图谱的根因分析系统</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%9F%BA%E7%A1%80"><span class="nav-number">3.1.</span> <span class="nav-text">数据基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%95%B0%E6%8D%AE"><span class="nav-number">3.1.1.</span> <span class="nav-text">配置数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A5%E5%BF%97"><span class="nav-number">3.1.2.</span> <span class="nav-text">日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%8A%E8%AD%A6"><span class="nav-number">3.1.3.</span> <span class="nav-text">告警</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E6%9B%B4"><span class="nav-number">3.1.4.</span> <span class="nav-text">变更</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%80%E6%9C%AF%E9%80%89%E6%8B%A9"><span class="nav-number">3.2.</span> <span class="nav-text">技术选择</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%93%E5%AE%B6%E7%B3%BB%E7%BB%9F%E5%92%8C%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1"><span class="nav-number">3.3.</span> <span class="nav-text">专家系统和知识图谱</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90%E8%AE%BE%E8%AE%A1"><span class="nav-number">3.4.</span> <span class="nav-text">根因分析设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E4%BA%8B%E4%BB%B6%E7%9A%84%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E8%AE%BE%E8%AE%A1"><span class="nav-number">3.4.1.</span> <span class="nav-text">异常事件的知识图谱设计</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%99%85%E6%A1%88%E4%BE%8B"><span class="nav-number">3.5.</span> <span class="nav-text">实际案例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%B6%E6%AE%B5%E4%B8%80%EF%BC%9A%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">3.5.1.</span> <span class="nav-text">阶段一：信息收集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%B6%E6%AE%B5%E4%BA%8C%EF%BC%9A%E6%A0%B9%E5%9B%A0%E5%AE%9A%E4%BD%8D"><span class="nav-number">3.5.2.</span> <span class="nav-text">阶段二：根因定位</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%B6%E6%AE%B5%E4%B8%89%EF%BC%9A%E6%A0%B9%E5%9B%A0%E8%A1%A5%E5%85%85"><span class="nav-number">3.5.3.</span> <span class="nav-text">阶段三：根因补充</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AF%AD"><span class="nav-number">3.6.</span> <span class="nav-text">结语</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%8B%8F%E5%AE%81%EF%BC%9A%E5%9F%BA%E4%BA%8E-NebulaGraph-%E6%9E%84%E5%BB%BA%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E7%9A%84%E5%A4%A7%E8%A7%84%E6%A8%A1%E5%91%8A%E8%AD%A6%E6%94%B6%E6%95%9B%E5%92%8C%E6%A0%B9%E5%9B%A0%E5%AE%9A%E4%BD%8D%E5%AE%9E%E8%B7%B5"><span class="nav-number">4.</span> <span class="nav-text">苏宁：基于 NebulaGraph 构建知识图谱的大规模告警收敛和根因定位实践</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">4.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%97%9B%E7%82%B9%E5%8F%8A%E4%BA%A7%E5%93%81%E5%AF%B9%E7%AD%96%E6%BC%94%E8%BF%9B"><span class="nav-number">4.2.</span> <span class="nav-text">痛点及产品对策演进</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%A7%E5%93%81%E5%AF%B9%E7%AD%96%E6%BC%94%E8%BF%9B"><span class="nav-number">4.3.</span> <span class="nav-text">产品对策演进</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF%E4%B8%8E%E6%9E%B6%E6%9E%84"><span class="nav-number">4.4.</span> <span class="nav-text">思路与架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E7%BB%B4%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E6%9E%84%E5%BB%BA"><span class="nav-number">4.5.</span> <span class="nav-text">运维知识图谱构建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AF%E7%A1%AC%E4%BB%B6%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E6%9E%84%E5%BB%BA"><span class="nav-number">4.5.1.</span> <span class="nav-text">软硬件知识图谱构建</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CMDB-%E6%95%B0%E6%8D%AE%E6%9E%84%E5%BB%BA%E6%B5%81%E7%A8%8B"><span class="nav-number">4.5.1.1.</span> <span class="nav-text">CMDB 数据构建流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E9%93%BE-%E7%89%A9%E7%90%86%E8%AE%BE%E5%A4%87%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5%E6%95%B0%E6%8D%AE"><span class="nav-number">4.5.1.2.</span> <span class="nav-text">调用链 &#x2F; 物理设备网络连接数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%88%E5%B9%B6%E5%9B%BE%E8%B0%B1"><span class="nav-number">4.5.1.3.</span> <span class="nav-text">合并图谱</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%8A%E8%AD%A6%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E6%9E%84%E5%BB%BA"><span class="nav-number">4.5.2.</span> <span class="nav-text">告警知识图谱构建</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%91%8A%E8%AD%A6%E6%95%B0%E6%8D%AE%E5%88%86%E7%B1%BB"><span class="nav-number">4.5.2.1.</span> <span class="nav-text">告警数据分类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%A0%E6%9E%9C%E8%8A%82%E7%82%B9%E9%80%89%E5%8F%96"><span class="nav-number">4.5.2.2.</span> <span class="nav-text">因果节点选取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9E%84%E5%BB%BA%E5%9B%A0%E6%9E%9C%E5%8F%91%E7%8E%B0%E6%A0%B7%E6%9C%AC"><span class="nav-number">4.5.2.3.</span> <span class="nav-text">构建因果发现样本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%A0%E6%9E%9C%E7%AE%97%E6%B3%95"><span class="nav-number">4.5.2.4.</span> <span class="nav-text">因果算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%A0%E6%9E%9C%E8%BE%B9%E7%9A%84%E6%9D%83%E9%87%8D%E8%AE%A1%E7%AE%97"><span class="nav-number">4.5.2.5.</span> <span class="nav-text">因果边的权重计算</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9E%84%E5%BB%BA%E5%91%8A%E8%AD%A6%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1"><span class="nav-number">4.5.2.6.</span> <span class="nav-text">构建告警知识图谱</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E5%AD%98%E5%82%A8"><span class="nav-number">4.6.</span> <span class="nav-text">知识图谱存储</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%BA%93%E5%BC%95%E5%85%A5"><span class="nav-number">4.6.1.</span> <span class="nav-text">图数据库引入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%BA%93%E9%80%89%E5%9E%8B"><span class="nav-number">4.6.2.</span> <span class="nav-text">图数据库选型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%8A%E8%AD%A6%E6%94%B6%E6%95%9B%E5%8F%8A%E6%A0%B9%E5%9B%A0%E5%AE%9A%E4%BD%8D"><span class="nav-number">4.7.</span> <span class="nav-text">告警收敛及根因定位</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B"><span class="nav-number">4.7.1.</span> <span class="nav-text">流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%8A%E8%AD%A6%E6%94%B6%E6%95%9B"><span class="nav-number">4.7.2.</span> <span class="nav-text">告警收敛</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B9%E5%9B%A0%E5%AE%9A%E4%BD%8D"><span class="nav-number">4.7.3.</span> <span class="nav-text">根因定位</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%88%E6%9E%9C%E5%8F%8A%E4%BC%98%E5%8C%96%E6%96%B9%E5%90%91"><span class="nav-number">4.8.</span> <span class="nav-text">效果及优化方向</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">197</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">3.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">51:48</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

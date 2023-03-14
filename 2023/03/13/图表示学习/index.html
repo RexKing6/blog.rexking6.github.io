@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图表示学习">
+<meta property="og:url" content="https://blog.rexking6.top/2023/03/13/%E5%9B%BE%E8%A1%A8%E7%A4%BA%E5%AD%A6%E4%B9%A0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-1d147cd83dcc41c863d608b6eee8d24e_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-460ad9133c702d5c2acab640ed09dbdf_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-6c548cc39af4400988d04ed1104bb3c2_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-147bb9aa6cb646c83680e93bcf016c4e_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-20a6b345cfe45706b43db91a78ee5b69_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-d3b6b9ee7c3f3bbc1661ecf0bb678a18_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-740642a04298d289d19cd4225d062b5d_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-f571c8ce1fc5ebf33f1a0867302f65f1_b.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-e81b090018d692cebe3069ebe5021e8b_720w.webp">
+<meta property="article:published_time" content="2023-03-12T16:12:52.000Z">
+<meta property="article:modified_time" content="2023-03-14T16:52:22.265Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/v2-1d147cd83dcc41c863d608b6eee8d24e_720w.webp">
+
+<link rel="canonical" href="https://blog.rexking6.top/2023/03/13/%E5%9B%BE%E8%A1%A8%E7%A4%BA%E5%AD%A6%E4%B9%A0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>图表示学习 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2023/03/13/%E5%9B%BE%E8%A1%A8%E7%A4%BA%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          图表示学习
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-03-13 00:12:52" itemprop="dateCreated datePublished" datetime="2023-03-13T00:12:52+08:00">2023-03-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-03-15 00:52:22" itemprop="dateModified" datetime="2023-03-15T00:52:22+08:00">2023-03-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2023/03/13/%E5%9B%BE%E8%A1%A8%E7%A4%BA%E5%AD%A6%E4%B9%A0/" class="post-meta-item leancloud_visitors" data-flag-title="图表示学习" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>10k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>9 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>综合转载于：</p>
+<ul>
+<li><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/112295277">图表示学习极简教程</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/64200072">深度学习中不得不学的Graph Embedding方法</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/64756917">关于Node2vec算法中Graph Embedding同质性和结构性的进一步探讨</a></p>
+</li>
+</ul>
+<h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><p>随着Deep Learning的爆火，图数据挖掘和CV、NLP等领域一样，存在着“爆发式”发展的趋势。更加准确地说，笔者认为图数据挖掘正处在爆发的前夜。本文主要从<strong>基于图结构的表示学习</strong>和<strong>基于图特征的表示学习</strong>两个角度简要介绍图表示学习的现状和自己的认识。</p>
+<p>在非图的表示学习中，研究者们主要考虑的是每一个研究对象的特征(姓名、年龄、身高等)信息。然而，研究对象是存在于客观世界的主体，存在一定的图结构信息(QQ、微信好友，师生关系等都构成了图网络)。如何对图结构进行表示学习以表示图的结构信息是一个很重要的topic。</p>
+<p> 图表示学习的主要目标是：将结点映射为<strong>向量</strong>表示的时候尽可能多地保留图的<strong>拓扑信息</strong>。图表示学习主要分为<strong>基于图结构的表示学习</strong>和<strong>基于图特征的表示学习</strong>。如图1，基于图结构的表示学习对结点的向量表示只来源于图的拓扑结构( $n \times n$ 的邻接矩阵表达的图结构)，只是对图结构的单一表示，缺乏对图结点特征消息的表示。如图2，基于图特征的表示学习对结点的向量表示<strong>既</strong>包含了图的拓扑信息( $n \times n$的邻接矩阵表达的图结构)<strong>也</strong>包含了已有的特征向量( $n$个维度为$f$包含结点特征的向量，如姓名、年龄、身高等信息)。</p>
+<p><img src="https://image.rexking6.top/img/v2-1d147cd83dcc41c863d608b6eee8d24e_720w.webp" alt="图1：基于图结构的表示学习"></p>
+<p><img src="https://image.rexking6.top/img/v2-460ad9133c702d5c2acab640ed09dbdf_720w.webp" alt="图2：基于图特征的表示学习"></p>
+<p>通过上述的介绍，我们可以知道图表示学习的task就是用 n 个向量表示图上的 n 个结点，这样我们就可以将一个难以表达的拓扑结构转化为可以丢进炼丹炉的vector啦。</p>
+<h1 id="基于图结构的表示学习"><a href="#基于图结构的表示学习" class="headerlink" title="基于图结构的表示学习"></a>基于图结构的表示学习</h1><p>在我们的图表示学习中，我们希望Embedding出来的向量在图上“接近”时在向量空间也“接近”。对于第2个“接近”，就是欧式空间两个向量的距离。对于第一个“接近”，可以有很多的解释：</p>
+<ul>
+<li><strong>1-hop</strong>：两个相邻的结点就可以定义为临近；</li>
+<li><strong>k-hop</strong>：两个<em>k</em>阶临近的结点也可以定义为临近；</li>
+<li><strong>具有结构性</strong>：结构性相对于异质性而言。异质性关注的是结点的邻接关系；结构性将两个结构上相似的结点定义为“临近”。比方说，某两个点是各自小组的中心，这样的两个节点就具有结构性。</li>
+</ul>
+<h2 id="DeepWalk"><a href="#DeepWalk" class="headerlink" title="DeepWalk"></a>DeepWalk</h2><p>早期影响力较大的graph embedding方法是2014年提出的DeepWalk，它的主要思想是在由物品组成的图结构上进行随机游走，产生大量物品序列，然后将这些物品序列作为训练样本输入word2vec进行训练，得到物品的embedding。图3用图示的方法展现了DeepWalk的过程。</p>
+<p><img src="https://image.rexking6.top/img/v2-6c548cc39af4400988d04ed1104bb3c2_720w.webp" alt="图3 DeepWalk的算法流程（引自阿里论文）"></p>
+<p>如图3，整个DeepWalk的算法流程可以分为四步：</p>
+<ol>
+<li>图a展示了原始的用户行为序列</li>
+<li>图b基于这些用户行为序列构建了物品相关图，可以看出，物品A，B之间的边产生的原因就是因为用户U1先后购买了物品A和物品B，所以产生了一条由A到B的有向边。如果后续产生了多条相同的有向边，则有向边的权重被加强。在将所有用户行为序列都转换成物品相关图中的边之后，全局的物品相关图就建立起来了。</li>
+<li><strong>图c采用随机游走的方式随机选择起始点，重新产生物品序列。</strong></li>
+<li>图d最终将这些物品序列输入word2vec模型，生成最终的物品Embedding向量。</li>
+</ol>
+<p>在上述DeepWalk的算法流程中，核心是第三步，其中唯一需要形式化定义的是随机游走的跳转概率，也就是到达节点 $v_i$ 后，下一步遍历 $v_i$ 的临接点 $v_j$ 的概率。如果物品的相关图是有向有权图，那么从节点 $v_i$ 跳转到节点 $v_j$ 的概率定义如下：</p>
+<script type="math/tex; mode=display">
+P\left(v_j \mid v_i\right)= \begin{cases}\frac{\mathbf{M}_{i j}}{\sum_{j \in N_{+}\left(v_i\right)} \mathbf{M}_{i j}}, & v_j \in N_{+}\left(v_i\right), \\ 0, & e_{i j} \notin \mathcal{E},\end{cases}</script><p>其中$N_+(v_i)$是节点 $v_i$ 所有的出边集合，$Mij是节点vi到节点vj边的权重。</p>
+<p>如果物品相关图是无向无权重图，那么跳转概率将是上面公式的一个特例，即权重Mij将为常数1，且N+(vi)应是节点vi所有“边”的集合，而不是所有“出边”的集合。</p>
+<h2 id="Node2vec"><a href="#Node2vec" class="headerlink" title="Node2vec"></a>Node2vec</h2><p>2016年，斯坦福大学在DeepWalk的基础上更进一步，通过调整随机游走权重的方法使graph embedding的结果在网络的<strong>同质性（homophily）</strong>和<strong>结构性（structural equivalence）</strong>中进行权衡权衡。</p>
+<p>具体来讲，网络的“同质性”指的是距离相近节点的embedding应该尽量近似，如图4，节点u与其相连的节点s1、s2、s3、s4的embedding表达应该是接近的，这就是“同质性“的体现。</p>
+<p>“结构性”指的是结构上相似的节点的embedding应该尽量接近，图4中节点u和节点s6都是各自局域网络的中心节点，结构上相似，其embedding的表达也应该近似，这是“结构性”的体现。</p>
+<p><img src="https://image.rexking6.top/img/v2-147bb9aa6cb646c83680e93bcf016c4e_720w.webp" alt="图4 宽度优先搜索（BFS）和 深度优先搜索（DFS）示意图c"></p>
+<p>其中，网络的“<strong>同质性</strong>”指的是距离相近节点的embedding应该尽量近似，如图1中，节点u与其相连的节点s1、s2、s3、s4的embedding表达应该是接近的，这就是“<strong>同质性</strong>“的体现。</p>
+<p>“结构性”指的是结构上相似的节点的embedding应该尽量接近，图1中节点u和节点s6都是各自局域网络的中心节点，结构上相似，其embedding的表达也应该近似，这是“<strong>结构性</strong>”的体现。</p>
+<p>Node2vec在具体的实现上，是通过调整模型参数，使随机游走更倾向于宽度优先搜索（BFS），或者深度优先搜索（DFS），从而在embedding结果中更好的体现“结构性”或者“同质性”，那么，下面就到了比较容易让人困惑的问题了：</p>
+<p><strong>到底是宽度优先搜索（BFS）更能体现“结构性”，还是深度优先搜索（DFS）更能体现“结构性”呢？</strong></p>
+<p>当然，对于“同质性”，我们同样可以问出一个对偶问题。到底是宽度优先搜索（BFS）更能体现“同质性”，还是深度优先搜索（DFS）更能体现“同质性”呢？</p>
+<p>为了使Graph Embedding的结果能够表达网络的<strong>同质性</strong>，在随机游走的过程中，需要让游走的过程更倾向于<strong>宽度优先搜索（BFS）</strong>，因为BFS更喜欢游走到跟当前节点有直接连接的节点上，因此就会有更多同质性信息包含到生成的样本序列中，从而被embedding表达；另一方面，为了抓住网络的<strong>结构性</strong>，就需要随机游走更倾向于<strong>深度优先搜索（DFS）</strong>，因为DFS会更倾向于通过多次跳转，游走到远方的节点上，使得生成的样本序列包含更多网络的整体结构信息。</p>
+<p>不知道大家跟我最初的想法是不是一致，遗憾的是，这种想法是与论文原文的解释相反的，恰恰是<strong>BFS更多抓住了网络的结构性，而DFS更能体现网络的同质性</strong>。为什么？</p>
+<p>结合原文和自己的理解，我这里给出一个可能正确的解释，因为并没有通过实验去验证，最“正确”的做法当然是你自己实现之后评估一下哪种结果更能体现同质性。</p>
+<p>对于宽度优先搜索（BFS）来说，其搜索往往是在当前节点（这里以节点u为例）的邻域进行的，特别是在node2vec中，由于存在所谓的“返回概率”，所以即使从u搜索到了s1，也有很大概率从s1再返回u，所以BFS产生的序列往往是在u附近的节点间进行来回的震荡，这就相当于对u周围的网络结构进行了一次<strong>微观扫描（microscope view）</strong>。</p>
+<p>那么这个微观扫描当然更容易得到<strong>微观结构</strong>的观察，所以BFS就更容易使embedding结果更多反应网络的“结构性”。这里我需要纠正一下大家对“结构性”的理解，正如上面所说的一样，这里的“结构”更多的指的是微观结构，而不是大范围内，甚至整个网络范围内的宏观结构，而是一阶、二阶范围内的微观结构。</p>
+<p>再举个例子理解一下，比如对于节点u和节点s9这两个节点来说，节点u是局部网络的中心节点，节点s9是一个十分边缘的节点。那么在对这个网络进行多次BFS随机游走的过程中，节点u肯定会被多次遍历到，而且会与s1-s4等更多节点发生联系，而边缘节点s9无论从遍历次数，还是从邻接点的丰富程度来说都远不及节点u，因此两者的embedding自然区别很大。</p>
+<p>如果用DFS进行遍历，由于遍历存在更大的不确定性，因此s9有更大的可能被包含在更多的序列中，并跟更多的节点发生联系，这就减弱了局部结构性的信息。类似于平滑了结构性的信息，自然是不如BFS更能反应“微观结构”了。</p>
+<p>另一方面，<strong>为什么说DFS更能反应“同质性”呢</strong>？</p>
+<p>这里还要对“同质性”也进行一个纠正，这里的“同质性”不是指一阶、二阶这类非常局限的同质性，而是在相对较广范围内的，能够发现一个社区、一个群、一个聚集类别的“同质性”。要发现这类同质性，当然需要使用DFS进行更广范围内的探索。如果仅用BFS在微观范围内探索，如何发现一个社区的边界在哪里呢？</p>
+<p>所以，<strong>DFS相当于对网络结构进行了一次宏观扫描</strong>（macroscope view），只有在宏观的视角，才能发现大的集团、社区的聚集性，和集团内部节点的“同质性”。</p>
+<p>那么在node2vec算法中，是怎样控制BFS和DFS的倾向性的呢？主要是通过节点间的跳转概率。图5显示了node2vec算法<strong>从节点t跳转到节点v后</strong>，下一步从<strong>节点v</strong>跳转到周围各点的跳转概率。</p>
+<p><img src="https://image.rexking6.top/img/v2-20a6b345cfe45706b43db91a78ee5b69_720w.webp" alt="node2vec的跳转概率"></p>
+<p>形式化来讲，从节点v跳转到下一个节点x的概率为</p>
+<script type="math/tex; mode=display">
+\pi_{\mathrm{vx}}=\alpha_{p q}(t, x) \cdot \omega_{v x}</script><p>其中$\omega_{v x}$是边vx的权重，$\alpha_{p q}(t, x)$的定义如下：</p>
+<script type="math/tex; mode=display">
+\alpha_{p q}(t, x)= \begin{cases}\frac{1}{p} & \text { if } d_{t x}=0 \\ 1 & \text { if } d_{t x}=1 \\ \frac{1}{q} & \text { if } d_{t x}=2\end{cases}</script><p>其中，$d_{tx}$指的是节点$t$到节点$x$的距离，参数$p$和$q$共同控制着随机游走的倾向性。参数$p$被称为返回参数（return parameter），$p$越小，随机游走回节点t的可能性越大，node2vec就更注重表达网络的同质性，参数$q$被称为进出参数（in-out parameter），$q$越小，则随机游走到远方节点的可能性越大，node2vec更注重表达网络的结构性，反之，当前节点更可能在附近节点游走。</p>
+<p><img src="https://image.rexking6.top/img/v2-d3b6b9ee7c3f3bbc1661ecf0bb678a18_720w.webp" alt="上图是DFS结果，下图是BFS结果"></p>
+<p>论文中最后通过实验的方式验证了DFS和BFS对于“同质性”和“结构性”的挖掘结果。颜色接近的节点代表其embedding的相似性更强。图2上图是node2vec更倾向于DFS的结果，可以看到各聚类的内部节点相似，这是网络“同质性”的体现；而图2下图中，结构类似节点的embedding更为相似，这是“结构性”的体现。</p>
+<p>node2vec所体现的网络的同质性和结构性在推荐系统中也是可以被很直观的解释的。<strong>同质性相同的物品很可能是同品类、同属性、或者经常被一同购买的物品</strong>，而<strong>结构性相同的物品则是各品类的爆款、各品类的最佳凑单商品等拥有类似趋势或者结构性属性的物品</strong>。毫无疑问，二者在推荐系统中都是非常重要的特征表达。由于node2vec的这种灵活性，以及发掘不同特征的能力，甚至可以把不同node2vec生成的embedding融合共同输入后续深度学习网络，以保留物品的不同特征信息。</p>
+<h2 id="阿里的EGES"><a href="#阿里的EGES" class="headerlink" title="阿里的EGES"></a>阿里的EGES</h2><p>2018年阿里公布了其在淘宝应用的Embedding方法EGES（Enhanced Graph Embedding with Side Information），其基本思想是在DeepWalk生成的graph embedding基础上引入补充信息。</p>
+<p>如果单纯使用用户行为生成的物品相关图，固然可以生成物品的embedding，但是如果遇到新加入的物品，或者没有过多互动信息的长尾物品，推荐系统将出现严重的冷启动问题。<strong>为了使“冷启动”的商品获得“合理”的初始Embedding，阿里团队通过引入了更多补充信息来丰富Embedding信息的来源，从而使没有历史行为记录的商品获得Embedding。</strong></p>
+<p>生成Graph embedding的第一步是生成物品关系图，通过用户行为序列可以生成物品相关图，利用相同属性、相同类别等信息，也可以通过这些相似性建立物品之间的边，从而生成基于内容的knowledge graph。而基于knowledge graph生成的物品向量可以被称为补充信息（side information）embedding向量，当然，根据补充信息类别的不同，可以有多个side information embedding向量。</p>
+<p><strong>那么如何融合一个物品的多个embedding向量，使之形成物品最后的embedding呢？最简单的方法是在深度神经网络中加入average pooling层将不同embedding平均起来，阿里在此基础上进行了加强，对每个embedding加上了权重</strong>，如图7所示，对每类特征对应的Embedding向量，分别赋予了权重$a_0$，$a_1…a_n$。图中的Hidden Representation层就是对不同Embedding进行加权平均操作的层，得到加权平均后的Embedding向量后，再直接输入softmax层，这样通过梯度反向传播，就可以求的每个embedding的权重$a_i(i=0…n)$。</p>
+<p><img src="https://image.rexking6.top/img/v2-740642a04298d289d19cd4225d062b5d_720w.webp" alt="阿里的EGES Graph Embedding模型"></p>
+<p>在实际的模型中，阿里采用了$e^{a_j}$而不是$a_j$作为相应embedding的权重，一是避免权重为0，二是因为$e^{a_j}$在梯度下降过程中有良好的数学性质。阿里的EGES并没有过于复杂的理论创新，但给出一个工程性的结合多种Embedding的方法，降低了某类Embedding缺失造成的冷启动问题，是实用性极强的Embedding方法。</p>
+<p>时至今日，Graph Embedding仍然是工程和学术领域研究和实践的热点，除了本节介绍的DeepWalk，Node2vec，EGES等主流的方法，还有LINE，SDNE等方法也很流行。</p>
+<h1 id="基于图特征的表示学习"><a href="#基于图特征的表示学习" class="headerlink" title="基于图特征的表示学习"></a>基于图特征的表示学习</h1><p>在基于图特征的表示学习中，由于加入了结点的特征矩阵 $X$ (姓名、年龄、身高等这样的特征)，需要同基于图结构的表示学习区别开来。这一类的模型通常被叫做“图神经网络”。</p>
+<h2 id="GCN"><a href="#GCN" class="headerlink" title="GCN"></a>GCN</h2><p><a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/1609.02907">Graph Convolutional Networks</a>(图卷积网络)是非常基本第一个GNN模型。在讨论GCN之前，我们先来看一下CNN(卷积神经网络)是怎么做卷积运算的。如图6所示，CNN的两个主要特点是局部感知与权值共享。换句话说，就是聚合某个像素点<strong>周围</strong>的像素特征。</p>
+<p><img src="https://image.rexking6.top/img/v2-f571c8ce1fc5ebf33f1a0867302f65f1_b.webp" alt="卷积神经网络示意"></p>
+<p>类似地，在GCN中，新的特征也是对上一层邻居结点特征的聚合，公式如下：</p>
+<script type="math/tex; mode=display">
+H^{(l)}=\sigma\left(D^{-\frac{1}{2}}(A+I) D^{-\frac{1}{2}} H^{(l-1)} W^l\right)</script><p>其中 $A$ 是邻接矩阵，$D=\operatorname{diag}\left(d_1, d_2, \ldots, d_n\right)$是顶点的度矩阵(对角阵)，$I$是单位阵，$W$是神经网络层与层之间传播的系数矩阵。此外$H$表示的是该层的结点特征矩阵，第一层的特征矩阵$H_0$是原始的结点特征矩阵$X$。也许有人会有疑问，DNN的输入应该是一个向量，为什么这里用的是矩阵的表示呢？其实，这里的矩阵可以视作是由多个向量组成的，可以类比于CNN中的“<strong>多通道</strong>”概念。我们来看一下下面的公式推演：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+& H(X)=D^{-0.5} A D^{-0.5} X W \\
+& \Rightarrow\left[\begin{array}{ccccc}
+\frac{1}{\sqrt{d_1}} & & & \\
+& \frac{1}{\sqrt{d_2}} & & & \\
+& & \ddots & \\
+& & & \frac{1}{\sqrt{d_n}}
+\end{array}\right]\left[\begin{array}{cccc}
+A_{11} & A_{12} & \cdots & A_{1 n} \\
+A_{21} & A_{22} & \cdots & A_{2 n} \\
+\vdots & \vdots & \ddots & \vdots \\
+A_{n 1} & A_{n 2} & \cdots & A_{n n}
+\end{array}\right]\left[\begin{array}{cccc}
+\frac{1}{\sqrt{d_1}} & & & \\
+& \frac{1}{\sqrt{d_2}} & & \\
+& \ddots & \\
+& & & \frac{1}{\sqrt{d_n}}
+\end{array}\right] \\
+& \Rightarrow\left[\begin{array}{cccc}
+\frac{A_{11}}{\sqrt{d_1}} & \frac{A_{12}}{\sqrt{d_1}} & \cdots & \frac{A_{1 n}}{\sqrt{d_1}} \\
+\frac{A_{21}}{\sqrt{d_2}} & \frac{A_{22}}{\sqrt{d_2}} & \cdots & \frac{A_{2 n}}{\sqrt{d_2}} \\
+\vdots & \vdots & \ddots & \vdots \\
+\frac{A_{n 1}}{\sqrt{d_n}} & \frac{A_{n 2}}{\sqrt{d_n}} & \cdots & \frac{A_{n n}}{\sqrt{d_n}}
+\end{array}\right]\left[\begin{array}{llll}
+\frac{1}{\sqrt{d_1}} & & & \\
+& \frac{1}{\sqrt{d_2}} & & \\
+& & \ddots & \\
+& & & \frac{1}{\sqrt{d_n}}
+\end{array}\right] \\
+& \Rightarrow\left[\begin{array}{cccc}
+\frac{A_{11}}{\sqrt{d_1} \sqrt{d_1}} & \frac{A_{12}}{\sqrt{d_1} \sqrt{d_2}} & \cdots & \frac{A_{1 n}}{\sqrt{d_1} \sqrt{d_n}} \\
+\frac{A_{21}}{\sqrt{d_2} \sqrt{d_1}} & \frac{A_{22}}{\sqrt{d_2} \sqrt{d_2}} & \cdots & \frac{A_{2 n}}{\sqrt{d_2} \sqrt{d_n}} \\
+\vdots & \vdots & \ddots & \vdots \\
+\frac{A_{n 1}}{\sqrt{d_n} \sqrt{d_1}} & \frac{A_{n 2}}{\sqrt{d_n} \sqrt{d_2}} & \cdots & \frac{A_{n n}}{\sqrt{d_n} \sqrt{d_n}}
+\end{array}\right] \Rightarrow \sum_i \frac{A_{i j}}{\sqrt{d_i d_j}} X W, j \in \text { Neighbor }(i) \\
+&
+\end{aligned}</script><p>根据上面的推导，我们不难从最后一个公式中看看出结点 $i$ 在下一层的表示是由其所有的邻居结点 $j$ 所构成集合 Neighbor $(i)$ 来决定的。因此，我们换一个视角，从每一个结点的角度来看GCN的公式。我们可以发现公式可以表示为：</p>
+<script type="math/tex; mode=display">
+h_v^l=\sigma\left(W^l \sum_{u \in \mathcal{N} i} \bigcup v \frac{h_u^{l-1}}{\sqrt{\left|N_u\right| \cdot\left|N_v\right|}}\right)</script><p>其中$h_v^l$是第$l$层网络中结点 $v$的向量表示，$h_v^{l-1}$是第$l-1$层网络上一结点$v$的向量表示。$\mathcal{N}_i$表示的是结点$i$的邻居结点构成的集合。公式和上面的一堆推导可以说是殊途同归。其核心的意思都表示的是“<strong>邻居结点的聚合</strong>”。从直观层面，GCN的含义就是“聚合”的含义。然而，从图信号角度对GCN进行分析，又会是一番新的境界。</p>
+<h2 id="GraphSAGE"><a href="#GraphSAGE" class="headerlink" title="GraphSAGE"></a>GraphSAGE</h2><p>GCN提出之后，同年的NIPS上<a href="https://link.zhihu.com/?target=https%3A//papers.nips.cc/paper/6703-inductive-representation-learning-on-large-graphs.pdf">GraphSAGE</a>也横空出世，其主要的特点是<strong>固定的采样倍率</strong>和不同的聚合方式。</p>
+<h3 id="采样倍率"><a href="#采样倍率" class="headerlink" title="采样倍率"></a>采样倍率</h3><p>在GCN中，我们采用的聚合方式是将一个结点的所有邻居进行聚合。若每一层结点的邻居结点个数为 $\bar{d}$ ，那么经过$K$层的聚合后，结点的聚合代价为$\sum_{i=0}^k \bar{d}^i$。若$\bar{d}=10, K=3$，那么每个结点就要有1111个结点参与计算，要是乘上所有的结点个数，计算的代价简直credible。</p>
+<p>对于邻居节点的聚合，GraphSAGE在一个epoch中，作者并未将某个结点所有的邻居结点进行聚合，而是设置一个定值$S_k$，在第$k$层选择邻居的时候只从中选最多只选择$S_k$个邻居结点进行聚合，计算的复杂度大致在$\mathcal{O}\left(\prod_{k=1}^K S_k\right)$这个水平。这一改进对GNN的落地有着重要意义。</p>
+<h3 id="聚合方式"><a href="#聚合方式" class="headerlink" title="聚合方式"></a>聚合方式</h3><p>结点聚合应该满足：</p>
+<ol>
+<li><strong>对聚合结点的数量自适应</strong>：向量的维度不应随邻居结点和总结点个数改变。</li>
+<li>聚合操作对聚合结点具有<strong>排列不变性</strong>：e.g.$\operatorname{Agg}\left(v_1, v_2\right)=\operatorname{Agg}\left(v_2, v_1\right)$。</li>
+<li>显然，在优化过程中，模型的计算要是<strong>可导</strong>的。</li>
+</ol>
+<p>根据上述的几点原则，作者提出了几种聚合方式：</p>
+<ul>
+<li><p>平均/求和聚合算子(mean/sum)</p>
+<script type="math/tex; mode=display">
+\text{Agg}^{\text {sum }}=\sigma\left(\text{SUM}\left\{W h_i+b, \forall v_j \in \mathcal{N}\left(v_i\right)\right\}\right)</script><p>其中 $W$ 和 $b$ 都是需要learning的参数。</p>
+</li>
+<li><p>池化算子(pooling)</p>
+<script type="math/tex; mode=display">
+\text{Agg}^{\text {pooling }}=\text{MAX}\sigma\left(\left\{W h_i+b, \forall v_j \in \mathcal{N}\left(v_i\right)\right\}\right)</script><p>对其中的MAX的含义是各元素上运用max算子计算。</p>
+</li>
+<li><p>LSTM聚合</p>
+<p>与平均聚合相比，LSTM聚合具有更大的表达能力。但是，重要的是LSTM并不具有排列不变性，因为它们是以顺序方式处理其输入。因此，需要将LSTM应用于节点邻居的随机排列，这可以使LSTM适应无序集合。</p>
+</li>
+</ul>
+<h2 id="GAT"><a href="#GAT" class="headerlink" title="GAT"></a>GAT</h2><p>自从有了Attention机制之后，似乎万物皆可Attention了。在图学习中，<a href="https://link.zhihu.com/?target=https%3A//arxiv.org/pdf/1710.10903.pdf">Graph Attention Network</a>就是引入了注意力机制的GNN。说到底，GAT还是对邻居结点信息的聚合：</p>
+<script type="math/tex; mode=display">
+h_{v_i}^l=W^l \sigma\left(\sum_{v_j \in \mathcal{N}\left(v_i\right)} \alpha_{i j}^l h^{l-1} v_j\right)</script><p>其中$\alpha_{i j}$是结点$v_i$与其相邻结点 $v_j$ 之间的权重系数，$\alpha_{i j}$ 的计算公式为：</p>
+<script type="math/tex; mode=display">
+\alpha_{i j}=\frac{\exp \left(\text { LeakyReLU }\left(\alpha^T\left[W h_i \| W h_j\right]\right)\right)}{\sum_{v(k) \in \mathcal{N}\left(v_i\right)} \operatorname{LeakyReLU}\left(\alpha^T\left[W h_i \| W h_k\right]\right)}</script><p>其中 $||$ 是concat操作，权重参数向量$\alpha \in R^{2 \cdot d^{l+1}}$ 。这个公式乍一看比较复杂，其实是由两个部分组成。如图7(左)，首先算出相关度的权重系数$e_{i j}=\operatorname{LeakyReLU}\left(\alpha^T\left[W h_i | W h_j\right]\right)$，然后在对 $e_{ij}$进行softmax归一化处理，以确保权重之和为1。其实这里的Attention不就是一个加权嘛。</p>
+<p><img src="https://image.rexking6.top/img/v2-e81b090018d692cebe3069ebe5021e8b_720w.webp" alt="图7：图注意力机制示意"></p>
+<p>此外，作者在提出GAT时也提出了多头注意力机制的方法。如图7(右)所示，不同的颜色代表了不同的注意力计算过程，并将结果进行拼接或平均。具体公式如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+h^{\prime} v_i & =\|_{k=1}^K \sigma\left(\sum_{v_j \in \mathcal{N}\left(v_i\right)} \alpha_{i j}^l W^l h_{v_j}\right) \\
+\text { or : } h^{\prime} v_i & =\sigma\left(\frac{1}{K} \sum_{k=1}^K \sum_{v_j \in \mathcal{N}\left(v_i\right)} \alpha_{i j}^l W^l h_{v_j}\right)
+\end{aligned}</script>
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\08\30\A-B测试\" rel="bookmark">A/B测试</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\03\21\Fisher线性判别\" rel="bookmark">Fisher线性判别</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\07\06\MobileNet\" rel="bookmark">MobileNet</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2023/03/13/%E5%9B%BE%E8%A1%A8%E7%A4%BA%E5%AD%A6%E4%B9%A0/" title="图表示学习">https://blog.rexking6.top/2023/03/13/图表示学习/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/03/12/%E4%B8%9A%E7%95%8C%E6%A0%B9%E5%9B%A0%E5%AE%9A%E4%BD%8D%E5%AE%9E%E8%B7%B5/" rel="prev" title="业界根因定位实践">
+      <i class="fa fa-chevron-left"></i> 业界根因定位实践
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Introduction"><span class="nav-number">2.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%BB%93%E6%9E%84%E7%9A%84%E8%A1%A8%E7%A4%BA%E5%AD%A6%E4%B9%A0"><span class="nav-number">3.</span> <span class="nav-text">基于图结构的表示学习</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DeepWalk"><span class="nav-number">3.1.</span> <span class="nav-text">DeepWalk</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Node2vec"><span class="nav-number">3.2.</span> <span class="nav-text">Node2vec</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%BF%E9%87%8C%E7%9A%84EGES"><span class="nav-number">3.3.</span> <span class="nav-text">阿里的EGES</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%89%B9%E5%BE%81%E7%9A%84%E8%A1%A8%E7%A4%BA%E5%AD%A6%E4%B9%A0"><span class="nav-number">4.</span> <span class="nav-text">基于图特征的表示学习</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#GCN"><span class="nav-number">4.1.</span> <span class="nav-text">GCN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GraphSAGE"><span class="nav-number">4.2.</span> <span class="nav-text">GraphSAGE</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%87%E6%A0%B7%E5%80%8D%E7%8E%87"><span class="nav-number">4.2.1.</span> <span class="nav-text">采样倍率</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%81%9A%E5%90%88%E6%96%B9%E5%BC%8F"><span class="nav-number">4.2.2.</span> <span class="nav-text">聚合方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GAT"><span class="nav-number">4.3.</span> <span class="nav-text">GAT</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">197</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">3.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">51:48</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
