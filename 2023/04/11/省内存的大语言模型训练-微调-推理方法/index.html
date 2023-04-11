@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="省内存的大语言模型训练&#x2F;微调&#x2F;推理方法">
+<meta property="og:url" content="https://blog.rexking6.top/2023/04/11/%E7%9C%81%E5%86%85%E5%AD%98%E7%9A%84%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83-%E5%BE%AE%E8%B0%83-%E6%8E%A8%E7%90%86%E6%96%B9%E6%B3%95/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/34352134.png">
+<meta property="og:image" content="https://image.rexking6.top/img/erwteryretyh.png">
+<meta property="og:image" content="https://image.rexking6.top/img/4645673465.png">
+<meta property="og:image" content="https://image.rexking6.top/img/werqwerq.png">
+<meta property="og:image" content="https://image.rexking6.top/img/1231234.png">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-8152ca5f44565bd0a06b5cc01458cdb1_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-858c910e6670236fa9402971452f3fab_720w.webp">
+<meta property="article:published_time" content="2023-04-10T16:51:45.000Z">
+<meta property="article:modified_time" content="2023-04-11T00:32:04.447Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/34352134.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2023/04/11/%E7%9C%81%E5%86%85%E5%AD%98%E7%9A%84%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83-%E5%BE%AE%E8%B0%83-%E6%8E%A8%E7%90%86%E6%96%B9%E6%B3%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>省内存的大语言模型训练/微调/推理方法 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2023/04/11/%E7%9C%81%E5%86%85%E5%AD%98%E7%9A%84%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83-%E5%BE%AE%E8%B0%83-%E6%8E%A8%E7%90%86%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          省内存的大语言模型训练/微调/推理方法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-04-11 00:51:45 / 修改时间：08:32:04" itemprop="dateCreated datePublished" datetime="2023-04-11T00:51:45+08:00">2023-04-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2023/04/11/%E7%9C%81%E5%86%85%E5%AD%98%E7%9A%84%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83-%E5%BE%AE%E8%B0%83-%E6%8E%A8%E7%90%86%E6%96%B9%E6%B3%95/" class="post-meta-item leancloud_visitors" data-flag-title="省内存的大语言模型训练/微调/推理方法" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>4.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>综合转载于：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/OrZIZ6v3h_rjfBPjeeRufw">有哪些省内存的大语言模型训练/微调/推理方法？</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/591858021">如何快速低成本训练自己私有领域的的AIGC模型？</a></li>
+</ul>
+<p>大模型（LLMs）现在是 NLP 领域的最主流方法之一了。这个趋势带来的主要问题之一，就是大模型的训练/微调/推理需要的内存也越来越多。举例来说，即使 RTX 3090 有着 24GB 的 RAM，是除了 A100 之外显存最大的显卡。但使用一块 RTX 3090 依然无法 fp32 精度训练最小号的 LLaMA-6B。本文总结一些 Memory-Efficient 的 LLMs 的训练/微调/推理方法，包括：</p>
+<p>● fp16</p>
+<p>● int8</p>
+<p>● LoRA</p>
+<p>● Gradient checkpointing</p>
+<p>● Torch FSDP</p>
+<p>● CPU offloading</p>
+<h1 id="估算模型所需的RAM"><a href="#估算模型所需的RAM" class="headerlink" title="估算模型所需的RAM"></a>估算模型所需的RAM</h1><p>首先，我们需要了解如何根据参数量估计模型大致所需的 RAM，这在实践中有很重要的参考意义。我们需要通过估算设置 batch_size，设置模型精度，选择微调方法和参数分布方法等。</p>
+<p>接下来，我们用 <strong>LLaMA-6B</strong> 模型为例估算其大致需要的内存。首先考虑精度对所需内存的影响：</p>
+<p>● fp32 精度，一个参数需要 32 bits, 4 bytes.</p>
+<p>● fp16 精度，一个参数需要 16 bits, 2 bytes.</p>
+<p>● int8 精度，一个参数需要 8 bits, 1 byte.</p>
+<p>其次，考虑模型需要的 RAM 大致分三个部分：</p>
+<p>● 模型参数</p>
+<p>● 梯度</p>
+<p>● 优化器参数</p>
+<p><strong>模型参数</strong>：等于参数量*每个参数所需内存。</p>
+<ul>
+<li><p>对于 fp32，LLaMA-6B 需要 6B*4 bytes = 24GB内存</p>
+</li>
+<li><p>对于 int8，LLaMA-6B 需要 6B*1 byte = 6GB</p>
+</li>
+</ul>
+<p><strong>梯度：</strong>同上，等于参数量*每个梯度参数所需内存。</p>
+<p><strong>优化器参数：</strong>不同的优化器所储存的参数量不同。</p>
+<p>对于常用的 AdamW 来说，需要储存两倍的模型参数（用来储存一阶和二阶momentum）。</p>
+<ul>
+<li>fp32 的 LLaMA-6B，AdamW 需要 6B*8 bytes = 48 GB</li>
+<li>int8 的 LLaMA-6B，AdamW 需要 6B*2 bytes = 12 GB</li>
+</ul>
+<p>除此之外，<strong>CUDA kernel</strong> 也会占据一些 RAM，大概 1.3GB 左右，查看方式如下。</p>
+<p><img src="https://image.rexking6.top/img/34352134.png" alt=""></p>
+<p>综上，int8 精度的 LLaMA-6B 模型部分大致需要 6GB+6GB+12GB+1.3GB = 25.3GB 左右。</p>
+<p>再根据LLaMA的架构（hidden_size = 4096, intermediate_size =11008, num_hidden_layers = 32, context_length = 2048）计算中间变量内存。</p>
+<p>每个 instance 需要：</p>
+<p><img src="https://image.rexking6.top/img/erwteryretyh.png" alt=""></p>
+<p>所以一张 A100（80GB RAM）大概可以在 int8 精度；batch_size = 50 的设定下进行全参数训练。</p>
+<p>查看消费级显卡的内存和算力：</p>
+<p><strong>2023 GPU Benchmark and Graphics Card Comparison Chart</strong></p>
+<p><em><a target="_blank" rel="noopener" href="https://www.gpucheck.com/gpu-benchmark-graphics-card-comparison-chart">https://www.gpucheck.com/gpu-benchmark-graphics-card-comparison-chart</a></em></p>
+<h1 id="Fp16-mixed-precision"><a href="#Fp16-mixed-precision" class="headerlink" title="Fp16-mixed precision"></a>Fp16-mixed precision</h1><p><img src="https://image.rexking6.top/img/4645673465.png" alt=""></p>
+<p>混合精度训练的大致思路是在 forward pass 和 gradient computation 的时候使用 fp16 来加速，但是在更新参数时使用 fp32。</p>
+<p>用 torch 实现：</p>
+<p><strong>CUDA Automatic Mixed Precision examples</strong></p>
+<p><em><a target="_blank" rel="noopener" href="https://pytorch.org/docs/stable/notes/amp_examples.html">https://pytorch.org/docs/stable/notes/amp_examples.html</a></em></p>
+<p>torch fp16 推理：直接使用 model.half() 将模型转换为fp16.</p>
+<p><img src="https://image.rexking6.top/img/werqwerq.png" alt=""></p>
+<p>使用 Huggingface Transformers：在 TrainingArguments 里声明 fp16=True</p>
+<p><em><a target="_blank" rel="noopener" href="https://huggingface.co/docs/transformers/perf_train_gpu_one#fp16-training">https://huggingface.co/docs/transformers/perf_train_gpu_one#fp16-training</a></em></p>
+<h1 id="Int8-bitsandbytes"><a href="#Int8-bitsandbytes" class="headerlink" title="Int8-bitsandbytes"></a>Int8-bitsandbytes</h1><p>Int8 是个很极端的数据类型，它最多只能表示 - 128～127 的数字，并且完全没有精度。为了在训练和 inference 中使用这个数据类型，bitsandbytes 使用了两个方法最大程度地降低了其带来的误差：</p>
+<ol>
+<li><p>vector-wise quantization</p>
+</li>
+<li><p>mixed precision decompasition</p>
+</li>
+</ol>
+<p>Huggingface 在这篇文章中用动图解释了 quantization 的实现：</p>
+<p><em><a target="_blank" rel="noopener" href="https://huggingface.co/blog/hf-bitsandbytes-integration">https://huggingface.co/blog/hf-bitsandbytes-integration</a></em></p>
+<p>论文：</p>
+<p><strong>LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale</strong></p>
+<p><em><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2208.07339">https://arxiv.org/abs/2208.07339</a></em></p>
+<p>借助 Huggingface PEFT，使用 int8 训练 opt-6.5B 的完整流程：</p>
+<p><em><a target="_blank" rel="noopener" href="https://github.com/huggingface/peft/blob/main/examples/int8_training/Finetune_opt_bnb_peft.ipynb">https://github.com/huggingface/peft/blob/main/examples/int8_training/Finetune_opt_bnb_peft.ipynb</a></em></p>
+<h1 id="PEFT"><a href="#PEFT" class="headerlink" title="PEFT"></a>PEFT</h1><p>PEFT(Parameter-Efficient Fine-Tuning)，不用finetune模型的全部参数，只需要finetune模型的少量参数，这提升了计算效率同时减少存储成本。PEFT的另外一个好处是可以一定程度上减少模型过拟合Q的风险，避免模型出现灾难性遗忘。目前huggingface已经开源了 一个PEFT库:</p>
+<p><a href="https://link.zhihu.com/?target=https%3A//github.com/huggingface/peft">https://link.zhihu.com/?target=https%3A//github.com/huggingface/peft</a></p>
+<p>目前该库已经支持如下的方法:</p>
+<ol>
+<li><strong>LORA:</strong> LORA: LOW-RANK ADAPTATION OF LARGE LANGUAGE MODELS</li>
+<li><strong>Prefix Tuning:</strong> P-Tuning v2: Prompt Tuning Can Be Comparable to Fine-tuning Universally Across Scales and Tasks</li>
+<li><strong>Prompt Tuning:</strong> The Power of Scale for Parameter-Efficient Prompt Tuning</li>
+<li><strong>P-Tuning:</strong> GPT Understands, Too</li>
+</ol>
+<p>其中LoRA是一种比较用的PEFT方法，它是微软在2021年提出的一种高效fientune语言大模型的方法，其核心思路是freeze大模型的参数，同时在transformer层中引入可训练的秩分解矩阵 (rank decomposition matrices)，从而大大减少模型要finetune的参数量。</p>
+<p><img src="https://image.rexking6.top/img/1231234.png" alt=""></p>
+<p>LoRA 发现再微调 LLMs 时，更新矩阵（update matrix) 往往特别 sparse，也就是说 update matrix 是低秩矩阵。LoRA 的作者根据这一特点将 update matrix reparametrize 为 两个低秩矩阵的积积 $B \cdot A$ 。其中， $W_0 \in R^{d \times k} ， \mathrm{~A}$ 和 B 的秩为 $\mathrm{r}$ ，且 $r \ll \min (d, k)$ 。如此一来， $\mathrm{A}+\mathrm{B}$ 的参数量将大大小于 $W_0$.</p>
+<p>LoRA 的论文：</p>
+<p><em><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2106.09685.pdf">https://arxiv.org/pdf/2106.09685.pdf</a></em></p>
+<p>借助 Huggingface PEFT 框架，使用 LoRA 微调 mt0：</p>
+<p><em><a target="_blank" rel="noopener" href="https://github.com/huggingface/peft/blob/main/examples/conditional_generation/peft_lora_seq2seq.ipynb">https://github.com/huggingface/peft/blob/main/examples/conditional_generation/peft_lora_seq2seq.ipynb</a></em></p>
+<p>比如目前很客人利用LoRA在开源的stable diffusion上训练不同风格的模型，比如cvitai  上开源的 墨心模型，只有 144MB 参数就可以生成中国水墨化风格图像：</p>
+<p><img src="https://image.rexking6.top/img/v2-8152ca5f44565bd0a06b5cc01458cdb1_720w.webp" alt=""></p>
+<p>再比如Alpaca-LoRA 采用LoRA来finetune LLaMA模型以实现轻量级ChatGPT:</p>
+<p><img src="https://image.rexking6.top/img/v2-858c910e6670236fa9402971452f3fab_720w.webp" alt=""></p>
+<h1 id="Gradient-Checkpointing"><a href="#Gradient-Checkpointing" class="headerlink" title="Gradient Checkpointing"></a>Gradient Checkpointing</h1><p>在 torch 中使用 - 把 model 用一个 customize 的 function 包装一下即可，详见：</p>
+<p><strong>Explore Gradient-Checkpointing in PyTorch</strong></p>
+<p><em><a target="_blank" rel="noopener" href="https://qywu.github.io/2019/05/22/explore-gradient-checkpointing.html">https://qywu.github.io/2019/05/22/explore-gradient-checkpointing.html</a></em></p>
+<p>在 Huggingface Transformers 中使用：</p>
+<p><em><a target="_blank" rel="noopener" href="https://huggingface.co/docs/transformers/v4.27.2/en/perf_train_gpu_one#gradient-checkpointing">https://huggingface.co/docs/transformers/v4.27.2/en/perf_train_gpu_one#gradient-checkpointing</a></em></p>
+<h1 id="Torch-FSDP-CPU-offload"><a href="#Torch-FSDP-CPU-offload" class="headerlink" title="Torch FSDP+CPU offload"></a>Torch FSDP+CPU offload</h1><p>Fully Sharded Data Paralle（FSDP）和 DeepSpeed 类似，均通过 ZeRO 等分布优化算法，减少内存的占用量。其将模型参数，梯度和优化器状态分布至多个 GPU 上，而非像 DDP 一样，在每个 GPU 上保留完整副本。CPU offload 则允许在一个 back propagation 中，将参数动态地从 GPU -&gt; CPU, CPU -&gt; GPU 进行转移，从而节省 GPU 内存。</p>
+<p>Huggingface 这篇博文解释了 ZeRO 的大致实现方法：</p>
+<p><em><a target="_blank" rel="noopener" href="https://huggingface.co/blog/zero-deepspeed-fairscale">https://huggingface.co/blog/zero-deepspeed-fairscale</a></em></p>
+<p>借助 torch 实现 FSDP，只需要将 model 用 FSDPwarp 一下；同样，cpu_offload 也只需要一行代码：</p>
+<p><em><a target="_blank" rel="noopener" href="https://pytorch.org/blog/introducing-pytorch-fully-sharded-data-parallel-api/">https://pytorch.org/blog/introducing-pytorch-fully-sharded-data-parallel-api/</a></em></p>
+<p>在这个可以查看 FSDP 支持的模型：</p>
+<p><em><a target="_blank" rel="noopener" href="https://pytorch.org/docs/stable/fsdp.html">https://pytorch.org/docs/stable/fsdp.html</a></em></p>
+<p>在 Huggingface Transformers 中使用 Torch FSDP：</p>
+<p><em><a target="_blank" rel="noopener" href="https://huggingface.co/docs/transformers/v4.27.2/en/main_classes/trainer#transformers.Trainin">https://huggingface.co/docs/transformers/v4.27.2/en/main_classes/trainer#transformers.Trainin</a></em></p>
+<p>根据某些 issue，shard_grad_op（只分布保存 optimizer states 和 gradients）模式可能比 fully_shard 更稳定：</p>
+<p><em><a target="_blank" rel="noopener" href="https://github.com/tatsu-lab/stanford_alpaca/issues/32">https://github.com/tatsu-lab/stanford_alpaca/issues/32</a></em></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\28\AMPC-1080Ti机器-深度环境搭建\" rel="bookmark">AMPC-1080Ti机器-深度环境搭建</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\12\coursera深度学习笔记\" rel="bookmark">coursera深度学习笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\24\使用Google-Colaboratory免费GPU\" rel="bookmark">使用Google Colaboratory免费GPU</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2023/04/11/%E7%9C%81%E5%86%85%E5%AD%98%E7%9A%84%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83-%E5%BE%AE%E8%B0%83-%E6%8E%A8%E7%90%86%E6%96%B9%E6%B3%95/" title="省内存的大语言模型训练&#x2F;微调&#x2F;推理方法">https://blog.rexking6.top/2023/04/11/省内存的大语言模型训练-微调-推理方法/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag"># 深度学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/04/04/%E5%BD%93%E4%B8%8B%E8%B6%85%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E5%8F%91%E5%B1%95%E7%8E%B0%E7%8A%B6/" rel="prev" title="当下超大语言模型发展现状">
+      <i class="fa fa-chevron-left"></i> 当下超大语言模型发展现状
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/04/11/%E5%8D%A1%E6%96%B9%E6%A3%80%E9%AA%8C%EF%BC%9A%E7%A6%BB%E6%95%A3%E5%8F%98%E9%87%8F%E7%9A%84%E5%85%B3%E8%81%94%E6%80%A7%E5%88%86%E6%9E%90/" rel="next" title="卡方检验：离散变量的关联性分析">
+      卡方检验：离散变量的关联性分析 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BC%B0%E7%AE%97%E6%A8%A1%E5%9E%8B%E6%89%80%E9%9C%80%E7%9A%84RAM"><span class="nav-number">2.</span> <span class="nav-text">估算模型所需的RAM</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Fp16-mixed-precision"><span class="nav-number">3.</span> <span class="nav-text">Fp16-mixed precision</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Int8-bitsandbytes"><span class="nav-number">4.</span> <span class="nav-text">Int8-bitsandbytes</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PEFT"><span class="nav-number">5.</span> <span class="nav-text">PEFT</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Gradient-Checkpointing"><span class="nav-number">6.</span> <span class="nav-text">Gradient Checkpointing</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Torch-FSDP-CPU-offload"><span class="nav-number">7.</span> <span class="nav-text">Torch FSDP+CPU offload</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">206</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">3.6m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">53:48</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

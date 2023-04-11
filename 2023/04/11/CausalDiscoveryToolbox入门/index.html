@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CausalDiscoveryToolbox入门">
+<meta property="og:url" content="https://blog.rexking6.top/2023/04/11/CausalDiscoveryToolbox%E5%85%A5%E9%97%A8/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20230411085241316.png">
+<meta property="og:image" content="https://image.rexking6.top/img/20210330172741683.JPG">
+<meta property="article:published_time" content="2023-04-11T00:48:25.000Z">
+<meta property="article:modified_time" content="2023-04-11T00:59:43.054Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="因果推断">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/image-20230411085241316.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2023/04/11/CausalDiscoveryToolbox%E5%85%A5%E9%97%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>CausalDiscoveryToolbox入门 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2023/04/11/CausalDiscoveryToolbox%E5%85%A5%E9%97%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CausalDiscoveryToolbox入门
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-04-11 08:48:25 / 修改时间：08:59:43" itemprop="dateCreated datePublished" datetime="2023-04-11T08:48:25+08:00">2023-04-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%9B%A0%E6%9E%9C%E6%8E%A8%E6%96%AD/" itemprop="url" rel="index"><span itemprop="name">因果推断</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2023/04/11/CausalDiscoveryToolbox%E5%85%A5%E9%97%A8/" class="post-meta-item leancloud_visitors" data-flag-title="CausalDiscoveryToolbox入门" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>4.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>综合转载于：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/Bit_Coders/article/details/113630451">CausalDiscoveryToolbox：因果建模、因果图代码实现</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/Jiu__Yue/article/details/127848424">因果发现工具 Causal Discovery Toolbox(cdt)安装指南</a></li>
+</ul>
+<p>最近在分析观测数据的因果关系时，发现一个很好用的工具包——CausalDiscoveryToolbox（以下简称Cdt），功能齐全，轻松上手因果发现。</p>
+<p>下面简单整理下该工具包的原理+用法。</p>
+<h1 id="CausalDiscoveryToolbox简介"><a href="#CausalDiscoveryToolbox简介" class="headerlink" title="CausalDiscoveryToolbox简介"></a>CausalDiscoveryToolbox简介</h1><p><a target="_blank" rel="noopener" href="https://github.com/FenTechSolutions/CausalDiscoveryToolbox">[Github]</a> <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1903.02278">[论文]</a> <a target="_blank" rel="noopener" href="https://fentechsolutions.github.io/CausalDiscoveryToolbox/html/index.html">[文档]</a></p>
+<ul>
+<li>用于在从数据的联合概率分布样本中学习因果图和相关的因果机制。</li>
+<li>实现了端到端的因果发现方法，支持从观测数据中恢复直接依赖关系（因果图的骨架）和变量之间的因果关系。</li>
+<li>实现了许多用于图结构恢复的算法（包括来自bnlearn1，pcalg2包的算法）。</li>
+<li>基于Numpy，Scikit-learn，Pytorch和R开发。</li>
+<li>支持GPU硬件加速。</li>
+</ul>
+<h1 id="因果建模的过程"><a href="#因果建模的过程" class="headerlink" title="因果建模的过程"></a>因果建模的过程</h1><p>Cdt工具包对一般的因果建模流程进行了概括：</p>
+<p><img src="https://image.rexking6.top/img/image-20230411085241316.png" alt=""></p>
+<p>Cdt工具包可以直接从观测数据中进行因果发现（获得因果有向图），也可以先恢复图结构（获得无向依赖图）之后，再进行因果发现（获得因果有向图）。</p>
+<h2 id="图恢复算法-Graph-recovery-algorithms"><a href="#图恢复算法-Graph-recovery-algorithms" class="headerlink" title="图恢复算法 Graph recovery algorithms"></a>图恢复算法 Graph recovery algorithms</h2><p>在Cdt工具包中实现了两种从原始数据中恢复无向依赖图的方法：</p>
+<ul>
+<li><p>二元依赖 (Bivariate dependencies)</p>
+<ul>
+<li>用于确定因果图中的（无向）边。</li>
+<li>依赖于统计检验，例如皮尔逊相关性（Pearson’s correlation）或互信息分数（mutual information scores）3。在第一阶段中可以使用二元依赖关系来建立因果图骨架。</li>
+</ul>
+</li>
+<li><p>多元方法 (Multivariate methods)</p>
+<ul>
+<li>目的是恢复全因果图。即为图的所有变量选择父、子和配偶节点（子的父母）。</li>
+<li>输出一个networkx.Graph图对象。</li>
+</ul>
+</li>
+</ul>
+<h2 id="因果发现算法-Causal-Discovery-algorithms"><a href="#因果发现算法-Causal-Discovery-algorithms" class="headerlink" title="因果发现算法 Causal Discovery algorithms"></a>因果发现算法 Causal Discovery algorithms</h2><p>Cdt包的主要焦点是从观测数据中发现因果关系，从成对设置到全图建模。</p>
+<ul>
+<li><p>成对建模（The pairwise setting）</p>
+<ul>
+<li>把每一对变量作为因果对问题（CEP4，cause-effect pair problem）进行处理，从而确定这些变量之间的因果关系。</li>
+<li>比如识别X→Y还是Y→X，或者X与Y没有关系。因果对参考教程</li>
+<li>成对建模的两个经典方法：加性噪声模型（ANM）5和IGCI6 (Information-Geometric Causal Inference)，在有篇因果对的综述里有详细介绍，后面有空梳理下。</li>
+<li>成对建模的前提假设是：这两个变量已经受到其他协变量的制约，并且剩余的潜在协变量几乎没有影响，可以被认为是“噪声”。</li>
+</ul>
+</li>
+<li><p>全图建模（The graph setting）</p>
+<ul>
+<li><p>基于贝叶斯或基于分数的方法，输出有向无环图或部分有向无环图。</p>
+<p>①依赖于条件独立性测试，称为基于约束的方法，如PC7或FCI8。</p>
+<p>②依赖于基于分数的方法，通过图搜索启发式方法（如GES9或CAM10）找到使似然分数最大化的图。</p>
+<p>③利用著名的对抗生成网络，例如CGNN11或SAM12。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="安装Cdt工具包"><a href="#安装Cdt工具包" class="headerlink" title="安装Cdt工具包"></a>安装Cdt工具包</h1><ol>
+<li><p>直接使用pip安装：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install cdt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装R语言及相应R包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">install.packages(&#x27;BiocManager&#x27;)</span><br><span class="line">BiocManager::install(c(&quot;SID&quot;, &quot;bnlearn&quot;, &quot;pcalg&quot;, &quot;kpcalg&quot;, &quot;glmnet&quot;, &quot;mboost&quot;, &quot;devtools&quot;))&#x27;</span><br><span class="line">library(devtools)</span><br><span class="line">install_github(&quot;Diviyan-Kalainathan/RCIT&quot;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改<code>cdt</code>找R包的路径</p>
+<ol>
+<li>找到对应的cdt安装路径，我是在anaconda下配置的环境，我的路径是D:\anaconda3\envs\dowhy\Lib\site-packages\cdt</li>
+<li>进入utils，打开Settings.py，修改_init_函数下的self.rpath参数为对应的刚才R语言安装目录下的Rscript的路径，我的Rscript路径为D:\SoftWare\R-4.1.2\bin\Rscript.exe</li>
+<li>最终修改样式：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">self.rpath = &#x27;D:\\SoftWare\\R-4.1.2\\bin\\Rscript.exe&#x27;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="使用示例"><a href="#使用示例" class="headerlink" title="使用示例"></a>使用示例</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cdt</span><br><span class="line"><span class="keyword">from</span> cdt <span class="keyword">import</span> SETTINGS</span><br><span class="line">SETTINGS.verbose=<span class="literal">True</span></span><br><span class="line"><span class="comment">#SETTINGS.NJOBS=16</span></span><br><span class="line"><span class="comment">#SETTINGS.GPU=1</span></span><br><span class="line"><span class="keyword">import</span> networkx <span class="keyword">as</span> nx</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">plt.axis(<span class="string">&#x27;off&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Load data</span></span><br><span class="line">data = pd.read_csv(<span class="string">&quot;lucas0_train.csv&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(data.head())</span><br><span class="line"></span><br><span class="line"><span class="comment"># Finding the structure of the graph</span></span><br><span class="line">glasso = cdt.independence.graph.Glasso()</span><br><span class="line">skeleton = glasso.predict(data)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Pairwise setting</span></span><br><span class="line">model = cdt.causality.pairwise.ANM()</span><br><span class="line">output_graph = model.predict(data, skeleton)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Visualize causality graph</span></span><br><span class="line">options = &#123;</span><br><span class="line">        <span class="string">&quot;node_color&quot;</span>: <span class="string">&quot;#A0CBE2&quot;</span>,</span><br><span class="line">        <span class="string">&quot;width&quot;</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="string">&quot;node_size&quot;</span>:<span class="number">400</span>,</span><br><span class="line">        <span class="string">&quot;edge_cmap&quot;</span>: plt.cm.Blues,</span><br><span class="line">        <span class="string">&quot;with_labels&quot;</span>: <span class="literal">True</span>,</span><br><span class="line">    &#125;</span><br><span class="line">nx.draw_networkx(output_graph,**options)</span><br></pre></td></tr></table></figure>
+<p>上述代码输出的因果图：</p>
+<p><img src="https://image.rexking6.top/img/20210330172741683.JPG" alt=""></p>
+<p>示例数据：<br><a target="_blank" rel="noopener" href="https://download.csdn.net/download/Bit_Coders/16241408">https://download.csdn.net/download/Bit_Coders/16241408</a></p>
+<p>网络结构的绘制参考networkx文档：<br><a target="_blank" rel="noopener" href="https://networkx.org/documentation/stable/index.html">https://networkx.org/documentation/stable/index.html</a></p>
+<h1 id="工具包模块"><a href="#工具包模块" class="headerlink" title="工具包模块"></a>工具包模块</h1><p>该软件包分为5个模块：</p>
+<ul>
+<li>因果关系：cdt.causality在成对设置或图形设置中实施因果发现算法。</li>
+<li>独立性：cdt.independence包括恢复数据依赖关系图的方法。</li>
+<li>数据：cdt.data为用户提供生成数据和加载基准数据的工具。</li>
+<li>实用程序：cdt.utils为用户提供用于模型构建，图形实用程序和设置的工具。</li>
+<li>指标：cdt.metrics包括图表的评分指标，以输入为准 networkx.DiGraph<br>用于计算的所有方法，接口与Scikit-learn类似，在这里.predict() 发动对给定的数据到工具箱中的算法，.fit()使得训练学习算法大部分的算法是类，它们的参数可以在自定义.init()中设置。</li>
+</ul>
+<p>程序包及其算法的结构：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">cdt package</span><br><span class="line">|</span><br><span class="line">|- independence</span><br><span class="line">|  |- graph (Infering the skeleton from data)</span><br><span class="line">|  |  |- Lasso variants (Randomized Lasso[1], Glasso[2], HSICLasso[3])</span><br><span class="line">|  |  |- FSGNN (CGNN[12] variant for feature selection)</span><br><span class="line">|  |  |- Skeleton recovery using feature selection algorithms (RFECV[5], LinearSVR[6], RRelief[7], ARD[8,9], DecisionTree)</span><br><span class="line">|  |</span><br><span class="line">|  |- stats (pairwise methods for dependency)</span><br><span class="line">|     |- Correlation (Pearson, Spearman, KendallTau)</span><br><span class="line">|     |- Kernel based (NormalizedHSIC[10])</span><br><span class="line">|     |- Mutual information based (MIRegression, Adjusted Mutual Information[11], Normalized mutual information[11])</span><br><span class="line">|</span><br><span class="line">|- data</span><br><span class="line">|  |- CausalPairGenerator (Generate causal pairs)</span><br><span class="line">|  |- AcyclicGraphGenerator (Generate FCM-based graphs)</span><br><span class="line">|  |- load_dataset (load standard benchmark datasets)</span><br><span class="line">|</span><br><span class="line">|- causality</span><br><span class="line">|  |- graph (methods for graph inference)</span><br><span class="line">|  |  |- CGNN[12]</span><br><span class="line">|  |  |- PC[13]</span><br><span class="line">|  |  |- GES[13]</span><br><span class="line">|  |  |- GIES[13]</span><br><span class="line">|  |  |- LiNGAM[13]</span><br><span class="line">|  |  |- CAM[13]</span><br><span class="line">|  |  |- GS[23]</span><br><span class="line">|  |  |- IAMB[24]</span><br><span class="line">|  |  |- MMPC[25]</span><br><span class="line">|  |  |- SAM[26]</span><br><span class="line">|  |  |- CCDr[27]</span><br><span class="line">|  |</span><br><span class="line">|  |- pairwise (methods for pairwise inference)</span><br><span class="line">|     |- ANM[14] (Additive Noise Model)</span><br><span class="line">|     |- IGCI[15] (Information Geometric Causal Inference)</span><br><span class="line">|     |- RCC[16] (Randomized Causation Coefficient)</span><br><span class="line">|     |- NCC[17] (Neural Causation Coefficient)</span><br><span class="line">|     |- GNN[12] (Generative Neural Network -- Part of CGNN )</span><br><span class="line">|     |- Bivariate fit (Baseline method of regression)</span><br><span class="line">|     |- Jarfo[20]</span><br><span class="line">|     |- CDS[20]</span><br><span class="line">|     |- RECI[28]</span><br><span class="line">|</span><br><span class="line">|- metrics (Implements the metrics for graph scoring)</span><br><span class="line">|  |- Precision Recall</span><br><span class="line">|  |- SHD</span><br><span class="line">|  |- SID [29]</span><br><span class="line">|</span><br><span class="line">|- utils</span><br><span class="line">   |- Settings -&gt; SETTINGS class (hardware settings)</span><br><span class="line">   |- loss -&gt; MMD loss [21, 22] &amp; various other loss functions</span><br><span class="line">   |- io -&gt; for importing data formats</span><br><span class="line">   |- graph -&gt; graph utilities</span><br></pre></td></tr></table></figure></p>
+<h1 id="使用感想"><a href="#使用感想" class="headerlink" title="使用感想"></a>使用感想</h1><ul>
+<li>接口简单，文档清晰，易于上手。</li>
+<li>不过目前还<strong>不支持使用干预措施</strong>。</li>
+<li>Cdt工具包是在观察环境进行因果发现的软件包，所以相当于还是在因果科学的第一层级“关联”。不过从当前的实际应用角度来说，“干预”和“反事实”的实施难度较大，“关联”层级的因果发现和推理已经能起到一定的作用。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2023/04/11/CausalDiscoveryToolbox%E5%85%A5%E9%97%A8/" title="CausalDiscoveryToolbox入门">https://blog.rexking6.top/2023/04/11/CausalDiscoveryToolbox入门/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%9B%A0%E6%9E%9C%E6%8E%A8%E6%96%AD/" rel="tag"># 因果推断</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/04/11/%E5%8D%A1%E6%96%B9%E6%A3%80%E9%AA%8C%EF%BC%9A%E7%A6%BB%E6%95%A3%E5%8F%98%E9%87%8F%E7%9A%84%E5%85%B3%E8%81%94%E6%80%A7%E5%88%86%E6%9E%90/" rel="prev" title="卡方检验：离散变量的关联性分析">
+      <i class="fa fa-chevron-left"></i> 卡方检验：离散变量的关联性分析
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CausalDiscoveryToolbox%E7%AE%80%E4%BB%8B"><span class="nav-number">2.</span> <span class="nav-text">CausalDiscoveryToolbox简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%A0%E6%9E%9C%E5%BB%BA%E6%A8%A1%E7%9A%84%E8%BF%87%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">因果建模的过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E6%81%A2%E5%A4%8D%E7%AE%97%E6%B3%95-Graph-recovery-algorithms"><span class="nav-number">3.1.</span> <span class="nav-text">图恢复算法 Graph recovery algorithms</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%A0%E6%9E%9C%E5%8F%91%E7%8E%B0%E7%AE%97%E6%B3%95-Causal-Discovery-algorithms"><span class="nav-number">3.2.</span> <span class="nav-text">因果发现算法 Causal Discovery algorithms</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85Cdt%E5%B7%A5%E5%85%B7%E5%8C%85"><span class="nav-number">4.</span> <span class="nav-text">安装Cdt工具包</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B"><span class="nav-number">5.</span> <span class="nav-text">使用示例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7%E5%8C%85%E6%A8%A1%E5%9D%97"><span class="nav-number">6.</span> <span class="nav-text">工具包模块</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%84%9F%E6%83%B3"><span class="nav-number">7.</span> <span class="nav-text">使用感想</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">206</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">3.6m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">53:48</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
