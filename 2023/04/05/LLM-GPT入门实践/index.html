@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LLM-GPT入门实践">
+<meta property="og:url" content="https://blog.rexking6.top/2023/04/05/LLM-GPT%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-04-05T02:32:24.000Z">
+<meta property="article:modified_time" content="2023-04-16T16:36:52.606Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.rexking6.top/2023/04/05/LLM-GPT%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>LLM-GPT入门实践 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2023/04/05/LLM-GPT%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LLM-GPT入门实践
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-05 10:32:24" itemprop="dateCreated datePublished" datetime="2023-04-05T10:32:24+08:00">2023-04-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-04-17 00:36:52" itemprop="dateModified" datetime="2023-04-17T00:36:52+08:00">2023-04-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2023/04/05/LLM-GPT%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/" class="post-meta-item leancloud_visitors" data-flag-title="LLM-GPT入门实践" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>7.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>最近LLM-GPT挺火的，尝试了几个模型：</p>
+<ul>
+<li>Chinese-LLaMA-Alpaca</li>
+<li>Chinese-Vicuna</li>
+<li>alpaca-lora</li>
+<li>BELLE</li>
+<li>ChatGLM</li>
+</ul>
+<p>并对效果好的模型（BELLE和ChatGLM）尝试微调，转载于：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/8MLzrEFNUUCp4CCp8JpGPw">定制你的私人本地离线”ChatGPT” - GPT 模型微调实战指南</a></li>
+</ul>
+<h1 id="Chinese-LLaMA-Alpaca"><a href="#Chinese-LLaMA-Alpaca" class="headerlink" title="Chinese-LLaMA-Alpaca"></a>Chinese-LLaMA-Alpaca</h1><p>项目地址：<a target="_blank" rel="noopener" href="https://github.com/ymcui/Chinese-LLaMA-Alpaca">https://github.com/ymcui/Chinese-LLaMA-Alpaca</a></p>
+<blockquote>
+<p>为了促进大模型在中文NLP社区的开放研究，本项目开源了<strong>中文LLaMA模型和指令精调的Alpaca大模型</strong>。这些模型<strong>在原版LLaMA的基础上扩充了中文词表</strong>并使用了中文数据进行二次预训练，进一步提升了中文基础语义理解能力。同时，中文Alpaca模型进一步使用了中文指令数据进行精调，显著提升了模型对指令的理解和执行能力。</p>
+</blockquote>
+<p>LLaMA和Alpaca有什么区别？我应该用哪个？</p>
+<blockquote>
+<p>中文Alpaca模型在上述中文LLaMA模型的基础上进一步使用了指令数据进行精调，具体见<a target="_blank" rel="noopener" href="https://github.com/ymcui/Chinese-LLaMA-Alpaca#训练细节">训练细节</a>一节。如希望体验类ChatGPT对话交互，请使用Alpaca模型，而不是LLaMA模型。</p>
+</blockquote>
+<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><ol>
+<li><p>确保Python在3.9以上</p>
+</li>
+<li><p>因为LLaMa权重版开源，从<a target="_blank" rel="noopener" href="https://github.com/juncongmoo/pyllama">pyllama</a>下载权重</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pip install pyllama</span><br><span class="line"># 很可能需要运行多次</span><br><span class="line">python -m llama.download --model_size 7B --folder /tmp/pyllama_data</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装git lfs</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash</span><br><span class="line">sudo apt install git-lfs</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>下载Chinese-Alpaca-7B补丁权重</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip install huggingface_hub</span><br><span class="line">git clone https://huggingface.co/ziqingyang/chinese-alpaca-lora-7b</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装依赖库</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pip install transformers==4.28.0</span><br><span class="line">pip install sentencepiece==0.1.97</span><br><span class="line">pip install peft==0.2.0</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="权重转换"><a href="#权重转换" class="headerlink" title="权重转换"></a>权重转换</h2><ol>
+<li><p>将原版LLaMA模型转换为HF格式：请使用<a target="_blank" rel="noopener" href="https://huggingface.co/docs/transformers/installation#install-from-source">🤗transformers</a>提供的脚本<a target="_blank" rel="noopener" href="https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/convert_llama_weights_to_hf.py">convert_llama_weights_to_hf.py</a>，将原版LLaMA模型转换为HuggingFace格式。将原版LLaMA的<code>tokenizer.model</code>放在<code>--input_dir</code>指定的目录，其余文件放在<code>$&#123;input_dir&#125;/$&#123;model_size&#125;</code>下。执行以下命令后，<code>--output_dir</code>中将存放转换好的HF版权重。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python src/transformers/models/llama/convert_llama_weights_to_hf.py \</span><br><span class="line">    --input_dir path_to_original_llama_root_dir \</span><br><span class="line">    --model_size 7B \</span><br><span class="line">    --output_dir path_to_original_llama_hf_dir</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>合并LoRA权重，生成全量模型权重：这一步骤会对原版LLaMA模型（HF格式）扩充中文词表，合并LoRA权重并生成全量模型权重。此处可有两种选择：</p>
+<ul>
+<li>输出PyTorch版本权重（<code>.pth</code>文件），使用<code>merge_llama_with_chinese_lora.py</code>脚本<ul>
+<li>以便<a target="_blank" rel="noopener" href="https://github.com/ymcui/Chinese-LLaMA-Alpaca#llamacpp量化部署">使用llama.cpp工具进行量化和部署</a></li>
+</ul>
+</li>
+<li>输出HuggingFace版本权重（<code>.bin</code>文件），使用<code>merge_llama_with_chinese_lora_to_hf.py</code>脚本（感谢@sgsdxzy 提供）<ul>
+<li>以便<a target="_blank" rel="noopener" href="https://github.com/ymcui/Chinese-LLaMA-Alpaca#使用transformers推理">使用Transformers进行推理</a></li>
+<li>以便<a target="_blank" rel="noopener" href="https://github.com/ymcui/Chinese-LLaMA-Alpaca#使用text-generation-webui搭建界面">使用text-generation-webui搭建界面</a></li>
+</ul>
+</li>
+</ul>
+<p>以上两个脚本所需参数一致，仅输出文件格式不同。下面以生成PyTorch版本权重为例，介绍相应的参数设置。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python scripts/merge_llama_with_chinese_lora.py \</span><br><span class="line">    --base_model path_to_original_llama_hf_dir \</span><br><span class="line">    --lora_model path_to_chinese_llama_or_alpaca_lora \</span><br><span class="line">    --output_dir path_to_output_dir </span><br></pre></td></tr></table></figure>
+<p>参数说明：</p>
+<ul>
+<li><code>--base_model</code>：存放HF格式的LLaMA模型权重和配置文件的目录（Step 1生成）</li>
+<li><code>--lora_model</code>：中文LLaMA/Alpaca LoRA解压后文件所在目录，也可使用<a target="_blank" rel="noopener" href="https://github.com/ymcui/Chinese-LLaMA-Alpaca#Model-Hub">🤗Model Hub模型调用名称</a></li>
+<li><code>--output_dir</code>：指定保存全量模型权重的目录，默认为<code>./</code></li>
+<li>（可选）<code>--offload_dir</code>：对于低内存用户需要指定一个offload缓存路径</li>
+</ul>
+</li>
+</ol>
+<h2 id="部署推理"><a href="#部署推理" class="headerlink" title="部署推理"></a>部署推理</h2><p>本项目中的模型主要支持以下三种推理和部署方式：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/ymcui/Chinese-LLaMA-Alpaca#llamacpp">llama.cpp</a>：提供了一种模型量化和在本地CPU上部署方式</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/ymcui/Chinese-LLaMA-Alpaca#使用Transformers推理">🤗Transformers</a>：提供原生transformers推理接口，支持CPU/GPU上进行模型推理</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/ymcui/Chinese-LLaMA-Alpaca#使用text-generation-webui搭建界面">text-generation-webui</a>：提供了一种可实现前端UI界面的部署方式</li>
+</ul>
+<h3 id="llama-cpp量化部署"><a href="#llama-cpp量化部署" class="headerlink" title="llama.cpp量化部署"></a>llama.cpp量化部署</h3><p>接下来以<a target="_blank" rel="noopener" href="https://github.com/ggerganov/llama.cpp">llama.cpp工具</a>为例，介绍MacOS和Linux系统中，将模型进行量化并在<strong>本地CPU上部署</strong>的详细步骤。Windows则可能需要cmake等编译工具的安装（Windows用户出现模型无法理解中文或生成速度特别慢时请参考<a target="_blank" rel="noopener" href="https://github.com/ymcui/Chinese-LLaMA-Alpaca/tree/main#FAQ">FAQ#6</a>）。<strong>本地快速部署体验推荐使用经过指令精调的Alpaca模型，有条件的推荐使用FP16模型，效果更佳。</strong> 下面以中文Alpaca-7B模型为例介绍，运行前请确保：</p>
+<ol>
+<li>模型量化过程需要将未量化模型全部载入内存，请确保有足够可用内存（7B版本需要13G以上）</li>
+<li>加载使用4-bit量化后的模型时（例如7B版本），确保本机可用内存大于4-6G（受上下文长度影响）</li>
+<li>系统应有<code>make</code>（MacOS/Linux自带）或<code>cmake</code>（Windows需自行安装）编译工具</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/ggerganov/llama.cpp">llama.cpp</a>官方建议使用Python 3.9~3.11编译和运行该工具</li>
+</ol>
+<h4 id="Step-1-克隆和编译llama-cpp"><a href="#Step-1-克隆和编译llama-cpp" class="headerlink" title="Step 1: 克隆和编译llama.cpp"></a>Step 1: 克隆和编译llama.cpp</h4><p>运行以下命令对llama.cpp项目进行编译，生成<code>./main</code>和<code>./quantize</code>二进制文件。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/ggerganov/llama.cpp &amp;&amp; cd llama.cpp &amp;&amp; make</span><br></pre></td></tr></table></figure>
+<h4 id="Step-2-生成量化版本模型"><a href="#Step-2-生成量化版本模型" class="headerlink" title="Step 2: 生成量化版本模型"></a>Step 2: 生成量化版本模型</h4><p>将<a target="_blank" rel="noopener" href="https://github.com/ymcui/Chinese-LLaMA-Alpaca#合并模型">合并模型</a>（选择生成<code>.pth</code>格式模型）中最后一步生成的<code>tokenizer.model</code>文件放入<code>zh-models</code>目录下，模型文件<code>consolidated.*.pth</code>和配置文件<code>params.json</code>放入<code>zh-models/7B</code>目录下。请注意LLaMA和Alpaca的<code>tokenizer.model</code>不可混用（原因见<a target="_blank" rel="noopener" href="https://github.com/ymcui/Chinese-LLaMA-Alpaca#训练细节">训练细节</a>）。目录结构类似：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">llama.cpp/zh-models/</span><br><span class="line">   - 7B/</span><br><span class="line">     - consolidated.00.pth</span><br><span class="line">     - params.json</span><br><span class="line">   - tokenizer.model</span><br></pre></td></tr></table></figure>
+<p>将上述<code>.pth</code>模型权重转换为ggml的FP16格式，生成文件路径为<code>zh-models/7B/ggml-model-f16.bin</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python convert.py zh-models/7B/</span><br></pre></td></tr></table></figure>
+<p>进一步对FP16模型进行4-bit量化，生成量化模型文件路径为<code>zh-models/7B/ggml-model-q4_0.bin</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./quantize ./zh-models/7B/ggml-model-f16.bin ./zh-models/7B/ggml-model-q4_0.bin 2</span><br></pre></td></tr></table></figure>
+<p>此处也可以将最后一个参数改为<code>3</code>，即生成<code>q4_1</code>版本的量化权重。<code>q4_1</code>权重比<code>q4_0</code>大一些，速度慢一些，效果方面会有些许提升，具体可参考<a target="_blank" rel="noopener" href="https://github.com/ggerganov/llama.cpp#perplexity-measuring-model-quality">llama.cpp#PPL</a>。</p>
+<h4 id="Step-3-加载并启动模型"><a href="#Step-3-加载并启动模型" class="headerlink" title="Step 3: 加载并启动模型"></a>Step 3: 加载并启动模型</h4><p>运行<code>./main</code>二进制文件，<code>-m</code>命令指定4-bit量化或FP16的GGML模型。以下是命令示例（并非最优参数）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./main -m zh-models/7B/ggml-model-q4_0.bin --color -f prompts/alpaca.txt -ins -c 2048 --temp 0.2 -n 256 --repeat_penalty 1.3</span><br></pre></td></tr></table></figure>
+<p>在提示符 <code>&gt;</code> 之后输入你的prompt，<code>cmd/ctrl+c</code>中断输出，多行信息以<code>\</code>作为行尾。如需查看帮助和参数说明，请执行<code>./main -h</code>命令。下面介绍一些常用的参数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">-ins 启动类ChatGPT对话交流的运行模式</span><br><span class="line">-f 指定prompt模板，alpaca模型请加载prompts/alpaca.txt</span><br><span class="line">-c 控制上下文的长度，值越大越能参考更长的对话历史（默认：512）</span><br><span class="line">-n 控制回复生成的最大长度（默认：128）</span><br><span class="line">-b 控制batch size（默认：8），可适当增加</span><br><span class="line">-t 控制线程数量（默认：4），可适当增加</span><br><span class="line">--repeat_penalty 控制生成回复中对重复文本的惩罚力度</span><br><span class="line">--temp 温度系数，值越低回复的随机性越小，反之越大</span><br><span class="line">--top_p, top_k 控制解码采样的相关参数</span><br></pre></td></tr></table></figure>
+<h3 id="使用Transformers推理"><a href="#使用Transformers推理" class="headerlink" title="使用Transformers推理"></a>使用Transformers推理</h3><p>如果想在不安装其他库或Python包的情况下快速体验模型效果，可以使用<a target="_blank" rel="noopener" href="https://github.com/ymcui/Chinese-LLaMA-Alpaca/blob/main/scripts/inference_hf.py">scripts/inference_hf.py</a> 脚本启动非量化模型。该脚本支持CPU和GPU的单卡推理。以启动Chinese-Alpaca-7B模型为例，脚本运行方式如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">CUDA_VISIBLE_DEVICES=&#123;device_id&#125; python scripts/inference_hf.py \</span><br><span class="line">    --base_model path_to_original_llama_hf_dir \</span><br><span class="line">    --lora_model path_to_chinese_llama_or_alpaca_lora \</span><br><span class="line">    --with_prompt \</span><br><span class="line">    --interactive</span><br></pre></td></tr></table></figure>
+<p>如果已经执行了<code>merge_llama_with_chinese_lora_to_hf.py</code>脚本将lora权重合并，那么无需再指定<code>--lora_model</code>，启动方式更简单：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CUDA_VISIBLE_DEVICES=&#123;device_id&#125; python scripts/inference_hf.py \</span><br><span class="line">    --base_model path_to_merged_llama_or_alpaca_hf_dir \</span><br><span class="line">    --with_prompt \</span><br><span class="line">    --interactive</span><br></pre></td></tr></table></figure>
+<p>参数说明：</p>
+<ul>
+<li><code>&#123;device_id&#125;</code>：CUDA设备编号。如果为空，那么在CPU上进行推理</li>
+<li><code>--base_model &#123;base_model&#125;</code>：存放<strong>HF格式</strong>的LLaMA模型权重和配置文件的目录。如果之前合并生成的是PyTorch格式模型，<a target="_blank" rel="noopener" href="https://github.com/ymcui/Chinese-LLaMA-Alpaca#step-1-将原版llama模型转换为hf格式">请转换为HF格式</a></li>
+<li><code>--lora_model &#123;lora_model&#125;</code> ：中文LLaMA/Alpaca LoRA解压后文件所在目录，也可使用<a target="_blank" rel="noopener" href="https://github.com/ymcui/Chinese-LLaMA-Alpaca#Model-Hub">🤗Model Hub模型调用名称</a>。若不提供此参数，则只加载<code>--base_model</code>指定的模型</li>
+<li><code>--tokenizer_path &#123;tokenizer_path&#125;</code>：存放对应tokenizer的目录。若不提供此参数，则其默认值与<code>--lora_model</code>相同；若也未提供<code>--lora_model</code>参数，则其默认值与<code>--base_model</code>相同</li>
+<li><code>--with_prompt</code>：是否将输入与prompt模版进行合并。<strong>如果加载Alpaca模型，请务必启用此选项！</strong></li>
+<li><code>--interactive</code>：以交互方式启动，以便进行多次<strong>单轮问答</strong>（此处不是llama.cpp中的上下文对话）</li>
+<li><code>--data_file &#123;file_name&#125;</code>：非交互方式启动下，按行读取<code>file_name</code>中的的内容进行预测</li>
+<li><code>--predictions_file &#123;file_name&#125;</code>：非交互式方式下，将预测的结果以json格式写入<code>file_name</code></li>
+</ul>
+<p>注意事项：</p>
+<ul>
+<li>因不同框架的解码实现细节有差异，该脚本并不能保证复现llama.cpp的解码效果</li>
+<li>该脚本仅为方便快速体验用，并未对多机多卡、低内存、低显存等情况等条件做任何优化</li>
+<li>如在CPU上运行7B模型推理，请确保有32GB内存；如在GPU上运行7B模型推理，请确保有20GB显存</li>
+</ul>
+<h3 id="使用text-generation-webui搭建界面"><a href="#使用text-generation-webui搭建界面" class="headerlink" title="使用text-generation-webui搭建界面"></a>使用text-generation-webui搭建界面</h3><p>接下来以<a target="_blank" rel="noopener" href="https://github.com/oobabooga/text-generation-webui">text-generation-webui工具</a>为例，介绍无需合并模型即可进行<strong>本地化部署</strong>的详细步骤。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"># 克隆text-generation-webui</span><br><span class="line">git clone https://github.com/oobabooga/text-generation-webui</span><br><span class="line">cd text-generation-webui</span><br><span class="line">pip install -r requirements.txt</span><br><span class="line"></span><br><span class="line"># 将下载后的lora权重放到loras文件夹下</span><br><span class="line">ls loras/chinese-alpaca-lora-7b</span><br><span class="line">adapter_config.json  adapter_model.bin  special_tokens_map.json  tokenizer_config.json  tokenizer.model</span><br><span class="line"></span><br><span class="line"># 将HuggingFace格式的llama-7B模型文件放到models文件夹下</span><br><span class="line">ls models/llama-7b-hf</span><br><span class="line">pytorch_model-00001-of-00002.bin pytorch_model-00002-of-00002.bin config.json pytorch_model.bin.index.json generation_config.json</span><br><span class="line"></span><br><span class="line"># 复制lora权重的tokenizer到models/llama-7b-hf下</span><br><span class="line">cp loras/chinese-alpaca-lora-7b/tokenizer.model models/llama-7b-hf/</span><br><span class="line">cp loras/chinese-alpaca-lora-7b/special_tokens_map.json models/llama-7b-hf/</span><br><span class="line">cp loras/chinese-alpaca-lora-7b/tokenizer_config.json models/llama-7b-hf/</span><br><span class="line"></span><br><span class="line"># 修改/modules/LoRA.py文件，大约在第28行</span><br><span class="line">shared.model.resize_token_embeddings(len(shared.tokenizer))</span><br><span class="line">shared.model = PeftModel.from_pretrained(shared.model, Path(f&quot;&#123;shared.args.lora_dir&#125;/&#123;lora_name&#125;&quot;), **params)</span><br><span class="line"></span><br><span class="line"># 接下来就可以愉快的运行了，参考https://github.com/oobabooga/text-generation-webui/wiki/Using-LoRAs</span><br><span class="line">python server.py --model llama-7b-hf --lora chinese-alpaca-lora-7b</span><br></pre></td></tr></table></figure>
+<h1 id="Chinese-Vicuna"><a href="#Chinese-Vicuna" class="headerlink" title="Chinese-Vicuna"></a>Chinese-Vicuna</h1><p>项目地址：<a target="_blank" rel="noopener" href="https://github.com/Facico/Chinese-Vicuna">https://github.com/Facico/Chinese-Vicuna</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/Facico/Chinese-Vicuna</span><br><span class="line">pip install -r ./Chinese-Vicuna/requirements.txt</span><br><span class="line">python ./Chinese-Vicuna/interaction.py --lora_path Facico/Chinese-Vicuna-lora-7b-3epoch-belle-and-guanaco --use_local 0</span><br></pre></td></tr></table></figure>
+<h1 id="alpaca-lora"><a href="#alpaca-lora" class="headerlink" title="alpaca-lora"></a>alpaca-lora</h1><p>项目地址：<a target="_blank" rel="noopener" href="https://github.com/tloen/alpaca-lora">https://github.com/tloen/alpaca-lora</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/tloen/alpaca-lora</span><br><span class="line">pip install -r requirements.txt</span><br><span class="line">python generate.py \</span><br><span class="line">    --load_8bit \</span><br><span class="line">    --base_model &#x27;decapoda-research/llama-7b-hf&#x27; \</span><br><span class="line">    --lora_weights &#x27;tloen/alpaca-lora-7b&#x27;</span><br></pre></td></tr></table></figure>
+<p>像以上三个基于LLaMA的模型，微调的数据集是需要以下三个输入：</p>
+<ul>
+<li>instruction</li>
+<li>input</li>
+<li>output</li>
+</ul>
+<p>所以在一些只有input的数据集中，可以将input等同于instruction。</p>
+<h1 id="BELLE"><a href="#BELLE" class="headerlink" title="BELLE"></a>BELLE</h1><p>项目地址：<a target="_blank" rel="noopener" href="https://github.com/LianjiaTech/BELLE">https://github.com/LianjiaTech/BELLE</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/LianjiaTech/BELLE</span><br><span class="line">cd BELLE/gptq</span><br><span class="line">pip install -r requirements.txt</span><br><span class="line">python setup_cuda.py install &amp;&amp; CUDA_VISIBLE_DEVICES=0 &amp;&amp; python test_kernel.py</span><br></pre></td></tr></table></figure>
+<p>接着下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https://huggingface.co/BelleGroup/BELLE_BLOOM_GPTQ_4BIT</span><br><span class="line">python bloom_inference.py BELLE_BLOOM_GPTQ_4BIT  --temperature 1.2  --wbits 4 --groupsize 128 --load  BELLE_BLOOM_GPTQ_4BIT/bloom7b-2m-4bit-128g.pt</span><br></pre></td></tr></table></figure>
+<p>如果模型下不下来，可以从<a target="_blank" rel="noopener" href="https://huggingface.co/BelleGroup/BELLE_BLOOM_GPTQ_4BIT/tree/main得到单独文件的下载链接，再下载。">https://huggingface.co/BelleGroup/BELLE_BLOOM_GPTQ_4BIT/tree/main得到单独文件的下载链接，再下载。</a></p>
+<p>效果不错，后面看看怎么微调。</p>
+<h1 id="ChatGLM"><a href="#ChatGLM" class="headerlink" title="ChatGLM"></a>ChatGLM</h1><ul>
+<li>官网：<a target="_blank" rel="noopener" href="https://chatglm.cn/blog">https://chatglm.cn/blog</a></li>
+<li>项目地址：<a target="_blank" rel="noopener" href="https://github.com/THUDM/ChatGLM-6B">https://github.com/THUDM/ChatGLM-6B</a></li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/THUDM/ChatGLM-6B</span><br><span class="line">cd ChatGLM-6B</span><br><span class="line">pip install -r requirements.txt</span><br><span class="line">python web_demo.py</span><br></pre></td></tr></table></figure>
+<p>效果也不错，比BELLE差一点，看看怎么微调。</p>
+<p>微调数据集：每行一个 JSON 对象，JSON 格式如下：{“summary”: “提示词”, “content”: “期望生成的结果”}</p>
+<blockquote>
+<p>训练目的是让模型说出他是微调后的结果，所以json内容基本以这个为主：</p>
+<p>{“summary”: “你是谁?”, “content”: “我是wstart通过ChatGLM -6B微调后的模型，训练编号是：0.08376971294904079”}</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\28\AMPC-1080Ti机器-深度环境搭建\" rel="bookmark">AMPC-1080Ti机器-深度环境搭建</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\07\20\Transformer\" rel="bookmark">Transformer</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\12\coursera深度学习笔记\" rel="bookmark">coursera深度学习笔记</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2023/04/05/LLM-GPT%E5%85%A5%E9%97%A8%E5%AE%9E%E8%B7%B5/" title="LLM-GPT入门实践">https://blog.rexking6.top/2023/04/05/LLM-GPT入门实践/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag"># 深度学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/04/04/%E5%BD%93%E4%B8%8B%E8%B6%85%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E5%8F%91%E5%B1%95%E7%8E%B0%E7%8A%B6/" rel="prev" title="当下超大语言模型发展现状">
+      <i class="fa fa-chevron-left"></i> 当下超大语言模型发展现状
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/04/11/%E7%9C%81%E5%86%85%E5%AD%98%E7%9A%84%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83-%E5%BE%AE%E8%B0%83-%E6%8E%A8%E7%90%86%E6%96%B9%E6%B3%95/" rel="next" title="省内存的大语言模型训练/微调/推理方法">
+      省内存的大语言模型训练/微调/推理方法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Chinese-LLaMA-Alpaca"><span class="nav-number">2.</span> <span class="nav-text">Chinese-LLaMA-Alpaca</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87"><span class="nav-number">2.1.</span> <span class="nav-text">环境准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9D%83%E9%87%8D%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.2.</span> <span class="nav-text">权重转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2%E6%8E%A8%E7%90%86"><span class="nav-number">2.3.</span> <span class="nav-text">部署推理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#llama-cpp%E9%87%8F%E5%8C%96%E9%83%A8%E7%BD%B2"><span class="nav-number">2.3.1.</span> <span class="nav-text">llama.cpp量化部署</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-1-%E5%85%8B%E9%9A%86%E5%92%8C%E7%BC%96%E8%AF%91llama-cpp"><span class="nav-number">2.3.1.1.</span> <span class="nav-text">Step 1: 克隆和编译llama.cpp</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-2-%E7%94%9F%E6%88%90%E9%87%8F%E5%8C%96%E7%89%88%E6%9C%AC%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.3.1.2.</span> <span class="nav-text">Step 2: 生成量化版本模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-3-%E5%8A%A0%E8%BD%BD%E5%B9%B6%E5%90%AF%E5%8A%A8%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.3.1.3.</span> <span class="nav-text">Step 3: 加载并启动模型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Transformers%E6%8E%A8%E7%90%86"><span class="nav-number">2.3.2.</span> <span class="nav-text">使用Transformers推理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8text-generation-webui%E6%90%AD%E5%BB%BA%E7%95%8C%E9%9D%A2"><span class="nav-number">2.3.3.</span> <span class="nav-text">使用text-generation-webui搭建界面</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Chinese-Vicuna"><span class="nav-number">3.</span> <span class="nav-text">Chinese-Vicuna</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#alpaca-lora"><span class="nav-number">4.</span> <span class="nav-text">alpaca-lora</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BELLE"><span class="nav-number">5.</span> <span class="nav-text">BELLE</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ChatGLM"><span class="nav-number">6.</span> <span class="nav-text">ChatGLM</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">210</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">3.7m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">56:12</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

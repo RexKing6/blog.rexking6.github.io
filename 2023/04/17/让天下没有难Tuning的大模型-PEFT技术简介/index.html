@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="让天下没有难Tuning的大模型-PEFT技术简介">
+<meta property="og:url" content="https://blog.rexking6.top/2023/04/17/%E8%AE%A9%E5%A4%A9%E4%B8%8B%E6%B2%A1%E6%9C%89%E9%9A%BETuning%E7%9A%84%E5%A4%A7%E6%A8%A1%E5%9E%8B-PEFT%E6%8A%80%E6%9C%AF%E7%AE%80%E4%BB%8B/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-b2bacec87ccf52deb679e2a45690de66_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-8ecb48524f48d662ba18cd039b14885f_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-e3afa0803f7c606a0da73615e89dee9f_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-ef3aa259e828f8c33bdaa7502f8faf68_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-7ac87b2053c0c2448c9e6f59cf559bbf_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-912a0b05cb7865903717ac1d8b7c6d23_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-71ca7bb6fbac19add95c015b4d6a8c7d_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-13c49a40ee7dcd1f83072d0476eb07ff_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-1bad66fe8caa33a17e619f047e8fb577_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-244697a79e21d38f1e9454eda3cfdaeb_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-be7be5a8e0aa82c8def498b12c90dc69_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-63847b4a18b607de844a71029fb23d27_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-66fda3f4823b7e48f907dbc09a89063b_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-401815fb3688b618f36d3ef1f28f9471_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-adee20c26d3d45841fe03a6059204f2f_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-34c0c7c4ab10db044ecc52af7d9f5baf_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-6794d1dbf0e98e91a3a3dda992154750_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-97aae485b7b9f326944a6586fe533e95_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-2265adb0787f315f52a2d2af15b4ddf2_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-76d0acc5d77754d3ca35261e7d4b57f9_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-29fda57cdefb6b5029a1a07ac61239c8_720w.webp">
+<meta property="og:image" content="https://pic1.zhimg.com/80/v2-08b726e6894ba1828272d43463d76f50_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-95e4a55fb15b315685893d668dc40d74_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-876ffa7f503600ccde1e3ba84544e40a_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-6857026c3b2627b2a58e0459e306078b_r.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-9ce668a0a8d2f9b54f8e3282b49e20cb_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-7610fc82919618f7c44a9fb44ba52eaf_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-4727941f026ee376ab38e23c0d257ae8_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-358a47bea9080e8c2cd358955d1f37e0_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-9749454a5785b206c886838c53e701ea_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-600ed0a71cc06db333044fff971e443a_720w.webp">
+<meta property="article:published_time" content="2023-04-17T00:45:41.000Z">
+<meta property="article:modified_time" content="2023-04-17T15:19:55.447Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/v2-b2bacec87ccf52deb679e2a45690de66_720w.webp">
+
+<link rel="canonical" href="https://blog.rexking6.top/2023/04/17/%E8%AE%A9%E5%A4%A9%E4%B8%8B%E6%B2%A1%E6%9C%89%E9%9A%BETuning%E7%9A%84%E5%A4%A7%E6%A8%A1%E5%9E%8B-PEFT%E6%8A%80%E6%9C%AF%E7%AE%80%E4%BB%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>让天下没有难Tuning的大模型-PEFT技术简介 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2023/04/17/%E8%AE%A9%E5%A4%A9%E4%B8%8B%E6%B2%A1%E6%9C%89%E9%9A%BETuning%E7%9A%84%E5%A4%A7%E6%A8%A1%E5%9E%8B-PEFT%E6%8A%80%E6%9C%AF%E7%AE%80%E4%BB%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          让天下没有难Tuning的大模型-PEFT技术简介
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-04-17 08:45:41 / 修改时间：23:19:55" itemprop="dateCreated datePublished" datetime="2023-04-17T08:45:41+08:00">2023-04-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2023/04/17/%E8%AE%A9%E5%A4%A9%E4%B8%8B%E6%B2%A1%E6%9C%89%E9%9A%BETuning%E7%9A%84%E5%A4%A7%E6%A8%A1%E5%9E%8B-PEFT%E6%8A%80%E6%9C%AF%E7%AE%80%E4%BB%8B/" class="post-meta-item leancloud_visitors" data-flag-title="让天下没有难Tuning的大模型-PEFT技术简介" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>6.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/618894319">让天下没有难Tuning的大模型-PEFT技术简介</a>。</p>
+<p>最近，深度学习的研究中出现了许多大型预训练模型，例如GPT-3、BERT等，这些模型可以在多种自然语言处理任务中取得优异的性能表现。而其中，ChatGPT模型因为在对话生成方面的表现而备受瞩目，成为了自然语言处理领域的热门研究方向。</p>
+<p>然而，这些大型预训练模型的训练成本非常高昂，需要庞大的计算资源和大量的数据，一般人难以承受。这也导致了一些研究人员难以重复和验证先前的研究成果。为了解决这个问题，研究人员开始研究Parameter-Efficient Fine-Tuning (PEFT)技术。PEFT技术旨在通过最小化微调参数的数量和计算复杂度，来提高预训练模型在新任务上的性能，从而缓解大型预训练模型的训练成本。这样一来，即使计算资源受限，也可以利用预训练模型的知识来迅速适应新任务，实现高效的迁移学习。因此，PEFT技术可以在提高模型效果的同时，大大缩短模型训练时间和计算成本，让更多人能够参与到深度学习研究中来。下面我们将深入探讨PEFT的一些主要做法。</p>
+<h1 id="常用的PEFT方法"><a href="#常用的PEFT方法" class="headerlink" title="常用的PEFT方法"></a>常用的PEFT方法</h1><h2 id="Adapter-Tuning"><a href="#Adapter-Tuning" class="headerlink" title="Adapter Tuning"></a>Adapter Tuning</h2><p>谷歌的研究人员首次在论文《Parameter-Efficient Transfer Learning for NLP》提出针对BERT的PEFT微调方式，拉开了PEFT研究的序幕。他们指出，在面对特定的下游任务时，如果进行Full-fintuning（即预训练模型中的所有参数都进行微调），太过低效；而如果采用固定预训练模型的某些层，只微调接近下游任务的那几层参数，又难以达到较好的效果。</p>
+<p>于是他们设计了如下图所示的Adapter结构，将其嵌入Transformer的结构里面，在训练时，固定住原来预训练模型的参数不变，只对新增的Adapter结构进行微调。同时为了保证训练的高效性（也就是尽可能少的引入更多参数），他们将Adapter设计为这样的结构：首先是一个down-project层将高维度特征映射到低维特征，然后过一个非线形层之后，再用一个up-project结构将低维特征映射回原来的高维特征；同时也设计了skip-connection结构，确保了在最差的情况下能够退化为identity。</p>
+<p><img src="https://image.rexking6.top/img/v2-b2bacec87ccf52deb679e2a45690de66_720w.webp" alt=""></p>
+<p>从实验结果来看，该方法能够在只额外对增加的3.6%参数规模（相比原来预训练模型的参数量）的情况下取得和Full-finetuning接近的效果（GLUE指标在0.4%以内）。</p>
+<p><img src="https://image.rexking6.top/img/v2-8ecb48524f48d662ba18cd039b14885f_720w.webp" alt=""></p>
+<h2 id="Prefix-Tuning"><a href="#Prefix-Tuning" class="headerlink" title="Prefix Tuning"></a>Prefix Tuning</h2><p><img src="https://image.rexking6.top/img/v2-e3afa0803f7c606a0da73615e89dee9f_720w.webp" alt=""></p>
+<p>Prefix Tuning方法由斯坦福的研究人员提出，与Full-finetuning更新所有参数的方式不同，该方法是在输入token之前构造一段任务相关的virtual tokens作为Prefix，然后训练的时候只更新Prefix部分的参数，而Transformer中的其他部分参数固定。该方法其实和构造Prompt类似，只是Prompt是人为构造的“显式”的提示,并且无法更新参数，而Prefix则是可以学习的“隐式”的提示。</p>
+<p>同时，为了防止直接更新Prefix的参数导致训练不稳定的情况，他们在Prefix层前面加了MLP结构(相当于将Prefix分解为更小维度的Input与MLP的组合后输出的结果)，训练完成后，只保留Prefix的参数。</p>
+<p>实验结果也说明了Prefix Tuning的方式可以取得不错的效果。</p>
+<p><img src="https://image.rexking6.top/img/v2-ef3aa259e828f8c33bdaa7502f8faf68_720w.webp" alt=""></p>
+<p>除此之外，作者还做了一系列的消融实验说明该方法的有效性：</p>
+<ul>
+<li>Prefix长度的影响</li>
+<li>不同的任务所需要的Prefix的长度有差异</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-7ac87b2053c0c2448c9e6f59cf559bbf_720w.webp" alt=""></p>
+<ul>
+<li><p>Full vs Embedding-only</p>
+<p>作者对比了Embedding-only（只有最上层输入处的Embedding作为参数更新，后续的参数固定）和Full（每一层的Prefix相关的参数都训练）的方式的效果</p>
+</li>
+<li><p>Prefixing vs Infixing</p>
+<p>对比了[PREFIX; x; y] 方式与[x; INFIX; y] 方式的差异，还是Prefix方式最好</p>
+</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-912a0b05cb7865903717ac1d8b7c6d23_720w.webp" alt=""></p>
+<ul>
+<li><p>Initialization</p>
+</li>
+<li><ul>
+<li>用任务相关的Prompt去初始化Prefix能取得更好的效果</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-71ca7bb6fbac19add95c015b4d6a8c7d_720w.webp" alt=""></p>
+<h1 id="Prompt-Tuning"><a href="#Prompt-Tuning" class="headerlink" title="Prompt Tuning"></a>Prompt Tuning</h1><p>论文《<a href="https://link.zhihu.com/?target=https%3A//arxiv.org/pdf/2104.08691.pdf">The Power of Scale for Parameter-Efficient Prompt Tuning</a>》</p>
+<p>我给这篇文章取了个新名字：Scale is All You Need，总的来说就是，只要模型规模够大，简单加入Prompt tokens进行微调，就能取得很好的效果。</p>
+<p>该方法可以看作是Prefix Tuning的简化版本，只在输入层加入prompt tokens，并不需要加入MLP进行调整来解决难训练的问题，主要在T5预训练模型上做实验。似乎只要预训练模型足够强大，其他的一切都不是问题。作者也做实验说明随着预训练模型参数量的增加，Prompt Tuning的方法会逼近Fine-tune的结果。</p>
+<p><img src="https://image.rexking6.top/img/v2-13c49a40ee7dcd1f83072d0476eb07ff_720w.webp" alt=""></p>
+<p><img src="https://image.rexking6.top/img/v2-1bad66fe8caa33a17e619f047e8fb577_720w.webp" alt=""></p>
+<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><p><img src="https://image.rexking6.top/img/v2-244697a79e21d38f1e9454eda3cfdaeb_720w.webp" alt=""></p>
+<p>作者做了一系列对比实验，都在说明：随着预训练模型参数的增加，一切的问题都不是问题，最简单的设置也能达到极好的效果。</p>
+<ul>
+<li>a) Prompt长度影响：模型参数达到一定量级时，Prompt长度为1也能达到不错的效果，Prompt长度为20就能达到极好效果。</li>
+<li>b) Prompt初始化方式影响：Random Uniform方式明显弱于其他两种，但是当模型参数达到一定量级，这种差异也不复存在。</li>
+<li>c) 预训练的方式：LM Adaptation的方式效果好，但是当模型达到一定规模，差异又几乎没有了。</li>
+<li>d) 微调步数影响：模型参数较小时，步数越多，效果越好。同样随着模型参数达到一定规模，zero shot也能取得不错效果。</li>
+</ul>
+<h1 id="P-Tuning"><a href="#P-Tuning" class="headerlink" title="P-Tuning"></a>P-Tuning</h1><h2 id="V1"><a href="#V1" class="headerlink" title="V1"></a>V1</h2><p>P-Tuning方法的提出主要是为了解决这样一个问题：大模型的Prompt构造方式严重影响下游任务的效果。</p>
+<p><img src="https://image.rexking6.top/img/v2-be7be5a8e0aa82c8def498b12c90dc69_720w.webp" alt=""></p>
+<p>P-Tuning提出将Prompt转换为可以学习的Embedding层，只是考虑到直接对Embedding参数进行优化会存在这样两个挑战：</p>
+<ul>
+<li>Discretenes： 对输入正常语料的Embedding层已经经过预训练，而如果直接对输入的prompt embedding进行随机初始化训练，容易陷入局部最优。</li>
+<li>Association：没法捕捉到prompt embedding之间的相关关系。</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-63847b4a18b607de844a71029fb23d27_720w.webp" alt=""></p>
+<p>作者在这里提出用MLP+LSTM的方式来对prompt embedding进行一层处理</p>
+<p><img src="https://image.rexking6.top/img/v2-66fda3f4823b7e48f907dbc09a89063b_720w.webp" alt=""></p>
+<h3 id="与Prefix-Tuning的区别"><a href="#与Prefix-Tuning的区别" class="headerlink" title="与Prefix-Tuning的区别"></a>与Prefix-Tuning的区别</h3><p>这篇文章（2021-03）和Prefix-Tuning（2021-01）差不多同时提出，做法其实也有一些相似之处，主要区别在</p>
+<ul>
+<li>Prefix Tuning是将额外的embedding加在开头，看起来更像是模仿Instruction指令；而P-Tuning的位置则不固定。</li>
+<li>Prefix Tuning通过在每个Attention层都加入Prefix Embedding来增加额外的参数，通过MLP来初始化；而P-Tuning只是在输入的时候加入Embedding，并通过LSTM+MLP来初始化。</li>
+</ul>
+<h2 id="V2"><a href="#V2" class="headerlink" title="V2"></a>V2</h2><p>论文《P-Tuning v2: Prompt Tuning Can Be Comparable to Fine-tuning Universally Across Scales and Tasks》</p>
+<p>从标题就可以看出这篇文章的野心，P-Tuning v2的目标就是要让Prompt Tuning能够在不同参数规模的预训练模型、针对不同下游任务的结果上都达到匹敌Fine-tuning的结果。</p>
+<p>那也就是说当前Prompt Tuning方法未能在这两个方面都存在局限性。</p>
+<ul>
+<li>不同模型规模：Prompt Tuning和P-tuning这两种方法都是在预训练模型参数规模够足够大时，才能达到和Fine-tuning类似的效果，而参数规模较小时效果则很差。</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-401815fb3688b618f36d3ef1f28f9471_720w.webp" alt=""></p>
+<ul>
+<li>不同任务类型：Prompt Tuning和P-tuning这两种方法在sequence tagging任务上表现都很差。</li>
+</ul>
+<h3 id="主要结构"><a href="#主要结构" class="headerlink" title="主要结构"></a>主要结构</h3><p>相比Prompt Tuning和P-tuning的方法， P-tuning v2方法在多层加入了Prompts tokens作为输入，带来两个方面的好处：</p>
+<ol>
+<li>带来更多可学习的参数（从P-tuning和Prompt Tuning的0.1%增加到0.1%-3%），同时也足够parameter-efficient。</li>
+<li>加入到更深层结构中的Prompt能给模型预测带来更直接的影响。</li>
+</ol>
+<p><img src="https://image.rexking6.top/img/v2-adee20c26d3d45841fe03a6059204f2f_720w.webp" alt=""></p>
+<h3 id="几个关键设计因素"><a href="#几个关键设计因素" class="headerlink" title="几个关键设计因素"></a>几个关键设计因素</h3><p><img src="https://image.rexking6.top/img/v2-34c0c7c4ab10db044ecc52af7d9f5baf_720w.webp" alt=""></p>
+<ul>
+<li><strong>Reparameterization</strong>：Prefix Tuning和P-tuning中都有MLP来构造可训练的embedding。本文发现在自然语言理解领域，面对不同的任务以及不同的数据集，这种方法可能带来完全相反的结论。</li>
+<li><strong>Prompt Length：</strong> 不同的任务对应的最合适的Prompt Length不一样，比如简单分类任务下length=20最好，而复杂的任务需要更长的Prompt Length。</li>
+<li><strong>Multi-task Learning</strong> 多任务对于P-Tuning v2是可选的，但可以利用它提供更好的初始化来进一步提高性能。</li>
+<li><strong>Classification Head</strong> 使用LM head来预测动词是Prompt Tuning的核心，但我们发现在完整的数据设置中没有必要这样做，并且这样做与序列标记不兼容。P-tuning v2采用和BERT一样的方式，在第一个token处应用随机初始化的分类头。</li>
+</ul>
+<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><ul>
+<li><p>不同预训练模型大小下的表现，在小模型下取得与Full-finetuning相近的结果，并远远优于P-Tuning。</p>
+<p><img src="https://image.rexking6.top/img/v2-6794d1dbf0e98e91a3a3dda992154750_720w.webp" alt=""></p>
+</li>
+<li><p>不同任务下的P-Tuning v2效果都很好，而P-Tuning和Prompt Learning效果不好；同时，采用多任务学习的方式能在多数任务上取得最好的结果。</p>
+<p><img src="https://image.rexking6.top/img/v2-97aae485b7b9f326944a6586fe533e95_720w.webp" alt=""></p>
+</li>
+<li><p>Verbalizer with LM head v.s. [CLS] label with linear head，两种方式没有太明显的区别</p>
+<p><img src="https://image.rexking6.top/img/v2-2265adb0787f315f52a2d2af15b4ddf2_720w.webp" alt=""></p>
+</li>
+<li><p>Prompt depth，在加入相同层数的Prompts前提下，往更深层网络加效果优于往更浅层网络（只有BoolQ中17-24反而低于1-8是例外）。</p>
+<p><img src="https://image.rexking6.top/img/v2-76d0acc5d77754d3ca35261e7d4b57f9_720w.webp" alt=""></p>
+</li>
+</ul>
+<h1 id="LoRA"><a href="#LoRA" class="headerlink" title="LoRA"></a>LoRA</h1><p>微软和CMU的研究者指出，现有的一些PEFT的方法还存在这样一些问题：</p>
+<ul>
+<li><p>由于增加了模型的深度从而额外增加了模型推理的延时，如Adapter方法</p>
+</li>
+<li><p>Prompt较难训练，同时减少了模型的可用序列长度，如Prompt Tuning、Prefix Tuning、P-Tuning方法</p>
+</li>
+<li><p>往往效率和质量不可兼得，效果差于full-finetuning。</p>
+</li>
+</ul>
+<p>有研究者对语言模型的参数进行研究发现：语言模型虽然参数众多，但是起到关键作用的还是其中低秩的本质维度（low instrisic dimension）。本文受到该观点的启发，提出了<strong>Lo</strong>w-<strong>R</strong>ank <strong>A</strong>daption(LoRA)，设计了如下所示的结构，在涉及到矩阵相乘的模块，引入A、B这样两个低秩矩阵模块去模拟Full-finetune的过程，相当于只对语言模型中起关键作用的低秩本质维度进行更新。</p>
+<p><img src="https://image.rexking6.top/img/v2-29fda57cdefb6b5029a1a07ac61239c8_720w.webp" alt=""></p>
+<p><img src="https://pic1.zhimg.com/80/v2-08b726e6894ba1828272d43463d76f50_720w.webp" alt=""></p>
+<p>这么做就能完美解决以上存在的3个问题：</p>
+<ul>
+<li><p>相比于原始的Adapter方法“额外”增加网络深度，必然会带来推理过程额外的延迟，该方法可以在推理阶段直接用训练好的A、B矩阵参数与原预训练模型的参数相加去替换原有预训练模型的参数，这样的话推理过程就相当于和Full-finetune一样，没有额外的计算量，从而不会带来性能的损失。</p>
+</li>
+<li><p>由于没有使用Prompt方式，自然不会存在Prompt方法带来的一系列问题。</p>
+</li>
+<li><p>该方法由于实际上相当于是用LoRA去模拟Full-finetune的过程，几乎不会带来任何训练效果的损失，后续的实验结果也证明了这一点。</p>
+</li>
+</ul>
+<p>在实验中，研究人员将这一LoRA模块与Transformer的attention模块相结合，在RoBERTa 、DeBERTa、GPT-2和GPT-3 175B这几个大模型上都做了实验，实验结果也充分证明了该方法的有效性。</p>
+<p><img src="https://image.rexking6.top/img/v2-95e4a55fb15b315685893d668dc40d74_720w.webp" alt=""></p>
+<p><img src="https://image.rexking6.top/img/v2-876ffa7f503600ccde1e3ba84544e40a_720w.webp" alt=""></p>
+<h1 id="UniPELT"><a href="#UniPELT" class="headerlink" title="UniPELT"></a>UniPELT</h1><h2 id="Towards-a-Unified-View-of-PETL"><a href="#Towards-a-Unified-View-of-PETL" class="headerlink" title="Towards a Unified View of PETL"></a>Towards a Unified View of PETL</h2><p>这篇ICLR2022的文章研究了典型的PEFT方法，试图将PEFT统一到一个框架下，找出它们起作用的具体原因，并进行改进。主要研究了三个问题：</p>
+<ul>
+<li>典型的PEFT方法有什么联系？</li>
+<li>典型的PEFT方法中是哪些关键模块在起作用？</li>
+<li>能否对这些关键模块进行排列组合，找出更有用的PEFT方法？</li>
+</ul>
+<h2 id="通用形式"><a href="#通用形式" class="headerlink" title="通用形式"></a>通用形式</h2><p>通过对Prefix Tuning的推导，得出了和Adapter Tuning以及LoRA形式一致的形式。</p>
+<p><img src="https://image.rexking6.top/img/v2-6857026c3b2627b2a58e0459e306078b_r.jpg" alt=""></p>
+<p><img src="https://image.rexking6.top/img/v2-9ce668a0a8d2f9b54f8e3282b49e20cb_720w.webp" alt=""></p>
+<p>包括这几大要素：</p>
+<ul>
+<li>Δℎ 的形式</li>
+<li>嵌入Transformer结构的方式（分为Parrell和Sequential两种。Parallel指的是在输入层嵌入，这样与原有结构可以并行计算；Sequential指的是在输出层嵌入，相当于增加了网路的深度，与原有结构存在依赖关系）</li>
+<li>修改的表示层（主要指对attention层的修改还是对ffn层的修改）</li>
+<li>组合方式。怎么与原有的参数组合，包括简单相加（Adapter）、门控式（Prefix Tuning）、缩放式（LoRA）三种）</li>
+</ul>
+<p>根据这个统一的框架，还另外设计了三种变体Parallel Adapter、Multi-head Parallel Adapter、Scaled Parallel Adapter。</p>
+<h2 id="一些实验"><a href="#一些实验" class="headerlink" title="一些实验"></a>一些实验</h2><h3 id="哪种嵌入形式更好：Parallel-or-Sequencial"><a href="#哪种嵌入形式更好：Parallel-or-Sequencial" class="headerlink" title="哪种嵌入形式更好：Parallel or Sequencial?"></a>哪种嵌入形式更好：Parallel or Sequencial?</h3><p>答案是：<strong>Parallel更好</strong></p>
+<p><img src="https://image.rexking6.top/img/v2-7610fc82919618f7c44a9fb44ba52eaf_720w.webp" alt=""></p>
+<h3 id="对哪块结构做修改更好？Attention-or-FFN？"><a href="#对哪块结构做修改更好？Attention-or-FFN？" class="headerlink" title="对哪块结构做修改更好？Attention or FFN？"></a>对哪块结构做修改更好？Attention or FFN？</h3><ul>
+<li><p><strong>当微调的参数量较多时，从结果来看，对FFN层进行修改更好</strong>。一种可能的解释是FFN层学到的是任务相关的文本模式，而Attention层学到的是成对的位置交叉关系，针对新任务并不需要进行大规模调整。</p>
+<p><img src="https://image.rexking6.top/img/v2-4727941f026ee376ab38e23c0d257ae8_720w.webp" alt=""></p>
+</li>
+<li><p>当微调参数量较少（0.1%）时，对Attention进行调整效果更好。</p>
+<p><img src="https://image.rexking6.top/img/v2-358a47bea9080e8c2cd358955d1f37e0_720w.webp" alt=""></p>
+</li>
+</ul>
+<h3 id="哪种组合方式效果更好？"><a href="#哪种组合方式效果更好？" class="headerlink" title="哪种组合方式效果更好？"></a>哪种组合方式效果更好？</h3><p>从结果来看，缩放式的组合效果更好。</p>
+<p><img src="https://image.rexking6.top/img/v2-9749454a5785b206c886838c53e701ea_720w.webp" alt=""></p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>基于以上的经验，</p>
+<ul>
+<li>Scaled parallel adapter is the best variant to modify FFN</li>
+<li>FFN can better utilize modification at larger capacities</li>
+<li>modifying head attentions like prefix tuning can achieve strong performance with only 0.1% parameters</li>
+</ul>
+<p>研究者设计出最新的结构MAM Adapter，取得了最好的效果：</p>
+<p><img src="https://image.rexking6.top/img/v2-600ed0a71cc06db333044fff971e443a_720w.webp" alt=""></p>
+<h1 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h1><h2 id="典型应用"><a href="#典型应用" class="headerlink" title="典型应用"></a>典型应用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/mymusise/ChatGLM-Tuning：一种平价的chatgpt实现方案，基于清华的ChatGLM-6B">https://github.com/mymusise/ChatGLM-Tuning：一种平价的chatgpt实现方案，基于清华的ChatGLM-6B</a> + LoRA 进行finetune</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/tloen/alpaca-lora">https://github.com/tloen/alpaca-lora</a></li>
+</ul>
+<h2 id="PEFT实现"><a href="#PEFT实现" class="headerlink" title="PEFT实现"></a>PEFT实现</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/huggingface/peft：huggingface">https://github.com/huggingface/peft：huggingface</a> PEFT</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/jxhe/unify-parameter-efficient-tuning">https://github.com/jxhe/unify-parameter-efficient-tuning</a></li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ol>
+<li><a href="https://link.zhihu.com/?target=https%3A//arxiv.org/pdf/1902.00751.pdf">Parameter-Efficient Transfer Learning for NLP</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//arxiv.org/pdf/2101.00190.pdf">Prefix-Tuning: Optimizing Continuous Prompts for Generation</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//arxiv.org/pdf/2104.08691.pdf">The Power of Scale for Parameter-Efficient Prompt Tuning</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//arxiv.org/pdf/2106.10199.pdf">BitFit: Simple Parameter-efficient Fine-tuning for Transformer-based Masked Language-models</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//arxiv.org/pdf/2103.10385.pdf">GPT Understands, Too</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//arxiv.org/pdf/2110.04366.pdf">TOWARDS A UNIFIED VIEW OF PARAMETER-EFFICIENT TRANSFER LEARNING</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//arxiv.org/pdf/2110.07577.pdf">UNIPELT: A Unified Framework for Parameter-Efficient Language Model Tuning</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//kexue.fm/archives/9138">Ladder Side-Tuning：预训练模型的“过墙梯”</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//arxiv.org/pdf/2012.13255.pdf">INTRINSIC DIMENSIONALITY EXPLAINS THE EFFECTIVENESS OF LANGUAGE MODEL FINE-TUNING</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//blog.csdn.net/qq_36426650/article/details/120607050">Prompt-Tuning——深度解读一种新的微调范式</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//kexue.fm/archives/8295">P-tuning：自动构建模版，释放语言模型潜能</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//arxiv.org/pdf/2110.07602.pdf">P-Tuning v2: Prompt Tuning Can Be Comparable to Fine-tuning Universally Across Scales and Tasks</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\28\AMPC-1080Ti机器-深度环境搭建\" rel="bookmark">AMPC-1080Ti机器-深度环境搭建</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\07\20\Transformer\" rel="bookmark">Transformer</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\12\coursera深度学习笔记\" rel="bookmark">coursera深度学习笔记</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2023/04/17/%E8%AE%A9%E5%A4%A9%E4%B8%8B%E6%B2%A1%E6%9C%89%E9%9A%BETuning%E7%9A%84%E5%A4%A7%E6%A8%A1%E5%9E%8B-PEFT%E6%8A%80%E6%9C%AF%E7%AE%80%E4%BB%8B/" title="让天下没有难Tuning的大模型-PEFT技术简介">https://blog.rexking6.top/2023/04/17/让天下没有难Tuning的大模型-PEFT技术简介/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag"># 深度学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/04/11/CausalDiscoveryToolbox%E5%85%A5%E9%97%A8/" rel="prev" title="CausalDiscoveryToolbox入门">
+      <i class="fa fa-chevron-left"></i> CausalDiscoveryToolbox入门
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/04/17/Auto-GPT%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB%EF%BC%88%E4%B8%87%E5%AD%97%E5%B9%B2%E8%B4%A7-%E5%8E%9F%E7%90%86%E9%80%9F%E8%AF%BB%EF%BC%89/" rel="next" title="Auto-GPT源码解读（万字干货+原理速读）">
+      Auto-GPT源码解读（万字干货+原理速读） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84PEFT%E6%96%B9%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">常用的PEFT方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Adapter-Tuning"><span class="nav-number">2.1.</span> <span class="nav-text">Adapter Tuning</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Prefix-Tuning"><span class="nav-number">2.2.</span> <span class="nav-text">Prefix Tuning</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Prompt-Tuning"><span class="nav-number">3.</span> <span class="nav-text">Prompt Tuning</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C"><span class="nav-number">3.1.</span> <span class="nav-text">实验</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#P-Tuning"><span class="nav-number">4.</span> <span class="nav-text">P-Tuning</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#V1"><span class="nav-number">4.1.</span> <span class="nav-text">V1</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8EPrefix-Tuning%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">4.1.1.</span> <span class="nav-text">与Prefix-Tuning的区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#V2"><span class="nav-number">4.2.</span> <span class="nav-text">V2</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E7%BB%93%E6%9E%84"><span class="nav-number">4.2.1.</span> <span class="nav-text">主要结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%A0%E4%B8%AA%E5%85%B3%E9%94%AE%E8%AE%BE%E8%AE%A1%E5%9B%A0%E7%B4%A0"><span class="nav-number">4.2.2.</span> <span class="nav-text">几个关键设计因素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">4.2.3.</span> <span class="nav-text">实验结果</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LoRA"><span class="nav-number">5.</span> <span class="nav-text">LoRA</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UniPELT"><span class="nav-number">6.</span> <span class="nav-text">UniPELT</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Towards-a-Unified-View-of-PETL"><span class="nav-number">6.1.</span> <span class="nav-text">Towards a Unified View of PETL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E7%94%A8%E5%BD%A2%E5%BC%8F"><span class="nav-number">6.2.</span> <span class="nav-text">通用形式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E5%AE%9E%E9%AA%8C"><span class="nav-number">6.3.</span> <span class="nav-text">一些实验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%93%AA%E7%A7%8D%E5%B5%8C%E5%85%A5%E5%BD%A2%E5%BC%8F%E6%9B%B4%E5%A5%BD%EF%BC%9AParallel-or-Sequencial"><span class="nav-number">6.3.1.</span> <span class="nav-text">哪种嵌入形式更好：Parallel or Sequencial?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E5%93%AA%E5%9D%97%E7%BB%93%E6%9E%84%E5%81%9A%E4%BF%AE%E6%94%B9%E6%9B%B4%E5%A5%BD%EF%BC%9FAttention-or-FFN%EF%BC%9F"><span class="nav-number">6.3.2.</span> <span class="nav-text">对哪块结构做修改更好？Attention or FFN？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%93%AA%E7%A7%8D%E7%BB%84%E5%90%88%E6%96%B9%E5%BC%8F%E6%95%88%E6%9E%9C%E6%9B%B4%E5%A5%BD%EF%BC%9F"><span class="nav-number">6.3.3.</span> <span class="nav-text">哪种组合方式效果更好？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">6.4.</span> <span class="nav-text">结论</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B"><span class="nav-number">7.</span> <span class="nav-text">案例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8"><span class="nav-number">7.1.</span> <span class="nav-text">典型应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PEFT%E5%AE%9E%E7%8E%B0"><span class="nav-number">7.2.</span> <span class="nav-text">PEFT实现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">8.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">210</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">3.7m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">56:12</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
