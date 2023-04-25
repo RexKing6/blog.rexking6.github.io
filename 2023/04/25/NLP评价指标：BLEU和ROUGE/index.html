@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NLP评价指标：BLEU和ROUGE">
+<meta property="og:url" content="https://blog.rexking6.top/2023/04/25/NLP%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87%EF%BC%9ABLEU%E5%92%8CROUGE/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-9cb3e314959727f80996b62bfaae1ed9_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-ec8de32dae289603e0704c6cfc57a16d_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-3f32e39f150add0b3335d496a23b4043_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-b3a8ad919614e516ce39d672e4d6c4c2_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-706c24281b9a12da3b3835c9f28e735a_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-c4014322a61892d6fae459eb1fa5c413_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-8df2e94ffb1639214c2af3a6295e3d61_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-651993c40ef0f5c481704244ad948738_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-99d9d0d571989b8d7230929f5c4b2f93_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-f380304ca0ae326f59b938d4fbc86844_720w.webp">
+<meta property="article:published_time" content="2023-04-25T14:28:33.000Z">
+<meta property="article:modified_time" content="2023-04-25T15:05:13.430Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/v2-9cb3e314959727f80996b62bfaae1ed9_720w.webp">
+
+<link rel="canonical" href="https://blog.rexking6.top/2023/04/25/NLP%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87%EF%BC%9ABLEU%E5%92%8CROUGE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>NLP评价指标：BLEU和ROUGE | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2023/04/25/NLP%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87%EF%BC%9ABLEU%E5%92%8CROUGE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          NLP评价指标：BLEU和ROUGE
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-04-25 22:28:33 / 修改时间：23:05:13" itemprop="dateCreated datePublished" datetime="2023-04-25T22:28:33+08:00">2023-04-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2023/04/25/NLP%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87%EF%BC%9ABLEU%E5%92%8CROUGE/" class="post-meta-item leancloud_visitors" data-flag-title="NLP评价指标：BLEU和ROUGE" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>6.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>综合转载于：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/321734655">机器翻译、机器摘要自动评价指标BLEU介绍</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/504279252">NLP评估指标之ROUGE</a></li>
+</ul>
+<h1 id="BLEU"><a href="#BLEU" class="headerlink" title="BLEU"></a>BLEU</h1><p><img src="https://image.rexking6.top/img/v2-9cb3e314959727f80996b62bfaae1ed9_720w.webp" alt=""></p>
+<p>给定一句话，假设两个翻译工具的结果为：</p>
+<p><img src="https://image.rexking6.top/img/v2-ec8de32dae289603e0704c6cfc57a16d_720w.webp" alt=""></p>
+<p>这个句子的参考翻译为：（由于一个话的翻译可以有种风格，参考翻译一般为多个，当然也可以只有一个）</p>
+<p><img src="https://image.rexking6.top/img/v2-3f32e39f150add0b3335d496a23b4043_720w.webp" alt=""></p>
+<p>一个很直观的想法，谁和参考翻译更接近，谁就翻译的更好。那么怎么评估接近呢？可以考虑机器翻译的每一个词是否出现在参考译文组中。比如翻译后的句子有5个单词，如果3个单词出现在了参考译文组中，那么单词级别的Precision = 3/5。可以更进一步的考虑N-gram级别的Precision,比如Bigram，即把两个单词（it is）当成一个元素是否出现在参考翻译组中。</p>
+<p>下面一个例子，是假设翻译工具翻译出的全部是the，单词级别的Precision为7/7，这个值与实际情况不符，我们修正刚才的计算公式，对分子截断为一个参考译文中，出现的最大次数，比如the在Reference 1中出现的次数最多，为2次，修正后单词级别的Precision为2/7。</p>
+<p><img src="https://image.rexking6.top/img/v2-b3a8ad919614e516ce39d672e4d6c4c2_720w.webp" alt=""></p>
+<p>下图展示了对人的翻译和机器的翻译分别用截断n-gram Precision （1， 2， 3， 4）进行评价，可以发现这种指标可以轻易地区分人的翻译和机器的翻译（也就是轻易地区分好的翻译和一般的翻译）。</p>
+<p><img src="https://image.rexking6.top/img/v2-706c24281b9a12da3b3835c9f28e735a_720w.webp" alt=""></p>
+<p>上面的指标偏爱过短的翻译。比如翻译工具是of the, 这个翻译的unigram是2/2和bigram是1/1。但是却召回了过少的词。</p>
+<p><img src="https://image.rexking6.top/img/v2-c4014322a61892d6fae459eb1fa5c413_720w.webp" alt=""></p>
+<p>精度往往与召回结对，来对结果进行评价。但在机器翻译中，召回全部的词并不是一个好的翻译。比如翻译I always invariably perpetually do. 比I always do.召回了参考译文组中更多的词，但翻译结果却不如后者好。</p>
+<p><img src="https://image.rexking6.top/img/v2-8df2e94ffb1639214c2af3a6295e3d61_720w.webp" alt=""></p>
+<p>我们加一个过短惩罚系数BP(brevity penalty)。假定参考译文的长度为r, 候选翻译长度为c,当c &gt;= r时，我们不进行惩罚，设置BP为1，当c &lt;r时，我们进行惩罚。</p>
+<script type="math/tex; mode=display">
+\mathrm{BP}= \begin{cases}1 & \text { if } c>r \\ e^{(1-r / c)} & \text { if } c \leq r\end{cases}</script><p>最终我们得到了BLEU的计算公式：</p>
+<script type="math/tex; mode=display">
+\mathrm{BLEU}=\mathrm{BP} \cdot \exp \left(\sum_{n=1}^N w_n \log p_n\right)</script><p>N取值为4，表示计算1-gram, 2-gram, 3-gram, 4-gram的截断精度，取log然后加权求和，其中$w_1$, $w_2$, $w_3$, $w_4$均取值为1/4。之所以取log,是因为$p_1$,$p_2$,$p_3$,$p_4$指数下降，取log后也BLEU分数与人工评估也更加吻合。</p>
+<p>我们对500个句子计算BLEU分数，结果如下，人工H1,H2比系统(机器)S1, S2, S3要高（人工翻译比机器翻译好）。</p>
+<p><img src="https://image.rexking6.top/img/v2-651993c40ef0f5c481704244ad948738_720w.webp" alt=""></p>
+<p>我们将500个句子分成20个组，每组25个句子，对每组求BLEU,然后求Mean和StdDev，结果也变化不大。说明只要收集少量的句子，就可以区分不同的系统。</p>
+<p><img src="https://image.rexking6.top/img/v2-99d9d0d571989b8d7230929f5c4b2f93_720w.webp" alt=""></p>
+<p>下图是BLEU评估和人工评估，可以看到BLEU和人工评估相关性很高。</p>
+<p><img src="https://image.rexking6.top/img/v2-f380304ca0ae326f59b938d4fbc86844_720w.webp" alt=""></p>
+<h1 id="ROUGE"><a href="#ROUGE" class="headerlink" title="ROUGE"></a>ROUGE</h1><p>ROUGE指标是在机器翻译、自动摘要、问答生成等领域常见的评估指标。ROUGE通过将模型生成的摘要或者回答与参考答案（一般是人工生成的）进行比较计算，得到对应的得分。ROUGE指标与BLEU指标非常类似，均可用来衡量生成结果和标准结果的匹配程度，不同的是ROUGE基于召回率，BLEU更看重准确率。在论文中主要提到了4种方法，分别是$\text{Rouge}-N、\text{Rouge}-L、\text{Rouge}-W、\text{Rouge}-S$。</p>
+<h2 id="ROUGE-N"><a href="#ROUGE-N" class="headerlink" title="ROUGE-N"></a>ROUGE-N</h2><p>Rouge-N实际上是将模型生成的结果和标准结果按N-gram拆分后，计算召回率。比如有2个句子（一般模型生成的成为hypothesis，简写hyp；标准结果称为reference，简写为ref）：</p>
+<blockquote>
+<p>模型生成（hyp）：the cat was found under the bed</p>
+<p>标准结果（ref）：the cat was under the bed</p>
+</blockquote>
+<p>按1-gram和2-gram拆分后，可表示为一下表格：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>hyp 1-gram</th>
+<th>ref 1-gram</th>
+<th>hyp 2-gram</th>
+<th>ref 2-gram</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>the</td>
+<td>the</td>
+<td>the cat</td>
+<td>the cat</td>
+</tr>
+<tr>
+<td>2</td>
+<td>cat</td>
+<td>cat</td>
+<td>cat was</td>
+<td>cat was</td>
+</tr>
+<tr>
+<td>3</td>
+<td>was</td>
+<td>was</td>
+<td>was found</td>
+<td>was under</td>
+</tr>
+<tr>
+<td>4</td>
+<td>found</td>
+<td>under</td>
+<td>found under</td>
+<td>under the</td>
+</tr>
+<tr>
+<td>5</td>
+<td>under</td>
+<td>the</td>
+<td>under the</td>
+<td>the bed</td>
+</tr>
+<tr>
+<td>6</td>
+<td>the</td>
+<td>bed</td>
+<td>the bed</td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td>bed</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>count</td>
+<td>7</td>
+<td>6</td>
+<td>6</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>在原论文中，ROUGE-N的公式为：</p>
+<blockquote>
+<p>论文中第一个求和项条件中，Refermce应该是写错了，这里改成了Reference</p>
+</blockquote>
+<script type="math/tex; mode=display">
+\text{Rouge-N}=\frac{\sum_{S \in \text { ReferenceSummaries }}\sum_{\operatorname{gram}_n \in S} \text {Count}_{\text {match}}\left(\text {gram}_n\right)}{\sum_{\text {S} \in \text {ReferenceSummaries}}\sum_{\text {gram}_n \in S} \text {Count}\left(\text {gram}_n\right)}</script><p>分子表示所有样本的标准结果按N-gram拆分后与生产结果按N-gram拆分后匹配上个数的和；分母表示所有样本的标准结果，按N-gram拆分后的和。这样很容易计算，$\text {Rouge}-1=\frac{6}{6}=1.0$，同样$\text {Rouge}-2=\frac{4}{5}=0.8$。以此类推，一般来说N越大，分值容易越小。前面提到的都是单个reference的情况，对于多个reference的情况，论文中也有提到，两两计算取最大值。</p>
+<h2 id="ROUGE-L"><a href="#ROUGE-L" class="headerlink" title="ROUGE-L"></a>ROUGE-L</h2><p>Rouge-L的L表示: Longest Common Subsequence，Rouge-L的计算利用了最长公共子序列（区别一下最长公共子串，这个是连续的，子序列不一定连续，但是二者都是有词的顺序的）。论文中Rouge-L的公式可以表示为：</p>
+<script type="math/tex; mode=display">
+\begin{gathered}
+R_{l c s}=\frac{L C S(X, Y)}{m} \\
+p_{l c s}=\frac{L C S(X, Y)}{n} \\
+F_{l c s}=\frac{\left(1+\beta^2\right) R_{l c s} P_{l c s}}{R_{l c s}+\beta^2 P_{l c s}}
+\end{gathered}</script><p>上面的公式中，$X$表示标准答案，也就是上面两个句子中的ref，$Y$表示生产答案，也就是上面两个句子中的hyp。$m$表示$X$的长度，$n$表示$Y$的长度。$L C S(X, Y)$表示X和Y的最长公共子序列，$\beta$是一个超参数，需要自己设置，论文中提到这个值一般的比较大。沿用上面的例子则可以得到：</p>
+<script type="math/tex; mode=display">
+\begin{gathered}
+m=6 \\
+n=7 \\
+L C S(X, Y)=6 \\
+R_{\text {lcs }}=\frac{L C S(X, Y)}{m}=\frac{6}{6}=1.0 \\
+p_{\text {lcs }}=\frac{L C S(X, Y)}{n}=\frac{6}{7} \approx 0.86 \\
+F_{\text {lcs }}=\frac{\left(1+\beta^2\right) R_{\text {lcs }} P_{\text {lcs }}}{R_{\text {lcs }}+\beta^2 P_{\text {lcs }}}=\frac{\left(1+\beta^2\right) \times 1.0 \times 0.86}{1.0+\beta^2 \times 0.86}
+\end{gathered}</script><p>公式中的 $F_{l c s}$ 就是ROUGE-L的得分，因为 $\beta$ 设置的比较大，所以最终 $F_{l c s}$ 还是受召回率 $\left(R_{l c s}\right)$的影响更大，也符合ROUGE一开始的初衷。</p>
+<h2 id="ROUGE-W"><a href="#ROUGE-W" class="headerlink" title="ROUGE-W"></a>ROUGE-W</h2><p>先举一个例子，下面三句话中， $X$ 是reference， $Y_1, Y_2$ 是hypothesis:</p>
+<blockquote>
+<script type="math/tex; mode=display">
+\begin{aligned}
+& X:[\boldsymbol{A} \boldsymbol{B} \boldsymbol{C} \boldsymbol{D} \mathrm{FG}] \\
+& Y_1:[\boldsymbol{A} \boldsymbol{B} \boldsymbol{C} \boldsymbol{D} \mathrm{H} \mathrm{K}] \\
+& Y_2:[\boldsymbol{A} H \boldsymbol{B} K \boldsymbol{C} \mid \boldsymbol{D}]
+\end{aligned}</script></blockquote>
+<p>我看可以看到三个例子，用Rouge-L去计算的时候，他们都有相同的最长公共子序列 $\boldsymbol{A} 、 \boldsymbol{B} 、 \boldsymbol{C}、 \boldsymbol{D}$ 。这个例子中它们有相同的ROUGE一L分。但是这种情况下，应该是 $Y_1$ 要好于 $Y_2$ 的，因为 $Y_1$ 有 更多的连续匹配。Rouge-W就是所做的工作就是给连续的匹配给到更多的权重，让连续匹配的比 非连续匹配的有更高的分数。论文中给出的计算公式是：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+R_{w l c s} & =f^{-1}\left(\frac{W L C S(X, Y)}{f(m)}\right) \\
+p_{w l c s} & =f^{-1}\left(\frac{W L C S(X, Y)}{f(n)}\right) \\
+F_{w l c s} & =\frac{\left(1+\beta^2\right) R_{w l c s} P_{w l c s}}{R_{w l c s}+\beta^2 P_{w l c s}}
+\end{aligned}</script><p>$F_{w l c s}$ 就是Rouge-W分数，上面公式中， $W L C S(X, Y)$ 是根据连续匹配情况加权后的最长公共 子序列长度 (叫分值更合适) 。在论文中，这两个例子算出来的Rouge-W分数是不一样的：Rouge $-W_{Y_1}=0.571$, Rouge $-W_{Y_2}=0.286$ 。总的来说Rouge-W的实现比前面的要复杂，更多的细节可以参考原始论文<a href="https://link.zhihu.com/?target=https%3A//aclanthology.org/W04-1013.pdf">《ROUGE: A Package for Automatic Evaluation of Summaries》</a>。</p>
+<h2 id="ROUGGE-S"><a href="#ROUGGE-S" class="headerlink" title="ROUGGE-S"></a>ROUGGE-S</h2><p>Rouge-S的S表示：Skip-Bigram Co-Occurrence Statistics，这其实是Rouge-N的一种扩展，N-gram是连续的，Skip-bigram是允许跳过中间的某些词，同时结合了Rouge-L的计算方式。论文中给到的公式是：</p>
+<script type="math/tex; mode=display">
+\begin{gathered}
+R_{s k i p 2}=\frac{S K I P 2(X, Y)}{C(m, 2)} \\
+p_{s k i p 2}=\frac{S K I P 2(X, Y)}{C(n, 2)} \\
+F_{s k i p 2}=\frac{\left(1+\beta^2\right) R_{s k i p 2} P_{s k i p 2}}{R_{s k i p 2}+\beta^2 P_{s k i p 2}}
+\end{gathered}</script><p>结合几个简单的句子作为例子说明一下：</p>
+<blockquote>
+<p>S1（ref）：police killed the gunman</p>
+<p>S2（hyp）：police kill the gunman</p>
+<p>S3（hyp）：the gunman kill police</p>
+<p>S4（hyp）：the gunman police killed</p>
+<p>S5（hyp）：gunman the killed police</p>
+</blockquote>
+<p>其中 $C(m, 2) 、 C(n, 2)$ 分别表示reference、hypothesis句子中，skip-bigram的组合的个数。 对于 $\mathrm{S} 1, \mathrm{~S} 2$ 来说 $C\left(S_{1 / 2}, 2\right)$ ，具体组合为:</p>
+<blockquote>
+<p>【S1】：police killed、police the、police gunman、killed the、killed gunman、the gunman</p>
+<p>【S2】：police kill、police the、police gunman、kill the 、kill gunman、the gunman</p>
+</blockquote>
+<p>两句话的skip-bigram都是6个 $(C(4,2)=6)$ ，共同的部分为 “ police the”, “police gunman”, “the gunman”, 所以 $S K I P 2(S 1, S 2)=3$ 。所以当 $\beta=1$ 时，代入上面的公式:</p>
+<script type="math/tex; mode=display">
+\text {Rouge}-S_{S1, S2}=F_{\text {skip2 }}=\frac{\left(1+\beta^2\right) 0.5 * 0.5}{0.5+\beta^2 * 0.5}=0.5</script><p>有一个比较特别的情况，可以看到S5，它与 $S 1$ 出现的单词是一样的，但由于顺序不同，其 $S K I P 2(S 1, S 5)=0$ ，为了区分 $S 5$ 这种情况和没有单个单词与 $S 1$ 共现的情况，提出了Rouge 一SU。Rouge-SU，Extension of Rouge-s，在Rouge-S的基础上增加了unigram。</p>
+<h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><p>缺点是这种方法只能在单词、短语的角度去衡量两个句子的形似度。并不能支持同义词、近义词等语意级别去衡量。比如：</p>
+<blockquote>
+<p>ref = “I’m very happy!”</p>
+<p>hyp = “I’m very sad!”</p>
+<p>hyp1 = “I’m very cheerful!”</p>
+</blockquote>
+<p>hyp1和hyp2的rouge得分是一样的。但显然hyp1才是与ref更相近的。</p>
+<p>好处是这种方式计算高效，在忽略近义词等情况下，做到比较合理的判断。</p>
+<h2 id="Rouge的实现"><a href="#Rouge的实现" class="headerlink" title="Rouge的实现"></a>Rouge的实现</h2><p>在github上面，关于Rouge的实现有pyrouge,files2rouge,rouge,py-rouge，其中rouge，files2rouge是同一个人开发的，笔者使用了rouge，其开源地址是：<a href="https://link.zhihu.com/?target=http%3A//github.com/pltrdy/rouge">http://github.com/pltrdy/rouge</a>。作为一个python包提供给python开发者调用，安装和使用都比较友好。</p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install rouge</span><br></pre></td></tr></table></figure>
+<h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><p>举一个简单例子，更多可以去开源地址的README中查看。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> rouge <span class="keyword">import</span> Rouge </span><br><span class="line"></span><br><span class="line">hypothesis = <span class="string">&quot;the #### transcript is a written version of each day &#x27;s cnn student news program use this transcript to he    lp students with reading comprehension and vocabulary use the weekly newsquiz to test your knowledge of storie s you     saw on cnn student news&quot;</span></span><br><span class="line"></span><br><span class="line">reference = <span class="string">&quot;this page includes the show transcript use the transcript to help students with reading comprehension and     vocabulary at the bottom of the page , comment for a chance to be mentioned on cnn student news . you must be a teac    her or a student age # # or older to request a mention on the cnn student news roll call . the weekly newsquiz tests     students &#x27; knowledge of even ts in the news&quot;</span></span><br><span class="line"></span><br><span class="line">rouger = Rouge()</span><br><span class="line">scores = rouger.get_scores(hypothesis, reference)</span><br></pre></td></tr></table></figure>
+<p>输出是json格式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">  &#123;</span><br><span class="line">    &quot;rouge-1&quot;: &#123;</span><br><span class="line">      &quot;f&quot;: 0.4786324739396596,</span><br><span class="line">      &quot;p&quot;: 0.6363636363636364,</span><br><span class="line">      &quot;r&quot;: 0.3835616438356164</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;rouge-2&quot;: &#123;</span><br><span class="line">      &quot;f&quot;: 0.2608695605353498,</span><br><span class="line">      &quot;p&quot;: 0.3488372093023256,</span><br><span class="line">      &quot;r&quot;: 0.20833333333333334</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;rouge-l&quot;: &#123;</span><br><span class="line">      &quot;f&quot;: 0.44705881864636676,</span><br><span class="line">      &quot;p&quot;: 0.5277777777777778,</span><br><span class="line">      &quot;r&quot;: 0.3877551020408163</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\28\AMPC-1080Ti机器-深度环境搭建\" rel="bookmark">AMPC-1080Ti机器-深度环境搭建</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\07\20\Transformer\" rel="bookmark">Transformer</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\12\coursera深度学习笔记\" rel="bookmark">coursera深度学习笔记</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2023/04/25/NLP%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87%EF%BC%9ABLEU%E5%92%8CROUGE/" title="NLP评价指标：BLEU和ROUGE">https://blog.rexking6.top/2023/04/25/NLP评价指标：BLEU和ROUGE/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag"># 深度学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/04/17/Auto-GPT%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB%EF%BC%88%E4%B8%87%E5%AD%97%E5%B9%B2%E8%B4%A7-%E5%8E%9F%E7%90%86%E9%80%9F%E8%AF%BB%EF%BC%89/" rel="prev" title="Auto-GPT源码解读（万字干货+原理速读）">
+      <i class="fa fa-chevron-left"></i> Auto-GPT源码解读（万字干货+原理速读）
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BLEU"><span class="nav-number">2.</span> <span class="nav-text">BLEU</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ROUGE"><span class="nav-number">3.</span> <span class="nav-text">ROUGE</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ROUGE-N"><span class="nav-number">3.1.</span> <span class="nav-text">ROUGE-N</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ROUGE-L"><span class="nav-number">3.2.</span> <span class="nav-text">ROUGE-L</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ROUGE-W"><span class="nav-number">3.3.</span> <span class="nav-text">ROUGE-W</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ROUGGE-S"><span class="nav-number">3.4.</span> <span class="nav-text">ROUGGE-S</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">3.5.</span> <span class="nav-text">优缺点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rouge%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.6.</span> <span class="nav-text">Rouge的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">3.6.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">3.6.2.</span> <span class="nav-text">使用</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">211</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">3.7m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">56:22</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
