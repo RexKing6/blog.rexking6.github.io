@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小样本学习(Few-shot Learning)综述">
+<meta property="og:url" content="https://blog.rexking6.top/2023/07/16/%E5%B0%8F%E6%A0%B7%E6%9C%AC%E5%AD%A6%E4%B9%A0-Few-shot-Learning-%E7%BB%BC%E8%BF%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-063c0dbe1b6dfab62e4d0b6c56cfd3bc_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-51b8efcebe0ee5e46b7ece663f9d013b_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-f44fea21917275b9e39bf98068b6e373_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-5c7e9c869f8abad834315bf6e17d31ff_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-87377f50ac00983d68c6752447a480ea_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-486ded74be50696e93656d246f523fec_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-8706889bc64f17a21f8a6ed91cf6ddf0_720w.webp">
+<meta property="og:image" content="https://pic1.zhimg.com/80/v2-83751de8688e1513b7ff3b669dc90924_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-4ee9a4fd75632f2e8243f136eb8deabc_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-af917d04839c633ae831b108db7e93c5_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-d2f1e09dd64d2c03da9870ad4bff7b5f_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-189e59ff0fed6747fb686bb7d9d42477_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-77403d759184f95da1acfdd5fab87fd4_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-cec97fd1bf14a1e01cdae1c27e5ee140_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-d941b0b7f861a2d22851d8d8e0a2bcd7_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-11ad781ee22a8c5f643fd099f83f1ad9_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-2a13f84f695ff098984be0dff92c7bdb_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-44d5761022354c9654519bef42cf0038_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-f2f0200d466d410694512e0b28740afe_720w.webp">
+<meta property="article:published_time" content="2023-07-16T12:11:03.000Z">
+<meta property="article:modified_time" content="2023-07-24T16:36:19.136Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="小样本学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/v2-063c0dbe1b6dfab62e4d0b6c56cfd3bc_720w.webp">
+
+<link rel="canonical" href="https://blog.rexking6.top/2023/07/16/%E5%B0%8F%E6%A0%B7%E6%9C%AC%E5%AD%A6%E4%B9%A0-Few-shot-Learning-%E7%BB%BC%E8%BF%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>小样本学习(Few-shot Learning)综述 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2023/07/16/%E5%B0%8F%E6%A0%B7%E6%9C%AC%E5%AD%A6%E4%B9%A0-Few-shot-Learning-%E7%BB%BC%E8%BF%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          小样本学习(Few-shot Learning)综述
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-07-16 20:11:03" itemprop="dateCreated datePublished" datetime="2023-07-16T20:11:03+08:00">2023-07-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-25 00:36:19" itemprop="dateModified" datetime="2023-07-25T00:36:19+08:00">2023-07-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B0%8F%E6%A0%B7%E6%9C%AC%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">小样本学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2023/07/16/%E5%B0%8F%E6%A0%B7%E6%9C%AC%E5%AD%A6%E4%B9%A0-Few-shot-Learning-%E7%BB%BC%E8%BF%B0/" class="post-meta-item leancloud_visitors" data-flag-title="小样本学习(Few-shot Learning)综述" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>11k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>10 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/359356731">小样本学习(Few-shot Learning)综述</a>。</p>
+<p>论文题目：《Generalizing from a Few Examples: A Survey on Few-Shot Learning》</p>
+<p>该论文出自香港科技大学。</p>
+<p><strong>摘要</strong>：<strong>机器学习在数据密集型应用中取得了成功，但在数据集很少时，常常受到阻碍</strong>。近期，为了解决这个问题，提出了“小样本学习”。它可以用先验知识从受监督的经验有限的新任务中快速得出结论。为了全面了解FSL，本文进行了一项彻底的调查研究。首先从FSL的正式定义开始，我们将FSL与几个相关的机器学习问题区分开来。其中不可靠的经验风险最小化是FSL的核心问题。基于采用先验知识来处理核心问题的方式，将不同的FSL方法分为三个方面：1）数据使用先验知识来增强监督经验，2）模型通过先验知识来约束假设空间，3）算法使用先验知识来改变假设空间搜索最佳假设的参数。在这种统一的分类法下，本文对不同类别的利弊进行了详尽的讨论。最后，在问题设置、技术、应用和理论方面为FSL提出了可能的方向，为后续研究提供深刻见解。</p>
+<h1 id="一、引言"><a href="#一、引言" class="headerlink" title="一、引言"></a>一、引言</h1><p>计算机科学之父图灵早在1950年时，就曾提出，“机器会思考吗？”这样的问题。机器的最终目标是像人一样聪明。近些年出现了强大的计算设备GPU，大型数据集ImageNet及先进模型和算法。AI已经在一些方面击败了人类，比如：AlphaGo，ResNet(在分类任务上击败了人类)。人工智能还支持yu日常生活中一些智能工具的开发，如语音助听器、搜索引擎、自动驾驶汽车和工业机器人。</p>
+<p>即使AI发展的如火如荼，然而当前的技术无法在少量数据中推广。人类能够利用过去的经验快速学习新任务，给一个小孩几张陌生人的照片，他可以从大量照片中找到同一人的照片。在人类看起来如此简单的事情，然而机器就无法做到。</p>
+<p>因此，缩小AI和人类之间的差距是一个重要的方向。由于机器学习涉及如何构建随经验而自动改进的计算机程序的问题，因此可以通过机器学习来解决。为了从少量有监督的样本信息中学习，诞生了机器学习算法Few-shot Learning (FSL)。典型的应用有字符生成，机器人技术（一键模仿，多臂强盗，视觉导航，连续控制），药物发现，FSL翻译，冷启动项目推荐。另外，FSL还可以减轻标签数据的收集和减少数据密集型应用的数据收集。比如：图像分类、图像检索、目标跟踪、手势识别、图像理解、视觉问题回答、视频时间检测、语言建模和神经结构搜索。</p>
+<p>在人工智能接近人类的学术目标和工业对廉价学习需求的推动下，FSL近来备受关注，已成为热门话题。许多机器学习算法被提出，如meta-learning、embedding learning、generative modeling。然而目前并没有相关工作去调研FLS方法，解释为什么有些方法能工作，有些方法失败，不同方法的利弊。因此，本文对FSL问题进行了详细的调研。</p>
+<p>这篇调研的贡献可总结如下：</p>
+<p>（1）给出了FSL的正式定义，这自然离不开经典机器学习的定义。这个定义不仅充分说明了FSL如何工作，还阐明了FSL的目标是什么及如何解决它。此定义有助于确定FSL领域的未来研究目标。</p>
+<p>（2）列出了相关的学习问题并给出了具体的例子，说明了与FSL的区别与联系。这些讨论有助于在各种学习中更好地区分和定位FSL。</p>
+<p>指出FSL监督学习的核心问题是不可靠的经验风险最小化，它是基于机器学习中的错误分解进行分析的。这为以后更有条理和系统化的方式改进FSL方法提供了见解。</p>
+<p>（3）从数据、模型和算法的角度进行了微观的扩展性回顾，并通统一的分类法去组织。还总结了一些见解，并讨论了每个类别的优缺点。这有助于更好地理解FSL方法。</p>
+<p>（4）我们在问题设置、技术、应用、理论方面给出了FSL未来有前景的研究方向。这些深刻见解是基于当前FSL的弱点，并有可能在未来做出改进。</p>
+<h2 id="1-1-调研的组织情况"><a href="#1-1-调研的组织情况" class="headerlink" title="1.1 调研的组织情况"></a>1.1 调研的组织情况</h2><p>第二部分提供了FSL的概述，包括FSL的正式定义、相关的学习问题、核心问题及现有工作在数据、模型和算法方面的分类。第三部分用数据扩增来解决FSL问题。第四部分用算法减少假说空间大小的方法，使FSL可行。第五部分用于改进算法的搜索策略以处理FSL问题的方法。第六部分，从问题设置、技术、应用和理论方面为FSL提出了未来的方向。第七部分，总结调研。</p>
+<h2 id="1-2-符号和术语"><a href="#1-2-符号和术语" class="headerlink" title="1.2 符号和术语"></a>1.2 符号和术语</h2><p><img src="https://image.rexking6.top/img/v2-063c0dbe1b6dfab62e4d0b6c56cfd3bc_720w.webp" alt=""></p>
+<h1 id="二、概述"><a href="#二、概述" class="headerlink" title="二、概述"></a>二、概述</h1><h2 id="2-1-问题定义"><a href="#2-1-问题定义" class="headerlink" title="2.1 问题定义"></a>2.1 问题定义</h2><p>由于FSL是机器学习的子区域，这里先给出机器学习的定义：对于某类任务T和性能度量P，一个计算机程序被认为可以从经验E中学习是指，通过经验E改进后，它在任务T上由性能度量P衡量的性能有所提升。</p>
+<p>例如：一个图像分类任务T，一个机器学习程序可以通过训练大量的标记数据得到经验E，进而提高分类准确率。另一个例子，AlphaGo，在古老的围棋比赛中击败人类，通过在一个数据库E上训练3000多万个人类专家记录的动作，并反复与自己比赛，来提高自己对对手的获胜率。</p>
+<p>机器学习的应用中包含了很多有监督学习，然而，有些应用是不可行的，甚至不可能。FSL是一个典型的机器学习案例，它致力于在有限的监督样本中学习更好的性能。</p>
+<p><strong>小样本学习定义：</strong>是一种机器学习问题，经验E在任务T上有少量的监督信息的样本情况下获得的。</p>
+<p>现有的小样本学习主要是监督学习问题。具体描述如下：</p>
+<p><img src="https://image.rexking6.top/img/v2-51b8efcebe0ee5e46b7ece663f9d013b_720w.webp" alt=""></p>
+<p><strong>FSL 三个典型的应用场景：</strong></p>
+<p>（1）模仿人类学习。为了向人类智能迈进，计算机程序能够解决FSL问题至关重要。一个流行的任务就是，仅给出几个样本就可以生成一个新的字符。受人类学习方式的启发，计算机程序使用E进行学习，E有有监督信息的给定示例和预训练的概念（如部分和关系）作为先验知识组成。通过视觉图灵测试（P）的通过率对生成的字符进行评估，该测试可以区分图像是由人还是机生成的。有了这些先验知识，计算机程序还可以学习分类，解析和生成带有人类示例的新手写字符。</p>
+<p>（2）罕见案例学习。如：新药物的发现，此案例无法收集足够多的监督样本。</p>
+<p>（3）减少数据收集和计算成本。</p>
+<p>FSL方法通过将E中可用的监督信息与一些先验知识相结合来使任务T的学习变得可行。这些先验知识是学习器在看到例子之前对未知函数的所有信息。FSL方法的一种典型类型是贝叶斯学习，它结合了所提供的训练集Dtrain和一些先验概率分布，这些概率分布在给出Dtrain之前就可用。</p>
+<p>在经验E中若只有一个监督信息样本时，则FSL称之为one-shot learning，若经验E未包含任何监督信息样本时，则FSL成为zero-shot learning（ZSL）。若目标类别中不含有监督信息的样本时，ZSL需要从其他的形式获得信息（属性、WordNet、罕见的对象识别任务中使用的单词嵌入），以传输一些受监督的信息并使学习成为可能。</p>
+<h2 id="2-2-相关的学习问题"><a href="#2-2-相关的学习问题" class="headerlink" title="2.2 相关的学习问题"></a>2.2 相关的学习问题</h2><h3 id="2-2-1-弱监督学习"><a href="#2-2-1-弱监督学习" class="headerlink" title="2.2.1 弱监督学习"></a>2.2.1 弱监督学习</h3><p><strong>弱监督学习定义</strong>：不完整、不精确、不准确、有噪声的监督信息。</p>
+<p>与FSL最相关的问题是指不完全监督（只有少量的有监督信息的样本）中的弱监督学习。</p>
+<p><strong>弱监督学习分类</strong>：</p>
+<ul>
+<li>半监督学习——使用少量有标签和大量无标签样本学习</li>
+<li>主动学习——无标签样本发给oracle（业务专家）询问输出，此类主要针对样本标记价格高，比如：行人检测。</li>
+</ul>
+<p><strong>FSL和弱监督学习的区别</strong></p>
+<p>弱监督学习和不完全监督学习仅包括分类和回归，而FSL学习还包括强化学习问题。此外，弱监督学习和不完全监督学习主要使用未标记的数据作为E中的附加信息，而FSL利用了各种先验知识，例如预训练模型和其他领域方式的监督数据，并且不限于使用未标记的数据。因此，只有当先验知识是未标记的数据且任务是分类或回归时，FSL才成为弱监督学习问题。</p>
+<h3 id="2-2-2-不平衡学习"><a href="#2-2-2-不平衡学习" class="headerlink" title="2.2.2 不平衡学习"></a>2.2.2 不平衡学习</h3><p><strong>定义：</strong>从经验E中学习y的偏态分布。</p>
+<p><strong>和FSL的区别：</strong>不平衡学习会进行训练和测试，以便在所有可能的y中进行选择。相比之下，FSL会通过一些样本对y进行训练和测试，同时可能会将其他的y作为学习的先验知识。</p>
+<h3 id="2-2-3-迁移学习"><a href="#2-2-3-迁移学习" class="headerlink" title="2.2.3 迁移学习"></a>2.2.3 迁移学习</h3><p><strong>定义：</strong>将知识从训练数据丰富的源域（任务）转移到数据缺乏的目标域（任务）。</p>
+<p>特点：迁移学习方法在FSL中得到了广泛的应用，其中先验知识从源任务转移到了少数任务。</p>
+<h3 id="2-2-4-元学习"><a href="#2-2-4-元学习" class="headerlink" title="2.2.4 元学习"></a>2.2.4 元学习</h3><p><strong>定义：</strong>跨任务提取元知识来改进新任务。</p>
+<p>特点：归纳FSL的先验知识</p>
+<h2 id="2-3-FSL的核心问题"><a href="#2-3-FSL的核心问题" class="headerlink" title="2.3 FSL的核心问题"></a>2.3 FSL的核心问题</h2><h3 id="2-3-1-经验风险最小化不可靠"><a href="#2-3-1-经验风险最小化不可靠" class="headerlink" title="2.3.1 经验风险最小化不可靠"></a>2.3.1 经验风险最小化不可靠</h3><p>真实风险期望：</p>
+<script type="math/tex; mode=display">
+R(h)=\int \ell(h(x), y) d p(x, y)=\mathbb{E}[\ell(h(x), y)]</script><p>估计风险经验：</p>
+<script type="math/tex; mode=display">
+R_I(h)=\frac{1}{I} \sum_{i=1}^I \ell\left(h\left(x_i\right), y_i\right)</script><p>大样本和小样本学习误差对比：</p>
+<p><img src="https://image.rexking6.top/img/v2-f44fea21917275b9e39bf98068b6e373_720w.webp" alt=""></p>
+<h2 id="2-4-FSL方法分类及研究现状"><a href="#2-4-FSL方法分类及研究现状" class="headerlink" title="2.4 FSL方法分类及研究现状"></a>2.4 FSL方法分类及研究现状</h2><p><img src="https://image.rexking6.top/img/v2-5c7e9c869f8abad834315bf6e17d31ff_720w.webp" alt=""></p>
+<h1 id="三、数据"><a href="#三、数据" class="headerlink" title="三、数据"></a>三、数据</h1><p>FSL（Few-shot Learning）利用先验知识来增加训练数据集。</p>
+<p><img src="https://image.rexking6.top/img/v2-87377f50ac00983d68c6752447a480ea_720w.webp" alt=""></p>
+<p>通过人工制定的规则进行的数据增强通常在FSL方法中用作预处理，可以为模型引入不同种类的不变性。比如，可使用平移、翻转、剪切、缩放、反射、裁剪、旋转等。然而，这些设计规则很大程度上取决于领域知识，且人工成本昂贵。此外，这些扩展规则可以特定于数据集，从而使其难以应用于其他数据集。再者，人类不可能列举出所有可能的不变性。因此，人工数据扩充不能完全解决FSL问题。</p>
+<p>除了人工设计规则以外，接下来将介绍几种高级的数据增强方法</p>
+<h2 id="3-1-从训练中转换样本"><a href="#3-1-从训练中转换样本" class="headerlink" title="3.1 从训练中转换样本"></a>3.1 从训练中转换样本</h2><p>该策略通过转换将每个样本转化为具有多个变化的样本来增强训练集。转换过程作为先验知识包含在经验E中，以便生成其他样本。文献[1]中，早期的FSL论文通过将每个样本与其他样本反复对齐，从类似的类中学习了一组几何变换。将学习到的变换应用于每个样本，形成一个大数据集，然后可通过标准的机器学习方法来学习该数据集。类似地，文献[2]中，在相似类中学习了一组自动编码器，每个自动编码器代表了一个类内变量，通过将学习得到的变化量来生成新样本。文献[3]中，假设所有类别在样本之间共享一些可转换的可变性，则可以学习一个转换函数，将从其他类别学习到的样本对之间的差异转移到样本中，以生成新的样本。文献[4]中，不是枚举成对的变量，而是使用从大量场景图像中获悉的一组独立的属性强度回归值，将每个$x_i$转换为几个样本，并将原始$x_i$的标签分配给这些新样本。文献[5]在[4]的基础上进行了改进，将连续属性子空间用于向x添加属性变化。</p>
+<h2 id="3-2-从弱标记或未标记的数据集中转换样本"><a href="#3-2-从弱标记或未标记的数据集中转换样本" class="headerlink" title="3.2 从弱标记或未标记的数据集中转换样本"></a>3.2 从弱标记或未标记的数据集中转换样本</h2><p>此策略通过从弱标记或未标记的大数据集中选择带有目标标记的样本来增强Dtrain。例如，利用监控摄像头拍摄的图片中，有人，汽车和道路，但都未被标记。再者，一段较长的演讲视频。它包含演讲者的一系列手势，但都未被明确注释。鉴于此类数据集包含样本的较大变化，因此将其增加到Dtrain有助于描述更清晰的p(x,y)。而且，由于不需要人工来标记，因此收集这样的数据集更加容易。但是，尽管收集成本很低，但主要问题是如何选择有目标标签的样本以增加到Dtrain。文献[6]中，为Dtrain中的每个目标标签学习了一个示例SVM，然后将其用于从弱标签数据集中预测样本的标签，而后将具有目标标签的样本添加到Dtrain中。文献[7]中，标签传播直接用于标记那些未标记的数据集，而不是学习分类器。文献[8]中，采用渐进策略选择信息丰富的未标记样本，然后为选定的样本分配伪标签，并用于更新CNN。</p>
+<h2 id="3-3-从相似数据集中转换样本"><a href="#3-3-从相似数据集中转换样本" class="headerlink" title="3.3 从相似数据集中转换样本"></a>3.3 从相似数据集中转换样本</h2><p>该策略通过聚合和调整来自相似且较大数据集的输入输出对来增强DtrainDtrain。聚合权重通常基于样本之间的某种相似性度量。文献[9]中，它从辅助文本语料库中提取聚合权重。由于这些样本可能不是来自目标FSL类，因此直接将汇总样本增加到DtrainDtrain可能会产生误导。因此，文献[10]中，生成对抗网络（GAN）被设计为从许多样本的数据集中生成不可区分的合成x集合。它有两个生成器，一个生成器将few-shot类的样本映射到大规模类，另一个生成器将大规模类的样本映射到少数类（以弥补GAN训练中样本的不足）。</p>
+<h2 id="3-4-讨论与总结"><a href="#3-4-讨论与总结" class="headerlink" title="3.4 讨论与总结"></a>3.4 讨论与总结</h2><p>使用哪种增强策略的选择取决于具体的应用。有时，针对目标任务（或类）存在大量弱标记或未标记的样本，但是由于收集注释数据或计算成本高，此时，可以通过转换标记较弱或未标记的数据集中的样本来执行样本扩增。当难以收集大规模的未标记数据集，但few-shot类具有某些相似类时，可以从这些相似类中转换样本。如果只有一些学习的转换器而没有原始样本可用，则可以通过转换训练集中的原始样本来进行扩充。总的来说，通过增强Dtrain解决FSL问题非常简单明了, 即通过利用目标任务的先验信息来扩充数据。然而，通过数据扩充来解决FSL问题的缺点在于扩充策略通常是针对每个数据集量身定制的，并且不能轻易地用于其他数据集（尤其是来自其他数据集或域的数据）。最近，文献[11]中，AutoAugment指出自动学习用于深度网络训练的增强策略的来解决这个问题。除此之外，因为生成的图像可以很容易地被人在视觉上评估，现有的方法主要是针对图像设计的。而文本和音频涉及语法和结构较难生成。文献[12]讲述了最近对文本使用数据增强的一些尝试。</p>
+<h1 id="四、模型"><a href="#四、模型" class="headerlink" title="四、模型"></a>四、模型</h1><p>给定有限样本的小样本Dtrain，仅使用简单模型(比如线性分类器)，可选择一个小的假设空间 $H$ 。然而，现实世界中的问题通常很复杂，并且不能由一个来自小H的假设 $h$ 很好地表示。因此，在FSL中首选是使用足够大的 $H$ ，这使得标准的机器学习模型不可行。FSL方法通过E中的先验知识设法将H约束到较小的假设空间来进行学习(图2(b))。此时，经验风险最小化器将更加可靠，且过拟合的风险也将会降低。根据所使用的先验知识，可以将属于该类别的方法进一步分为四种类型(表4)。</p>
+<p><img src="https://image.rexking6.top/img/v2-486ded74be50696e93656d246f523fec_720w.webp" alt=""></p>
+<p><img src="https://image.rexking6.top/img/v2-8706889bc64f17a21f8a6ed91cf6ddf0_720w.webp" alt=""></p>
+<h2 id="4-1-多任务学习（Multitask-Learning）"><a href="#4-1-多任务学习（Multitask-Learning）" class="headerlink" title="4.1 多任务学习（Multitask Learning）"></a>4.1 多任务学习（Multitask Learning）</h2><p>在存在多个相关任务的情况下，多任务学习通过利用通用任务信息和特定任务的信息同时学习这些任务。因此，它们自然可用于FSL。我们介绍了在FSL中使用多任务学习的一些实例。</p>
+<p>我们获得了与 $C$ 有关的任务 $T_1, \ldots, T_C$ ，其中一些任务样本很少，而有的任务的样本数很多。 每个任务 $T_C$ 都有一个数据集 $D_c=\left\{D_{\text {train }}^c, D_{\text{test}}^c\right\} \mathrm{Dc}=\{$Dtrain,Dtest$\}$ ，其中前者是训练集，后者是测试集。在这些 $C$ 任务中，我们将few-shot(小样本)任务作为目标任务，其余作为源任务。多任务学习即每个任务 $T_C$ 从训练集Dtrain中获得一个最优的 $\theta_c$ 。由于这些任务是联合学习的，因此为任务 $T_c$ 学习的 $\mathrm{hc}$ 的参数 $\theta_c$ 受其他任务的约束。根据任务参数的约束方式，我们将 该策略中的方法划分为(i)参数共享；(ii)参数绑定。</p>
+<p><strong>Parameter Sharing</strong>该策略直接在任务之间共享一些参数(如图5)。文献[160]中，两个任务网络共享通用信息的前几层，并学习不同的最终层以处理不同的输出。文献[61]中，法律文本上的两个自然语言处理任务被一起解决：收费预测和法律属性预测。单个嵌入功能用于对犯罪案件描述进行编码，然后将其送到特定于任务的嵌入函数和分类器中。文献[95]中，首先从源任务中对变化的自动编码器进行预训练，然后将其克隆到目标任务。共享两个变化的自动编码器中的某些层以捕获通用信息，两个变体自动编码器中的某些层是共享的，同时允许两个任务都具有一些特定于任务的层。目标任务只能更新其特定于任务的层，而源任务可以同时更新共享和特定于任务的层。文献[12]中，首先通过学习针对源任务和目标任务的单独的嵌入函数，将原始样本和生成的样本都映射到特定于任务的空间，然后通过共享的可变自动编码器进行嵌入。</p>
+<p><img src="https://pic1.zhimg.com/80/v2-83751de8688e1513b7ff3b669dc90924_720w.webp" alt="img"></p>
+<p><strong>Parameter Tying (参数绑定)</strong> 这种策略要求不同任务的参数 $\left(\theta_c{ }^{\prime} s\right)$ 必须相似(如图6)[45]。一种 流行的方法是对 $\left(\theta_c{ }^{\prime} s\right)$ 进行正则化。文献[151]中， $\left(\theta_c{ }^{\prime} s\right)$ 的所有成对差异都受到了惩罚。在 [85]中，有一个CNN用于源任务，另一个用于目标任务。这两个CNN的层使用一些特殊设计的正 则化术语对产。</p>
+<p><img src="https://image.rexking6.top/img/v2-4ee9a4fd75632f2e8243f136eb8deabc_720w.webp" alt=""></p>
+<h2 id="4-2-嵌入学习（Embedding-Learning）"><a href="#4-2-嵌入学习（Embedding-Learning）" class="headerlink" title="4.2 嵌入学习（Embedding Learning）"></a>4.2 嵌入学习（Embedding Learning）</h2><p>嵌入学习[63，122]将每个样本 $x_i \in \mathcal{X} \subseteq \mathbb{R}^d$ 嵌入到低维 $z_i \in Z \subseteq \mathbb{R}^m$ $\in \mathrm{Z} \subseteq \mathbb{R}^m$ ，这样相 似的样本会紧密靠近，而异类的样本则更容易区分。然后，在这个较低维的 $Z$ 中，可以构造一个 较小的假设空间 $H$ ，随后需要较少的训练样本。嵌入功能主要是从先验知识中学到的，并且可以 额外使用 $D_{\text {train }}$ 任务特定信息。</p>
+<p>嵌入学习具有以下关键组成部分：(i)将测试样本 $x_{t e s t} \in D_{t e s t}$ 嵌入Z的函数f，(ii)将训练样本 $x_{\text {test }} \in D_{\text {test }}$ 嵌入 $Z$ 的函数 $g$ (iii)相似性函数 $(\cdot, \cdot)$ 来测量 $f\left(x_{\text {test }}\right)$ 和 $Z$ 中的 $g\left(x_i\right)$ 之间的 相似度。根据该类的嵌入 $g\left(x_i\right)$ 与Z中的 $f\left(x_{\text {test }}\right)$ )最相似这个原则, 将测试样本 $x_{\text {test }}$ 分配给$x_i$类。 尽管可以为 $x_i$ 和 $x_{t e s t}$ 使用通用的嵌入函数，但是使用两个单独的嵌入函数可以获得更好的准确 性[14,138]。表5总结了现有的嵌入学习方法。根据嵌入函数 $f$ 和 $g$ 的参数是否随任务而变化，我 们将这些FSL方法分类为：(i)特定于任务的嵌入模型；(ii)任务不变(即一般)嵌入模型；(iii)混合嵌入 模型，可同时编码特定于任务和不变任务的信息。</p>
+<ul>
+<li><p>特定任务嵌入模型。通过仅使用来自该任务的信息为每个任务量身定制嵌入函数。例如：给定任务 $T_c$ 的少量数据 $D_{\text {train }}^c ， D_{\text {train }}^c$ 中样本之间的所有成对排名都列举为样本对[130]，训练样本的数量因此增加，仅使用特定任务的信息也可以学习嵌入函数。</p>
+</li>
+<li><p>任务不变嵌入模型。任务不变的嵌入方法从包含足够样本的大规模数据集中学习一个通用的嵌入函数，无需重新训练将其直接用于新的小样本 $D_{\text {train }}$ (图7)。第一个FSL嵌入模型[36]使用内核嵌入 样本。最近，卷积孪生网络[20]学会了更复杂的嵌入[70，150]。</p>
+</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-af917d04839c633ae831b108db7e93c5_720w.webp" alt=""></p>
+<p>​        通过元学习方法学习到了更复杂的任务不变嵌入模型：匹配网络；原型网络；其他方法。</p>
+<ul>
+<li>混合嵌入模型：尽管任务不变嵌入方法可以应用在新任务上且计算成本低。但不利用当前任务的特 定知识。当任务特性是 $D_{\text {train }}$ 只有少量样本的情况下，简单地应用任务不变的嵌入函数可能是不 合适的。为了缓解这一问题，混合嵌入模型采用了一般的任务不变嵌入模型，该模型是根据数据训 练中的特定任务信息从先验知识中学习而来的。这是通过学习一个函数来实现的，该函数将从 $D_{\text {train }}$ 中提取的信息作为输入并返回一个嵌入，该嵌入作为 $f(.)$ 的参数。如图8。</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-d2f1e09dd64d2c03da9870ad4bff7b5f_720w.webp" alt=""></p>
+<h2 id="4-3-基于外部记忆学习（Learning-with-External-Memory）"><a href="#4-3-基于外部记忆学习（Learning-with-External-Memory）" class="headerlink" title="4.3 基于外部记忆学习（Learning with External Memory）"></a>4.3 基于外部记忆学习（Learning with External Memory）</h2><p>基于外部记忆学习：使用外部存储器[49、89、124、145]学习从Dtrain中提取知识，并将其存储在外部存储器中(图9)。然后，每个新样本 $x_{\text {test }}$ 用从内存中提取内容的加权平均值表示。这限制了 $x_{\text {test }}$ 由内存中的内容表示，因此实质上减小了H的大小。</p>
+<p><img src="https://image.rexking6.top/img/v2-189e59ff0fed6747fb686bb7d9d42477_720w.webp" alt=""></p>
+<h2 id="4-4-生成模型"><a href="#4-4-生成模型" class="headerlink" title="4.4 生成模型"></a>4.4 生成模型</h2><p>生成模型: 生成建模方法借助先验知识(图10)从观测到的 $x_i$ 估计概率分布。 $p(x)$ 的估计通常涉 及 $p(x \mid y)$ 和 $p(y)$ 的估计。此类中的方法可以处理许多任务，例如生成，识别，重构和图像翻转。</p>
+<p><img src="https://image.rexking6.top/img/v2-77403d759184f95da1acfdd5fab87fd4_720w.webp" alt=""></p>
+<p>根据在潜变量代表的信息，现有方法可分为三种：</p>
+<ul>
+<li><p>可分解的元件：尽管在FSL问题中缺少具有监督信息的样本，但它们可能与其他任务的样本共享一些较小的可分解组件。这种方法利用从先验数据中学习到的可分解的各个元件，如人脸识别中的五官等，从中学习各元件与目标类的关系，将其与目标类联结起来。</p>
+</li>
+<li><p>相似类的先验概率分布：通常，相似的任务具有相似的先验概率，并且可以在FSL中使用。例如，考虑“橙色猫”，“豹”和“孟加拉虎”的三级分类，这三个物种相似，但孟加拉虎濒临灭绝，而橙色猫和豹则丰富，因此，人们可以学习一种 来自“橙色猫”以及“豹”的先验概率，并以此作为few-shot类别“孟加拉虎”的先决条件。该方法利用相似数据类的先验概率分布，将小样本数据分类至若干个对应的相似数据类中，利用类的先验概率分布建模。</p>
+</li>
+<li><p>推理网络参数：该方法利用现有的深度网络的参数的强特征表征能力来表征新的任务数据，更加高效且降低了对人类知识的要求。通常使用一些辅助大规模数据集对推理网络进行训练，典型的包括变分自编码器（VAE），自回归模型，生成对抗网络（GAN）, VAE和GAN的组合等。</p>
+</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li><p>多任务学习：当存在相似的任务或辅助任务时，可以使用多任务学习来约束few-shot任务的 $H$ 。但是，请注意，需要共同训练所有任务。因此，当一个新的few-shot任务到达时，整个多任务模型必须再次训练，这可能既昂贵又缓慢。此外，$D$ 和 $D_c$ 的大小不应具有可比性，否则，多次执行的任务可能会被具有许多样本的任务淹没。</p>
+</li>
+<li><p>嵌入学习：当存在一个包含足够的各种类别样本的大规模数据集时，可以使用嵌入学习方法。这些方法将样本映射到良好的嵌入空间，在其中可以很好地分离来自不同类别的样本，因此需要较小的 $\tilde{\mathcal{H}}$ 。但是，当few-shot任务与其他任务没有密切关系时，它们可能无法很好地工作。</p>
+</li>
+<li><p>基于外部的内存学习：此外，更多有关如何混合任务的不变和特定于任务的信息的探索是有帮助的。当有可用的内存网络时，可以通过在内存的基础上训练一个简单的模型(例如，分类器)将其轻松用于FSL。通过使用精心设计的更新规则，可以有选择地保护内存插槽。该策略的弱点在于，它会导致额外的空间和计算成本，随着内存大小的增加而增加。因此，当前的外部存储器具有有限的大小。</p>
+</li>
+<li>生成模型：最后，当除了FSL之外还想要执行诸如生成和重构之类的任务时，可以使用生成模型。他们从其他数据集中学习了先验概率$p(z;\gamma)$，这将H减小为更小的 $\tilde{\mathcal{H}}$。学习的生成模型也可以用于生成样本以进行数据扩充。但是，生成建模方法具有较高的推理成本，比确定性模型更难于推导。</li>
+</ul>
+<h1 id="五、算法"><a href="#五、算法" class="headerlink" title="五、算法"></a>五、算法</h1><p>FSL中，只能提供少量的训练集，因此获得的经验风险最小化器不可靠。基于算法的工作旨在利用先验知识寻找合适的模型参数，如初始化参数，优化路径等。</p>
+<p>根据先验知识如何影响搜索策略，可分为三类（如表7）：</p>
+<ol>
+<li>完善现有参数（Refine existing parameters）。用其他任务学习一个初始化参数，然后用训练集来进行微调。</li>
+<li>完善元学习参数（Refining meta-learned parameters）。初始化参数是通过一组任务中元学习得来的，这些任务是从与小样本任务相同的任务分布中提取来的，然后再利用训练集进行微调。</li>
+<li>学习优化器（Learning the optimizer）。此策略将元学习作为优化器进行学习，以直接为每个学习者输出搜索步骤，例如：更改搜索方向或步骤大小。</li>
+</ol>
+<p><img src="https://image.rexking6.top/img/v2-cec97fd1bf14a1e01cdae1c27e5ee140_720w.webp" alt=""></p>
+<h2 id="5-1-完善现有参数（Refine-existing-parameters）"><a href="#5-1-完善现有参数（Refine-existing-parameters）" class="headerlink" title="5.1 完善现有参数（Refine existing parameters）"></a>5.1 完善现有参数（Refine existing parameters）</h2><h3 id="5-1-1-通过正则化微调已有参数"><a href="#5-1-1-通过正则化微调已有参数" class="headerlink" title="5.1.1 通过正则化微调已有参数"></a>5.1.1 通过正则化微调已有参数</h3><p><img src="https://image.rexking6.top/img/v2-d941b0b7f861a2d22851d8d8e0a2bcd7_720w.webp" alt=""></p>
+<p>几种防止过拟合的方法如下：</p>
+<ul>
+<li>Early stopping</li>
+<li>Selectively updating θ</li>
+<li>Updating related parts of θ together</li>
+<li>Using a model regression network</li>
+</ul>
+<h3 id="5-1-2-聚合一组参数"><a href="#5-1-2-聚合一组参数" class="headerlink" title="5.1.2 聚合一组参数"></a>5.1.2 聚合一组参数</h3><p><img src="https://image.rexking6.top/img/v2-11ad781ee22a8c5f643fd099f83f1ad9_720w.webp" alt=""></p>
+<h3 id="5-1-3-利用新的参数微调存在的参数"><a href="#5-1-3-利用新的参数微调存在的参数" class="headerlink" title="5.1.3 利用新的参数微调存在的参数"></a>5.1.3 利用新的参数微调存在的参数</h3><p><img src="https://image.rexking6.top/img/v2-2a13f84f695ff098984be0dff92c7bdb_720w.webp" alt=""></p>
+<h2 id="5-2-完善元学习参数"><a href="#5-2-完善元学习参数" class="headerlink" title="5.2 完善元学习参数"></a>5.2 完善元学习参数</h2><p><img src="https://image.rexking6.top/img/v2-44d5761022354c9654519bef42cf0038_720w.webp" alt=""></p>
+<h2 id="5-3-优化学习器"><a href="#5-3-优化学习器" class="headerlink" title="5.3 优化学习器"></a>5.3 优化学习器</h2><p><img src="https://image.rexking6.top/img/v2-f2f0200d466d410694512e0b28740afe_720w.webp" alt=""></p>
+<h2 id="5-4-讨论与总结"><a href="#5-4-讨论与总结" class="headerlink" title="5.4 讨论与总结"></a>5.4 讨论与总结</h2><ul>
+<li>优化参数类：从与当前任务不同的任务中学习了参数θ，该策略可能会牺牲精度以提高速度。</li>
+<li>元学习类：元学习充当一个优化器。然而诸如如何跨不同粒度进行学习或不同数据源等重要问题仍然存在。从这个角度看，元学习和多任务学习是相似的，因此也存在如何避免负迁移的担忧。</li>
+</ul>
+<h1 id="6-未来工作"><a href="#6-未来工作" class="headerlink" title="6 未来工作"></a>6 未来工作</h1><h2 id="6-1-问题设置"><a href="#6-1-问题设置" class="headerlink" title="6.1 问题设置"></a>6.1 问题设置</h2><p>现有的FSL方法通常使用一种模态（例如：图像、文本或视频）中的先验知识。然而，尽管训练集中有一些当前使用的模态示例，但可能存在另一种模态。其中灭绝动物的研究就是一个典型例子，尽管这种动物可能只有有限的视觉示例，但由于人们倾向于特别注意这种稀有动物，因此在文本领域（例如教科书或网页）中可能会有很多有关它的信息。因此，来自多个模态的先验知识可以为补充视图提供先验知识。零样本学习中，经常使用多模态数据。一种可能性是迫使通过多种模态学习的嵌入在共享空间中进行匹配。不同模式可能包含不同结构：图像需要位置，文本需要句法结构。一个有希望的方向是在设计FSL方法时考虑使用多模态信息。</p>
+<h2 id="6-2-技术"><a href="#6-2-技术" class="headerlink" title="6.2 技术"></a>6.2 技术</h2><p>元学习常常需要假定任务同分布。现实中，任务数量多，但相关性未知或难以确定。目前元学习分布是静态固定的。实际上，任务分布是动态的，新任务不断到达，也应该纳入任务分布中，避免动态环境的灾难性遗忘，目前假设空间和搜索策略是认为设计的。实际上，我们期望AutoML方法能用在特征工程，模型选择，神经结构搜索等方面来服务FSL。</p>
+<h2 id="6-3-应用"><a href="#6-3-应用" class="headerlink" title="6.3 应用"></a>6.3 应用</h2><ul>
+<li><p>计算机视觉</p>
+<p>字符识别，图像分类，对象识别，字体样式迁移，词组接地，图像检索，对象跟踪，特定对象计数，位置识别，手势识别，零件标注，图像生成，图像跨域翻译，3D视图重建，图像字幕，视觉问答<br>视频：运动预测，视频分类，动作定位，人重新识别，事件监测，对象分割</p>
+</li>
+<li><p>机器人技术</p>
+<p>模仿：单个演示下学习机器人手臂的运动，几个演示中学习纠正动作<br>互动改进自己行为：多臂强盗，视觉导航，连续控制，动态环境</p>
+</li>
+<li><p>自然语言处理</p>
+<p>翻译示例：解析，句子填空，情绪分类,用户意图分类，刑事指控预测，词相似任务，多标签文本分类</p>
+</li>
+<li><p>声音信号处理</p>
+<p>一个例子的口语单词识别，语音合成，从音频样本中克隆声音，模仿父母语音讲故事，从一个用户到另一个用户的语音转换（一次性语音或文本，跨不同语言）</p>
+</li>
+<li><p>其他</p>
+<p>少注射药物发现，曲线拟合，通过逻辑推理理解数字类比来计算</p>
+</li>
+</ul>
+<p><strong>6.4 理论</strong></p>
+<ol>
+<li><p>样本复杂性理论</p>
+<p>样本复杂性：获得具有高概率的小经验风险的模型所需的训练样本数量<br>FSL方法：利用先验知识，扩充数据，约束假设空间，改变搜索策略，降低所需的样本复杂度，弥补监督信息的缺失</p>
+</li>
+<li><p>域适应问题</p>
+<p>通过微调前馈神经网络可以获得更好的风险界限<br>考虑一个任务训练的模型转移到另一个任务的风险</p>
+</li>
+<li><p>收敛性分析</p>
+<p>梯度下降，元学习方法的充分条件<br>元学习器学习网络的底层，学习器学习最后一层</p>
+</li>
+</ol>
+<p><strong>7 总结</strong></p>
+<p>小样本学习（FSL）旨在弥合AI和人类学习之间的差距。FSL可利用先验知识从含有监督信息的少量样本的新任务中学习。</p>
+
+    </div>
+
+    
+    
+    
+      
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2023/07/16/%E5%B0%8F%E6%A0%B7%E6%9C%AC%E5%AD%A6%E4%B9%A0-Few-shot-Learning-%E7%BB%BC%E8%BF%B0/" title="小样本学习(Few-shot Learning)综述">https://blog.rexking6.top/2023/07/16/小样本学习-Few-shot-Learning-综述/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B0%8F%E6%A0%B7%E6%9C%AC%E5%AD%A6%E4%B9%A0/" rel="tag"># 小样本学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/04/26/SoVITS4-0%E5%AE%9E%E8%B7%B5/" rel="prev" title="SoVITS4.0实践">
+      <i class="fa fa-chevron-left"></i> SoVITS4.0实践
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/07/25/%E4%BD%BF%E7%94%A8%E6%94%B9%E8%BF%9B%E5%90%8E%E7%9A%84Drain3%E8%BF%9B%E8%A1%8C%E4%B8%AD%E8%8B%B1%E6%96%87%E6%97%A5%E5%BF%97%E8%A7%A3%E6%9E%90/" rel="next" title="使用改进后的Drain3进行中英文日志解析">
+      使用改进后的Drain3进行中英文日志解析 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%BC%95%E8%A8%80"><span class="nav-number">2.</span> <span class="nav-text">一、引言</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-%E8%B0%83%E7%A0%94%E7%9A%84%E7%BB%84%E7%BB%87%E6%83%85%E5%86%B5"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 调研的组织情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-%E7%AC%A6%E5%8F%B7%E5%92%8C%E6%9C%AF%E8%AF%AD"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 符号和术语</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%A6%82%E8%BF%B0"><span class="nav-number">3.</span> <span class="nav-text">二、概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%E9%97%AE%E9%A2%98%E5%AE%9A%E4%B9%89"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 问题定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%E7%9B%B8%E5%85%B3%E7%9A%84%E5%AD%A6%E4%B9%A0%E9%97%AE%E9%A2%98"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 相关的学习问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-1-%E5%BC%B1%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A0"><span class="nav-number">3.2.1.</span> <span class="nav-text">2.2.1 弱监督学习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-2-%E4%B8%8D%E5%B9%B3%E8%A1%A1%E5%AD%A6%E4%B9%A0"><span class="nav-number">3.2.2.</span> <span class="nav-text">2.2.2 不平衡学习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-3-%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0"><span class="nav-number">3.2.3.</span> <span class="nav-text">2.2.3 迁移学习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-4-%E5%85%83%E5%AD%A6%E4%B9%A0"><span class="nav-number">3.2.4.</span> <span class="nav-text">2.2.4 元学习</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-FSL%E7%9A%84%E6%A0%B8%E5%BF%83%E9%97%AE%E9%A2%98"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 FSL的核心问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-1-%E7%BB%8F%E9%AA%8C%E9%A3%8E%E9%99%A9%E6%9C%80%E5%B0%8F%E5%8C%96%E4%B8%8D%E5%8F%AF%E9%9D%A0"><span class="nav-number">3.3.1.</span> <span class="nav-text">2.3.1 经验风险最小化不可靠</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-FSL%E6%96%B9%E6%B3%95%E5%88%86%E7%B1%BB%E5%8F%8A%E7%A0%94%E7%A9%B6%E7%8E%B0%E7%8A%B6"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 FSL方法分类及研究现状</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%95%B0%E6%8D%AE"><span class="nav-number">4.</span> <span class="nav-text">三、数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-%E4%BB%8E%E8%AE%AD%E7%BB%83%E4%B8%AD%E8%BD%AC%E6%8D%A2%E6%A0%B7%E6%9C%AC"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 从训练中转换样本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-%E4%BB%8E%E5%BC%B1%E6%A0%87%E8%AE%B0%E6%88%96%E6%9C%AA%E6%A0%87%E8%AE%B0%E7%9A%84%E6%95%B0%E6%8D%AE%E9%9B%86%E4%B8%AD%E8%BD%AC%E6%8D%A2%E6%A0%B7%E6%9C%AC"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 从弱标记或未标记的数据集中转换样本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-%E4%BB%8E%E7%9B%B8%E4%BC%BC%E6%95%B0%E6%8D%AE%E9%9B%86%E4%B8%AD%E8%BD%AC%E6%8D%A2%E6%A0%B7%E6%9C%AC"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 从相似数据集中转换样本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-%E8%AE%A8%E8%AE%BA%E4%B8%8E%E6%80%BB%E7%BB%93"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 讨论与总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.</span> <span class="nav-text">四、模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-%E5%A4%9A%E4%BB%BB%E5%8A%A1%E5%AD%A6%E4%B9%A0%EF%BC%88Multitask-Learning%EF%BC%89"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 多任务学习（Multitask Learning）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-%E5%B5%8C%E5%85%A5%E5%AD%A6%E4%B9%A0%EF%BC%88Embedding-Learning%EF%BC%89"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 嵌入学习（Embedding Learning）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-%E5%9F%BA%E4%BA%8E%E5%A4%96%E9%83%A8%E8%AE%B0%E5%BF%86%E5%AD%A6%E4%B9%A0%EF%BC%88Learning-with-External-Memory%EF%BC%89"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 基于外部记忆学习（Learning with External Memory）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-4-%E7%94%9F%E6%88%90%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.4.</span> <span class="nav-text">4.4 生成模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.5.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E7%AE%97%E6%B3%95"><span class="nav-number">6.</span> <span class="nav-text">五、算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-%E5%AE%8C%E5%96%84%E7%8E%B0%E6%9C%89%E5%8F%82%E6%95%B0%EF%BC%88Refine-existing-parameters%EF%BC%89"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 完善现有参数（Refine existing parameters）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-1-%E9%80%9A%E8%BF%87%E6%AD%A3%E5%88%99%E5%8C%96%E5%BE%AE%E8%B0%83%E5%B7%B2%E6%9C%89%E5%8F%82%E6%95%B0"><span class="nav-number">6.1.1.</span> <span class="nav-text">5.1.1 通过正则化微调已有参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-2-%E8%81%9A%E5%90%88%E4%B8%80%E7%BB%84%E5%8F%82%E6%95%B0"><span class="nav-number">6.1.2.</span> <span class="nav-text">5.1.2 聚合一组参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-3-%E5%88%A9%E7%94%A8%E6%96%B0%E7%9A%84%E5%8F%82%E6%95%B0%E5%BE%AE%E8%B0%83%E5%AD%98%E5%9C%A8%E7%9A%84%E5%8F%82%E6%95%B0"><span class="nav-number">6.1.3.</span> <span class="nav-text">5.1.3 利用新的参数微调存在的参数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-%E5%AE%8C%E5%96%84%E5%85%83%E5%AD%A6%E4%B9%A0%E5%8F%82%E6%95%B0"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 完善元学习参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-3-%E4%BC%98%E5%8C%96%E5%AD%A6%E4%B9%A0%E5%99%A8"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 优化学习器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-4-%E8%AE%A8%E8%AE%BA%E4%B8%8E%E6%80%BB%E7%BB%93"><span class="nav-number">6.4.</span> <span class="nav-text">5.4 讨论与总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-%E6%9C%AA%E6%9D%A5%E5%B7%A5%E4%BD%9C"><span class="nav-number">7.</span> <span class="nav-text">6 未来工作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1-%E9%97%AE%E9%A2%98%E8%AE%BE%E7%BD%AE"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 问题设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-2-%E6%8A%80%E6%9C%AF"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-3-%E5%BA%94%E7%94%A8"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 应用</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">215</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">3.7m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">56:36</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
