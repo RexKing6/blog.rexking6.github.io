@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python设计模式">
+<meta property="og:url" content="https://blog.rexking6.top/2023/07/30/Python%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img2022.cnblogs.com/blog/2036768/202205/2036768-20220509140813507-1019368751.png">
+<meta property="article:published_time" content="2023-07-29T16:44:15.000Z">
+<meta property="article:modified_time" content="2023-07-29T16:46:37.442Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="Python">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img2022.cnblogs.com/blog/2036768/202205/2036768-20220509140813507-1019368751.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2023/07/30/Python%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Python设计模式 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2023/07/30/Python%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Python设计模式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-07-30 00:44:15 / 修改时间：00:46:37" itemprop="dateCreated datePublished" datetime="2023-07-30T00:44:15+08:00">2023-07-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2023/07/30/Python%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" class="post-meta-item leancloud_visitors" data-flag-title="Python设计模式" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>18k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>16 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/Jony-li/articles/16249058.html">python设计模式</a>。</p>
+<h1 id="设计模式简介"><a href="#设计模式简介" class="headerlink" title="设计模式简介"></a>设计模式简介</h1><blockquote>
+<p>设计模式：对软件设计中普遍存在（反复出现）的各种问题，所提出的解决方案。每一个设计模式系统地命名、解释和评价了面向对象系统中一个重要的和重复出现的设计。<br>“四人帮”（Gang of Four， GoF）：Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides<br>《设计模式：可复用面向对象软件的基础》</p>
+</blockquote>
+<h2 id="复习：面向对象"><a href="#复习：面向对象" class="headerlink" title="复习：面向对象"></a>复习：面向对象</h2><blockquote>
+<p>面向对象的三大特性：</p>
+<ul>
+<li>封装：将数据、方法封装到一个类里；具有共有和私有属性。</li>
+<li>继承：多个类之间复用代码使用继承。</li>
+<li>多态：python本身就是一门多态语言，不用程序员去考虑多态，语言特性自己做了。</li>
+</ul>
+</blockquote>
+<h2 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h2><blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">接口：若干抽象方法的集合。`</span><br><span class="line">`作用：限制实现接口的类必须按照接口给定的调用方式实现这些方法；对高层模块隐藏了类的内部实现。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@abstractmethod：抽象方法，含abstractmethod方法的类不能实例化，继承了含abstractmethod方法的子类必须复写所有abstractmethod装饰的方法，未被装饰的可以不重写`</span><br><span class="line">`@property：方法伪装属性，方法返回值及属性值，被装饰方法不能有参数，必须实例化后调用，类不能调用`</span><br><span class="line">`@classmethod：类方法，可以通过实例对象和类对象调用，被该函数修饰的方法第一个参数代表类本身常用cls，被修饰函数内可调用类属性，不能调用实例属性`</span><br><span class="line">`@staticmethod：静态方法，可以通过实例对象和类对象调用，被装饰函数可无参数，被装饰函数内部通过类名.属性引用类属性或类方法，不能引用实例属性</span><br></pre></td></tr></table></figure>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> ABCMeta, abstractmethod</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Payment</span>(metaclass=ABCMeta):</span><br><span class="line">     <span class="comment"># abstract class 有抽象方法就是抽象类：抽象类不可被实例化</span></span><br><span class="line"><span class="meta">     @abstractmethod </span><span class="comment"># 该类被子类继承时必须实现被abstractmethod装饰的方法</span></span><br><span class="line">     <span class="keyword">def</span> <span class="title function_">pay</span>(<span class="params">self, money</span>):</span><br><span class="line">         <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+<h1 id="面向对象设计SOLID原则"><a href="#面向对象设计SOLID原则" class="headerlink" title="面向对象设计SOLID原则"></a>面向对象设计SOLID原则</h1><blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">开放封闭原则：一个软件实体如类、模块和函数应该对扩展开放，对修改关闭。即软件实体应尽量在不修改原有代码的情况下进行扩展。`</span><br><span class="line">`里氏替换原则：所有引用父类的地方必须能透明地使用其子类的对象。`</span><br><span class="line">`依赖倒置原则：高层模块不应该依赖低层模块，二者都应该依赖其抽象；抽象不应该依赖细节；细节应该依赖抽象。换言之，要针对接口编程，而不是针对实现编程。</span><br><span class="line">接口隔离原则：使用多个专门的接口，而不使用单一的总接口，即客户端不应该依赖那些它不需要的接口。`</span><br><span class="line">`单一职责原则：不要存在多于一个导致类变更的原因。通俗的说，即一个类只负责一项职责。</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h1 id="设计模式分类"><a href="#设计模式分类" class="headerlink" title="设计模式分类"></a>设计模式分类</h1><blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">创建型模式（5种）`：`工厂方法模式、抽象工厂模式、创建者模式`、原型模式、`单例模式`</span><br><span class="line">`结构型模式（7种）`：`适配器模式、桥模式、组合模式`、装饰模式、`外观模式`、享元模式、`代理模式`</span><br><span class="line">`行为型模式（11种）`：解释器模式、`责任链模式`、命令模式、迭代器模式、中介者模式、备忘录模式、`观察者模式`、状态模式、`策略模式`、访问者模式、`模板方法模式</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h2 id="创建型模式"><a href="#创建型模式" class="headerlink" title="创建型模式"></a>创建型模式</h2><h3 id="简单工厂模式（掌握）"><a href="#简单工厂模式（掌握）" class="headerlink" title="简单工厂模式（掌握）"></a>简单工厂模式（掌握）</h3><blockquote>
+<p>内容：不直接向客户端暴露对象创建的实现细节，而是通过一个工厂类来负责创建产品类的实例。</p>
+<p>角色：</p>
+<ul>
+<li>工厂角色（Creator）</li>
+<li>抽象产品角色（Product）</li>
+<li>具体产品角色（Concrete Product）</li>
+</ul>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> ABCMeta, abstractmethod</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Payment</span>(metaclass=ABCMeta):</span><br><span class="line">    <span class="comment"># abstract class</span></span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">pay</span>(<span class="params">self, money</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Alipay</span>(<span class="title class_ inherited__">Payment</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, use_huabei=<span class="literal">False</span></span>):</span><br><span class="line">        self.use_huaei = use_huabei</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">pay</span>(<span class="params">self, money</span>):</span><br><span class="line">        <span class="keyword">if</span> self.use_huaei:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;花呗支付%d元.&quot;</span> % money)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;支付宝余额支付%d元.&quot;</span> % money)</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">WechatPay</span>(<span class="title class_ inherited__">Payment</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">pay</span>(<span class="params">self, money</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;微信支付%d元.&quot;</span> % money)</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PaymentFactory</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">create_payment</span>(<span class="params">self, method</span>):</span><br><span class="line">        <span class="keyword">if</span> method == <span class="string">&#x27;alipay&#x27;</span>:</span><br><span class="line">            <span class="keyword">return</span> Alipay()</span><br><span class="line">        <span class="keyword">elif</span> method == <span class="string">&#x27;wechat&#x27;</span>:</span><br><span class="line">            <span class="keyword">return</span> WechatPay()</span><br><span class="line">        <span class="keyword">elif</span> method == <span class="string">&#x27;huabei&#x27;</span>:</span><br><span class="line">            <span class="keyword">return</span> Alipay(use_huabei=<span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">raise</span> TypeError(<span class="string">&quot;No such payment named %s&quot;</span> % method)</span><br><span class="line"></span><br><span class="line"><span class="comment"># client</span></span><br><span class="line">pf = PaymentFactory()</span><br><span class="line">p = pf.create_payment(<span class="string">&#x27;huabei&#x27;</span>)</span><br><span class="line">p.pay(<span class="number">100</span>)</span><br></pre></td></tr></table></figure>
+<p>优点：</p>
+<ul>
+<li>隐藏了对象创建的实现细节</li>
+<li>客户端不需要修改代码</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>违反了单一职责原则，将创建逻辑几种到一个工厂类里</li>
+<li>当添加新产品时，需要修改工厂类代码，违反了开闭原则</li>
+</ul>
+<blockquote>
+<p>由此方法引出工厂方法模式</p>
+</blockquote>
+<h3 id="工厂方法模式（使用较多）"><a href="#工厂方法模式（使用较多）" class="headerlink" title="工厂方法模式（使用较多）"></a>工厂方法模式（使用较多）</h3><blockquote>
+<p>内容：定义一个用于创建对象的接口（工厂接口），让子类决定实例化哪一个产品类。<br>角色：</p>
+<ul>
+<li>抽象工厂角色（Creator）</li>
+<li>具体工厂角色（Concrete Creator）</li>
+<li>抽象产品角色（Product）</li>
+<li>具体产品角色（Concrete Product）</li>
+</ul>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> ABCMeta, abstractmethod</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Payment</span>(metaclass=ABCMeta):</span><br><span class="line">    <span class="comment"># abstract class</span></span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">pay</span>(<span class="params">self, money</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Alipay</span>(<span class="title class_ inherited__">Payment</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, use_huabei=<span class="literal">False</span></span>):</span><br><span class="line">        self.use_huaei = use_huabei</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">pay</span>(<span class="params">self, money</span>):</span><br><span class="line">        <span class="keyword">if</span> self.use_huaei:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;花呗支付%d元.&quot;</span> % money)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;支付宝余额支付%d元.&quot;</span> % money)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">WechatPay</span>(<span class="title class_ inherited__">Payment</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">pay</span>(<span class="params">self, money</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;微信支付%d元.&quot;</span> % money)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BankPay</span>(<span class="title class_ inherited__">Payment</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">pay</span>(<span class="params">self, money</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;银行卡支付%d元.&quot;</span> % money)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PaymentFactory</span>(metaclass=ABCMeta):</span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">create_payment</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AlipayFactory</span>(<span class="title class_ inherited__">PaymentFactory</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">create_payment</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> Alipay()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">WechatPayFactory</span>(<span class="title class_ inherited__">PaymentFactory</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">create_payment</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> WechatPay()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">HuabeiFactory</span>(<span class="title class_ inherited__">PaymentFactory</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">create_payment</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> Alipay(use_huabei=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BankPayFactory</span>(<span class="title class_ inherited__">PaymentFactory</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">create_payment</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> BankPay()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># client</span></span><br><span class="line"></span><br><span class="line">pf = HuabeiFactory()</span><br><span class="line">p = pf.create_payment()</span><br><span class="line">p.pay(<span class="number">100</span>)</span><br></pre></td></tr></table></figure>
+<p>优点：</p>
+<ul>
+<li>每个具体产品都对应一个具体工厂类，不需要修改工厂类代码</li>
+<li>隐藏了对象创建的实现细节</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>每增加一个具体产品类，就必须增加一个相应的具体工厂类</li>
+</ul>
+<h3 id="抽象工厂模式-使用较少"><a href="#抽象工厂模式-使用较少" class="headerlink" title="抽象工厂模式(使用较少)"></a>抽象工厂模式(使用较少)</h3><blockquote>
+<p>内容：定义一个工厂类接口，让工厂子类来创建一系列相关或相互依赖的对象。<br>例：生产一部手机，需要手机壳、CPU、操作系统三类对象进行组装，其中每类对象都有不同的种类。对每个具体工厂，分别生产一部手机所需要的三个对象。<br>相比工厂方法模式，抽象工厂模式中的每个具体工厂都生产一套产品。</p>
+<p>角色：</p>
+<ul>
+<li>抽象工厂角色（Creator）</li>
+<li>具体工厂角色（Concrete Creator）</li>
+<li>抽象产品角色（Product）</li>
+<li>具体产品角色（Concrete Product）</li>
+<li>客户端（Client）</li>
+</ul>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> abstractmethod, ABCMeta</span><br><span class="line"><span class="comment"># ------抽象产品------</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PhoneShell</span>(metaclass=ABCMeta):</span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">show_shell</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CPU</span>(metaclass=ABCMeta):</span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">show_cpu</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">OS</span>(metaclass=ABCMeta):</span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">show_os</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># ------抽象工厂------</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PhoneFactory</span>(metaclass=ABCMeta):</span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">make_shell</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">make_cpu</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">make_os</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># ------具体产品------</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SmallShell</span>(<span class="title class_ inherited__">PhoneShell</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">show_shell</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;普通手机小手机壳&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BigShell</span>(<span class="title class_ inherited__">PhoneShell</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">show_shell</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;普通手机大手机壳&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AppleShell</span>(<span class="title class_ inherited__">PhoneShell</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">show_shell</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;苹果手机壳&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SnapDragonCPU</span>(<span class="title class_ inherited__">CPU</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">show_cpu</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;骁龙CPU&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MediaTekCPU</span>(<span class="title class_ inherited__">CPU</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">show_cpu</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;联发科CPU&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">AppleCPU</span>(<span class="title class_ inherited__">CPU</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">show_cpu</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;苹果CPU&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Android</span>(<span class="title class_ inherited__">OS</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">show_os</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Android系统&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">IOS</span>(<span class="title class_ inherited__">OS</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">show_os</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;iOS系统&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># ------具体工厂------</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MiFactory</span>(<span class="title class_ inherited__">PhoneFactory</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">make_cpu</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> SnapDragonCPU()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">make_os</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> Android()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">make_shell</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> BigShell()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">HuaweiFactory</span>(<span class="title class_ inherited__">PhoneFactory</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">make_cpu</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> MediaTekCPU()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">make_os</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> Android()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">make_shell</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> SmallShell()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">IPhoneFactory</span>(<span class="title class_ inherited__">PhoneFactory</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">make_cpu</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> AppleCPU()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">make_os</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> IOS()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">make_shell</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> AppleShell()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># ------客户端------</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Phone</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, cpu, os, shell</span>):</span><br><span class="line">        self.cpu = cpu</span><br><span class="line">        self.os = os</span><br><span class="line">        self.shell = shell</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">show_info</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;手机信息:&quot;</span>)</span><br><span class="line">        self.cpu.show_cpu()</span><br><span class="line">        self.os.show_os()</span><br><span class="line">        self.shell.show_shell()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">make_phone</span>(<span class="params">factory</span>):</span><br><span class="line">    cpu = factory.make_cpu()</span><br><span class="line">    os = factory.make_os()</span><br><span class="line">    shell = factory.make_shell()</span><br><span class="line">    <span class="keyword">return</span> Phone(cpu, os, shell)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p1 = make_phone(IPhoneFactory())</span><br><span class="line">p1.show_info()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>优点：</p>
+<ul>
+<li>将客户端与类的具体实现相分离</li>
+<li>每个工厂创建了一个完整的产品系列，使得易于交换产品系列</li>
+<li>有利于产品的一致性（即产品之间的约束关系）</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>难以支持新种类的（抽象）产品</li>
+</ul>
+</blockquote>
+<h3 id="建造者模式"><a href="#建造者模式" class="headerlink" title="建造者模式"></a>建造者模式</h3><p>内容：将一个复杂对象的构建与它的表示分离，使得同样的构建过程可以创建不同的表示。<br>角色：</p>
+<ul>
+<li>抽象建造者（Builder）</li>
+<li>具体建造者（Concrete Builder）</li>
+<li>指挥者（Director）</li>
+<li>产品（Product）</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#! /usr/bin/env python</span></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="comment"># Date: 2018/12/1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> ABCMeta, abstractmethod</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Player</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, face=<span class="literal">None</span>, body=<span class="literal">None</span>, arm=<span class="literal">None</span>, leg=<span class="literal">None</span></span>):</span><br><span class="line">        self.face = face</span><br><span class="line">        self.body = body</span><br><span class="line">        self.arm = arm</span><br><span class="line">        self.leg = leg</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__str__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;%s, %s, %s, %s&quot;</span> % (self.face, self.body, self.arm, self.leg)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PlayerBuilder</span>(metaclass=ABCMeta):</span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">build_face</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">build_body</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">build_arm</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">build_leg</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SexyGirlBuilder</span>(<span class="title class_ inherited__">PlayerBuilder</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        self.player = Player()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">build_face</span>(<span class="params">self</span>):</span><br><span class="line">        self.player.face = <span class="string">&quot;漂亮脸蛋&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">build_body</span>(<span class="params">self</span>):</span><br><span class="line">        self.player.body = <span class="string">&quot;苗条&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">build_arm</span>(<span class="params">self</span>):</span><br><span class="line">        self.player.arm = <span class="string">&quot;漂亮胳膊&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">build_leg</span>(<span class="params">self</span>):</span><br><span class="line">        self.player.leg = <span class="string">&quot;大长腿&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Monster</span>(<span class="title class_ inherited__">PlayerBuilder</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        self.player = Player()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">build_face</span>(<span class="params">self</span>):</span><br><span class="line">        self.player.face = <span class="string">&quot;怪兽脸&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">build_body</span>(<span class="params">self</span>):</span><br><span class="line">        self.player.body = <span class="string">&quot;怪兽身材&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">build_arm</span>(<span class="params">self</span>):</span><br><span class="line">        self.player.arm = <span class="string">&quot;长毛的胳膊&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">build_leg</span>(<span class="params">self</span>):</span><br><span class="line">        self.player.leg = <span class="string">&quot;长毛的腿&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PlayerDirector</span>: <span class="comment"># 控制组装顺序</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">build_player</span>(<span class="params">self, builder</span>):</span><br><span class="line">        builder.build_body()</span><br><span class="line">        builder.build_face()</span><br><span class="line">        builder.build_arm()</span><br><span class="line">        builder.build_leg()</span><br><span class="line">        <span class="keyword">return</span> builder.player</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># client</span></span><br><span class="line"></span><br><span class="line">builder = Monster()</span><br><span class="line">director = PlayerDirector()</span><br><span class="line">p = director.build_player(builder)</span><br><span class="line"><span class="built_in">print</span>(p)</span><br></pre></td></tr></table></figure>
+<p>建造者模式与抽象工厂模式相似，也用来创建复杂对象。主要区别是建造者模式着重一步步构造一个复杂对象，而抽象工厂模式着重于多个系列的产品对象。<br>优点：</p>
+<ul>
+<li>隐藏了一个产品的内部结构和装配过程</li>
+<li>将构造代码与表示代码分开</li>
+<li>可以对构造过程进行更精细的控制</li>
+</ul>
+<h3 id="单例模式-常用"><a href="#单例模式-常用" class="headerlink" title="单例模式(常用)"></a>单例模式(常用)</h3><blockquote>
+<p>内容：保证一个类只有一个实例，并提供一个访问它的全局访问点。<br>角色：</p>
+<ul>
+<li>单例（Singleton）</li>
+</ul>
+<p>优点：</p>
+<ul>
+<li>对唯一实例的受控访问</li>
+<li>单例相当于全局变量，但防止了命名空间被污染</li>
+</ul>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> abstractmethod, ABCMeta</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__new__</span>(<span class="params">cls, *args, **kwargs</span>):</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> <span class="built_in">hasattr</span>(cls, <span class="string">&quot;_instance&quot;</span>):</span><br><span class="line">            cls._instance = <span class="built_in">super</span>(Singleton, cls).__new__(cls)</span><br><span class="line">        <span class="keyword">return</span> cls._instance</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span>(<span class="title class_ inherited__">Singleton</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, a</span>):</span><br><span class="line">        self.a = a</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">a = MyClass(<span class="number">10</span>)</span><br><span class="line">b = MyClass(<span class="number">20</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(a.a)</span><br><span class="line"><span class="built_in">print</span>(b.a)</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(a), <span class="built_in">id</span>(b))</span><br></pre></td></tr></table></figure>
+<h3 id="创建型模式小结"><a href="#创建型模式小结" class="headerlink" title="创建型模式小结"></a>创建型模式小结</h3><p>抽象工厂模式和建造者模式相比于简单工厂模式和工厂方法模式而言更灵活也更复杂。<br>通常情况下、设计以简单工厂模式或工厂方法模式开始，当你发现设计需要更大的灵活性时，则像更复杂的设计模式演化。</p>
+<h2 id="结构型模式"><a href="#结构型模式" class="headerlink" title="结构型模式"></a>结构型模式</h2><h3 id="适配器模式"><a href="#适配器模式" class="headerlink" title="适配器模式"></a>适配器模式</h3><blockquote>
+<p>内容：将一个类的接口转换成客户希望的另一个接口。适配器模式使得原本由于接口不兼容而不能一起工作的那些类可以一起工作。<br>两种实现方式：</p>
+<ul>
+<li>类适配器：使用多继承</li>
+<li>对象适配器：使用组合</li>
+</ul>
+<p>角色：</p>
+<ul>
+<li>目标接口（Target）</li>
+<li>待适配的类（Adaptee）</li>
+<li>适配器（Adapter）</li>
+</ul>
+<p>适用场景：</p>
+<ul>
+<li>想使用一个已经存在的类，而它的接口不符合你的要求</li>
+<li>（对象适配器）想使用一些已经存在的子类，但不可能对每一个都进行子类化以匹配它们的接口。对象适配器可以适配它的父类接口。</li>
+</ul>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> ABCMeta, abstractmethod</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Payment</span>(metaclass=ABCMeta):</span><br><span class="line">    <span class="comment"># abstract class</span></span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">pay</span>(<span class="params">self, money</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Alipay</span>(<span class="title class_ inherited__">Payment</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">pay</span>(<span class="params">self, money</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;支付宝支付%d元.&quot;</span> % money)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">WechatPay</span>(<span class="title class_ inherited__">Payment</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">pay</span>(<span class="params">self, money</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;微信支付%d元.&quot;</span> % money)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BankPay</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">cost</span>(<span class="params">self, money</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;银联支付%d元.&quot;</span> % money)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ApplePay</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">cost</span>(<span class="params">self, money</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;苹果支付%d元.&quot;</span> % money)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># # 类适配器</span></span><br><span class="line"><span class="comment"># class NewBankPay(Payment, BankPay):</span></span><br><span class="line"><span class="comment">#     def pay(self, money):</span></span><br><span class="line"><span class="comment">#         self.cost(money)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 对象适配器</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">PaymentAdapter</span>(<span class="title class_ inherited__">Payment</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, payment</span>):</span><br><span class="line">        self.payment = payment</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">pay</span>(<span class="params">self, money</span>):</span><br><span class="line">        self.payment.cost(money)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p = PaymentAdapter(BankPay())</span><br><span class="line">p.pay(<span class="number">100</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 组合,B复用A类</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># class A:</span></span><br><span class="line"><span class="comment">#     pass</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># class B:</span></span><br><span class="line"><span class="comment">#     def __init__(self):</span></span><br><span class="line"><span class="comment">#         self.a = A()</span></span><br></pre></td></tr></table></figure>
+<h3 id="桥模式"><a href="#桥模式" class="headerlink" title="桥模式"></a>桥模式</h3><p>内容：将一个事物的两个维度分离，使其都可以独立地变化</p>
+<p>角色：</p>
+<ul>
+<li>抽象（Abstraction）</li>
+<li>细化抽象（RefinedAbstraction）</li>
+<li>实现者（Implementor）</li>
+<li>具体实现者（ConcreteImplementor</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> ABCMeta, abstractmethod</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Shape</span>(metaclass=ABCMeta):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, color</span>):</span><br><span class="line">        self.color = color</span><br><span class="line"></span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">draw</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Color</span>(metaclass=ABCMeta):</span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">paint</span>(<span class="params">self, shape</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Rectangle</span>(<span class="title class_ inherited__">Shape</span>):</span><br><span class="line">    name = <span class="string">&quot;长方形&quot;</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">draw</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="comment"># 长方形逻辑</span></span><br><span class="line">        self.color.paint(self)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Circle</span>(<span class="title class_ inherited__">Shape</span>):</span><br><span class="line">    name = <span class="string">&quot;圆形&quot;</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">draw</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="comment"># 圆形逻辑</span></span><br><span class="line">        self.color.paint(self)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Line</span>(<span class="title class_ inherited__">Shape</span>):</span><br><span class="line">    name = <span class="string">&quot;直线&quot;</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">draw</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="comment"># 直线逻辑</span></span><br><span class="line">        self.color.paint(self)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Red</span>(<span class="title class_ inherited__">Color</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">paint</span>(<span class="params">self, shape</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;红色的%s&quot;</span> % shape.name)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Green</span>(<span class="title class_ inherited__">Color</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">paint</span>(<span class="params">self, shape</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;绿色的%s&quot;</span> % shape.name)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Blue</span>(<span class="title class_ inherited__">Color</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">paint</span>(<span class="params">self, shape</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;蓝色的%s&quot;</span> % shape.name)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">shape = Line(Blue())</span><br><span class="line">shape.draw()</span><br><span class="line"></span><br><span class="line">shape2 = Circle(Green())</span><br><span class="line">shape2.draw()</span><br></pre></td></tr></table></figure>
+<p>应用场景：</p>
+<ul>
+<li>当事物有两个维度上的表现，两个维度都可能扩展时。</li>
+</ul>
+<p>优点：</p>
+<ul>
+<li>抽象和实现相分离</li>
+<li>优秀的扩展能力</li>
+</ul>
+<h3 id="组合模式"><a href="#组合模式" class="headerlink" title="组合模式"></a>组合模式</h3><p>内容：将对象组合成树形结构以表示“部分-整体”的层次结构。组合模式使得用户对单个对象和组合对象的使用具有一致性。<br>角色：</p>
+<ul>
+<li>抽象组件（Component）</li>
+<li>叶子组件（Leaf）</li>
+<li>复合组件（Composite）</li>
+<li>客户端（Client）</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> ABCMeta, abstractmethod</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 抽象组件</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Graphic</span>(metaclass=ABCMeta):</span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">draw</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 叶子组件</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Point</span>(<span class="title class_ inherited__">Graphic</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, x, y</span>):</span><br><span class="line">        self.x = x</span><br><span class="line">        self.y = y</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__str__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;点(%s, %s)&quot;</span> % (self.x, self.y)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">draw</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="built_in">str</span>(self))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 叶子组件</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Line</span>(<span class="title class_ inherited__">Graphic</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, p1, p2</span>):</span><br><span class="line">        self.p1 = p1</span><br><span class="line">        self.p2 = p2</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__str__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;线段[%s, %s]&quot;</span> % (self.p1, self.p2)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">draw</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="built_in">str</span>(self))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 复合组件</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Picture</span>(<span class="title class_ inherited__">Graphic</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, iterable</span>):</span><br><span class="line">        self.children = []</span><br><span class="line">        <span class="keyword">for</span> g <span class="keyword">in</span> iterable:</span><br><span class="line">            self.add(g)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">self, graphic</span>):</span><br><span class="line">        self.children.append(graphic)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">draw</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;------复合图形------&quot;</span>)</span><br><span class="line">        <span class="keyword">for</span> g <span class="keyword">in</span> self.children:</span><br><span class="line">            g.draw()</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;------复合图形------&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p1 = Point(<span class="number">2</span>,<span class="number">3</span>)</span><br><span class="line">l1 = Line(Point(<span class="number">3</span>,<span class="number">4</span>), Point(<span class="number">6</span>,<span class="number">7</span>))</span><br><span class="line">l2 = Line(Point(<span class="number">1</span>,<span class="number">5</span>), Point(<span class="number">2</span>,<span class="number">8</span>))</span><br><span class="line">pic1 = Picture([p1, l1, l2])</span><br><span class="line"></span><br><span class="line">p2 = Point(<span class="number">4</span>,<span class="number">4</span>)</span><br><span class="line">l3 = Line(Point(<span class="number">1</span>,<span class="number">1</span>), Point(<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">pic2 = Picture([p2, l3])</span><br><span class="line"></span><br><span class="line">pic = Picture([pic1, pic2])</span><br><span class="line">pic.draw()</span><br></pre></td></tr></table></figure>
+<p>适用场景：</p>
+<ul>
+<li>表示对象的“部分-整体”层次结构（特别是结构是递归的）</li>
+<li>希望用户忽略组合对象与单个对象的不同，用户统一地使用组合结构中的所有对象</li>
+</ul>
+<p>优点：</p>
+<ul>
+<li>定义了包含基本对象和组合对象的类层次结构</li>
+<li>简化客户端代码，即客户端可以一致地使用组合对象和单个对象</li>
+<li>更容易增加新类型的组件</li>
+</ul>
+<h3 id="外观模式"><a href="#外观模式" class="headerlink" title="外观模式"></a>外观模式</h3><p>内容：为子系统中的一组接口提供一个一致的界面，外观模式定义了一个高层接口，这个接口使得这一子系统更加容易使用。<br>角色：</p>
+<ul>
+<li>外观（facade）</li>
+<li>子系统类（subsystem classes）</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CPU</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">run</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;CPU开始运行&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">stop</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;CPU停止运行&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Disk</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">run</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;硬盘开始工作&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">stop</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;硬盘停止工作&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Memory</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">run</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;内存通电&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">stop</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;内存断电&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Computer</span>: <span class="comment"># Facade</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        self.cpu = CPU()</span><br><span class="line">        self.disk = Disk()</span><br><span class="line">        self.memory = Memory()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">run</span>(<span class="params">self</span>):</span><br><span class="line">        self.cpu.run()</span><br><span class="line">        self.disk.run()</span><br><span class="line">        self.memory.run()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">stop</span>(<span class="params">self</span>):</span><br><span class="line">        self.cpu.stop()</span><br><span class="line">        self.disk.stop()</span><br><span class="line">        self.memory.stop()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Client</span></span><br><span class="line"></span><br><span class="line">computer = Computer()</span><br><span class="line">computer.run()</span><br><span class="line">computer.stop()</span><br></pre></td></tr></table></figure>
+<p>优点：</p>
+<ul>
+<li>减少系统相互依赖</li>
+<li>提高了灵活性</li>
+<li>提高了安全性</li>
+</ul>
+<h3 id="代理模式"><a href="#代理模式" class="headerlink" title="代理模式"></a>代理模式</h3><p>内容：为其他对象提供一种代理以控制对这个对象的访问。<br>应用场景：</p>
+<ul>
+<li>远程代理：为远程的对象提供代理</li>
+<li>虚代理：根据需要创建很大的对象</li>
+<li>保护代理：控制对原始对象的访问，用于对象有不同访问权限时</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> ABCMeta, abstractmethod</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Subject</span>(metaclass=ABCMeta):</span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">get_content</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">set_content</span>(<span class="params">self, content</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">RealSubject</span>(<span class="title class_ inherited__">Subject</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, filename</span>):</span><br><span class="line">        self.filename = filename</span><br><span class="line">        f = <span class="built_in">open</span>(filename, <span class="string">&#x27;r&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;读取文件内容&quot;</span>)</span><br><span class="line">        self.content = f.read()</span><br><span class="line">        f.close()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">get_content</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> self.content</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">set_content</span>(<span class="params">self, content</span>):</span><br><span class="line">        f = <span class="built_in">open</span>(self.filename, <span class="string">&#x27;w&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">        f.write(content)</span><br><span class="line">        f.close()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">VirtualProxy</span>(<span class="title class_ inherited__">Subject</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;虚代理&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, filename</span>):</span><br><span class="line">        self.filename = filename</span><br><span class="line">        self.subj = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">get_content</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> self.subj:</span><br><span class="line">            self.subj = RealSubject(self.filename)</span><br><span class="line">        <span class="keyword">return</span> self.subj.get_content()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">set_content</span>(<span class="params">self, content</span>):</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> subj:</span><br><span class="line">            self.subj = RealSubject(self.filename)</span><br><span class="line">        <span class="keyword">return</span> self.subj.set_content(content)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ProtectedProxy</span>(<span class="title class_ inherited__">Subject</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, filename</span>):</span><br><span class="line">        self.subj = RealSubject(filename)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">get_content</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> self.subj.get_content()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">set_content</span>(<span class="params">self, content</span>):</span><br><span class="line">        <span class="keyword">raise</span> PermissionError(<span class="string">&quot;无写入权限&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># subj = RealSubject(&quot;test.txt&quot;)</span></span><br><span class="line"><span class="comment"># subj.get_content()</span></span><br><span class="line"></span><br><span class="line">subj = ProtectedProxy(<span class="string">&quot;test.txt&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(subj.get_content())</span><br><span class="line">subj.set_content(<span class="string">&quot;abc&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>角色：</p>
+<ul>
+<li>抽象实体（Subject）</li>
+<li>实体（RealSubject）</li>
+<li>代理（Proxy）</li>
+</ul>
+<p>优点：</p>
+<ul>
+<li>远程代理：可以隐藏对象位于远程地址空间的事实</li>
+<li>虚代理：可以进行优化，例如根据要求创建对象</li>
+<li>保护代理：允许在访问一个对象时有一些附加的内务处理</li>
+</ul>
+<h2 id="行为型模式"><a href="#行为型模式" class="headerlink" title="行为型模式"></a>行为型模式</h2><h3 id="责任链模式"><a href="#责任链模式" class="headerlink" title="责任链模式"></a>责任链模式</h3><p>内容：使多个对象都有机会处理请求，从而避免请求的发送者和接收者之间的耦合关系。将这些对象连成一条链，并沿着这条链传递该请求，直到有一个对象处理它为止。<br>角色：</p>
+<ul>
+<li>抽象处理者（Handler）</li>
+<li>具体处理者（ConcreteHandler）</li>
+<li>客户端（Client）</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> ABCMeta, abstractmethod</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Handler</span>(metaclass=ABCMeta):</span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">handle_leave</span>(<span class="params">self, day</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">GeneralManager</span>(<span class="title class_ inherited__">Handler</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">handle_leave</span>(<span class="params">self, day</span>):</span><br><span class="line">        <span class="keyword">if</span> day &lt;= <span class="number">10</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;总经理准假%d天&quot;</span> % day)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;你还是辞职吧&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DepartmentManager</span>(<span class="title class_ inherited__">Handler</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        self.<span class="built_in">next</span> = GeneralManager()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">handle_leave</span>(<span class="params">self, day</span>):</span><br><span class="line">        <span class="keyword">if</span> day &lt;= <span class="number">5</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;部门经理准假%s天&quot;</span> % day)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;部门经理职权不足&quot;</span>)</span><br><span class="line">            self.<span class="built_in">next</span>.handle_leave(day)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ProjectDirector</span>(<span class="title class_ inherited__">Handler</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        self.<span class="built_in">next</span> = DepartmentManager()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">handle_leave</span>(<span class="params">self, day</span>):</span><br><span class="line">        <span class="keyword">if</span> day &lt;= <span class="number">3</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;项目主管准假%d天&quot;</span> % day)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;项目主管职权不足&quot;</span>)</span><br><span class="line">            self.<span class="built_in">next</span>.handle_leave(day)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Client</span></span><br><span class="line">day = <span class="number">12</span></span><br><span class="line">h = ProjectDirector()</span><br><span class="line">h.handle_leave(day)</span><br></pre></td></tr></table></figure>
+<p>适用场景：</p>
+<ul>
+<li>有多个对象可以处理一个请求，哪个对象处理由运行时决定</li>
+<li>在不明确接收者的情况下，向多个对象中的一个提交一个请求</li>
+</ul>
+<p>优点：</p>
+<ul>
+<li>降低耦合度：一个对象无需知道是其他哪一个对象处理其请求</li>
+</ul>
+<h3 id="观察者模式-使用较多"><a href="#观察者模式-使用较多" class="headerlink" title="观察者模式(使用较多)"></a>观察者模式(使用较多)</h3><p>内容：定义对象间的一种一对多的依赖关系,当一个对象的状态发生改变时, 所有依赖于它的对象都得到通知并被自动更新。观察者模式又称“发布-订阅”模式<br>角色：<br>抽象主题（Subject）<br>具体主题（ConcreteSubject）——发布者<br>抽象观察者（Observer）<br>具体观察者（ConcreteObserver）——订阅者</p>
+<p><img src="https://img2022.cnblogs.com/blog/2036768/202205/2036768-20220509140813507-1019368751.png" alt="img"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> ABCMeta, abstractmethod</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Observer</span>(metaclass=ABCMeta): <span class="comment"># 抽象订阅者</span></span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">update</span>(<span class="params">self, notice</span>): <span class="comment"># notice 是一个Notice类的对象</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Notice</span>:  <span class="comment"># 抽象发布者</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        self.observers = []</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">attach</span>(<span class="params">self, obs</span>): <span class="comment"># 绑定</span></span><br><span class="line">        self.observers.append(obs)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">detach</span>(<span class="params">self, obs</span>): <span class="comment"># 解绑</span></span><br><span class="line">        self.observers.remove(obs)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">notify</span>(<span class="params">self</span>): <span class="comment"># 推送</span></span><br><span class="line">        <span class="keyword">for</span> obs <span class="keyword">in</span> self.observers:</span><br><span class="line">            obs.update(self)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">StaffNotice</span>(<span class="title class_ inherited__">Notice</span>): <span class="comment"># 具体发布者</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, company_info=<span class="literal">None</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        self.__company_info = company_info</span><br><span class="line"></span><br><span class="line"><span class="meta">    @property</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">company_info</span>(<span class="params">self</span>): <span class="comment"># 用来读取 __company_info</span></span><br><span class="line">        <span class="keyword">return</span> self.__company_info</span><br><span class="line"></span><br><span class="line"><span class="meta">    @company_info.setter </span><span class="comment"># 用来写 __company_info 的数据</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">company_info</span>(<span class="params">self, info</span>):</span><br><span class="line">        self.__company_info = info</span><br><span class="line">        self.notify() <span class="comment"># 推送给所有观察者</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Staff</span>(<span class="title class_ inherited__">Observer</span>): <span class="comment"># 具体订阅者</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        self.company_info = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">update</span>(<span class="params">self, notice</span>):</span><br><span class="line">        self.company_info = notice.company_info</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Client</span></span><br><span class="line"></span><br><span class="line">notice = StaffNotice(<span class="string">&quot;初始公司信息&quot;</span>)</span><br><span class="line">notice.company_info</span><br><span class="line">s1 = Staff()</span><br><span class="line">s2 = Staff()</span><br><span class="line">notice.attach(s1)</span><br><span class="line">notice.attach(s2)</span><br><span class="line"><span class="built_in">print</span>(s1.company_info)</span><br><span class="line">notice.company_info = <span class="string">&quot;公司今年业绩非常好，给大家发奖金！！！&quot;</span></span><br><span class="line"><span class="built_in">print</span>(s1.company_info)</span><br><span class="line"><span class="built_in">print</span>(s2.company_info)</span><br><span class="line">notice.detach(s2)</span><br><span class="line">notice.company_info = <span class="string">&quot;公司明天放假！！！&quot;</span></span><br><span class="line"><span class="built_in">print</span>(s1.company_info)</span><br><span class="line"><span class="built_in">print</span>(s2.company_info)</span><br></pre></td></tr></table></figure>
+<p>适用场景：</p>
+<ul>
+<li>当一个抽象模型有两方面，其中一个方面依赖于另一个方面。将这两者封装在独立对象中以使它们可以各自独立地改变和复用。</li>
+<li>当对一个对象的改变需要同时改变其它对象，而不知道具体有多少对象有待改变。</li>
+<li>当一个对象必须通知其它对象，而它又不能假定其它对象是谁。换言之，你不希望这些对象是紧密耦合的。</li>
+</ul>
+<p>优点：</p>
+<ul>
+<li>目标和观察者之间的抽象耦合最小</li>
+<li>支持广播通信</li>
+</ul>
+<h3 id="策略模式"><a href="#策略模式" class="headerlink" title="策略模式"></a>策略模式</h3><p>内容：定义一系列的算法，把它们一个个封装起来，并且使它们可相互替换。本模式使得算法可独立于使用它的客户而变化。<br>角色：</p>
+<ul>
+<li>抽象策略（Strategy）</li>
+<li>具体策略（ConcreteStrategy）</li>
+<li>上下文（Context）</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> ABCMeta,abstractmethod</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Strategy</span>(metaclass=ABCMeta):</span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">execute</span>(<span class="params">self, data</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FastStrategy</span>(<span class="title class_ inherited__">Strategy</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">execute</span>(<span class="params">self, data</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;用较快的策略处理%s&quot;</span> % data)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SlowStrategy</span>(<span class="title class_ inherited__">Strategy</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">execute</span>(<span class="params">self, data</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;用较慢的策略处理%s&quot;</span> % data)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Context</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, strategy, data</span>):</span><br><span class="line">        self.data = data</span><br><span class="line">        self.strategy = strategy</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">set_strategy</span>(<span class="params">self, strategy</span>):</span><br><span class="line">        self.strategy = strategy</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">do_strategy</span>(<span class="params">self</span>):</span><br><span class="line">        self.strategy.execute(self.data)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Client</span></span><br><span class="line"></span><br><span class="line">data = <span class="string">&quot;[...]&quot;</span></span><br><span class="line">s1 = FastStrategy()</span><br><span class="line">s2 = SlowStrategy()</span><br><span class="line">context = Context(s1, data)</span><br><span class="line">context.do_strategy()</span><br><span class="line">context.set_strategy(s2)</span><br><span class="line">context.do_strategy()</span><br></pre></td></tr></table></figure>
+<p>优点：</p>
+<ul>
+<li>定义了一系列可重用的算法和行为</li>
+<li>消除了一些条件语句</li>
+<li>可以提供相同行为的不同实现</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>客户必须了解不同的策略</li>
+</ul>
+<h3 id="模板方法模式"><a href="#模板方法模式" class="headerlink" title="模板方法模式"></a>模板方法模式</h3><p>内容：定义一个操作中的算法的骨架，而将一些步骤延迟到子类中。模板方法使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤。<br>角色：</p>
+<ul>
+<li>抽象类（AbstractClass）：定义抽象的原子操作（钩子操作）；实现一个模板方法作为算法的骨架。</li>
+<li>具体类（ConcreteClass）：实现原子操作</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> ABCMeta, abstractmethod</span><br><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> sleep</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Window</span>(metaclass=ABCMeta):</span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">start</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">repaint</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @abstractmethod</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">stop</span>(<span class="params">self</span>): <span class="comment"># 原子操作/钩子操作</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">run</span>(<span class="params">self</span>):  <span class="comment"># 模板方法</span></span><br><span class="line">        self.start()</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                self.repaint()</span><br><span class="line">                sleep(<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">except</span> KeyboardInterrupt:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">        self.stop()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyWindow</span>(<span class="title class_ inherited__">Window</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, msg</span>):</span><br><span class="line">        self.msg = msg</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">start</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;窗口开始运行&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">stop</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;窗口结束运行&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">repaint</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(self.msg)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">MyWindow(<span class="string">&quot;Hello...&quot;</span>).run()</span><br></pre></td></tr></table></figure>
+<p>适用场景：</p>
+<ul>
+<li>一次性实现一个算法的不变的部分</li>
+<li>各个子类中的公共行为应该被提取出来并集中到一个公共父类中以避免代码重复</li>
+<li>控制子类扩展</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\11\20\7个Python数据分析工具\" rel="bookmark">7个Python数据分析工具</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2017\09\13\Django知识点\" rel="bookmark">Django知识点</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\11\20\Python-collections四种高性能数据类型\" rel="bookmark">Python collections四种高性能数据类型</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2023/07/30/Python%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" title="Python设计模式">https://blog.rexking6.top/2023/07/30/Python设计模式/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Python/" rel="tag"># Python</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/07/25/%E4%BD%BF%E7%94%A8%E6%94%B9%E8%BF%9B%E5%90%8E%E7%9A%84Drain3%E8%BF%9B%E8%A1%8C%E4%B8%AD%E8%8B%B1%E6%96%87%E6%97%A5%E5%BF%97%E8%A7%A3%E6%9E%90/" rel="prev" title="使用改进后的Drain3进行中英文日志解析">
+      <i class="fa fa-chevron-left"></i> 使用改进后的Drain3进行中英文日志解析
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%AE%80%E4%BB%8B"><span class="nav-number">2.</span> <span class="nav-text">设计模式简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%8D%E4%B9%A0%EF%BC%9A%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.1.</span> <span class="nav-text">复习：面向对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A5%E5%8F%A3"><span class="nav-number">2.2.</span> <span class="nav-text">接口</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1SOLID%E5%8E%9F%E5%88%99"><span class="nav-number">3.</span> <span class="nav-text">面向对象设计SOLID原则</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%88%86%E7%B1%BB"><span class="nav-number">4.</span> <span class="nav-text">设计模式分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%9E%8B%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.1.</span> <span class="nav-text">创建型模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F%EF%BC%88%E6%8E%8C%E6%8F%A1%EF%BC%89"><span class="nav-number">4.1.1.</span> <span class="nav-text">简单工厂模式（掌握）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%BD%BF%E7%94%A8%E8%BE%83%E5%A4%9A%EF%BC%89"><span class="nav-number">4.1.2.</span> <span class="nav-text">工厂方法模式（使用较多）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F-%E4%BD%BF%E7%94%A8%E8%BE%83%E5%B0%91"><span class="nav-number">4.1.3.</span> <span class="nav-text">抽象工厂模式(使用较少)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.1.4.</span> <span class="nav-text">建造者模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F-%E5%B8%B8%E7%94%A8"><span class="nav-number">4.1.5.</span> <span class="nav-text">单例模式(常用)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%9E%8B%E6%A8%A1%E5%BC%8F%E5%B0%8F%E7%BB%93"><span class="nav-number">4.1.6.</span> <span class="nav-text">创建型模式小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E5%9E%8B%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.2.</span> <span class="nav-text">结构型模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.2.1.</span> <span class="nav-text">适配器模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A1%A5%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.2.2.</span> <span class="nav-text">桥模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.2.3.</span> <span class="nav-text">组合模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.2.4.</span> <span class="nav-text">外观模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.2.5.</span> <span class="nav-text">代理模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%8C%E4%B8%BA%E5%9E%8B%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.3.</span> <span class="nav-text">行为型模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%A3%E4%BB%BB%E9%93%BE%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.3.1.</span> <span class="nav-text">责任链模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F-%E4%BD%BF%E7%94%A8%E8%BE%83%E5%A4%9A"><span class="nav-number">4.3.2.</span> <span class="nav-text">观察者模式(使用较多)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.3.3.</span> <span class="nav-text">策略模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.3.4.</span> <span class="nav-text">模板方法模式</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">216</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zxpblog.cn/" title="https:&#x2F;&#x2F;www.zxpblog.cn&#x2F;" rel="noopener" target="_blank">赵小平</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">3.8m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">56:52</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
