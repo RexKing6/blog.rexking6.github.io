@@ -40,7 +40,7 @@
 <meta property="og:image" content="https://image.rexking6.top/img/extend-to-cpdag.png">
 <meta property="og:image" content="https://image.rexking6.top/img/markov-equivalence-class.png">
 <meta property="article:published_time" content="2023-03-30T17:12:16.000Z">
-<meta property="article:modified_time" content="2023-04-01T03:03:12.481Z">
+<meta property="article:modified_time" content="2024-01-14T17:43:10.668Z">
 <meta property="article:author" content="Run-Qing Chen">
 <meta property="article:tag" content="机器学习">
 <meta name="twitter:card" content="summary">
@@ -230,7 +230,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-01 11:03:12" itemprop="dateModified" datetime="2023-04-01T11:03:12+08:00">2023-04-01</time>
+                <time title="修改时间：2024-01-15 01:43:10" itemprop="dateModified" datetime="2024-01-15T01:43:10+08:00">2024-01-15</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -288,14 +288,14 @@
 <p>现在我们看看这个图变量之间的独立性是怎样的。先考虑x和t的路径：x-r-s-t。这条路径中并不存在碰撞点，所以x和t不独立，同样地，t和y、u、v都不独立。然而，对于变量x到y而言，x，y之间的路径必然会经过碰撞点t，所以x和y是独立，同样地，在碰撞点两侧的变量都是独立的，比如x和v，s和u，r和u也是独立的。</p>
 <h2 id="一般的条件独立"><a href="#一般的条件独立" class="headerlink" title="一般的条件独立"></a>一般的条件独立</h2><p>那么如果一条路径中没有碰撞点，怎么才能让他们独立呢？我们还能使用条件独立的性质，只要条件集Z能够将一条路径block掉，那么就可以让两个变量独立。注意的是，当碰撞点或碰撞点的子代出现在条件集的时候要小心，很有可能会导致不同的结果，这个问题我们留到规则3。现在我们先假设条件集中不存在碰撞点。</p>
 <p><strong>规则2</strong>：<em>当x到y的之间的任一路径都经过Z中的节点，且Z并不包含碰撞点或碰撞点的子代，则x和y独立。</em></p>
-<p><img src="https://image.rexking6.top/img/v2-1f7953c7b794b88e5191c3054f1d8daf_720w.webp" alt="img"></p>
+<p><img src="https://image.rexking6.top/img/v2-1f7953c7b794b88e5191c3054f1d8daf_720w.webp" alt=""></p>
 <p>如图，设结点集Z={r, v}（图中画圈的节点），根据规则2，x和s是条件独立的，因为x和s之间的路径被block掉了，同样地，u和y也是条件独立的。</p>
 <h2 id="当collider作为条件集"><a href="#当collider作为条件集" class="headerlink" title="当collider作为条件集"></a>当collider作为条件集</h2><p>现在我们先看看collider成为条件集的时候会发生什么。我们考虑一个例子</p>
-<p><img src="https://image.rexking6.top/img/v2-7f28f4b115b718502a26cd047402955a_720w.webp" alt="img"></p>
+<p><img src="https://image.rexking6.top/img/v2-7f28f4b115b718502a26cd047402955a_720w.webp" alt=""></p>
 <p>这里显然IQ和难度是独立的，他们共同决定成绩的高低，于是成绩是一个collider，而不同成绩会导致不同排名，所以排名是成绩的子代。现在如果我们已经知道一个人的成绩是多少，那么神奇的事情发生了，如果我们知道一个人IQ很低，但成绩很高，那么我们可以推断出难度肯定很低；同理我们知道成绩很高，但难度很大，那么可以推断出IQ很高。原本IQ和难度两个独立的变量在成绩的条件下变得不独立的。</p>
 <p>同理，因为ABCD等级是由不同成绩划分出来的，也包含了成绩的信息，所以我们知道一个人的等级同样可以推断出一个人的IQ和难度。因此当条件集是collider的时候，会反而使得两个独立的变量变得不独立。这就是我们判断条件独立性的时候要小心的地方。接下来是规则3，</p>
 <p><strong>规则3</strong>：<em>当碰撞点或碰撞点的子孙节点为集合Z的成员时，该碰撞点不再截断路径。</em></p>
-<p><img src="https://image.rexking6.top/img/v2-b5d8da3ad2afefcd383e1610c82593ff_720w.webp" alt="img"></p>
+<p><img src="https://image.rexking6.top/img/v2-b5d8da3ad2afefcd383e1610c82593ff_720w.webp" alt=""></p>
 <p>设结点集Z={r, p}（图中画圈的节点），根据规则3，在给定Z的情况下，s和y不独立，因为t的孩子节点p在集合Z中，所以t没有办法像规则1一样截断路径s-t-u-v-y，与此相反，条件集p使得s和u变得不独立了。然而在这里，x和u是独立的，虽然t不能截断它，但是r可以截断它（根据规则2）。</p>
 <h1 id="PC-算法"><a href="#PC-算法" class="headerlink" title="PC 算法"></a>PC 算法</h1><h2 id="概率图模型"><a href="#概率图模型" class="headerlink" title="概率图模型"></a>概率图模型</h2><p>对于一个 $K$ 维随机向量 $X=\left[X_1, X_2, \ldots, X_K\right]^{\top}$ ，一般难以直接建模。因为如果每个变量为离散变量并有 $M$ 个可能取值，在不作任何独立性假设的前提下，需要 $M^K-1$ 个参数才能表示其概率分布，参数数量会非常庞 大。</p>
 <p>一种减少参数数量的方法是独立性假设。把 $X$ 的联合概率分解为 $K$ 个条件概率的乘积:</p>
@@ -305,7 +305,7 @@ p(X=x)=\prod_{k=1}^K p\left(x_k \mid x_1, \ldots, x_{k-1}\right)</script><p>$x$ 
 <li>有向图模型 (Directed Graphical Model)，也称为贝叶斯网络 (Bayesian Network) 或信念网络 (Belief Network) ，使用有向无不图 (Directed Acyclic Graph，DAG) 来描述变量之间的关系。如果两个节点之间 有连边，表示文两个变量之间有因果关系，即不存在其他变量使得这两个变量条件独立。</li>
 <li>无向图模型，也称为马尔可夫陇机场（Markov Random Field，MRF），使用无向图来描述变量之间的关 系。两个节点之间有连边代表这两个变量之间有概率依赖关系，但不一定是因果关系。</li>
 </ul>
-<p><img src="https://image.rexking6.top/img/pcg.png" alt="pcg"></p>
+<p><img src="https://image.rexking6.top/img/pcg.png" alt=""></p>
 <p>本文只讨论有向图模型，即贝叶斯网络。</p>
 <h2 id="贝叶斯网络"><a href="#贝叶斯网络" class="headerlink" title="贝叶斯网络"></a>贝叶斯网络</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>有向无环图 $G$ 中，每个节点对应 $K$ 维随机向量 $X$ 中的一个变量，有向边 $e_{i j}$ 表示随机变量 $X_i$ 和 $X_j$ 之间具有 因果关系，父节点 $X_i$ 是『因』，子节点 $X_j$ 是『果』，显然这两个点之间一定非条件独立。<br>令 $X_{\pi_k}$ 为变量 $X_k$ 的所有父节点变量集合， $P\left(X_k \mid X_{\pi_k}\right)$ 表示每个随机变量的局部绦件㪜率分布 (Local Conditional Probability Distribution) 。<br>如果 $X$ 的联合概率分布可以分解为每个随机变量 $X_k$ 的局部条件概率的连乘形式，即:</p>
 <script type="math/tex; mode=display">
@@ -355,7 +355,7 @@ X_k \perp Z \mid X_{\pi_k}</script><p>其中 $Z$ 为 $X_k$ 的非后代节点。
 <p>给定 <em>O</em> 时，<em>i</em> 与 <em>j</em> 之间不存在<strong>有效路径</strong>（active path），即 <em>i</em> 和 <em>j</em> 在 <em>O</em> 下条件独立（记作 <em>i</em>⊥<em>j</em>∣<em>O</em>）。</p>
 </blockquote>
 <p>用 $O(i, j)$ 表示能够 $d$ 分隔 $i$ 和 $j$ 的点集，用 $a d j(G, x)$ 表示图 $G$ 中节点 $x$ 的相邻点集，那么 PC 算法检验条件独立性的具体流程为：</p>
-<p><img src="https://image.rexking6.top/img/pc-skeleton.png" alt="[Estimating High-Dimensional Directed Acyclic Graphs with the PC-Algorithm](https://www.jmlr.org/papers/volume8/kalisch07a/kalisch07a.pdf). Markus Kalisch and Peter Buhlmann. JMLR 2007."></p>
+<p><img src="https://image.rexking6.top/img/pc-skeleton.png" alt=""></p>
 <p>简单总结一下:</p>
 <ul>
 <li>$\ell=1$</li>
@@ -407,7 +407,7 @@ Z(i, j \mid K)=\frac{1}{2} \log \left(\frac{1+\hat{\rho}_{i, j \mid K}}{1-\hat{\
 </ul>
 <p>但很显然这种情兄是矛盾的，不可能存在，所以不用考虑。</p>
 <p>总结一下:</p>
-<p><img src="https://image.rexking6.top/img/extend-to-cpdag.png" alt="extend-to-cpdag"></p>
+<p><img src="https://image.rexking6.top/img/extend-to-cpdag.png" alt=""></p>
 <p>这样我们就可以得到一个完全部分有向无环图。</p>
 <h3 id="马尔科夫等价类"><a href="#马尔科夫等价类" class="headerlink" title="马尔科夫等价类"></a>马尔科夫等价类</h3><p><strong><em>这部分我就没看懂了。</em></strong></p>
 <p>很明显，完全部分有向无环图（CPDAG）跟有向无环图看上去就不一样。首先来看什么是<strong>部分有向无环图</strong>（Partially Directed Acyclic Graph，PDAG）：</p>
@@ -431,7 +431,7 @@ Z(i, j \mid K)=\frac{1}{2} \log \left(\frac{1+\hat{\rho}_{i, j \mid K}}{1-\hat{\
 <p>有向无环图 $G_1=\left(V, E_1\right)$ 和 $G_2=\left(V, E_2\right)$ 有相同的顶点集合和骨架， $V$ 为顶点集合， $E_1$ 和 $E_2$ 为 边的集合。<br>对于任意的不相交的顶点集合 $A, B, C \in V$ ，如果满足 $A, B$ 在 $G_1$ 和 $G_2$ 中都被 $C$ 所 $d$ 分隔（也叫有 相同的 $V$ 结构) ，则称图 $G_1$ 和 $G_2$ 是马尔科夫等价的。</p>
 </blockquote>
 <p>举个栗子：</p>
-<p><img src="https://image.rexking6.top/img/markov-equivalence-class.png" alt="马尔科夫等价类"></p>
+<p><img src="https://image.rexking6.top/img/markov-equivalence-class.png" alt=""></p>
 <p>上图 $G_1$ 和 $G_2$ 是马尔科夫等价类，它们左上角的那条有向边方向并不相同，这时 PC 算法就无法判断这条边的方 向了，只能输出无向边，即 $G_3$ 。</p>
 <p>所以，严格来说，PC 算法以及大多数基于依赖统计分析的贝叶斯网络结构学习算法，得到的都只是一个 CPDAG (依然有无向边)，而不是真正意义上的贝叶斯网络 (有向无环图)。</p>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
@@ -688,7 +688,7 @@ Z(i, j \mid K)=\frac{1}{2} \log \left(\frac{1+\hat{\rho}_{i, j \mid K}}{1-\hat{\
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fab fa-accessible-icon"></i>
   </span>
