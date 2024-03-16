@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大模型评估">
+<meta property="og:url" content="https://blog.rexking6.top/2024/01/16/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BC%B0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-4b1460913c4c35e32ff1b0ea4c9cd25b_720w.webp">
+<meta property="article:published_time" content="2024-01-15T16:52:39.000Z">
+<meta property="article:modified_time" content="2024-01-20T08:46:49.975Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="大模型">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/v2-4b1460913c4c35e32ff1b0ea4c9cd25b_720w.webp">
+
+<link rel="canonical" href="https://blog.rexking6.top/2024/01/16/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BC%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>大模型评估 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2024/01/16/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BC%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          大模型评估
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-01-16 00:52:39" itemprop="dateCreated datePublished" datetime="2024-01-16T00:52:39+08:00">2024-01-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-01-20 16:46:49" itemprop="dateModified" datetime="2024-01-20T16:46:49+08:00">2024-01-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" itemprop="url" rel="index"><span itemprop="name">大模型</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2024/01/16/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BC%B0/" class="post-meta-item leancloud_visitors" data-flag-title="大模型评估" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>17k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>15 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>综合转载于：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/644373658">LLM Evaluation 如何评估一个大模型？</a></li>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/Q4IU6dbwy5U-iQ0ah_TGBA">大模型评测最新调研和一点思考</a></li>
+</ul>
+<h1 id="模型X到底好不好？"><a href="#模型X到底好不好？" class="headerlink" title="模型X到底好不好？"></a>模型X到底好不好？</h1><p>最近半年随着 ChatGPT / GPT-4 的火热，各个学校或者公司也纷纷推出了自己的开源/闭源大模型。模型的火热发布也带来了一个重要的问题 — 如何评估一个模型X到底是好或者不好。</p>
+<p>在 ChatGPT 出现没多久时，这种评估往往是手动的：每个人都有若干个压箱底的刁钻问题，用来测试模型是否够“智能”。但显然这种测试只能带来一种“感觉”而非定量的衡量，如何客观公正的对一个模型进行充分的评估变成了一个迫切的需求。</p>
+<p>好消息是随着模型的发展，最近半年我们也看到了越来越多评测方面的工作，试图从各个角度测试模型的表现。就在这篇博客快写完的时候，也看到已经出现了第一篇大模型评测的综述文章 — <a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2307.03109.pdf">A Survey on Evaluation of Large Language Models</a>。足以看出，卷的不只有大模型，甚至还有模型的评测。</p>
+<p>本文试图<strong>从发展脉络的角度</strong>梳理不同的评测方法，试图理解为什么会发生这些变化，以及顺着这些脉络下一步会是什么。当然这样也不可避免的会混入大量个人观点，欢迎讨论。</p>
+<h1 id="用什么测试：从-NLP-任务到人类试题"><a href="#用什么测试：从-NLP-任务到人类试题" class="headerlink" title="用什么测试：从 NLP 任务到人类试题"></a>用什么测试：从 NLP 任务到人类试题</h1><h2 id="传统做法：NLP-任务评测"><a href="#传统做法：NLP-任务评测" class="headerlink" title="传统做法：NLP 任务评测"></a>传统做法：NLP 任务评测</h2><p>对 NLP 有所了解的同学肯定熟悉常见评估一个模型的方式，那就是做什么任务就在对应的数据集上评测。比如做阅读理解的会选择 SQuAD，做情感分析的会选择 SST-2，做句子表示的就会选择 STS 等等。</p>
+<blockquote>
+<p>SQuAD（Stanford Question Answering Dataset）是一个用于阅读理解任务的常用数据集，其评测方式主要基于人工标注和一些指标。以下是 SQuAD 数据集的评测方式的详细说明：</p>
+<ol>
+<li><p><strong>数据集结构：</strong> SQuAD 数据集包含一组文章段落，每个段落都伴随着一系列问题，每个问题都有一个正确的答案。参与者的任务是训练模型来阅读这些段落，并回答相关的问题。</p>
+</li>
+<li><p><strong>指标：</strong> SQuAD 数据集的主要评测指标包括以下几项：</p>
+<ul>
+<li><strong>Exact Match (EM)：</strong> EM 分数是一个精确匹配度量，它衡量模型生成的答案是否与人工标注的答案完全一致。计算方式是通过比较两个答案字符串是否相同。</li>
+<li><strong>F1 分数：</strong> F1 分数是一种权衡精确度和召回率的指标，计算方法涉及到预测答案和真实答案的共有词汇。F1 分数越高表示模型在生成答案时越准确。</li>
+</ul>
+</li>
+<li><p><strong>评测过程：</strong> 在评测阶段，使用训练好的模型对测试集中的段落和问题进行预测，得到模型的回答。然后，通过计算每个问题的 EM 和 F1 分数来评估模型的性能。具体的计算过程如下：</p>
+<ul>
+<li>对于每个问题，将模型生成的答案与真实答案进行比较，计算 Exact Match 分数。</li>
+<li>计算模型生成的答案和真实答案之间的共有词汇，然后计算 F1 分数。</li>
+<li>将所有问题的分数取平均得到整体性能评估。</li>
+</ul>
+</li>
+<li><p><strong>例子：</strong> 假设有一段落如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">makefileCopy code</span><br><span class="line">Passage: The quick brown fox jumps over the lazy dog.</span><br></pre></td></tr></table></figure>
+<p>相应的问题是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vbnetCopy code</span><br><span class="line">Question: What does the quick brown fox do?</span><br></pre></td></tr></table></figure>
+<p>真实答案是 “jumps over the lazy dog”。如果模型的预测答案也是这个完整的短语，那么该问题的 Exact Match 分数就是 1.0，F1 分数也是 1.0。如果模型的答案只包含部分正确的单词，那么 F1 分数将相应减小。</p>
+</li>
+</ol>
+<p>总体而言，SQuAD 数据集评测方式注重于模型对问题的准确回答，通过 Exact Match 和 F1 分数提供了对模型性能的全面评估。</p>
+<p>SST-2（Stanford Sentiment Treebank 2）是一个用于情感分析的数据集。它的评测方式也涉及到一些指标，让我们来了解一下：</p>
+<ol>
+<li><p><strong>数据集结构：</strong> SST-2 包含了一组电影评论，每个评论都被标注为正面（positive）或负面（negative）情感。任务的目标是训练模型来对这些评论进行情感分类。</p>
+</li>
+<li><p><strong>指标：</strong> 主要的评测指标通常包括准确率（Accuracy）和其他一些相关的二分类评价指标。</p>
+<ul>
+<li><strong>准确率（Accuracy）：</strong> 它是一个最基本的指标，表示模型正确分类的样本数量占总样本数量的比例。</li>
+<li><strong>其他指标：</strong> 除了准确率，还可以考虑精确度（Precision）、召回率（Recall）和 F1 分数等，这些指标提供了对模型在正面和负面类别上性能的更详细评估。</li>
+</ul>
+</li>
+<li><p><strong>评测过程：</strong> 在评测阶段，使用已经训练好的模型对测试集中的评论进行情感分类预测。然后，通过比较模型的预测标签与真实标签，计算准确率以及其他指标，从而评估模型在情感分析任务上的性能。</p>
+</li>
+<li><p><strong>例子：</strong> 假设有一条评论如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vbnetCopy code</span><br><span class="line">Review: This movie is amazing! I loved every moment of it.</span><br></pre></td></tr></table></figure>
+<p>如果模型的预测是正面情感，那么这个样本在准确率计算中被认为是正确分类的。相反，如果模型将其预测为负面情感，那么这个样本被认为是错误分类的。</p>
+</li>
+</ol>
+<p>总的来说，SST-2 数据集的评测方式注重于模型对文本情感的准确分类，而主要指标是准确率。其他指标则提供了更详细的性能评估，特别是当数据集中的正负样本分布不均匀时。</p>
+<p>STS（Semantic Textual Similarity）是一个用于度量两个文本之间语义相似度的任务，而STS 数据集中的评测方式略有不同。STS 数据集通常包含一对文本，每对文本都有一个关于它们语义相似度的连续值标签。</p>
+<p>以下是 STS 任务的评测方式：</p>
+<ol>
+<li><p><strong>数据集结构：</strong> STS 数据集包含了一系列文本对，每一对都有一个连续的语义相似度得分，通常在0到5或0到10的范围内。任务的目标是训练模型来预测文本对之间的语义相似度得分。</p>
+</li>
+<li><p><strong>评测指标：</strong> 由于 STS 的任务是回归任务，评测指标主要涉及到度量模型的预测得分与真实得分之间的相关性。</p>
+<ul>
+<li><strong>皮尔逊相关系数（Pearson Correlation Coefficient）：</strong> 衡量模型的预测得分与真实得分之间的线性相关性。值越接近1表示两者之间的线性相关性越强。</li>
+<li><strong>斯皮尔曼相关系数（Spearman Rank Correlation Coefficient）：</strong> 考虑了预测得分和真实得分的等级关系而不是具体数值，因此对异常值不敏感。</li>
+</ul>
+</li>
+<li><p><strong>评测过程：</strong> 在评测阶段，使用训练好的模型对测试集中的文本对进行语义相似度得分的预测。然后，通过计算预测得分与真实得分之间的相关系数，评估模型在 STS 任务上的性能。</p>
+</li>
+<li><p><strong>例子：</strong> 假设有一对文本如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vbnetCopy codeText A: The cat is sitting on the mat.</span><br><span class="line">Text B: The feline is perched on the rug.</span><br></pre></td></tr></table></figure>
+<p>如果这对文本的真实语义相似度得分是4.5，而模型的预测得分也是4.5，那么模型在这个样本上的表现是良好的。</p>
+</li>
+</ol>
+<p>总体而言，STS 数据集的评测方式注重于模型对文本语义相似度的连续值预测，而评价指标主要是皮尔逊相关系数和斯皮尔曼相关系数。</p>
+</blockquote>
+<p>最近几年随着预训练模型的发展（这里预训练模型指的是 BERT 时代下参数量在 1B 以下的模型，区别于参数量往往大于 10B 的“大模型”），单个的数据集已经逐渐不足以综合评估一个模型，那么我们就拿多个数据集组成一个测试基准 benchmark 来测量。一些比较常见的测试基准有：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://gluebenchmark.com/">GLUE</a> 以及 <a target="_blank" rel="noopener" href="https://super.gluebenchmark.com/">SuperGLUE</a> 算是最家喻户晓，也是被刷的最多的 NLP 基准了</li>
+</ul>
+<blockquote>
+<p>GLUE（General Language Understanding Evaluation）是一个多任务学习基准，旨在评估自然语言处理（NLP）模型在多个任务上的性能。GLUE 将多个任务组合到一个整体评测中，以测试模型的泛化能力和整体性能。其中，SST-2、STS 和其他任务都是 GLUE 基准中的一部分。</p>
+<p>评测 GLUE 时，通常使用下列任务：</p>
+<ol>
+<li><strong>MNLI（MultiNLI）：</strong> 自然语言推理任务，要求模型判断两个给定句子之间的关系（蕴涵、矛盾、中性）。</li>
+<li><strong>QQP（Quora Question Pairs）：</strong> 判断两个问题是否等价。</li>
+<li><strong>QNLI（Question-answering Natural Language Inference）：</strong> 阅读理解任务，要求模型判断一个问题是否可以从给定的文本段落中得到答案。</li>
+<li><strong>RTE（Recognizing Textual Entailment）：</strong> 判断给定的两个文本片段是否具有蕴涵关系。</li>
+<li><strong>MRPC（Microsoft Research Paraphrase Corpus）：</strong> 判断两个句子是否是语义上的同义。</li>
+<li><strong>STS-B（Semantic Textual Similarity Benchmark）：</strong> 与前面提到的 STS 相似，但在 GLUE 中作为子任务之一。</li>
+<li><strong>CoLA（Corpus of Linguistic Acceptability）：</strong> 判断给定的句子是否是语言上可接受的。</li>
+<li><strong>WNLI（Winograd Schema Challenge）：</strong> 自然语言推理任务，要求模型理解特定的语境和指代关系。</li>
+</ol>
+<p>GLUE 使用一个总体的评测指标，即 GLUE 得分，该得分综合考虑了模型在不同任务上的性能。GLUE 得分越高，表示模型在多任务学习上的表现越好。</p>
+<p>GLUE 得分的计算涉及多个任务，其中每个任务都有其特定的指标，然后通过一种综合的方式将这些任务的指标结合起来。具体计算 GLUE 得分的步骤如下：</p>
+<ol>
+<li><strong>任务评测：</strong> 对于 GLUE 中的每个任务，使用相应的评测指标计算模型在该任务上的性能。例如，对于 MNLI 任务，可能使用准确率（Accuracy）作为评测指标；对于 STS-B 任务，可能使用皮尔逊相关系数（Pearson Correlation Coefficient）和斯皮尔曼相关系数（Spearman Rank Correlation Coefficient）等。</li>
+<li><strong>标准化得分：</strong> 对于每个任务，将得到的评测指标进行标准化，使得它们在相同的尺度上。标准化的目的是确保各个任务的得分能够在计算 GLUE 得分时被平等对待。</li>
+<li><strong>合并任务：</strong> 将标准化后的任务得分合并到一个总体得分中。这可以通过简单的平均或加权平均来完成，具体取决于 GLUE 组织的具体方法。不同任务可能有不同的权重，以便更重要的任务对总体得分产生更大的影响。</li>
+<li><strong>得分计算：</strong> 将合并后的任务得分用于计算 GLUE 得分。通常，GLUE 得分的计算方法是对合并的任务得分进行平均或加权平均。</li>
+<li><strong>比较模型：</strong> GLUE 得分提供了一个标准化的方法，允许比较不同模型在多个任务上的性能。得分越高，表示模型在 GLUE 数据集的各个任务上表现越好。</li>
+</ol>
+<p>需要注意的是，不同的任务在 GLUE 中可能有不同的重要性，因此在合并任务得分时，可能会考虑一些任务具有更高的权重。GLUE 的目标是提供一个全面的评测框架，帮助研究人员了解模型在多任务学习上的整体表现。</p>
+<p>SuperGLUE（Super General Language Understanding Evaluation）是GLUE的扩展和改进版本，它提出了一系列更具挑战性的语言理解任务，旨在更全面地评估模型的性能。与GLUE类似，SuperGLUE将多个任务组合在一起，对模型进行综合评估。</p>
+<p>SuperGLUE中包含的任务有：</p>
+<ol>
+<li><strong>BoolQ（Boolean Questions）：</strong> 判断给定的句子是否可以用”是”或”否”回答。</li>
+<li><strong>CB（CommitmentBank）：</strong> 评估模型对于句子中陈述的强度或承诺的程度。</li>
+<li><strong>COPA（Choice of Plausible Alternatives）：</strong> 给定一个因果关系问题，选择两个备选答案中更符合句子中的因果关系。</li>
+<li><strong>MultiRC（Multi-Sentence Reading Comprehension）：</strong> 阅读理解任务，要求对一篇包含多个句子的文章中的问题进行回答。</li>
+<li><strong>RTE（Recognizing Textual Entailment）：</strong> 与GLUE中的RTE任务相似，判断给定的两个文本片段是否具有蕴涵关系。</li>
+<li><strong>WiC（Word in Context）：</strong> 判断两个句子中的单词是否在不同的语境中具有相同的意义。</li>
+<li><strong>WSC（Winograd Schema Challenge）：</strong> 与GLUE中的WNLI任务相似，测试模型对于复杂的指代关系和语境的理解。</li>
+</ol>
+<p>SuperGLUE得分的计算方式类似于GLUE，它综合考虑了模型在不同任务上的性能。通过引入更具挑战性的任务，SuperGLUE旨在更全面地评估模型的通用语言理解能力。评估过程涉及到在所有任务上对模型进行训练和测试，并使用综合得分来比较模型性能。</p>
+</blockquote>
+<ul>
+<li>相对应的，中文有 <a target="_blank" rel="noopener" href="https://www.cluebenchmarks.com/en/index.html">CLUE</a> 和 <a target="_blank" rel="noopener" href="https://github.com/CLUEbenchmark/SuperCLUE">SuperCLUE</a></li>
+</ul>
+<blockquote>
+<p>CLUE（Chinese Language Understanding Evaluation）是一个旨在推动中文自然语言处理研究的评测基准，类似于英文领域的GLUE和SuperGLUE。</p>
+<p>CLUE基准包含多个中文NLP任务，涵盖了文本分类、情感分析、文本相似度、阅读理解等多个方面。一些常见的CLUE任务包括：</p>
+<ol>
+<li><strong>AFQMC（Ant Financial Question Matching）：</strong> 问题匹配任务，要求判断两个问题是否相似。</li>
+<li><strong>TNEWS（Toutiao News Classification）：</strong> 头条新闻分类任务，要求将新闻文本分类到不同的类别中。</li>
+<li><strong>CMNLI（Chinese Multi-Genre NLI）：</strong> 中文自然语言推理任务，要求判断两个句子之间的关系（蕴涵、矛盾、中性）。</li>
+<li><strong>WSC（Word-Character Matching）：</strong> 词字符匹配任务，要求判断一个句子中的某个词在另一个句子中的位置。</li>
+<li><strong>IFLYTEK（iFLYTEK Dialogue Natural Language Inference）：</strong> 讯飞提供的对话自然语言推理任务。</li>
+<li><strong>CLUENER（Chinese Named Entity Recognition）：</strong> 中文命名实体识别任务，要求识别文本中的命名实体。</li>
+</ol>
+<p>评价一个模型在CLUE基准上的性能通常涉及在每个任务上计算相应的性能指标，然后可能使用综合得分来评估整体性能。这有助于研究人员了解模型在多个中文NLP任务上的表现，并促进中文自然语言处理领域的进展。</p>
+</blockquote>
+<ul>
+<li>多语言上的 <a target="_blank" rel="noopener" href="https://sites.research.google/xtreme">XTREME</a> 以及 <a target="_blank" rel="noopener" href="https://sites.research.google/xtreme/xtremer">XTREME-R</a></li>
+</ul>
+<blockquote>
+<p>XTREME 是由Google Research提出的，它汇集了来自多个任务和多个语言的数据集，旨在推动多语言自然语言处理（NLP）研究。</p>
+<p>XTREME 包含了以下多语言任务：</p>
+<ol>
+<li><strong>PAWS-X（PArallel Wiki Simplification - Cross-lingual）：</strong> 一个平行语料库，用于衡量句子级别的相似度。</li>
+<li><strong>XNLI（Cross-lingual Natural Language Inference）：</strong> 跨语言自然语言推理任务，是NLI任务的一个扩展，包含多语言的数据集。</li>
+<li><strong>MLQA（MultiLingual Question Answering）：</strong> 多语言的问答任务，要求模型理解和回答关于文章的问题。</li>
+<li><strong>Tatoeba：</strong> 一个包含多语言平行语料库的数据集，用于评估模型的跨语言泛化性能。</li>
+<li><strong>TyDiQA-GoldP：</strong> 用于评估跨语言阅读理解的数据集。</li>
+<li><strong>UDPOS（Universal Dependencies Part-of-Speech）：</strong> 一个包含跨语言部分词性标注的数据集。</li>
+<li><strong>WikiANN：</strong> 一个包含跨语言实体链接的数据集。</li>
+<li><strong>WMT：</strong> 用于机器翻译评估的数据集。</li>
+</ol>
+<p>XTREME 的评价方法涉及在每个任务上进行模型训练和测试，然后使用任务特定的评价指标。然后，通过综合多个任务上的性能，计算得到一个综合分数，用于评估模型在多语言理解上的表现。</p>
+</blockquote>
+<ul>
+<li>sentence embedding 的综合评估基准 <a target="_blank" rel="noopener" href="https://huggingface.co/blog/mteb">MTEB</a></li>
+</ul>
+<blockquote>
+<p>“MTEB” 是指 “Machine Translation Evaluation Benchmark，是 Hugging Face 团队提出的一个机器翻译评估基准：</p>
+<ol>
+<li><strong>目标：</strong> MTEB 旨在提供一个更全面和准确的机器翻译评估基准，超越传统的 BLEU、TER 等自动评价指标，以更好地反映翻译系统的性能。</li>
+<li><strong>数据集：</strong> MTEB 使用了包括WMT、CCMT、IWSLT等多个数据集的子集，涵盖多个语言对和翻译方向。</li>
+<li><strong>评估指标：</strong> MTEB 使用多个评估指标，包括自动指标（如BLEU、TER、METEOR）以及人工评估。此外，还引入了一种基于探索性分析的模型检查（Model Check）方法，用于更深入地理解模型在特定问题上的性能。</li>
+<li><strong>多样性评价：</strong> MTEB 强调了多样性的重要性，特别是对于涉及不同语言和翻译方向的评估。通过引入多样性评价，可以更全面地了解模型的表现。</li>
+<li><strong>模型检查：</strong> MTEB 提出了一种新颖的模型检查方法，旨在深入研究模型在特定翻译问题上的行为。这可以帮助研究人员更好地理解模型的优势和局限性。</li>
+</ol>
+<p>总体而言，MTEB 旨在提高机器翻译评估的水平，通过引入更多的多样性和深入的模型检查方法，从而更好地指导和评价翻译系统的性能。如果你对具体的 MTEB 指标和方法感兴趣，我建议详细查阅链接中提供的信息。</p>
+</blockquote>
+<ul>
+<li>…</li>
+</ul>
+<p>这些 NLP 任务往往代表着模型在解决某类特定问题上的表现，所以在 ChatGP / GPT-4 公开后，也仍然有许多论文来测试他们解决各类传统 NLP 任务的能力：</p>
+<ul>
+<li><p>既有相对来说综合测试的，例如：</p>
+</li>
+<li><ul>
+<li>A Multitask, Multilingual, Multimodal Evaluation of ChatGPT on Reasoning, Hallucination, and Interactivity</li>
+<li>Can ChatGPT Understand Too? A Comparative Study on ChatGPT and Fine-tuned BERT</li>
+<li>Is ChatGPT a General-Purpose Natural Language Processing Task Solver?</li>
+</ul>
+</li>
+<li><p>也有聚焦在各个具体角度的，例如：</p>
+</li>
+<li><ul>
+<li>翻译：Is ChatGPT A Good Translator? A Preliminary Study</li>
+<li>信息抽取：Zero-Shot Information Extraction via Chatting with ChatGPT</li>
+<li>情感分析：Sentiment Analysis in the Era of Large Language Models: A Reality Check</li>
+</ul>
+</li>
+</ul>
+<p>本文的角度是如何测试LLM，而不是已有LLM在特定NLP任务上表现如何，所以这里不再展开。前面提到的综述文章中的第一节详细讨论并总结了LLM在各个 NLP 任务上的表现，感兴趣的同学可以详细阅读。</p>
+<h2 id="范式转换：从NLP任务到人类试题"><a href="#范式转换：从NLP任务到人类试题" class="headerlink" title="范式转换：从NLP任务到人类试题"></a>范式转换：从NLP任务到人类试题</h2><p>然而从现状来看，例如各个新发布模型证明各自的优越性的时候，大家都可以明显感觉到，用 NLP 任务来评测大模型并不是默认做法了。在我看来主要有三个原因：</p>
+<ol>
+<li>NLP 任务不够难了：许多简单 NLP 任务，例如文本分类任务，预训练模型就可以逼近甚至超过人类表现，使得在他们上面即使取得高的结果，也没那么有吸引力了。</li>
+<li>NLP 数据集存在严重的数据污染问题：很多 NLP 任务数据集都是在互联网上轻易可以获取，从而容易混入大模型的预训练语料里，导致其上的结果没有那么有说服力。</li>
+<li>GPT-4 也不在上面测试了：不得不承认 OpenAI 的引领能力非常强，他们在测试上的倾向性自然会导致跟随者的变化，我们接下来详细讨论 GPT-4 的测试部分。</li>
+</ol>
+<p>GPT-4的（开发过程中的）测试细节我们不得而知，但是从其<a href="https://link.zhihu.com/?target=https%3A//openai.com/research/gpt-4">官方介绍</a>中我们就能看出重点：</p>
+<blockquote>
+<p><strong>We’ve created GPT-4, …, exhibits human-level performance on various professional and academic benchmarks.</strong></p>
+</blockquote>
+<p>也即，利用人类考题来进行测试。</p>
+<p>具体来说，从其<a href="https://link.zhihu.com/?target=https%3A//openai.com/research/gpt-4">官方博客</a>以及<a href="https://link.zhihu.com/?target=https%3A//cdn.openai.com/papers/gpt-4.pdf">论文</a>中，我们可以看到两个主要测试角度：</p>
+<ul>
+<li>simulating exams that were originally designed for humans 人类考试</li>
+<li>“traditional benchmarks” for ML models 传统测试基准例如 MMLU</li>
+</ul>
+<p>如果进一步查看 MMLU 的细节，可以注意到它其实也是一个包含多个科目的人类试题组成的测试集，足以见出用人类试题来检验大语言模型被认为是一个重要角度了。</p>
+<h2 id="GPT-4的（开发过程中的）测试细节我们不得而知，但是从其官方介绍中我们就能看出重点："><a href="#GPT-4的（开发过程中的）测试细节我们不得而知，但是从其官方介绍中我们就能看出重点：" class="headerlink" title="GPT-4的（开发过程中的）测试细节我们不得而知，但是从其官方介绍中我们就能看出重点："></a>GPT-4的（开发过程中的）测试细节我们不得而知，但是从其<a href="https://link.zhihu.com/?target=https%3A//openai.com/research/gpt-4">官方介绍</a>中我们就能看出重点：</h2><blockquote>
+<p><strong>We’ve created GPT-4, …, exhibits human-level performance on various professional and academic benchmarks.</strong></p>
+</blockquote>
+<p>也即，利用人类考题来进行测试。</p>
+<p>具体来说，从其<a href="https://link.zhihu.com/?target=https%3A//openai.com/research/gpt-4">官方博客</a>以及<a href="https://link.zhihu.com/?target=https%3A//cdn.openai.com/papers/gpt-4.pdf">论文</a>中，我们可以看到两个主要测试角度：</p>
+<ul>
+<li>simulating exams that were originally designed for humans 人类考试</li>
+<li>“traditional benchmarks” for ML models 传统测试基准例如 MMLU</li>
+</ul>
+<p>如果进一步查看 MMLU 的细节，可以注意到它其实也是一个包含多个科目的人类试题组成的测试集，足以见出用人类试题来检验大语言模型被认为是一个重要角度了。</p>
+<h2 id="新范式：利用人类考题来测试"><a href="#新范式：利用人类考题来测试" class="headerlink" title="新范式：利用人类考题来测试"></a>新范式：利用人类考题来测试</h2><p>MMLU 无论在什么测试基准里都被当作是一个核心的数据集，值得进一步讨论其细节。它最早是在 Measuring Massive Multitask Language Understanding 这篇 ICLR 2021 的文章中被提出。从题目也可以看到，重要的点在于 multitask，也即模型在非常多的任务下的表现如何。</p>
+<p>具体来说他收集了涵盖 57 个任务（也可以说是科目）的人类试题，包含例如数学、历史、计算机科学、法律等等学科，将其组成一个测试基准。可以想到，如果模型要有比较好的效果，需要同时具备世界知识（world knowledge），以及解题能力（problem solving）。现在看来似乎这个想法非常自然且合理，但回头看在当时算是非常有前瞻性了。</p>
+<p>在我看来，这类人类试题主要有以下几个好处：</p>
+<p>整体来看，这种试题是测试人类智能的一个很好的载体，无论在哪个国家，试卷考试的方式来判断一个学生的智力水平发展到了什么阶段都是主要做法。所以在AGI比较火热的时候，用来测试模型/机器智能也是十分自然。</p>
+<p>从类型来看，不同科目的试题带来了不同纬度的测量，正如 MMLU 强调的，可以测试多任务的能力，拆解来说：</p>
+<ul>
+<li>语言 / 社会科学类题目，可以测量世界知识（world knowledge）— 想想一个模型需要对中文语境的知识了解到什么程度才可以回答 “明朝的第二个皇帝是谁” 这种问题</li>
+<li>数学 / 自然科学类题目，可以测量推理能力（reasoning ability）— 模型不仅需要理解题意，还需要根据所有信息进行推理甚至计算再答题</li>
+<li>当然还有很多其他的能力，但是上面两个 <em>世界知识</em> 及 <em>推理能力</em>，往往是大模型擅长（相较于小模型），或者说希望能够增强的方面。</li>
+</ul>
+<p>希望上述论证能说服你相信“人类试题是测试大模型的一个很好载体”这一观点。沿着 MMLU 的思路，后续有了一系列相关工作：</p>
+<h3 id="英文测试"><a href="#英文测试" class="headerlink" title="英文测试"></a>英文测试</h3><p>对于英文而言，仿照 MMLU 有许多以人类试题为载体的测试，但大部分并不是以新数据集/测试当作重点（毕竟已经有了MMLU），而是检验在特定类型题目上，LLM的表现：</p>
+<ul>
+<li>How Does ChatGPT Perform on the United States Medical Licensing Examination? The Implications of Large Language Models for Medical Education and Knowledge Assessment</li>
+<li>Can ChatGPT pass high school exams on English Language Comprehension?</li>
+<li>Automatically Answering and Generating Machine Learning Final Exams</li>
+</ul>
+<p>值得注意的是，此类 paper 由于测试的设定千差万别，特别是些不规范/错误的做法也容易引起很大的争议，例如：<a href="https://link.zhihu.com/?target=https%3A//mp.weixin.qq.com/s/GxRfWKIWDzqfqJbjkdeBkA">爆火的「GPT-4 MIT本科数学满分」论文作弊，数据集本身有问题</a>。所以对于此类paper，特别是标题/结论比较吸引眼球的，可能要多留意一下。</p>
+<h3 id="中文测试"><a href="#中文测试" class="headerlink" title="中文测试"></a>中文测试</h3><p>对中文来说，最近几个月涌现了好几个测试基准，我们按发布时间排序：</p>
+<ul>
+<li><p>[<a href="https://link.zhihu.com/?target=https%3A//github.com/microsoft/AGIEval">AGIEval</a>] AGIEval: A Human-Centric Benchmark for Evaluating Foundation Models</p>
+</li>
+<li><ul>
+<li>选用标准化考试的问题，中文和英文总共 8062 道题目</li>
+<li>其中中文题目来自于三类：高考题、律师资格考试、公务员考试。</li>
+</ul>
+</li>
+<li><p>[<a href="https://link.zhihu.com/?target=https%3A//cevalbenchmark.com/">C-Eval</a>] C-Eval: A Multi-Level Multi-Discipline Chinese Evaluation Suite for Foundation Models</p>
+</li>
+<li><ul>
+<li>总共有 13948 个问题，均为单选题</li>
+<li>包含52个不同领域，分成了四个大的类别：STEM / Social science / Humanity / Other</li>
+<li>把数理类题目挑出来单独构造了 C-Eval Hard，用于着重测试模型的推理能力</li>
+</ul>
+</li>
+<li><p>[<a href="https://link.zhihu.com/?target=https%3A//github.com/OpenLMLab/GAOKAO-Bench">GAOKAO-bench</a>] Evaluating the Performance of Large Language Models on GAOKAO Benchmark</p>
+</li>
+<li><ul>
+<li>收集了2010-2022年全国高考卷的题目，其中包括1781道客观题和1030道主观题</li>
+<li>客观题可以自动评测，主观题依赖于专家打分</li>
+</ul>
+</li>
+<li><p>[<a href="https://link.zhihu.com/?target=https%3A//github.com/DAMO-NLP-SG/M3Exam">M3Exam</a>] M3Exam: A Multilingual, Multimodal, Multilevel Benchmark for Examining Large Language Models</p>
+</li>
+<li><ul>
+<li>多语言数据集，包含1164道中文试题，涵盖三个教育阶段：小升初、初升高、高升大（高考），可以用来测试模型发展达到什么阶段。</li>
+<li>中文部分也公开了图片类试题，可以测试中文多模态模型。</li>
+</ul>
+</li>
+<li><p>[<a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/2306.05783">XIEZHI</a>] Xiezhi: An Ever-Updating Benchmark for Holistic Domain Knowledge Evaluation</p>
+</li>
+<li><ul>
+<li>涵盖了来自516个领域的总共249587道多选题，所以可以用来测试模型在不同领域上的优势和劣势</li>
+</ul>
+</li>
+<li><p>[<a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/2306.09212">CMMLU</a>] CMMLU: Measuring massive multitask language understanding in Chinese</p>
+</li>
+<li><ul>
+<li>涵盖 11528 个多选题，横跨 67 个科目</li>
+<li>涉及一些不是常见标准化考试类型的题目，例如食物，中国驾驶规范等</li>
+</ul>
+</li>
+</ul>
+<h3 id="多语言测试"><a href="#多语言测试" class="headerlink" title="多语言测试"></a>多语言测试</h3><p>多语言方面，目前仅有一个数据集 M3Exam，其他的工作也都是类似英文的在某特定语言上的特定类型考试做测试。</p>
+<ul>
+<li><p>[<a href="https://link.zhihu.com/?target=https%3A//github.com/DAMO-NLP-SG/M3Exam">M3Exam</a>] M3Exam: A Multilingual, Multimodal, Multilevel Benchmark for Examining Large Language Models</p>
+</li>
+<li><ul>
+<li>包含 12317 个问题，涵盖从高资源语种例如中文英文，到低资源语种例如斯瓦希里语及爪哇语等9个语言。</li>
+<li>一个特点是所有问题均来源是当地的真实人类试题，所以包含了特定的文化背景，要求模型不仅是能理解语言，还需要对背景知识（真-<em>世界</em>知识）有所掌握</li>
+</ul>
+</li>
+<li><p>Evaluating GPT-4 and ChatGPT on Japanese Medical Licensing Examinations</p>
+</li>
+<li><p>Evaluating GPT-3.5 and GPT-4 Models on Brazilian University Admission Exams</p>
+</li>
+<li><p>Investigating the effectiveness of ChatGPT in mathematical reasoning and problem solving: Evidence from the Vietnamese national high school graduation examination.</p>
+</li>
+</ul>
+<h1 id="人类试题是否是个理想的测试载体？"><a href="#人类试题是否是个理想的测试载体？" class="headerlink" title="人类试题是否是个理想的测试载体？"></a>人类试题是否是个理想的测试载体？</h1><p>前面列举了中文、英文、多语言方向上一些新的数据集的出现。虽然是最近两三个月的工作，但他们迅速变成了较为公认的测量基准，例如最近一个月发布的一些新模型，包括 <a href="https://link.zhihu.com/?target=https%3A//huggingface.co/baichuan-inc/baichuan-7B">baichuan-7B</a>、<a href="https://link.zhihu.com/?target=https%3A//internlm.org/">InternLM (书生·浦语)</a> 等都采用了其中一些数据集作为主要的测试指标。</p>
+<p>虽然上文似乎都是在试图论证“人类试题作为测量基准”的优越性，但如果我们停下来再考虑下，人类试题是不是真的是个完全理想的测试载体？答案似乎也不是100%成立：</p>
+<ul>
+<li><p>最大的问题还是数据污染问题，许多试题，例如中国的高考题可能传播面很广，很容易被（不小心）混入到模型的训练语料里，造成模型的效果被高估。</p>
+</li>
+<li><p>其次，目前许多模型为“中模型”（10B左右），前面讨论采用人类试题的动机时提到过，他们能体现或者凸显的是：世界知识+推理能力，10B尺寸的模型是否可以获得这些能力本身也是个有待商榷的问题。所以：</p>
+</li>
+<li><ul>
+<li>许多模型在这些试题上取得近乎随机的结果 — 并不证明他们真的很差，这个级别的模型期待他们有其他角度的能力或许更为现实</li>
+<li>有些中等模型在上面取得比较好的结果 — 并不证明他们真的很好，可能训练数据朝向此类数据做了倾斜</li>
+</ul>
+</li>
+</ul>
+<h1 id="小结：用什么任务来测试模型"><a href="#小结：用什么任务来测试模型" class="headerlink" title="小结：用什么任务来测试模型"></a>小结：用什么任务来测试模型</h1><p>这节中主要讨论的是<strong>用什么来测试</strong>，也即从传统NLP任务到人类试题这种范式的转移。</p>
+<p>值得注意的是他们也往往不是非此即彼的关系，从形式上来看，单选题类型的人类试题完全也可以被当作是QA任务里的 MCQ (multiple-choice question)，所以有些测试基准会直接把他们混在一起。例如 Huggingface 的 <a href="https://link.zhihu.com/?target=https%3A//huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard">Open LLM Leaderboard</a> 中包含四个数据集，既有 MMLU 和 <a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/1803.05457">AI2 Reasoning Challenge</a>（自然科学类型的问题），也有“传统的”NLP数据集例如 <a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/1905.07830">HellaSwag</a> 和 <a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/2109.07958">TruthfulQA</a>。</p>
+<h1 id="怎么测试：Evaluator-与榜单"><a href="#怎么测试：Evaluator-与榜单" class="headerlink" title="怎么测试：Evaluator 与榜单"></a>怎么测试：Evaluator 与榜单</h1><p>解决了<strong>用什么</strong>来做测试，这节我们主要讨论<strong>如何测试</strong>。具体来说涉及两个方面：1. 谁来打分（X-as-Evaluator）以及 2. 在什么上面打分（刷什么榜单）</p>
+<h2 id="如何给模型输出打分：自动评测-人工评测-GPT-4评测"><a href="#如何给模型输出打分：自动评测-人工评测-GPT-4评测" class="headerlink" title="如何给模型输出打分：自动评测 / 人工评测 / GPT-4评测"></a>如何给模型输出打分：自动评测 / 人工评测 / GPT-4评测</h2><p>上文介绍的任务，无论是传统的NLP任务，或者多选题形式的人类考题，都有相对明确的打分标准，例如准确率 accuracy，或者专门的衡量指标例如 ROUGE 或者 BLEU。然而对于更丰富一些的任务，例如对话或者人类试题中的主观题，自动评估往往是不够的。</p>
+<p>早期碰到此类情况的时候，默认选择就是用人类打分，然而随着 LLM 的发展，特别是 GPT-4 这种极为强悍的模型，用模型来给模型打分也逐渐流行起来。甚至可以看到最近的一些模型的宣传方法就是“<em>GPT-4认为我们达到了 ChatGPT XX% 效果</em>”这种画风。</p>
+<p>具体来说对于不同模型的输出，用一个（相对来说比较强的）模型，例如 GPT-4 来对这些输出进行比较和打分：</p>
+<ul>
+<li>Benchmarking Foundation Models with Language-Model-as-an-Examiner.</li>
+<li>PandaLM: An Automatic Evaluation Benchmark for LLM Instruction Tuning Optimization</li>
+<li>Large Language Models are not Fair Evaluators</li>
+</ul>
+<p>相较于 reference-based metric 例如 BERTScore 而言，这类 reference-free 的方法往往更加方便，因为只需要给模型的输出即可。但是值得注意的是，最近的一些工作（比如上面的最后一篇）也发现模型做自动评估往往还是存在一些系统性的偏见，即使简单地把不同答案顺序做调换喂给模型，也会影响到最终结果。所以用模型来打分仍然算是一个“研究角度”，而不能被100%信任。</p>
+<h2 id="刷榜：永恒的课题"><a href="#刷榜：永恒的课题" class="headerlink" title="刷榜：永恒的课题"></a>刷榜：永恒的课题</h2><p>对于NLP或者ML模型来说，刷榜都是永恒的课题。上节中介绍的各个数据集本身就可以组建起对应的榜单，例如 C-Eval 对应的 <a href="https://link.zhihu.com/?target=https%3A//cevalbenchmark.com/static/leaderboard.html">leaderboard</a>，再次就不重复列举。</p>
+<p>此外还有些榜单是汇聚多个数据集组成一个更综合的榜单，这里列举一些关注度比较高的综合榜单：</p>
+<ul>
+<li><p>HELM: Holistic Evaluation of Language Models</p>
+</li>
+<li><ul>
+<li>比较早推出的相对全面的衡量，包含非常多的任务/数据集。</li>
+</ul>
+</li>
+<li><p>Huggingface 的 <strong>[ </strong> Open LLM Leaderboard](<a href="https://link.zhihu.com/?target=https%3A//huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard">https://link.zhihu.com/?target=https%3A//huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard</a>)</p>
+</li>
+<li><ul>
+<li><p>对象是 huggingface 上的开源模型</p>
+</li>
+<li><p>包含四个数据集：<a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/1803.05457">AI2 Reasoning Challenge</a> (25-shot)，<a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/1905.07830">HellaSwag</a> (10-shot)，<a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/2009.03300">MMLU</a> (5-shot)，<a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/2109.07958">TruthfulQA</a> (0-shot)。可以看到 setting 包含 zero-shot 和 few-shot。数据处理和测试的来源是 <a href="https://link.zhihu.com/?target=https%3A//github.com/EleutherAI/lm-evaluation-harness">lm-evaluation-harness</a>。</p>
+</li>
+<li><p>huggingface 还有两外两个榜单，不过受到的关注度相对低一些：</p>
+</li>
+<li><ul>
+<li><a href="https://link.zhihu.com/?target=https%3A//huggingface.co/spaces/HuggingFaceH4/human_eval_llm_leaderboard">human and GPT4 evals</a> 更侧重评估开放域的文本生成能力</li>
+<li><a href="https://link.zhihu.com/?target=https%3A//huggingface.co/spaces/optimum/llm-perf-leaderboard">performance bencmarks</a> 侧重在不同硬件限制下模型的表现</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a href="https://link.zhihu.com/?target=https%3A//github.com/google/BIG-bench">BIG-bench</a>: Beyond the Imitation Game: Quantifying and extrapolating the capabilities of language models</p>
+</li>
+<li><ul>
+<li>包括200多个任务，涵盖方方面面</li>
+</ul>
+</li>
+<li><p><a href="https://link.zhihu.com/?target=https%3A//lmsys.org/blog/2023-05-03-arena/">Chatbot Arena</a> 的 <a href="https://link.zhihu.com/?target=https%3A//chat.lmsys.org/%3Farena">leaderboard</a></p>
+</li>
+<li><ul>
+<li>侧重于对话角度：”features anonymous, randomized battles in a crowdsourced manner”</li>
+<li>逻辑是同时跟两个（匿名）模型对话，然后投票选出最好的那个</li>
+<li>作者会每隔一段时间对leaderboard进行一次讨论和分析，可以在<a href="https://link.zhihu.com/?target=https%3A//lmsys.org/blog/2023-05-03-arena/">网站上</a>看到。</li>
+<li>最近他们也放出了一个新的 benchmark：MT-Bench，侧重于多轮问答的测试</li>
+</ul>
+</li>
+<li><p><a href="https://link.zhihu.com/?target=https%3A//github.com/tatsu-lab/alpaca_eval">AlpacaEval</a>: An Automatic Evaluator for Instruction-following Language Models</p>
+</li>
+<li><ul>
+<li>用模型例如 GPT-4 或者 Claude 来对（要测试的）模型进行打分</li>
+<li>当然为了说明这种方法的可靠性，他们用2w条左右的人工标注进行验证，通过高相关性说明这个榜单是可靠的</li>
+</ul>
+</li>
+<li><p><a href="https://link.zhihu.com/?target=https%3A//github.com/InternLM/opencompass/blob/main/README_zh-CN.md">OpenCompass</a></p>
+</li>
+<li><ul>
+<li>进一步集成了多个数据集/任务，试图得到更全面的评测方案</li>
+</ul>
+</li>
+</ul>
+<p>值得一提的是，在调研过程中也发现一个有意思的现象，越全的榜单更新频率或者用的反而不一定多，毕竟完整测试一次开销太大；然而太小的榜单可能又难以让人信服，所以类似于 <a href="https://link.zhihu.com/?target=https%3A//huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard">Open LLM Leaderboard</a> 这种“适中”体量的榜单更受欢迎。</p>
+<h2 id="支线剧情：LLM还有很多其他重要角度"><a href="#支线剧情：LLM还有很多其他重要角度" class="headerlink" title="支线剧情：LLM还有很多其他重要角度"></a>支线剧情：LLM还有很多其他重要角度</h2><p>以上的各种测试基准或者榜单重点在于衡量模型的<strong>*通用</strong>问题解决能力*，特别是知识与推理能力，有些额外考虑了对话类型模型的对话问答能力。然而目前来看LLM的应用潜力远不止于此，所以最近也出现了些工作从不同角度来进行衡量，这里列举一些：</p>
+<ul>
+<li><p>从领域的角度，例如常见的 医疗 medical、法律 legal、教育 education 等等</p>
+</li>
+<li><ul>
+<li>CARE-MI: Chinese Benchmark for Misinformation Evaluation in Maternity and Infant Care</li>
+</ul>
+</li>
+<li><p>工具使用能力，即 tool learning 的角度：</p>
+</li>
+<li><ul>
+<li>API-Bank: A Benchmark for Tool-Augmented LLMs</li>
+<li>On the Tool Manipulation Capability of Open-source Large Language Models</li>
+</ul>
+</li>
+<li><p>模型的鲁棒性</p>
+</li>
+<li><ul>
+<li>PromptBench: Towards Evaluating the Robustness of Large Language Models on Adversarial Prompts</li>
+</ul>
+</li>
+<li><p>模型的可靠性</p>
+</li>
+<li><ul>
+<li>TRUSTGPT: A Benchmark for Trustworthy and Responsible Large Language Models</li>
+<li>CARE-MI: Chinese Benchmark for Misinformation Evaluation in Maternity and Infant Care</li>
+</ul>
+</li>
+<li><p>多模态能力</p>
+</li>
+<li><ul>
+<li>MME: A Comprehensive Evaluation Benchmark for Multimodal Large Language Models</li>
+</ul>
+</li>
+</ul>
+<h1 id="总结与（不一定准确的）展望"><a href="#总结与（不一定准确的）展望" class="headerlink" title="总结与（不一定准确的）展望"></a>总结与（不一定准确的）展望</h1><p>这篇文章顺着发展的脉络梳理了下主流（以及非主流）的各式各样 LLM 评测方法，我们可以稍微总结一下以及讨论下顺着这些脉络，还有哪些有价值/有趣的问题值得探索：</p>
+<h2 id="百花齐放还是五花八门"><a href="#百花齐放还是五花八门" class="headerlink" title="百花齐放还是五花八门"></a>百花齐放还是五花八门</h2><p>总的来说，可以看到各式评测百花齐放，无论你做什么模型，似乎都能找个榜单刷上一刷。然而这背后也蕴含着种种问题，各个评测基准你套我我套你，一个基准里套着另一个基准里的数据集。最终展现出来的只是一个 number，但这个 number 的可靠性到底多少可能要画上一个问号。</p>
+<p>比如前段时间闹出争议的 Falcon 在 huggingface 榜单上好过 LLama，最后官方给出的解释是用到的 prompt 和算分数的方式与原版稍有差异，具体可看以下两篇文章：</p>
+<ul>
+<li><a href="https://link.zhihu.com/?target=https%3A//huggingface.co/blog/evaluating-mmlu-leaderboard">What’s going on with the Open LLM Leaderboard?</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/640880251">Huggingface LLM 排行榜指标探索</a></li>
+</ul>
+<p>但注意，此时大家已经用了 <strong>相同模型 + 相同数据集</strong>，即使这样都能有如此大的差异，更别说其他情况下，评测的结果可靠性如何。</p>
+<p>所以如果你只是关注评测/榜单上的结果作为模型比较与选择的参考，那么请注意：</p>
+<ul>
+<li>首先所有的评测都是biased，没有一个榜单是绝对可靠，他们往往只能从一个纬度来揭示模型的特点。</li>
+<li>其次由于上述的特点，很多榜单是可以被刷榜的，特别是在（巨大？）利益的驱动下，可能各种trick都会被用上，所以更不要盲目信赖榜单上的结果。</li>
+</ul>
+<p>当然话永远可以从两面说，当你了解了上述风险以后，知道不同角度的场景的榜单对于快速了解某个方向比较好的模型是哪些仍然是有用的。此外，大部分人对于 LLM 的需求都是强应用相关的，那么基于自己的需求，构造一个专属的 test set（真-private set）要可靠的多。</p>
+<h2 id="LLM-Evaluation-是个有趣-有用的研究方向"><a href="#LLM-Evaluation-是个有趣-有用的研究方向" class="headerlink" title="LLM Evaluation 是个有趣/有用的研究方向"></a>LLM Evaluation 是个有趣/有用的研究方向</h2><p>如何公平、有效的评估一个模型不仅仅是个数据工程，也是个值得深究的学术问题。光从上面的讨论，我们就已经提到了各种评估方法的种种问题，那么如何解决这些问题从而可以更好的展现出 LLM 的能力或者对不同 LLM 进行比较就显得非常重要了。</p>
+<p>那么还有哪些可以继续挖掘的方向，可以考虑从目前评测的几个显著弱点着手，例如：</p>
+<ul>
+<li>榜单可能被刻意刷榜，从而模糊了模型的真实效果</li>
+<li>数据泄漏/污染问题</li>
+<li>LLM 的应用场景过于多元，单一维度的衡量可能难以展示起完整性能</li>
+</ul>
+<p>特别是后面两点，这是 LLM 不同于之前普通 ML 模型的特性，所以更值得被关注。</p>
+<h2 id="测试到底应该扮演着什么角色"><a href="#测试到底应该扮演着什么角色" class="headerlink" title="测试到底应该扮演着什么角色"></a>测试到底应该扮演着什么角色</h2><p>最后我想用 GPT-4 报告里关于分工的部分来结束本文，可以看到评测与分析这一部分有多少的人力投入：</p>
+<p><img src="https://image.rexking6.top/img/v2-4b1460913c4c35e32ff1b0ea4c9cd25b_720w.webp" alt=""></p>
+<p>回到现实，即使各家公司都在积极发展自己的模型，评测这一部分恐怕都被严重的忽视，或者沦为 PR 的一种工具（“我的模型X可以在我的榜单Y上表现的非常好”）。</p>
+<p>呼应下 <a href="https://link.zhihu.com/?target=https%3A//www.notion.so/6b79edd91b454e3d8ea41c59ea2af873%3Fpvs%3D21">C-Eval 博客</a> 里提到的观点，<strong>测试应该用于辅助模型开发，而不是打榜</strong>。建立起一个优质高效的评测可以极大的辅助模型的开发过程。我想 GPT-4 的目标也不是为了成功解决各种人类考题，而是因为达到了一定的知识与推理水平，所以可以成功解决人类考题，大家共勉。</p>
+<h1 id="有趣的链接"><a href="#有趣的链接" class="headerlink" title="有趣的链接"></a>有趣的链接</h1><p>之所以不叫参考文献是因为都已经放在上文了，这里放一些我在调研过程中发现的有趣/有用的文章，他们可能无法和本文形成直接联系，但都值得一看：</p>
+<ul>
+<li><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/641130271">产品视角看LLM：LLM的benchmark结果已经不可信</a></p>
+</li>
+<li><p>两个中文的“主观”手动评测，如果关注中文的表现，值得看看：</p>
+</li>
+<li><ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/631348070">绝不客观的LLM评测</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/634608422">CLiB中文大模型能力评测榜单</a></li>
+</ul>
+</li>
+<li><p>当前炼制“大语言模型”的两个现象<a target="_blank" rel="noopener" href="https://www.zhihu.com/people/147bf0c743d6aa5ccea428a6f4cc7186">@张俊林</a>大佬在四月的博客文章，现在看来当时提到的问题只是稍微缓解，并没有被解决。</p>
+</li>
+<li><p><a href="https://link.zhihu.com/?target=https%3A//www.notion.so/6b79edd91b454e3d8ea41c59ea2af873%3Fpvs%3D21">C-Eval: 构造中文大模型的知识评估基准</a> - C-Eval 数据集的构造过程，特别是其中关于刷榜和模型开发讨论的部分值得一读。</p>
+</li>
+</ul>
+<h1 id="其他：prompt-engineering"><a href="#其他：prompt-engineering" class="headerlink" title="其他：prompt engineering"></a>其他：prompt engineering</h1><p>我们知道如今这些大模型对prompt很是敏感，同一个问题回答错了，可能换种问法比如加个“一步步推理”引导语他就又能回答对了，又比如通过few-shot这种形式先给它几个例子然后再问类似的问题，就能很好的回答。</p>
+<p>每个模型对prompt的敏感度又不一样，对于同一个问题，同一个模型得到的结论可能都是不一样的，那怎么办呢？</p>
+<p>这里笔者的建议是不要本末倒置，我们现在做的事情是测评，尤其是在做多个模型之间的对比，那么prompt就应该是符合人提问习惯的指令形式，对于某个问题人类怎么喜欢问就怎么来，如果模型不能get到，那就是你的指令对齐或者泛化做的不好，而不是说要花很大力气去写prompt迎合各个模型。</p>
+<p>那么返回头来说，如果现在的工作是在测当前这个模型到底有没有这个知识，举个不太恰当的例子，假设你正在研发一个大模型，发现问“中国的capital是哪里？”他居然回答是苹果，那这个时候需要定位这个问题，你就可以先用中文问问“中国的首都是哪里？”看看能不能回答对，又或者先举几个类似的例子告诉模型，然后再问它，如果能够回答说吗模型本身是有“北京是中国的首都”这个通用知识的，可能是英文或者双语能力不行，所以这里通常的做法是，会用few-shot的指令形式去测底座模型，先看看底座模型是否有这个能力，如果没有，那后面训练什么的都是很难。又比如你是一个运营工作人员，现在也只能用A这个模型来完成某一件事，那就可以花点时间来做prompt engineering，来使得输出最大化的满足你的需求。</p>
+<p>所以作为测评，指令设计不应该特意<strong><em>过多的去迎合模型</em></strong>（除非有如上的特殊目的等等），甚至应该像上一节说的，要多样性，才能更好的探究到模型的理解能力。</p>
+<p>还有一篇综述可以看看：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2307.03109.pdf">A Survey on Evaluation of Large Language Models</a>。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2023\04\17\Auto-GPT源码解读（万字干货-原理速读）\" rel="bookmark">Auto-GPT源码解读（万字干货+原理速读）</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2023\11\26\GPU关键指标汇总：算力、显存、通信\" rel="bookmark">GPU关键指标汇总：算力、显存、通信</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2023\04\05\LLM-GPT入门实践\" rel="bookmark">LLM-GPT入门实践</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2024/01/16/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BC%B0/" title="大模型评估">https://blog.rexking6.top/2024/01/16/大模型评估/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" rel="tag"># 大模型</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/11/29/%E9%AB%98%E5%B9%B6%E5%8F%91%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%EF%BC%9A%E9%99%8D%E7%BA%A7%E3%80%81%E7%86%94%E6%96%AD%E3%80%81%E9%99%90%E6%B5%81%E4%B8%8E%E7%BC%93%E5%AD%98%E9%A2%84%E7%83%AD/" rel="prev" title="高并发系统设计：降级、熔断、限流与缓存预热">
+      <i class="fa fa-chevron-left"></i> 高并发系统设计：降级、熔断、限流与缓存预热
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/01/20/%E5%A4%A7%E6%A8%A1%E5%9E%8BAgents%E7%B1%BB%E5%9E%8B/" rel="next" title="大模型Agents类型">
+      大模型Agents类型 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8BX%E5%88%B0%E5%BA%95%E5%A5%BD%E4%B8%8D%E5%A5%BD%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">模型X到底好不好？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%A8%E4%BB%80%E4%B9%88%E6%B5%8B%E8%AF%95%EF%BC%9A%E4%BB%8E-NLP-%E4%BB%BB%E5%8A%A1%E5%88%B0%E4%BA%BA%E7%B1%BB%E8%AF%95%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">用什么测试：从 NLP 任务到人类试题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%A0%E7%BB%9F%E5%81%9A%E6%B3%95%EF%BC%9ANLP-%E4%BB%BB%E5%8A%A1%E8%AF%84%E6%B5%8B"><span class="nav-number">3.1.</span> <span class="nav-text">传统做法：NLP 任务评测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8C%83%E5%BC%8F%E8%BD%AC%E6%8D%A2%EF%BC%9A%E4%BB%8ENLP%E4%BB%BB%E5%8A%A1%E5%88%B0%E4%BA%BA%E7%B1%BB%E8%AF%95%E9%A2%98"><span class="nav-number">3.2.</span> <span class="nav-text">范式转换：从NLP任务到人类试题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GPT-4%E7%9A%84%EF%BC%88%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E7%9A%84%EF%BC%89%E6%B5%8B%E8%AF%95%E7%BB%86%E8%8A%82%E6%88%91%E4%BB%AC%E4%B8%8D%E5%BE%97%E8%80%8C%E7%9F%A5%EF%BC%8C%E4%BD%86%E6%98%AF%E4%BB%8E%E5%85%B6%E5%AE%98%E6%96%B9%E4%BB%8B%E7%BB%8D%E4%B8%AD%E6%88%91%E4%BB%AC%E5%B0%B1%E8%83%BD%E7%9C%8B%E5%87%BA%E9%87%8D%E7%82%B9%EF%BC%9A"><span class="nav-number">3.3.</span> <span class="nav-text">GPT-4的（开发过程中的）测试细节我们不得而知，但是从其官方介绍中我们就能看出重点：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B0%E8%8C%83%E5%BC%8F%EF%BC%9A%E5%88%A9%E7%94%A8%E4%BA%BA%E7%B1%BB%E8%80%83%E9%A2%98%E6%9D%A5%E6%B5%8B%E8%AF%95"><span class="nav-number">3.4.</span> <span class="nav-text">新范式：利用人类考题来测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8B%B1%E6%96%87%E6%B5%8B%E8%AF%95"><span class="nav-number">3.4.1.</span> <span class="nav-text">英文测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AD%E6%96%87%E6%B5%8B%E8%AF%95"><span class="nav-number">3.4.2.</span> <span class="nav-text">中文测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E8%AF%AD%E8%A8%80%E6%B5%8B%E8%AF%95"><span class="nav-number">3.4.3.</span> <span class="nav-text">多语言测试</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%BA%E7%B1%BB%E8%AF%95%E9%A2%98%E6%98%AF%E5%90%A6%E6%98%AF%E4%B8%AA%E7%90%86%E6%83%B3%E7%9A%84%E6%B5%8B%E8%AF%95%E8%BD%BD%E4%BD%93%EF%BC%9F"><span class="nav-number">4.</span> <span class="nav-text">人类试题是否是个理想的测试载体？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93%EF%BC%9A%E7%94%A8%E4%BB%80%E4%B9%88%E4%BB%BB%E5%8A%A1%E6%9D%A5%E6%B5%8B%E8%AF%95%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.</span> <span class="nav-text">小结：用什么任务来测试模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%8E%E4%B9%88%E6%B5%8B%E8%AF%95%EF%BC%9AEvaluator-%E4%B8%8E%E6%A6%9C%E5%8D%95"><span class="nav-number">6.</span> <span class="nav-text">怎么测试：Evaluator 与榜单</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E7%BB%99%E6%A8%A1%E5%9E%8B%E8%BE%93%E5%87%BA%E6%89%93%E5%88%86%EF%BC%9A%E8%87%AA%E5%8A%A8%E8%AF%84%E6%B5%8B-%E4%BA%BA%E5%B7%A5%E8%AF%84%E6%B5%8B-GPT-4%E8%AF%84%E6%B5%8B"><span class="nav-number">6.1.</span> <span class="nav-text">如何给模型输出打分：自动评测 &#x2F; 人工评测 &#x2F; GPT-4评测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%B7%E6%A6%9C%EF%BC%9A%E6%B0%B8%E6%81%92%E7%9A%84%E8%AF%BE%E9%A2%98"><span class="nav-number">6.2.</span> <span class="nav-text">刷榜：永恒的课题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%AF%E7%BA%BF%E5%89%A7%E6%83%85%EF%BC%9ALLM%E8%BF%98%E6%9C%89%E5%BE%88%E5%A4%9A%E5%85%B6%E4%BB%96%E9%87%8D%E8%A6%81%E8%A7%92%E5%BA%A6"><span class="nav-number">6.3.</span> <span class="nav-text">支线剧情：LLM还有很多其他重要角度</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E4%B8%8E%EF%BC%88%E4%B8%8D%E4%B8%80%E5%AE%9A%E5%87%86%E7%A1%AE%E7%9A%84%EF%BC%89%E5%B1%95%E6%9C%9B"><span class="nav-number">7.</span> <span class="nav-text">总结与（不一定准确的）展望</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%99%BE%E8%8A%B1%E9%BD%90%E6%94%BE%E8%BF%98%E6%98%AF%E4%BA%94%E8%8A%B1%E5%85%AB%E9%97%A8"><span class="nav-number">7.1.</span> <span class="nav-text">百花齐放还是五花八门</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LLM-Evaluation-%E6%98%AF%E4%B8%AA%E6%9C%89%E8%B6%A3-%E6%9C%89%E7%94%A8%E7%9A%84%E7%A0%94%E7%A9%B6%E6%96%B9%E5%90%91"><span class="nav-number">7.2.</span> <span class="nav-text">LLM Evaluation 是个有趣&#x2F;有用的研究方向</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E5%88%B0%E5%BA%95%E5%BA%94%E8%AF%A5%E6%89%AE%E6%BC%94%E7%9D%80%E4%BB%80%E4%B9%88%E8%A7%92%E8%89%B2"><span class="nav-number">7.3.</span> <span class="nav-text">测试到底应该扮演着什么角色</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%89%E8%B6%A3%E7%9A%84%E9%93%BE%E6%8E%A5"><span class="nav-number">8.</span> <span class="nav-text">有趣的链接</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%EF%BC%9Aprompt-engineering"><span class="nav-number">9.</span> <span class="nav-text">其他：prompt engineering</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">223</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">3.8m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">57:36</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
