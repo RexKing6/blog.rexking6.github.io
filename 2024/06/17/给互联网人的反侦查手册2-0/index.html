@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="给互联网人的反侦查手册2.0">
+<meta property="og:url" content="https://blog.rexking6.top/2024/06/17/%E7%BB%99%E4%BA%92%E8%81%94%E7%BD%91%E4%BA%BA%E7%9A%84%E5%8F%8D%E4%BE%A6%E6%9F%A5%E6%89%8B%E5%86%8C2-0/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/123123436457.webp">
+<meta property="article:published_time" content="2024-06-16T16:32:02.000Z">
+<meta property="article:modified_time" content="2024-06-16T16:46:55.884Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/123123436457.webp">
+
+<link rel="canonical" href="https://blog.rexking6.top/2024/06/17/%E7%BB%99%E4%BA%92%E8%81%94%E7%BD%91%E4%BA%BA%E7%9A%84%E5%8F%8D%E4%BE%A6%E6%9F%A5%E6%89%8B%E5%86%8C2-0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>给互联网人的反侦查手册2.0 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2024/06/17/%E7%BB%99%E4%BA%92%E8%81%94%E7%BD%91%E4%BA%BA%E7%9A%84%E5%8F%8D%E4%BE%A6%E6%9F%A5%E6%89%8B%E5%86%8C2-0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          给互联网人的反侦查手册2.0
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-06-17 00:32:02 / 修改时间：00:46:55" itemprop="dateCreated datePublished" datetime="2024-06-17T00:32:02+08:00">2024-06-17</time>
+            </span>
+
+          
+            <span id="/2024/06/17/%E7%BB%99%E4%BA%92%E8%81%94%E7%BD%91%E4%BA%BA%E7%9A%84%E5%8F%8D%E4%BE%A6%E6%9F%A5%E6%89%8B%E5%86%8C2-0/" class="post-meta-item leancloud_visitors" data-flag-title="给互联网人的反侦查手册2.0" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>11 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/uD2zSknYSgNpikFd9FaF4g">给互联网人的反侦查手册2.0</a>。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>屏幕另一端的人严肃地提出了第一个问题：“2022 年 x 月 x 日，你在 x 点 x 分 x 秒你打开了 xx 文档，你先是快速滑动页面，之后在 xx 位置停顿了一段时间，你在干什么？”</p>
+<p>类似的问题持续了几十分钟，“什么时候打开”“停留了多久”“有什么目的”，另一端的人提出的了新的要求 —— 面向屏幕，举起手机，打开相册，滑动照片 —— 以确保这些照片里没有任何与公司业务相关的资料。</p>
+<p>不久前函道（化名）被主管要求离职，留一个月时间给他找工作。一个月后，他按照 HR 主管要求，与公司内审部门员工进行一对一的视频会议。</p>
+<p>他此时已经拿到了另一家互联网公司的 offer，岗位职能、工作内容不同，业务也在不同国家。但视频会议结束后，主管告知他被启动了竞业。公司此后发布公告称，对他启动竞业的原因是离职前查看了机密信息。</p>
+<p>他被反复询问查看的内部文档，是公司创始人过去几年的公开讲话和一些公开文档，十多万名在职员工都可以随时打开阅读。</p>
+<p>一年半后，这家公司起诉函道违反了竞业协议加入竞对，索赔 60 万元，仲裁庭判决函道赔偿公司 18 万元，公司与函道皆不服，选择上诉。6 个月后，一审法院维持仲裁原判，公司继续上诉，时隔两个半月，二审法院再次维持原判。</p>
+<p>在一些公司，不定期监控员工、大范围向初级员工启动竞业协议已是常态。</p>
+<p>一位应届生员工在 2022 年加入一家互联网公司的社区团购业务担任运营管培生，工作一年后他提出离职，被告知启动竞业九个月。同期，他同岗位的员工离职则未被竞业。在与公司的沟通中，HR 告诉他，对他启动竞业的原因是，他是同批员工中最早离职的，“起了很坏的带头作用。”</p>
+<p>这家电商公司的一位出海项目员工则在工作中经历了十几个小时的小黑屋问话，四位廉政人员轮番上阵，要求他自证清白，要么出示手机供公司检查，要么承认自己违反了公司规定，“只要你承认，我们未来一年给你打低绩效，这件事就算过去了。” 他认为自己没有违规行为，拒绝认错。公司选择与他单方面解除劳动合同。</p>
+<p>一位有十几年刑侦工作经验、后在一家互联网公司廉政部门就职的人士将自己曾经手的一部分调查归类为 “先射箭再画靶”，只要公司怀疑一名员工存在问题，有时无需扎实的证据链，廉政部门就有办法从员工身上挑出毛病，“有时候是诱导员工过度承认问题，公司开除员工，有时候是问话耗到最后，员工自己就想走了。”</p>
+<p>在互联网行业更乐观的那些年，这些做法并不常见。互联网公司更愿意宣扬自由、平等的工作环境，而不是监控和竞业协议。直到 2016 年前后，竞业协议在互联网行业还不太普及，滴滴从腾讯微信团队挖中层产品人员，拼多多从阿里、微信团队挖人都是常事。普通员工甚至主管都不适用于竞业，只有极少数高管和掌握核心技术者才会被要求签署竞业协议。</p>
+<p>大约从 2018 年之后，市场竞争变得愈发激烈，竞业也快速普及。入职合同中包括竞业限制条款，默认全员签署基本上已经成为互联网行业常态，如果员工不愿意签，则意味着和这个行业内好的机会失之交臂。</p>
+<p>《晚点 LatePost》在 2019 年第一次介绍<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzU3Mjk1OTQ0Ng==&amp;mid=2247484214&amp;idx=1&amp;sn=b1224a60029f5b6f5cb7ec35d2f0c4f1&amp;scene=21#wechat_redirect">竞业协议的扩大化</a>。之后，“先进” 行业的做法快速普及到更多行业，包括银行、汽车，大部分诉讼也不再针对公司中高层，而是基层员工。</p>
+<p>这不是全球通行的做法。<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzU0OTAwNjE4Nw==&amp;mid=2247504197&amp;idx=1&amp;sn=17c7a03a83cfc7101643e3091877a371&amp;scene=21#wechat_redirect">竞业协议在硅谷几乎看不到</a>。硅谷所在的美国加州于 1872 年立法禁止竞业协定，当时南北战争刚结束不过几年。有学者认为人员自由促进了硅谷的繁荣。</p>
+<p>竞业协议的普及代表着工作环境的变化、公司相对员工的权力平衡的改变。工作环境中的监控成了保证竞业协议得到执行的手段。遵守法律法规、公序良俗是员工也是企业的义务，但在此之外，冲突发生时，双方掌握的信息和法律资源往往不对等。</p>
+<p>《晚点 LatePost》曾在 2021 年推出<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzU3Mjk1OTQ0Ng==&amp;mid=2247488220&amp;idx=1&amp;sn=ce66420ad8a8c47aa7d759d26d2a4809&amp;scene=21#wechat_redirect">《给互联网人的反侦查手册》</a>，旨在帮助互联网员工了解自己的工作环境，当自身合法权益遭到侵害时更有效自我保护。</p>
+<p>本次的 2.0 版本是在第一版的基础上，就过去几年新出现的各类问题和情况做出更新。我们会持续更新这部手册，但希望随着就业环境、法治的优化，让这部手册没有再次更新的必要。</p>
+<h2 id="入职前："><a href="#入职前：" class="headerlink" title="入职前："></a>入职前：</h2><h3 id="了解你的工作环境"><a href="#了解你的工作环境" class="headerlink" title="了解你的工作环境"></a>了解你的工作环境</h3><p>最高法院的裁判文书网曾经收录所有判例，但这个网站已经持续很长时间无法正常搜索，并且之后也不会上传所有记录。从我们过往查看到的诉讼文书中，一些公司会通过各种方式追缉前员工，典型的一些证据包括：</p>
+<ol>
+<li>对前员工寄快递，或派出人员假装快递员，手机号填前员工，地址填竞对公司，签收了就代表查有此人，签收记录在公证生效后，将成为公司起诉前员工违反竞业限制的证据；</li>
+<li>雇佣私人侦探，连续多日跟拍前员工在新公司上下班的过程，跟拍的内容细节到员工上下电梯，直到进入办公区前打卡的前一刻；</li>
+<li>通过各种方式查看员工朋友圈和社交媒体，员工在跳槽后，如果在朋友圈发布了关于新公司的内容，评论里有 “恭喜履新”，回复一句 “谢谢！” 都可以当成证据。</li>
+</ol>
+<p>今天，你更多需要依靠各种垂直社区和社交媒体了解公司如何对待自己的前员工。找工作前问朋友，看脉脉、知乎或者 V2EX 之类的垂直职业讨论社区，关注一家公司的过往各种新闻报道都是必要的。</p>
+<h3 id="入职一些公司，你可能需要准备工作微信号"><a href="#入职一些公司，你可能需要准备工作微信号" class="headerlink" title="入职一些公司，你可能需要准备工作微信号"></a>入职一些公司，你可能需要准备工作微信号</h3><p>有 5 位在不同时期离开同一家电商企业的员工向《晚点 LatePost》回忆，办理离职手续时，HR 或者主管要求自己打开微信，像老师盯学生写作业一样，看着他们退出相关微信群，有 2 位还被要求一一删除自己同事的微信好友，其中一位整整删了 2 个多小时才结束。</p>
+<p>这不是一个普遍现象。一般情况下，员工离职时公司删除其工作联系无可厚非。不过机制完善的公司往往清除的是钉钉、飞书、企业微信、企业邮箱等工作专用工具上的信息。</p>
+<p>一位早先离职的上述电商员工说，自己入职前就听说公司有这种不体面的环节，但又不想在离职时与公司发生冲突，就注册了单独的微信号，只和工作相关的人联系。 </p>
+<p>北京大学法学院助理教授阎天认为，如果双方事先约定了离职时删除微信，员工需要遵守。如果事先没有约定，员工有权拒绝。如果企业因此不提供离职证明，员工可以依法提起仲裁。</p>
+<h3 id="仔细阅读签下名字的所有合同及其潜在风险"><a href="#仔细阅读签下名字的所有合同及其潜在风险" class="headerlink" title="仔细阅读签下名字的所有合同及其潜在风险"></a>仔细阅读签下名字的所有合同及其潜在风险</h3><p>多位 2018 年入职一家上海互联网公司的员工告诉《晚点 LatePost》，他们入职时签署了劳动合同和正常的竞业合同。但入职一年后，他们接到了补充签署新合同的要求。新合同规定，员工过往的薪资包中包含薪资 + 股票，其中股票可以作为员工离职后的竞业补偿。离职后，员工离职后应遵守竞业义务，但公司不需要再以现金形式支付竞业补偿。</p>
+<p>签署这份新合同时，上述员工们很少有人仔细阅读了该条款。一些员工在 2022 年离职后未被明确告知启动竞业，也没有等到公司发放的离职补偿金，他们默认竞业已经作废，加入了其他公司。</p>
+<p>不久之后，他们因为违反竞业，陆续收到了公司发来的起诉书，要求归属股票作废，并继续履行竞业义务。审理该案件的法院均认定员工签署的合同具备法律效力，公司可以不发放现金作为补偿，员工需要配合履行竞业义务。</p>
+<p>多位代理劳动纠纷的律师告诉《晚点 LatePost》，《劳动合同法》第 47 条将解除或终止劳动合同的经济补偿形式限定在货币形式，而对竞业限制经济补偿的给付，劳动法及相关司法解释，仅规定用人单位在竞业期间需按照每月不低于薪资的 30% 标准支付补贴，并没有严格限定在货币支付。</p>
+<p>这意味着对于股权激励是否能够作为员工竞业限制义务的补偿，现行的法律没有明确规定，公司这么做并不违法。</p>
+<p>对于这一行为，不同地区的法院、不同的法官都可能给出不一样的判决。</p>
+<p>裁判文书网信息显示，有些地区的法院曾就此类案例作出判决，部分法院均认为公司股票价格可能存在波动，竞业期内可能出现股价低于最低补偿金的情况，故不支持企业主张；也有法院认定竞业限制的经济补偿可以以非金钱的方式，在员工还未离职前发放，员工在离职后应遵守竞业限制义务。</p>
+<p>更有效的规避办法，还是在签下名字前，认真阅读面前的文件。</p>
+<h2 id="在职期间："><a href="#在职期间：" class="headerlink" title="在职期间："></a>在职期间：</h2><h3 id="工作和私人设备完全隔离，避免在工作设备存储个人信息"><a href="#工作和私人设备完全隔离，避免在工作设备存储个人信息" class="headerlink" title="工作和私人设备完全隔离，避免在工作设备存储个人信息"></a>工作和私人设备完全隔离，避免在工作设备存储个人信息</h3><p>公司往往会配发工作电脑，有些还会配发工作手机。这些设备往往会安装防护软件，理由是防止电脑被攻击入侵，防止数据泄露，但就像保护一栋大楼一样，你必须对这栋大楼有很多了解，才能去保护它。</p>
+<p>公司可以监控工作设备上的所有可疑数据流动，工作电脑上的各种内容，包括但不限于聊天内容、浏览的网页、传输的文件，都有可能被记录下来。</p>
+<p>通常，微信等软件会加密传输数据，但根据深信服等企业监控设备提供商，至少电脑上的微信客户端、网页版微信聊天是可以截取的。</p>
+<p>一家互联网公司技术部门员工曾在办公电脑后台进程中发现名为 “第三只眼” 的监控软件，可以实时抓取员工电脑的信息上传到后台，包括微信聊天记录、网页浏览记录等。</p>
+<p>这源于一次操作失误，原本只对业务员工电脑下发的监控软件，不小心被错发至谨慎的技术部门。在被员工发现并质疑后，公司放弃使用该软件，重新采购了一款更隐蔽的监控软件。</p>
+<p>大公司可以自己开发此类软件，中小公司采购一套监控系统也不昂贵。在电商平台上，一套包含各种监控功能的解决方案均价 3 万 - 5 万元不等。</p>
+<p>大多数员工并不会用这些设备做违反公司规定的事，大多数公司也不可能实时监控所有人的信息。但监控有时候会成为一种手段，当公司要大裁员，或者内部斗争，都可能调用监控找到瑕疵。</p>
+<p>另外，在工作设备存储个人数据还有信息丢失的风险。公司可以在裁员、员工离职等情况下随时远程清空设备，这是合法行为。如果你在意私人信息的安全性，就需要避免用工作电脑和工作手机处理个人事务。</p>
+<p>有时，员工出于下班后处理紧急工作的需要，不得不使用私人电脑安装工作软件办公，但这样的行为可能带来风险，一些公司的工作客户端可能出现卸载不干净的情况，甚至员工离职后还有后台监控进程长期存活。如果临时不得不使用个人设备办公，有技术人员建议用虚拟机运行办公软件，以降低风险。</p>
+<h3 id="也不要将私人设备连接公司网络"><a href="#也不要将私人设备连接公司网络" class="headerlink" title="也不要将私人设备连接公司网络"></a>也不要将私人设备连接公司网络</h3><p>在私人电脑和手机上连接公司的 VPN 网络或者公司 Wi-Fi 联网后，传输的信息可能被截取。</p>
+<p>IT 与知识产权律师赵占领告诉《晚点 LatePost》，公司在办公场所对员工和派发的工作电脑和工作手机上安装软件进行监控，在法律上是被允许的。</p>
+<p>但如果在员工的私人手机里要安装监控软件，赵占领律师表示，“那就必须要明确告知会监控哪些信息，经过员工同意，如果超出告知的范围，比如你告知只是安装一个 VPN ，但实际会监听你的通话录音，那显然就侵犯到了员工的隐私权。”</p>
+<p>但这只是从理论角度的分析，实际情况中，员工想要举证自己被监听非常困难。员工能做的，主要就是避免自己的私人设备连接公司网络和安装软件。</p>
+<p>多位不同公司的安全人士称，连接公司 Wi-Fi 首先意味着公司可以明确获得员工私人设备上每个应用的数据用量，它们将成为该员工是否传输大量数据的判断依据之一，举个例子，公司无法查看员工个人手机上的微信聊天内容，但可以知道具体时间段有谁用微信拨打了语音电话。</p>
+<p>上述人士提示，一些个人设备连接公司网络后常见的监控方式包括但不限于：</p>
+<ol>
+<li>在互联网出口处，用镜像交换机或网关方式进行监控，并结合一些根证书下发安装等方式（甚至可以通过管理权限达到员工完全不知情的静默效果），可以查看网页浏览和下载、电子邮件、网页论坛等的用户名和密码、传送等上网情况；</li>
+<li>利用安装后门软件进行监控，这种方式能获得更多的信息，比如对被监控设备远程屏幕截取、复制或删除设备上的文件、查看聊天内容乃至密码记录，以及审计股票、游戏、电影等各类上网软件的使用情况。</li>
+</ol>
+<h3 id="私人设备，iOS-往往比-Android-更安全，但也不是绝对安全"><a href="#私人设备，iOS-往往比-Android-更安全，但也不是绝对安全" class="headerlink" title="私人设备，iOS 往往比 Android 更安全，但也不是绝对安全"></a>私人设备，iOS 往往比 Android 更安全，但也不是绝对安全</h3><p>多位互联网安全人士认为，大多数情况下，私人设备的安全性排序是 iOS &gt; 原生 Android 系统 &gt; 第三方定制 Android 系统。当然，任何系统都无法保证绝对安全。</p>
+<p>iOS 系统的安全性来自其更封闭的应用生态和沙盒机制，所有在 App Store 上架的应用必须经过审核，每个应用在沙盒中独立运行，无法读取其他应用数据。原生 Android 系统也采用沙盒机制，但对权限和生态的管控没有 iOS 严格。第三方定制 Android 系统则可能存在更多漏洞。</p>
+<p>需要特别注意手机安装的测试软件和描述文件等。一种可能出现的情况是，公司在发布内测应用时要求员工使用个人设备测试，需要安装测试版软件和授权证书，都可能帮助公司获取更多个人信息。</p>
+<p>如果员工需要检查自己的手机是否安装了不明来源的证书，iOS 可以参见 「设置 - 通用 - 描述文件与设备管理」，Android 则通常在「设置-安全与隐私」菜单下。最理想的情况是避免在个人设备中安装任何证书文件，或在离职后及时重置手机，避免留下潜在漏洞。</p>
+<h3 id="不要以常识去推断规则"><a href="#不要以常识去推断规则" class="headerlink" title="不要以常识去推断规则"></a>不要以常识去推断规则</h3><p>公司都有员工规范，除了一些大是大非，还有很多细节，具体到比如不能与合作伙伴或者同行业大小公司有任何经济往来等等，哪怕是一两百元的小礼品。</p>
+<p>一家电商企业员工曾在节日时给合作的商家赠送了价值不到两百元的礼物，事后，因为和商家在合作条款上未能协商一致，对方举报他违反规定，导致他被公司开除。虽然整个集团规定小额礼品可以接受。但他所在的业务部有单独的 “十诫”，其一是员工不能和商户有任何的经济往来。</p>
+<p>2024 年初，一家互联网公司的出海业务以违规为由开除了多名员工，理由是这些员工曾注册过公司，从事跨境业务。他们在入职时曾向 HR 报备过该情况，也办理了注销或转让手续，但公司依然判断他们有违规嫌疑，在没有拿出明确证据的情况下，公司要求对其单方面解除劳动合同。</p>
+<h3 id="公司怎么追踪自己的用户，就可以这样追踪自己的员工"><a href="#公司怎么追踪自己的用户，就可以这样追踪自己的员工" class="headerlink" title="公司怎么追踪自己的用户，就可以这样追踪自己的员工"></a>公司怎么追踪自己的用户，就可以这样追踪自己的员工</h3><p>在互联网公司都在追求更高效率的经营时，它们往往会仔细追踪每一个数据指标，利用每一个信息分析用户行为，所有的动作只为一个目的，留住更多用户时间和让更多的用户为平台贡献价值。</p>
+<p>在工信部和各地网信办历年来公布的违规收集用户信息和侵害用户权益的公示名单上，你可以找到大多数主流互联网公司产品的名字。</p>
+<p>对员工，被记录和分析的几乎是一切。大到访问商业机密：查看商业数据、OKR 的行为往往被记录；小到开门：在多家并不要求员工打卡的互联网巨头，HR 都会根据门禁刷卡信息提醒团队负责人，评估出门较早的员工工作是否不饱和。</p>
+<p>大多数互联网公司使用的监控软件，都可以实现包括但不限于远程控制、屏幕监控、聊天记录监控、程序运行管控、网址访问记录、电脑屏幕录制、文件防泄密报警等功能。</p>
+<h3 id="社交媒体-职场社区的-“匿名”-并不安全"><a href="#社交媒体-职场社区的-“匿名”-并不安全" class="headerlink" title="社交媒体 / 职场社区的 “匿名” 并不安全"></a>社交媒体 / 职场社区的 “匿名” 并不安全</h3><p>一些互联网社区提供匿名板块 / 功能，鼓励员工在匿名区就公司最新变化和重大事件发言。但这些匿名区并不能让员工隐身。</p>
+<p>根据国家网信办 2015 年出台的《互联网用户账号名称管理规定》，互联网公司提供服务，需遵循 “前台匿名，后台实名” 原则，要求用户通过真实身份信息认证后注册账号。</p>
+<p>如果一家公司认为员工的匿名发言对其利益造成了损害，即便匿名发言的内容属实，公司也可能以侵权名义起诉平台，要求其提供用户信息，以锁定和追责员工。</p>
+<p>尽管大多数平台都承诺将保护匿名用户信息放在第一位，但他们必须配合法律规定。这类案件一旦涉及到平台，大多数匿名社区 / 平台所有者往往都会选择交出用户信息，包括姓名（名称）、联系方式、网络地址等信息。</p>
+<p>一位互联网社区人士告诉《晚点 LatePost》，因为提供匿名功能，他们每年会遭遇大量来自公司的诉讼，尽管据理力争，但多数时候他们很难打赢官司，大约 80% 的诉讼最终会向原告交出用户注册信息。</p>
+<h3 id="泄露你隐私的不只是数据"><a href="#泄露你隐私的不只是数据" class="headerlink" title="泄露你隐私的不只是数据"></a>泄露你隐私的不只是数据</h3><p>缩小范围，再通过询问目标身边的人是基本侦查手段。不过今天的互联网大厂并不只在察觉员工违规或犯罪行为时使用这招，有时候只是为了让公司不想对外传播的声音消失 —— 哪怕是正面信息。</p>
+<p>一位互联网公司员工曾被要求向同事套话。原因是有人在脉脉上发帖抱怨办公电梯故障，自己打卡迟到被罚。HR 查到是哪些人被困后，联系这位员工，让他去问一位有私交的同事，是否在脉脉上发了帖子。</p>
+<p>该公司另一位员工在离职时尝试与主管沟通竞业问题，期间他被要求提供其他同事的离职去向信息，换取自己不被竞业。</p>
+<p>一位互联网公司安全部门人士告诉我们，一些极端情况下，少数公司甚至可以利用周边的公共监控，如商场、写字楼、购物中心的监控探头对员工进行标记和定位，调取员工的轨迹记录，作为开除员工的依据。</p>
+<h3 id="极端情况下，了解你的义务和权利"><a href="#极端情况下，了解你的义务和权利" class="headerlink" title="极端情况下，了解你的义务和权利"></a>极端情况下，了解你的义务和权利</h3><p>小黑屋约谈员工也是大公司常用的手段之一。在被约谈前，员工并不会被告知即将发生的事情，通常只是主管 /HR 叫去谈一谈，然后被转交给内审 / 廉政部门处理。</p>
+<p>接下来发生的事情往往大同小异：在隔绝的空间里，审问方多对一谈话、夸大所掌握证据、缜密盘问每一个细节，最终从小处突破拿到口供……几乎所有技巧都可以在美国警察审讯教材《刑事审讯与供述》（Criminal Interrogation And Confessions）里找到。这本 1962 年出版的方法论多次修订再版，被全球警方所借鉴。</p>
+<p>今天，大多数大公司都有相关的人员储备，他们雇佣的 “问询者”，往往拥有丰富的经验。</p>
+<p>员工有配合企业问询的义务，小黑屋并不会被认定为 “非法拘禁”。“这是企业行使管理权的一部分，除非询问的内容涉及员工个人隐私、商业秘密或者国家秘密，否则员工原则上不能拒绝被询问。” 阎天教授表示。</p>
+<p>但很多时候，问询往往是不公平的。很多公司的询问中，相关人员通常以两到三人一组出现，和员工的会面往往安排在狭小逼仄的密闭会议室内，扮演 “黑白脸”、车轮战，长达数小时甚至十几小时的询问，都是询问者常用的策略之一。</p>
+<p>面对询问，一些员工认为自己并没有犯错或者只是犯了小错，说一些对自己有利的东西无可厚非。一些办案人员还会向员工承诺，多交代一些可以从轻处理的说辞，但这类说法往往站不住脚。员工自以为说出了对自己有利的信息，但公司举证不一定要举对你有利的部分。</p>
+<p>一家公司的员工曾在接受问询后发现，公司要求他签字的数页询问记录中，包含了他配合的回答的信息和一部分他从未说过的信息。如果他配合签字，那些他没有说过的话都会成为开除他的直接证据。</p>
+<p>可以提醒的是，员工虽然有配合调查的义务，但也有拒绝和要求中止的权利。面对提问者带有恶意性质的问询和威胁式提问，无论其使用何种手段威逼利诱，员工都可以选择不回答。</p>
+<p>问话过程中，员工应该录音，必要时可以证明自己说过 / 没说过什么。员工可以有饮食 / 午休 / 去洗手间 / 下班时间要求离开的自由，也可以在感到身体不适时要求询问随时中止。审问你的人可能是前任警察，即便他有充分的审讯经验，但他如今没有执法权，不能强制你做任何事情，或者有明显限制你出入的语言或行为。</p>
+<p>极端情况下，一些公司还会要求检查员工的所有个人设备，查看设备中的照片、聊天记录、银行账单流水等信息。在实际操作中，如果此时员工没有直接并明确拒绝问询者拿走手机，那企业的行为往往会被认定得到了员工的默许。</p>
+<p>但上述行为都不属于正当行为。任何一家公司都没有权力限制员工人身自由，也无权检查员工的私人设备，哪怕这些设备被用于日常工作。根据《宪法》《民法典》，公民的人身自由、名誉、隐私、个人信息等权利受到保护，非因法定事由或者取得权利人同意，他人不得擅自侵犯。</p>
+<p>一个人很难为刑侦式的问询做什么心理准备，但拒绝不合理的要求是可以做的——对面并不是警察，公司没有强制权。</p>
+<h2 id="离职前后："><a href="#离职前后：" class="headerlink" title="离职前后："></a>离职前后：</h2><h3 id="离职谨慎更新简历、查询信息"><a href="#离职谨慎更新简历、查询信息" class="headerlink" title="离职谨慎更新简历、查询信息"></a>离职谨慎更新简历、查询信息</h3><p>一个人在领英、脉脉等渠道更新简历，往往会被猎头视为潜在求职对象。一些企业的 HR 也是这么想的。</p>
+<p>一位有多家互联网巨头工作经验的员工建议，离职前不要轻易向公开平台释放简历及相关信息，而是在私下场合谨慎表达对工作的意愿和态度；默认公司会爬取领英、招聘网站数据，如果你只是在招聘平台更新简历，也可能会被识别为潜在离职人员。</p>
+<p>员工在离职前夕最好避免随便 / 大量查看下载公司内部信息。在离职后，员工最好清理个人设备，最有效的办法是全面格式化重置设备，而不是简单卸载和删除与工作相关的文件及程序，避免恶意程序仍在后台运行。</p>
+<p>另外，如果前公司产品使用时需要提供地理位置、相册、搜索记录等数据权限，员工最好避免在一段时间内使用前公司产品和服务，包括 app、小程序等。</p>
+<p>以及，出于日常生活中各种环节可能出现的个人信息泄漏风险的考虑，也最好避免用过去曾经使用过的手机号码 / 通信地址等接收快递包裹和下单外卖。</p>
+<h3 id="关于竞业，我们也没什么好办法，但可以提供一些建议"><a href="#关于竞业，我们也没什么好办法，但可以提供一些建议" class="headerlink" title="关于竞业，我们也没什么好办法，但可以提供一些建议"></a>关于竞业，我们也没什么好办法，但可以提供一些建议</h3><p>竞业限制设计的初衷是保护商业秘密、防止恶性竞争，这从一开始就是一个保护公司而非保护员工的制度，竞业限制协议的起草权和定义权在公司手中，员工天然处于弱势地位。</p>
+<p>过去几年中，随着互联网公司们卷入更激烈的商业竞争，彼此试图进入对方的领域把生意重做一遍，竞业在竞争扩大中逐渐变形。</p>
+<p>今天，一些互联网公司选择对所有员工开出无差别竞业，竞业范围罗列了上百家公司，让员工离职后几乎无处可去。（详见<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzU3Mjk1OTQ0Ng==&amp;mid=2247484214&amp;idx=1&amp;sn=b1224a60029f5b6f5cb7ec35d2f0c4f1&amp;chksm=fcc9bc8fcbbe359918a4c19c3984f7e2f7fe6a896665e0b2f0a1517837e473ee190f5716cd4b&amp;scene=21#wechat_redirect">《全网通缉前员工的互联网大公司们》</a><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzU3Mjk1OTQ0Ng==&amp;mid=2247489702&amp;idx=1&amp;sn=3c0bfbd3a94beace77e3da2e93909bff&amp;scene=21#wechat_redirect">《竞业协议下沉时代》</a>）</p>
+<p>关于公司竞业限制的范围，赵占领律师曾表示，有的公司采用明确列举，有的采用概括方式，字节、拼多多、腾讯等公司是列举加概括的方式。所以，即使入职没有被列在竞业名单上的公司，但只要存在竞争关系，哪怕从事不直接相关的岗位，员工依然可能存在违反竞业的风险。</p>
+<p>任启明教授认为，互联网公司随具体业务的发展，进入其他互联网业务领域。因此一家互联网公司将其他大型互联网公司均视为竞争对手，具有经营本身的合理性。这也是目前法院做出裁决的依据。</p>
+<p>结果是竞业协议可以涵盖几乎整个互联网行业，成为企业单方面约束员工的手段。面对公司能够调用的侦查资源，员工也基本无从躲避。</p>
+<p>在制定了严苛的竞业规则后，一些公司还会用极端手段追踪员工。根据法院公布的裁判文书，拼多多为起诉一位前员工违反竞业协议加入美团，选择了跟踪拍摄当事员工进入办公楼打卡的视频。同样的手法，你也可以在腾讯、美团、字节等公司相关的诉讼判决文书中找到类似案例。根据一份判决，互联网公司互相偷拍的视频可以详尽到，连续三天在对方办公楼内拍摄前员工走动、电梯上与人打招呼的视频。</p>
+<p>一些中小型互联网公司也试图效仿大公司，对大部分一线员工签发竞业。但他们没有大公司的财力，事后无法支付竞业补贴，反被员工告上法庭。</p>
+<p>一家互联网公司 HR 认为，公司清楚基层员工并不掌握什么核心商业秘密，竞业的做法往往是对商业竞争的恐惧，担心竞争对手能够学习自己的长处。公司希望通过无差别竞业，增加员工的离职成本。</p>
+<p>过去几年，我们几乎每个月都会接到读者关于竞业限制的疑问，也常常在其他文章中和访谈对象聊到相关遭遇。以下是一些员工和律师分享的经验和建议：</p>
+<ol>
+<li>签署入职合同时可以全程录音，遇到合同中包含竞业条款向 HR 和部门领导多问几句，自己的岗位哪些工作内容是需要保密的？需要保密到什么程度？采取什么样的保密手段？如果 HR 和部门领导说不清，回复这是公司标准程序，按照规定必须全员签署。这一沟通的录音可能在未来的诉讼中作为证据，质证公司对员工的竞业不合理。</li>
+<li>在大多数公司，关于员工离职时是否要发起竞业，通常由部门领导直接决定，员工可以尝试与部门领导沟通，避免被直接启动竞业。</li>
+<li>如果遭遇竞业，补偿金支付期限最长不能超过三个月，金额不低于 30%，超期未收到补偿，可即刻向法院申请废止竞业协议。</li>
+<li>公司下发启动竞业协议的通知后，注销银行卡、手机卡拒收补偿金，以无法取得联系为由逃避竞业都是没用的。</li>
+<li>如果公司愿意，竞业协议中的 “等” 范围可以扩充到无限大，且这一主张可能得到法庭支持。</li>
+<li>涉及竞业诉讼，需要律师有相关案件代理经验。当事人最好能找到有多年劳动法诉讼经验的律师代理案件。</li>
+<li>一些大公司在当地拥有很强的影响力，可能需要异地寻找代理律师。</li>
+<li>公司可能在起诉阶段向员工提出 2 - 3 倍年薪甚至更高薪资水平的赔偿金额，以向员工施压，但在劳动仲裁和法院裁定中，超高额索赔的诉求往往很难被支持，赔偿金额可以由双方重新商定。</li>
+<li>大公司可能会雇佣侦探跟踪员工，大多数公开场合（公共交通、户外、公司外）的录音录像资料，大概率会被法院采信，这并不违法。</li>
+<li>员工想要否定偷拍证据的合法性，需要提供连续多次被同一人跟踪的记录证据和警方立案记录，但大多数人往往不具备取证能力和意识，也没有意识到自己曾被偷拍。</li>
+<li>最好的自我保护是在择业最初远离此类会采取极端竞业手段的公司，因为你未来失去的可能比今天得到的更多。</li>
+</ol>
+<h3 id="实在没办法的时候，个体怎么和大公司打官司"><a href="#实在没办法的时候，个体怎么和大公司打官司" class="headerlink" title="实在没办法的时候，个体怎么和大公司打官司"></a>实在没办法的时候，个体怎么和大公司打官司</h3><p>在一系列自我保护动作失效之后，员工要维护自身权益，可能不得不学习一个新技能 —— 作为个体，如何与大公司打官司。</p>
+<p>打官司是一个很复杂的项目，找到一位专业律师，是这场漫长博弈中关键的第一步。而围绕员工劳动权益，专业对口的律师并不如我们想像的那么多，且他们中的多数更愿意站在公司那一边 —— 代理个人的案件投入高，回报低，企业客户能给的收益是数倍甚至更多。</p>
+<p>一位为本手册提供了多项专业法律意见的劳动代理律师希望我们不要署名，他愿意为那些遭到不公正待遇的员工代理劳动纠纷案件，但署名可能导致他得罪潜在客户，影响其他需要和公司合作的案件。</p>
+<p>走到诉讼，更关键的是员工能够拿出哪些证据。上述律师曾代理过最成功的一起劳动纠纷案件是员工要求公司支付加班费，当事人拿出了过去十年每一次加班的凭据（微信记录、审批记录、工作成果等），累计超过 1000 页证据向公司索赔近 200 万元。最终法院支持了他的主张，实际赔偿金额超过 100 万元。</p>
+<p>今天大多数互联网公司员工遇到的情况是，他们在日常工作中往往没有取证意识，离职时也被公司清空了各种数据，一些员工试图在离职后控告公司违反劳动法，但又很难拿出有说服力的证据。</p>
+<p>我们并非鼓励员工与公司之间的对立和猜忌，但从众多裁判文书网公布的判决案例和我们了解到的实际纠纷来看，员工在日常工作中养成取证意识是必要的。</p>
+<p>日常签署的与自身利益相关的文件，无论纸质还是电子版，都应该第一时间备份。</p>
+<p>因为一些已签署的文件可能不会再回到员工手上。一家互联网公司多位员工被告知合同要寄往总部盖章审核。此后，他们没有再拿到已签署的合同，离职后，他们曾多次向公司申请拿回在职期间签署的合同，但都未能拿到。</p>
+<p>遭遇公司问话或沟通重要问题时，员工全程录音也有其必要，作用是证明当时双方都说过什么。以加班为例，员工需要保存的证据包括但不限于加班当日的沟通记录、明确的工作任务、实际完成的工作成果、上下班打卡记录和离开公司时带有明确时间戳的照片或视频等。</p>
+<p>劳动仲裁 / 诉讼中，员工可以提供的证据清单包括但不限于物证（如工牌、办公设备、存有文件的 U 盘）、书证（劳动合同、解除劳动合同通知书、员工手册、考勤绩效表、工资单等）、音像资料（录音、录像）以及电子数据（工作聊天记录、工作邮件、短信等）。</p>
+<p><img src="https://image.rexking6.top/img/123123436457.webp" alt=""></p>
+<p>需要强调，任何劳动纠纷诉讼，员工必须要拿出充分、具体的证据，仅凭员工自述或一部分聊天沟通记录，不足以让法庭支持其主张。另外，员工在劳动仲裁时准备的证据，也可能会在后续一审、二审中使用，应及时做好备份，为后续诉讼节省时间。</p>
+<p>接下来，员工还需要了解仲裁和诉讼的流程，提前做好准备。这意味着员工需要从零开始学习一套新的经验，这足够让人身心俱疲。</p>
+<p>根据法律规定，中国劳动争议案件处理流程一般为 “一裁两审”，即先申请劳动仲裁，对裁决不服的，提起一审和二审诉讼程序。除去有公司欠付劳动报酬的书证可以直接向法院起诉，大多数劳动纠纷都需要从仲裁开始。</p>
+<p>多数情况下，劳动仲裁的时效通常为员工知道或应当知道权益受到损害之日起 1 年，员工可以向工作地或者公司注册地的劳动仲裁委员会提起仲裁，需要准备的材料包括但不限于仲裁申请书、身份证明、劳动关系证明和相关证据。</p>
+<p>劳动仲裁准备期间，当事人应及时向仲裁庭和律师沟通，了解所需提交的证据，避免出现证据疏漏，以及在每个需要的环节到场配合。在仲裁全程，仲裁庭通常会根据案件情况主张双方和解。如未能达成和解，裁决结果通常会在申请受理后 45 天 - 60 天内下发。</p>
+<p>如果当事人或者公司对仲裁结果不满意，可以提起诉讼，在收到仲裁裁决书之日起 15 天内可向人民法院提起诉讼。</p>
+<p>进入法院庭审，对于劳动争议案件，多数地方法院都会遵循 “类案类判” 原则，即对于相同类型的案件，法院或者法官会给出与过去裁判结果相同或类似的判决结果。这也是多数劳动者在竞业等诉讼中败诉的重要原因。</p>
+<p>当事人如果想要跳出这一循环，往往需要补充更多有效证据或与律师商议准备工作，就案件特殊性，从案件一审开始，就要求法院对案情重新作全面审查，重新调查取证。这在很大程度上取决于劳动者前期自我保护时获得的各类证据的丰富程度。</p>
+<p>需要强调的是，当一个普通员工面对和公司的诉讼，无论是作为原告还是被告，个体的力量都是渺小无力的。上诉律师曾经代理的一个劳动纠纷案件，从劳动仲裁到案件二审用时四年零六个月。在案件结束后，当事公司动用关系撤销了该案所有判决书在网络上的留存记录。</p>
+<p>员工们面对的是一个比自身强大数倍的对手，公司有着经验丰富的法务及律师团队，充足的时间和资源，一些大公司凭借其贡献的税收和就业在地方积累了一定的影响力，这意味着员工即便有正当理由和证据，想要打赢官司也并不容易。</p>
+<p>一家电商平台前员工曾在与公司的诉讼中遇到法官在庭后调解，劝他接受自己败诉，不要再次上诉。这位法官告诉他，“我们理解你的困难，但以前同类的案子都是这么判的，如果给你不同的判决结果，那以前的案子该怎么办？”</p>
+<p>但依然有人坚持把官司继续打下去，函道与公司的官司从仲裁打到了终审，在终审判决前，公司提出了调解，如果他接受调解结果，则赔偿金额可以降低到 5 万元，比最初公司主张的 60 万元降低 90% 以上。</p>
+<p>他选择放弃调解，理由是公司的行为是错的，自己希望坚持做对的事情，哪怕需要为此付出更高的成本。</p>
+<p>但做出这样选择的人是极少数。</p>
+<p>和大多数与公司打官司结果不理想、选择沉默的员工不同，函道选择主动发声，将他和公司的所有交涉记录在社交媒体公布，将如何在工作日常中取证，如何与公司打官司写成文档，提醒更多的同事如何做好自我保护。</p>
+<p>当公司的权力不会被质疑和监督，当每一个遭遇不公正对待的员工最终沉默时，公司管理手段可能进一步升级，向员工、合作伙伴以及社会的各个角落持续扩散，每个人所处的商业环境会更加恶劣。</p>
+<p>英国作家弗吉尼亚·伍尔芙（Virginia Woolf）曾用 “没有什么算真正发生过，直到它被描述出来” 形容自己写作的意义。</p>
+<p>对大公司员工而言，很多问题也是这样，个体面对机构的力量渺小、微不足道，但发声、讲述本身有意义。每个人昨天和今天的选择，决定了我们会到达什么样的明天。</p>
+
+    </div>
+
+    
+    
+    
+      
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2024/06/17/%E7%BB%99%E4%BA%92%E8%81%94%E7%BD%91%E4%BA%BA%E7%9A%84%E5%8F%8D%E4%BE%A6%E6%9F%A5%E6%89%8B%E5%86%8C2-0/" title="给互联网人的反侦查手册2.0">https://blog.rexking6.top/2024/06/17/给互联网人的反侦查手册2-0/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/01/20/%E5%A4%A7%E6%A8%A1%E5%9E%8BAgents%E7%B1%BB%E5%9E%8B/" rel="prev" title="大模型Agents类型">
+      <i class="fa fa-chevron-left"></i> 大模型Agents类型
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">2.</span> <span class="nav-text">正文</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%A5%E8%81%8C%E5%89%8D%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">入职前：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%86%E8%A7%A3%E4%BD%A0%E7%9A%84%E5%B7%A5%E4%BD%9C%E7%8E%AF%E5%A2%83"><span class="nav-number">2.1.1.</span> <span class="nav-text">了解你的工作环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A5%E8%81%8C%E4%B8%80%E4%BA%9B%E5%85%AC%E5%8F%B8%EF%BC%8C%E4%BD%A0%E5%8F%AF%E8%83%BD%E9%9C%80%E8%A6%81%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C%E5%BE%AE%E4%BF%A1%E5%8F%B7"><span class="nav-number">2.1.2.</span> <span class="nav-text">入职一些公司，你可能需要准备工作微信号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%94%E7%BB%86%E9%98%85%E8%AF%BB%E7%AD%BE%E4%B8%8B%E5%90%8D%E5%AD%97%E7%9A%84%E6%89%80%E6%9C%89%E5%90%88%E5%90%8C%E5%8F%8A%E5%85%B6%E6%BD%9C%E5%9C%A8%E9%A3%8E%E9%99%A9"><span class="nav-number">2.1.3.</span> <span class="nav-text">仔细阅读签下名字的所有合同及其潜在风险</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8%E8%81%8C%E6%9C%9F%E9%97%B4%EF%BC%9A"><span class="nav-number">2.2.</span> <span class="nav-text">在职期间：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E5%92%8C%E7%A7%81%E4%BA%BA%E8%AE%BE%E5%A4%87%E5%AE%8C%E5%85%A8%E9%9A%94%E7%A6%BB%EF%BC%8C%E9%81%BF%E5%85%8D%E5%9C%A8%E5%B7%A5%E4%BD%9C%E8%AE%BE%E5%A4%87%E5%AD%98%E5%82%A8%E4%B8%AA%E4%BA%BA%E4%BF%A1%E6%81%AF"><span class="nav-number">2.2.1.</span> <span class="nav-text">工作和私人设备完全隔离，避免在工作设备存储个人信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B9%9F%E4%B8%8D%E8%A6%81%E5%B0%86%E7%A7%81%E4%BA%BA%E8%AE%BE%E5%A4%87%E8%BF%9E%E6%8E%A5%E5%85%AC%E5%8F%B8%E7%BD%91%E7%BB%9C"><span class="nav-number">2.2.2.</span> <span class="nav-text">也不要将私人设备连接公司网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A7%81%E4%BA%BA%E8%AE%BE%E5%A4%87%EF%BC%8CiOS-%E5%BE%80%E5%BE%80%E6%AF%94-Android-%E6%9B%B4%E5%AE%89%E5%85%A8%EF%BC%8C%E4%BD%86%E4%B9%9F%E4%B8%8D%E6%98%AF%E7%BB%9D%E5%AF%B9%E5%AE%89%E5%85%A8"><span class="nav-number">2.2.3.</span> <span class="nav-text">私人设备，iOS 往往比 Android 更安全，但也不是绝对安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E8%A6%81%E4%BB%A5%E5%B8%B8%E8%AF%86%E5%8E%BB%E6%8E%A8%E6%96%AD%E8%A7%84%E5%88%99"><span class="nav-number">2.2.4.</span> <span class="nav-text">不要以常识去推断规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AC%E5%8F%B8%E6%80%8E%E4%B9%88%E8%BF%BD%E8%B8%AA%E8%87%AA%E5%B7%B1%E7%9A%84%E7%94%A8%E6%88%B7%EF%BC%8C%E5%B0%B1%E5%8F%AF%E4%BB%A5%E8%BF%99%E6%A0%B7%E8%BF%BD%E8%B8%AA%E8%87%AA%E5%B7%B1%E7%9A%84%E5%91%98%E5%B7%A5"><span class="nav-number">2.2.5.</span> <span class="nav-text">公司怎么追踪自己的用户，就可以这样追踪自己的员工</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BE%E4%BA%A4%E5%AA%92%E4%BD%93-%E8%81%8C%E5%9C%BA%E7%A4%BE%E5%8C%BA%E7%9A%84-%E2%80%9C%E5%8C%BF%E5%90%8D%E2%80%9D-%E5%B9%B6%E4%B8%8D%E5%AE%89%E5%85%A8"><span class="nav-number">2.2.6.</span> <span class="nav-text">社交媒体 &#x2F; 职场社区的 “匿名” 并不安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%84%E9%9C%B2%E4%BD%A0%E9%9A%90%E7%A7%81%E7%9A%84%E4%B8%8D%E5%8F%AA%E6%98%AF%E6%95%B0%E6%8D%AE"><span class="nav-number">2.2.7.</span> <span class="nav-text">泄露你隐私的不只是数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%81%E7%AB%AF%E6%83%85%E5%86%B5%E4%B8%8B%EF%BC%8C%E4%BA%86%E8%A7%A3%E4%BD%A0%E7%9A%84%E4%B9%89%E5%8A%A1%E5%92%8C%E6%9D%83%E5%88%A9"><span class="nav-number">2.2.8.</span> <span class="nav-text">极端情况下，了解你的义务和权利</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A6%BB%E8%81%8C%E5%89%8D%E5%90%8E%EF%BC%9A"><span class="nav-number">2.3.</span> <span class="nav-text">离职前后：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A6%BB%E8%81%8C%E8%B0%A8%E6%85%8E%E6%9B%B4%E6%96%B0%E7%AE%80%E5%8E%86%E3%80%81%E6%9F%A5%E8%AF%A2%E4%BF%A1%E6%81%AF"><span class="nav-number">2.3.1.</span> <span class="nav-text">离职谨慎更新简历、查询信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E7%AB%9E%E4%B8%9A%EF%BC%8C%E6%88%91%E4%BB%AC%E4%B9%9F%E6%B2%A1%E4%BB%80%E4%B9%88%E5%A5%BD%E5%8A%9E%E6%B3%95%EF%BC%8C%E4%BD%86%E5%8F%AF%E4%BB%A5%E6%8F%90%E4%BE%9B%E4%B8%80%E4%BA%9B%E5%BB%BA%E8%AE%AE"><span class="nav-number">2.3.2.</span> <span class="nav-text">关于竞业，我们也没什么好办法，但可以提供一些建议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E5%9C%A8%E6%B2%A1%E5%8A%9E%E6%B3%95%E7%9A%84%E6%97%B6%E5%80%99%EF%BC%8C%E4%B8%AA%E4%BD%93%E6%80%8E%E4%B9%88%E5%92%8C%E5%A4%A7%E5%85%AC%E5%8F%B8%E6%89%93%E5%AE%98%E5%8F%B8"><span class="nav-number">2.3.3.</span> <span class="nav-text">实在没办法的时候，个体怎么和大公司打官司</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">224</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">3.8m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">58:01</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
