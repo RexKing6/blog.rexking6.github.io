@@ -39,9 +39,11 @@
 <meta property="og:image" content="http://image.rexking6.top/img/clip1551771620.png">
 <meta property="og:image" content="http://image.rexking6.top/img/clip1551771657.png">
 <meta property="article:published_time" content="2019-03-03T11:06:07.000Z">
-<meta property="article:modified_time" content="2024-01-14T17:43:10.729Z">
+<meta property="article:modified_time" content="2024-07-10T16:37:52.434Z">
 <meta property="article:author" content="Run-Qing Chen">
-<meta property="article:tag" content="时间序列">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="AIOps">
+<meta property="article:tag" content="异常检测">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://image.rexking6.top/img/clip1551664418.png">
 
@@ -229,7 +231,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-01-15 01:43:10" itemprop="dateModified" datetime="2024-01-15T01:43:10+08:00">2024-01-15</time>
+                <time title="修改时间：2024-07-11 00:37:52" itemprop="dateModified" datetime="2024-07-11T00:37:52+08:00">2024-07-11</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -237,7 +239,15 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/" itemprop="url" rel="index"><span itemprop="name">时间序列</span></a>
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/AIOps/" itemprop="url" rel="index"><span itemprop="name">AIOps</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/AIOps/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" itemprop="url" rel="index"><span itemprop="name">异常检测</span></a>
                 </span>
             </span>
 
@@ -297,11 +307,11 @@
 <p><strong>通道的预测值。</strong>考虑一个时间序列 $X=\{\textbf{x}^{(1)}, \textbf{x}^{(2)},…,\textbf{x}^{(n)}\}$，其中时间序列中的每一步 $\textbf{x}^{(t)} \in R^m$ 为 $m$ 维向量 $\{x_1^{(t)},x_2^{(t)},…,x_m^{(t)}\}$，其元素对应于输入变量[30]。对于每个点 $\textbf{x}^{(t)}$，序列长度 $l_s$ 决定输入模型进行预测的点的数量。预测长度 $l_p$ 决定预测的步长，其中预测的维数 $d$ 为 $1\le d\le m$。由于我们的目标是预测单个通道的遥测值，因此我们考虑 $d = 1$ 的情况。我们还使用 $l_p=1$ 来限制每个步骤 $t$ 的预测数量，并减少处理时间。因此，每一步生成 $t$ 的单个标量预测值 $\hat y^{(t)}$ 为实际的遥测值（参见图1）。在 $l_p&gt;1$ 的情况下或 $d&gt;1$，高斯参数可用于在单个步骤 $t$ [30]表示预测值的矩阵。</p>
 <p><img src="http://image.rexking6.top/img/clip1551664418.png" alt=""></p>
 <p><em>图1. 每个时间步长 $t$ 预测所用输入矩阵的可视化表示。将当前预测误差与过去预测误差进行比较，以确定其是否异常。</em></p>
-<p>在我们的遥测预测场景中，输入到LSTM中的 $\textbf{x}^{(t)}​$ 包括给定信道的先验遥测值和发送到航天器的编码命令信息。具体地说，发出命令的模块和发送或接收命令的模块的组合是一个 one-hot 编码的模块，并插入到每个步骤 $t​$ 中（参见图3）。</p>
+<p>在我们的遥测预测场景中，输入到LSTM中的 $\textbf{x}^{(t)}$ 包括给定信道的先验遥测值和发送到航天器的编码命令信息。具体地说，发出命令的模块和发送或接收命令的模块的组合是一个 one-hot 编码的模块，并插入到每个步骤 $t$ 中（参见图3）。</p>
 <h2 id="动态误差阈值"><a href="#动态误差阈值" class="headerlink" title="动态误差阈值"></a>动态误差阈值</h2><p>对其期望值随环境因素和命令序列的变化而变化的数千个遥测信道进行自动化监测，需要一种快速、通用和无监督的方法来确定预测值是否异常。一种常见的方法是对过去平滑误差的分布做出高斯假设，因为这允许快速比较新误差和先前误差的紧凑表示[2,41]。然而，当参数假设被违反时，这种方法常常会出现问题，正如我们在4.3节中所演示的那样，我们提供了一种方法，可以在不做此类假设的情况下有效地标识极值。基于距离的方法在这方面是类似的，但它们通常涉及高计算成本，例如需要将每个点与 $k$ 个相邻点集进行比较的方法[15,26]。此外，这些方法更加通用，并且关注在正常值范围内发生的异常。只有异常高或低平滑的预测误差才是令人感兴趣的，误差阈值化在某种意义上是初始异常检测问题的简化版。</p>
 <p><strong>误差和平滑。</strong>每一步 $t$ 产生一个预测值 $\hat y^{(t)}$，计算预测误差为 $e^{(t)}=|y^{(t)}-\hat y^{(t)}|$，其中 $y^{(t)}=x_i^{(t+1)}$，其中 $i$ 对应于真实遥测值的维数（见图1），将每一个 $e^{(t)}$ 附加到一个一维误差向量上，</p>
 <script type="math/tex; mode=display">
-\textbf{e} = [e^{(t-h)},...,e^{(t-l_s)},...,e^{(t-1)},e^{(t)}]</script><p>其中 $h​$ 是用于评估当前误差的历史误差值的数量。然后对这组误差集 $\bf e​$ 进行平滑以抑制基于LSTM的预测中经常出现的误差峰值，值的突然变化通常不会得到完美的预测，即使在正常的行为下[41]，也会导致误差值的急剧峰值。我们使用指数加权平均（EWMA）来产生平滑误差 $\textbf{e}_s = [e_s^{(t-h)},…,e_s^{(t-ls)},…,e_s^{(t-1)},e_s^{(t)}]​$ [22]。为了评估这些值是否为正常值，我们为其平滑预测误差设置了一个阈值，将阈值以上的平滑预测误差对应的值分类为异常。</p>
+\textbf{e} = [e^{(t-h)},...,e^{(t-l_s)},...,e^{(t-1)},e^{(t)}]</script><p>其中 $h$ 是用于评估当前误差的历史误差值的数量。然后对这组误差集 $\bf e$ 进行平滑以抑制基于LSTM的预测中经常出现的误差峰值，值的突然变化通常不会得到完美的预测，即使在正常的行为下[41]，也会导致误差值的急剧峰值。我们使用指数加权平均（EWMA）来产生平滑误差 $\textbf{e}_s = [e_s^{(t-h)},…,e_s^{(t-ls)},…,e_s^{(t-1)},e_s^{(t)}]$ [22]。为了评估这些值是否为正常值，我们为其平滑预测误差设置了一个阈值，将阈值以上的平滑预测误差对应的值分类为异常。</p>
 <p><strong>阈值计算和异常评分。</strong>在这个阶段，有时可以通过使用标记样本的监督方法来学习适当的异常阈值，但是通常情况下，没有足够的标记数据，这在我们的情景中也是如此[9]。我们提出了一种无监督的方法，它可以在低开销和不使用标记数据或误差统计假设的情况下实现高性能。阈值 $ϵ$ 从集合中选择：</p>
 <script type="math/tex; mode=display">
 \pmb{\epsilon}=\mu(\textbf{e}_s)+\textbf{z}\sigma(\textbf{e}_s)</script><p>其中 $ϵ$ 取决于：</p>
@@ -315,14 +325,14 @@
 &\textbf{E}_{seq}=\text{continuous sequences of }e_a \in \textbf{e}_a
 \end{align*}</script><p>使用 $z\in\bf z$ 来确定 “评估 $ε$ 的值”，其中 $\textbf{z}$ 是表示高于 $\mu(\textbf{e}_s)$ 的标准差的数量的有序正值集。 $\bf z$ 的值取决于上下文，但根据我们的实验结果，我们发现 $2$ 到 $10$ 之间的范围可以很好地工作。$z$ 小于 $2$ 的值通常导致过多的假阳率。 一旦确定了 $\text{arg max}(\pmb ϵ)$，每个得到的平滑错误序列 $\textbf{e}_{seq}\in \textbf{E}_{seq}$ 都会得到一个异常分数 $s$，表示异常的严重程度：</p>
 <script type="math/tex; mode=display">
-s^{(i)}=\frac{\text{max}(\textbf{e}_{seq}^{(i)})-\text{arg max}(\pmb ϵ)}{\mu(\textbf{e}_s)+\sigma(\textbf{e}_s)}</script><p>简单地说，一个阈值被发现，如果去掉超过它的所有值，平滑误差 $\textbf{e}_s$ 的均值和标准差会下降最大的百分比。该函数还惩罚具有大量异常值（$|\textbf{e}_a|$）和序列（$|\textbf{E}_{seq}|​$）以防止过度贪心的行为。然后根据每个异常误差序列到所选阈值的距离，给出其平滑误差最大值的归一化分数。</p>
+s^{(i)}=\frac{\text{max}(\textbf{e}_{seq}^{(i)})-\text{arg max}(\pmb ϵ)}{\mu(\textbf{e}_s)+\sigma(\textbf{e}_s)}</script><p>简单地说，一个阈值被发现，如果去掉超过它的所有值，平滑误差 $\textbf{e}_s$ 的均值和标准差会下降最大的百分比。该函数还惩罚具有大量异常值（$|\textbf{e}_a|$）和序列（$|\textbf{E}_{seq}|$）以防止过度贪心的行为。然后根据每个异常误差序列到所选阈值的距离，给出其平滑误差最大值的归一化分数。</p>
 <h2 id="减少误报（假阳性）"><a href="#减少误报（假阳性）" class="headerlink" title="减少误报（假阳性）"></a>减少误报（假阳性）</h2><p><strong>修剪异常。</strong>基于预测的异常检测方法的精度在很大程度上取决于用于设置阈值和判断当前预测误差的历史数据量（$h$）。在大规模情况下，在实时场景中查询和处理历史数据变得非常昂贵，历史记录的缺乏可能导致假阳性，而由于评估历史数据的上下文比较窄，假阳性只能被视为异常。此外，在处理大量数据时，较低的假阳率仍然会让负责评估潜在异常事件的人类评审员不知所措。</p>
 <p>为了减少误报、限制内存和计算成本，我们引入了一个剪接过程，其中创建了一个新的集合 $\textbf{e}_{max}$，其中包含按降序排序的所有 $\textbf{e}_{seq}$的 $\text{max}(\textbf{e}_{seq})$。我们还在 $\textbf{e}_{max}$ 的末尾添加了非异常 $\text{max}(\{e_s \in \textbf{e}_s\in\textbf{E}_{seq}|e_s\in \textbf{e}_a\})$ 的最大平滑误差。</p>
 <p>然后以增量的方式逐步执行序列，计算每一步的减少百分比 $d^{(i)}=(e_{max}^{(i-1)}-e_{max}^{(i)})/e_{max}^{(i-1)}$，其中 $i\in\{1, 2,…,(|\textbf{E}_{seq}| + 1)\}$。如果在某个步骤 $i$ 中，$d^{(i)}$ 超过了最小百分比降幅 $p$，则所有 $e_{max}^{(j)} \in \textbf{e}_{max}|j&lt;i$ 及其对应的异常序列均为异常。如果 $d^{(i)}$ 没有满足最小减少量 $p$，对于所有后续误差 $d^{(i)},d^{(i+1)},…,d^{(i+|\textbf{E}_{seq}|+1)}$，这些平滑的误差序列将被重新分类为正常误差。这种修剪有助于确保异常序列不是流中常规噪声的结果，并且通过阈值处理来初始识别异常值序列。将评估限制在少数潜在异常序列中的最大错误，要比不进行阈值化就需要进行大量的值对值比较更有效。</p>
 <p><strong>学习历史数据。</strong>一旦收集到少量异常历史记录或标记数据，就可以使用第二种策略来限制假阳率。基于相似度 $s$ 异常通常不会在同一通道内频繁重复出现的假设，我们可以设置最小分数 $s_{min}$，以便在 $s &lt; s_{min}$ 时将未来的异常重新分类为正常。最低分数只适用于系统产生异常率超过某一比率的数据通道，并为所有这些通道单独设置 $s_{min}$。可以使用通道的先验异常得分来设置适当的 $s_{min}$，具体取决于在精确度和召回率之间的期望平衡。</p>
 <p>此外，如果异常检测系统有一种机制，用户可以通过该机制为异常提供标签，那么这些标签还可以用于为给定流设置 $s_{min}$。例如，如果一个流或通道有多个合并的假阳性异常，那么 $s_{min}$ 可以设置在这些假阳性异常分数的上界附近。这两种方法都在提高系统早期实现的精确度方面发挥了重要作用，因为它们有助于解释航天器的正常行为，这些行为并不常见，但会定期发生。</p>
 <p><img src="http://image.rexking6.top/img/clip1551751427.png" alt=""></p>
-<p><em>图2. 展示异常修剪过程的例子。在这种情况下，$\textbf{e}_{max} =[0.01396, 0.01072, 0.00994]$，最小下降百分比 $p=0.1$。从异常2到异常1的下降幅度为 $d^{(1)}=0.23&gt;p$，该序列保留为异常分类。从异常1到下一个最高平滑误差（$e_s=0.0099$）的下降幅度为 $d^{(2)} = .07 &lt; p​$，因此这个序列被重新分类为正常序列。</em></p>
+<p><em>图2. 展示异常修剪过程的例子。在这种情况下，$\textbf{e}_{max} =[0.01396, 0.01072, 0.00994]$，最小下降百分比 $p=0.1$。从异常2到异常1的下降幅度为 $d^{(1)}=0.23&gt;p$，该序列保留为异常分类。从异常1到下一个最高平滑误差（$e_s=0.0099$）的下降幅度为 $d^{(2)} = .07 &lt; p$，因此这个序列被重新分类为正常序列。</em></p>
 <p><img src="http://image.rexking6.top/img/clip1551664666.png" alt=""></p>
 <p><em>图3. 展示了包含上下文异常的遥测流的命令信息编码，该异常不太可能使用基于限制或距离的方法识别。使用已编码的命令信息和信道的先前遥测值，将生成下一个时间步骤的预测，并产生误差。在这个例子中，一步预测和实际遥测值非常接近，如顶部时间序列所示。利用3.2节中详细介绍的非参数阈值化方法设置误差阈值，得到标记异常区域内的两个预测异常序列，一个为假阳性，一个为真阳性。假阳性表明需要对3.3节中描述的序列进行修剪，如果该序列相对接近阈值以下的值，则将该序列重新分类为正常序列（参见图2）。</em></p>
 <h1 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h1><p>对于包括SMAP和MSL在内的许多航天器，目前的异常检测系统难以评估。警报的精确度和召回率是无法捕获的，遥测评估通常是手工进行的。幸运的是，可以在前面提到的ISA报告中发现遥测异常的迹象。在specifc遥测通道的ISAs清单中详细描述的所有事件和异常的一个子集，通过挖掘SMAP和MSL的ISA报告，我们能够收集到一组与涉及不同子系统和通道类型的实际航天器问题相对应的遥测异常。</p>
@@ -427,13 +437,13 @@ L=1-Q(\frac{\mu_s-\mu_W}{\sigma_W^2})</script><p>如果 $L\ge1-\epsilon_{norm}$ 
   <div class="popular-posts-header">相关文章</div>
   <ul class="popular-posts">
     <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\2020\02\11\Dynamic-Time-Warping-动态时间规整\" rel="bookmark">Dynamic Time Warping 动态时间规整</a></div>
-    </li>
-    <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\2019\01\12\Facebook-时间序列预测算法-Prophet-的研究\" rel="bookmark">Facebook 时间序列预测算法 Prophet 的研究</a></div>
-    </li>
-    <li class="popular-posts-item">
       <div class="popular-posts-title"><a href="\2019\02\14\《Deep-and-Confident-Prediction-for-Time-Series-at-Uber》笔记\" rel="bookmark">《Deep and Confident Prediction for Time Series at Uber》笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\13\《Adversarial-Complementary-Learning-for-Weakly-Supervised-Object-Localization》笔记\" rel="bookmark">《Adversarial Complementary Learning for Weakly Supervised Object Localization》笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\07\05\《CAM-Learning-Deep-Features-for-Discriminative-Localization》笔记\" rel="bookmark">《CAM-Learning Deep Features for Discriminative Localization》笔记</a></div>
     </li>
   </ul>
 
@@ -477,7 +487,9 @@ L=1-Q(\frac{\mu_s-\mu_W}{\sigma_W^2})</script><p>如果 $L\ge1-\epsilon_{norm}$ 
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/" rel="tag"># 时间序列</a>
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/AIOps/" rel="tag"># AIOps</a>
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
           </div>
 
         
@@ -583,13 +595,13 @@ L=1-Q(\frac{\mu_s-\mu_W}{\sigma_W^2})</script><p>如果 $L\ge1-\epsilon_{norm}$ 
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-count">52</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-count">49</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

@@ -80,9 +80,10 @@
 <meta property="og:image" content="http://image.rexking6.top/img/clip1552303988.png">
 <meta property="og:image" content="http://image.rexking6.top/img/clip1552304056.png">
 <meta property="article:published_time" content="2019-03-08T08:35:54.000Z">
-<meta property="article:modified_time" content="2024-01-14T17:43:10.724Z">
+<meta property="article:modified_time" content="2024-07-10T16:24:04.210Z">
 <meta property="article:author" content="Run-Qing Chen">
-<meta property="article:tag" content="图像检索">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="检索">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://image.rexking6.top/img/clip1552184557.png">
 
@@ -270,7 +271,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-01-15 01:43:10" itemprop="dateModified" datetime="2024-01-15T01:43:10+08:00">2024-01-15</time>
+                <time title="修改时间：2024-07-11 00:24:04" itemprop="dateModified" datetime="2024-07-11T00:24:04+08:00">2024-07-11</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -278,7 +279,11 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%9B%BE%E5%83%8F%E6%A3%80%E7%B4%A2/" itemprop="url" rel="index"><span itemprop="name">图像检索</span></a>
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E6%A3%80%E7%B4%A2/" itemprop="url" rel="index"><span itemprop="name">检索</span></a>
                 </span>
             </span>
 
@@ -350,8 +355,8 @@
 <h1 id="基于LSH的方法"><a href="#基于LSH的方法" class="headerlink" title="基于LSH的方法"></a>基于LSH的方法</h1><p>这些方法通常基于局部敏感哈希(LSH)的思想，LSH通过一组适当选择的随机投影函数将高维点映射到低维点。即使在最坏的情况下，这类方法在查询结果质量、效率和索引大小方面也具有良好的概率理论保证。另一方面，从经验上看，数据无关的方法往往优于数据相关的方法，因为后者不能利用数据分布。</p>
 <p>局部敏感哈希（LSH）是由Indyk和Motwani在[26]中首先引入的。用于距离函数 $f$  的LSH函数族 $\mathcal{H}$ 被定义为$(r_1,r_2,p_1,p_2)$ -对于任何两个数据点 $x$ 和 $y$ 的敏感，是指存在两个距离阈值 $r_1$ 和 $r_2$ 以及两个概率阈值 $p_1$ 和 $p_2$  满足</p>
 <script type="math/tex; mode=display">
-\left\{\begin{aligned}&\text{Pr}_{h\in\mathcal{H}}[h(x)=h(y)]\ge p_1,&&\text{if }f(x,y)<r_1\\&\text{Pr}_{h\in\mathcal{H}}[h(x)=h(y)]\le p_2,&&\text{if }f(x,y)>r_2\end{aligned}\right..</script><p>这意味着，将两点 $x, y$ 映射到相同值的机会随着距离 $f(x, y)$ 的减小而增加。2-稳定分布，即高斯/正态分布可以用来构造欧氏距离的LSH函数族。数据点根据随机投影和描述方法映射到散列值（例如桶）。同时使用一定数量的哈希函数来保证性能保证，使用不同的方案，如 AND-then-OR 方案[14]、OR-then-AND 方案[45]、基于倒排的方案[18,25]或基于树的方案[39]。在这一类别中，我们评估了两种最新的基于LSH的方法，并给出了理论保证：SRS[39]和QALSH[25]。它们都可以在任意 $c &gt; 1​$ 下工作。注意，我们排除了最近的一些工作，因为要么没有已知的实际实现（例如[3]），要么它们不支持欧氏距离（例如FALCONN[2]）。也有一些基于LSH的经验方法失去了理论保证，其中一些将被纳入其他类别。</p>
-<h2 id="SRS"><a href="#SRS" class="headerlink" title="SRS"></a>SRS</h2><p>SRS将高维数据集投影到低维空间（不超过10维）中进行精确的 kNN 搜索。我们将查询 $q​$ 与原始空间中任意点 $o​$ 的距离记为 $dist(o)​$，投影空间中的距离记为 $\Delta(o)​$。SRS的关键观测为任意点 $o​$，$\frac{\Delta(o)^2}{dist(o)^2}​$ 服从标准的 $\mathcal{X}^2(m)​$ 分布。因此，求解 c-ANN 问题的基本方法分为两步：(1) 通过对数据点的 $m​$ 维投影进行 $k=T’​$ 的 kNN 查询，得到有序的候选集；(2) 按顺序检查这些候选点的距离，如果满足“早终止检验”（如果存在一个 c-ANN 点，且概率至少为给定阈值），或者算法已检查了 $T’​$ 个点，则返回到目前距离最小的点。设 $m = O(1)​$，算法保证返回点距离不超过 $c​$ 乘以最近邻距离，且概率不变；空间和时间的复杂性在 $n​$ 中都是线性的，并且与 $d​$ 无关。</p>
+\left\{\begin{aligned}&\text{Pr}_{h\in\mathcal{H}}[h(x)=h(y)]\ge p_1,&&\text{if }f(x,y)<r_1\\&\text{Pr}_{h\in\mathcal{H}}[h(x)=h(y)]\le p_2,&&\text{if }f(x,y)>r_2\end{aligned}\right..</script><p>这意味着，将两点 $x, y$ 映射到相同值的机会随着距离 $f(x, y)$ 的减小而增加。2-稳定分布，即高斯/正态分布可以用来构造欧氏距离的LSH函数族。数据点根据随机投影和描述方法映射到散列值（例如桶）。同时使用一定数量的哈希函数来保证性能保证，使用不同的方案，如 AND-then-OR 方案[14]、OR-then-AND 方案[45]、基于倒排的方案[18,25]或基于树的方案[39]。在这一类别中，我们评估了两种最新的基于LSH的方法，并给出了理论保证：SRS[39]和QALSH[25]。它们都可以在任意 $c &gt; 1$ 下工作。注意，我们排除了最近的一些工作，因为要么没有已知的实际实现（例如[3]），要么它们不支持欧氏距离（例如FALCONN[2]）。也有一些基于LSH的经验方法失去了理论保证，其中一些将被纳入其他类别。</p>
+<h2 id="SRS"><a href="#SRS" class="headerlink" title="SRS"></a>SRS</h2><p>SRS将高维数据集投影到低维空间（不超过10维）中进行精确的 kNN 搜索。我们将查询 $q$ 与原始空间中任意点 $o$ 的距离记为 $dist(o)$，投影空间中的距离记为 $\Delta(o)$。SRS的关键观测为任意点 $o$，$\frac{\Delta(o)^2}{dist(o)^2}$ 服从标准的 $\mathcal{X}^2(m)$ 分布。因此，求解 c-ANN 问题的基本方法分为两步：(1) 通过对数据点的 $m$ 维投影进行 $k=T’$ 的 kNN 查询，得到有序的候选集；(2) 按顺序检查这些候选点的距离，如果满足“早终止检验”（如果存在一个 c-ANN 点，且概率至少为给定阈值），或者算法已检查了 $T’$ 个点，则返回到目前距离最小的点。设 $m = O(1)$，算法保证返回点距离不超过 $c$ 乘以最近邻距离，且概率不变；空间和时间的复杂性在 $n$ 中都是线性的，并且与 $d$ 无关。</p>
 <h2 id="QALSH"><a href="#QALSH" class="headerlink" title="QALSH"></a>QALSH</h2><p>传统上，LSH函数是以查询无关的方式构造的，即在任何查询到达之前对桶进行分区。然而，更接近查询的对象可能被划分到不同的桶中，这是不可取的。QALSH提出了查询感知桶分区的概念，并据此开发了新的查询感知LSH函数。在给定预先指定的桶宽 $w$ 的情况下，先前工作中使用哈希函数 $h_{\vec a,b}(o)=\vec a·\vec o+b$，QALSH使用函数 $h_{\vec a}(o)=\vec a·\vec o$。与以往一样，第一个对象 $o$ 沿着随机线 $\vec a$ 投影。当查询 $q$ 到达时，计算 $q$ 的投影（即$h_{\vec  a(q)}$），并用查询投影（或简化为查询）作为桶分区的锚。桶分区的这种方法被称为查询感知的。在预处理步骤中，计算所有数据对象沿随机线 $\vec a$ 的投影，并使用 $B^+$-tree对所有数据投影进行索引。当查询对象 $q$ 到达时，QALSH计算查询投影，并使用 $B^+$-tree定位落在 $[h_{\vec a}(q) - \frac{w}{2},h_{\vec a}(q) + \frac{w}{2}]$ 区间内的对象。此外，QALSH可以逐步地定位离查询更远的数据对象，就像执行 $B^+$-tree范围搜索一样。</p>
 <h1 id="基于编码的方法"><a href="#基于编码的方法" class="headerlink" title="基于编码的方法"></a>基于编码的方法</h1><p>大量的工作致力于从数据分布中学习哈希函数，使哈希编码空间中最近邻的搜索结果尽可能接近原始空间中的搜索结果。综述请参考[42,41]。</p>
 <p>我们在此类别中评估的一些示例方法包括Neighbor Sensitive Hashing [35]，Selective Hashing [19]，Anchor Graph Hashing [30]，Scalable Graph Hashing [28]，Neighborhood APProximation index [34]和Optimal Product Quantization [20]。</p>
@@ -676,7 +681,7 @@ c(\theta)=\frac{s(\theta)+\omega_bb(\theta)}{\text{min}_{\theta\in\Theta}(s(\the
 <p><img src="http://image.rexking6.top/img/clip1552302263.png" alt=""></p>
 <p><em>表8. 使用不同树的索引大小。</em></p>
 <p><img src="http://image.rexking6.top/img/clip1552302299.png" alt=""></p>
-<p><em>图28. 不同的 $f​$ 下加速比vs召回率（Annoy）。</em></p>
+<p><em>图28. 不同的 $f$ 下加速比vs召回率（Annoy）。</em></p>
 <h2 id="HKMeans"><a href="#HKMeans" class="headerlink" title="HKMeans"></a>HKMeans</h2><p>我们在k均值聚类中随机选择初始化中心。 根据Flann源代码的建议，我们应用迭代次数 $iter$ 和分支大小 $b$ 的不同组合来生成召回率和加速比的权衡。</p>
 <p><img src="http://image.rexking6.top/img/clip1552302517.png" alt=""></p>
 <p><em>图29. 不同的 $iter$ 下加速比vs召回率（Flann-HKM）。</em></p>
@@ -684,20 +689,20 @@ c(\theta)=\frac{s(\theta)+\omega_bb(\theta)}{\text{min}_{\theta\in\Theta}(s(\the
 <p><em>图30. 不同的 $b$ 下加速比vs召回率（Flann-HKM）。</em></p>
 <h2 id="KD树"><a href="#KD树" class="headerlink" title="KD树"></a>KD树</h2><p>除了参数 $t$ 是随机kd树的数量外，我们使用源代码提供的默认设置。随着树的数量的增加，搜索性能会得到提高。而当 $t$ 大于8时，加速比并不明显增加。</p>
 <p><img src="http://image.rexking6.top/img/clip1552302572.png" alt=""></p>
-<p><em>图31. 不同的 $t​$ 下加速比vs召回率（Flann-KD）。</em></p>
+<p><em>图31. 不同的 $t$ 下加速比vs召回率（Flann-KD）。</em></p>
 <h2 id="Flann"><a href="#Flann" class="headerlink" title="Flann"></a>Flann</h2><p>Flann将成本定义为搜索时间、树构建时间和树内存开销的组合。</p>
 <p>我们使用默认搜索精度（90％）和权衡因子 $wb$ 和 $wm$ 的几种组合。 对于构建时间权重 $wb$，我们使用了三个不同的可能值：0代表我们不关心树构建时间的情况，1代表树构建时间和搜索时间具有相同重要性的情况和0.01代表我们主要关心搜索时间的情况，但我们也想避免较长的构建时间。 类似地，对于不考虑存储使用的情况，存储器权重选择为0；对于主要考虑存储使用的情况，存储器权重选择为0；1表示介于这两种情况之间。</p>
-<p>当我们更多地关注存储使用的大小时，搜索速度非常低，几乎下降到线性扫描的速度。对于具有中等数据大小的数据集或具有足够内存的系统，$wm$ 为0将提供良好的搜索性能。由于 $wb$ 再较大和较小之间的搜索性能差距较大，本文选取0.01作为 $wb​$ 的值。</p>
+<p>当我们更多地关注存储使用的大小时，搜索速度非常低，几乎下降到线性扫描的速度。对于具有中等数据大小的数据集或具有足够内存的系统，$wm$ 为0将提供良好的搜索性能。由于 $wb$ 再较大和较小之间的搜索性能差距较大，本文选取0.01作为 $wb$ 的值。</p>
 <p><img src="http://image.rexking6.top/img/clip1552303296.png" alt=""></p>
-<p><em>图32. 不同的 $wm​$ 下加速比vs召回率（Flann）。</em></p>
+<p><em>图32. 不同的 $wm$ 下加速比vs召回率（Flann）。</em></p>
 <p><img src="http://image.rexking6.top/img/clip1552303365.png" alt=""></p>
-<p><em>图33. 不同的 $wb​$ 下加速比vs召回率（Flann）。</em></p>
+<p><em>图33. 不同的 $wb$ 下加速比vs召回率（Flann）。</em></p>
 <h2 id="Small-World-1"><a href="#Small-World-1" class="headerlink" title="Small World"></a>Small World</h2><p>Small World涉及到参数 $NN$（在索引构造过程中找到最接近查询的近邻点）。$S$（搜索过程中使用的进入数）是一个搜索参数，我们对 $S$ 值进行调优，以获得搜索速度和质量之间的权衡。构造算法计算量大，搜索时间与 $NN$ 的值基本成线性关系。图34显示了不同 $NN$ 的加速效果。$NN$ 比较小时对低召回率率有较好的搜索性能，而对高召回率有较差的搜索性能。对于大多数数据集，当 $NN$ 值为10或20时，该算法可以提供良好的搜索折衷。</p>
 <p><img src="http://image.rexking6.top/img/clip1552303422.png" alt=""></p>
-<p><em>图34. 不同的 $NN​$ 下加速比vs召回率（SW）。</em></p>
+<p><em>图34. 不同的 $NN$ 下加速比vs召回率（SW）。</em></p>
 <h2 id="Hierarchical-Navigable-Small-World-1"><a href="#Hierarchical-Navigable-Small-World-1" class="headerlink" title="Hierarchical Navigable Small World"></a>Hierarchical Navigable Small World</h2><p>在索引复杂度和搜索性能之间进行权衡时，主要采用两个参数：$M$ 表示索引阶段某些层中潜在邻居的大小，$efConstruction$ 用于控制索引过程中邻居的质量。我们使用 $efConstruction$ 的默认值，它被设置为200。$efSearch$ 是一个类似于 $efConstruction$ 的参数，用于控制搜索质量。我们改变了 $efSearch$ 的值，以便在搜索速度和质量之间进行权衡。图35显示了不同 $M$ 的搜索性能。与 $SW$ 相似，较小的 $M$ 值对于低召回率的搜索性能很好，但是对于高召回率的搜索性能下降。我们将 $M = 10$ 设为默认值。</p>
 <p><img src="http://image.rexking6.top/img/clip1552303495.png" alt=""></p>
-<p><em>图35. 不同的 $M​$ 下加速比vs召回率（HNSW）。</em></p>
+<p><em>图35. 不同的 $M$ 下加速比vs召回率（HNSW）。</em></p>
 <h2 id="Rank-Cover-Tree-1"><a href="#Rank-Cover-Tree-1" class="headerlink" title="Rank Cover Tree"></a>Rank Cover Tree</h2><p>在RCT中，有参数：$B$（$1/B$ 是从较低级别采样的采样率，可以确定树的高度 $h$），$p$（每个节点的父级的最大数量）和覆盖参数 $ω$。 根据作者的建议，我们选择 $h = 4$ 来建立排名覆盖树。</p>
 <p><img src="http://image.rexking6.top/img/clip1552303661.png" alt=""></p>
 <p><em>图36. 加速比vs召回率（RCT）。</em></p>
@@ -736,13 +741,13 @@ c(\theta)=\frac{s(\theta)+\omega_bb(\theta)}{\text{min}_{\theta\in\Theta}(s(\the
   <div class="popular-posts-header">相关文章</div>
   <ul class="popular-posts">
     <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\2018\09\24\Bag-of-Visual-Word视觉词袋\" rel="bookmark">Bag-of-Visual Word视觉词袋</a></div>
+      <div class="popular-posts-title"><a href="\2019\03\14\《Cache-locality-is-not-enough-HighPerformance-Nearest-Neighbor-Search-with-Product-Quantization-Fast-Scan》笔记\" rel="bookmark">《Cache locality is not enough: HighPerformance Nearest Neighbor Search with Product Quantization Fast Scan》笔记</a></div>
     </li>
     <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\2019\01\27\ANN-Search及一些方法\" rel="bookmark">ANN Search及一些方法</a></div>
+      <div class="popular-posts-title"><a href="\2018\07\13\《Adversarial-Complementary-Learning-for-Weakly-Supervised-Object-Localization》笔记\" rel="bookmark">《Adversarial Complementary Learning for Weakly Supervised Object Localization》笔记</a></div>
     </li>
     <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\2018\10\12\Fisher-Kernel-Fisher-Vector\" rel="bookmark">Fisher Kernel & Fisher Vector</a></div>
+      <div class="popular-posts-title"><a href="\2018\07\05\《CAM-Learning-Deep-Features-for-Discriminative-Localization》笔记\" rel="bookmark">《CAM-Learning Deep Features for Discriminative Localization》笔记</a></div>
     </li>
   </ul>
 
@@ -786,7 +791,8 @@ c(\theta)=\frac{s(\theta)+\omega_bb(\theta)}{\text{min}_{\theta\in\Theta}(s(\the
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E5%9B%BE%E5%83%8F%E6%A3%80%E7%B4%A2/" rel="tag"># 图像检索</a>
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E6%A3%80%E7%B4%A2/" rel="tag"># 检索</a>
           </div>
 
         
@@ -892,13 +898,13 @@ c(\theta)=\frac{s(\theta)+\omega_bb(\theta)}{\text{min}_{\theta\in\Theta}(s(\the
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-count">52</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-count">49</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
