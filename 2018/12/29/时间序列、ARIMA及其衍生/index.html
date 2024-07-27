@@ -35,9 +35,9 @@
 <meta property="og:image" content="http://image.rexking6.top/img/clip1546139861.png">
 <meta property="og:image" content="http://image.rexking6.top/img/clip1546139814.png">
 <meta property="article:published_time" content="2018-12-29T10:05:20.000Z">
-<meta property="article:modified_time" content="2024-01-14T17:43:10.794Z">
+<meta property="article:modified_time" content="2024-07-26T13:24:10.769Z">
 <meta property="article:author" content="Run-Qing Chen">
-<meta property="article:tag" content="时间序列">
+<meta property="article:tag" content="时 - 算法 - AIOps - 时序预测">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://image.rexking6.top/img/clip1546096319.png">
 
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-01-15 01:43:10" itemprop="dateModified" datetime="2024-01-15T01:43:10+08:00">2024-01-15</time>
+                <time title="修改时间：2024-07-26 21:24:10" itemprop="dateModified" datetime="2024-07-26T21:24:10+08:00">2024-07-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -233,7 +233,15 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/" itemprop="url" rel="index"><span itemprop="name">时间序列</span></a>
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/AIOps/" itemprop="url" rel="index"><span itemprop="name">AIOps</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/AIOps/%E6%97%B6%E5%BA%8F%E9%A2%84%E6%B5%8B/" itemprop="url" rel="index"><span itemprop="name">时序预测</span></a>
                 </span>
             </span>
 
@@ -312,7 +320,7 @@ F_{t_1,t_2,...,t_m}(x_1,x_2,...,x_m)=F_{t_1+r, t_2+r,...t_m+r}(x_1,x_2,...,x_m)<
 <p>得到不同的分解成分后，就可以使用时间序列模型对各个成分进行拟合，当然也可以选择其他预测方法。</p>
 <h1 id="ARIMA"><a href="#ARIMA" class="headerlink" title="ARIMA"></a>ARIMA</h1><h2 id="AR（自回归模型）"><a href="#AR（自回归模型）" class="headerlink" title="AR（自回归模型）"></a>AR（自回归模型）</h2><p>描述当前值与历史值之间的关系， 用变量自身的历史时间数据对自身进行预测。自回归模型必须满足平稳性的要求。</p>
 <script type="math/tex; mode=display">
-x_t=\phi_0+\phi_1x_{t-1}+\phi_2x_{t-2}+...+\phi_px_{t-p}+\varepsilon_t</script><p>以前 $p$ 期的序列值 $x_{t-1},x_{t-2},…,x_{t-p}$ 为自变量，随机变量 $X_t$ 的取值 $x_t​$ 为因变量建立线性回归模型。</p>
+x_t=\phi_0+\phi_1x_{t-1}+\phi_2x_{t-2}+...+\phi_px_{t-p}+\varepsilon_t</script><p>以前 $p$ 期的序列值 $x_{t-1},x_{t-2},…,x_{t-p}$ 为自变量，随机变量 $X_t$ 的取值 $x_t$ 为因变量建立线性回归模型。</p>
 <div class="table-container">
 <table>
 <thead>
@@ -396,7 +404,7 @@ x_t=\phi_0+\phi_1x_{t-1}+\phi_2x_{t-2}+...+\phi_px_{t-p}+\varepsilon_t-\theta_1\
 </li>
 <li><p>$p$ 和 $q$ 阶数的确定（ACF 和 PACF 确定）</p>
 </li>
-<li><p>建立模型 $ARIMA(p,d,q)​$</p>
+<li><p>建立模型 $ARIMA(p,d,q)$</p>
 </li>
 </ol>
 <h2 id="定阶"><a href="#定阶" class="headerlink" title="定阶"></a>定阶</h2><h3 id="ADF定阶d"><a href="#ADF定阶d" class="headerlink" title="ADF定阶d"></a>ADF定阶d</h3><p>ADF是一种常用的单位根检验方法，他的原假设为序列具有单位根，即非平稳，对于一个平稳的时序数据，就需要在给定的置信水平上显著，拒绝原假设。ADF只是单位根检验的方法之一，如果想采用其他检验方法，可以安装第三方包arch，里面提供了更加全面的单位根检验方法，个人还是比较钟情ADF检验。以下为检验结果，其 p 值大于0.99，说明并不能拒绝原假设。<a target="_blank" rel="noopener" href="http://www.statsmodels.org/stable/generated/statsmodels.tsa.stattools.adfuller.html">statsmodels.tsa.stattools.adfuller</a>。</p>
@@ -431,7 +439,7 @@ AIC=2k-2\text{ln}(L)</script></li>
 <li>BIC（Bayesian Information Criterion）：贝叶斯信息准则<script type="math/tex; mode=display">
 BIC=k\text{ln}(n)-2\text{ln}(L)</script></li>
 </ul>
-<p>以上两种评价准则的目的是为了选择出简单有效的模型，$k$ 表示模型参数的个数，$n$表示样本的数量，$L$  表示似然函数。使得 $k$ 越小，$L​$ 似然函数越大越好。AIC 和 BIC 越小越好。实际情况中， AIC 一般会比 BIC 更好。</p>
+<p>以上两种评价准则的目的是为了选择出简单有效的模型，$k$ 表示模型参数的个数，$n$表示样本的数量，$L$  表示似然函数。使得 $k$ 越小，$L$ 似然函数越大越好。AIC 和 BIC 越小越好。实际情况中， AIC 一般会比 BIC 更好。</p>
 <h1 id="statsmodels-tsa中的ARIMA及其衍生"><a href="#statsmodels-tsa中的ARIMA及其衍生" class="headerlink" title="statsmodels.tsa中的ARIMA及其衍生"></a>statsmodels.tsa中的ARIMA及其衍生</h1><p><code>statsmodels</code>中，除了普通的ARIMA <code>statsmodels.tsa.arima_process.ArmaProcess</code>，也提供了另外两种更高级的变种，SARIMAX <code>statsmodels.tsa.statespace.sarimax.SARIMAX</code> 和 VARIMAX <code>statsmodels.tsa.statespace.varmax.VARMAX</code>。</p>
 <h2 id="SARIMAX"><a href="#SARIMAX" class="headerlink" title="SARIMAX"></a>SARIMAX</h2><p>Seasonal Autoregressive Integrated Moving-Average with eXogenous regressors，即支持外生变量的季节性ARIMA。</p>
 <blockquote>
@@ -457,18 +465,6 @@ BIC=k\text{ln}(n)-2\text{ln}(L)</script></li>
     
     
       
-  <div class="popular-posts-header">相关文章</div>
-  <ul class="popular-posts">
-    <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\2020\02\11\Dynamic-Time-Warping-动态时间规整\" rel="bookmark">Dynamic Time Warping 动态时间规整</a></div>
-    </li>
-    <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\2019\01\12\Facebook-时间序列预测算法-Prophet-的研究\" rel="bookmark">Facebook 时间序列预测算法 Prophet 的研究</a></div>
-    </li>
-    <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\2019\02\17\《Time-series-Extreme-Event-Forecasting-with-Neural-Networks-at-Uber》笔记\" rel="bookmark">《Time-series Extreme Event Forecasting with Neural Networks at Uber》笔记</a></div>
-    </li>
-  </ul>
 
         <div class="reward-container">
   <div>一分一毛，也是心意。</div>
@@ -510,7 +506,7 @@ BIC=k\text{ln}(n)-2\text{ln}(L)</script></li>
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/" rel="tag"># 时间序列</a>
+              <a href="/tags/%E6%97%B6-%E7%AE%97%E6%B3%95-AIOps-%E6%97%B6%E5%BA%8F%E9%A2%84%E6%B5%8B/" rel="tag"># 时 - 算法 - AIOps - 时序预测</a>
           </div>
 
         
@@ -616,13 +612,13 @@ BIC=k\text{ln}(n)-2\text{ln}(L)</script></li>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-count">85</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-count">80</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -705,13 +701,13 @@ BIC=k\text{ln}(n)-2\text{ln}(L)</script></li>
       <i class="fa fa-chart-area"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">3.8m</span>
+    <span title="站点总字数">3.9m</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">58:01</span>
+    <span title="站点阅读时长">58:52</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
   </div>
