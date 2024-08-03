@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="根因分析RCA">
+<meta property="og:url" content="https://blog.rexking6.top/2021/07/01/%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90RCA/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/20210115142605236.png">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-27362a19e0b215704a58db6867c790f4_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20230317235800371.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20230317234739578.png">
+<meta property="og:image" content="https://image.rexking6.top/img/xtrace_dg_distributed_call.png">
+<meta property="og:image" content="https://image.rexking6.top/img/xtrace_dg_trace_graph.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20230318094804153.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20230322003123468.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20230320232629145.png">
+<meta property="article:published_time" content="2021-07-01T00:43:52.000Z">
+<meta property="article:modified_time" content="2024-08-03T16:35:57.647Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="AIOps">
+<meta property="article:tag" content="根因定位">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/20210115142605236.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2021/07/01/%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90RCA/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>根因分析RCA | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2021/07/01/%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90RCA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          根因分析RCA
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-01 08:43:52" itemprop="dateCreated datePublished" datetime="2021-07-01T08:43:52+08:00">2021-07-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-08-04 00:35:57" itemprop="dateModified" datetime="2024-08-04T00:35:57+08:00">2024-08-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/AIOps/" itemprop="url" rel="index"><span itemprop="name">AIOps</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/AIOps/%E6%A0%B9%E5%9B%A0%E5%AE%9A%E4%BD%8D/" itemprop="url" rel="index"><span itemprop="name">根因定位</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/07/01/%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90RCA/" class="post-meta-item leancloud_visitors" data-flag-title="根因分析RCA" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>22k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>20 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>综合转载于：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/333245105">智能运维 | 故障诊断与根因分析论文一览</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/331456480/answer/806871325">异常检测中‘根因定位’（root cause analysis）有什么常用的算法？ - 旅行者的回答 - 知乎 </a></li>
+<li><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/196682.html">应用实时监控服务ARMS链路追踪</a></li>
+</ul>
+<p>近些年来，在需要支持多平台的互联网应用中，微服务架构越来越受欢迎。与此同时，对于互联网公司来说，微服务的性能质量至关重要，因为微服务故障会降低用户体验并带来经济损失。有效的定位故障的根本原因对于快速恢复服务并减轻损失来说至关重要。</p>
+<p>随着5G与云计算的⼤⼒发展，如何进行更自动化的运维以管理⼤规模的服务设备，是当今云⼚商⾮常关心的问题。针对这⼀问题，全球权威的IT研究与顾问咨询公司 Gartner于2016年提出了AIOps(Artificial Intelligence for IT Operations)概念，即智能运维。</p>
+<p><img src="https://image.rexking6.top/img/20210115142605236.png" alt="图 | AIOps要分析的三种类型的数据（日志/指标/链路）"></p>
+<p>AIOps涉及时间序列异常检测、关联分析、语义分析等多学科领域，旨在将⼈⼯智能的能⼒与⼯业运维相结合，通过机器学习的⽅法来解决复杂场景下的故障处理、变更管理、容量管理、服务资源调度等问题，帮助⼈们或代替⼈更好地做出决策，提⾼运维的效率。</p>
+<p>其中最为困难的问题是<strong>诊断微服务架构的故障原因</strong>。</p>
+<p>首先，<strong>服务侧的异常会由多方面的原因造成</strong>，有的时候是因为网络的抖动，有的时候是因为机器的故障，有的时候甚至是因为人为的变更，有效的根因定位<strong>需要整合非常多的数据（Log/Metric/Trace）以及丰富的专家经验</strong>；</p>
+<p>其次，捕捉服务调用关系可以帮助我们追溯异常，但<strong>获取固定的服务拓扑关系比较困难</strong>，不同厂家有不同的微服务设计很难规范化，同时当服务调用频繁变化时，基于规则的静态故障定位方法便会失效；</p>
+<p>再者，即使我们构建了服务之间的拓扑关系，由于存在<strong>故障的间接传播</strong>，使得当故障发生时，系统中的各项服务指标都会发生抖动，大量噪音使得模型难以<strong>“在万军之中取上将首级”</strong>，找到致使故障发生的问题机器和问题指标。</p>
+<p>因此，在智能运维（AIOps）领域，故障诊断（根因分析）这是一个极具研究意义的系统性的难题。</p>
+<p>当前针对微服务系统的故障根因问题，学术界已有一些成熟的工作，包括层次化定位故障的实体，捕捉服务指标之间的关联关系，分析故障在微服务之间传播等，涵盖亚马逊/微软/阿里/谷歌/Ebay/IBM/华为/腾讯/…等诸多大厂的云服务实践。</p>
+<p>本文梳理近年来KDD/WWW/AAAI/VLDB/IWQOS/IEEE Access等国际顶会发表的有关论文，将根因分析场景大致抽象为几大方向：</p>
+<ul>
+<li><strong>搜索定位</strong></li>
+<li><strong>指标关联</strong></li>
+<li><strong>调用异常</strong></li>
+<li><strong>组合分析</strong></li>
+</ul>
+<h1 id="搜索定位"><a href="#搜索定位" class="headerlink" title="搜索定位"></a>搜索定位</h1><ul>
+<li><p><strong>问题概述：</strong>该类根因分析旨在对<strong>指标总量进行实时的异常检测</strong>，再对检测出的异常查找<strong>定位导致该总量异常的细粒度指标</strong>集合</p>
+</li>
+<li><p><strong>适用场景：</strong>业务KPI（集群请求错误数/网络整体延时/…)</p>
+</li>
+<li><p><strong>问题定义：</strong>一个KPI指标根据多种属性分别监控。比如Page Views（PV），分别统计来自不同ISP和不同省份的PV。如Fig 所示：</p>
+<p><img src="https://image.rexking6.top/img/v2-27362a19e0b215704a58db6867c790f4_720w.webp" alt=""></p>
+<p>表中的f和v分别表示PV的期望的正常值和观测值，我们看到红色的部分观测值和正常值不符，这些PV就是发生了异常。根因定位问题希望的是定位发生异常时哪些属性取值导致了异常，比如Fig中的根因就应该是(Province=Beijing&amp;Shanghai, ISP=*)。</p>
+</li>
+</ul>
+<h2 id="主要算法"><a href="#主要算法" class="headerlink" title="主要算法"></a>主要算法</h2><p><img src="https://image.rexking6.top/img/image-20230317235800371.png" alt=""></p>
+<p>主要的算法我理解有两类，一类是将这个问题看作是关联规则挖掘（挖掘和异常关联的属性集合，即关联规则），另一类是设定一个判别根因的目标函数然后进行启发式搜索。也有一些其他的方法，比如用神经网络去做多分类，但是方法我感觉不是很实用，也没有发在很好的会议上，就略去了。</p>
+<h2 id="关联规则挖掘"><a href="#关联规则挖掘" class="headerlink" title="关联规则挖掘"></a>关联规则挖掘</h2><ul>
+<li>INFOCOM：首先对所有属性组合进行异常检测，在有异常的结果里面，然后用Apriori/FP-growth去搜索support超过阈值的属性组合，再根据confidence去筛选</li>
+<li>SIGMETRICS：用Apriori/FP-growth去搜索support超过阈值的属性组合，结合support+lift设计filter</li>
+<li>FSE：可能原本目标的问题和这里的问题不太一致，但是比较类似。它使用的Contrast set mining可以看为一种特殊的关联规则挖掘。contrast set mining是挖掘在不同的类中分布（support）差别很大的属性组合，而前两者挖掘的是和某个特定的类（即异常）关联的属性组合。</li>
+</ul>
+<p>关联规则挖掘在参数（support和confidence的阈值，异常检测的阈值）合适的情况下，可以取得非常好的效果。但是显然这些参数随着数据集和故障案例的不同会有不同的最佳取值，因此实际上这一类方法的效果可能不太稳定。</p>
+<h2 id="剪枝-启发式搜索"><a href="#剪枝-启发式搜索" class="headerlink" title="剪枝/启发式搜索"></a>剪枝/启发式搜索</h2><p>这些方法首先需要定义自己关注的根因是什么样的，并据此定义一个目标函数$f: \text { attribute combinations } \rightarrow \mathbb{R}$，即给定一个（或者一组）属性组合评估起根因分数。之后就是在整个搜索空间中搜索使得目标函数最大化的属性组合作为根因。由于搜索空间往往十分巨大，所以还需要各种各样的启发式方法或者剪枝方法。</p>
+<h3 id="Adtributor"><a href="#Adtributor" class="headerlink" title="Adtributor"></a>Adtributor</h3><p>假设根因只可能是一个属性出了问题，例如只有可能是某一个省份或者某一运营商的问题，而不会是某个省份的某个运营商的问题。即(Province=Beijing, ISP=*)和(Province=*, ISP=China Mobile)都是合法的根因，而(Province=Beijing, ISP=China Mobile)是不会出现的。这个假设大大简化了问题，但是明显是不能覆盖实际的需求的。</p>
+<p>Adtributor提出了两个指标用来评估属性组合。一个是解释力，指的是该属性组合对应的指标变化和整体的指标变化的比例。另一个是surprise， 一个属性下面的各个指标的取值的分布是否有变化。根因属性的话应该有明显变化。</p>
+<p>因为是只考虑一个属性，所以搜索空间并不大，基本上就是搜索解释力和surprise最大的属性。</p>
+<h3 id="Recursive-Adtributor"><a href="#Recursive-Adtributor" class="headerlink" title="Recursive Adtributor"></a>Recursive Adtributor</h3><p>这是一篇学位论文中提到的。Recursive Adtributor主要是为了解决Adtributor的不合理的假设的问题。基本的思路是递归调用Adtributor。Adtributor会返回一个根因属性和对应的取值，Recursive Adtributor就会在选出来的切片3.上递归调用Adtributor，得到下一个根因属性和对应的取值。</p>
+<p><img src="https://image.rexking6.top/img/image-20230317234739578.png" alt=""></p>
+<h3 id="iDice"><a href="#iDice" class="headerlink" title="iDice"></a>iDice</h3><p>通常情况下，一个软件系统下用户上报问题（issue report）的数量是相对稳定的，但是有时会发生issue report的数量突变（通常是骤增）的情况，往往由个别<strong>属性组合</strong>（如“Country=India; TenantType=Home; DataCenter=DC1”）对应的issue report数量突变引起的。该文要解决的问题就是如何快速找出导致issue report数量突变的问题组合。</p>
+<p>首先iDice处理的问题是我们讨论问题的一个子集，它只专注处理issue report数量增加的根因。即考虑的指标只有issue report的数量。</p>
+<p>iDice的目标函数如下：</p>
+<script type="math/tex; mode=display">
+R=p_a * \ln \frac{p_a}{p_b}</script><p>其中p指的是属性组合对应的issue report占所有issue的比例。a和b分别指的是异常时刻后（after）和前（before）。整个公式就是两个比例的fisher distance。</p>
+<p>为了加速搜索，iDice提出了三个剪枝策略：</p>
+<ul>
+<li>首先，issue report数量本身太小的属性组合会被剪枝。这个剪枝策略显然就无法用在例如响应时间等指标上。</li>
+<li>其次，issue report数量随时间没有突变的会被剪枝。</li>
+<li>最后，根因属性组合需要把在故障时刻前后issue report数量有没有发生突变的细粒度属性组合分开。即有变化的应该是根因属性组合的细粒度属性组合，而没有变化的应该不是。</li>
+</ul>
+<h3 id="HotSpot"><a href="#HotSpot" class="headerlink" title="HotSpot"></a>HotSpot</h3><ul>
+<li><p>场景：在互联网运维中，有一类多维度KPI指标体系（如网页访问量PV、收入指标、错误计数等），其指标数目繁多、之间具有复杂的相互影响关系，通常只对KPI总量进行实时的异常检测算法，检测出异常后，再对体系查找定位导致该总量异常的细粒度指标集合。</p>
+</li>
+<li><p>示例：例如有可能是某一个省份(Province)或者某一运营商(ISP)的问题，也有可能是某个省份的某个运营商的问题。即(Province=Beijing, ISP=*)和(Province=*, ISP=China Mobile)、(Province=Beijing, ISP=China Mobile)都是合法的根因。</p>
+</li>
+<li><p>该文介绍一种对这种多维度指标体系中准确、高效地进行异常定位的方法，HotSpot，其构建多维时序指标的数据立方（Data Cube）并采用蒙特卡洛树搜索（MCTS）方法定位出根因元素集合。</p>
+</li>
+<li>HotSpot首先的出发点是Ripple effect。假设两个属性的指标取值是相关的，那么它们两一定是由第三个属性（可能和它们两之一重合）共同导致的。所以如果一个属性组合是根因，那么他和别的属性都是独立的。也就是说根因属性组合的更细粒度属性组合的指标变化，和根因指标本身的指标变化，一定是成比例的。</li>
+<li>基于这个假设，Hotspot设计了一个目标函数叫potential score。这个分数评估两方面的内容：对于待评估属性组合的更细粒度属性组合，它们的指标应该是异常的并且服从ripple effect；另一方遍，对于其他的属性组合，它们的指标应该是正常的。</li>
+<li>HotSpot和其他工作例如iDice很不一样的一点就是，它显式地考虑了有多个根因同时作用的情况。因此搜索空间直接变成了属性组合数目的幂，搜索空间的极大地增加了。为了解决这个问题，HotSpot采用了MCTS算法（蒙特卡洛树搜索，AlphaGo用过的）来进行启发式搜索。</li>
+</ul>
+<h3 id="Squeeze"><a href="#Squeeze" class="headerlink" title="Squeeze"></a>Squeeze</h3><ul>
+<li>Squeeze依然是基于ripple effect，但是相比HotSpot额外证明了ripple effect对于衍生指标（例如响应时间等，具体定义参见论文）也成立。</li>
+<li>Squeeze的目标函数也基本还是potential score，只是做了一些改进，使得对于根因的属性数量比较大，根因的指标变化相比整体不够显著的时候，算法效果稳健了很多。</li>
+<li>最大的变化是搜索过程。Squeeze没有采用暴力搜索加MCTS优化。而是采用了一套启发式策略来大大加速搜索，同时避免性能损失。<ul>
+<li>首先，根据ripple effect，我们发现同一个根因所影响的细粒度属性组合的指标变化比例是相同的。因此我们利用这种先对细粒度属性组合进行聚类。</li>
+<li>之后，我们在每一类中再去搜索根因。因为此时已经不用考虑多根因同时作用的影响，所以问题简化了很多。此时，我们又采用了一个启发式策论。基本的思路是，根因属性组合对应的细粒度属性组合的指标应该都是异常的。</li>
+</ul>
+</li>
+</ul>
+<h3 id="MID"><a href="#MID" class="headerlink" title="MID"></a>MID</h3><ul>
+<li>和iDice针对的是同样的问题，采用了iDice相同的目标函数。不同之处在于搜索策略不同。</li>
+<li>MID采用了Meta-heuristic Searching的策略，它定义了四个操作，每个可以把一个属性组合更新为一个新的。然后定义了一个meta-heuristic 函数，用来评测一个属性取值是不是更有可能在根因中。具体的做法是评估其熵。</li>
+<li>最后在搜索过程中，在每一步中MID评测当前属性组合的目标函数值，然后随机选择一个操作，根据meta-heuristic 函数选择操作要增删改的属性和取值，最后得到一个新的属性组合，进去下一轮循环。这个方法看起来很简单，但是有个巨大的问题就是每次随机选择的操作有可能重复出现已经搜索过的节点。但是如果简单禁止重复，那么就无法在搜索路径上进行回溯。因此这里需要一个合适的策略，我不太清楚怎么做能达到最好的效果。可惜原论文没有提及方法的细节。</li>
+</ul>
+<h3 id="ImpAPTr"><a href="#ImpAPTr" class="headerlink" title="ImpAPTr"></a>ImpAPTr</h3><ul>
+<li>ImpAPTr只处理成功率下降的异常。</li>
+<li>ImpAPTr提出了两个目标函数，和Adtributor用过的解释力和surprise基本思路一致。但是ImpAPTr并没有假设单属性组合。它还是会搜索多个属性的组合，然后用这两个目标函数分别排序。再用排序得到的排名的均值作为最后的排序依据。</li>
+<li>这个方法在根因的属性数量不多以及单根因的时候效果很好。</li>
+</ul>
+<h3 id="AutoRoot"><a href="#AutoRoot" class="headerlink" title="AutoRoot"></a>AutoRoot</h3><ul>
+<li>改进了Squeeze。</li>
+<li>首先是提出一种对聚类方法的修改，主要是在聚类之前会用KDE对density做一遍平滑。应该是比较有作用的。</li>
+<li>其次是把generalized potential score中的<a target="_blank" rel="noopener" href="https://www.zhihu.com/search?q=绝对误差&amp;search_source=Entity&amp;hybrid_search_source=Entity&amp;hybrid_search_extra={&quot;sourceType&quot;%3A&quot;answer&quot;%2C&quot;sourceId&quot;%3A806871325}">绝对误差</a>改成了相对误差。这在指标的时序预测误差较大的时候会受很大影响。</li>
+<li>最后使用了在类内搜索的时候采用了一种新的启发式策略，比Squeeze多考虑了一些。</li>
+</ul>
+<h3 id="HALO"><a href="#HALO" class="headerlink" title="HALO"></a>HALO</h3><ul>
+<li>思想比较直观，考虑到多维属性中，某些属性之间其实存在包含关系（即有层次结构），首先提取这种层次结构，搜索时按照层次结构去搜索，减少了搜索范围</li>
+<li>属性层次图+维度搜索，减少了搜索空间</li>
+</ul>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><ol>
+<li>F. Ahmed, J. Erman, Z. Ge, A. X. Liu, J. Wang, and H. Yan, “Detecting and localizing end-to-end performance degradation for cellular data services based on tcp loss ratio and round trip time,” IEEE/ACM Transactions on Networking (TON), vol. 25, no. 6, pp. 3709–3722, 2017.</li>
+<li>Fred Lin, Keyur Muzumdar, Nikolay Pavlovich Laptev, Mihai-Valentin Curelea, Seunghak Lee, and Sriram Sankar. 2020. Fast Dimensional Analysis for Root Cause Investigation in a Large-Scale Service Environment. Proc. ACM Meas. Anal. Comput. Syst. 4, 2 (June 2020), 31:1-31:23. <a target="_blank" rel="noopener" href="https://doi.org/10.1145/3392149">https://doi.org/10.1145/3392149</a></li>
+<li>Marco Castelluccio, Carlo Sansone, Luisa Verdoliva, and Giovanni Poggi. 2017. Automatically analyzing groups of crashes for finding correlations. In Proceedings of the 2017 11th Joint Meeting on Foundations of Software Engineering, ACM, Paderborn Germany, 717–726. DOI:<a target="_blank" rel="noopener" href="https://doi.org/10.1145/3106237.3106306">https://doi.org/10.1145/3106237.3106306</a> <a target="_blank" rel="noopener" href="https://doi.org/10.1145/3106237.3106306">https://doi.org/10.1145/3106237.3106306</a></li>
+<li>R. Bhagwan, R. Kumar, R. Ramjee, G. Varghese, S. Mohapatra,  H. Manoharan, and P. Shah, “Adtributor: Revenue debugging in advertising systems,” in 11th USENIX Symposium on Networked Systems Design and Implementation (NSDI 14), 2014, pp. 43–55.</li>
+<li>Q. Lin, J.-G. Lou, H. Zhang, and D. Zhang, “idice: problem identiﬁcation for emerging issues,” in 2016 IEEE/ACM 38th International Conference on Software Engineering (ICSE).</li>
+<li>M. Persson and L. Rudenius, “Anomaly detection and fault localization an automated process for advertising systems,” Master’s thesis, 2018, g¨oteborg : Chalmers University of Technology.</li>
+<li>HotSpot: Anomaly Localization for Additive KPIs with Multi-Dimensional Attributes Yongqian Sun, Youjian Zhao, Ya Su, Dapeng Liu, Xiaohui Nie, Yuan Meng, Shiwen Cheng, Dan Pei, Shenglin Zhang, Xianping Qu, Xuanyou Guo. IEEE Access2018.</li>
+<li>Generic and Robust Localization of Multi-Dimensional Root Causes  Zeyan Li, Chengyang Luo, Yiwei Zhao, Yongqian Sun, Kaixin Sui, Xiping Wang, Dapeng Liu, Xing Jin, Qi Wang and Dan Pei. ISSRE 2019</li>
+<li>Jiazhen Gu, Chuan Luo, Si Qin, Bo Qiao, Qingwei Lin, Hongyu Zhang, Ze Li, Yingnong Dang, Shaowei Cai, Wei Wu, Yangfan Zhou, Murali Chintalapati, and Dongmei Zhang. 2020. Efficient incident identification from multi-dimensional issue reports via meta-heuristic search. In Proceedings of the 28th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering, ACM, Virtual Event USA, 292–303. DOI:<a target="_blank" rel="noopener" href="https://doi.org/10.1145/3368089.3409741">https://doi.org/10.1145/3368089.3409741</a> <a target="_blank" rel="noopener" href="https://doi.org/10.1145/3368089.3409741">https://doi.org/10.1145/3368089.3409741</a></li>
+<li>G. Rong, H. Wang, Y. You, H. Zhang, J. Sun, D. Shao, and Y. Xu. 2020. Locating the Clues of Declining Success Rate of Service Calls. In 2020 IEEE 31st International Symposium on Software Reliability Engineering (ISSRE), 335–345. DOI:<a target="_blank" rel="noopener" href="https://doi.org/10.1109/ISSRE5003.2020.00039">https://doi.org/10.1109/ISSRE5003.2020.00039</a> <a target="_blank" rel="noopener" href="https://doi.org/10.1109/ISSRE5003.2020.00039">https://doi.org/10.1109/ISSRE5003.2020.00039</a></li>
+<li>Pengkun Jing, Yanni Han, Jiyan Sun, Tao Lin, and Yanjie Hu. 2021. AutoRoot: A Novel Fault Localization Schema of Multi-dimensional Root Causes. In 2021 IEEE Wireless Communications and Networking Conference (WCNC), 1–7. DOI:<a target="_blank" rel="noopener" href="https://doi.org/10.1109/WCNC49053.2021.9417302">https://doi.org/10.1109/WCNC49053.2021.9417302</a> <a target="_blank" rel="noopener" href="https://doi.org/10.1109/WCNC49053.2021.9417302">https://doi.org/10.1109/WCNC49053.2021.9417302</a></li>
+<li>Zhang X, Du C, Li Y, et al. Halo: Hierarchy-aware fault localization for cloud systems[C]//Proceedings of the 27th ACM SIGKDD Conference on Knowledge Discovery &amp; Data Mining. 2021: 3948-3958.</li>
+</ol>
+<h1 id="调用异常"><a href="#调用异常" class="headerlink" title="调用异常"></a>调用异常</h1><ul>
+<li>问题概述：该类根因分析一般具有明确的服务调用拓扑关系，旨在捕捉服务链路上的异常，定位异常实体</li>
+<li>使用场景：中间件（微服务之间的调用异常）</li>
+</ul>
+<h2 id="trace调用链数据"><a href="#trace调用链数据" class="headerlink" title="trace调用链数据"></a>trace调用链数据</h2><p>在广义上，一个调用链代表一个事务或者流程在（分布式）系统中的执行过程。在OpenTracing标准中，调用链是多个Span组成的一个有向无环图（Directed Acyclic Graph，简称DAG），每一个Span代表调用链中被命名并计时的连续性执行片段。</p>
+<p>下图是一个分布式调用的例子：客户端发起请求，请求首先到达负载均衡器，接着经过认证服务、计费服务，然后请求资源，最后返回结果。</p>
+<p><img src="https://image.rexking6.top/img/xtrace_dg_distributed_call.png" alt="分布式调用示例"></p>
+<p>数据被采集存储后，分布式追踪系统一般会选择使用包含时间轴的时序图来呈现这个调用链。</p>
+<p><img src="https://image.rexking6.top/img/xtrace_dg_trace_graph.png" alt="包含时间轴的链路图"></p>
+<h2 id="主要算法-1"><a href="#主要算法-1" class="headerlink" title="主要算法"></a>主要算法</h2><p>因为近两年出现了一些针对网络路由调用和其他虚拟资源调用的论文，所以这些归在其他中。</p>
+<p><img src="https://image.rexking6.top/img/image-20230318094804153.png" alt=""></p>
+<h2 id="trace调用链"><a href="#trace调用链" class="headerlink" title="trace调用链"></a>trace调用链</h2><h3 id="trace特征构造"><a href="#trace特征构造" class="headerlink" title="trace特征构造"></a>trace特征构造</h3><h4 id="MEPFL"><a href="#MEPFL" class="headerlink" title="MEPFL"></a>MEPFL</h4><ul>
+<li>定位异常微服务+具体节点+故障类型</li>
+<li>2个公开数据：Sock Shop和TrainTicket，<a target="_blank" rel="noopener" href="https://fudanselab.github.io/Research-ESEC-FSE2019-AIOPS">https://fudanselab.github.io/Research-ESEC-FSE2019-AIOPS</a></li>
+<li>用了专业领域知识来构建特征</li>
+<li>多层预测，4个分类模型，细化故障定位，能获得微服务-&gt;具体instance节点-&gt;不同故障类型的定位</li>
+</ul>
+<h4 id="Seer"><a href="#Seer" class="headerlink" title="Seer"></a>Seer</h4><ul>
+<li>定位异常微服务+具体节点+具体metric</li>
+<li>比较完整的系统设计，包括trace数据的采集+分布式存储+处理+故障预测+定位</li>
+<li>两步走，先根据trace看具体微服务哪里出问题，根据trace数据+深度学习进行微服务的故障预测，然后深入具体微服务的节点node，根据更底层的metrics看哪里出问题</li>
+</ul>
+<h4 id="TraceAnomaly"><a href="#TraceAnomaly" class="headerlink" title="TraceAnomaly"></a>TraceAnomaly</h4><ul>
+<li><p>定位异常微服务</p>
+</li>
+<li><p>微服务调用跟踪的异常通常表明基于微服务的大型软件服务的质量受到了损害。但是，由于以下原因，及时准确地检测trace异常非常具有挑战性：</p>
+<ul>
+<li>大量底层为服务</li>
+<li>它们之间的复杂调用关系</li>
+<li>响应时间于调用路径之间的相互依赖性</li>
+</ul>
+<p>我们的核心思想是使用机器学习在定期的离线培训期间自动学习trace的总体正常模式。</p>
+</li>
+<li><p>构造service trace vector（STV）</p>
+</li>
+</ul>
+<h4 id="TraceRCA"><a href="#TraceRCA" class="headerlink" title="TraceRCA"></a>TraceRCA</h4><ul>
+<li>定位异常微服务</li>
+<li>先要知道异常发生，然后根据异常发生去检测trace里面的链路哪些有异常，哪些指标可能相关，得到异常set+features，然后排序</li>
+<li>核心思想：a microservice with more abnormal and less normal traces passing through it is more likely to be the root cause</li>
+</ul>
+<h3 id="trace-gt-有向图"><a href="#trace-gt-有向图" class="headerlink" title="trace-&gt;有向图"></a>trace-&gt;有向图</h3><h4 id="Graph-based-RCA"><a href="#Graph-based-RCA" class="headerlink" title="Graph-based RCA"></a>Graph-based RCA</h4><ul>
+<li>定位异常微服务</li>
+<li>考虑到要检查的众多服务和连接，识别应用程序中检测到的异常的根本原因可能是一项困难且耗时的任务。基于这些体系结构的图表现形式，提出了根因分析框架。这些图可用于将系统中发生的任何异常情况与异常图库进行比较，该库可作为用户对这些异常进行故障排除的知识库。</li>
+<li>构造调用图（点是容器+host，边是调用）-&gt;异常检测，子异常图-&gt;经验达标沉淀异常库，计算相似性</li>
+</ul>
+<h4 id="Trace-RCA"><a href="#Trace-RCA" class="headerlink" title="Trace RCA"></a>Trace RCA</h4><ul>
+<li>定位异常微服务</li>
+<li>trace log-&gt;graph</li>
+<li>根据历史情况聚类，沉淀trace的图库，并抽取正常的图模式</li>
+<li>异常检测获得异常trace-&gt;匹配图库找对应的cluster-&gt;比较对应的normal pattern-&gt;计算</li>
+</ul>
+<h3 id="trace-gt-无向图"><a href="#trace-gt-无向图" class="headerlink" title="trace-&gt;无向图"></a>trace-&gt;无向图</h3><h4 id="invariance-network"><a href="#invariance-network" class="headerlink" title="invariance network"></a>invariance network</h4><ul>
+<li>定位异常微服务</li>
+<li>基于不变网络理论，没有调用关系，无向网络，自己构造图</li>
+<li>检测系统异常在许多领域（例如安全性，故障管理和工业优化）引起了极大的兴趣。最近，<strong>不变网络</strong>已被证明是表征复杂系统行为的有效方法。在不变网络中，节点表示系统组件，边缘表示两个组件之间的稳定，重要的交互作用。<strong>不变性网络的结构和演化，尤其是消失的相关性，可以为定位因果异常和执行诊断提供重要的启示</strong>。然而，现有的利用不变网络检测因果异常的方法通常使用消失的相关性百分比来对可能的偶然分量进行排名，这有几个局限性：1）网络中的故障传播被忽略；2）根源偶然异常可能并不总是那些消失率很高的节点；3）消失的相关性的时间模式未用于鲁棒检测。为了解决这些局限性，在本文中，我们提出了一个<strong>基于网络扩散的框架</strong>，以识别重大的因果异常并对它们进行排名。我们的方法可以有效地对整个不变网络上的故障传播建模，并且可以对结构和随时间变化的破碎不变模式进行联合推断。</li>
+</ul>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="NetBouncer"><a href="#NetBouncer" class="headerlink" title="NetBouncer"></a>NetBouncer</h3><ul>
+<li>IDC网络中的主动设备和链路故障定位，总共分为3步：<ol>
+<li>根据网络生成一个探测计划，保证在每个交换机都至少有一条健康路径的时候，在Clos网络中可连接识别</li>
+<li>基于IP in IP的高效路径探测，通过交换机中的硬件功能来低成本明确探测路径</li>
+<li>源于路径测量的故障推理，将故障定位的领域知识编码成专门的二次正则化项。此外，还开发了基于坐标下降的高效算法，利用了所有路径中的链路的稀疏特性，比SGD快一个数量级</li>
+</ol>
+</li>
+<li>NetBouncer针对的是非瞬态（不短于两个探测间隔），分组丢失网络事件。虽然它擅长检测系统会忽略的灰色故障，但其他与丢包相关的事件也在其范围中</li>
+</ul>
+<h3 id="Deepview"><a href="#Deepview" class="headerlink" title="Deepview"></a>Deepview</h3><ul>
+<li>针对的是VHD故障（虚拟硬盘）</li>
+<li>在数据中心中，每当VHD访问速度太慢而无法响应时，客户系统会崩溃。为了保护数据完整性，当VHD不响应时，必须暂停客用操作系统。但是不能永久暂停，过慢VM可能导致客户无法通过自己的应用程序级SLAs。经过一些等待后，一个合理的选择是通过崩溃的客用操作系统来向客户暴露潜在的VHD访问失败。简称此VHD故障由计算存储分离或VHD故障引起</li>
+<li><p>以全局视角将该问题建模成二部图，然后采用两种推理算法：</p>
+<ul>
+<li>Lasso regression来选择组件的小部分子集作为候选集</li>
+<li>假设检验作为处理强信号和弱信号并给组件打标记的一种原则性和可解释的方式</li>
+</ul>
+</li>
+<li><p>同样利用了clos网络的性质</p>
+</li>
+</ul>
+<h2 id="参考文献-1"><a href="#参考文献-1" class="headerlink" title="参考文献"></a>参考文献</h2><ol>
+<li>Zhou X, Peng X, Xie T, et al. Latent error prediction and fault localization for microservice applications by learning from system trace logs[C]//Proceedings of the 2019 27th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering. 2019: 683-694.</li>
+<li>Gan Y, Zhang Y, Hu K, et al. Seer: Leveraging big data to navigate the complexity of performance debugging in cloud microservices[C]//Proceedings of the twenty-fourth international conference on architectural support for programming languages and operating systems. 2019: 19-33.</li>
+<li>Liu P, Xu H, Ouyang Q, et al. Unsupervised detection of microservice trace anomalies through service-level deep bayesian networks[C]//2020 IEEE 31st International Symposium on Software Reliability Engineering (ISSRE). IEEE, 2020: 48-58.</li>
+<li>Li Z, Chen J, Jiao R, et al. Practical root cause localization for microservice systems via trace analysis[C]//2021 IEEE/ACM 29th International Symposium on Quality of Service (IWQOS). IEEE, 2021: 1-10.</li>
+<li>Brandón Á, Solé M, Huélamo A, et al. Graph-based root cause analysis for service-oriented and microservice architectures[J]. Journal of Systems and Software, 2020, 159: 110432.</li>
+<li>Cai Z, Li W, Zhu W, et al. A real-time trace-level root-cause diagnosis system in alibaba datacenters[J]. IEEE Access, 2019, 7: 142692-142702.</li>
+<li>Cheng W, Zhang K, Chen H, et al. Ranking causal anomalies via temporal and dynamical analysis on vanishing correlations[C]//Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining. 2016: 805-814.</li>
+<li>Tan C, Jin Z, Guo C, et al. NetBouncer: Active Device and Link Failure Localization in Data Center Networks[C]//NSDI. 2019: 599-614.</li>
+<li>Zhang Q, Yu G, Guo C, et al. Deepview: Virtual disk failure diagnosis and pattern detection for azure[C]//15th {USENIX} Symposium on Networked Systems Design and Implementation ({NSDI} 18). 2018: 519-532.</li>
+</ol>
+<h1 id="指标关联"><a href="#指标关联" class="headerlink" title="指标关联"></a>指标关联</h1><p><strong>问题概述：</strong>该类根因分析旨在分析海量的<strong>多维时间序列</strong>，找到故障时<strong>不同指标之间的关联关系（因果关系）</strong></p>
+<p><strong>适用场景：</strong>机器多维指标分析（disk&amp;load/net&amp;load/cpu&amp;mem/…)</p>
+<h2 id="主要算法-2"><a href="#主要算法-2" class="headerlink" title="主要算法"></a>主要算法</h2><p><img src="https://image.rexking6.top/img/image-20230322003123468.png" alt=""></p>
+<h3 id="时序相关性分析"><a href="#时序相关性分析" class="headerlink" title="时序相关性分析"></a>时序相关性分析</h3><h4 id="ε-diagnosis"><a href="#ε-diagnosis" class="headerlink" title="ε-diagnosis"></a>ε-diagnosis</h4><ul>
+<li>基于这样的假设：服务异常前后变化大的为根因</li>
+<li>具体做法就是对于每个metric，对异常前和异常后的序列对做假设检验</li>
+</ul>
+<h4 id="Log-AD-RCA"><a href="#Log-AD-RCA" class="headerlink" title="Log AD RCA"></a>Log AD RCA</h4><ul>
+<li>基于假设是：和从日志中检测出的异常得分序列相关性高的metric最有可能是根因</li>
+</ul>
+<h3 id="拓扑图分析"><a href="#拓扑图分析" class="headerlink" title="拓扑图分析"></a>拓扑图分析</h3><ul>
+<li>拓扑图一般指的是服务依赖关系图</li>
+<li>该类方法首先通过微服务之间的关系或者微服务和host之间的关系来构建拓扑图，然后针对因果图照出根因KPI或者service，主要方法有BFS、随机游走和计算图性质等</li>
+</ul>
+<h4 id="Sieve"><a href="#Sieve" class="headerlink" title="Sieve"></a>Sieve</h4><ol>
+<li>服务依赖图构建</li>
+<li>对metrics聚类，每个簇选取有代表性的metric：metric包括系统级别（如CPU、memory和IO等）的和应用级别的（如RT）</li>
+<li>找根因 基于服务依赖图+Granger Causality构建图</li>
+</ol>
+<h4 id="MicroRCA"><a href="#MicroRCA" class="headerlink" title="MicroRCA"></a>MicroRCA</h4><p>已知整体故障，定位到具体微服务，总体思路比较简单：</p>
+<ol>
+<li>构建图：根据ms和host的依赖关系，以及ms之间的交互关系来构建属性图</li>
+<li>提取异常子图</li>
+<li>计算有权图权重</li>
+<li>通过personalized pagerank 计算中心性得分作为排序</li>
+</ol>
+<h3 id="因果图分析"><a href="#因果图分析" class="headerlink" title="因果图分析"></a>因果图分析</h3><div class="table-container">
+<table>
+<thead>
+<tr>
+<th>年份期刊</th>
+<th>论文方法</th>
+<th>metrics关联</th>
+<th>根因诊断</th>
+<th>优缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2016TSC</td>
+<td>CauseInfer</td>
+<td>微服务之间因果关系：基于traffic lag<br />KPI之间因果关系：PC算法</td>
+<td>DFS：从frontend出发，进行DFS，若当前节点异常，则继续访问其孩子节点，直到最后一个无孩子的异常节点为止；若当前节点正常，则访问其兄弟节点。当一个异常节点没有孩子节点</td>
+<td>假设了数据不遗漏，要求因果图的每一层都要有异常表现；不适用于数据遗漏的场景</td>
+</tr>
+<tr>
+<td>2018ICST</td>
+<td>LOUD</td>
+<td>Granger causality test（因果图构建后之后，只看异常KPI相关的子图）</td>
+<td>eigenvector centrality<br />non-backtracking centrality<br />HITS<br />PageRank<br />实验中PageRank效果最好</td>
+<td>根据某次故障的异常KPI子图进行PageRank等多种方式，得到分数最高的根因，给不出异常传播链路</td>
+</tr>
+<tr>
+<td>2018CCGRID</td>
+<td>CloudRanger</td>
+<td>PC算法</td>
+<td>随机游走（计算转移矩阵时考虑了上次访问节点的权重）设计三种策略</td>
+<td>构图的方式借用了贝叶斯网络的d-分离<br />随机游走的策略可以参考</td>
+</tr>
+<tr>
+<td>2019ICWS王平</td>
+<td>MS-Rank</td>
+<td>PC-stable算法</td>
+<td>随机游走（带metrics权重，权重还会根据反馈结果进行调整）</td>
+<td>基本上是基于CloudRanger，不过是在service的metric增加了一些设计</td>
+</tr>
+<tr>
+<td>2019WWW微软</td>
+<td>AirAlert</td>
+<td>FCI<br />based on the causal Markov assumption<br />pearson correlation</td>
+<td>没有诊断环节<br />构建因果图的目的时提取后面预测模型所需要的特征</td>
+<td>构造因果图的方法可以参考</td>
+</tr>
+<tr>
+<td>2020WWW王平</td>
+<td>AutoMAP</td>
+<td>PC算法+图的相加相减操作</td>
+<td>随机游走（带metrics权重，权重还会根据反馈结果进行调整）</td>
+<td>构造因果图阶段，根据不同metrics分别构建图，获得边权重；根据异常和正常情况也分别构建图；最后也会有图的融合或者相减的操作<br />和MS-Rank类似，有反馈机制，用于调整metrics权重<br />随机游走阶段没啥特别创新</td>
+</tr>
+<tr>
+<td>2020IWQoS裴丹阿里</td>
+<td>MicroCause</td>
+<td>KPI之间因果算法：PCMCI算法/PCTS算法</td>
+<td>随机游走（计算转移矩阵时用偏相关）+异常程度+人工经验 确定排序</td>
+<td>因果推断策略模块的作用，从结果来看，效果一般<br />随机游走策略的作用，这部分改进效果明显，但是未分开比较偏相关、异常程度、先验这三部分的作用，没法说明各个子模块分别带来多大提升<br />有源码</td>
+</tr>
+<tr>
+<td>2020AS</td>
+<td>O&amp;M Graph</td>
+<td>PC算法+领域知识图谱</td>
+<td>BFS，找出所有路径再基于规则排序：<br />路径权重之和越大，排序越靠前；路径长度越短，排序越靠前</td>
+<td>领域知识图谱，其实是物理设备设施的拓扑，从而得到这些设备设施上KPI的连接<br />在构造因果图时，如果符合这些连接，直接保留<br />路径长度越短，排序越靠前，如果有遗漏数据等情况，不是越短越好</td>
+</tr>
+<tr>
+<td>2021SIGSOFT王平</td>
+<td>DyCause</td>
+<td>Granger causality test-&gt;时间动态因果图+多图融合</td>
+<td>BFS</td>
+<td>动态因果关系只能用在时间序列中，不适用于事件</td>
+</tr>
+<tr>
+<td>2021CIKM阿里</td>
+<td>CloudRCA</td>
+<td>PC算法+CMDB</td>
+<td>贝叶斯网络</td>
+<td></td>
+</tr>
+<tr>
+<td>2021ASE</td>
+<td>Groot</td>
+<td>以事件作为节点，通过专家规则得到因果边，构造出因果图</td>
+<td>PageRank改造过后的GrootRank</td>
+<td>全依靠专家只是得到事件因果边，忽略了专家覆盖不了的情况<br />给不出故障传播链路</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="参考文献-2"><a href="#参考文献-2" class="headerlink" title="参考文献"></a>参考文献</h2><ol>
+<li>Nguyen H, Tan Y, Gu X. Pal: P ropagation-aware a nomaly l ocalization for cloud hosted distributed applications[M]//Managing Large-scale Systems via the Analysis of System Logs and the Application of Machine Learning Techniques. 2011: 1-8.</li>
+<li>Nguyen H, Shen Z, Tan Y, et al. FChain: Toward black-box online fault localization for cloud systems[C]//2013 IEEE 33rd International Conference on Distributed Computing Systems. IEEE, 2013: 21-30.</li>
+<li>Shan H, Chen Y, Liu H, et al. ε-diagnosis: Unsupervised and real-time diagnosis of small-window long-tail latency in large-scale microservice platforms[C]//The World Wide Web Conference. 2019: 3215-3222.</li>
+<li>Wang L, Zhao N, Chen J, et al. Root-cause metric location for microservice systems via log anomaly detection[C]//2020 IEEE International Conference on Web Services (ICWS). IEEE, 2020: 142-150.</li>
+<li>Thalheim J, Rodrigues A, Akkus I E, et al. Sieve: Actionable insights from monitored metrics in distributed systems[C]//Proceedings of the 18th ACM/IFIP/USENIX Middleware Conference. 2017: 14-27.</li>
+<li>Samir A, Pahl C. Dla: Detecting and localizing anomalies in containerized microservice architectures using markov models[C]//2019 7th International Conference on Future Internet of Things and Cloud (FiCloud). IEEE, 2019: 205-213.</li>
+<li>Wu L, Tordsson J, Elmroth E, et al. Microrca: Root cause localization of performance issues in microservices[C]//NOMS 2020-2020 IEEE/IFIP Network Operations and Management Symposium. IEEE, 2020: 1-9.</li>
+<li>Wu L, Bogatinovski J, Nedelkoski S, et al. Performance diagnosis in cloud microservices using deep learning[C]//Service-Oriented Computing–ICSOC 2020 Workshops: AIOps, CFTIC, STRAPS, AI-PA, AI-IOTS, and Satellite Events, Dubai, United Arab Emirates, December 14–17, 2020, Proceedings. Cham: Springer International Publishing, 2021: 85-96.</li>
+<li>Wu L, Bogatinovski J, Nedelkoski S, et al. Performance diagnosis in cloud microservices using deep learning[C]//Service-Oriented Computing–ICSOC 2020 Workshops: AIOps, CFTIC, STRAPS, AI-PA, AI-IOTS, and Satellite Events, Dubai, United Arab Emirates, December 14–17, 2020, Proceedings. Cham: Springer International Publishing, 2021: 85-96.</li>
+<li>Chen P, Qi Y, Zheng P, et al. Causeinfer: Automatic and distributed performance diagnosis with hierarchical causality graph in large distributed systems[C]//IEEE INFOCOM 2014-IEEE Conference on Computer Communications. IEEE, 2014: 1887-1895.</li>
+<li>Mariani L, Monni C, Pezzé M, et al. Localizing faults in cloud systems[C]//2018 IEEE 11th International Conference on Software Testing, Verification and Validation (ICST). IEEE, 2018: 262-273.</li>
+<li>Wang P, Xu J, Ma M, et al. Cloudranger: Root cause identification for cloud native systems[C]//2018 18th IEEE/ACM International Symposium on Cluster, Cloud and Grid Computing (CCGRID). IEEE, 2018: 492-502.</li>
+<li>Ma M, Lin W, Pan D, et al. Ms-rank: Multi-metric and self-adaptive root cause diagnosis for microservice applications[C]//2019 IEEE International Conference on Web Services (ICWS). IEEE, 2019: 60-67.</li>
+<li>Chen Y, Yang X, Lin Q, et al. Outage prediction and diagnosis for cloud service systems[C]//The world wide web conference. 2019: 2659-2665.</li>
+<li>Ma M, Xu J, Wang Y, et al. Automap: Diagnose your microservice-based web applications automatically[C]//Proceedings of The Web Conference 2020. 2020: 246-258.</li>
+<li>Meng Y, Zhang S, Sun Y, et al. Localizing failure root causes in a microservice through causality inference[C]//2020 IEEE/ACM 28th International Symposium on Quality of Service (IWQoS). IEEE, 2020: 1-10.</li>
+<li>Qiu J, Du Q, Yin K, et al. A causality mining and knowledge graph based method of root cause diagnosis for performance anomaly in cloud applications[J]. Applied Sciences, 2020, 10(6): 2166.</li>
+<li>Pan Y, Ma M, Jiang X, et al. DyCause: Crowdsourcing to Diagnose Microservice Kernel Failure[J]. IEEE Transactions on Dependable and Secure Computing, 2023.</li>
+<li>Zhang Y, Guan Z, Qian H, et al. CloudRCA: a root cause analysis framework for cloud computing platforms[C]//Proceedings of the 30th ACM International Conference on Information &amp; Knowledge Management. 2021: 4373-4382.</li>
+<li>Wang H, Wu Z, Jiang H, et al. Groot: An event-graph-based approach for root cause analysis in industrial settings[C]//2021 36th IEEE/ACM International Conference on Automated Software Engineering (ASE). IEEE, 2021: 419-429.</li>
+</ol>
+<h1 id="组合分析"><a href="#组合分析" class="headerlink" title="组合分析"></a>组合分析</h1><p><strong>方法概述：</strong>该类根因分析旨在组合更多的数据进行分析，包括<strong>事件分析</strong>、<strong>调用与指标</strong>（Trace&amp;Metric）、<strong>调用与日志</strong>（Trace&amp;Log）</p>
+<p><strong>适用场景：</strong>构建AIOps系统</p>
+<h2 id="主要算法-3"><a href="#主要算法-3" class="headerlink" title="主要算法"></a>主要算法</h2><p><img src="https://image.rexking6.top/img/image-20230320232629145.png" alt=""></p>
+<h3 id="Correlating-Events-with-Time-Series"><a href="#Correlating-Events-with-Time-Series" class="headerlink" title="Correlating Events with Time Series"></a>Correlating Events with Time Series</h3><ul>
+<li>evaluate the correlation between time series data and event data<ul>
+<li>是否相关</li>
+<li>是否有延时</li>
+<li>正相关/负相关</li>
+</ul>
+</li>
+<li>互联网产品在日常运行提供服务时，运维人员会对机器、进程和服务层面的日志、事件和性能数据等进行自动测量，这些数据主要分为<strong>事件（Event）和时间序列（Time Series）</strong>两大类数据。时序数据指的是实值-时间序列（通常有固定的时间间隔），例如CPU使用率等；而事件数据指的是记录了特定事件发生的序列，例如内存溢出事件等。为了保证产品的服务质量、减少服务宕机时间，从而避免更大的经济损失，对关键的服务事件的诊断显得尤为重要。实际的运维工作中，对服务事件进行诊断时，运维人员可以通过分析与服务事件相关的时序数据，来对事件发生的原因进行分析。虽然这个相关关系不能完全准确的反映真实的因果关系，但是仍然可以为诊断提供一些很好的线索和启示。</li>
+</ul>
+<h3 id="COT"><a href="#COT" class="headerlink" title="COT"></a>COT</h3><ul>
+<li>COT的思路是，对于历史上的每一个 Outage，研究员们都挖掘与该 Outage 相关的故障之间的关联信息，并以服务为单位，将故障之间的关联信息进行聚合，然后，以 Outage 中服务之间的故障关联为特征，以 Outage 的根因服务为标签，训练机器学习模型。在新的 Outage 发生后，研究员们可以通过历史故障的关联信息，快速找到与该 Outage 相关的故障，并用相同的方法对这些故障进行聚合与特征提取，再利用先前训练好的机器学习模型来预测其根因服务。</li>
+</ul>
+<h3 id="Roots"><a href="#Roots" class="headerlink" title="Roots"></a>Roots</h3><ul>
+<li>PaaS的应用异常检测+根因定位（负载变化、云服务）</li>
+<li>Roots不需要应用程序及检测，它结合使用元数据注入和平台级工具来跟踪PaaS云中由应用程序请求触发的事件</li>
+<li>针对应用的请求，在全链路打标，PaaS内部继续打标跟踪，并收集分析，让用户不再看黑盒</li>
+</ul>
+<h3 id="Multitier-Service-RCA"><a href="#Multitier-Service-RCA" class="headerlink" title="Multitier Service RCA"></a>Multitier Service RCA</h3><ul>
+<li>公有云租户应用根因定位，VM级别定位，自己或者别人的VM都可以<ul>
+<li>采集trace+VM metrics，计算调用时间</li>
+<li>基于VM Communication Graph VCG构造anomaly propagation graph(APG)，边是调用关系以及同物理机的协同关系</li>
+<li>随机游走，概率是相似度-VM的metric与调用响应时间的Pearson相关系数</li>
+</ul>
+</li>
+</ul>
+<h3 id="FluxRank"><a href="#FluxRank" class="headerlink" title="FluxRank"></a>FluxRank</h3><ul>
+<li><p>在运维领域，服务侧的异常会由多方面的原因造成，有的时候是因为网络的抖动，有的时候是因为机器的故障，有的时候甚至是因为人为的变更。该论文主要介绍了<strong>如何从服务的故障定位到局部异常的机器</strong>，也就是说在发现服务故障的同时，进一步推断出是由哪些机器出现问题而导致的。该文介绍了FluxRank，它是一种可广泛部署的框架，可以自动，准确地定位根本原因机器，以便可以触发某些操作来减轻服务故障。</p>
+</li>
+<li><p>从服务故障（service KPI）定位到局部异常的机器及KPI（类似MicroCause）</p>
+</li>
+<li><p>三个步骤：</p>
+<ol>
+<li><p>Change Quantification，找出服务异常时间段内每台机器各个KPI的变化时间和变化程度</p>
+</li>
+<li><p>Digest Distillation，以各台机器的KPI变化程度作为特征，进行机器级别的聚类，将KPI变化相似的机器聚类到一个簇</p>
+</li>
+<li>Digest Ranking，建立逻辑回归模型，对2中形成的簇进行排序，将最可能引发故障的机器簇排序靠前，并根据KPI变化程度对簇内KPI排序</li>
+</ol>
+</li>
+<li><p>领域总结：</p>
+<ul>
+<li>引起故障的机器的某些KPI的change start time在服务故障点之前</li>
+<li>引起故障机器的哥哥KPI的change start time比较接近，而其他机器的各个KPI的change start time一般相差大一些。（可以解释为异常从引起故障的机器传递到其他机器和模块需要的时间各不相同，受一些随机因素影响）</li>
+<li>引起故障的机器的某些KPI的变化程度比较大</li>
+</ul>
+</li>
+</ul>
+<h3 id="Gandalf"><a href="#Gandalf" class="headerlink" title="Gandalf"></a>Gandalf</h3><ul>
+<li>Gandalf没有采用单独的组件日志分别分析每个部署的方法，而是采用自顶向下的方法来全面评估部署的影响。 Gandalf持续监视来自基础设施的监控数据，包括服务级别日志、性能计数器和流程级别事件。 当检测到系统异常时，Gandalf会分析它是否由部署引起。 如果发现部署不正确，Gandalf会将其停止。</li>
+<li>Gandalf的核心决策逻辑是由异常检测、相关分析和影响评估组成的。 该模型首先从原始数据中检测异常。 然后，它通过时间和空间相关性以及整体排序算法（ensemble ranking algorithm），判断部署是否与检测到的故障高度相关。 最后，使用高斯判别器（ Gaussian discriminant classifier）来确定可疑部署所造成的影响是否足以阻止部署。</li>
+<li>Gandalf系统是lambda架构，将实时决策引擎与批处理决策引擎结合在一起。 实时引擎监测部署前后一个小时的时间窗口，以检测紧急问题。 批处理引擎分析系统30天的状况，以检测更复杂、潜在的问题。 当Gandalf识别出不良的部署时，它会自动通知部署引擎停止部署，并向相关团队发出通知。</li>
+</ul>
+<h3 id="GRANO"><a href="#GRANO" class="headerlink" title="GRANO"></a>GRANO</h3><ul>
+<li>通过提供<strong>系统组件拓扑</strong>，<strong>警报</strong>和<strong>应用程序事件</strong>的整体视图，该文介绍了Grano模型，这是用于云原生分布式数据平台的<strong>端到端异常检测和根因分析系统</strong>。Grano提供：一个<strong>检测层</strong>，用于处理大量时间序列监视数据，以检测逻辑和物理系统组件的异常；具有新颖图形模型和算法的<strong>异常图形层</strong>，可利用系统拓扑数据和检测结果在系统组件级别识别根本原因；<strong>应用层</strong>自动通知待命人员，并通过交互式图形界面提供实时和按需的RCA支持。该系统使用eBay的生产数据进行部署和评估，以帮助值班人员将根本原因的识别时间从数小时缩短至数分钟。</li>
+<li>云原生数据库异常检测+根因定位（软件节点+硬件节点）<ol>
+<li>采集metrics+各种alarm+event</li>
+<li>异常检测之后形成event+各种事件</li>
+<li>构造异常图anomaly graph</li>
+<li>edge+node score</li>
+<li>score propagation</li>
+<li>root cause， the alarm types，alarm frequency， and topology for the suspected incidents</li>
+</ol>
+</li>
+</ul>
+<h3 id="GMTA"><a href="#GMTA" class="headerlink" title="GMTA"></a>GMTA</h3><ul>
+<li>微服务调用异常定位系统，trace</li>
+<li>完整系统：包括数据采集、存储、流式处理、不同level的数据访问、异常trace/path展示与对比、系统展示等</li>
+<li>多层数据消费：将trace提炼成graph聚类成为path，结合领域知识提炼业务流</li>
+</ul>
+<h3 id="Groot"><a href="#Groot" class="headerlink" title="Groot"></a>Groot</h3><ul>
+<li>metrics异常检测之后形成event+各种事件，trace</li>
+<li>针对微服务系统根因定位（具体事件+节点）</li>
+<li>整体流程<ol>
+<li>构造通用节点、服务依赖图（基于trace、拓扑等）</li>
+<li>构造事件因果图（整合SRE的经验）</li>
+<li>异常子图进行优化的PageRank排序打分</li>
+<li>root event</li>
+</ol>
+</li>
+</ul>
+<h2 id="参考文献-3"><a href="#参考文献-3" class="headerlink" title="参考文献"></a>参考文献</h2><ol>
+<li>Luo C, Lou J G, Lin Q, et al. Correlating events with time series for incident diagnosis[C]//Proceedings of the 20th ACM SIGKDD international conference on Knowledge discovery and data mining. 2014: 1583-1592.</li>
+<li>Wang Y, Li G, Wang Z, et al. Fast outage analysis of large-scale production clouds with service correlation mining[C]//2021 IEEE/ACM 43rd International Conference on Software Engineering (ICSE). IEEE, 2021: 885-896.</li>
+<li>Jayathilaka H, Krintz C, Wolski R. Performance monitoring and root cause analysis for cloud-hosted web applications[C]//Proceedings of the 26th International Conference on World Wide Web. 2017: 469-478.</li>
+<li>Weng J, Wang J H, Yang J, et al. Root cause analysis of anomalies of multitier services in public clouds[J]. IEEE/ACM Transactions on Networking, 2018, 26(4): 1646-1659.</li>
+<li>Liu P, Chen Y, Nie X, et al. Fluxrank: A widely-deployable framework to automatically localizing root cause machines for software service failure mitigation[C]//2019 IEEE 30th International Symposium on Software Reliability Engineering (ISSRE). IEEE, 2019: 35-46.</li>
+<li>Li Z, Cheng Q, Hsieh K, et al. Gandalf: An Intelligent, End-To-End Analytics Service for Safe Deployment in Large-Scale Cloud Infrastructure[C]//NSDI. 2020, 20: 389-402.</li>
+<li>Wang H, Nguyen P, Li J, et al. Grano: Interactive graph-based root cause analysis for cloud-native distributed data platform[J]. Proceedings of the VLDB Endowment, 2019, 12(12): 1942-1945.</li>
+<li>Guo X, Peng X, Wang H, et al. Graph-based trace analysis for microservice architecture understanding and problem diagnosis[C]//Proceedings of the 28th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering. 2020: 1387-1397.</li>
+<li>Wang H, Wu Z, Jiang H, et al. Groot: An event-graph-based approach for root cause analysis in industrial settings[C]//2021 36th IEEE/ACM International Conference on Automated Software Engineering (ASE). IEEE, 2021: 419-429.</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2023\03\12\业界根因定位实践\" rel="bookmark">业界根因定位实践</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2020\02\11\Dynamic-Time-Warping-动态时间规整\" rel="bookmark">Dynamic Time Warping 动态时间规整</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2019\01\12\Facebook-时间序列预测算法-Prophet-的研究\" rel="bookmark">Facebook 时间序列预测算法 Prophet 的研究</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2021/07/01/%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90RCA/" title="根因分析RCA">https://blog.rexking6.top/2021/07/01/根因分析RCA/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/AIOps/" rel="tag"># AIOps</a>
+              <a href="/tags/%E6%A0%B9%E5%9B%A0%E5%AE%9A%E4%BD%8D/" rel="tag"># 根因定位</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/06/01/%E7%90%86%E8%B4%A2/" rel="prev" title="理财">
+      <i class="fa fa-chevron-left"></i> 理财
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/07/01/Python%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90/" rel="next" title="Python性能分析">
+      Python性能分析 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%90%9C%E7%B4%A2%E5%AE%9A%E4%BD%8D"><span class="nav-number">2.</span> <span class="nav-text">搜索定位</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E7%AE%97%E6%B3%95"><span class="nav-number">2.1.</span> <span class="nav-text">主要算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E8%81%94%E8%A7%84%E5%88%99%E6%8C%96%E6%8E%98"><span class="nav-number">2.2.</span> <span class="nav-text">关联规则挖掘</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%AA%E6%9E%9D-%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2"><span class="nav-number">2.3.</span> <span class="nav-text">剪枝&#x2F;启发式搜索</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Adtributor"><span class="nav-number">2.3.1.</span> <span class="nav-text">Adtributor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Recursive-Adtributor"><span class="nav-number">2.3.2.</span> <span class="nav-text">Recursive Adtributor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#iDice"><span class="nav-number">2.3.3.</span> <span class="nav-text">iDice</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HotSpot"><span class="nav-number">2.3.4.</span> <span class="nav-text">HotSpot</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Squeeze"><span class="nav-number">2.3.5.</span> <span class="nav-text">Squeeze</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MID"><span class="nav-number">2.3.6.</span> <span class="nav-text">MID</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ImpAPTr"><span class="nav-number">2.3.7.</span> <span class="nav-text">ImpAPTr</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AutoRoot"><span class="nav-number">2.3.8.</span> <span class="nav-text">AutoRoot</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HALO"><span class="nav-number">2.3.9.</span> <span class="nav-text">HALO</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">2.4.</span> <span class="nav-text">参考文献</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E5%BC%82%E5%B8%B8"><span class="nav-number">3.</span> <span class="nav-text">调用异常</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#trace%E8%B0%83%E7%94%A8%E9%93%BE%E6%95%B0%E6%8D%AE"><span class="nav-number">3.1.</span> <span class="nav-text">trace调用链数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E7%AE%97%E6%B3%95-1"><span class="nav-number">3.2.</span> <span class="nav-text">主要算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#trace%E8%B0%83%E7%94%A8%E9%93%BE"><span class="nav-number">3.3.</span> <span class="nav-text">trace调用链</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#trace%E7%89%B9%E5%BE%81%E6%9E%84%E9%80%A0"><span class="nav-number">3.3.1.</span> <span class="nav-text">trace特征构造</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#MEPFL"><span class="nav-number">3.3.1.1.</span> <span class="nav-text">MEPFL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Seer"><span class="nav-number">3.3.1.2.</span> <span class="nav-text">Seer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TraceAnomaly"><span class="nav-number">3.3.1.3.</span> <span class="nav-text">TraceAnomaly</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TraceRCA"><span class="nav-number">3.3.1.4.</span> <span class="nav-text">TraceRCA</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#trace-gt-%E6%9C%89%E5%90%91%E5%9B%BE"><span class="nav-number">3.3.2.</span> <span class="nav-text">trace-&gt;有向图</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Graph-based-RCA"><span class="nav-number">3.3.2.1.</span> <span class="nav-text">Graph-based RCA</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Trace-RCA"><span class="nav-number">3.3.2.2.</span> <span class="nav-text">Trace RCA</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#trace-gt-%E6%97%A0%E5%90%91%E5%9B%BE"><span class="nav-number">3.3.3.</span> <span class="nav-text">trace-&gt;无向图</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#invariance-network"><span class="nav-number">3.3.3.1.</span> <span class="nav-text">invariance network</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">3.4.</span> <span class="nav-text">其他</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NetBouncer"><span class="nav-number">3.4.1.</span> <span class="nav-text">NetBouncer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deepview"><span class="nav-number">3.4.2.</span> <span class="nav-text">Deepview</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE-1"><span class="nav-number">3.5.</span> <span class="nav-text">参考文献</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8C%87%E6%A0%87%E5%85%B3%E8%81%94"><span class="nav-number">4.</span> <span class="nav-text">指标关联</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E7%AE%97%E6%B3%95-2"><span class="nav-number">4.1.</span> <span class="nav-text">主要算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E5%BA%8F%E7%9B%B8%E5%85%B3%E6%80%A7%E5%88%86%E6%9E%90"><span class="nav-number">4.1.1.</span> <span class="nav-text">时序相关性分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%CE%B5-diagnosis"><span class="nav-number">4.1.1.1.</span> <span class="nav-text">ε-diagnosis</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Log-AD-RCA"><span class="nav-number">4.1.1.2.</span> <span class="nav-text">Log AD RCA</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%93%E6%89%91%E5%9B%BE%E5%88%86%E6%9E%90"><span class="nav-number">4.1.2.</span> <span class="nav-text">拓扑图分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Sieve"><span class="nav-number">4.1.2.1.</span> <span class="nav-text">Sieve</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MicroRCA"><span class="nav-number">4.1.2.2.</span> <span class="nav-text">MicroRCA</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%A0%E6%9E%9C%E5%9B%BE%E5%88%86%E6%9E%90"><span class="nav-number">4.1.3.</span> <span class="nav-text">因果图分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE-2"><span class="nav-number">4.2.</span> <span class="nav-text">参考文献</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E5%88%86%E6%9E%90"><span class="nav-number">5.</span> <span class="nav-text">组合分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E7%AE%97%E6%B3%95-3"><span class="nav-number">5.1.</span> <span class="nav-text">主要算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Correlating-Events-with-Time-Series"><span class="nav-number">5.1.1.</span> <span class="nav-text">Correlating Events with Time Series</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#COT"><span class="nav-number">5.1.2.</span> <span class="nav-text">COT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Roots"><span class="nav-number">5.1.3.</span> <span class="nav-text">Roots</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Multitier-Service-RCA"><span class="nav-number">5.1.4.</span> <span class="nav-text">Multitier Service RCA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FluxRank"><span class="nav-number">5.1.5.</span> <span class="nav-text">FluxRank</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Gandalf"><span class="nav-number">5.1.6.</span> <span class="nav-text">Gandalf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GRANO"><span class="nav-number">5.1.7.</span> <span class="nav-text">GRANO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GMTA"><span class="nav-number">5.1.8.</span> <span class="nav-text">GMTA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Groot"><span class="nav-number">5.1.9.</span> <span class="nav-text">Groot</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE-3"><span class="nav-number">5.2.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">227</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">81</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">78</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">59:56</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
