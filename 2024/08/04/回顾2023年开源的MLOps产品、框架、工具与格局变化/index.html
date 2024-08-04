@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="回顾2023年开源的MLOps产品、框架、工具与格局变化">
+<meta property="og:url" content="https://blog.rexking6.top/2024/08/04/%E5%9B%9E%E9%A1%BE2023%E5%B9%B4%E5%BC%80%E6%BA%90%E7%9A%84MLOps%E4%BA%A7%E5%93%81%E3%80%81%E6%A1%86%E6%9E%B6%E3%80%81%E5%B7%A5%E5%85%B7%E4%B8%8E%E6%A0%BC%E5%B1%80%E5%8F%98%E5%8C%96/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722740808825.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722740976993.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722741072169.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722741161132.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742060790.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742126793.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742188846.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742231296.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742293415.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742342235.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742386478.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742412571.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742448240.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742486045.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742508075.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742542188.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742598916.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742624167.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742715173.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742774798.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722742983324.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722743014519.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722743099119.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722743134737.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722743244132.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722743304852.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722743394217.png">
+<meta property="og:image" content="https://pic4.zhimg.com/80/v2-3859d18677583b193fafa10729a06487_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722743436735.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722743502611.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722743657730.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722743749835.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722743884140.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722743995726.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722744087044.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722744117609.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722744160157.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722744196700.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722744223140.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722744298509.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722744357212.png">
+<meta property="og:image" content="https://image.rexking6.top/img/QQ_1722744378704.png">
+<meta property="article:published_time" content="2024-08-04T03:02:35.000Z">
+<meta property="article:modified_time" content="2024-08-04T04:06:45.944Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="框架工具">
+<meta property="article:tag" content="MLOps">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/QQ_1722740808825.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2024/08/04/%E5%9B%9E%E9%A1%BE2023%E5%B9%B4%E5%BC%80%E6%BA%90%E7%9A%84MLOps%E4%BA%A7%E5%93%81%E3%80%81%E6%A1%86%E6%9E%B6%E3%80%81%E5%B7%A5%E5%85%B7%E4%B8%8E%E6%A0%BC%E5%B1%80%E5%8F%98%E5%8C%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>回顾2023年开源的MLOps产品、框架、工具与格局变化 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2024/08/04/%E5%9B%9E%E9%A1%BE2023%E5%B9%B4%E5%BC%80%E6%BA%90%E7%9A%84MLOps%E4%BA%A7%E5%93%81%E3%80%81%E6%A1%86%E6%9E%B6%E3%80%81%E5%B7%A5%E5%85%B7%E4%B8%8E%E6%A0%BC%E5%B1%80%E5%8F%98%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          回顾2023年开源的MLOps产品、框架、工具与格局变化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-08-04 11:02:35 / 修改时间：12:06:45" itemprop="dateCreated datePublished" datetime="2024-08-04T11:02:35+08:00">2024-08-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E6%A1%86%E6%9E%B6%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">框架工具</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E6%A1%86%E6%9E%B6%E5%B7%A5%E5%85%B7/MLOps/" itemprop="url" rel="index"><span itemprop="name">MLOps</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2024/08/04/%E5%9B%9E%E9%A1%BE2023%E5%B9%B4%E5%BC%80%E6%BA%90%E7%9A%84MLOps%E4%BA%A7%E5%93%81%E3%80%81%E6%A1%86%E6%9E%B6%E3%80%81%E5%B7%A5%E5%85%B7%E4%B8%8E%E6%A0%BC%E5%B1%80%E5%8F%98%E5%8C%96/" class="post-meta-item leancloud_visitors" data-flag-title="回顾2023年开源的MLOps产品、框架、工具与格局变化" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>23k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>21 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/667299175">MLOps（六）-回顾2023年开源的MLOps产品、框架、工具与格局变化</a>。</p>
+<h1 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h1><p>模型实验环境是 MLOps 中最重要的部分之一。MLOps 的Pipelines实践可以提高机器学习产品开发速度，当实验环境和其他基础设施元素集成不佳时，就会出现最大的瓶颈。实验环境本身就是数据科学家迭代机器学习模型的地方，这些模型旨在解决特定的业务问题，一旦 ML 系统被推送到更高的环境进行部署，数据科学家就会继续迭代新的、改进的 ML 模型版本，以便在生产中针对当前的Top的冠军模型进行测试。</p>
+<p>让我们来看看高效的实验环境应该具备的属性。作为 MLOps 工程师，你应该努力向你的用户提供这些内容，而作为<strong>数据科学家</strong>或<strong>AI产品经理</strong>，如果你正在探索将开源机器学习平台集成到工作流中以简化模型开发和模型部署的可能性，那么你有必要知道MLOps它被要求做到什么功能。本文是UP个人将主流MLOps框架与国外Medium阅读文章的总结的见解，你将发现机器学习平台、框架和专用工具的汇编，某些工具旨在帮助你进行数据探索、部署策略和测试过程。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722740808825.png" alt=""></p>
+<ol>
+<li><strong>环境需要能够访问原始数据。</strong>虽然处理原始数据是数据工程职能部门的责任，但数据科学家需要能够探索和分析可用的原始数据，并决定哪些数据需要移动到数据价值链的上游，并由数据工程师进行管理。</li>
+<li><strong>环境需要能够访问特选数据。</strong>特选数据可能在数据仓库中可用，但未通过要素存储公开。此类数据不应公开用于生产环境中的模型训练。数据科学家需要能够探索精选数据，并查看需要将哪些内容推送到下游到特征存储。</li>
+<li><strong>如果 ML 训练管道已准备好移动到生产阶段，则用于训练机器学习模型的数据应来自特征存储</strong>。</li>
+<li><strong>数据科学家应该能够轻松启动不同类型的计算集群</strong>（可能是 Spark、Flink或任何其他技术），以实现有效的原始数据和精选数据探索。</li>
+<li><strong>数据科学家应该能够在开发环境中临时启动远程机器学习</strong>Pipelines<strong>来构建运行</strong>，这显着提高了迭代速度，因为它消除了创建拉取请求以测试管道是否正确编写的需要。</li>
+<li><strong>一旦管道经过临时测试并准备好移动到更高的环境，就应该有一个自动化设置，在创建一组特定的拉取请求时执行测试和升级。</strong> 例如，从 /feature-<em> 到 /</em>release-<strong> 分支的 PR 可以触发 CI/CD 进程来测试 ML 管道并将其部署到预生产环境（</strong>建议参考：kubeflow**）。</li>
+<li><strong>Jupyternotebook和 CI/CD 的任何其他样板代码都应是 Git 集成的一部分</strong>。笔记本最好位于模板存储库中的生产项目代码旁边。明确某些类型的代码应该位于何处 —一种流行的方法是为存储库模板提供清晰的文档。</li>
+<li><strong>数据科学家应该能够运行本地 ML 管道，并直接从笔记本将实验相关元数据输出到实验/模型跟踪系统。</strong>从自动化管道的角度来看，与实验/模型跟踪系统的集成应该没有什么不同。</li>
+<li><strong>Jupyternotebook必须在生产代码运行的同一环境中运行</strong>。在将应用程序移植到生产环境时，不兼容的依赖项不应导致问题。可能有多个生产环境 - 将其交换为给定的笔记本应该很容易。这可以通过再容器中运行 Notebook 来实现。</li>
+</ol>
+<h1 id="二、2023年MLOps变化"><a href="#二、2023年MLOps变化" class="headerlink" title="二、2023年MLOps变化"></a>二、2023年MLOps变化</h1><p>2023 年 是Gen AI的元年，因此LLM给MLOps 格局带来巨大的改变，并提出大模型LLMOps概念。许多产商决定MLOps产品规划的共同特征是开源和闭源解决方案的共存。开源 MLOps 工具因其灵活性、社区支持和对各种工作流程的适应性而获得了巨大的吸引力。另一方面，闭源平台通常提供企业级功能、增强的安全性和专门的用户支持，并将LLM大语言模型应用到垂直领域，各行各业遍地开花。以下是 2023 年景观的概述图：</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722740976993.png" alt=""></p>
+<p>2023 年 MLOps 和 LLMOps 格局2023 年的 MLOps 和 LLMOps 前景</p>
+<p>本文的其余部分将重点介绍 2023 年市场上的 90 多个 MLOps 工具和平台，分为以下类别：</p>
+<ul>
+<li><strong>端到端机器学习操作 （MLOps） 平台</strong></li>
+<li><strong>实验跟踪、模型元数据存储和管理</strong></li>
+<li><strong>数据集标注和标注</strong></li>
+<li><strong>数据存储和版本控制</strong></li>
+<li><strong>数据质量监控和管理</strong></li>
+<li><strong>功能商店</strong></li>
+<li><strong>模型轮毂</strong></li>
+<li><strong>模型质量测试</strong></li>
+<li><strong>工作流编排和流水线工具</strong></li>
+<li><strong>模型部署和服务</strong></li>
+<li><strong>模型可观测性</strong></li>
+<li><strong>负责任的 AI</strong></li>
+<li><strong>计算和基础设施</strong></li>
+<li><strong>GPU 云服务器</strong></li>
+<li><strong>[新]无服务器 GPU</strong></li>
+<li><strong>[新]矢量数据库和数据检索</strong></li>
+<li><strong>[新]基础模型训练框架</strong></li>
+</ul>
+<h2 id="2-1-如何评估-MLOps-是一个成功的工具和平台"><a href="#2-1-如何评估-MLOps-是一个成功的工具和平台" class="headerlink" title="2.1 如何评估 MLOps 是一个成功的工具和平台"></a>2.1 如何评估 MLOps 是一个成功的工具和平台</h2><p>与每个软件解决方案一样，评估 MLOps（机器学习操作）工具和平台可能是一项复杂的任务，因为它需要考虑不同的因素。下面，您将找到评估 MLOps 工具和平台时需要考虑的一些关键因素，具体取决于您的需求和偏好。</p>
+<ol>
+<li>云和技术战略</li>
+<li>与公司战略、组织技术堆栈中的其他工具保持一致</li>
+<li>商业细节</li>
+<li>组织中的知识和技能</li>
+<li>关键用例和/或用户旅程</li>
+<li>用户支持安排</li>
+<li>活跃的用户社区和未来路线图</li>
+</ol>
+<h2 id="2-2-端到端-MLOps-平台"><a href="#2-2-端到端-MLOps-平台" class="headerlink" title="2.2 端到端 MLOps 平台"></a>2.2 端到端 MLOps 平台</h2><p>端到端 MLOps 平台提供了一个统一的生态系统，可简化从数据准备和模型开发到部署和监控的整个 ML 工作流。</p>
+<p>端到端 MLOps 平台的核心功能其中应包括：</p>
+<ul>
+<li><strong>数据管理和预处理：</strong>提供数据引入、存储和<strong>预处理</strong>能力，使您能够高效管理和准备用于训练和评估的数据。这包括数据标记、数据版本控制、数据增强以及与常用数据存储系统集成的功能。</li>
+<li><strong>实验和模型开发：</strong>平台应提供设计和运行试验、探索不同算法和架构以及优化模型性能的功能。这包括超参数优化、自动模型选择和模型指标可视化的功能。</li>
+<li><strong>模型部署和服务</strong>：通过提供容器化、API 管理和可扩展的服务基础设施功能，实现无缝的模型部署和服务。</li>
+<li><strong>模型监控和性能跟踪</strong>：平台应包括实时<strong>监控和跟踪</strong>已部署 ML 模型的性能的功能。这包括日志记录、监控模型指标、检测异常和警报的功能，使您能够确保模型的可靠性、稳定性和最佳性能。</li>
+<li><strong>协作和版本控制</strong>：支持数据和 ML 团队之间的协作，允许他们共享代码、模型和实验。他们还应该提供版本控制功能来管理 ML 工件的更改和修订，确保可重复性并促进有效的团队合作。</li>
+<li><strong>自动化流水线和工作流编排：</strong> 平台应提供用于自动化流水线和工作流编排的工具，使您能够定义和管理复杂的 ML 管道。这包括依赖项管理、任务调度和错误处理功能，可简化 ML 工作流的管理和执行。</li>
+<li><strong>模型治理和合规性</strong>：它们应满足<strong>模型治理</strong>和合规性要求，以便您可以在 ML 解决方案中实施道德注意事项、隐私保护措施和法规合规性。这包括模型可解释性、公平性评估、隐私保护和合规性跟踪等功能。</li>
+<li><strong>与 ML 工具和库集成：</strong>为您提供灵活性和可扩展性。这使您能够利用您喜欢的 ML 工具并访问各种资源，从而提高生产力并支持使用尖端技术。</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/QQ_1722741072169.png" alt=""></p>
+<h1 id="三、MLOps-开源平台"><a href="#三、MLOps-开源平台" class="headerlink" title="三、MLOps 开源平台"></a>三、MLOps 开源平台</h1><h2 id="3-1-KubeFlow"><a href="#3-1-KubeFlow" class="headerlink" title="3.1 KubeFlow"></a>3.1 KubeFlow</h2><p>在 Kubernetes 确立了自己作为容器集群的标准之后，Google 几乎立即创建了Kubeflow，这是一个开源项目，旨在简化在 Kubernetes 中使用 ML 的过程。它具有此编排工具的所有优势，从能够在任何基础架构上部署到管理松散耦合的微服务，以及按需扩展。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722741161132.png" alt=""></p>
+<p>开源 MLOps 平台 Kubeflow</p>
+<p>使用 Kuberflow，您可以从以下功能中受益：</p>
+<ol>
+<li><p>Jupyter 笔记本</p>
+<p>创建和自定义 Jupyter 笔记本，立即查看运行代码的结果，并创建交互式分析报告。</p>
+</li>
+<li><p>自定义 TensorFlow 作业运算符</p>
+<p>此功能有助于训练模型并应用 TensorFlow 或 Seldon Core 服务容器将模型导出到 Kubernetes。</p>
+</li>
+<li><p>简化的容器化</p>
+<p>Kuberflow 消除了容器化代码所涉及的复杂性。数据科学家可以在更短的时间内执行数据准备、模型训练和部署。</p>
+</li>
+</ol>
+<h2 id="3-2-MLFlow"><a href="#3-2-MLFlow" class="headerlink" title="3.2 MLFlow"></a>3.2 MLFlow</h2><p>MLflow是一个开源平台，供机器学习工程师通过试验、部署和测试来管理机器学习生命周期。当你想要跟踪机器学习模型的性能时，MLflow 会派上用场。它就像一个仪表板，您可以在其中：</p>
+<ul>
+<li>监控机器学习管道，</li>
+<li>存储模型元数据，以及</li>
+<li>选择性能最佳的型号。</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/QQ_1722742060790.png" alt=""></p>
+<p>目前，MLflow 提供了四个组件：</p>
+<p><strong>Tracking</strong></p>
+<p>MLflow <strong>Tracking</strong> 是一个 API 和 UI，用于记录参数、代码版本、指标和输出文件，用于运行代码和可视化结果。可以使用 Python、REST、R API 和 Java API 执行日志和查询试验。您还可以记录结果。</p>
+<p><strong>Project</strong></p>
+<p>MLflow Project 是一种工具，供机器学习团队以可重用和可重现的方式打包数据科学代码。它带有一个 API 和命令行工具，用于将项目连接到工作流中。它可以帮助您在任何平台上运行项目。</p>
+<p><strong>Model</strong></p>
+<p>使用 MLflow 模型，可以轻松打包机器学习模型，以供各种下游工具（如 Apache Spark）使用。这样一来，在不同的服务环境中部署机器学习模型就更易于管理了。</p>
+<p>总体而言，很多用户喜欢 MLflow，因为它无需专用服务器即可在本地轻松使用，并且具有出色的 UI，您可以在其中探索试验。</p>
+<h2 id="3-3-MetaFlow"><a href="#3-3-MetaFlow" class="headerlink" title="3.3 MetaFlow"></a>3.3 MetaFlow</h2><p>Netflix 将 Metaflow 创建为一个开源 MLOps 平台，用于构建和管理大型企业级数据科学项目。数据科学家可以使用此平台进行机器学习模型的端到端开发和部署。</p>
+<ul>
+<li><strong>强大的图书馆支持</strong></li>
+</ul>
+<p>Metaflow 支持所有流行的数据科学工具，如 TensorFlow 和 scikit-learn，因此您可以继续使用自己喜欢的工具。Metaflow 支持 Python 和 R，使其在库和包选择方面更加灵活。</p>
+<ul>
+<li><strong>强大的版本控制工具包</strong></li>
+</ul>
+<p>Metaflow 的优点在于它会自动对您的所有机器学习实验进行版本和跟踪。你不会丢失任何重要的东西，你甚至可以在笔记本中检查所有实验的结果。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722742126793.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://metaflow.org/">https://metaflow.org/</a></p>
+<h2 id="3-4-Flyte"><a href="#3-4-Flyte" class="headerlink" title="3.4 Flyte"></a>3.4 Flyte</h2><p>如果你正在寻找一个平台来负责你的机器学习项目的<a href="https://link.zhihu.com/?target=https%3A//neptune.ai/blog/ml-experiment-tracking">实验跟踪</a>和维护，看看<a href="https://link.zhihu.com/?target=https%3A//github.com/flyteorg/flyte">Flyte</a>。它是一个开源业务流程协调程序，旨在简化为生产创建可靠的数据和机器学习管道。它的架构优先考虑可扩展性和可重复性，利用 Kubernetes 的强大功能作为其基础框架。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722742188846.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://flyte.org/features">https://flyte.org/features</a></p>
+<p>Flyte 提供了大量的功能和用例，从简单的机器学习项目到复杂的 LLM 项目。为了给您一个 我已经提炼了一些功能并在下面列出了它们，但您可以查看他们的网站和文档。</p>
+<ul>
+<li><strong>大型项目支持</strong></li>
+</ul>
+<p>Flyte 帮助他们执行了对他们的业务至关重要的大规模计算。扩展和监视所有管道更改可能非常具有挑战性，这已经不是什么秘密了，尤其是在工作流具有复杂的数据依赖关系的情况下。Flyte 成功地处理了更复杂的任务，因此开发人员可以专注于业务逻辑而不是机器。</p>
+<ul>
+<li><strong>提高可重复性</strong></li>
+</ul>
+<p>此工具还可以帮助您确保构建的机器学习模型的可重复性。Flyte 跟踪更改，进行版本控制，并将模型与其依赖项一起容器化。</p>
+<ul>
+<li><strong>多语言支持</strong></li>
+</ul>
+<p>Flyte 旨在支持 Python、Java 或 Scala 中的复杂 ML 项目。</p>
+<p>Flyte 在向公众发布之前已经过 Lyft 内部测试。它拥有管理 7,000 多个独特工作流程的良好记录，每月总计 100,000 次执行。</p>
+<h2 id="3-5-MLReef"><a href="#3-5-MLReef" class="headerlink" title="3.5 MLReef"></a>3.5 MLReef</h2><p><img src="https://image.rexking6.top/img/QQ_1722742231296.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://about.mlreef.com/">https://about.mlreef.com/</a></p>
+<p>MLReef 是一个 MLOps 平台，供团队协作和共享其机器学习实验的结果。项目建立在由您或社区实现的可重用机器学习模块之上。这提高了开发速度，并通过促进并发性使工作流更加高效。</p>
+<p>MLReef 提供四个方向的工具：</p>
+<ul>
+<li><strong>数据管理</strong></li>
+</ul>
+<p>你有一个完全版本化的数据托管和处理基础结构，用于设置和管理机器学习模型。</p>
+<ul>
+<li><strong>脚本存储库</strong></li>
+</ul>
+<p>每个开发人员都可以访问可在机器学习管道中使用的容器化和版本控制脚本存储库。</p>
+<ul>
+<li><strong>实验管理</strong></li>
+</ul>
+<p>可以使用 MLReef 跨项目的不同迭代进行试验跟踪。</p>
+<ul>
+<li><strong>MLOps</strong></li>
+</ul>
+<p>此解决方案可帮助您优化管道管理和编排，自动执行日常任务。</p>
+<p>此外，MLReef 欢迎任何规模的项目。新手可以将其用于小型项目、经验丰富的开发人员 - 用于小型、中型和企业项目。</p>
+<ul>
+<li><strong>新人友好</strong></li>
+</ul>
+<p>如果你在开发机器学习模型方面没有太多经验，你会发现一个用户友好的界面和社区支持，以应对你可能遇到的任何问题。</p>
+<ul>
+<li><strong>经历</strong></li>
+</ul>
+<p>MLReef 可让您在 Git 上构建项目，同时为您处理所有 DevOps 混乱。您可以在自动化环境中轻松监控进度和结果。</p>
+<ul>
+<li><strong>企业生产</strong></li>
+</ul>
+<p>适用于企业的 MLReef 易于在云端或本地进行扩展和控制。</p>
+<p>总而言之，MLReef 是机器学习项目的便捷框架。只需几个简单的设置，您就可以逐块开发、测试和优化您的机器学习解决方案。</p>
+<h2 id="3-6-Seldon-Core"><a href="#3-6-Seldon-Core" class="headerlink" title="3.6 Seldon Core"></a>3.6 Seldon Core</h2><p><img src="https://image.rexking6.top/img/QQ_1722742293415.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/SeldonIO/seldon-core">https://github.com/SeldonIO/seldon-core</a></p>
+<p>Seldon Core是在 Kubernetes 上部署机器学习模型的平台之一。该平台可帮助开发人员在强大的 Kubernetes 环境中构建模型，并具有自定义资源定义等功能来管理模型图。您还可以将持续集成和部署工具与平台合并。</p>
+<ul>
+<li><strong>构建可扩展的模型</strong></li>
+</ul>
+<p>Seldon 核心可以将基于 TensorFlow、PyTorch、H2O 和其他框架构建的模型转换为基于 REST/GRPC 的可扩展微服务架构。</p>
+<ul>
+<li><strong>监控模型性能</strong></li>
+</ul>
+<p>它将为您处理缩放，并为您提供用于测量模型性能、检测异常值和进行开箱即用的 A/B 测试的高级解决方案。</p>
+<ul>
+<li><strong>坚固可靠</strong></li>
+</ul>
+<p>Seldon Core 可以吹嘘通过持续维护和安全策略更新支持的系统的稳健性和可靠性。</p>
+<p>Seldon Core 提供的优化服务器允许您构建大规模深度学习系统，而无需对其进行容器化或担心其安全性。</p>
+<h2 id="3-7-Sematic"><a href="#3-7-Sematic" class="headerlink" title="3.7 Sematic"></a>3.7 Sematic</h2><p>Sematic 是一个开源机器学习开发平台。它使 ML 工程师和数据科学家能够使用简单的 Python 代码制作复杂的端到端机器学习管道，然后可以在不同的平台上执行：他们的本地计算机、云虚拟机或 Kubernetes 集群，利用基于云的资源的潜力。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722742342235.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/sematic-ai/sematic">https://github.com/sematic-ai/sematic</a></p>
+<p>这个开源平台借鉴了领先的自动驾驶汽车企业积累的见解。它有助于将数据处理任务（例如由 Apache Spark 提供支持的任务）与模型训练工作（例如 PyTorch 或 TensorFlow）甚至基于 Python 的任意业务逻辑无缝链接。这种合并导致创建类型安全、可追溯和可重复的端到端管道。这些管道具有全面的监控和可视化功能，可通过现代 Web 仪表板轻松管理。</p>
+<p>以下是 Sematic 提供的一些功能：</p>
+<ul>
+<li><strong>轻松部署</strong></li>
+</ul>
+<p>使用 Sematic 踏上您的旅程轻而易举，无需初始部署或基础设施要求。只需在本地安装 Sematic 即可开始探索。</p>
+<ul>
+<li><strong>从本地到云的奇偶校验</strong></li>
+</ul>
+<p>在个人笔记本电脑上运行的相同代码可以在 Kubernetes 集群上无缝执行，从而确保结果一致。</p>
+<ul>
+<li><strong>端到端透明度</strong></li>
+</ul>
+<p>管道的每个工件都经过精心存储、跟踪和呈现在 Web 仪表板中，从而实现全面监督。</p>
+<ul>
+<li><strong>利用多样化的计算资源</strong></li>
+</ul>
+<p>定制分配给管道每个步骤的资源，通过一系列选项（包括 CPU、内存、GPU 和 Spark 集群）优化性能和云占用空间。</p>
+<ul>
+<li><strong>核心的可重复性</strong></li>
+</ul>
+<p>从直观的用户界面中充满信心地重新运行您的管道，确保每次都能获得可重复的结果。</p>
+<p>Sematic 为您的机器学习管道引入了非凡的清晰度，为您提供了项目、日志、错误、源代码管理和依赖项图等关键方面的全面视图。这种强大的洞察力与 SDK 和 GUI 无缝结合，既简单又直观。</p>
+<p>Sematic 通过提供精确校准的抽象级别来达到熟练的平衡。这种平衡使 ML 工程师能够专注于完善他们的业务逻辑，同时利用云资源的力量——所有这些都不需要使用复杂的基础设施专业知识。</p>
+<h2 id="3-8-neptune-ai（比较推荐）"><a href="#3-8-neptune-ai（比较推荐）" class="headerlink" title="3.8 neptune.ai（比较推荐）"></a>3.8 neptune.ai（比较推荐）</h2><p><img src="https://image.rexking6.top/img/QQ_1722742386478.png" alt=""></p>
+<p>Neptune是一款轻量级的实验跟踪器，适用于那些在调试和重现实验、共享结果和混乱的模型切换中苦苦挣扎的ML团队。它提供了一个单一的地方来跟踪、比较、存储和协作实验和模型。借助Neptune，数据科学家可以更快地开发生产就绪模型，ML工程师可以立即访问模型工件，以便将它们部署到生产中。</p>
+<p><strong>1、日志和显示</strong></p>
+<p>将代码片段添加到ML管道的任何步骤一次。决定要记录什么以及如何记录。运行一百万次。</p>
+<p>任何框架：任何代码、PyTorch、PyTorch Lightning、TensorFlow/Keras、scikit-learn、LightGBM、XGBoost、Optuna、Kedro。</p>
+<p>任何元数据类型：指标、参数、数据集和模型版本、图像、交互式绘图、视频、硬件（GPU、CPU、内存）、代码状态。</p>
+<p>从ML管道中的任何位置：多节点管道、分布式计算、执行期间或之后的日志、离线日志以及重新联机时的同步。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722742412571.png" alt=""></p>
+<p><strong>2、组织实验</strong></p>
+<p>在完全可自定义的嵌套结构中组织日志。在用户定义的仪表板模板中显示模型元数据。</p>
+<p>嵌套元数据结构：灵活的API允许您根据需要自定义元数据日志记录结构。</p>
+<p>自定义仪表板：在一个视图中组合不同的元数据类型。为一次运行定义它。在任何地方使用。查看GPU、内存消耗和加载时间以调试训练速度。查看学习曲线、图像预测和混淆矩阵以调试模型质量。</p>
+<p>表视图：创建运行表的不同视图并保存它们以供以后使用。您可以有单独的表视图用于调试、比较参数集或最佳实验。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722742448240.png" alt=""></p>
+<p><strong>3、比较结果</strong></p>
+<p>在neptune.aiWeb应用程序中实时可视化训练。查看不同的参数和配置如何影响结果。更快地优化模型。</p>
+<p>比较：学习曲线、参数、图像、数据集。</p>
+<p>搜索、排序和过滤：按您记录的任何字段进行实验。使用我们的查询语言根据参数值、指标、执行时间或其他任何内容过滤运行。</p>
+<p>可视化和显示：运行表、交互式显示、文件夹结构、仪表板。</p>
+<p>实时监控：硬件消耗指标、GPU、CPU、内存。</p>
+<p>分组方式：数据集版本、参数。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722742486045.png" alt=""></p>
+<p><strong>4、模型版本</strong></p>
+<p>在一个地方版本、审查和访问生产就绪模型和与之关联的元数据。</p>
+<p>版本模型：注册模型、创建模型版本、版本外部模型工件。</p>
+<p>查看和更改阶段：查看验证、测试指标和其他模型元数据。您可以在无/暂存/生产/存档之间移动模型。</p>
+<p>访问和共享模型：每个模型和模型版本都可以通过neptune.aiWeb应用程序或API访问。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722742508075.png" alt=""></p>
+<p><strong>5、分享结果</strong></p>
+<p>有一个后台地方可以让您的团队查看结果并访问所有模型和实验。</p>
+<p>发送链接：通过复制和发送持久URL来共享您在neptune.ai应用程序中看到的每个图表、仪表板、表格视图或任何其他内容。</p>
+<p>查询应用编程接口：通过neptune.ai应用编程接口访问所有模型元数据。无论你记录了什么，你都可以用类似的方式查询。</p>
+<p>管理用户和项目：创建不同的项目，向其中添加用户，并授予不同的权限级别。</p>
+<p>添加您的整个组织：在每个付费计划中获得无限用户。因此，您可以免费邀请整个组织，包括产品经理和主题专家。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722742542188.png" alt=""></p>
+<h1 id="四、数据处理MLOps开源平台"><a href="#四、数据处理MLOps开源平台" class="headerlink" title="四、数据处理MLOps开源平台"></a>四、数据处理MLOps开源平台</h1><p>数据处理平台非常适合用于为任何给定应用准备强大的管道。这些平台能够扩展、优化、批处理、分发数据流等。</p>
+<h2 id="4-1-Apache-Airflow"><a href="#4-1-Apache-Airflow" class="headerlink" title="4.1 Apache Airflow"></a>4.1 Apache Airflow</h2><p>Apache Airflow 是一个开源平台，专为开发、调度和警惕监控以批处理为中心的工作流而量身定制。Airflow 广泛的 Python 基础使您能够打造复杂的工作流程，无缝衔接与各种技术的联系。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722742598916.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://airflow.apache.org/docs/apache-airflow/stable/index.html">https://airflow.apache.org/docs/apache-airflow/stable/index.html</a></p>
+<p>用户友好的 Web 界面负责工作流管理，精心监督其状态。从在您的个人笔记本电脑上部署为单个流程，到配置能够支持最复杂工作流程的分布式设置，Airflow 可容纳大量部署选项。Airflow 工作流的一个独特标志是它们在 Python 代码中的锚定。这种“工作流即代码”范式具有多方面的作用：</p>
+<ul>
+<li><strong>动态实力</strong></li>
+</ul>
+<p>气流管道通过 Python 代码进行模制，从而灌输动态管道生成功能。</p>
+<ul>
+<li><strong>固有的可扩展性</strong></li>
+</ul>
+<p>Airflow 框架包含一系列与多种技术无缝对接的操作员。Airflow 的每个组件都保留了固有的可扩展性，可无缝适应您的独特环境。</p>
+<ul>
+<li><strong>极致的灵活性</strong></li>
+</ul>
+<p>工作流程参数化的结构被编织到系统中，利用Jinja模板引擎的强大功能来简化定制。</p>
+<p>Apache Airflow 是任何机器学习堆栈的多功能补充，提供动态工作流编排，以适应不断变化的数据和需求。凭借其灵活性、广泛的连接性和可扩展性，Airflow 允许机器学习从业者在集成各种技术的同时构建自定义工作流程即代码。其监控功能、社区支持以及与云资源的兼容性增强了机器学习操作中的机器学习可重复性、协作和高效资源利用率。</p>
+<h1 id="五、监控-MLOps-开源平台"><a href="#五、监控-MLOps-开源平台" class="headerlink" title="五、监控 MLOps 开源平台"></a>五、监控 MLOps 开源平台</h1><h2 id="5-1-EvidentlyAI"><a href="#5-1-EvidentlyAI" class="headerlink" title="5.1 EvidentlyAI"></a>5.1 EvidentlyAI</h2><p>显然，AI 是一个开源的可观测性平台，允许您评估、测试和监控机器学习模型。该平台涵盖了从验证到生产的阶段。它为表格数据、嵌入以及基于文本的模型和数据提供服务。它还扩展了其服务，以满足大型语言模型或 LLM 的需求。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722742624167.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://www.evidentlyai.com/">https://www.evidentlyai.com/</a></p>
+<p>这些是 EvidentlyAI 提供的一些产品：</p>
+<ul>
+<li>1数据和模型可视化仪表板</li>
+<li>2数据和 ML 监控</li>
+<li>3数据质量和完整性检查</li>
+<li>4数据漂移监控</li>
+<li>5ML 模型性能监控</li>
+<li>6NLP 和 LLM 监控。</li>
+</ul>
+<p>通过这些产品，EvidentlyAI 提供以下功能：</p>
+<ul>
+<li><strong>生成报表</strong></li>
+</ul>
+<p>即插即用功能使用户能够轻松构建数据集和模型性能报告。这些报告易于分享并吸引互动。</p>
+<ul>
+<li><strong>测试管道</strong></li>
+</ul>
+<p>显然，AI 测试套件允许您为机器学习模型和数据正确创建测试管道，以查看是否检测到任何偏差。</p>
+<ul>
+<li><strong>监测</strong></li>
+</ul>
+<p>凭借仪表板功能和广泛的测试方法，Evidently 使监控和调试机器学习模型变得简单且具有交互性。</p>
+<ul>
+<li><strong>数据质量</strong></li>
+</ul>
+<p>使用 EvidentlyAI，您可以运行各种探索性分析，以确保数据具有高质量和完整性。它使您能够通过一行代码轻松发现数据中的问题。</p>
+<p>显然，AI 是一个易于使用的平台，它提供了强大的功能和良好的功能。这个测试平台是目前最好的测试平台之一，它紧跟潮流，因为它为 LLM 提供服务。</p>
+<h1 id="六、MLOps开源框架"><a href="#六、MLOps开源框架" class="headerlink" title="六、MLOps开源框架"></a>六、MLOps开源框架</h1><p>现在已经涵盖了开源平台，让我们深入了解这些框架。</p>
+<p><strong>Workflow open source MLOps frameworks</strong></p>
+<p>工作流框架允许你提供一种结构化方法来简化 MLOps 应用程序的不同阶段。您必须记住，有些框架涵盖两个阶段，而有些框架可能涵盖多个阶段。</p>
+<h2 id="6-1-Kedro"><a href="#6-1-Kedro" class="headerlink" title="6.1 Kedro"></a>6.1 Kedro</h2><p>Kedro是一个 Python 框架，供机器学习工程师和数据科学家创建可重复和可维护的代码。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722742715173.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://kedro.org/">https://kedro.org/</a></p>
+<p>如果您想组织<strong>数据管道</strong>并使机器学习项目开发更加高效，那么这个框架是您最好的朋友。您不必在代码重写上浪费时间，并且将有更多机会专注于健壮的管道。此外，Kedro 还帮助团队建立协作标准，以限制延迟并构建可扩展、可部署的项目。</p>
+<p>Kedro 有很多优点：</p>
+<ul>
+<li><strong>项目模板</strong></li>
+</ul>
+<p>通常，您必须花费大量时间了解如何设置分析项目。Kedro 提供了一个标准模板，可以节省您的时间。</p>
+<ul>
+<li><strong>数据管理</strong></li>
+</ul>
+<p>Kedro 将帮助您加载和存储数据，以停止对代码的可重复性和可伸缩性感到担忧。</p>
+<ul>
+<li><strong>配置管理</strong></li>
+</ul>
+<p>当您使用复杂的软件系统时，这是一个必要的工具。如果对配置管理不够重视，可能会遇到严重的可靠性和可伸缩性问题。</p>
+<p>Kedro 提倡采用数据驱动的 ML 开发方法，并维护行业级标准，同时降低企业的运营风险</p>
+<h2 id="6-2-ZenML"><a href="#6-2-ZenML" class="headerlink" title="6.2 ZenML"></a>6.2 ZenML</h2><p>ZenML是一个 MLOps 框架，用于编排机器学习<strong>试验管道</strong>。它为您提供了以下工具：</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722742774798.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://www.zenml.io/">https://www.zenml.io/</a></p>
+<ul>
+<li><strong>预处理数据</strong></li>
+</ul>
+<p>ZenML 可帮助您将原始数据转换为可分析的数据。</p>
+<ul>
+<li><strong>训练模型</strong></li>
+</ul>
+<p>在其他方便模型训练的工具中，该平台使用声明性管道配置，因此您可以轻松地在本地和云环境之间切换。</p>
+<ul>
+<li><strong>进行拆分测试</strong></li>
+</ul>
+<p>ZenML的创建者声称，该平台的主要优势是自动实验跟踪和保证实验之间的可比性。</p>
+<ul>
+<li><strong>评估结果</strong></li>
+</ul>
+<p>XML 专注于使 ML 开发对于个人开发人员和大型团队来说都是可重复和直接的。</p>
+<p>该框架使您摆脱了使用传统工具交付机器学习模型的所有麻烦。如果您难以提供足够的实验数据来证明结果的可重复性，想要减少浪费并使代码的重用更简单，ZenML 将为您提供帮助。</p>
+<h1 id="七、部署和服务开源-MLOps-框架"><a href="#七、部署和服务开源-MLOps-框架" class="headerlink" title="七、部署和服务开源 MLOps 框架"></a>七、部署和服务开源 MLOps 框架</h1><h2 id="7-1-BentoML"><a href="#7-1-BentoML" class="headerlink" title="7.1 BentoML"></a>7.1 BentoML</h2><p>BentoML是一个框架，允许您构建、部署和扩展任何机器学习应用程序。BentoML 提供了一种将训练好的模型以及任何预处理、后处理和自定义代码捆绑成容器化格式的方法</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722742983324.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://docs.bentoml.org/en/0.13-lts/concepts.html">https://docs.bentoml.org/en/0.13-lts/concepts.html</a></p>
+<p>BentoML的一些主要功能包括：</p>
+<ul>
+<li><strong>模型服务</strong></li>
+</ul>
+<p>BentoML 允许您使用 REST API 轻松提供机器学习模型。它抽象了为机器学习模型提供服务和管理基础设施的复杂性。</p>
+<ul>
+<li><strong>模型包装</strong></li>
+</ul>
+<p>可以将经过训练的模型以及依赖项和自定义代码打包到单个可部署的项目中。这使得重现模型部署变得简单。</p>
+<ul>
+<li><strong>多框架支持</strong></li>
+</ul>
+<p>BentoML 支持各种机器学习框架，例如 TensorFlow、PyTorch、Scikit-learn、XGBoost 等。</p>
+<ul>
+<li><strong>部署灵活性</strong></li>
+</ul>
+<p>您可以在各种环境中部署 BentoML 模型，包括本地服务器、云平台和 Kubernetes 集群。</p>
+<ul>
+<li><strong>可扩展性</strong></li>
+</ul>
+<p>BentoML 支持高吞吐量服务，使其适用于需要高效且可扩展模型部署的机器学习应用程序。</p>
+<ul>
+<li><strong>版本控制</strong></li>
+</ul>
+<p>BentoML 允许您对模型工件进行版本控制，并轻松地在不同版本之间切换以进行服务。</p>
+<ul>
+<li><strong>监视和日志记录</strong></li>
+</ul>
+<p>BentoML提供了用于监控已部署模型的运行状况和性能的功能，包括日志记录和指标。</p>
+<ul>
+<li><strong>定制</strong></li>
+</ul>
+<p>您可以自定义部署环境、预处理、后处理以及已部署模型的其他方面。</p>
+<p>BentoML 可以成为您的 ML 武器库中的重要资源，因为它基本上可以轻松可靠地提供更多功能。借助 BentoML，您可以将机器学习模型部署为 REST API、Docker 容器，甚至是无服务器函数。</p>
+<h1 id="八、工作流编排开源-MLOps-框架"><a href="#八、工作流编排开源-MLOps-框架" class="headerlink" title="八、工作流编排开源 MLOps 框架"></a>八、工作流编排开源 MLOps 框架</h1><h2 id="8-1-Argo-工作流程"><a href="#8-1-Argo-工作流程" class="headerlink" title="8.1 Argo 工作流程"></a>8.1 Argo 工作流程</h2><p><img src="https://image.rexking6.top/img/QQ_1722743014519.png" alt=""></p>
+<p>Argo Workflow是一个基于Kubernetes的编排工具，它基于YAML。它是轻巧且易于使用的工具。因为它基于 YAML，所以它被实现为 Kubernetes CRD（自定义资源定义）。它是开源的，并受到大型社区的信任。</p>
+<p>Argo Workflow为广泛的生态系统提供支持，其中一些是：</p>
+<ol>
+<li>Kedro</li>
+<li>Kubeflow Pipelines</li>
+<li>Seldon</li>
+<li>SQLFlow</li>
+<li>Argo Events</li>
+<li>Couler</li>
+<li>Hera</li>
+<li>Katlib</li>
+</ol>
+<p>Argo Workflow 还支持基于 Python 的环境。尽管 Argo 提供了相当多的功能，但我列出了一些吸引我的功能：</p>
+<ul>
+<li><strong>用户界面</strong></li>
+</ul>
+<p>该工作流提供了一个用户界面，允许用户轻松管理其工作流。</p>
+<ul>
+<li><strong>工件支持</strong></li>
+</ul>
+<p>可以集成 S3、Azure Blob 存储等平台来存储元数据。</p>
+<ul>
+<li><strong>调度</strong></li>
+</ul>
+<p>您可以使用 cron 计划整个 ML 工作流。这允许您将作业和任务安排在特定时间、特定日期或定期运行。</p>
+<ul>
+<li><strong>Kubernetes的</strong></li>
+</ul>
+<p>如果您对使用 Kubernetes 集群有很好的了解，那么 Argo 是首选。一个关键特性是 Argo 将每个步骤定义为一个容器。</p>
+<ul>
+<li><strong>效率</strong></li>
+</ul>
+<p>它可以轻松计算数据处理和 ML 的密集型作业，使其高效可靠。</p>
+<p>您可以在此处找到完整的文档。</p>
+<h1 id="九、MLOps-开源工具"><a href="#九、MLOps-开源工具" class="headerlink" title="九、MLOps 开源工具"></a>九、MLOps 开源工具</h1><p>开源工具和库解决了机器学习应用程序中的一个特定方面。您可以选择这些工具中的任何一个，并将其用于您自己的应用程序，并将它们放入所需的框架中。一个关键优势是这些工具与大多数工作环境兼容，并且它们也兼容。</p>
+<p>在此列表中，我们将介绍 ML 生命周期中的一些主要领域，在这些领域中，开源工具将为您完成工作。</p>
+<p><strong>Development and deployment open source ML tools</strong></p>
+<h2 id="9-1-MLRun"><a href="#9-1-MLRun" class="headerlink" title="9.1 MLRun"></a>9.1 MLRun</h2><p>MLRun 是用于机器学习模型开发和部署的工具。如果您正在寻找一种可以在<strong>各种环境中</strong>方便运行并<strong>支持多种技术</strong>堆栈的工具，那么绝对值得一试。MLRun 提供了一种管理数据管道的综合方法</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722743099119.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/mlrun/mlrun">https://github.com/mlrun/mlrun</a></p>
+<p>MLRun 具有分层体系结构，可提供以下强大功能：</p>
+<ul>
+<li><strong>功能和项目存储</strong></li>
+</ul>
+<p>此层可帮助您处理数据的准备和处理，并将其存储在不同的存储库中。</p>
+<ul>
+<li><strong>弹性无服务器运行时层</strong></li>
+</ul>
+<p>将简单的代码转换为易于扩展和维护的微服务。它与 Kubernetes 作业、Dask 和 Apache Spark 等标准运行时引擎兼容。</p>
+<ul>
+<li><strong>自动化层</strong></li>
+</ul>
+<p>为了让您专注于模型训练模型和微调超参数，管道自动化工具可帮助您准备数据、测试和实时部署。您只需提供监督即可创建最先进的 ML 解决方案。</p>
+<ul>
+<li><strong>中央管理层</strong></li>
+</ul>
+<p>在这里，您可以访问统一的仪表板来管理您的整个工作流程。MLRun 具有方便的用户界面、CLI 和可在任何地方访问的 SDK。</p>
+<p>使用 MLRun，只需编写一次代码，然后使用自动化解决方案在不同平台上运行代码。该工具管理构建过程、执行、数据移动、缩放、版本控制、参数化、输出跟踪等。</p>
+<h3 id="9-2-CML（持续机器学习）"><a href="#9-2-CML（持续机器学习）" class="headerlink" title="9.2 CML（持续机器学习）"></a>9.2 CML（持续机器学习）</h3><p><img src="https://image.rexking6.top/img/QQ_1722743134737.png" alt=""></p>
+<p>CML（Continuous Machine Learning）是一个用于机器学习项目持续集成和交付（CI / CD）的库。该库由 DVC 的创建者开发，DVC 是一个用于对机器学习模型和机器学习实验进行版本控制的开源库。与 DVC、Tensorboard 和云服务一起，CML 应该促进在产品中开发和实现机器学习模型的过程。</p>
+<ul>
+<li><strong>自动化管道构建</strong></li>
+</ul>
+<p>CML 旨在自动执行机器学习工程师的一些工作，包括训练实验、模型评估、数据集及其添加。</p>
+<ul>
+<li><strong>集成 API</strong></li>
+</ul>
+<p>该工具被定位为一个库，支持用于数据科学项目的 GitFlow，允许自动生成报告，并隐藏使用外部服务的复杂细节。外部服务的示例包括云平台：AWS、Azure、GCP 等。对于基础结构任务，还使用 DVC、docker 和 Terraform。最近，机器学习项目的基础设施方面引起了更多关注。</p>
+<p>该库非常灵活，并提供广泛的功能;从发送报告和发布数据，到为项目分发云资源。</p>
+<h1 id="十、AutoML-开源工具"><a href="#十、AutoML-开源工具" class="headerlink" title="十、AutoML 开源工具"></a>十、AutoML 开源工具</h1><h2 id="10-1-AutoKeras"><a href="#10-1-AutoKeras" class="headerlink" title="10.1 AutoKeras"></a>10.1 AutoKeras</h2><p>AutoKeras 是用于自动化机器学习 （AutoML） 的开源库。借助 AutoML 框架，您可以自动处理原始数据、选择机器学习模型并优化学习算法的超参数。</p>
+<ul>
+<li><strong>简化机器学习模型开发</strong></li>
+</ul>
+<p>AutoML 减少了人类开发机器学习模型时发生的偏差和方差，并简化了机器学习模型的开发。</p>
+<ul>
+<li><strong>享受自动超参数调优</strong></li>
+</ul>
+<p>AutoKeras 是一种工具，它提供了自动匹配深度学习模型的架构和超参数的功能。</p>
+<ul>
+<li><strong>构建灵活的解决方案</strong></li>
+</ul>
+<p>AutoKeras 以其灵活性而闻名。在这种情况下，无论后端如何，您编写的代码都将被执行。它支持 Theano、Tensorflow 和其他框架。</p>
+<p>AutoKeras 内部有多个训练数据集。它们已经以一种方便工作的形式出现，但它并没有向你展示AutoKeras的全部功能。事实上，它包含用于对文本、图片和时间序列进行适当预处理的工具。换句话说，最常见的数据类型，使数据准备过程更易于管理。该工具还具有内置的模型可视化功能。</p>
+<h2 id="10-2-H2O-自动机器学习"><a href="#10-2-H2O-自动机器学习" class="headerlink" title="10.2 H2O 自动机器学习"></a>10.2 H2O 自动机器学习</h2><p><img src="https://image.rexking6.top/img/QQ_1722743244132.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://docs.h2o.ai/h2o/latest-stable/h2o-docs/automl.html">https://docs.h2o.ai/h2o/latest-stable/h2o-docs/automl.html</a></p>
+<p>H2O.ai是一个使用 AutoML 优化机器学习过程的软件平台。H2O声称该平台可以比scikit-learn等流行的机器学习库更快地训练模型。</p>
+<p>H2O 是一个机器学习、预测性数据分析平台，用于构建机器学习模型并在 Java 和 Python 中为它们生成生产代码，只需单击一个按钮即可完成。</p>
+<ul>
+<li><strong>开箱即用地实施 ML 模型</strong></li>
+</ul>
+<p>它实现了有监督和无监督算法，如 GLM 和 K-Means，以及一个名为 Flow 的易于使用的 Web 界面。</p>
+<ul>
+<li><strong>根据您的需求定制 H2O</strong></li>
+</ul>
+<p>该工具对初学者和经验丰富的开发人员都有帮助。它为编码人员配备了一个简单的包装函数，只需几行代码即可管理与建模相关的任务。经验丰富的机器学习工程师很欣赏这个功能，因为它允许他们专注于构建模型的其他更密集的思考过程（如数据探索和特征工程）。</p>
+<p>总体而言，H2O是解决机器学习和数据科学问题的强大工具。即使是初学者也可以从数据中提取价值并构建强大的模型。H2O继续发展和发布新产品，同时保持全面的高质量。</p>
+<h3 id="10-3-EvalML"><a href="#10-3-EvalML" class="headerlink" title="10.3 EvalML"></a>10.3 EvalML</h3><p>EvalML 是一个库，提供多种功能，例如构建、优化和评估机器学习管道。EvalML 提供利用 <em>Featuretools</em> 和 <em>Compose</em> 的端<strong>到端监督</strong>式机器学习解决方案。前者是用于在关系数据集中执行自动化<strong>特征</strong>工程的框架，后者用于<strong>自动化预测工程</strong>。</p>
+<p>借助这些自动化功能，EvalML 提供了四个重要功能：</p>
+<ul>
+<li><strong>自动化</strong></li>
+</ul>
+<p>它从图片中拿走了手工工作。您可以轻松创建机器学习模型。自动化功能包括数据质量检查、交叉验证和许多其他功能。</p>
+<ul>
+<li><strong>数据检查</strong></li>
+</ul>
+<p>顾名思义，它会检查数据完整性，并在您可以使用它们来训练模型之前揭示重复、不平衡分布等问题和问题。</p>
+<ul>
+<li><strong>端到端</strong></li>
+</ul>
+<p>提供端到端功能，包括数据预处理、特征工程、特征选择和各种其他机器学习建模技术。</p>
+<ul>
+<li><strong>模型理解</strong></li>
+</ul>
+<p>它可以帮助您了解和检查机器学习模型。</p>
+<p>总而言之，EvalML 是一个了不起的工具，它基本上自动化了 ML 生命周期的两个主要阶段，即数据预处理和 ML 建模。EvalML 有一个活跃的贡献者列表，并且库每天都会更新。您可以轻松地将这个轻量级库用于您自己的应用程序，因为文档非常简单易懂。</p>
+<h3 id="10-4-微软NNI"><a href="#10-4-微软NNI" class="headerlink" title="10.4 微软NNI"></a>10.4 微软NNI</h3><p><img src="https://image.rexking6.top/img/QQ_1722743304852.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/microsoft/nni">https://github.com/microsoft/nni</a></p>
+<p>NNI 或神经网络智能是 Microsoft 创建的轻量级工具，用于自动化神经网络优化。这个开源工具包允许用户自动执行特征工程、神经架构搜索或 NAS、模型压缩和超参数调整。</p>
+<p>NNI 在 Python 中提供了简单易用的函数调用。与其他 Python 库和框架类似，可以在现有管道中利用 NNI。您只需要一个 PyTorch 工作环境，即可即插即用，只需调用一个函数即可自动执行优化技术。例如，如果要执行：</p>
+<ul>
+<li>超参数调优，然后只需调用 nni.get_next_parameter（）</li>
+<li>模型修剪然后调用其中一种修剪方法，例如 L1NormPruner（model， config）</li>
+<li>模型量化然后调用任何量化函数，例如 QAT_Quantizer（model， config）</li>
+<li>神经架构搜索，然后你可以分别调用策略和计算器，如 RegularizedEvolution（） 和 FunctionalEvaluator（）。</li>
+</ul>
+<p>还有其他功能：一次性神经架构搜索和特征工程。NNI 提出的想法是自动化神经网络模型工程。</p>
+<p>从本质上讲，NNI 简化了模型构建和工程阶段，同时允许您管理 AutoML 机器学习实验。除了上述所有内容外，它还提供了一个仪表板，您可以在其中监控调整过程，从而控制实验。如果您是一个花费大量时间构建模型并对其进行微调的人，那么此工具是必需的。</p>
+<h1 id="十一、数据验证开源-ML-工具"><a href="#十一、数据验证开源-ML-工具" class="headerlink" title="十一、数据验证开源 ML 工具"></a>十一、数据验证开源 ML 工具</h1><p>数据验证是检查数据质量的过程。在此阶段，请确保集合中没有不一致或缺失的数据。数据验证工具可自动执行此常规过程并提高数据清理的质量。</p>
+<h2 id="11-1-Hadoop"><a href="#11-1-Hadoop" class="headerlink" title="11.1 Hadoop"></a>11.1 Hadoop</h2><p>Hadoop 是一组可自由再分发的实用程序、库和框架，用于开发和执行在集群上运行的程序。这种用于存储和处理大数据的基础技术是 Apache 软件基金会的顶级项目。</p>
+<p>该项目由4个主要模块组成：</p>
+<ul>
+<li><strong>Hadoop 常见</strong></li>
+</ul>
+<p>Hadoop Common 是一组基础架构软件库和实用程序，用于其他解决方案和相关项目，特别是用于管理分布式文件和创建必要的基础架构。</p>
+<ul>
+<li><strong>HDFS 是一个分布式文件系统</strong></li>
+</ul>
+<p>Hadoop 分布式文件系统是一种将文件存储在各种数据服务器上的技术，其地址位于特殊的名称服务器上。HDFS提供大文件的可靠存储，逐块分布在计算集群的节点之间。</p>
+<ul>
+<li><strong>YARN是一个任务调度和集群管理系统</strong></li>
+</ul>
+<p>YARN 是一组系统程序，可提供分布式应用程序的共享、可伸缩性和可靠性。</p>
+<ul>
+<li><strong>Hadoop MapReduce（哈多普地图缩减）</strong></li>
+</ul>
+<p>这是一个平台，用于使用许多计算机组成集群进行编程和执行分布式MapReduce计算。</p>
+<p>如今，Hadoop中有一个完整的相关项目和技术生态系统，用于数据挖掘和机器学习。</p>
+<h2 id="11-2-Apache-Spark"><a href="#11-2-Apache-Spark" class="headerlink" title="11.2 Apache Spark"></a>11.2 Apache Spark</h2><p>Apache Spark可帮助您处理半结构化的内存中数据。Spark的主要优点是性能和用户友好的编程界面。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722743394217.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://spark.apache.org/docs/latest/web-ui.html">https://spark.apache.org/docs/latest/web-ui.html</a></p>
+<p>该框架有五个组件：一个核心和四个库，每个库解决一个特定的问题。</p>
+<ul>
+<li><strong>火花核心</strong></li>
+</ul>
+<p>这是框架的核心。您可以将其用于调度和核心 I/O 功能。</p>
+<ul>
+<li><strong>Spark SQL的</strong></li>
+</ul>
+<p>Spark SQL 是处理数据时派上用场的四个框架库之一。为了加快运行速度，此工具使用 DataFrames，并可充当分布式 SQL 查询引擎。</p>
+<ul>
+<li><strong>Spark 流式处理</strong></li>
+</ul>
+<p>这是一个易于使用的流数据处理工具。它将数据分解为微批处理模式。Spark的创建者声称性能不会因此而受到太大影响。</p>
+<ul>
+<li><strong>MLlib的</strong></li>
+</ul>
+<p>这是一个高速分布式机器学习系统。当与交替最小二乘法 （ALS） 算法进行基准测试时，它比其竞争对手 Apache Mahout 库快 9 倍。MLlib 包括用于分类、回归和推荐系统的常用算法。</p>
+<ul>
+<li><strong>GraphX的</strong></li>
+</ul>
+<p>GraphX 是一个用于可扩展图形处理的库。GraphX 不适用于以事务方式更改的图形，例如数据库。</p>
+<p>Spark是完全自主的，但如果需要，还可以与其他标准ML工具（如Hadoop）兼容。</p>
+<h2 id="11-3-Great-Expectations"><a href="#11-3-Great-Expectations" class="headerlink" title="11.3 Great Expectations"></a>11.3 Great Expectations</h2><p>为了有效管理复杂的数据管道，数据从业者认识到测试和记录的重要性。GX 为在数据堆栈中快速部署适应性强、可扩展的数据质量测试提供了解决方案。其用户友好的文档确保了技术和非技术用户的可访问性。</p>
+<p>远大期望 （GX） 通过结合质量测试、文档和分析，帮助数据团队促进对其数据的集体理解。</p>
+<p><img src="https://pic4.zhimg.com/80/v2-3859d18677583b193fafa10729a06487_720w.webp" alt="img"></p>
+<p>一些主要功能包括：</p>
+<ul>
+<li><strong>无缝集成</strong></li>
+</ul>
+<p>GX 无缝集成到您当前的技术堆栈中，并可以与您的 CI/CD 管道链接，从而实现精确的数据质量增强。验证并连接您的现有数据，使 Expectation Suites 能够完美地满足您的数据质量要求。</p>
+<ul>
+<li><strong>快速上手</strong></li>
+</ul>
+<p>GX 可以迅速产生有价值的结果，即使对于大型数据集也是如此。其数据助手提供针对各个领域量身定制的精选期望，加速数据发现，以便在管道中快速部署数据质量。自动生成的数据文档可确保持续提供最新的文档。</p>
+<ul>
+<li><strong>统一洞察</strong></li>
+</ul>
+<p>期望是GX的核心抽象，阐明了预期的数据状态。Expectation 库采用人类可读的词汇表，以满足技术和非技术用户的需求。它们捆绑在期望套件中，可以很好地描述您的数据期望。</p>
+<ul>
+<li><strong>安全性和透明度</strong></li>
+</ul>
+<p>GX通过在您自己的系统中处理数据来保护您的数据安全。它的开源基础确保了完全的透明度，允许完全控制洞察力。</p>
+<ul>
+<li><strong>数据合同支持</strong></li>
+</ul>
+<p>利用检查点对期望进行透明、集中和自动化的测试，生成可读的数据文档。检查点可以根据评估结果触发操作，从而提高数据质量。</p>
+<ul>
+<li><strong>加强协作</strong></li>
+</ul>
+<p>GX 的数据文档是可检查、可共享和人类可读的，促进了对数据质量的相互理解。以多种格式发布数据文档，以便与现有目录、仪表板和报告工具无缝集成。</p>
+<p>“远大期望”通过增强数据可靠性、降低影响机器学习模型的数据质量差的风险以及在团队中促进数据质量管理的协作方法，与 MLOps 工具很好地保持一致。</p>
+<h2 id="11-4-TensorFlow-扩展-（TFX）"><a href="#11-4-TensorFlow-扩展-（TFX）" class="headerlink" title="11.4 TensorFlow 扩展 （TFX）"></a>11.4 TensorFlow 扩展 （TFX）</h2><p><img src="https://image.rexking6.top/img/QQ_1722743436735.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://www.tensorflow.org/tfx">https://www.tensorflow.org/tfx</a></p>
+<p>TFX 是 TensorFlow Extended 的缩写，它提供了一系列强大的功能，可实现有效的机器学习操作：</p>
+<ul>
+<li><strong>可扩展的 ML 管道</strong></li>
+</ul>
+<p>TFX 提供为可扩展和高性能机器学习任务量身定制的结构化组件序列，简化端到端 ML 管道的开发。</p>
+<ul>
+<li><strong>组件模块化</strong></li>
+</ul>
+<p>TFX 组件使用专用库构建，既提供了有凝聚力的框架，又可以根据您的需求灵活地使用单个组件。</p>
+<ul>
+<li><strong>数据预处理</strong></li>
+</ul>
+<p>TFX 包括用于数据预处理、转换和特征工程的强大工具，这对于为模型训练准备数据至关重要。</p>
+<ul>
+<li><strong>模型训练和验证</strong></li>
+</ul>
+<p>它支持使用 TensorFlow 进行模型训练，并有助于模型验证，从而确保机器学习模型的稳健性和可靠性。</p>
+<ul>
+<li><strong>自动模型部署</strong></li>
+</ul>
+<p>TFX 简化了将模型部署到各种服务环境的过程，从而实现了与生产系统的顺利集成。</p>
+<ul>
+<li><strong>工件跟踪</strong></li>
+</ul>
+<p>TFX 维护对实验工件的跟踪，帮助跟踪和管理 ML 模型的生命周期。</p>
+<ul>
+<li><strong>定制组件开发</strong></li>
+</ul>
+<p>它允许创建自定义组件以满足特定要求或集成第三方工具。</p>
+<ul>
+<li><strong>与 TensorFlow 集成</strong></li>
+</ul>
+<p>作为 TensorFlow 的扩展，TFX 与 TensorFlow 生态系统工具和技术无缝集成。</p>
+<p>TFX 非常适合您的 MLOps 工具包，因为它专注于可扩展性、性能和端到端 ML 管道管理。它简化了机器学习工作流的开发和部署，确保了高效的数据预处理、模型训练、验证和部署。它的模块化以及与 TensorFlow 的集成使其成为您寻求高效和有效机器学习操作的宝贵资产。</p>
+<h1 id="十二-、数据探索开源-ML-工具"><a href="#十二-、数据探索开源-ML-工具" class="headerlink" title="十二 、数据探索开源 ML 工具"></a>十二 、数据探索开源 ML 工具</h1><p>数据探索软件是为自动化数据分析而创建的，可提供简化的模式识别和轻松的见解可视化。数据探索是一个认知密集型过程，您需要强大的工具来帮助您跟踪和执行代码。</p>
+<h2 id="12-1-Jupyter-笔记本"><a href="#12-1-Jupyter-笔记本" class="headerlink" title="12.1 Jupyter 笔记本"></a>12.1 Jupyter 笔记本</h2><p>Jupyter Notebook 是一个开发环境，您可以在其中立即查看执行代码及其片段的结果。与传统 IDE 的区别在于，代码可以分解为块并按任意顺序执行。您可以将文件加载到内存中，单独检查其内容，也可以单独处理内容。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722743502611.png" alt=""></p>
+<ul>
+<li><strong>多语言支持</strong></li>
+</ul>
+<p>通常，当我们谈论 Jupyter Notebook 时，我们指的是使用 Python。但是，事实上，您可以使用其他语言，例如 Ruby、Perl 或 R。</p>
+<ul>
+<li><strong>与云集成</strong></li>
+</ul>
+<p>开始在云中使用 Jupyter Notebook 的最简单方法是使用 Google Colab。这意味着您只需要启动浏览器并打开所需的页面。之后，云系统将为您分配资源并允许您执行任何代码。</p>
+<p>优点是您无需在计算机上安装任何东西。云负责一切，您只需编写和运行代码即可。</p>
+<h1 id="十三、数据版本控制开源-ML-工具"><a href="#十三、数据版本控制开源-ML-工具" class="headerlink" title="十三、数据版本控制开源 ML 工具"></a>十三、数据版本控制开源 ML 工具</h1><p>在完成之前，将有多个机器学习模型版本。为确保不会丢失任何内容，请使用强大且值得信赖的数据版本控制系统，其中每个更改都是可跟踪的。</p>
+<h2 id="13-1-数据版本控制-（DVC）"><a href="#13-1-数据版本控制-（DVC）" class="headerlink" title="13.1 数据版本控制 （DVC）"></a>13.1 数据版本控制 （DVC）</h2><p><img src="https://image.rexking6.top/img/QQ_1722743657730.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://dvc.org/">https://dvc.org/</a></p>
+<p>DVC 是一种设计用于管理 ML 项目中的软件版本的工具。它既可用于试验，也可用于将模型部署到生产环境。DVC 运行在 Git 之上，使用其基础结构，并具有类似的语法。</p>
+<ul>
+<li><strong>全自动版本控制</strong></li>
+</ul>
+<p>DVC 创建图元文件来描述需要保存在项目的 Git 历史记录中的管道和版本控制文件。如果您在 DVC 的控制下传输某些数据，它将开始跟踪所有更改。</p>
+<ul>
+<li><strong>基于 Git 的修改跟踪</strong></li>
+</ul>
+<p>您可以像使用 Git 一样处理数据：保存版本，将其发送到远程存储库，获取所需的数据版本，以及更改和切换版本。DVC界面直观清晰。</p>
+<p>总体而言，DVS 是用于数据和模型版本控制的绝佳工具。如果不需要管道和远程存储库，则可以对在本地计算机上工作的特定项目的数据进行版本控制。DVC 允许您非常快速地处理数十 GB 的数据。</p>
+<p>但是，它还允许您在团队之间交换数据和模型。对于数据存储，您可以使用云解决方案。</p>
+<h2 id="13-2-Pachyderm"><a href="#13-2-Pachyderm" class="headerlink" title="13.2 Pachyderm"></a>13.2 Pachyderm</h2><p>Pachyderm 是一个类似 Git 的工具，用于跟踪数据中的转换。它跟踪数据沿袭并确保数据保持相关性。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722743749835.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://www.pachyderm.com/">https://www.pachyderm.com/</a></p>
+<p>Pachyderm很有用，因为它提供：</p>
+<ul>
+<li><strong>溯源</strong></li>
+</ul>
+<p>您希望您的数据从原始数据到最终预测的整个过程都是完全可追溯的。通过对数据的版本控制，Pachyderm 为您提供了完全透明的数据管道视图。这可能是一个挑战;例如，当多个转换器使用相同的数据集时，可能很难说出为什么会得到这个或那个结果。</p>
+<ul>
+<li><strong>再现性</strong></li>
+</ul>
+<p>Pachyderm 是朝着数据科学模型的可重复性迈出的一步。您将始终放心，在将模型传给客户后，您的客户可以获得相同的结果。</p>
+<p>Pachyderm 将您的所有数据存储在一个中心位置并更新所有更改。任何转变都不会被忽视。</p>
+<h1 id="十四、数据检测开源-ML-工具"><a href="#十四、数据检测开源-ML-工具" class="headerlink" title="十四、数据检测开源 ML 工具"></a>十四、数据检测开源 ML 工具</h1><h2 id="14-1-Alibi-Detect"><a href="#14-1-Alibi-Detect" class="headerlink" title="14.1 Alibi Detect"></a>14.1 Alibi Detect</h2><p>Alibi Detect 是 SeldonIO 的开源 Python 库，它还提供了我们之前讨论过的 Seldon Core。此库允许您检查数据的完整性。它为表格数据、文本、图像和时间序列提供异常值、对抗性和漂移检测等功能。它与 TensorFlow 和 PyTorch 后端兼容。</p>
+<p>Abili Detect 提供了多种方法来检查数据的完整性。该文档非常简洁，并且还提供了一个示例以更好地理解。我强烈建议您仔细阅读文档，因为它将非常有益。</p>
+<p>如果您使用的是 TensorFlow 和 PyTorch 等框架，那么这将是 Abili Detect 的最佳理由，因为它将在机器学习管道中创建平稳过渡。在机器学习工作流中使用此库的另一个原因是它提供了<strong>内置的预处理步骤</strong>。此功能实质上使您能够在使用变压器库时检测漂移。它还可以帮助您从机器学习模型中提取隐藏层。</p>
+<h2 id="14-2-Frouros"><a href="#14-2-Frouros" class="headerlink" title="14.2 Frouros"></a>14.2 Frouros</h2><p>Frouros是一个开源的 Python 库，旨在解决漂移检测问题。与提供异常值和对抗检测的 Abili Detect 不同，Frouros 只专注于漂移检测。这个库很特别，因为它提供了用于检测数据和概念漂移的经典和更新的算法。</p>
+<p>Frouros 也是一个轻量级库，可与 <strong>Scikit-Learn、Numpy、PyTorch</strong> 和其他框架配合使用。它提供了多种方法，这些方法基本上只适用于单变量数据集和一些多变量数据集。</p>
+<p>因此，作为最终结论，该库非常适合想要探索单变量数据集中数据漂移概念的人。但是，由于该库提供了广泛的算法，因此它是学习甚至部署在相当小的项目中的好地方。</p>
+<h1 id="十五、模型服务开源-ML-工具"><a href="#十五、模型服务开源-ML-工具" class="headerlink" title="十五、模型服务开源 ML 工具"></a>十五、模型服务开源 ML 工具</h1><h2 id="15-1-Streamlit"><a href="#15-1-Streamlit" class="headerlink" title="15.1 Streamlit"></a>15.1 Streamlit</h2><p>Streamlit 是一个开源 Python 库，用于创建主要与数据科学和 ML 项目相关的交互式 Web 应用程序。Streamlit 属于框架类别，但由于它只允许您部署 ML 应用程序，因此我将其归入工具类别。</p>
+<p>无论如何，StreamLit 允许您以最小的努力构建基于 Web 的仪表板、可视化和应用程序。一些主要功能包括：</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722743884140.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://streamlit.io/">https://streamlit.io/</a></p>
+<ul>
+<li><strong>快速原型制作</strong></li>
+</ul>
+<p>如前所述，您可以通过编写直接与数据和可视化交互的 Python 代码来创建交互式应用程序</p>
+<ul>
+<li><strong>单纯</strong></li>
+</ul>
+<p>该库设计为用户友好型，具有简单直观的 API 调用函数。您只需几行代码即可创建交互式小部件。</p>
+<ul>
+<li><strong>数据可视化</strong></li>
+</ul>
+<p>Streamlit 支持与流行的数据可视化库（如 Matplotlib、Plotly 和 Altair）集成，使您能够在 Web 应用程序中显示图表和图形。</p>
+<ul>
+<li><strong>定制</strong></li>
+</ul>
+<p>虽然 Streamlit 开箱即用，但您还可以使用 CSS 样式和其他布局组件自定义应用程序的外观和布局。</p>
+<ul>
+<li><strong>集成</strong></li>
+</ul>
+<p>您可以将 Streamlit 应用与机器学习模型、数据分析脚本和其他基于 Python 的功能集成，以创建有凝聚力的数据驱动型机器学习应用程序。</p>
+<ul>
+<li><strong>互动</strong></li>
+</ul>
+<p>Streamlit 的小部件和功能允许用户与数据交互、调整参数并在应用程序的可视化中查看实时更新。</p>
+<ul>
+<li><strong>共享和部署</strong></li>
+</ul>
+<p>您可以在各种平台（包括云服务）上部署您的 Streamlit 应用程序，从而轻松与他人共享您的工作。</p>
+<ul>
+<li><strong>社区和扩展</strong></li>
+</ul>
+<p>Streamlit 拥有不断壮大的社区，并支持一系列扩展和集成，使您能够增强应用程序的功能。</p>
+<p>Streamlit 特别适用于您希望创建简单且交互式的数据可视化工具或原型而无需在 Web 开发中投入大量时间的场景。它通常被数据科学家和工程师使用，他们希望以一种可访问且引人入胜的方式展示他们的数据分析和机器学习结果。</p>
+<h2 id="15-2-火炬服务"><a href="#15-2-火炬服务" class="headerlink" title="15.2 火炬服务"></a>15.2 火炬服务</h2><p>TorchServe 是一个开源的模型服务工具，由 Facebook AI 制作。它旨在简化 PyTorch 模型的部署和管理，与您的 MLOps 工作流无缝保持一致。让我们深入探讨为什么 TorchServe 是 MLOps 环境中模型管理和推理的引人注目的选择。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722743995726.png" alt=""></p>
+<ul>
+<li><strong>高效的模型管理</strong></li>
+</ul>
+<p>TorchServe 的突出功能之一是其强大的模型管理 API。它为 MLOps 从业者提供了多模型管理能力，允许以优化的方式将模型分配给工作人员。这意味着您可以毫不费力地处理多个模型、版本控制和配置，同时确保对资源分配进行微调以实现最佳性能。</p>
+<ul>
+<li><strong>多功能推理支持</strong></li>
+</ul>
+<p>TorchServe 通过其推理 API 扩展其功能，提供对 REST 和 gRPC 协议的支持。但它并不止于此;它配备了批量推理功能，优化了单个和多个数据点的预测过程。这种多功能性确保您的模型可以无缝集成到各种应用中。</p>
+<ul>
+<li><strong>让复杂的部署变得简单</strong></li>
+</ul>
+<p>对于那些处理涉及具有相互依赖模型的复杂有向无环图 （DAG） 的复杂部署的人来说，TorchServe 可以提供帮助。其 TorchServe 工作流功能支持部署这些复杂的设置，为您提供满足苛刻的实际场景所需的灵活性。</p>
+<ul>
+<li><strong>在领先的 MLOps 平台中广泛采用</strong></li>
+</ul>
+<p>TorchServe的声誉超越了其自身的生态系统。它是在 Kubeflow、MLflow、SageMaker、Google Vertex AI 和 Kserve 等平台中提供 PyTorch 模型的默认选择，同时支持 v1 和 v2 API。这种广泛采用充分说明了它在 MLOps 环境中的有效性和兼容性。</p>
+<ul>
+<li><strong>优化推理导出</strong></li>
+</ul>
+<p>为了优化推理，TorchServe 提供了一套选项。无论是开箱即用的 TorchScript、ONNX、ORT、IPEX 还是 TensorRT，您都可以自由地以适合您特定性能要求的格式导出模型。这种灵活性可确保您的模型为高效执行做好准备。</p>
+<ul>
+<li><strong>核心性能</strong></li>
+</ul>
+<p>MLOps 专业人员知道性能至关重要。TorchServe 认识到这一点，并提供内置支持来优化、基准测试和分析 PyTorch 模型和 TorchServe 本身。这意味着您可以微调部署以获得最佳吞吐量和响应能力。</p>
+<ul>
+<li><strong>用于自定义用例的富有表现力的处理程序</strong></li>
+</ul>
+<p>使用 TorchServe 富有表现力的处理程序架构，处理各种用例的推理变得轻而易举。它简化了根据您的独特要求自定义推理的过程，并提供了大量开箱即用的解决方案来满足各种场景。</p>
+<ul>
+<li><strong>全面的指标和监控</strong></li>
+</ul>
+<p>监视模型的运行状况和性能至关重要。TorchServe 附带一个指标 API，为系统级指标提供开箱即用的支持。它与 Prometheus 无缝集成以导出指标，并且还支持自定义指标。此外，它与 PyTorch 的分析器无缝对齐，以进行深入的性能分析。</p>
+<p>TorchServe 与领先的 MLOps 平台无缝集成，使您能够高效地部署和管理模型。如果您正在寻找一个强大的解决方案来提升您的 MLOps 工作流程，那么 TorchServe 应该在您的工具包中占有重要地位。</p>
+<h1 id="十六-、测试和维护开源-ML-工具"><a href="#十六-、测试和维护开源-ML-工具" class="headerlink" title="十六 、测试和维护开源 ML 工具"></a>十六 、测试和维护开源 ML 工具</h1><h2 id="16-1、Prometheus"><a href="#16-1、Prometheus" class="headerlink" title="16.1、Prometheus"></a>16.1、Prometheus</h2><p>ML 开发的最后一步是在完成主要工作后进行测试和维护。特殊工具可以确保结果在长期内是可重复的。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722744087044.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://prometheus.io/docs/introduction/overview/">https://prometheus.io/docs/introduction/overview/</a></p>
+<p>Prometheus 是由 Soundcloud 构建的开源监控工具包。这个工具包有一个非常活跃的社区，并得到了大量组织的大力支持。Prometheus 的基本概念是它以时间序列格式存储所有数据和指标。这意味着在监控阶段收集的指标与时间戳相关联。</p>
+<p>这就是 <strong>Prometheus 非常适合时间序列数据</strong>的原因。它还支持多维<strong>数据收集</strong>以及查询数据集。这意味着您可以使用 Prometheus 来记录 ML 系统指标。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722744117609.png" alt=""></p>
+<p>上图显示了如何将指标记录到时序数据库中，然后可以通过端点检索相同的指标。</p>
+<p>一些突出的主要功能是：</p>
+<ul>
+<li><strong>独立服务器</strong></li>
+</ul>
+<p>每个 Prometheus 服务器都是一个独立的服务器，这意味着它们独立于其他服务器，因此非常可靠。</p>
+<ul>
+<li><strong>PromQL的</strong></li>
+</ul>
+<p>一种功能强大的查询语言，允许对时间序列数据进行搜索、切片和切片。使用 PromQL，您还可以在 Prometheus 的表达式浏览器上生成图形、表格和警报。</p>
+<ul>
+<li><strong>高效存储</strong></li>
+</ul>
+<p>数据以自定义格式存储在内存和本地磁盘上时序数据库中。这也允许有效的扩展。</p>
+<ul>
+<li><strong>尺寸数据</strong></li>
+</ul>
+<p>Prometheus 的关键概念是以时间序列格式存储数据。因此，您可以选择任何时间范围来了解模型的行为。最重要的是，您可以使用 Grafana 创建可视化仪表板。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722744160157.png" alt=""></p>
+<p>如果您想要一个通用的轻量级工具来收集和记录有关您系统的指标，那么 Prometheus 是必须的。</p>
+<h2 id="16-2-ModsysML"><a href="#16-2-ModsysML" class="headerlink" title="16.2 ModsysML"></a>16.2 ModsysML</h2><p>ModsysML 是一个非常新的 MLOps 工具，它允许用户在单个 API 中测试、自动化工作负载和比较输出、提高数据质量和捕获回归。这使您能够通过测试数据质量来自动化、加速和回测运行主动智能和见解的整个过程。</p>
+<p>ModsysML简化了在各种相关测试用例中精心完善AI系统的过程。通过仔细检查和对比输出，它构建了促进决策的工作流程。用户可以加快质量评估并及时识别回归。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722744196700.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/modsysML/modsysML">https://github.com/modsysML/modsysML</a></p>
+<p>提供的工具套件包含三个基本功能：</p>
+<ul>
+<li>对人工智能系统进行精确结果的性能基准测试。</li>
+<li>制定自动化任务或重新审视已建立的任务以进行全面评估。</li>
+<li>检测数据流中的即时波动。</li>
+</ul>
+<p>在用户界面 （UI） 和 Python 库的支持下，您可以针对特定用例复杂地校准 AI 系统。这包括创建自动化工作流程，以及从数据集中的实时变化中获取数据驱动的见解。</p>
+<h2 id="16-3-Deepchecks"><a href="#16-3-Deepchecks" class="headerlink" title="16.3 Deepchecks"></a>16.3 Deepchecks</h2><p><img src="https://image.rexking6.top/img/QQ_1722744223140.png" alt="Deepchecks 的 UI 示例，用于监控和测试开源 ML 工具"></p>
+<p>我们遇到了另一个开源工具，它允许您彻底评估和测试数据以及 ML 模型的完整性。Deepchecks提供从研究到生产的持续评估。它有一个强大而活跃的社区支持它。</p>
+<p>Deepchecks 适用于表格、NLP 和计算机视觉 （CV） 数据集。它提供四种解决方案：</p>
+<ol>
+<li>测试</li>
+<li>CI/CD （英语）</li>
+<li>监测</li>
+<li>根本原因分析</li>
+</ol>
+<p>Deepchecks 为检测数据和 ML 模型中的缺陷提供了一种方便的途径，同时还支持主动增强步骤。事实证明，其<strong>功能“套件</strong>”特别具有优势，有助于对各种数据和ML模型方面进行深入评估，从而生成有价值的报告。</p>
+<p>为了便于更清楚地掌握，下面概述了在套件中执行的预定义检查及其功能：</p>
+<ul>
+<li><strong>数据集完整性</strong></li>
+</ul>
+<p>用于确定数据集的准确性和全面性。</p>
+<ul>
+<li><strong>训练测试验证</strong></li>
+</ul>
+<p>设计了一组检查，以确定数据拆分在模型训练和测试阶段的适当性。</p>
+<ul>
+<li><strong>模型评估</strong></li>
+</ul>
+<p>执行一组检查以衡量模型性能、其对不同场景的适应性以及任何过拟合指标。</p>
+<p>Deepcheck 适合您的工作流程的原因之一是因为它提供的自动化解决方案，尤其是<strong>根本原因分析</strong>。从本质上讲，它加快了在整个模型生命周期中掌握问题根本根源的过程，使您能够快速辨别问题的根本原因。它承诺为您提供问题的详细细节。</p>
+<h1 id="十七、实验跟踪开源-ML-工具"><a href="#十七、实验跟踪开源-ML-工具" class="headerlink" title="十七、实验跟踪开源 ML 工具"></a>十七、实验跟踪开源 ML 工具</h1><h2 id="17-1-AIM"><a href="#17-1-AIM" class="headerlink" title="17.1 AIM"></a>17.1 AIM</h2><p><img src="https://image.rexking6.top/img/QQ_1722744298509.png" alt="Aim 的 UI 示例，实验跟踪开源 ML 工具"></p>
+<p>Aim 是一个开源、自托管的 AI 元数据监控解决方案，专为管理大量跟踪的元数据序列而量身定制，数量达数万个。</p>
+<p>Aim 提供了一个高效且视觉上令人愉悦的用户界面 （UI），便于元数据的探索和并置，包括训练运行或代理执行等元素。此外，其软件开发工具包 （SDK） 提供了与跟踪元数据进行编程交互的能力，这是 Jupyter Notebooks 中简化自动化和分析的理想功能。</p>
+<p>一些主要功能包括：</p>
+<ul>
+<li><strong>简化的运行比较</strong></li>
+</ul>
+<p>毫不费力地对比各种运行，以加快模型构建过程。</p>
+<ul>
+<li><strong>深入的运行检测</strong></li>
+</ul>
+<p>让自己沉浸在每次运行的细节中，促进无缝故障排除。</p>
+<ul>
+<li><strong>相关详细信息的集中存储库</strong></li>
+</ul>
+<p>所有相关信息都集中起来，确保无忧的治理和管理。</p>
+<p>Aim 可以处理多达 100,000 个元数据序列，这就是为什么它可以成为最适合您的 ML 堆栈之一的原因。除此之外，它还具有漂亮的用户界面，功能强大且吸引眼球。</p>
+<h3 id="17-2-Guild-AI"><a href="#17-2-Guild-AI" class="headerlink" title="17.2 Guild AI"></a>17.2 Guild AI</h3><p>Guild AI 作为一个开源工具包，可以简化和提高机器学习实验的效率。它是一个包罗万象的 ML 工程工具包，具有一系列功能。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722744357212.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://guild.ai/">https://guild.ai/</a></p>
+<ul>
+<li><strong>自动实验跟踪</strong></li>
+</ul>
+<p>Guild AI 允许您运行原始训练脚本，捕获独特的实验结果，并提供用于分析、可视化和比较的工具。</p>
+<ul>
+<li><strong>使用 AutoML 进行超参数优化</strong></li>
+</ul>
+<p>通过使用网格搜索、随机搜索和贝叶斯优化技术自动执行试验，利用 AutoML 进行超参数优化。</p>
+<ul>
+<li><strong>比较与分析</strong></li>
+</ul>
+<p>比较和分析试验运行，以获得见解并提高模型的性能。</p>
+<ul>
+<li><strong>高效的备份和归档</strong></li>
+</ul>
+<p>保护与培训相关的操作，如数据准备和测试，并将运行存档到 S3 等远程系统。</p>
+<ul>
+<li><strong>远程操作和加速</strong></li>
+</ul>
+<p>在云加速器上远程执行操作，优化您的工作流程效率。</p>
+<ul>
+<li><strong>模型包装和再现性</strong></li>
+</ul>
+<p>打包和分发模型，以实现跨不同环境的无缝可重复性。</p>
+<ul>
+<li><strong>简化的管道自动化</strong></li>
+</ul>
+<p>启用自动化管道，使工作流程执行更顺畅。</p>
+<ul>
+<li><strong>调度和并行处理</strong></li>
+</ul>
+<p>利用调度和并行处理来优化资源利用率。</p>
+<ul>
+<li><strong>远程训练和管理</strong></li>
+</ul>
+<p>进行远程训练、备份和恢复实验，以提高灵活性。</p>
+<p>如果您正在寻找一种提供自动化实验管理、优化和洞察力的工具，以简化和增强机器学习工作流程，那么 Guild AI 是首选工具。</p>
+<h2 id="十八、模型可解释性开源-ML-工具"><a href="#十八、模型可解释性开源-ML-工具" class="headerlink" title="十八、模型可解释性开源 ML 工具"></a>十八、模型可解释性开源 ML 工具</h2><h3 id="18-1-Alibi-Explain"><a href="#18-1-Alibi-Explain" class="headerlink" title="18.1 Alibi Explain"></a>18.1 Alibi Explain</h3><p>Alibi Explain 是 SeldonIO 的另一个工具。它是一个开源 Python 库，主要关注 ML 模型的可解释性和解释性。该库致力于提供解释方法的顶级实现，包括为分类和回归模型量身定制的黑盒、白盒、局部和全局方法。</p>
+<p>在 Alibi Explain 中，您可以使用一系列算法或方法（称为解释器）。每个解释器都充当获取模型行为见解的渠道。根据经过训练的模型，可获得的一系列见解受到多个变量的影响。</p>
+<p><img src="https://image.rexking6.top/img/QQ_1722744378704.png" alt=""></p>
+<p><a target="_blank" rel="noopener" href="https://docs.seldon.io/projects/alibi/en/stable/">https://docs.seldon.io/projects/alibi/en/stable/</a></p>
+<p>从广义上讲，Alibi 提供的解释器范围受以下限制：</p>
+<ul>
+<li>模型处理的数据的性质，包括图像、表格数据或文本。</li>
+<li>模型执行的任务，即回归或分类。</li>
+<li>采用的特定模型类型，包括神经网络和随机森林。</li>
+</ul>
+<p>一般来说，可解释性是 ML 世界中最受追捧的功能之一。这是因为作为人类，我们很想知道封闭内部发生了什么。如果您从事医学或医疗保健或任何与生活相关的行业，那么此工具是您开发武器库中的必备工具。</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>开源 MLOps 工具是必要的。它们可以帮助您在不花费大量资金的情况下自动执行大量日常工作。成熟的平台为不同目的提供了广泛的工具选择，适用于您可能需要的任何技术堆栈。然而，在实践中，通常事实证明，您仍然需要将它们与使用起来更直观的专用工具集成。幸运的是，大多数开源工具都使集成尽可能无缝。</p>
+<p>然而，关于开源工具，需要了解的一件重要事情是，你不应该指望它们是完全免费的：你的ML项目的基础设施、支持和维护的成本仍然会由你或者企业来承担，请做好成本\效益的分析。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2024\08\04\基于Kubeflow的机器学习调度平台落地实战\" rel="bookmark">基于Kubeflow的机器学习调度平台落地实战</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\28\AMPC-1080Ti机器-深度环境搭建\" rel="bookmark">AMPC-1080Ti机器-深度环境搭建</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\08\08\Jupyter-Notebook远程登录及自定义配置\" rel="bookmark">Jupyter Notebook远程登录及自定义配置</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2024/08/04/%E5%9B%9E%E9%A1%BE2023%E5%B9%B4%E5%BC%80%E6%BA%90%E7%9A%84MLOps%E4%BA%A7%E5%93%81%E3%80%81%E6%A1%86%E6%9E%B6%E3%80%81%E5%B7%A5%E5%85%B7%E4%B8%8E%E6%A0%BC%E5%B1%80%E5%8F%98%E5%8C%96/" title="回顾2023年开源的MLOps产品、框架、工具与格局变化">https://blog.rexking6.top/2024/08/04/回顾2023年开源的MLOps产品、框架、工具与格局变化/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E6%A1%86%E6%9E%B6%E5%B7%A5%E5%85%B7/" rel="tag"># 框架工具</a>
+              <a href="/tags/MLOps/" rel="tag"># MLOps</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/08/04/%E5%A6%82%E4%BD%95%E6%A3%80%E6%B5%8BGPU%E5%B8%B8%E8%A7%81%E6%95%85%E9%9A%9C/" rel="prev" title="如何检测GPU常见故障">
+      <i class="fa fa-chevron-left"></i> 如何检测GPU常见故障
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/08/04/%E5%9F%BA%E4%BA%8EKubeflow%E7%9A%84%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E8%B0%83%E5%BA%A6%E5%B9%B3%E5%8F%B0%E8%90%BD%E5%9C%B0%E5%AE%9E%E6%88%98/" rel="next" title="基于Kubeflow的机器学习调度平台落地实战">
+      基于Kubeflow的机器学习调度平台落地实战 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%83%8C%E6%99%AF"><span class="nav-number">2.</span> <span class="nav-text">一、背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E3%80%812023%E5%B9%B4MLOps%E5%8F%98%E5%8C%96"><span class="nav-number">3.</span> <span class="nav-text">二、2023年MLOps变化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%E5%A6%82%E4%BD%95%E8%AF%84%E4%BC%B0-MLOps-%E6%98%AF%E4%B8%80%E4%B8%AA%E6%88%90%E5%8A%9F%E7%9A%84%E5%B7%A5%E5%85%B7%E5%92%8C%E5%B9%B3%E5%8F%B0"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 如何评估 MLOps 是一个成功的工具和平台</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%E7%AB%AF%E5%88%B0%E7%AB%AF-MLOps-%E5%B9%B3%E5%8F%B0"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 端到端 MLOps 平台</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%89%E3%80%81MLOps-%E5%BC%80%E6%BA%90%E5%B9%B3%E5%8F%B0"><span class="nav-number">4.</span> <span class="nav-text">三、MLOps 开源平台</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-KubeFlow"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 KubeFlow</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-MLFlow"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 MLFlow</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-MetaFlow"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 MetaFlow</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-Flyte"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 Flyte</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-5-MLReef"><span class="nav-number">4.5.</span> <span class="nav-text">3.5 MLReef</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-6-Seldon-Core"><span class="nav-number">4.6.</span> <span class="nav-text">3.6 Seldon Core</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-7-Sematic"><span class="nav-number">4.7.</span> <span class="nav-text">3.7 Sematic</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-8-neptune-ai%EF%BC%88%E6%AF%94%E8%BE%83%E6%8E%A8%E8%8D%90%EF%BC%89"><span class="nav-number">4.8.</span> <span class="nav-text">3.8 neptune.ai（比较推荐）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86MLOps%E5%BC%80%E6%BA%90%E5%B9%B3%E5%8F%B0"><span class="nav-number">5.</span> <span class="nav-text">四、数据处理MLOps开源平台</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-Apache-Airflow"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 Apache Airflow</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E7%9B%91%E6%8E%A7-MLOps-%E5%BC%80%E6%BA%90%E5%B9%B3%E5%8F%B0"><span class="nav-number">6.</span> <span class="nav-text">五、监控 MLOps 开源平台</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-EvidentlyAI"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 EvidentlyAI</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%AD%E3%80%81MLOps%E5%BC%80%E6%BA%90%E6%A1%86%E6%9E%B6"><span class="nav-number">7.</span> <span class="nav-text">六、MLOps开源框架</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1-Kedro"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 Kedro</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-2-ZenML"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 ZenML</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E9%83%A8%E7%BD%B2%E5%92%8C%E6%9C%8D%E5%8A%A1%E5%BC%80%E6%BA%90-MLOps-%E6%A1%86%E6%9E%B6"><span class="nav-number">8.</span> <span class="nav-text">七、部署和服务开源 MLOps 框架</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#7-1-BentoML"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 BentoML</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%BC%96%E6%8E%92%E5%BC%80%E6%BA%90-MLOps-%E6%A1%86%E6%9E%B6"><span class="nav-number">9.</span> <span class="nav-text">八、工作流编排开源 MLOps 框架</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#8-1-Argo-%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 Argo 工作流程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B9%9D%E3%80%81MLOps-%E5%BC%80%E6%BA%90%E5%B7%A5%E5%85%B7"><span class="nav-number">10.</span> <span class="nav-text">九、MLOps 开源工具</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#9-1-MLRun"><span class="nav-number">10.1.</span> <span class="nav-text">9.1 MLRun</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#9-2-CML%EF%BC%88%E6%8C%81%E7%BB%AD%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%EF%BC%89"><span class="nav-number">10.1.1.</span> <span class="nav-text">9.2 CML（持续机器学习）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%81%E3%80%81AutoML-%E5%BC%80%E6%BA%90%E5%B7%A5%E5%85%B7"><span class="nav-number">11.</span> <span class="nav-text">十、AutoML 开源工具</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#10-1-AutoKeras"><span class="nav-number">11.1.</span> <span class="nav-text">10.1 AutoKeras</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-2-H2O-%E8%87%AA%E5%8A%A8%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0"><span class="nav-number">11.2.</span> <span class="nav-text">10.2 H2O 自动机器学习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#10-3-EvalML"><span class="nav-number">11.2.1.</span> <span class="nav-text">10.3 EvalML</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-4-%E5%BE%AE%E8%BD%AFNNI"><span class="nav-number">11.2.2.</span> <span class="nav-text">10.4 微软NNI</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%81%E4%B8%80%E3%80%81%E6%95%B0%E6%8D%AE%E9%AA%8C%E8%AF%81%E5%BC%80%E6%BA%90-ML-%E5%B7%A5%E5%85%B7"><span class="nav-number">12.</span> <span class="nav-text">十一、数据验证开源 ML 工具</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#11-1-Hadoop"><span class="nav-number">12.1.</span> <span class="nav-text">11.1 Hadoop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-2-Apache-Spark"><span class="nav-number">12.2.</span> <span class="nav-text">11.2 Apache Spark</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-3-Great-Expectations"><span class="nav-number">12.3.</span> <span class="nav-text">11.3 Great Expectations</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-4-TensorFlow-%E6%89%A9%E5%B1%95-%EF%BC%88TFX%EF%BC%89"><span class="nav-number">12.4.</span> <span class="nav-text">11.4 TensorFlow 扩展 （TFX）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%81%E4%BA%8C-%E3%80%81%E6%95%B0%E6%8D%AE%E6%8E%A2%E7%B4%A2%E5%BC%80%E6%BA%90-ML-%E5%B7%A5%E5%85%B7"><span class="nav-number">13.</span> <span class="nav-text">十二 、数据探索开源 ML 工具</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#12-1-Jupyter-%E7%AC%94%E8%AE%B0%E6%9C%AC"><span class="nav-number">13.1.</span> <span class="nav-text">12.1 Jupyter 笔记本</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%81%E4%B8%89%E3%80%81%E6%95%B0%E6%8D%AE%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6%E5%BC%80%E6%BA%90-ML-%E5%B7%A5%E5%85%B7"><span class="nav-number">14.</span> <span class="nav-text">十三、数据版本控制开源 ML 工具</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#13-1-%E6%95%B0%E6%8D%AE%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6-%EF%BC%88DVC%EF%BC%89"><span class="nav-number">14.1.</span> <span class="nav-text">13.1 数据版本控制 （DVC）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#13-2-Pachyderm"><span class="nav-number">14.2.</span> <span class="nav-text">13.2 Pachyderm</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%81%E5%9B%9B%E3%80%81%E6%95%B0%E6%8D%AE%E6%A3%80%E6%B5%8B%E5%BC%80%E6%BA%90-ML-%E5%B7%A5%E5%85%B7"><span class="nav-number">15.</span> <span class="nav-text">十四、数据检测开源 ML 工具</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#14-1-Alibi-Detect"><span class="nav-number">15.1.</span> <span class="nav-text">14.1 Alibi Detect</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#14-2-Frouros"><span class="nav-number">15.2.</span> <span class="nav-text">14.2 Frouros</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%81%E4%BA%94%E3%80%81%E6%A8%A1%E5%9E%8B%E6%9C%8D%E5%8A%A1%E5%BC%80%E6%BA%90-ML-%E5%B7%A5%E5%85%B7"><span class="nav-number">16.</span> <span class="nav-text">十五、模型服务开源 ML 工具</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#15-1-Streamlit"><span class="nav-number">16.1.</span> <span class="nav-text">15.1 Streamlit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#15-2-%E7%81%AB%E7%82%AC%E6%9C%8D%E5%8A%A1"><span class="nav-number">16.2.</span> <span class="nav-text">15.2 火炬服务</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%81%E5%85%AD-%E3%80%81%E6%B5%8B%E8%AF%95%E5%92%8C%E7%BB%B4%E6%8A%A4%E5%BC%80%E6%BA%90-ML-%E5%B7%A5%E5%85%B7"><span class="nav-number">17.</span> <span class="nav-text">十六 、测试和维护开源 ML 工具</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#16-1%E3%80%81Prometheus"><span class="nav-number">17.1.</span> <span class="nav-text">16.1、Prometheus</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#16-2-ModsysML"><span class="nav-number">17.2.</span> <span class="nav-text">16.2 ModsysML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#16-3-Deepchecks"><span class="nav-number">17.3.</span> <span class="nav-text">16.3 Deepchecks</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%81%E4%B8%83%E3%80%81%E5%AE%9E%E9%AA%8C%E8%B7%9F%E8%B8%AA%E5%BC%80%E6%BA%90-ML-%E5%B7%A5%E5%85%B7"><span class="nav-number">18.</span> <span class="nav-text">十七、实验跟踪开源 ML 工具</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#17-1-AIM"><span class="nav-number">18.1.</span> <span class="nav-text">17.1 AIM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#17-2-Guild-AI"><span class="nav-number">18.1.1.</span> <span class="nav-text">17.2 Guild AI</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E5%85%AB%E3%80%81%E6%A8%A1%E5%9E%8B%E5%8F%AF%E8%A7%A3%E9%87%8A%E6%80%A7%E5%BC%80%E6%BA%90-ML-%E5%B7%A5%E5%85%B7"><span class="nav-number">18.2.</span> <span class="nav-text">十八、模型可解释性开源 ML 工具</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#18-1-Alibi-Explain"><span class="nav-number">18.2.1.</span> <span class="nav-text">18.1 Alibi Explain</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">18.3.</span> <span class="nav-text">结论</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">232</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">84</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">81</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">60:46</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

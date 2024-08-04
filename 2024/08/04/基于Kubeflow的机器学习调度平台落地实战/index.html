@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于Kubeflow的机器学习调度平台落地实战">
+<meta property="og:url" content="https://blog.rexking6.top/2024/08/04/%E5%9F%BA%E4%BA%8EKubeflow%E7%9A%84%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E8%B0%83%E5%BA%A6%E5%B9%B3%E5%8F%B0%E8%90%BD%E5%9C%B0%E5%AE%9E%E6%88%98/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/5c480fcf5644a.png">
+<meta property="og:image" content="https://image.rexking6.top/img/5c48100ab7829.png">
+<meta property="og:image" content="https://image.rexking6.top/img/5c481032ed5e9.png">
+<meta property="og:image" content="https://image.rexking6.top/img/5c4810677ccff.png">
+<meta property="og:image" content="https://image.rexking6.top/img/5c48119b7a24e.png">
+<meta property="og:image" content="https://image.rexking6.top/img/5c481065476aa.png">
+<meta property="og:image" content="https://image.rexking6.top/img/5c481065910be.png">
+<meta property="og:image" content="https://image.rexking6.top/img/5c481068983ea.png">
+<meta property="og:image" content="https://image.rexking6.top/img/5c481065e1967.png">
+<meta property="og:image" content="https://image.rexking6.top/img/5c48106726f50.png">
+<meta property="og:image" content="https://image.rexking6.top/img/5c48119bbb461.png">
+<meta property="og:image" content="https://image.rexking6.top/img/5c481067e8c45.png">
+<meta property="article:published_time" content="2024-08-04T04:08:04.000Z">
+<meta property="article:modified_time" content="2024-08-04T04:26:34.696Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="框架工具">
+<meta property="article:tag" content="MLOps">
+<meta property="article:tag" content="Kubeflow">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/5c480fcf5644a.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2024/08/04/%E5%9F%BA%E4%BA%8EKubeflow%E7%9A%84%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E8%B0%83%E5%BA%A6%E5%B9%B3%E5%8F%B0%E8%90%BD%E5%9C%B0%E5%AE%9E%E6%88%98/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>基于Kubeflow的机器学习调度平台落地实战 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2024/08/04/%E5%9F%BA%E4%BA%8EKubeflow%E7%9A%84%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E8%B0%83%E5%BA%A6%E5%B9%B3%E5%8F%B0%E8%90%BD%E5%9C%B0%E5%AE%9E%E6%88%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          基于Kubeflow的机器学习调度平台落地实战
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-08-04 12:08:04 / 修改时间：12:26:34" itemprop="dateCreated datePublished" datetime="2024-08-04T12:08:04+08:00">2024-08-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E6%A1%86%E6%9E%B6%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">框架工具</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E6%A1%86%E6%9E%B6%E5%B7%A5%E5%85%B7/MLOps/" itemprop="url" rel="index"><span itemprop="name">MLOps</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E6%A1%86%E6%9E%B6%E5%B7%A5%E5%85%B7/MLOps/Kubeflow/" itemprop="url" rel="index"><span itemprop="name">Kubeflow</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2024/08/04/%E5%9F%BA%E4%BA%8EKubeflow%E7%9A%84%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E8%B0%83%E5%BA%A6%E5%B9%B3%E5%8F%B0%E8%90%BD%E5%9C%B0%E5%AE%9E%E6%88%98/" class="post-meta-item leancloud_visitors" data-flag-title="基于Kubeflow的机器学习调度平台落地实战" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>11k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>10 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://www.infoq.cn/article/k4uLIMaNccimGfuQk_cd">基于Kubeflow的机器学习调度平台落地实战</a>。</p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>随着机器学习和人工智能的迅猛发展，业界出现了许多开源的机器学习平台。由于机器学习与大数据天然的紧密结合，基于 Hadoop Yarn 的分布式任务调度仍是业界主流，但是随着容器化的发展，Docker + Kubernetes 的云原生组合，也展现出了很强的生命力。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">公司</th>
+<th style="text-align:left">平台名称</th>
+<th style="text-align:left">集群管理和调度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">百度</td>
+<td style="text-align:left"><a target="_blank" rel="noopener" href="https://github.com/PaddlePaddle/Paddle">PaddlePaddle</a></td>
+<td style="text-align:left">Docker+<a target="_blank" rel="noopener" href="https://github.com/PaddlePaddle/Paddle/blob/develop/doc/v2/howto/cluster/multi_cluster/k8s_aws_cn.md">Kubernetes</a></td>
+</tr>
+<tr>
+<td style="text-align:left">腾讯</td>
+<td style="text-align:left"><a target="_blank" rel="noopener" href="https://github.com/Angel-ML/angel">Angel</a></td>
+<td style="text-align:left">Docker+Yarn</td>
+</tr>
+<tr>
+<td style="text-align:left">阿里</td>
+<td style="text-align:left"><a target="_blank" rel="noopener" href="https://github.com/alibaba/x-deeplearning">X-DeepLearning</a></td>
+<td style="text-align:left">Docker+Yarn</td>
+</tr>
+<tr>
+<td style="text-align:left">360</td>
+<td style="text-align:left"><a target="_blank" rel="noopener" href="https://github.com/Qihoo360/XLearning">XLearning</a></td>
+<td style="text-align:left">Yarn</td>
+</tr>
+<tr>
+<td style="text-align:left">京东</td>
+<td style="text-align:left"><a target="_blank" rel="noopener" href="https://blog.csdn.net/karamos/article/details/80130751">登月平台</a></td>
+<td style="text-align:left">Docker+Kubernetes</td>
+</tr>
+<tr>
+<td style="text-align:left">才云科技</td>
+<td style="text-align:left"><a target="_blank" rel="noopener" href="https://caicloud.io/products/clever">Clever</a></td>
+<td style="text-align:left">Docker+Kubernetes</td>
+</tr>
+</tbody>
+</table>
+</div>
+<blockquote>
+<p>表 1. 互联网业界机器学习平台架构对比</p>
+</blockquote>
+<h1 id="痛点"><a href="#痛点" class="headerlink" title="痛点"></a>痛点</h1><p>在建设分布式训练平台的过程中，我们和机器学习的各个业务方，包括搜索推荐、图像算法、交易风控反作弊等，进行了深入沟通，调研他们的痛点。从中我们发现，算法业务方往往专注于模型和调参，而工程领域是他们相对薄弱的一个环节。建设一个强大的分布式平台，整合各个资源池，提供统一的机器学习框架，将能大大加快训练速度，提升效率，带来更多的可能性，此外还有助于提升资源利用率。</p>
+<h2 id="痛点一：对算力的需求越来越强烈"><a href="#痛点一：对算力的需求越来越强烈" class="headerlink" title="痛点一：对算力的需求越来越强烈"></a>痛点一：对算力的需求越来越强烈</h2><p><strong>算力代表了生产力</strong>。深度学习在多个领域的出色表现，给业务带来了更多的可能性，同时对算力提出了越来越高的要求。深度学习模型参数的规模陡增，迭代的时间变的更长，从之前的小时级别，变成天级别，甚至月级别。以商品推荐为例，面对几亿的参数，近百亿的样本数量，即使采用 GPU 机器，也需要长达一个星期的训练时间；而图像业务拥有更多的参数和更复杂的模型，面对 TB 级的训练样本，单机场景下往往需要长达近一个月的训练时间。</p>
+<p>再者，机器学习具有试错性非常强的特点，更快的训练速度可以带来更多的尝试，从而发掘更多的可能性。Tensorflow 从 0.8 版本开始支持分布式训练，至今为止，无论高阶还是低阶的 API，对分布式训练已经有了完善的支持。同时，Kubernetes 和 Hadoop 等具有完善的资源管理和调度功能，为 Tensorflow 分布式训练奠定资源层面的基础。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Intel-bigdata/TensorFlowOnYARN">Tensorflow On Yarn</a> 和 <a target="_blank" rel="noopener" href="https://github.com/yahoo/TensorFlowOnSpark">Tensorflow On Spark</a> 是较早的解决方案，奇虎 360 的 <a target="_blank" rel="noopener" href="https://github.com/Qihoo360/XLearning">Xlearning</a> 也得到众人的青睐。而基于 Kubernetes 的 <a target="_blank" rel="noopener" href="https://github.com/kubeflow/kubeflow">kubeflow</a> 解决了 Yarn 的痛点，展现出旺盛的生命力。</p>
+<p>上述方案无一例外的将各个部门分散的机器纳入到统一的资源池，并提供资源管理和调度功能，让基于 Excel 表的资源管理和人肉调度成为过去，让用户更专注于算法模型，而非基础设施。在几十个 worker 下，无论是 CPU 还是 GPU 的分布式训练，训练速度都能得到近乎线性的提升，将单机的训练时间从月级别缩短到一天以内，提升效率的同时也大大提升了资源利用率。</p>
+<p>蘑菇街早期的业务方往往独立维护各自团队的 GPU 机器“小池子”，机器的资源分配和管理存在盲区，缺乏统一管理和调度。GPU 的资源存在不均衡和资源利用率低下的问题。事实上，大数据团队之前已经将 CPU 类型的训练任务接入了 Xlearning，尝到了分布式训练的甜头，但也发现一些问题：</p>
+<ol>
+<li>公司目前的 Yarn 不支持 GPU 资源管理，虽然近期版本已支持该特性，但存在稳定性风险。</li>
+<li>缺乏资源隔离和限制，同节点的任务容易出现资源冲突。</li>
+<li>监控信息不完善。在发生资源抢占时，往往无法定位根本原因。</li>
+<li>缺少弹性能力，目前资源池是静态的，如果能借助公有云的弹性能力，在业务高峰期提供更大的算力，将能更快的满足业务需求。</li>
+</ol>
+<h2 id="痛点二：人肉管理的成本很高"><a href="#痛点二：人肉管理的成本很高" class="headerlink" title="痛点二：人肉管理的成本很高"></a>痛点二：人肉管理的成本很高</h2><p>业务方反馈的第二大问题是人肉管理的成本问题。人肉化的管理主要包含了部署和训练任务管理两大方面。</p>
+<h3 id="人肉部署"><a href="#人肉部署" class="headerlink" title="人肉部署"></a>人肉部署</h3><p>一个典型的场景是：团队内的成员共享一批机器，每次跑训练任务前，用户手动登陆机器，下载代码，安装对应的 python 包，过程繁琐且容易出现安装包版本的冲突。</p>
+<p>由于不同的训练任务对 python 的版本和依赖完全不同，比如有些模型使用 python 2.7，有些使用 python 3.3，有些使用 tensorflow 1.8，有些使用 tensorflow 1.11 等等，非常容易出现依赖包冲突的问题。虽然沙箱能在一定程度上解决这问题，但是也带来了额外的管理负担。</p>
+<p>此外，不同 GPU 机型依赖的 Nvidia 驱动也不同，较新的卡，比如 V100 所依赖的版本更高。人肉部署还需要管理和维护多个不同的驱动版本。</p>
+<h3 id="训练任务管理"><a href="#训练任务管理" class="headerlink" title="训练任务管理"></a>训练任务管理</h3><p>人肉启动训练任务时，需要手动查看/评估资源的剩余可用情况，手动指定 PS 和 Worker 的数量，管理配置并进行服务发现。这些都给业务方带来了很大的负担。</p>
+<h3 id="解决的思路"><a href="#解决的思路" class="headerlink" title="解决的思路"></a>解决的思路</h3><p>Docker 和 Kubernetes 很好的解决了人肉管理的问题:</p>
+<ol>
+<li>部署：借助 Docker 良好的隔离性，各个容器的文件系统互不影响，将训练任务和驱动程序制作成镜像，避免了多次安装的繁琐。此外 Kubernetes 提供了服务发现功能，简化了分布式的部署。</li>
+<li>训练任务生命周期管理：Kubernetes 提供了生命周期管理的 API，用户基于 API 即可一键式完成训练任务的增删改查，避免人工 ssh 的各种繁琐操作，可以大幅提升用户体验和效率。</li>
+</ol>
+<h2 id="痛点三：监控的缺失"><a href="#痛点三：监控的缺失" class="headerlink" title="痛点三：监控的缺失"></a>痛点三：监控的缺失</h2><p>监控也是分布式训练重要的一环，它是性能调优的重要依据。比如在 PS-Worker 的训练框架下，我们需要为每个 PS/Worker 配置合适的 GPU/CPU/Memory，并设置合适的 PS 和 Worker 数量。如果某个参数配置不当，往往容易造成性能瓶颈，影响整体资源的利用率。比如当 PS 的网络很大时，我们需要增加 PS 节点，并对大参数进行 partition；当 worker CPU 负载过高时，我们应该增加 Worker 的核数。</p>
+<p>早期版本的 Hadoop 和 Yarn 并不支持 GPU 的资源可视化监控，而 Kubernetes 已拥有非常成熟监控方案 Prometheus，它能周期采集 CPU，内存，网络和 GPU 的监控数据，即每个 PS/Worker 的资源使用率都能得到详细的展示，为优化资源配置提供了依据。事实上，我们也是通过监控信息为不同的训练任务分配合适的资源配置，使得在训练速度和整体的吞吐率上达到一个较好的效果。</p>
+<h2 id="痛点四：资源隔离较弱"><a href="#痛点四：资源隔离较弱" class="headerlink" title="痛点四：资源隔离较弱"></a>痛点四：资源隔离较弱</h2><p>早期的机器学习平台基于 Yarn 的 Angel 和 XLearning，由于 Yarn 缺乏对实例之间的资源隔离，我们在内存，网络，磁盘等均遇到不同程度的问题。</p>
+<p>由于 Yarn 没有对任务的内存进行隔离，所以，业务方常常因对内存资源估计不准而导致 worker 的进程 OOM。由于所有的进程都共用宿主机的 IP，很容易造成端口冲突，此外磁盘 IO 和网络 IO 也很容易被打爆。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left">Yarn</th>
+<th style="text-align:left">Kubernetes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">调度</td>
+<td style="text-align:left">以任务为粒度进行调度 支持Capacity Schedule、Fair Schedule等多种调度器 抢占式调度，支持任务排队，支持基于Tag的调度</td>
+<td style="text-align:left">以Pod为粒度进行调度 Label/Selector机制，支持多调度器 Kube-batch支持抢占式调度</td>
+</tr>
+<tr>
+<td style="text-align:left">隔离性</td>
+<td style="text-align:left">隔离性偏弱，高版本支持cgroup <strong>磁盘和网络IO未隔离</strong>，多任务容易造成抢占</td>
+<td style="text-align:left">隔离性强 docker可以使用独立IP 底层通过<strong>Linux内核的cgroup/namespace和TC等机制，保证磁盘和网络IO的隔离</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">多租户配额管理</td>
+<td style="text-align:left">通过队列机制实现多租户的配额管理</td>
+<td style="text-align:left">支持基于namespace的配额管理，包括GPU的配额</td>
+</tr>
+<tr>
+<td style="text-align:left">开源社区</td>
+<td style="text-align:left">活跃度相对低，Apache基金会</td>
+<td style="text-align:left">活跃度相对高，CNCF基金会</td>
+</tr>
+<tr>
+<td style="text-align:left">可扩展性</td>
+<td style="text-align:left">可扩展性好，可以支持其他 非 Yarn的调度框架</td>
+<td style="text-align:left">可扩展性好，支持CRD和operator，能满足内部业务的定制化需求</td>
+</tr>
+</tbody>
+</table>
+</div>
+<blockquote>
+<p>表 2. Hadoop Yarn 和 Kubernetes 的横向对比</p>
+</blockquote>
+<h1 id="Kubeflow-及核心组件"><a href="#Kubeflow-及核心组件" class="headerlink" title="Kubeflow 及核心组件"></a>Kubeflow 及核心组件</h1><p>Kubeflow 是由 Google 等公司于 2017 年推出的基于 Kubernetes 的开源项目，它支持常见的机器学习框架。</p>
+<h2 id="Kubeflow-简介"><a href="#Kubeflow-简介" class="headerlink" title="Kubeflow 简介"></a>Kubeflow 简介</h2><blockquote>
+<p>The Kubeflow project is dedicated to making deployments of machine learning (ML) workflows on Kubernetes simple, portable and scalable.</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://www.kubeflow.org/">Kubeflow</a> 旨在支持多种机器学习框架运行在 Kubernetes 之上，比如 Tensorflow, Pytorch, Caffe 等常见框架。它包含了 operator、pipeline、超参数调优、serving 等诸多模块。它通过提供对应的 operator，基于 Kubernetes 的 Pod/headless Service 等基础资源为框架提供与之相配的更高层次的资源。比如 tf-operator 为 Tensorflow 提供了 job 维度的生命周期管理能力，以满足 Tensorflow 分布式训练的资源和拓扑需求，达到了一键式部署 Tensorflow 训练任务的效果。</p>
+<p>Kubeflow 包含如下 operator，分别对应主流的分布式计算框架。蘑菇街主要采用了 kubeflow 中的 tf-operator，来实现对机器学习任务的统一管理。</p>
+<p><img src="https://image.rexking6.top/img/5c480fcf5644a.png" alt=""></p>
+<blockquote>
+<p>图 1. Kubeflow 所支持的主流分布式计算框架</p>
+</blockquote>
+<h2 id="Distributed-Tensorflow"><a href="#Distributed-Tensorflow" class="headerlink" title="Distributed Tensorflow"></a>Distributed Tensorflow</h2><p>蘑菇街业务方使用的计算框架主要是 Tensorflow，因此有必要先介绍一下 <a target="_blank" rel="noopener" href="https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/distribute">Tensorflow 的分布式训练</a>，Tensorflow 支持如下三种分布式策略：</p>
+<ul>
+<li>MirroredStrategy：适用于单机多卡的训练场景，功能有限，不在本文讨论范围内。</li>
+<li>ParameterServerStrategy：用于多机多卡场景，主要分为 worker 节点和 PS 节点，其中模型参数全部存储在 PS 节点，worker 在每个 step 计算完梯度后向 PS 更新梯度，蘑菇街当前使用这种方案。</li>
+<li>CollectiveAllReduceStrategy：用于多机多卡场景，通过 <a target="_blank" rel="noopener" href="https://github.com/baidu-research/baidu-allreduce/blob/master/collectives.cu#L156">all-reduce</a> 的方式融合梯度，只需要 worker 节点，不需要 PS 节点，从另外一个角度说，该节点既充当 worker 角色，又充当 PS 角色。该方案是带宽优化的，具有性能好，可扩展性强的特点，是 Tensorflow 推荐的未来方向。</li>
+</ul>
+<p>以 ParameterServerStrategy 为例，一个分布式训练集群至少需要两种类型的节点：PS 和 worker。由于在训练中需要一个 worker 节点来评估效果和保存 checkpoint，因此单独把该节点作为 chief(或者叫 master) 节点。通常情况下，一个集群需要多个 worker 节点，多个 PS 节点，一个 chief 节点。所有 worker 节点的 CPU/内存/GPU 等资源配置完全相同，所有 PS 节点的 CPU/内存等资源配置也相同。从资源拓扑角度出发，如果能够提供一种 Kubernetes 资源，用户可以基于该资源定义 PS/worker/chief 的数量和规格，用户就可以一键式创建分布式集群，大大简化了分布式集群的部署和配置。tf-operator 定义了 <a target="_blank" rel="noopener" href="https://github.com/kubeflow/tf-operator/blob/master/tf_job_design_doc.md">TFJob 资源</a>，用户可以借助 tf-operator 在 Kubernetes 上一键拉起分布式训练集群。</p>
+<p>从 Tensorflow 分布式训练的使用方式出发，用户在启动每个节点的任务时，需要传入集群所有节点的网络信息。这意味着分布式训练集群的每个节点需要预先知道所有其它节点的网络地址信息，即要求服务发现功能。tf-operator 基于 Kubernetes headless service，完美的提供了服务发现功能，无需用户再手工指定 PS/Worker 的 IP 信息，极大的降低了用户的部署成本。</p>
+<p><img src="https://image.rexking6.top/img/5c48100ab7829.png" alt=""></p>
+<blockquote>
+<p>图 2. Tensorflow 分布式训练的 ClusterSpec 配置</p>
+</blockquote>
+<h1 id="落地实践"><a href="#落地实践" class="headerlink" title="落地实践"></a>落地实践</h1><p><img src="https://image.rexking6.top/img/5c481032ed5e9.png" alt=""></p>
+<blockquote>
+<p>图 3. 基于 Kubernetes 的机器学习基础平台总体架构</p>
+</blockquote>
+<p>主要包含了以下几部分：</p>
+<h2 id="Tensorflow-生命周期管理-tf-operator"><a href="#Tensorflow-生命周期管理-tf-operator" class="headerlink" title="Tensorflow 生命周期管理(tf-operator)"></a>Tensorflow 生命周期管理(tf-operator)</h2><p>在部署 tf-operator 之后，首先需要在 Kubernetes 中创建对应的 <a target="_blank" rel="noopener" href="https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/">TFJob CRD</a>，之后就可以创建 TFJob 资源了。</p>
+<p>在如下的样例中，我们定义了一个具有 10 个 worker，4 个 ps，1 个 chief 的分布式训练集群。从 TFJob 参数不难发现，它对 ParameterServerStrategy 和 CollectiveAllReduceStrategy 这两种策略方式都支持，只是在 CollectiveAllReduceStrategy 场景下，无需要设置 PS 资源。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: <span class="string">&quot;kubeflow.org/v1alpha1&quot;</span></span><br><span class="line">kind: <span class="string">&quot;TFJob&quot;</span></span><br><span class="line">metadata:</span><br><span class="line">  name: <span class="string">&quot;example-job&quot;</span></span><br><span class="line">spec:</span><br><span class="line">  replicaSpecs:</span><br><span class="line">    - replicas: 1</span><br><span class="line">      tfReplicaType: CHIEF</span><br><span class="line">      template:</span><br><span class="line">        spec:</span><br><span class="line">          containers:</span><br><span class="line">            - image: gcr.io/tf-on-k8s-dogfood/chief_sample:latest</span><br><span class="line">              name: tensorflow</span><br><span class="line">          restartPolicy: OnFailure</span><br><span class="line">    - replicas: 10</span><br><span class="line">      tfReplicaType: WORKER</span><br><span class="line">      template:</span><br><span class="line">        spec:</span><br><span class="line">          containers:</span><br><span class="line">            - image: gcr.io/tf-on-k8s-dogfood/worker_sample:latest</span><br><span class="line">              name: tensorflow</span><br><span class="line">          restartPolicy: OnFailure</span><br><span class="line">    - replicas: 4</span><br><span class="line">      tfReplicaType: PS</span><br><span class="line">      template:</span><br><span class="line">        spec:</span><br><span class="line">          containers:</span><br><span class="line">            - image: gcr.io/tf-on-k8s-dogfood/ps_sample:latest</span><br><span class="line">              name: tensorflow</span><br></pre></td></tr></table></figure>
+<p>Tf-operator 启动后，通过 list-watch 不断的监听 TFJob 资源相关事件，当收到创建 TFJob 事件时，tf-operator 依次创建 PS/Worker/Chief(Master) Replica 资源。以 PS Replica 为例，根据 replicas 数量依次创建等同数量的 pod，并为每个 pod 创建 headless service。此外，它还生成 TF_CONFIG 环境变量，这个环境变量记录了所有 pod 的域名和端口，最终在创建 pod 时候注入到容器中。</p>
+<p><img src="https://image.rexking6.top/img/5c4810677ccff.png" alt=""></p>
+<blockquote>
+<p>图 4. tf-operator 的配置示例</p>
+</blockquote>
+<h2 id="任务调度-kube-batch"><a href="#任务调度-kube-batch" class="headerlink" title="任务调度(kube-batch)"></a>任务调度(kube-batch)</h2><p>通过引入 kube-batch，满足了业务方对批量任务调度的需求。没有采用 Kubernetes 默认的调度器，主要是基于以下两点考虑：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Gang_scheduling">GANG scheduling</a>：Kubernetes 默认的调度器是以 pod 为粒度的，并不支持 GANG scheduling。机器学习的训练任务要求集群保持一个整体，要么所有的 pod 都能成功创建，要么没有一个 pod 能被创建。试想资源处于临界状态时，如果采用默认的调度器调度一个分布式训练集群，则会导致部分节点因资源不足而无法成功调度，那些成功创建的 pod 空占用资源，但是无法进行训练。</li>
+<li>任务排队：Kubernetes 默认的调度器无法提供队列调度的功能，而不会像 Hadoop 任务那样进行排队。而面向机器学习/大数据/HPC 的批量任务调度，往往要求系统能维护一个或多个队列，进行任务排队。当任务结束并且释放资源后，后续的任务可以继续执行。</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://github.com/kubernetes-sigs/kube-batch">Kube-batch</a> 目前是 Kubernetes SIGs 旗下的一个孵化项目，是一个运行在 Kubernetes 上面向机器学习/大数据/HPC 的批调度器（batch scheduler），它支持以 Pod Group 为单位进行资源调度，并支持 preempt 和 priority。对于暂时无法满足资源条件的 Pod，在 Kubernetes 中会处于 pending 状态，直到资源释放从而继续执行。</p>
+<p>Kube-batch 的基本流程如下图，它通过 list-watch 监听 Pod, Queue, PodGroup 和 Node 等资源，在本地维护一份集群资源的全局缓存，依次通过如下的策略（reclaim, allocate, preemption，predict） 完成资源的调度。</p>
+<p><img src="https://image.rexking6.top/img/5c48119b7a24e.png" alt=""></p>
+<blockquote>
+<p>图 5. kube-batch 基本流程</p>
+</blockquote>
+<p><img src="https://image.rexking6.top/img/5c481065476aa.png" alt=""></p>
+<blockquote>
+<p>图 6. kube-batch 工作流程</p>
+</blockquote>
+<p>kube-batch 旨在通过配置策略，提供 gang scheduling 的调度能力，由于是基于 queue 的调度思想，kube-batch 对机器学习及大数据任务的调度具有很大的潜力。</p>
+<p><img src="https://image.rexking6.top/img/5c481065910be.png" alt=""></p>
+<blockquote>
+<p>图 7. 蘑菇街的使用姿势</p>
+</blockquote>
+<p>由于 kube-batch 对任务的 actions 有四种，可以根据自身的业务特点，指定只使用其中的一种或者多种：如果简单的分配，使用 allocation 即可；如果资源存在碎片，让调度器能够感知并重新分配，可以将 allocation 与 backfill 结合起来使用。如此既可满足业务的调度需求，又可以在一定程度上提升调度性能。</p>
+<h2 id="认证和授权（Dex"><a href="#认证和授权（Dex" class="headerlink" title="认证和授权（Dex)"></a>认证和授权（Dex)</h2><p>我们引入了由 CoreOS 研发的<a target="_blank" rel="noopener" href="https://github.com/dexidp/dex">dex</a> 组件，并嵌入到我们的 SDK 中，实现了与公司 LDAP 的对接。我们将 Kubernetes 中的 namespace 映射成不同的应用组，应用的负责人会自动授予（Rolebinding）管理员的角色（Role），同时针对一些特权用户还会创建 clusterRole 及 clusterRolebinding，方便这些特权用户访问某些需要高级权限的 API（如查询 node 信息等）。</p>
+<p><img src="https://image.rexking6.top/img/5c481068983ea.png" alt=""></p>
+<blockquote>
+<p>图 8. Dex 认证流程</p>
+</blockquote>
+<p><img src="https://image.rexking6.top/img/5c481065e1967.png" alt=""></p>
+<blockquote>
+<p>图 9. Dex 授权流程</p>
+</blockquote>
+<h2 id="多租户的隔离性"><a href="#多租户的隔离性" class="headerlink" title="多租户的隔离性"></a>多租户的隔离性</h2><p>平台需要接入多个不同的业务方，自然需要考虑多租户间的隔离性。我们利用 Kubernetes 提供的 resource quota，以 namespace 为单位对资源进行分配。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl <span class="keyword">get</span> resourcequota <span class="comment">--all-namespaces</span></span><br><span class="line">NAMESPACE                        NAME                AGE</span><br><span class="line"><span class="keyword">default</span>                          compute<span class="operator">-</span>resources   <span class="number">73</span>d</span><br><span class="line">tinyplus<span class="operator">-</span>docker<span class="operator">-</span>algo<span class="operator">-</span>anticheat   compute<span class="operator">-</span>resources   <span class="number">74</span>d</span><br><span class="line">tinyplus<span class="operator">-</span>docker<span class="operator">-</span>algo<span class="operator">-</span>image       compute<span class="operator">-</span>resources   <span class="number">74</span>d</span><br><span class="line">tinyplus<span class="operator">-</span>docker<span class="operator">-</span>algo<span class="operator">-</span><span class="keyword">search</span>      compute<span class="operator">-</span>resources   <span class="number">74</span>d</span><br><span class="line">tinyplus<span class="operator">-</span>docker                  compute<span class="operator">-</span>resources   <span class="number">74</span>d</span><br></pre></td></tr></table></figure>
+<p><img src="https://image.rexking6.top/img/5c48106726f50.png" alt=""></p>
+<blockquote>
+<p>图 10. 多租户下的资源配额</p>
+</blockquote>
+<h1 id="性能调优"><a href="#性能调优" class="headerlink" title="性能调优"></a>性能调优</h1><p>这里介绍一下蘑菇街在分布式机器学习调优的一些经验，主要分为 Kubernetes 层面、Tensorflow 层面和业务层面的一些调优。</p>
+<h2 id="Kubernetes-层面调优"><a href="#Kubernetes-层面调优" class="headerlink" title="Kubernetes 层面调优"></a>Kubernetes 层面调优</h2><h3 id="CPUShare-VS-CPUSet"><a href="#CPUShare-VS-CPUSet" class="headerlink" title="CPUShare VS CPUSet"></a>CPUShare VS CPUSet</h3><p>以商品推荐常用的 <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1606.07792">wide and deep</a> 模型为例，该模型采用 CPU 资源进行训练，宿主机的规格为 80C256G。</p>
+<p>从直觉上说，训练本质上是大量的矩阵运算，而矩阵运算在内存地址空间具有良好连续性的特点。若充分利用 CPU cache，将有助于提升 cache 的命中率，最终加快训练速度。Kubernetes 从 1.8 开始支持 <a target="_blank" rel="noopener" href="https://kubernetes.io/blog/2018/07/24/feature-highlight-cpu-manager/">CPU Manager</a> 特性，该特性支持对于 Guaranteed 类型的 pod，采用 CpuSet 为 Pod 分配独占的 CPU core。在相同训练任务下，对比 CpuSet 和 CpuShare 对训练速度的影响，发现在 worker CPU 核数较少的情况下，CpuSet 的性能远远超过 CpuShare。</p>
+<p><img src="https://image.rexking6.top/img/5c48119bbb461.png" alt=""></p>
+<blockquote>
+<p>图 11. CpuSet 和 CpuShare 性能对比（Y 轴数值越大越好）</p>
+</blockquote>
+<p>虽然 Guaranteed 类型的 Pod 牺牲了资源弹性，但是 CpuSet 带来的性能收益要高于弹性带来的收益。即使对 CpuShare 容器不设置 cpu limits，当跑满容器的 CPU 资源时，相同 cpu requests 下，CpuSet 容器的性能依旧比 CpuShare 的性能高出 20% 以上。</p>
+<p>在 kubelet 中开启 CPU Manaer 特性的配置参数如下</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--feature-gates=CPUManager=true</span></span><br><span class="line"><span class="comment">--cpu-manager-policy=static</span></span><br><span class="line"><span class="comment">--cpu-manager-reconcile-period=5s</span></span><br><span class="line"><span class="comment">--kube-reserved=cpu=500m</span></span><br></pre></td></tr></table></figure>
+<h3 id="Pod-Affinity"><a href="#Pod-Affinity" class="headerlink" title="Pod Affinity"></a>Pod Affinity</h3><p>PS/Worker 训练框架下，PS 节点作为中心节点，网络流量往往非常大，容易把带宽跑满。通过 Pod AntiAffinity 将所有 PS 节点尽可能打散到不同的宿主机上，从而分摊网络流量。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">podAntiAffinity:</span><br><span class="line">  preferredDuringSchedulingIgnoredDuringExecution:</span><br><span class="line">  - weight: <span class="number">100</span></span><br><span class="line">    podAffinityTerm:</span><br><span class="line">      labelSelector:</span><br><span class="line">        matchExpressions:</span><br><span class="line">        - key: tf-replica-<span class="built_in">type</span></span><br><span class="line">          operator: NotIn</span><br><span class="line">          values:</span><br><span class="line">          - ps</span><br><span class="line">      topologyKey: kubernetes.<span class="built_in">io</span>/hostname</span><br></pre></td></tr></table></figure>
+<h3 id="设置合适的资源配比"><a href="#设置合适的资源配比" class="headerlink" title="设置合适的资源配比"></a>设置合适的资源配比</h3><p>不同模型的计算量和参数各不相同，因此针对每个模型都应该设置一个合适的 PS/Worker 的规格和数量。在监控完善的条件下，可以根据监控数据分析瓶颈，调整实例的规格和数量，使得整体的训练速度和平台吞吐量能达到较好的水平。</p>
+<h3 id="Kube-batch-调度"><a href="#Kube-batch-调度" class="headerlink" title="Kube-batch 调度"></a>Kube-batch 调度</h3><p>由于 kube-batch 默认开启“reclaim, allocate, backfill, preempt”四种 actions，导致每次调度时轮询周期较长，通过配置 actions 为 allocate 一种可以提高 30%的调度效率。</p>
+<h2 id="Tensorflow-层面调优"><a href="#Tensorflow-层面调优" class="headerlink" title="Tensorflow 层面调优"></a>Tensorflow 层面调优</h2><p>Tensorflow 的调优主要参考了<a target="_blank" rel="noopener" href="https://www.tensorflow.org/guide/performance/overview">官网文档</a>。</p>
+<h3 id="线程数"><a href="#线程数" class="headerlink" title="线程数"></a>线程数</h3><p>由于 sysconf 系统调用等隔离性的问题，容器观察到的 CPU 信息往往是宿主机的。Tensorflow 默认的线程数为 CPU 核数，如此情况下，Tensorflow 创建的线程数远远超过实际分配到的 CPU 核数。同样以 wide and deep 模型为例，通过保持与 cpu limit一致的线程数，上下文切换降低约 40%，训练速度提升约 5%。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">config</span> = tf.ConfigProto()</span><br><span class="line"><span class="built_in">config</span>.intra_op_parallelism_threads = cpu_limit_cores</span><br><span class="line"><span class="built_in">config</span>.inter_op_parallelism_threads = cpu_limit_cores</span><br><span class="line">tf.Session(<span class="built_in">config</span>=<span class="built_in">config</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="业务层面调优"><a href="#业务层面调优" class="headerlink" title="业务层面调优"></a>业务层面调优</h2><h3 id="Partition"><a href="#Partition" class="headerlink" title="Partition"></a>Partition</h3><p>在某次训练中发现 PS 流量节点的分布不均匀，其中某个 PS 节点的流量非常大，而其它 PS 节点的流量相对较低。通过分析 timeline.json 发现某个 embedding 向量非常大，所以通过 partition，将该 tensor 分散到不同的 PS 节点上，从而避免了某个 PS 节点成为瓶颈。</p>
+<p><img src="https://image.rexking6.top/img/5c481067e8c45.png" alt=""></p>
+<blockquote>
+<p>图 12. 通过 partition 将 tensor 打散到不同的 PS 节点</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">partitioner = tf.<span class="title function_">fixed_size_partitioner</span>(ps_number, axis=<span class="number">0</span>)</span><br><span class="line"><span class="keyword">with</span> tf.<span class="title function_">variable_scope</span>(<span class="string">&quot;emb_layer&quot;</span>, partitioner= partitioner) <span class="keyword">as</span> <span class="attr">scope</span>:</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+<h3 id="Adam-优化器"><a href="#Adam-优化器" class="headerlink" title="Adam 优化器"></a>Adam 优化器</h3><p>由于 Adam 优化器会更新所有参数的梯度，所以在大 embedding 向量下，如果采用 adam 优化器，会大大增加计算量，严重影响训练速度。因此建议采用 Lazy_Adam_Optimizer 或者 Adadelta 优化器。</p>
+<h1 id="总结和体会"><a href="#总结和体会" class="headerlink" title="总结和体会"></a>总结和体会</h1><p>目前上述基于 Kubernetes 的机器学习平台已经在生产环境为多个业务方提供了服务。建设这套平台的过程，也是我们探索的过程。以下我们总结了一些还不尽如人意的地方，以及我们对未来的展望。</p>
+<h2 id="tf-operator"><a href="#tf-operator" class="headerlink" title="tf-operator"></a>tf-operator</h2><p>从落地的情况来看，tf-operator 的功能能满足基本的要求，稳定性较高。但是在故障恢复稍有欠缺，对于 pod 级别的故障，依赖 kubelet 来恢复；对于 node 级别的故障，目前还不支持故障恢复。分布训练下，故障概率随着 worker 数量和训练时间的增加而增加。worker 作为无状态节点，故障恢复既是可行的，也是非常有必要的。</p>
+<h2 id="kube-batch"><a href="#kube-batch" class="headerlink" title="kube-batch"></a>kube-batch</h2><p>目前 kube-batch 功能薄弱，成熟度有待商榷。比如 kube-batch 只有 predict 功能，没有 priority 功能。并且 predict 功能也非常薄弱，仅支持部分基础的 filter，比如 PodMatchNodeSelector, PodFitsHostPorts 以及基本的资源调度等。特别是 PodAffinity 特性，对于 PS-Worker 架构非常有用，因为 PS 节点的网络流量非常大，所以需要 PS 节点之间反亲和，将各个 PS 节点分散。此外，kube-batch 也不支持多任务之间依赖关系。</p>
+<p>Kube-batch 的落地效果差强人意，社区的维护力度较低。除了功能薄弱以外，我们也碰上了诸多的问题，处于勉强可用状态。我们建议可将 pod 群维度的资源判断功能放到上层，只有当空闲资源满足创建整个分布式训练集群时，再将请求发送给 Kubernetes，由 Kubernetes 默认的调度器完成调度，当然，这种方式也存在一些缺点。</p>
+<h3 id="GPU-虚拟化"><a href="#GPU-虚拟化" class="headerlink" title="GPU 虚拟化"></a>GPU 虚拟化</h3><p>目前 GPU 相关的监控、隔离性以及更细粒度的调度，仍然是业界的痛点问题。Nvidia 提供的 GPU 虚拟化方案需要收取高额的 Lincense 费用，目前业界还没有免费的 GPU 虚拟化方案。</p>
+<p>在实际的业务场景中，一些业务的 GPU 使用率并不高，但以虚拟机或者容器方式运行时往往会独占一块 GPU 卡，虽然可以通过设置 CUDA_VISIBLE_DEVICES 来实现多个容器共享一块 GPU 卡，但任务之间的隔离性是无法保证的。</p>
+<p>另外，Kubernetes 进行 GPU 资源分配时，默认还不感知 GPU 的 Topology，而不同分配的策略，对训练的性能也会产生很大的影响。<a target="_blank" rel="noopener" href="https://issues.apache.org/jira/browse/YARN-7481">YARN</a>和<a target="_blank" rel="noopener" href="https://github.com/kubernetes/kubernetes/issues/49964">Kubernetes</a>开源社区都在努力增强这块的调度能力。</p>
+<h3 id="Kubeflow-展望"><a href="#Kubeflow-展望" class="headerlink" title="Kubeflow 展望"></a>Kubeflow 展望</h3><p>Kubeflow 是目前基于 Kubernetes 的主流机器学习解决方案，它抽象了和机器学习相关的 PS-Worker 模型，实现了一套 pipeline 的工作流，支持超参数训练和 Jupyter notebooks 集成等能力。</p>
+<p>由于 Kubeflow 解决了基于 Yarn 的机器学习平台的痛点，同时容器化越来越普及。基于 Kubernetes 这样大规模的企业级容器平台，将会是未来的方向，相信 Kubeflow 在 2019 年将会有更好的发展。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2024\08\04\回顾2023年开源的MLOps产品、框架、工具与格局变化\" rel="bookmark">回顾2023年开源的MLOps产品、框架、工具与格局变化</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\28\AMPC-1080Ti机器-深度环境搭建\" rel="bookmark">AMPC-1080Ti机器-深度环境搭建</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\08\08\Jupyter-Notebook远程登录及自定义配置\" rel="bookmark">Jupyter Notebook远程登录及自定义配置</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2024/08/04/%E5%9F%BA%E4%BA%8EKubeflow%E7%9A%84%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E8%B0%83%E5%BA%A6%E5%B9%B3%E5%8F%B0%E8%90%BD%E5%9C%B0%E5%AE%9E%E6%88%98/" title="基于Kubeflow的机器学习调度平台落地实战">https://blog.rexking6.top/2024/08/04/基于Kubeflow的机器学习调度平台落地实战/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E6%A1%86%E6%9E%B6%E5%B7%A5%E5%85%B7/" rel="tag"># 框架工具</a>
+              <a href="/tags/MLOps/" rel="tag"># MLOps</a>
+              <a href="/tags/Kubeflow/" rel="tag"># Kubeflow</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/08/04/%E5%9B%9E%E9%A1%BE2023%E5%B9%B4%E5%BC%80%E6%BA%90%E7%9A%84MLOps%E4%BA%A7%E5%93%81%E3%80%81%E6%A1%86%E6%9E%B6%E3%80%81%E5%B7%A5%E5%85%B7%E4%B8%8E%E6%A0%BC%E5%B1%80%E5%8F%98%E5%8C%96/" rel="prev" title="回顾2023年开源的MLOps产品、框架、工具与格局变化">
+      <i class="fa fa-chevron-left"></i> 回顾2023年开源的MLOps产品、框架、工具与格局变化
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/08/05/%E3%80%8APrediction%20of%20GPU%20Failures%20Under%20Deep%20Learning%20Workloads%E3%80%8B%E7%AC%94%E8%AE%B0/" rel="next" title="《Prediction of GPU Failures Under Deep Learning Workloads》笔记">
+      《Prediction of GPU Failures Under Deep Learning Workloads》笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">2.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%97%9B%E7%82%B9"><span class="nav-number">3.</span> <span class="nav-text">痛点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%97%9B%E7%82%B9%E4%B8%80%EF%BC%9A%E5%AF%B9%E7%AE%97%E5%8A%9B%E7%9A%84%E9%9C%80%E6%B1%82%E8%B6%8A%E6%9D%A5%E8%B6%8A%E5%BC%BA%E7%83%88"><span class="nav-number">3.1.</span> <span class="nav-text">痛点一：对算力的需求越来越强烈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%97%9B%E7%82%B9%E4%BA%8C%EF%BC%9A%E4%BA%BA%E8%82%89%E7%AE%A1%E7%90%86%E7%9A%84%E6%88%90%E6%9C%AC%E5%BE%88%E9%AB%98"><span class="nav-number">3.2.</span> <span class="nav-text">痛点二：人肉管理的成本很高</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%BA%E8%82%89%E9%83%A8%E7%BD%B2"><span class="nav-number">3.2.1.</span> <span class="nav-text">人肉部署</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E4%BB%BB%E5%8A%A1%E7%AE%A1%E7%90%86"><span class="nav-number">3.2.2.</span> <span class="nav-text">训练任务管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E7%9A%84%E6%80%9D%E8%B7%AF"><span class="nav-number">3.2.3.</span> <span class="nav-text">解决的思路</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%97%9B%E7%82%B9%E4%B8%89%EF%BC%9A%E7%9B%91%E6%8E%A7%E7%9A%84%E7%BC%BA%E5%A4%B1"><span class="nav-number">3.3.</span> <span class="nav-text">痛点三：监控的缺失</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%97%9B%E7%82%B9%E5%9B%9B%EF%BC%9A%E8%B5%84%E6%BA%90%E9%9A%94%E7%A6%BB%E8%BE%83%E5%BC%B1"><span class="nav-number">3.4.</span> <span class="nav-text">痛点四：资源隔离较弱</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Kubeflow-%E5%8F%8A%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6"><span class="nav-number">4.</span> <span class="nav-text">Kubeflow 及核心组件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubeflow-%E7%AE%80%E4%BB%8B"><span class="nav-number">4.1.</span> <span class="nav-text">Kubeflow 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Distributed-Tensorflow"><span class="nav-number">4.2.</span> <span class="nav-text">Distributed Tensorflow</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%90%BD%E5%9C%B0%E5%AE%9E%E8%B7%B5"><span class="nav-number">5.</span> <span class="nav-text">落地实践</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Tensorflow-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%AE%A1%E7%90%86-tf-operator"><span class="nav-number">5.1.</span> <span class="nav-text">Tensorflow 生命周期管理(tf-operator)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6-kube-batch"><span class="nav-number">5.2.</span> <span class="nav-text">任务调度(kube-batch)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A4%E8%AF%81%E5%92%8C%E6%8E%88%E6%9D%83%EF%BC%88Dex"><span class="nav-number">5.3.</span> <span class="nav-text">认证和授权（Dex)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E7%A7%9F%E6%88%B7%E7%9A%84%E9%9A%94%E7%A6%BB%E6%80%A7"><span class="nav-number">5.4.</span> <span class="nav-text">多租户的隔离性</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98"><span class="nav-number">6.</span> <span class="nav-text">性能调优</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kubernetes-%E5%B1%82%E9%9D%A2%E8%B0%83%E4%BC%98"><span class="nav-number">6.1.</span> <span class="nav-text">Kubernetes 层面调优</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CPUShare-VS-CPUSet"><span class="nav-number">6.1.1.</span> <span class="nav-text">CPUShare VS CPUSet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pod-Affinity"><span class="nav-number">6.1.2.</span> <span class="nav-text">Pod Affinity</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E5%90%88%E9%80%82%E7%9A%84%E8%B5%84%E6%BA%90%E9%85%8D%E6%AF%94"><span class="nav-number">6.1.3.</span> <span class="nav-text">设置合适的资源配比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kube-batch-%E8%B0%83%E5%BA%A6"><span class="nav-number">6.1.4.</span> <span class="nav-text">Kube-batch 调度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Tensorflow-%E5%B1%82%E9%9D%A2%E8%B0%83%E4%BC%98"><span class="nav-number">6.2.</span> <span class="nav-text">Tensorflow 层面调优</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E6%95%B0"><span class="nav-number">6.2.1.</span> <span class="nav-text">线程数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%9A%E5%8A%A1%E5%B1%82%E9%9D%A2%E8%B0%83%E4%BC%98"><span class="nav-number">6.3.</span> <span class="nav-text">业务层面调优</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Partition"><span class="nav-number">6.3.1.</span> <span class="nav-text">Partition</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Adam-%E4%BC%98%E5%8C%96%E5%99%A8"><span class="nav-number">6.3.2.</span> <span class="nav-text">Adam 优化器</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E5%92%8C%E4%BD%93%E4%BC%9A"><span class="nav-number">7.</span> <span class="nav-text">总结和体会</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#tf-operator"><span class="nav-number">7.1.</span> <span class="nav-text">tf-operator</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kube-batch"><span class="nav-number">7.2.</span> <span class="nav-text">kube-batch</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GPU-%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="nav-number">7.2.1.</span> <span class="nav-text">GPU 虚拟化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kubeflow-%E5%B1%95%E6%9C%9B"><span class="nav-number">7.2.2.</span> <span class="nav-text">Kubeflow 展望</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">232</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">84</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">81</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">60:46</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

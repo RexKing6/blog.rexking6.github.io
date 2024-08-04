@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内存故障预测利器EDAC">
+<meta property="og:url" content="https://blog.rexking6.top/2024/08/04/%E5%86%85%E5%AD%98%E6%95%85%E9%9A%9C%E9%A2%84%E6%B5%8B%E5%88%A9%E5%99%A8EDAC/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/87d5aadacf7f7e373c8d1bb15ebd5c16.jpeg">
+<meta property="article:published_time" content="2024-08-04T02:17:34.000Z">
+<meta property="article:modified_time" content="2024-08-04T02:39:13.944Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="AIOps">
+<meta property="article:tag" content="故障预测">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/87d5aadacf7f7e373c8d1bb15ebd5c16.jpeg">
+
+<link rel="canonical" href="https://blog.rexking6.top/2024/08/04/%E5%86%85%E5%AD%98%E6%95%85%E9%9A%9C%E9%A2%84%E6%B5%8B%E5%88%A9%E5%99%A8EDAC/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>内存故障预测利器EDAC | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2024/08/04/%E5%86%85%E5%AD%98%E6%95%85%E9%9A%9C%E9%A2%84%E6%B5%8B%E5%88%A9%E5%99%A8EDAC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          内存故障预测利器EDAC
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-08-04 10:17:34 / 修改时间：10:39:13" itemprop="dateCreated datePublished" datetime="2024-08-04T10:17:34+08:00">2024-08-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/AIOps/" itemprop="url" rel="index"><span itemprop="name">AIOps</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/AIOps/%E6%95%85%E9%9A%9C%E9%A2%84%E6%B5%8B/" itemprop="url" rel="index"><span itemprop="name">故障预测</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2024/08/04/%E5%86%85%E5%AD%98%E6%95%85%E9%9A%9C%E9%A2%84%E6%B5%8B%E5%88%A9%E5%99%A8EDAC/" class="post-meta-item leancloud_visitors" data-flag-title="内存故障预测利器EDAC" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>6.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于<a href="服务器内存故障预测居然可以这样做！">https://cloud.tencent.com/developer/article/2056717</a>。</p>
+<p>随着互联网业务的快速发展，基础设施的可用性也越来越受到业界的关注。内存发生故障的故障率高、频次多、影响大，这些对于上层业务而言都是不能接受的。</p>
+<p>本文主要介绍EDAC（Error Detection And Correction）框架在内存预测方面的应用。首先介绍了EDAC应用的背景，接着是EDAC的原理介绍，然后通过EDAC安装——配置——测试过程详细地介绍了EDAC在vivo服务器上的应用，最后提出了内存预测使用EDAC的方案总结以及服务器RAS（Reliability, Availability and Serviceability）应用减小硬件故障对系统的影响的展望。</p>
+<h1 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h1><p>随着互联网业务的快速发展，基础设施的可用性也越来越受到业界的关注。然而硬件故障一直以来都是一种普遍存在的现象，由于硬件故障而造成的损失往往是巨大的。在服务器各个部件中，除硬盘故障以外，内存故障是第二大常见的硬件故障类型。并且服务器内存的数量众多，vivo的内存数量达到40w+条，内存故障造成的最严重的后果是会直接导致系统崩溃，服务器宕机，这些对于上层业务而言都是不能接受的。</p>
+<p>内存故障可分为UCE（Uncorrectable Error）和CE（Correctable Error）。当硬件侦测到一个错误，它会通过两种方式报告给CPU的。其中一种方式是中断，这种情况如果是UCE也就是不可纠正错误，则可能会导致服务器立马宕机。如果是CE，即可纠正错误，硬件会利用一部分资源对该错误进行修复，而当内存CE累计过多，无法进行自我修复时，则会产生UCE，造成系统宕机重启。因此，我们需要尽早地发现CE过多的内存条，及时进行更换，避免造成重大的损失。</p>
+<p>以往内存故障大多是通过MCE（Machine Check Exception）log 和BMC记录的SEL （System Error Log）日志结合去发现定位故障的，而这些最大的问题是不能够提前发现内存问题，往往是服务器宕机重启后才被动发现的。除此之外还存在以下几个方面的问题：</p>
+<ol>
+<li>MCE日志很难直接定位到故障内存槽位。</li>
+<li>没有直观的CE/UCE错误计数。</li>
+<li>无法根据内存条上CE/UCE的数量判断内存的健康状况。</li>
+</ol>
+<p>针对以上问题，我们需要寻找别的解决方案。这时EDAC便出现在我们的视野，它能够完美地解决上面所说的所有问题，并且能够实现内存CE故障的主动发现，提前发现内存问题。</p>
+<p>本文将主要介绍EDAC的原理以及如何通过它实现的故障预测。</p>
+<h1 id="EDAC-原理介绍"><a href="#EDAC-原理介绍" class="headerlink" title="EDAC 原理介绍"></a>EDAC 原理介绍</h1><p>EDAC（Error Detection And Correction）是Linux系统的错误检测和纠正的框架，它的目的是在linux系统运行过程中，当错误发生时能够发现并且报告出硬件错误。EDAC由一个核心（edac_core.ko）和多个内存控制器驱动模块组成，它的子系统有edac_mc、edac_device、PCI bus scanning，分别是负责收集内存控制器，其他控制器（比如L3 Cache控制器）以及PCI设备所报告的错误。</p>
+<p>这里主要讲述EDAC子系统edac_mc是如何收集内存控制器的错误。内存CE以及UCE是edac_mc class获取的主要错误类型，它主要涉及了以下几个函数：</p>
+<ul>
+<li><strong>【edac_mc_alloc()】</strong>：使用结构体mem_ctl_info来描述内存控制器，只有EDAC的核心才能接触到它，通过edac_mc_alloc()这个函数去分配填充结构体的内容。</li>
+<li><strong>【edac_device_handle_ce()】</strong>：标记CE错误。</li>
+<li><strong>【edac_device_handle_ue()】</strong>：标志UCE错误。</li>
+<li><strong>【edac_mc_handle_error()】</strong>：向用户空间报告内存事件，它的参数包括故障点的层次结构以及故障类型，累计的相关UCE/CE错误计数统计。</li>
+<li><strong>【edac_raw_mc_handle_error()】</strong>：向用户空间报告内存事件，但是不做任何事情来发现它的位置，只有当硬件错误来自BIOS时，才会被edac_mc_handle_error()直接调用。</li>
+</ul>
+<p>那么EDAC是如何控制和报告设备故障的呢？它又是如何将故障定位以及记录到对应的内存条上的呢？</p>
+<blockquote>
+<p> Linux 是通过sysfs文件系统来展示内核设备的层次关系，EDAC则通过它来控制和报告设备故障。EDAC是通过抽象出来的内存控制器模型，将故障定位到对应的内存条上，这主要也是与内存在系统中的排列结构相关。CPU对应的每个MC（memory controller）设备控制着一组DIMM内存模块，这些模块通以片选行(Chip-Select Row,csrowX)和通道(Channel,chX)的方式排布，在系统中可以有多个csrow和多个通道。</p>
+</blockquote>
+<p>通过下列路径可以查看相关文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># ls /sys/devices/system/edac/mc/mc0/csrow0/</span><br><span class="line">ce_count  ch0_ce_count  ch0_dimm_label  ch1_ce_count  ch1_dimm_label  dev_type  edac_mode  mem_type  power  size_mb  subsystem  ue_count  uevent</span><br></pre></td></tr></table></figure>
+<p>部分文件的用途如下表所示：</p>
+<p><img src="https://image.rexking6.top/img/87d5aadacf7f7e373c8d1bb15ebd5c16.jpeg" alt=""></p>
+<p>EDAC如果发现硬件设备控制器报告的是UE事件，并且控制器要求UE即停机，则会重启系统。控制器检查到CE事件后，可以看作对未来UCE事件的预测。我们可以通过一些屏蔽手段或者更换内存条减少UE事件以及系统宕机的可能性。</p>
+<h1 id="EDAC-的应用"><a href="#EDAC-的应用" class="headerlink" title="EDAC 的应用"></a>EDAC 的应用</h1><p>EDAC在vivo 现网中的应用过程主要分为以下几步：</p>
+<h2 id="（1）EDAC在Linux系统中的支持"><a href="#（1）EDAC在Linux系统中的支持" class="headerlink" title="（1）EDAC在Linux系统中的支持"></a>（1）EDAC在Linux系统中的支持</h2><p>EDAC在Linux 2.6.16以上的内核中以及系统发行版都已经得到了支持，但是内核中edac的驱动模块却有很多，不同的系统版本支持的驱动模块却不尽相同，可以通过以下方式查看系统支持哪些驱动模块。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># ls /lib/modules/<span class="number">3.10</span><span class="number">.0</span>-<span class="number">693.</span>el7.x86_64/kernel/drivers/edac/</span><br><span class="line">amd64_edac_mod.ko.xz  edac_core.ko.xz     i3000_edac.ko.xz  i5000_edac.ko.xz  i5400_edac.ko.xz  i7core_edac.ko.xz   ie31200_edac.ko.xz  skx_edac.ko.xz</span><br><span class="line">e752x_edac.ko.xz      edac_mce_amd.ko.xz  i3200_edac.ko.xz  i5100_edac.ko.xz  i7300_edac.ko.xz  i82975x_edac.ko.xz  sb_edac.ko.xz       x38_edac.ko.xz</span><br></pre></td></tr></table></figure>
+<p>那么这些驱动模块之间有什么区别？我们又应该怎样选择呢？拿sb_edac与skx_edac进行说明，我们先来看一下它们描述。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># modinfo sb_edac</span><br><span class="line">filename:       /lib/modules/<span class="number">3.10</span><span class="number">.0</span>-<span class="number">693.</span>el7.x86_64/kernel/drivers/edac/sb_edac.ko.xz</span><br><span class="line">description:    MC Driver <span class="keyword">for</span> Intel Sandy Bridge and Ivy Bridge memory controllers -  Ver: <span class="number">1.1</span><span class="number">.1</span></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"># modinfo skx_edac</span><br><span class="line">filename:       /lib/modules/<span class="number">3.10</span><span class="number">.0</span>-<span class="number">693.</span>el7.x86_64/kernel/drivers/edac/skx_edac.ko.xz</span><br><span class="line">description:    MC Driver <span class="keyword">for</span> Intel Skylake server processors</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>通过查看描述我们发现，原来驱动模块是和CPU的产品架构有关，安装不匹配的模块会出现 edac-util: Error: No memory controller data found 这样的报错。经过我们测试发现，一般而言，如果CPU的产品架构支持的驱动模块存在的话，系统会默认安装支持的驱动。</p>
+<h2 id="（2）配置内存槽位与物理槽位对应关系"><a href="#（2）配置内存槽位与物理槽位对应关系" class="headerlink" title="（2）配置内存槽位与物理槽位对应关系"></a>（2）配置内存槽位与物理槽位对应关系</h2><p>通过sysfs文件系统我们可以看到哪个CPU的哪个内存控制下的哪个通道的哪条内存的CE计数，但是它对应的系统下的哪一个内存呢，毕竟我们服务器日常的<a target="_blank" rel="noopener" href="https://cloud.tencent.com/solution/operation?from_column=20065&amp;from=20065">运维</a>，经常看到的是系统槽位名称，那么它们的关系是怎样的呢？</p>
+<p>经过查看edac-util的源代码结构发现，它提供了labels.db这个配置文件，去存储服务器内存的系统槽位与物理槽位对应关系。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># cat /etc/edac/labels.db</span><br><span class="line"># EDAC Motherboard DIMM labels Database file.</span><br><span class="line">#</span><br><span class="line"># $Id: labels.db <span class="number">102</span> <span class="number">2008</span>-09-<span class="number">25</span> <span class="number">15</span>:<span class="number">52</span>:07Z grondo $</span><br><span class="line">#</span><br><span class="line">#  Vendor-name and model-name are found from the program <span class="string">&#x27;dmidecode&#x27;</span></span><br><span class="line">#  labels are found from the silk screen on the motherboard.</span><br><span class="line">#</span><br><span class="line">#Vendor: &lt;vendor-name&gt;</span><br><span class="line">#  Model: &lt;model-name&gt;</span><br><span class="line">#    &lt;label&gt;:  &lt;mc&gt;.&lt;row&gt;.&lt;channel&gt;</span><br></pre></td></tr></table></figure>
+<p>编写这个文件的时候，我们需要知道内存是如何在服务器上是怎么插，并且知道它对应的是系统中的槽位名称，不同服务器型号系统槽位的名称不同。一般能使内存性能发挥最大的插法，总结起来就是对称插法，并且先插离CPU远的通道，每个通道里面先插离CPU远的槽位。</p>
+<p>配置完成后，如何去检查是否配置正确呢，主要分为两步：</p>
+<blockquote>
+<p> ① 使用edac-ctl查看SYSFS CONTETS条数是否正确</p>
+<p> ② 用dmidecode -t memory查看内存的名称是否一致</p>
+</blockquote>
+<p>这里我们还遇到一个rpm包的问题：对于厂商的主板的model name前后有多个空格的情况，edac-ctl无法识别到主板的model name，lables.db无法注册成功。最后我们修改了edac-utils包的源代码，重新进行了打包。</p>
+<h2 id="（3）测试与验证"><a href="#（3）测试与验证" class="headerlink" title="（3）测试与验证"></a>（3）测试与验证</h2><p>安装配置完成后，就到了测试验证环节了，要怎样去验证EDAC的正确性，保证CE错误记录到了对应的内存条上呢？我们可以使用APEI Error inject做一些错误注入的测试。</p>
+<p>APEI Error inject 它的原理是依赖APEI（ACPI Platform Error Interface），它的结构中有四张表：</p>
+<ul>
+<li><strong>BERT（Boot Error Record Table）</strong>：主要用来记录在启动过程中出现的错误</li>
+<li><strong>ERST（Error Record Serialization Table)</strong> ：用来永久存储错误的抽象接口，存储各种硬件或平台的相关错误，错误类型包括 Corrected Error（CE），Uncorrected Recoverable Error（UCR），以及 Uncorrected Non-Recoverable Error，或者说Fatal Error。</li>
+<li><strong>EINJ（Error Injection Table）</strong>：主要作用是用来注入错误并触发错误，是一个用来测试的表</li>
+<li><strong>HEST（Hardware Error Source Table）</strong>：定义了很多错误源和错误类型。定义这些硬件错误源的目的在于标准化软硬件错误接口的实现。</li>
+</ul>
+<p>这里是通过debugfs向内核APEI结构中的EINJ表注入内存错误来进行测试，debugfs是一种用于内核调试的虚拟文件系统，简单来说就是可以通过debugfs映射内核数据到用户空间，使用户能够修改一些数据进行调试。</p>
+<p>方法步骤如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"># 查看是否存在EINJ表</span><br><span class="line"># ls /sys/firmware/acpi/tables/EINJ </span><br><span class="line"></span><br><span class="line"># grep &lt;以下字段&gt; /boot/config-<span class="number">3.10</span><span class="number">.0</span>-<span class="number">693.</span>el7.x86_64</span><br><span class="line"></span><br><span class="line">CONFIG_DEBUG_FS=y </span><br><span class="line">CONFIG_ACPI_APEI=y</span><br><span class="line">CONFIG_ACPI_APEI_EINJ=m</span><br><span class="line"></span><br><span class="line"># 安装einj</span><br><span class="line"># modprobe einj</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 查看内存地址范围，这一步是因为/proc/iomem这个文件记录的是物理地址的分配情况，有些内存地址是系统预留存放以及其他设备所占用的，无法进行错误注入。</span><br><span class="line"># cat /proc/iomem | grep <span class="string">&quot;System RAM&quot;</span></span><br><span class="line"><span class="number">00001000</span>-000997ff</span><br><span class="line"><span class="number">00100000</span>-69f79fff</span><br><span class="line">6c867000-6c9e6fff</span><br><span class="line">6f345000-6f7fffff</span><br><span class="line"><span class="number">100000000</span>-407fffffff</span><br><span class="line"></span><br><span class="line"># 查看内存页大小</span><br><span class="line"># getconf PAGESIZE</span><br><span class="line"><span class="number">4096</span> 即4KB</span><br><span class="line"></span><br><span class="line"># 进入edac错误注入目录</span><br><span class="line"></span><br><span class="line"># cat /proc/mounts | grep debugfs</span><br><span class="line">debugfs /sys/kernel/debug debugfs rw,relatime <span class="number">0</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line"># cd  /sys/kernel/debug/apei/einj/</span><br><span class="line"></span><br><span class="line"># 查看支持注入的错误类型</span><br><span class="line"># cat available_error_type</span><br><span class="line"><span class="number">0x00000008</span>  Memory Correctable</span><br><span class="line"><span class="number">0x00000010</span>  Memory Uncorrectable non-fatal</span><br><span class="line"><span class="number">0x00000020</span>  Memory Uncorrectable fatal</span><br><span class="line"></span><br><span class="line"># 写入要注入的错误的类型</span><br><span class="line">echo <span class="number">0x8</span> &gt; error_type </span><br><span class="line"></span><br><span class="line"># 写入内存地址掩码</span><br><span class="line">echo <span class="number">0xfffffffffffff000</span> &gt; param2</span><br><span class="line"></span><br><span class="line"># 写入内存地址</span><br><span class="line">echo <span class="number">0x32dec000</span> &gt; param1</span><br><span class="line"></span><br><span class="line"># 写入<span class="number">0x0</span>，若为<span class="number">1</span>，则会跳过触发环节</span><br><span class="line">echo <span class="number">0x0</span> &gt; notrigger</span><br><span class="line"></span><br><span class="line"># 写入任何整数触发错误注入，这是错误注入的最后一步</span><br><span class="line">echo <span class="number">1</span> &gt; error_inject</span><br><span class="line"></span><br><span class="line"># 查看日志</span><br><span class="line"># tail /<span class="keyword">var</span>/log/message</span><br><span class="line">xxxxxx xxxxxxxx kernel: [<span class="number">2258720.203422</span>] EDAC MC0: <span class="number">1</span> CE memory read error on CPU_SrcID#0_MC#0_Chan#0_DIMM#<span class="number">1</span> (channel:<span class="number">0</span> slot:<span class="number">1</span> page:<span class="number">0x32dec</span> offset:<span class="number">0x0</span> grain:<span class="number">32</span> syndrome:<span class="number">0x0</span> -  err_code:<span class="number">0101</span>:0090 socket:<span class="number">0</span> imc:<span class="number">0</span> rank:<span class="number">0</span> bg:<span class="number">0</span> ba:<span class="number">3</span> row:<span class="number">327</span> col:<span class="number">300</span>)</span><br><span class="line"></span><br><span class="line"># 使用edac-util -v查看，可以看到对应的内存条上新增了CE计数</span><br></pre></td></tr></table></figure>
+<h1 id="总结与展望"><a href="#总结与展望" class="headerlink" title="总结与展望"></a>总结与展望</h1><ol>
+<li>EDAC可以明确的获取到服务器的每条内存上的CE计数，我们可以通过CE计数去设定阈值，分析CE计数曲线等，结合其他MCE log 、SEL等对内存进行健康状况评估，进行内存预测。EDAC在vivo服务器全量上线过程以来，累计提前发现450+ case的内存CE问题，服务器的宕机数量明显减少。对满足报修标准服务器业务进行迁移，并更换相应的内存条，避免因服务器突然宕机导致业务的不稳定，甚至因此造成的损失。</li>
+<li>EDAC是服务器RAS（Reliability, Availability and Serviceability）在内存方面应用的一小部分。RAS是指通过一些技术手段，软硬件结合去保证服务器的这三个能力。RAS在内存方面的优化还有很多，例如MCA（Machine Check Architecture）recovery等等。未来我们也将引入RAS去缓解硬件故障对系统的影响。 </li>
+</ol>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.kernel.org/doc/html/latest/driver-api/edac.html">https://www.kernel.org/doc/html/latest/driver-api/edac.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.kernel.org/doc/html/latest/admin-guide/ras.html">https://www.kernel.org/doc/html/latest/admin-guide/ras.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.kernel.org/doc/html/latest/firmware-guide/acpi/apei/einj.html">https://www.kernel.org/doc/html/latest/firmware-guide/acpi/apei/einj.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/grondo/edac-utils/">https://github.com/grondo/edac-utils/</a></li>
+<li><a target="_blank" rel="noopener" href="https://uefi.org/specs/ACPI/6.4/18_ACPI_Platform_Error_Interfaces/ACPI_PLatform_Error_Interfaces.html">https://uefi.org/specs/ACPI/6.4/18_ACPI_Platform_Error_Interfaces/ACPI_PLatform_Error_Interfaces.html</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2024\08\05\《Prediction of GPU Failures Under Deep Learning Workloads》笔记\" rel="bookmark">《Prediction of GPU Failures Under Deep Learning Workloads》笔记</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2024\08\04\如何检测GPU常见故障\" rel="bookmark">如何检测GPU常见故障</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2020\02\11\Dynamic-Time-Warping-动态时间规整\" rel="bookmark">Dynamic Time Warping 动态时间规整</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2024/08/04/%E5%86%85%E5%AD%98%E6%95%85%E9%9A%9C%E9%A2%84%E6%B5%8B%E5%88%A9%E5%99%A8EDAC/" title="内存故障预测利器EDAC">https://blog.rexking6.top/2024/08/04/内存故障预测利器EDAC/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/AIOps/" rel="tag"># AIOps</a>
+              <a href="/tags/%E6%95%85%E9%9A%9C%E9%A2%84%E6%B5%8B/" rel="tag"># 故障预测</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/08/04/%E6%AF%95%E4%B8%9A%E5%89%8D%E8%A6%81%E5%81%9A%E7%9A%84%E5%87%A0%E4%BB%B6%E4%BA%8B/" rel="prev" title="毕业前要做的几件事">
+      <i class="fa fa-chevron-left"></i> 毕业前要做的几件事
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/08/04/%E5%A6%82%E4%BD%95%E6%A3%80%E6%B5%8BGPU%E5%B8%B8%E8%A7%81%E6%95%85%E9%9A%9C/" rel="next" title="如何检测GPU常见故障">
+      如何检测GPU常见故障 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.</span> <span class="nav-text">背景介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#EDAC-%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D"><span class="nav-number">3.</span> <span class="nav-text">EDAC 原理介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#EDAC-%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">EDAC 的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%881%EF%BC%89EDAC%E5%9C%A8Linux%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E6%94%AF%E6%8C%81"><span class="nav-number">4.1.</span> <span class="nav-text">（1）EDAC在Linux系统中的支持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E9%85%8D%E7%BD%AE%E5%86%85%E5%AD%98%E6%A7%BD%E4%BD%8D%E4%B8%8E%E7%89%A9%E7%90%86%E6%A7%BD%E4%BD%8D%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB"><span class="nav-number">4.2.</span> <span class="nav-text">（2）配置内存槽位与物理槽位对应关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E6%B5%8B%E8%AF%95%E4%B8%8E%E9%AA%8C%E8%AF%81"><span class="nav-number">4.3.</span> <span class="nav-text">（3）测试与验证</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E4%B8%8E%E5%B1%95%E6%9C%9B"><span class="nav-number">5.</span> <span class="nav-text">总结与展望</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">232</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">84</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">81</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">60:46</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
