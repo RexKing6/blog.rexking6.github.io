@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何从实验中获得更多？——AB实验的异质性分析实践">
+<meta property="og:url" content="https://blog.rexking6.top/2024/11/16/%E5%A6%82%E4%BD%95%E4%BB%8E%E5%AE%9E%E9%AA%8C%E4%B8%AD%E8%8E%B7%E5%BE%97%E6%9B%B4%E5%A4%9A%EF%BC%9F%E2%80%94%E2%80%94AB%E5%AE%9E%E9%AA%8C%E7%9A%84%E5%BC%82%E8%B4%A8%E6%80%A7%E5%88%86%E6%9E%90%E5%AE%9E%E8%B7%B5/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20241116232348923.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20241116232415064.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20241116232500685.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20241116233000145.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20241116233743077.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20241116233836333.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20241116234322502.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20241123002921982.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20241123002958450.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20241123003034373.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20241123003241828.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20241123003314040.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20241123003713015.png">
+<meta property="article:published_time" content="2024-11-16T15:22:01.000Z">
+<meta property="article:modified_time" content="2024-11-22T16:40:33.876Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="因果推断">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/image-20241116232348923.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2024/11/16/%E5%A6%82%E4%BD%95%E4%BB%8E%E5%AE%9E%E9%AA%8C%E4%B8%AD%E8%8E%B7%E5%BE%97%E6%9B%B4%E5%A4%9A%EF%BC%9F%E2%80%94%E2%80%94AB%E5%AE%9E%E9%AA%8C%E7%9A%84%E5%BC%82%E8%B4%A8%E6%80%A7%E5%88%86%E6%9E%90%E5%AE%9E%E8%B7%B5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>如何从实验中获得更多？——AB实验的异质性分析实践 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2024/11/16/%E5%A6%82%E4%BD%95%E4%BB%8E%E5%AE%9E%E9%AA%8C%E4%B8%AD%E8%8E%B7%E5%BE%97%E6%9B%B4%E5%A4%9A%EF%BC%9F%E2%80%94%E2%80%94AB%E5%AE%9E%E9%AA%8C%E7%9A%84%E5%BC%82%E8%B4%A8%E6%80%A7%E5%88%86%E6%9E%90%E5%AE%9E%E8%B7%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          如何从实验中获得更多？——AB实验的异质性分析实践
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-11-16 23:22:01" itemprop="dateCreated datePublished" datetime="2024-11-16T23:22:01+08:00">2024-11-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-11-23 00:40:33" itemprop="dateModified" datetime="2024-11-23T00:40:33+08:00">2024-11-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E5%9B%A0%E6%9E%9C%E6%8E%A8%E6%96%AD/" itemprop="url" rel="index"><span itemprop="name">因果推断</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2024/11/16/%E5%A6%82%E4%BD%95%E4%BB%8E%E5%AE%9E%E9%AA%8C%E4%B8%AD%E8%8E%B7%E5%BE%97%E6%9B%B4%E5%A4%9A%EF%BC%9F%E2%80%94%E2%80%94AB%E5%AE%9E%E9%AA%8C%E7%9A%84%E5%BC%82%E8%B4%A8%E6%80%A7%E5%88%86%E6%9E%90%E5%AE%9E%E8%B7%B5/" class="post-meta-item leancloud_visitors" data-flag-title="如何从实验中获得更多？——AB实验的异质性分析实践" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>7.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/FjifDJTSnOYXBymJ0hI5Dw">如何从实验中获得更多？——AB实验的异质性分析实践</a>。</p>
+<h1 id="一、引言"><a href="#一、引言" class="headerlink" title="一、引言"></a>一、引言</h1><p>大家好，我是技术中心-数据科学部的夏栉，我们团队核心职责之一是负责app的实验设计、评估与分析工作。实验的重要性不言而喻，在实际业务中被广泛的开展和应用。通过AB实验，帮助我们低成本理解和验收策略的效果，是辅助业务策略和算法升级迭代的强有力工具。当实验结果的数据回收之后，数据科学同学一方面针对本次实验的数据情况，完成实验评估、进行策略影响链路和实验分析，给予明确的实验结论，并及时提供决策建议和风险提醒；另一方面，对于需要长期推进的策略或业务形态来说，为了高效且正向的迭代实验，充分利用已有实验数据进行优化空间的洞察和探索是必不可少的，从而辅助完成策略的改进或精细化。而异质性分析就是这其中重要的手段，推动实现从实验到优化的闭环迭代过程。</p>
+<p>在过去的一年中，我主要负责物流成本补贴方向的数据科学工作。感谢过程中团队给予的机会和帮助，以及业务和算法同学的支持，得以实现补贴场景的异质性分析实践和落地。本文将阐述异质性分析的基本原理和方法、具体实践流程、落地等情况，总结实践经验，也期待更多交流和探讨。</p>
+<h1 id="二、为什么做异质性分析"><a href="#二、为什么做异质性分析" class="headerlink" title="二、为什么做异质性分析"></a>二、为什么做异质性分析</h1><h2 id="2-1-从实验到优化"><a href="#2-1-从实验到优化" class="headerlink" title="2.1 从实验到优化"></a>2.1 从实验到优化</h2><p>实际业务过程中，我们常遇到许多业务判断，如某个范围内配置补贴后，履约情况明显得到改善，接起率的改善是由补贴工具带来的还是自然的好转等问题。</p>
+<p>这些问题实质上都是想要知道，如何从数据的相关性判定为逻辑上的因果关系。开展随机实验（AB Test）通过随机化过程避免混杂因子影响使得我们获得理想的干预效果的手段，避免将因果效应错误归因于不相关的变量。从因果角度去理解AB实验能够更好的实现认知升级、科学的设计和开展实验。</p>
+<p>那么，通过异质性分析手段实现实验的优化，实际上是在整体效应的基础上，去进一步评估局部效应，更深入地挖掘在一次实验中可能影响我们策略对业务结果作用表现的原因和混淆因子，把握因果之间以及这些因子之间的相互作用关系，帮助看清整体策略表现，并洞察优化空间。</p>
+<p><img src="https://image.rexking6.top/img/image-20241116232348923.png" alt=""></p>
+<h2 id="2-2-异质性的必要性"><a href="#2-2-异质性的必要性" class="headerlink" title="2.2 异质性的必要性"></a>2.2 异质性的必要性</h2><p><img src="https://image.rexking6.top/img/image-20241116232415064.png" alt=""></p>
+<p>我们发现，在一次AB实验中，通过对照组和实验组的直接对比，可以获得平均因果效应，但是（如下图）可能在不同的群体上，我们发现策略的表现是有所差异的。比如，在A人群上策略对关注指标有所提升，在B人群上却是负向效果，当我们只观测平均因果效应时，这些信息便会被掩盖。也就是说，当一个策略输出正向的平均因果效应，这其中可能存在部分样本无因果效应或者为负向因果效应；如果一个策略整体为负向因果效应，那么其中也有可能有小部分群体是正向的。因此我们需要在一些细分维度上去看实验的表现，以实现策略的精细化。</p>
+<p><img src="https://image.rexking6.top/img/image-20241116232500685.png" alt=""></p>
+<p>对于一次成本策略的实验，平均因果效应能够细拆到天气、距离等等维度上，我们可以发现不同场景下策略表现的差异性。比如对于xx补贴来说，针对天气是否恶劣的情况在使用补贴工具时，可针对性的进行引导。而除了这些已知的、单一的维度外，仍然有许多未知维度或者交叉维度策略上可能表现出异质性。那么异质性分析核心就是给出这些局部场景下的CATE（Conditional Average Treatment Effect，见3.1.2），挖掘出异质性表现场景。</p>
+<p>实际上，AB实验在实际应用中，我们经常发现策略的影响因素是复杂的，涉及到多个维度因素，当试图更进一步分析时，会自然而然地进行维度下钻，分别计算每个维度的策略效果。经历过的同学应该都有感悟，这一过程经常会繁杂和混乱，消耗大量的时间和精力。</p>
+<p>下面的表格对传统维度下钻方式和uplift模型异质性分析进行比较：</p>
+<p><img src="https://image.rexking6.top/img/image-20241116233000145.png" alt=""></p>
+<p>综合来看，维度下钻的主要问题一是在于难以选择维度组合，一方面无法将维度影响（维度组合或混淆因子）考虑全面、二是交叉维度高时操作困难；二是维度组合下的划分结果实验显著性不可信。而利用Uplift方法，得到稳定和置信的模型前提下，这些问题将迎刃而解，在第三部分展开介绍。</p>
+<h2 id="2-3-物流实验异质性分析的特点"><a href="#2-3-物流实验异质性分析的特点" class="headerlink" title="2.3 物流实验异质性分析的特点"></a>2.3 物流实验异质性分析的特点</h2><p>聚焦到物流领域，物流实验的研究对象大多是运单，不同于常见的用户实验作用链路和数据埋点相对清晰和全面，在进行异质性分析时存在一定的困难。</p>
+<p>首先是对于<strong>物流场景方面，影响链路复杂度高，刻画难度大</strong>；如一个运单在运行的过程中，存在各个策略的相互影响，每一环对于最终观测的Outcome都可能产生极大的影响。因此对于上下游环节的把握，需要较多的业务认知。另一方面，对于运单分流实验来说，由于运单是即时产生的，可获得的特征和观测都是一次性的，不存在历史表现等特征，且运单间实际上存在溢出效应，因此<strong>除了运单本身特征外，更多需要环境、供需、过程特征的输入</strong>。具体实践而言，一方面需要对影响环节进行梳理，对分析范围进行相应适当的限制，确定适当的分析场景；限定太多可能会缺乏落地价值和应用能力，限定太少可能会造成未观测到的混淆因素过多，难以得到置信的模型。另一方面，需要尽可能对过程中的混淆因子进行特征的抽象。</p>
+<p>目标方面，就物流成本这一子场景来说，是通过不同的补贴或定价或活动等等策略，实现各方面的提升。于是，关于物流成本方向异质性分析的具体目标可以概括为：</p>
+<ul>
+<li><strong>看清本策略：</strong>策略的整体效果评价；</li>
+<li><p><strong>优化本策略：</strong>策略异质性场景挖掘；</p>
+</li>
+<li><p>获得准确的CATE，辅助实验评估，有助于找到相应的场景，以进行后续策略迭代；</p>
+</li>
+<li><p>挖掘未关注的特征因子，为算法模型的迭代提供新<strong>特征输入</strong>；</p>
+</li>
+<li><p><strong>联动其他策略：</strong>其他价值洞见输出，实现成本与X的联动/置换。</p>
+</li>
+</ul>
+<h1 id="三、如何开展异质性分析"><a href="#三、如何开展异质性分析" class="headerlink" title="三、如何开展异质性分析"></a>三、如何开展异质性分析</h1><h2 id="3-1-基础知识准备"><a href="#3-1-基础知识准备" class="headerlink" title="3.1 基础知识准备"></a>3.1 基础知识准备</h2><h3 id="3-1-1-Uplift简介"><a href="#3-1-1-Uplift简介" class="headerlink" title="3.1.1 Uplift简介"></a>3.1.1 Uplift简介</h3><p>Uplift模型与传统的预测模型最大的区别就是预测目标，从直接对y建模变为了对增量部分的建模。实际上，每个样本只可能对应有一种Treatment，不存在平行时空找到不同Treatment下的结果，因此uplift模型实质上是对反事实的预测，也由于这个原因，不存在预测结果的Ground truth，因此对Uplift模型的模型评估也不同于传统的预测模型。</p>
+<p><img src="https://image.rexking6.top/img/image-20241116233743077.png" alt=""></p>
+<p>我们熟知的营销四象限是Uplift模型最经典的应用，针对一个策略的作用结果可以将人群分为四类：高敏感人群，即给策略干预才会转化；自然转化人群，即给不给策略都会转化；无动于衷人群，即给不给策略都不会转化；反作用人群，即本来会转化、但是上了策略后反而不转化的人群。通过Uplift增益模型，我们可以找到AB实验中高敏感人群、反作用人群的样本所属的维度、维值，得到实现正向效果、负向效果分别在哪些场景。</p>
+<h3 id="3-1-2-因果效应"><a href="#3-1-2-因果效应" class="headerlink" title="3.1.2 因果效应"></a>3.1.2 因果效应</h3><p><img src="https://image.rexking6.top/img/image-20241116233836333.png" alt=""></p>
+<h3 id="3-1-3-无偏估计ATE的三大假设"><a href="#3-1-3-无偏估计ATE的三大假设" class="headerlink" title="3.1.3 无偏估计ATE的三大假设"></a>3.1.3 无偏估计ATE的三大假设</h3><ul>
+<li><p><strong>稳定单元干预值假设</strong>（Stable Unit Treatment Value Assumption, SUTVA），又称：一致性假设（Consistency）；</p>
+<p>任何单元的潜在结果，不会因为分配给其他单位的处理而变化。并且对于每个单位，每个处理水平的不同形式或版本不会导致不同的潜在结果，两层含义：</p>
+<p>a. 单元之间具有独立性，不会产生相互作用；</p>
+<p>b. 一种处理只会导致一种结果；</p>
+</li>
+<li><p><strong>可忽略性假设</strong>（Ignobility）又称：条件独立性假设（Conditional Independence Assumption, CIA）；</p>
+<p>给定背景变量X，处理（或干预）变量和结果变量之间的关系是独立的，两层含义：</p>
+<p>a. 如果两个单元有相同的背景变量，那么他们施加相同的干预时，他们的潜在结果应该是一样的；</p>
+<p>b. 具备相同变量的两个单元，他们的分配到干预的概率也应该相同；</p>
+</li>
+<li><p><strong>正值假设</strong>（Positivity）</p>
+<p>确保对于任意背景变量X的unit集合，T=1和T=0的结果均存在；也就是在所有可能的取值范围内，处理（treatment）的概率是正值，即处理在观察样本中至少发生了一次。从而避免由于对给定的X，仅包含T=0的结果数据，使得T=1的结果无法估测。理论上每一个样本都必须要有接受treatment的可能性，实际操作中可以通过检查样本的分布情况来评估Positivity假定是否成立，当不满足正值假定的条件下，需要通过建模或者重加权的手段对反事实结果进行预估。</p>
+</li>
+</ul>
+<h2 id="3-2-分析流程"><a href="#3-2-分析流程" class="headerlink" title="3.2 分析流程"></a>3.2 分析流程</h2><h3 id="3-2-1-场景确定"><a href="#3-2-1-场景确定" class="headerlink" title="3.2.1 场景确定"></a>3.2.1 场景确定</h3><p><strong>实验选择</strong></p>
+<p>影响链路短，样本量大，注意空白组的流量足够。</p>
+<p><strong>确定Treatment</strong></p>
+<p>在成本实验中，Treatment一般为补贴、扣减等策略工具。是否施加策略 （0-1 变量，划分到空白组or实验组）作为Treatment（如果实验组中不是实际生效单，Treatment也是1）；如果实验内模型存在挑单逻辑，实验组和空白组统一挑单逻辑下的生效单/拟生效单，实验组中生效单为1，空白组拟生效单为0。</p>
+<p><strong>确定Outcome</strong></p>
+<p>最好能够以实验的核心关注指标作为Outcome，但是由于核心关注指标有一些是比较后置的业务指标，影响链路比较复杂，所以可以通过一些影响范围或作用环节的限定来确定Outcome。但是最终定下的Outcome一定需要能够直接影响到业务核心关注指标。</p>
+<h3 id="3-2-2-特征构建"><a href="#3-2-2-特征构建" class="headerlink" title="3.2.2 特征构建"></a>3.2.2 特征构建</h3><p>接下来需要进行特征构建。对于因果推断来说，核心解决的挑战就是<strong>混淆因子</strong>，混淆因子的影响主要有两类：</p>
+<ul>
+<li><p>一是Confounders影响Outcome，使得Outcome具有欺骗性 (Spurious Effect) 不能正确反映Treatment的作用；</p>
+</li>
+<li><p>二是Confounders影响Treatment Assignment：导致选择偏差 (Selection Bias)，即观察到的数据分布与关心的数据分布不一致。</p>
+</li>
+</ul>
+<p>以发放补贴提升接起为例，我们通过观测数据会发现发了补贴的运单整体的接起率反而比没有发放的运单接起率要低，难道发放补贴对于接起率并没有正向的提升吗？实际上，我们在发放补贴时会针对难单进行补贴，而难单的接起率本身要低于大盘的接起率。这里的“运单难度”就是影响“发补贴”与“接起”之间因果关系的混淆因子。运单难度大因此运单相应接起率低，就是Spurious Effect；发放补贴的单都是难单，就是Selection Bias。</p>
+<p>这里需要挖掘的也是这两类特征，一是会影响Outcome表现的特征、另一类是影响treatment对Outcome效应的混淆特征。特征需要保证相关性、可解释性和数据的可用性。</p>
+<p><img src="https://image.rexking6.top/img/image-20241116234322502.png" alt=""></p>
+<h3 id="3-2-3-常见模型"><a href="#3-2-3-常见模型" class="headerlink" title="3.2.3 常见模型"></a>3.2.3 常见模型</h3><p>常见的Rubin Causal Model框架实现因果效应估计的模型方法：</p>
+<p><img src="https://image.rexking6.top/img/image-20241123002921982.png" alt=""></p>
+<h3 id="3-2-4-模型评估与解释"><a href="#3-2-4-模型评估与解释" class="headerlink" title="3.2.4 模型评估与解释"></a>3.2.4 模型评估与解释</h3><p><strong>模型评估</strong></p>
+<p>由于没有真实存在的ground truth，评估的方向是预测ITE的排序是否与真实的Uplift排序一致。所以通过对数据样本做分组(或累积)，将所有样本按照模型给出的uplift得分降序排列，按照等比分为K组(bins)，后续的效果评估则通过对比相应组内Treatment组和Control组的得分差异实现。由此衍生出AUUC、Qini系数等评价指标。当auuc或qini系数越大时，说明模型预测干预效果的能力越强，即模型能够更有效地区分哪些个体对干预反应更积极。</p>
+<p>（1）Uplift Curve &amp; AUUC （左图）</p>
+<ul>
+<li>将数据集分组不断细分，精确到每个样本维度时，每次计算截止前t个样本的增量，得到Uplift Curve；</li>
+<li>曲线中，越高拱的模型效果越好，使用曲线下面积称为AUUC(Area Under Uplift Curve)作为数值衡量，与二分类评估中的AUC(Area Under ROC Curve)类似。也有些定义AUUC为Uplift曲线和Baseline的曲线下面积差；</li>
+</ul>
+<p>（2）Qini Curve &amp; Qini Coefficient （右图）</p>
+<ul>
+<li>当Treatment组和Control组样本不一致时，其表达的增量存在偏差，以Treatment组的样本量为准，对Control组做一个缩放，累积绘制的曲线称为Qini 曲线</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/image-20241123002958450.png" alt=""></p>
+<p><strong>模型解释</strong></p>
+<p>（1）Shap Value</p>
+<ul>
+<li>SHAP 是由Shapley value启发而来的一种加性的可解释模型，属于模型事后解释的方法，它的核心思想是计算特征对模型输出的边际贡献，再从全局和局部两个层面对“黑盒模型”进行解释。SHAP构建一个加性的解释模型，所有的特征都视为“贡献者”。</li>
+<li>SHAP认为，对于每个预测样本，模型都产生一个预测值，SHAP value就是该样本中各个特征所分配到的数值。通过计算一个特征加入到模型时的边际贡献，然后考虑到该特征在所有的特征序列的情况下不同的边际贡献再取均值。</li>
+</ul>
+<p>（2）Shap摘要图（左图）</p>
+<ul>
+<li>摘要图结合了特征重要度和特征的影响，纵轴为所有样本SHAP值之和的特征排序，横轴为SHAP值。每个点代表一个样本，颜色表示特征值（红色对应高值，蓝色对应低值）；宽的地方表示有大量的样本聚集，一个点代表一个样本。</li>
+</ul>
+<p>（3）Shap依赖图（右图）</p>
+<ul>
+<li>代表两个变量交互效应。选择所需要分析的特征，每个点代表一个样本，横轴为特征值，纵轴为对应的shap值；颜色表示交互的特征（红色对应高值，蓝色对应低值）</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/image-20241123003034373.png" alt=""></p>
+<h1 id="四、物流成本相关实践"><a href="#四、物流成本相关实践" class="headerlink" title="四、物流成本相关实践"></a>四、物流成本相关实践</h1><h2 id="4-1-业务背景"><a href="#4-1-业务背景" class="headerlink" title="4.1 业务背景"></a>4.1 业务背景</h2><p>压力补贴是为了解决在压力场景下的接起率问题。对于配置压力补贴的场景开展异质性分析，目标在于挖掘钱效表现异质性场景，帮助算法迭代，或对低钱效场景探索策略优化方向。压力补贴实验为补贴配置场景内的运单随机分流实验，针对这一场景的Treatment为空白组Treatment=0，算法模型组Treatment=1；Outcome为在指派阶段是否接起。</p>
+<h2 id="4-2-模型建立"><a href="#4-2-模型建立" class="headerlink" title="4.2 模型建立"></a>4.2 模型建立</h2><ul>
+<li>部分变量举例</li>
+</ul>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>变量类型</th>
+<th>变量含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>决策指标</td>
+<td>是否指派接起</td>
+</tr>
+<tr>
+<td>分桶指标</td>
+<td>是否为算法模型组（treatment = 1）</td>
+</tr>
+<tr>
+<td>实验单元</td>
+<td>订单id</td>
+</tr>
+<tr>
+<td>非实验变量 - 出价</td>
+<td>基配</td>
+</tr>
+<tr>
+<td>非实验变量 - 出价</td>
+<td>压力补贴金额</td>
+</tr>
+<tr>
+<td>非实验变量 - 时间线</td>
+<td>补贴发生时间</td>
+</tr>
+<tr>
+<td>非实验变量 - 时间线</td>
+<td>剩余人力T</td>
+</tr>
+<tr>
+<td>非实验变量 - 运单信息</td>
+<td>是否节假日</td>
+</tr>
+<tr>
+<td>非实验变量 - 运单信息</td>
+<td>是否正常天气</td>
+</tr>
+<tr>
+<td>非实验变量 - 实时供需</td>
+<td>范围内非空闲人力数量</td>
+</tr>
+<tr>
+<td>非实验变量 - 实时供需</td>
+<td>范围内开工空闲人力数量</td>
+</tr>
+<tr>
+<td>……</td>
+<td>……</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul>
+<li>用特征、Treatment共同预测Outcome，构建base-learner</li>
+</ul>
+<p><strong>模型效果：</strong></p>
+<p><img src="https://image.rexking6.top/img/image-20241123003241828.png" alt=""></p>
+<ul>
+<li>基于base-learner结果选取除Treatment外的Top N特征，以强化Treatment的影响；选用X-learner对uplift值进行建模。</li>
+</ul>
+<p><strong>模型效果：</strong></p>
+<p><img src="https://image.rexking6.top/img/image-20241123003314040.png" alt=""></p>
+<h2 id="4-3-模型解释和结论输出"><a href="#4-3-模型解释和结论输出" class="headerlink" title="4.3 模型解释和结论输出"></a>4.3 模型解释和结论输出</h2><p>通过因果模型可获得每个样本的ITE，即补贴带来的接起提升情况。通过ITE在不同特征下的聚合计算出CATE，可得到特征分层下的效应量；计算shap-value可得到每个特征对ITE的贡献情况。</p>
+<p><strong>步骤：</strong></p>
+<p>Step1：总体shap图确认对uplift有比较强影响的特征集合：</p>
+<script type="math/tex; mode=display">
+X_1, X_2, X_3, \ldots, X_n</script><p>Step2: 单特征shap图，确认 $X_i$ 对 $Y$ 的影响关系，保证CATE结果可信。</p>
+<p>Step3：判断对 $Y$ 的影响是否存在混杂因子 $W$</p>
+<p>Step4: 若有，则需下钻 $W$ 计算 $X_i$ 各维度下的CATE表现：</p>
+<script type="math/tex; mode=display">
+Y\left(T=1 \mid X_i=x_{i j}, W=w_k\right)-Y\left(T=0 \mid X_i=x_{i j}, W=w_k\right)</script><p>若无，则直接计算 $X_i$ 各维度下的CATE表现：</p>
+<script type="math/tex; mode=display">
+Y\left(T=1 \mid X_i=x_{i j}\right)-Y\left(T=0 \mid X_i=x_{i j}\right)</script><p>Step5：shap value 结合 CATE 结合 空白组 $Y$ 輸出结论：</p>
+<p>shap value正向，CATE大，策略有效的场景。</p>
+<p>shap value负向，CATE小，base低，策略优化空间。</p>
+<p>shap value负向，CATE小，base高，降本or置换空间。</p>
+<h1 id="五、结语"><a href="#五、结语" class="headerlink" title="五、结语"></a>五、结语</h1><p>通过异质性分析的手段，能够帮助我们在实验中进行更精细化的分析，通过业务洞见和特征输入的方式，从而辅助实现策略的优化迭代。在这一过程中需要不断沉淀常见的混淆因子、把握策略的影响链路，理解各类变量的复杂影响关系。我们当前的工作都是基于RCM框架进行的，依赖于三大假设，通过发现混淆因子进行反事实推断，基于Shap Value进行统计意义上的可解释/重要性；实际上在更进一步看清策略影响、归因推理时，SCM框架表达能力更强，更擅长描述复杂的问题，基于图模型进行因果推断，可实现因果效应估计也可用于结构发现。</p>
+<p>总之，异质性分析不只是一个工具，更是一种思维方式，为我们提供了一个多维度的分析视角。通过异质性分析不仅强化了我们对策略的理解，引导我们进行更科学、更精准的进行决策，对于策略的迭代和优化提供一定的方向。</p>
+<h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><h2 id="因果推断与认知升级"><a href="#因果推断与认知升级" class="headerlink" title="因果推断与认知升级"></a>因果推断与认知升级</h2><p>Judea Pearl 在《The Book of Why》一书中提出“因果关系之梯”，将认知能力从下到上分成了3个层级（关联-&gt;干涉-&gt;反事实），学习难度依次增加：</p>
+<ul>
+<li>关联，也是传统机器学习的主要思路，刻画的是人类的基本观察能力，回答数据间的关联性问题（相关性学习）。相关性学习的一大缺点是数据具有欺骗性，数据反映出来的相关性不等同于因果。相关性学习可以拿来做数据分析，但不适合做决策。</li>
+<li>干涉，即通过一定的动作来干预并获得期望的结果，回答的问题是“如果做了X，那Y会怎样”。从历史数据只能获取到条件概率P(Y|X=x)，而无法直接得到干涉结果。这时候，随机实验（AB Test）正是帮助我们获得理想的干预效果的手段。</li>
+<li>反事实，刻画的是人类的“高阶”能力——想象力，回答的问题是“如果当初我不做A而做B，那结果会如何”。我们把观测到的实际数据称为“事实”，把我们想象的另外一面称为“反事实”。在真实世界中，事实和反事实是不会同时出现的，这时候就需要借助因果推断的技术进行反事实推断。</li>
+</ul>
+<h2 id="混淆因子的影响"><a href="#混淆因子的影响" class="headerlink" title="混淆因子的影响"></a>混淆因子的影响</h2><p>在不断攀登因果之梯的过程中最大的目标就是找出事物之间真正的因果关系，这其中最大的挑战在于无处不在的混淆因子。对于开展因果推断的影响主要在两个方面：</p>
+<ul>
+<li>Confounders影响Outcome：使得Outcome具有欺骗性 (Spurious Effect) 不能正确反映Treatment的作用；</li>
+<li>Confounders影响Treatment Assignment：导致选择偏差 (Selection Bias)，即观察到的数据分布和我们关心的数据分布不一样；比如补贴的例子中发放补贴的单都是难单。</li>
+</ul>
+<p>这些confounder就是造成熟知的伪效应、辛普森悖论、选择偏差这些现象的根本原因。</p>
+<p><img src="https://image.rexking6.top/img/image-20241123003713015.png" alt="因此，在实际的业务过程中，需要大家时刻注意混淆因子对因果关系的影响，在利用数据进行结论的判断时进行相应的规避。"></p>
+<p>因此，在实际的业务过程中，需要大家时刻注意混淆因子对因果关系的影响，在利用数据进行结论的判断时进行相应的规避。</p>
+<p><strong>参考链接：</strong></p>
+<p>[1]<a target="_blank" rel="noopener" href="https://www.law.berkeley.edu/files/AIPW(1).pdf">https://www.law.berkeley.edu/files/AIPW(1).pdf</a></p>
+<p>[2]<a target="_blank" rel="noopener" href="https://sci-hub.se/10.1214/17-aoas1101">https://sci-hub.se/10.1214/17-aoas1101</a></p>
+<p>[3]<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1504.01132">https://arxiv.org/abs/1504.01132</a></p>
+<p>[4]<a target="_blank" rel="noopener" href="https://www.pnas.org/doi/pdf/10.1073/pnas.1804597116">https://www.pnas.org/doi/pdf/10.1073/pnas.1804597116</a></p>
+<p>[5]<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1712.04912v4">https://arxiv.org/abs/1712.04912v4</a></p>
+<p>[6]<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1605.03661">https://arxiv.org/abs/1605.03661</a></p>
+<p>[7]<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1606.03976">https://arxiv.org/abs/1606.03976</a></p>
+<p>[8]<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1810.00656.pdf">https://arxiv.org/pdf/1810.00656.pdf</a></p>
+<p>[9]<a target="_blank" rel="noopener" href="https://openreview.net/pdf?id=ByKWUeWA-">https://openreview.net/pdf?id=ByKWUeWA-</a></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2023\04\11\CausalDiscoveryToolbox入门\" rel="bookmark">CausalDiscoveryToolbox入门</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2023\03\31\D-Separation和PC算法\" rel="bookmark">D-Separation和PC算法</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\28\AMPC-1080Ti机器-深度环境搭建\" rel="bookmark">AMPC-1080Ti机器-深度环境搭建</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2024/11/16/%E5%A6%82%E4%BD%95%E4%BB%8E%E5%AE%9E%E9%AA%8C%E4%B8%AD%E8%8E%B7%E5%BE%97%E6%9B%B4%E5%A4%9A%EF%BC%9F%E2%80%94%E2%80%94AB%E5%AE%9E%E9%AA%8C%E7%9A%84%E5%BC%82%E8%B4%A8%E6%80%A7%E5%88%86%E6%9E%90%E5%AE%9E%E8%B7%B5/" title="如何从实验中获得更多？——AB实验的异质性分析实践">https://blog.rexking6.top/2024/11/16/如何从实验中获得更多？——AB实验的异质性分析实践/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E5%9B%A0%E6%9E%9C%E6%8E%A8%E6%96%AD/" rel="tag"># 因果推断</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/11/16/%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%BA%A7%E5%93%81%E7%9A%84L6%E5%92%8CL10%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/" rel="prev" title="服务器产品的L6和L10是什么？">
+      <i class="fa fa-chevron-left"></i> 服务器产品的L6和L10是什么？
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/11/23/%E5%A6%82%E4%BD%95%E5%8F%91%E5%B8%83%E7%AC%AC%E4%B8%80%E4%B8%AAPython%E9%A1%B9%E7%9B%AE%E5%BC%80%E6%BA%90%E5%8C%85%EF%BC%9F/" rel="next" title="如何发布第一个Python项目开源包？">
+      如何发布第一个Python项目开源包？ <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%BC%95%E8%A8%80"><span class="nav-number">2.</span> <span class="nav-text">一、引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E5%81%9A%E5%BC%82%E8%B4%A8%E6%80%A7%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">二、为什么做异质性分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%E4%BB%8E%E5%AE%9E%E9%AA%8C%E5%88%B0%E4%BC%98%E5%8C%96"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 从实验到优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%E5%BC%82%E8%B4%A8%E6%80%A7%E7%9A%84%E5%BF%85%E8%A6%81%E6%80%A7"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 异质性的必要性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-%E7%89%A9%E6%B5%81%E5%AE%9E%E9%AA%8C%E5%BC%82%E8%B4%A8%E6%80%A7%E5%88%86%E6%9E%90%E7%9A%84%E7%89%B9%E7%82%B9"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 物流实验异质性分析的特点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%A6%82%E4%BD%95%E5%BC%80%E5%B1%95%E5%BC%82%E8%B4%A8%E6%80%A7%E5%88%86%E6%9E%90"><span class="nav-number">4.</span> <span class="nav-text">三、如何开展异质性分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E5%87%86%E5%A4%87"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 基础知识准备</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-1-Uplift%E7%AE%80%E4%BB%8B"><span class="nav-number">4.1.1.</span> <span class="nav-text">3.1.1 Uplift简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-2-%E5%9B%A0%E6%9E%9C%E6%95%88%E5%BA%94"><span class="nav-number">4.1.2.</span> <span class="nav-text">3.1.2 因果效应</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-3-%E6%97%A0%E5%81%8F%E4%BC%B0%E8%AE%A1ATE%E7%9A%84%E4%B8%89%E5%A4%A7%E5%81%87%E8%AE%BE"><span class="nav-number">4.1.3.</span> <span class="nav-text">3.1.3 无偏估计ATE的三大假设</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-%E5%88%86%E6%9E%90%E6%B5%81%E7%A8%8B"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 分析流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-1-%E5%9C%BA%E6%99%AF%E7%A1%AE%E5%AE%9A"><span class="nav-number">4.2.1.</span> <span class="nav-text">3.2.1 场景确定</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-2-%E7%89%B9%E5%BE%81%E6%9E%84%E5%BB%BA"><span class="nav-number">4.2.2.</span> <span class="nav-text">3.2.2 特征构建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-3-%E5%B8%B8%E8%A7%81%E6%A8%A1%E5%9E%8B"><span class="nav-number">4.2.3.</span> <span class="nav-text">3.2.3 常见模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-4-%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BC%B0%E4%B8%8E%E8%A7%A3%E9%87%8A"><span class="nav-number">4.2.4.</span> <span class="nav-text">3.2.4 模型评估与解释</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E7%89%A9%E6%B5%81%E6%88%90%E6%9C%AC%E7%9B%B8%E5%85%B3%E5%AE%9E%E8%B7%B5"><span class="nav-number">5.</span> <span class="nav-text">四、物流成本相关实践</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-%E4%B8%9A%E5%8A%A1%E8%83%8C%E6%99%AF"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 业务背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-%E6%A8%A1%E5%9E%8B%E5%BB%BA%E7%AB%8B"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 模型建立</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-%E6%A8%A1%E5%9E%8B%E8%A7%A3%E9%87%8A%E5%92%8C%E7%BB%93%E8%AE%BA%E8%BE%93%E5%87%BA"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 模型解释和结论输出</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E7%BB%93%E8%AF%AD"><span class="nav-number">6.</span> <span class="nav-text">五、结语</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%99%84%E5%BD%95"><span class="nav-number">7.</span> <span class="nav-text">附录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%A0%E6%9E%9C%E6%8E%A8%E6%96%AD%E4%B8%8E%E8%AE%A4%E7%9F%A5%E5%8D%87%E7%BA%A7"><span class="nav-number">7.1.</span> <span class="nav-text">因果推断与认知升级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%B7%E6%B7%86%E5%9B%A0%E5%AD%90%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">7.2.</span> <span class="nav-text">混淆因子的影响</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">241</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">85</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">84</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">4.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">64:09</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何用RAG技术提升LLM的能力">
+<meta property="og:url" content="https://blog.rexking6.top/2024/10/17/%E5%A6%82%E4%BD%95%E7%94%A8RAG%E6%8A%80%E6%9C%AF%E6%8F%90%E5%8D%87LLM%E7%9A%84%E8%83%BD%E5%8A%9B/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-fc43f33af9f5b71a821f7452e719d75e_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-90f9fa4a8b8c9eaeaac331bc4f0ff6da_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-8564a001ffa52cdfb2846726f17d9f29_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-5116220ba2b12fa70d1947416456504a_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-b786c66d36d623c2c69167e7b00395ee_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-bbc116e208a02f60ee74aa4f52a5fd4b_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-288beb9930c0735f419f1e093ac80fc6_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-3239561fe67d7075630aa2ad5ad523ee_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-e0542e902a39dc83bc6934b16774b2b1_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-6ee76414eec048974841f527c87973ad_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-38c53217ab6fd1ce9a9e0837e4ba0e21_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-4bfbc7884b10a4621ae5d7d5419d0cc7_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-65acda9621e6ebd3e1a4cc4555b60188_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-0514597d6f665e34307d70043208a85d_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-8ed2ce8d068418d8ac64afd18ba8491f_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-1839f1f74d1965fb6061d3add16a06f3_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-05f0d541b9a03e4ecfe8566f5dcd5c31_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-6a0a1ebbc1d3baf7b369fe539995dba0_720w.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-a1f7008dda0eae9d353f7e9ef83400ba_720w.webp">
+<meta property="article:published_time" content="2024-10-17T15:52:23.000Z">
+<meta property="article:modified_time" content="2024-10-17T16:55:22.725Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="大模型">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/v2-fc43f33af9f5b71a821f7452e719d75e_720w.webp">
+
+<link rel="canonical" href="https://blog.rexking6.top/2024/10/17/%E5%A6%82%E4%BD%95%E7%94%A8RAG%E6%8A%80%E6%9C%AF%E6%8F%90%E5%8D%87LLM%E7%9A%84%E8%83%BD%E5%8A%9B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>如何用RAG技术提升LLM的能力 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2024/10/17/%E5%A6%82%E4%BD%95%E7%94%A8RAG%E6%8A%80%E6%9C%AF%E6%8F%90%E5%8D%87LLM%E7%9A%84%E8%83%BD%E5%8A%9B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          如何用RAG技术提升LLM的能力
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-10-17 23:52:23" itemprop="dateCreated datePublished" datetime="2024-10-17T23:52:23+08:00">2024-10-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-10-18 00:55:22" itemprop="dateModified" datetime="2024-10-18T00:55:22+08:00">2024-10-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" itemprop="url" rel="index"><span itemprop="name">大模型</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2024/10/17/%E5%A6%82%E4%BD%95%E7%94%A8RAG%E6%8A%80%E6%9C%AF%E6%8F%90%E5%8D%87LLM%E7%9A%84%E8%83%BD%E5%8A%9B/" class="post-meta-item leancloud_visitors" data-flag-title="如何用RAG技术提升LLM的能力" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>17k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>16 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/676939361">如何用RAG技术提升LLM的能力</a>。</p>
+<p>大语言模型表现出色，但是在处理幻觉、使用过时的知识、进行不透明推理等方面存在挑战。检索增强生成（RAG）作为一个新兴的解决方案，通过整合外部知识库的数据，提高了模型在知识密集型任务中的准确性和可信度，能够实现知识持续更新和特定领域信息的集成，有效将LLM的内在知识与外部数据的巨大动态资源相结合。</p>
+<p>本文主要是对综述论文《Retrieval-Augmented Generation for Large Language Models: A Survey》的概括和解读，同时也会整合一些其他来源的材料。后面主要探讨RAG范式（包括Naive RAG、Advanced RAG、Modular RAG）的发展，同时会详细介绍RAG的三大关键技术（检索、生成、增强），然后会介绍RAG的评估指标及应用实践。</p>
+<h1 id="大模型应用面临的挑战"><a href="#大模型应用面临的挑战" class="headerlink" title="大模型应用面临的挑战"></a>大模型应用面临的挑战</h1><p>大语言模型（如GPT系列、LLama系列、文心一言等），已经在自然语言领域的多项基准测试中取得突破性进展。然而，它们在处理特定领域或者一些高度专业化的场景时存在一些局限性。</p>
+<ul>
+<li>内容不真实：幻觉问题/领域知识匮乏</li>
+<li>时效性不强</li>
+<li>隐私&amp;安全性</li>
+</ul>
+<p>为了应对这些挑战，主要有以下几种类型的解决方案：</p>
+<ul>
+<li>参数化的方式：通过微调的手段将领域知识嵌入模型，更新模型参数。它的缺点是训练成本较高、灵活性较差；优势在于能够输出高质量的结果。</li>
+<li>非参数化方式：通过数据库存储相关的知识，检索后直接使用。它的优势在于成本低、灵活性强、可解释性高；缺点在于少了生成的过程，检索出的内容可能不能直接回答问题，有较高的理解成本。</li>
+<li>用非参数化的语料库与参数化的模型集成，也就是RAG，同时具备参数化方式和非参数化方式的优点。</li>
+</ul>
+<h1 id="什么是RAG"><a href="#什么是RAG" class="headerlink" title="什么是RAG"></a>什么是RAG</h1><p>顾名思义，RAG (Retrieval-Augmented Generation), 主要包括3个关键过程（Retrieval、Augmentation和Generation），它主要通过从外部知识库中“检索”最新信息作为外挂来“增强”LLM“生成”答案的效果。在回答问题或生成文本之前查询外部数据源并合成一个内容更加丰富的Prompt，从而显著提升输出的准确性和相关性。目前，RAG已经成为LLM系统中最流行的架构之一，因其高实用性和低门槛的特点，许多对话产品都是基于RAG进行构建。</p>
+<p><img src="https://image.rexking6.top/img/v2-fc43f33af9f5b71a821f7452e719d75e_720w.webp" alt=""></p>
+<h1 id="RAG框架结构"><a href="#RAG框架结构" class="headerlink" title="RAG框架结构"></a>RAG框架结构</h1><p>从简单到复杂可以分为三个层次的RAG，包括Naive RAG、Advanced RAG、Modular RAG，如下图所示。</p>
+<p><img src="https://image.rexking6.top/img/v2-90f9fa4a8b8c9eaeaac331bc4f0ff6da_720w.webp" alt=""></p>
+<h1 id="从Naive-RAG说起"><a href="#从Naive-RAG说起" class="headerlink" title="从Naive RAG说起"></a>从Naive RAG说起</h1><p>最基本的RAG方式，分为Indexing、Retrieval、Generation这3个步骤，简单而实用。</p>
+<h2 id="Naive-RAG的一些局限性"><a href="#Naive-RAG的一些局限性" class="headerlink" title="Naive RAG的一些局限性"></a>Naive RAG的一些局限性</h2><p>Naive RAG的效果在检索质量、结果生成质量和增强的过程方面都存在一定的挑战。</p>
+<ul>
+<li><p><strong>检索质量方面</strong></p>
+</li>
+<li><ul>
+<li>准确率低，可能会导致幻觉</li>
+<li>召回率低，导致信息不完整</li>
+<li>过时或者冗余的信息导致检索结果不准确</li>
+</ul>
+</li>
+<li><p>结果生成质量方面</p>
+</li>
+<li><ul>
+<li>幻觉问题，如果问题的答案未能被正确检索，生成的结果仍然会产生幻觉</li>
+<li>答非所问，问题和答案未能正确匹配</li>
+<li>生成有害和偏见的答案</li>
+</ul>
+</li>
+<li><p>增强过程（整合来自检索的内容）的挑战</p>
+</li>
+<li><ul>
+<li>内容不连贯/脱节</li>
+<li>冗余和重复</li>
+<li>确定每段内容对于结果生成的重要性</li>
+<li>协调来自不同写作风格/语气的内容差异，从而保证输出一致性</li>
+<li>生成结果可能过渡依赖增强信息，导致和增强信息相比没有带来额外的收益</li>
+</ul>
+</li>
+</ul>
+<h1 id="Advanced-RAG如何应对这些挑战"><a href="#Advanced-RAG如何应对这些挑战" class="headerlink" title="Advanced RAG如何应对这些挑战"></a>Advanced RAG如何应对这些挑战</h1><p>和Naive RAG相比，Advanced RAG加入了Pre-Retrieval 和 Post-Retrieval模块，同时对Retrieval模块也进行了一些优化，从而改进输出效果。</p>
+<h2 id="Pre-Retrieval"><a href="#Pre-Retrieval" class="headerlink" title="Pre-Retrieval"></a>Pre-Retrieval</h2><p>可以通过优化数据索引的方式来改进Pre-Retrieval阶段的质量。大致有5种策略可以使用：</p>
+<ul>
+<li>增强数据粒度：主要是对数据内容进行修订和简化，确保数据源的正确性和可读性。预索引优化的主要目的是提升文本的规范化、统一性，并确保信息的准确无误和上下文的充分性，以此来保障 RAG 系统的表现。具体的方式包括删除不相关信息、消除实体种的歧义和术语、确认事实准确性、维护上下文、更新过时文件。</li>
+<li>优化索引结构：包括调整chunk的大小来捕获相关的上下文、跨多个索引路径查询、通过利用图数据索引中节点之间的关系并结合图结构中的信息来捕获相关上下文。<ul>
+<li>层级索引</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-8564a001ffa52cdfb2846726f17d9f29_720w.webp" alt=""></p>
+<ul>
+<li>加入元数据信息：在RAG系统开发中，加入元数据如日期标签可以提高检索质量，特别是在处理时间敏感的数据如电子邮件查询时，强调最新信息的相关性而不仅是内容相似性。LlamaIndex通过节点后处理器支持这种以时间排序的检索策略，增强了系统的实用性和效率。</li>
+<li>对齐优化： 这一策略主要针对文档间的对齐问题和差异性问题。对齐处理包括设计假设性问题，可以理解为每一个 chunk 生成一个假设性提问，然后将这个问题本身也嵌合到 chunk 中。这种方法有助于解决文档间的不一致和对齐问题。</li>
+<li>混合检索</li>
+</ul>
+<h2 id="Retrieval"><a href="#Retrieval" class="headerlink" title="Retrieval"></a>Retrieval</h2><p>这一阶段主要通过计算query和chunks的相似性来召回上下文，核心是embedding模型，Advanced RAG主要对embedding模型进行优化。</p>
+<ul>
+<li>微调Embedding模型：利用特定场景的预料去微调embedding模型，将知识嵌入到模型中。</li>
+<li>Dynamic Embedding：相比于静态嵌入（每个固定单词的的向量固定），动态嵌入会根据不同的上下文对同一个单词的嵌入进行调整。嵌入中包含上下文信息能够产生更为可靠的结果。</li>
+</ul>
+<h2 id="Post-Retrieval"><a href="#Post-Retrieval" class="headerlink" title="Post-Retrieval"></a>Post-Retrieval</h2><p>在完成chunks检索并整合上下文提交给LLM生成最终结果前，可以通过ReRank和Prompt Compression的方式对文档进行优化。</p>
+<ul>
+<li><p><strong>ReRank</strong>： 前文提及的检索召回阶段一般直接对query和chunks的embedding向量进行相似性召回，无法捕捉query和chunk的复杂语义关系。Rerank阶段可以设计更加复杂的模块对召回的结果进行精细化的排序，从而提高召回的质量。</p>
+<p>llamaindex案例：<a target="_blank" rel="noopener" href="https://docs.llamaindex.ai/en/stable/examples/node_postprocessor/CohereRerank.html">https://docs.llamaindex.ai/en/stable/examples/node_postprocessor/CohereRerank.html</a></p>
+</li>
+<li><p><strong>Prompt Compression</strong>：研究表明，检索到的文档中的噪声会对 RAG 性能产生不利影响。在后期处理中，重点在于压缩无关上下文、突出关键段落、减少整体上下文长度。 Selective Context 和 LLMLingua 等方法利用小语言模型来计算即时互信息或困惑度，估计元素重要性。 Recomp通过以不同粒度训练压缩器来解决这个问题，而 Long Context 和“Walking in the Memory Maze” 设计总结技术来增强法学硕士的关键信息感知，特别是在处理广泛的背景方面。</p>
+<p>llamaindex案例：<a target="_blank" rel="noopener" href="https://docs.llamaindex.ai/en/stable/examples/node_postprocessor/LongLLMLingua.html">https://docs.llamaindex.ai/en/stable/examples/node_postprocessor/LongLLMLingua.html</a></p>
+</li>
+</ul>
+<h1 id="Modular-RAG"><a href="#Modular-RAG" class="headerlink" title="Modular RAG"></a>Modular RAG</h1><p>不同于Naive RAG和Advanced RAG，都有固定的一套流程，Modular RAG更多是增加了一些新的模块，并可以根据具体的需求对各个单一的模块进行组合得到新的架构模式。</p>
+<h2 id="新模块"><a href="#新模块" class="headerlink" title="新模块"></a>新模块</h2><ul>
+<li>搜索模块：为特定场景定制，可以在额外的语料库上进行直接搜索。</li>
+<li>记忆模块：利用LLM记忆能力和增强检索的生成器指导检索过程，使用生成的输出作为数据源。</li>
+<li>融合：通过LLM扩展用户查询，提高搜索的多样性和深度，优化结果并与用户意图更紧密对齐。</li>
+<li>路由：RAG系统通过查询路由功能，根据用户的查询内容选择最合适的信息源和处理方式，包括总结性回应、特定数据库搜索或合并不同信息源。这涉及多种数据存储类型，如向量、图形或关系数据库，以及索引层级。查询路由根据预置逻辑通过LLM执行，确保查询高效准确地被处理。</li>
+<li>预测：通过LLM生成上下文来解决检索内容中的冗余和噪声，比直接检索更有效。</li>
+<li>任务适配器：适用于不同下游任务，通过LLM生成查询提示和任务特定检索器，提高模型的泛用性和精确度。</li>
+</ul>
+<h2 id="新模式"><a href="#新模式" class="headerlink" title="新模式"></a>新模式</h2><p>Modular RAG是一个高度适应性的组织结构，它允许在RAG过程中替换或重新排列模块以适应特定问题的需求。传统的朴素RAG主要由“Retrieval”和“Read”模块组成，而高级RAG在此基础上增加了“Rewrite”和“Rerank”模块。然而，模块化RAG提供了更大的多样性和灵活性。<br>目前的研究主要探索两种组织模式：一种是增加或替换模块，另一种是调整模块之间的流程。通过这种灵活性，可以根据不同任务的需求定制RAG过程。<br>增加或替换模块策略旨在保持Retrieval-Read的核心结构，同时通过集成额外的模块来增强特定功能，如RRR模型中的Rewrite-Retrieval-Read过程。另一种方法是交换模块，如将LLM生成模块替换为检索模块，或者让LLM记住特定任务信息并进行输出，以处理知识密集型任务。<br>在调整模块之间的流程方面，重点在于增强语言模型和检索模型之间的交互。例如，DSP框架将上下文学习系统视为一个显式程序来处理知识密集型任务，而ITER-RETGEN方法则通过生成内容指导检索，并在检索-阅读的流程中迭代实施增强功能，显示了模块之间如何相互提升功能的创新方式。</p>
+<h2 id="优化RAG的pipeline"><a href="#优化RAG的pipeline" class="headerlink" title="优化RAG的pipeline"></a>优化RAG的pipeline</h2><p>RAG系统中的检索过程优化关注于提高信息检索的效率和质量。通过集成多种搜索技术、改进检索步骤、引入认知回溯、实现多样化查询策略和利用嵌入相似性，研究人员致力于在检索效率和上下文信息的深度之间找到平衡点。</p>
+<ul>
+<li><p>混合搜索——结合关键词搜索、语义搜索和向量搜索的技术以适应各种查询需求，并确保检索到相关且内容丰富的信息。</p>
+<p>llamaindex案例：<a href="https://link.zhihu.com/?target=https%3A//docs.llamaindex.ai/en/stable/examples/retrievers/simple_fusion.html">https://link.zhihu.com/?target=https%3A//docs.llamaindex.ai/en/stable/examples/retrievers/simple_fusion.html</a></p>
+</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-5116220ba2b12fa70d1947416456504a_720w.webp" alt=""></p>
+<ul>
+<li>递归检索和查询引擎——逐步检索，捕获关键语义，在流程后期提供更多上下文信息，以提供效率和响应深度之间的平衡。<ul>
+<li>sentence window retrieval</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-b786c66d36d623c2c69167e7b00395ee_720w.webp" alt=""></p>
+<ul>
+<li>Parent-child chunks retrieval</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-bbc116e208a02f60ee74aa4f52a5fd4b_720w.webp" alt=""></p>
+<ul>
+<li>StepBack-prompt——通过后向提示鼓励LLM围绕更宽泛概念进行推理，以提高复杂推理任务的性能。</li>
+<li>子查询——根据不同场景，采取不同的查询策略，如利用查询引擎、树查询、向量查询或顺序查询。</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-288beb9930c0735f419f1e093ac80fc6_720w.webp" alt=""></p>
+<p>假设性文档嵌入（HyDE）——HyDE是一个系统，它通过使用大型语言模型来创建假设性答案，并将这些答案嵌入空间以检索类似的真实文档。这种方法更注重答案之间而非查询与答案间的嵌入相似性。尽管这种方法有其创新之处，但在处理不熟悉的主题时，可能会产生不准确的结果。<br>llamaindex案例：<a target="_blank" rel="noopener" href="https://docs.llamaindex.ai/en/stable/examples/query_transformations/HyDEQueryTransformDemo.html">https://docs.llamaindex.ai/en/stable/examples/query_transformations/HyDEQueryTransformDemo.html</a></p>
+<p>这些方法不仅增加了系统的灵活性，也可能提高RAG系统在处理知识密集型任务时的表现，但也需要注意，这些方法可能在模型对特定主题不够熟悉时产生错误。</p>
+<h1 id="Retriever模块"><a href="#Retriever模块" class="headerlink" title="Retriever模块"></a>Retriever模块</h1><p>在 RAG 的背景下，从数据源中高效检索相关文档至关重要。然而，构建一个熟练的检索器面临着巨大的挑战。本节探讨了三个基本问题：1）我们如何实现准确的语义表示？ 2）什么方法可以对齐查询和文档的语义空间？ 3）检索器的输出如何与大语言模型的偏好保持一致？</p>
+<h2 id="如何得到准确的语义表征？"><a href="#如何得到准确的语义表征？" class="headerlink" title="如何得到准确的语义表征？"></a>如何得到准确的语义表征？</h2><p>在 RAG 中，语义空间至关重要，因为它涉及查询和文档的多维映射。该语义空间中的检索准确性会显着影响 RAG 结果。本节将介绍两种构建准确语义空间的方法。</p>
+<ul>
+<li><p>Chunk 优化： 优化文本块（Chunk）涉及分析文档特性（如长度和主题）、选择适合的嵌入模型、考虑用户问题的类型以及应用场景的特定需求。可以采用small2big技术针对不同查询阶段使用不同大小的文本块，通过abstract embedding进行快速检索，使用metadata filtering利用文档的额外信息来精化搜索结果，以及通过graph indexing提升多步逻辑推理能力。需要灵活运用这些策略，根据大语言模型能处理的Token数量上限来调整分块大小，实现更精确的查询结果。</p>
+</li>
+<li><p>微调Embedding模型：微调嵌入模型是必要的，因为尽管预训练模型能捕捉丰富的语义信息，但它们可能无法充分理解特定领域的专业知识。通过微调，模型能够更准确地捕捉特定任务或领域的细节，从而更好地理解用户查询并提高与相关内容的匹配度。未经微调的模型可能无法满足特定任务的精确要求。主要有两种微调的策略：</p>
+</li>
+<li><ul>
+<li>领域知识微调<br>为了使嵌入模型能精确理解特定领域的信息，需要构建专有数据集进行细致微调。微调依赖于三个数据集部分：查询、语料库和相关文档，以确保模型能根据查询匹配相关文档。LlamaIndex研究提供了关键类和函数，简化了嵌入模型微调流程，使得能够基于领域知识语料库定制模型。</li>
+<li>针对下游任务进行微调<br>已有研究展示了使用大语言模型(LLM)进行微调的方法，如PROMPTAGATOR使用LLM生成少样本查询以创建任务特定的检索器，解决数据匮乏问题。LLM-Embedder则结合硬数据和LLM的软性奖励进行双重微调。这些方法引入领域知识进行任务特定微调，改善语义表达，但检索器改进不一定直接有助于LLM，故有研究采用从LLM获取反馈直接微调嵌入模型。</li>
+</ul>
+</li>
+</ul>
+<h2 id="如何匹配query和文档的语义空间？"><a href="#如何匹配query和文档的语义空间？" class="headerlink" title="如何匹配query和文档的语义空间？"></a>如何匹配query和文档的语义空间？</h2><p>在检索增强型生成（RAG）应用的背景下，检索器可能使用单一的嵌入模型来同时编码查询和文档，或者为每个部分采用不同的模型。此外，用户的原始查询可能存在措辞不准确和缺乏语义信息的问题。因此，将用户查询的语义空间与文档的语义空间对齐至关重要。本节介绍了两种旨在实现这种对齐的基本技术。</p>
+<ul>
+<li><p>查询改写<br>查询改写是一种用于对齐查询和文档的语义的基本方法。</p>
+</li>
+<li><ul>
+<li>例如Query2Doc和ITER-RETGEN等方法利用大语言模型（LLM）将原始查询与额外指导信息相结合，创建一个伪文档。</li>
+<li>HyDE使用文本提示构造查询向量，生成捕获关键模式的“假设”文档。</li>
+<li>RRR提出了一个框架，颠倒了传统的检索和阅读顺序，专注于查询改写。</li>
+<li>STEP-BACKPROMPTING使LLM能够基于高层次概念进行抽象推理和检索。</li>
+<li>此外，多查询检索方法利用LLM同时生成和执行多个搜索查询，这对于解决具有多个子问题的复杂问题特别有利。</li>
+</ul>
+</li>
+</ul>
+<p>这些方法的详细内容可以参考 <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/677540243">如何利用查询改写技术改善RAG效果</a></p>
+<ul>
+<li><p>嵌入转换：除了查询改写等宽泛策略外，还有为嵌入转换专门设计的更细粒度技术。</p>
+</li>
+<li><ul>
+<li>LlamaIndex通过引入一个适配器模块，该模块可以在查询编码器之后集成，以便微调，从而优化查询嵌入的表示，使之更紧密地与预定任务对齐。</li>
+<li>SANTA解决了将查询与结构化外部文档对齐的挑战，特别是在处理结构化和非结构化数据之间的不一致性时。它通过两种预训练策略增强检索器对结构化信息的敏感性：首先，利用结构化与非结构化数据之间的内在对齐来指导对结构化感知的预训练方案中的对比学习；其次，采用掩码实体预测。后者采用以实体为中心的掩码策略，促使语言模型预测并填补掩码的实体，从而促进对结构化数据的更深入理解</li>
+</ul>
+</li>
+</ul>
+<h2 id="如何对齐检索结果和大模型的输出偏好"><a href="#如何对齐检索结果和大模型的输出偏好" class="headerlink" title="如何对齐检索结果和大模型的输出偏好"></a>如何对齐检索结果和大模型的输出偏好</h2><p>在RAG（检索增强型生成）流程中，虽然通过各种技术提高检索命中率可能看起来有益，但这并不一定能改善最终结果，因为检索到的文档可能并不符合大型语言模型（LLM）的具体要求。因此，本节介绍了两种旨在将检索器输出与大型语言模型的偏好对齐的方法</p>
+<ul>
+<li>微调检索器<br>多项研究利用大型语言模型（LLM）的反馈信号来精炼检索模型。例如，AAR通过使用编码器-解码器架构，通过FiD交叉注意力分数识别LM偏好的文档，为预训练的检索器引入监督信号。随后，检索器通过硬负采样和标准交叉熵损失进行微调。最终，改良后的检索器可以直接应用于提高目标LLM在目标任务中的性能。还有研究表明LLM可能更倾向于关注可读性高的文档而非信息丰富的文档。</li>
+</ul>
+<p>REPLUG计算检索到的文档的概率分布，然后通过计算KL散度进行监督训练。这种简单有效的训练方法利用LM作为监督信号提高检索模型的表现，无需特定的交叉注意力机制。</p>
+<p>UPRISE同样使用固定的LLM微调提示检索器。LLM和检索器都以提示-输入对作为输入，并利用LLM提供的分数指导检索器的训练，有效地将LLM视为数据集标注器。</p>
+<p>此外，Atlas提出了四种监督微调嵌入模型的方法：注意力蒸馏、EMDR2、困惑度蒸馏和LOOP，它们旨在提高检索器和LLM之间的协同作用，提升检索性能，并使对用户查询的回应更加精确。</p>
+<ul>
+<li>Adapters<br>微调模型可能面临挑战，比如通过API集成功能或应对有限的本地计算资源带来的限制。因此，一些方法选择引入外部适配器以帮助对齐。<br>PRCA通过上下文提取阶段和奖励驱动阶段来训练适配器，然后使用基于令牌的自回归策略优化检索器的输出。令牌过滤方法使用交叉注意力分数高效过滤令牌，仅选择得分最高的输入令牌。<br>RECOMP引入了用于生成摘要的提取式和生成式压缩器。这些压缩器要么选择相关句子，要么合成文档信息，创建针对多文档查询的定制摘要。<br>此外，PKG引入了一种通过指令性微调将知识整合到白盒模型中的创新方法。在这种方法中，检索器模块被直接替换以根据查询生成相关文档。这种方法有助于解决微调过程中遇到的困难，并提高模型性能。</li>
+</ul>
+<h1 id="Generator模块"><a href="#Generator模块" class="headerlink" title="Generator模块"></a>Generator模块</h1><p>RAG的核心是生成器，它结合检索器提取的信息，生成准确、相关的连贯文本。输入不仅限于上下文信息，还包含相关文本片段，使得回答更丰富、相关。生成器确保内容与信息的连贯性，并在生成阶段对输入数据进行精细调整，以适应大型模型。后续小节将探讨检索后处理和微调生成器。</p>
+<h2 id="如何通过Post-retrieval过程增强检索结果"><a href="#如何通过Post-retrieval过程增强检索结果" class="headerlink" title="如何通过Post-retrieval过程增强检索结果"></a>如何通过Post-retrieval过程增强检索结果</h2><p>在大型语言模型（LLM）的应用中，研究者依赖于如GPT-4这类先进模型来综合处理不同文档的信息。但LLMs面临上下文长度限制和对冗余信息处理的挑战，为此，研究转向了检索后处理，以提升检索结果质量和更好地满足用户需求。检索后处理通常包括信息压缩和结果重排序。</p>
+<ul>
+<li>信息压缩<br>信息压缩对于管理大量检索信息、减少噪音、解决上下文长度限制和提升生成效果至关重要。PRCA和RECOMP通过训练提取器和压缩器来生成更简洁的上下文。另一研究通过减少文档数量来提高模型答案的准确性，提出了结合LLM和小型语言模型(SLM)的“Filter-Reranker”范式，显示出在信息提取任务中的显著改进。</li>
+<li>重排序<br>重排序模型通过优先排列最相关文档，降低了性能下降问题，提升了检索的效率和响应速度。重排序模型在整个检索过程中充当优化器和精炼器的双重角色，为语言模型处理提供了更有效和准确的输入，同时通过上下文压缩提供了更精确的检索信息。</li>
+</ul>
+<h2 id="Fine-tuning-LLM-for-RAG"><a href="#Fine-tuning-LLM-for-RAG" class="headerlink" title="Fine-tuning LLM for RAG"></a>Fine-tuning LLM for RAG</h2><p>在RAG模型中，生成器的优化是提高模型性能的关键。生成器负责将检索的信息转化为与用户查询相关的自然文本。RAG区别于标准LLM的地方在于，它结合了用户的查询及检索器获取的结构化/非结构化文档作为输入，这对小型模型的理解尤为重要。因此，针对查询和检索文档的输入微调模型至关重要，通常会在微调前对检索到的文档进行后处理。RAG的生成器微调方法与LLM的通用微调方法保持一致。接下来的部分将介绍涉及不同数据类型和优化功能的研究工作。</p>
+<ul>
+<li>General Optimization Process<br>作为一般优化过程的一部分，训练数据通常由输入输出对构成，目的是训练模型根据输入x产生输出y。Self-Mem研究中，传统的训练方法被采用，在此方法中，模型给定输入x并检索相关文档z（选择最相关的一个），然后整合(x, z)生成输出y。该研究采用了两种微调范式：联合编码器和双编码器。联合编码器使用标准的编码器-解码器模型，编码器编码输入，而解码器通过注意力机制生成令牌。双编码器则设立两个独立编码器分别编码输入和文档，解码器使用双向交叉注意力处理这些输出。这两种架构都基于Transformer，并使用负对数似然损失来进行优化。</li>
+<li>利用对比学习<br>在语言模型训练阶段，通常创建输入和输出对，但这可能导致模型仅训练于正确的输出示例，即“曝光偏差”，限制其输出范围并可能过度拟合，影响泛化能力。为减少此偏差，SURGE使用图文对比学习法以促使模型产生多样化响应，减少过拟合并提升泛化。结构化数据检索任务中的SANTA框架采用三阶段训练，通过对比学习精炼查询和文档嵌入，并强调实体语义在文本数据表示中的重要性，训练模型重建掩码实体，以增强对实体语义的理解。</li>
+</ul>
+<h1 id="Augmentation模块"><a href="#Augmentation模块" class="headerlink" title="Augmentation模块"></a>Augmentation模块</h1><p>本节内容围绕三个关键方面展开：增强阶段、增强数据来源和增强过程。这些方面阐明了对RAG发展至关重要的关键技术。下图展示了RAG核心组件的分类体系。</p>
+<p><img src="https://image.rexking6.top/img/v2-3239561fe67d7075630aa2ad5ad523ee_720w.webp" alt=""></p>
+<p><img src="https://image.rexking6.top/img/v2-e0542e902a39dc83bc6934b16774b2b1_720w.webp" alt=""></p>
+<h2 id="在哪些阶段进行增强？"><a href="#在哪些阶段进行增强？" class="headerlink" title="在哪些阶段进行增强？"></a>在哪些阶段进行增强？</h2><h3 id="预训练阶段"><a href="#预训练阶段" class="headerlink" title="预训练阶段"></a>预训练阶段</h3><p>在预训练阶段加强开放领域问答的预训练模型（PTM），研究者们探索了结合检索策略的方法。例如，REALM模型在遮蔽语言模型（MLM）框架中实施了知识嵌入和检索-预测流程。RETRO模型从零开始利用检索增强进行大规模预训练，减少了参数数量并在困惑度上超越了GPT模型。Atlas模型将检索机制融合到T5架构的预训练和微调阶段，而COG模型通过模拟复制现有文本片段，展现了在问答和领域适应方面的出色性能。随着模型参数的增长定律，研究者们正在预训练更大的模型，如RETRO++模型。这些模型在文本生成质量、事实准确性、降低毒性以及下游任务熟练度方面取得了显著进步，特别是在知识密集型任务如开放领域问答中。增强预训练的模型在困惑度、文本生成质量和任务特定性能方面优于标准GPT模型，且使用的参数更少。这种方法还面临一些挑战，如大量预训练数据集和资源的需求以及模型大小增加时更新频率的下降。然而，这种方法提供了模型弹性方面的显著优势，训练完成的增强检索模型可以脱离外部库独立运行，提高了生成速度和运营效率，这使得它成为人工智能和机器学习领域持续研究和创新的热门话题。</p>
+<h3 id="Fine-tuning阶段"><a href="#Fine-tuning阶段" class="headerlink" title="Fine-tuning阶段"></a>Fine-tuning阶段</h3><p>RAG和微调是提升大型语言模型（LLMs）性能的重要手段，可以针对具体场景进行优化。微调有助于检索特定风格的文档，改善语义表达，并协调查询和文档之间的差异。此外，微调还可用于调整生成器产出具有特定风格和目标的文本，并可优化检索器与生成器间的协同作用。<br>微调检索器旨在提升语义表征的质量，通过使用专门的语料库直接微调嵌入模型来完成。此外，微调使检索器的能力与LLMs的偏好更好地协调，并针对特定任务提高适应性，同时增强多任务场景中的通用性。<br>微调生成器可以产出更加风格化和定制的文本，使模型能够适应不同的输入数据格式，并通过指令性数据集生成特定格式的内容。例如，在自适应或迭代检索场景中，LLMs可以被微调以产生推动下一步操作的内容。<br>协同微调检索器和生成器可以增强模型的泛化能力并避免过拟合，但这也会增加资源消耗。RA-DIT提出了一个轻量级的双指令调整框架，可有效地为LLMs增加检索能力并避免不必要的信息。<br>尽管微调存在专门数据集和计算资源的需求局限性，但它允许模型针对特定需求和数据格式进行定制，潜在地减少资源使用量。因此，微调是RAG模型适应特定任务的关键环节，尽管面临挑战，但能够提高模型的多功能性和适应性，是构建高效、有效检索增强系统的重要组成部分。</p>
+<h3 id="推理阶段"><a href="#推理阶段" class="headerlink" title="推理阶段"></a>推理阶段</h3><p>在RAG模型中，推理阶段是整合大型语言模型的关键环节。传统的Naive RAG在这个阶段整合检索内容指导生成过程。为克服其局限性，采用了在推理中引入更丰富上下文信息的高级技术。如DSP框架通过冻结的LMs与检索模型交换自然语言文本，丰富上下文提升生成结果；PKG为LLMs加入知识引导模块，使其检索相关信息而不改变LM参数；CREAICL通过同步检索跨语言知识增强上下文；而RECITE直接从LLMs采样段落生成上下文。<br>针对需要多步推理的任务，ITRG迭代检索信息以确定正确推理路径，ITERRETGEN采用迭代策略循环合并检索与生成，PGRA提出任务不可知检索器和提示引导重排器的两阶段框架。IRCOT结合RAG和思维链方法，在问答任务中提高GPT-3性能。<br>这些推理阶段优化提供了轻量且经济的选择，利用预训练模型的能力，无需额外训练。它们的主要优势是在不变更LLM参数的同时提供任务相关的上下文信息。不过，此方法需细致的数据处理优化，并受限于基础模型的固有能力。为有效应对多任务需求，通常与分步推理、迭代检索和自适应检索等程序优化技术结合使用。</p>
+<h2 id="增强数据源"><a href="#增强数据源" class="headerlink" title="增强数据源"></a>增强数据源</h2><p>RAG模型的效果显著受到数据源选择的影响，这些数据源根据不同知识和维度的需求可分为非结构化数据、结构化数据和由大型语言模型生成的内容。技术树展示了利用这些不同类型数据进行增强的代表性RAG研究，其中三种颜色的树叶分别代表不同数据类型的应用。最初，RAG模型的增强主要依赖非结构化数据如文本，随后演变为包括结构化数据如知识图谱进行优化。近期研究动向更倾向于使用LLMs自我生成的内容来进行检索和增强。</p>
+<h3 id="非结构化数据的增强"><a href="#非结构化数据的增强" class="headerlink" title="非结构化数据的增强"></a>非结构化数据的增强</h3><p>RAG模型在处理非结构化文本时，涵盖了从单个词汇到短语乃至文档段落的不同检索单元，以不同的粒度来平衡精确性与检索复杂性。一些研究如FLARE采用主动检索方法，由语言模型触发，以生成低概率词的句子为基础进行文档检索，并结合检索上下文优化生成结果。RETRO则利用块级检索逻辑，通过前一个块的最近邻居来指导下一个块的生成，注意到为保持因果逻辑，生成过程需要确保仅使用前一个块的信息。</p>
+<h3 id="结构化数据的增强"><a href="#结构化数据的增强" class="headerlink" title="结构化数据的增强"></a>结构化数据的增强</h3><p>结构化数据，如知识图谱（KGs），提供高质量的上下文并减少模型产生错误幻象。RET-LLMs 利用过去的对话构建知识图谱记忆以供未来参考。SUGRE 采用图神经网络（GNNs）来编码相关KG子图，通过多模态对比学习确保检索到的事实与生成文本之间的一致性。KnowledGPT 生成知识库（KB）搜索查询，并将知识存储在个性化的基础上，从而增强了RAG模型的知识丰富性和上下文性。</p>
+<h3 id="在RAG中利用LLMs生成的内容"><a href="#在RAG中利用LLMs生成的内容" class="headerlink" title="在RAG中利用LLMs生成的内容"></a>在RAG中利用LLMs生成的内容</h3><p>在RAG模型的发展中，研究人员探索了从LLMs内部知识中获取增强信息的方法，以克服外部辅助信息的局限。通过对问题进行分类和选择性地应用检索增强（SKR），替换传统检索器为LLM生成器以产生更准确上下文（GenRead），以及迭代建立无界记忆池以自我增强生成模型（Selfmem），这些创新做法极大地拓宽了数据源在RAG中的使用，目的是为了提升模型的整体性能和解决任务的有效性。</p>
+<h2 id="增强过程"><a href="#增强过程" class="headerlink" title="增强过程"></a>增强过程</h2><p>在RAG领域的实践中，一个单一的检索步骤后接生成步骤可能导致“中间迷失”现象，即单次检索可能带来与关键信息不符的冗余内容，影响生成质量。对于需要多步推理的复杂问题，这样的单一检索往往信息有限。为此，研究提出了迭代检索、递归检索和自适应检索等方法来优化检索过程，使其能够获取更深入、更相关的信息，特别是在处理复杂或多步查询时。自适应检索则可以根据任务和上下文的特定需求动态调整检索过程，提升了检索的灵活性和有效性。</p>
+<h3 id="迭代检索"><a href="#迭代检索" class="headerlink" title="迭代检索"></a>迭代检索</h3><p>在RAG模型的迭代检索过程中，为了为LLMs提供更全面的知识库，系统会根据初始查询和已生成的文本多次收集文档。这种方法能够增强答案生成的稳固性，但它可能会因为依赖特定的词汇序列来界定生成文本与检索文档的边界而导致语义不连贯和不相关信息的积累。针对特定数据场景，研究者们采用了递归检索和多跳检索技术，递归检索依赖于结构化索引来层次化处理数据，多跳检索则深入图结构化数据源提取关联信息。此外，ITER-RETGEN等方法将检索和生成融合在一起，通过检索增强的生成和生成增强的检索来处理特定任务，从而在后续的迭代中生成更好的回应。这些创新方法都在努力提升模型的性能和任务的有效性。<br>llamaindex案例：<a target="_blank" rel="noopener" href="https://docs.llamaindex.ai/en/stable/examples/evaluation/RetryQuery.html%23retry-query-engine">https://docs.llamaindex.ai/en/stable/examples/evaluation/RetryQuery.html%23retry-query-engine</a></p>
+<h3 id="递归检索"><a href="#递归检索" class="headerlink" title="递归检索"></a>递归检索</h3><p>递归检索常用于信息检索和NLP中，旨在通过迭代优化搜索查询来加深搜索结果的相关性和深度。这一过程通过反馈循环逐步精确至最关键的信息，从而增强搜索体验。例如，IRCoT利用思维链条来指导检索，ToC创建澄清树来优化查询中的模糊部分。递归检索对于初始用户需求不明确或信息需求专业化、细致的复杂搜索场景特别有效。这种方法的递归本质促使其持续学习和适应用户需求，经常能够显著提升用户对搜索结果的满意度。</p>
+<h3 id="自适应检索"><a href="#自适应检索" class="headerlink" title="自适应检索"></a>自适应检索</h3><p>自适应检索方法例如Flare和SelfRAG通过允许LLMs主动决定最佳的检索时机和内容来改进RAG框架，增强了检索信息的效率和相关性。这些方法都是LLMs在操作中主动判断的更广泛趋势的一部分，如AutoGPT、Toolformer和Graph-Toolformer等模型代理所展示的。例如，Graph-Toolformer主动地使用检索器、应用Self-Ask技术以及借助少量提示来启动搜索查询。WebGPT集成了强化学习框架以训练GPT-3模型在文本生成时自主使用搜索引擎。Flare通过监控生成过程中生成术语的概率来自动化检索时机。Self-RAG引入了“反思符号”，允许模型反思其输出，并自主决定何时激活检索，或由预定义阈值触发。Self-RAG通过使用批评分数来更新分数，使模型的行为更加定制化，并优化了检索决策过程。</p>
+<p>LLM的优化因其日益增长的重要性而受到关注，提示工程、Fine-Tuning和RAG都有各自的特点，选择使用哪种方法应基于特定场景的需求和每种方法的固有属性。</p>
+<p>llamaindex案例：<a target="_blank" rel="noopener" href="https://docs.llamaindex.ai/en/stable/examples/query_engine/flare_query_engine.html">https://docs.llamaindex.ai/en/stable/examples/query_engine/flare_query_engine.html</a></p>
+<h1 id="RAG和Fine-Tuning的对比"><a href="#RAG和Fine-Tuning的对比" class="headerlink" title="RAG和Fine-Tuning的对比"></a>RAG和Fine-Tuning的对比</h1><p>RAG 类似于给模型一本教科书用于特定信息的检索，非常适合处理具体的查询。而 FT 类似于学生随时间学习并内化知识，更适合重现特定的结构、风格或格式。FT 通过加强模型的基础知识、调整输出和传授复杂指令来提高模型的表现和效率，但在融入新知识或快速迭代新使用场景方面相对较弱。<br>RAG 和 FT 并不互斥，实际上可以互补，有助于在不同层次上提升模型的能力。在某些案例中，结合使用 RAG 和 FT 可能能够实现最优性能。然而，涉及 RAG 和 FT 的优化过程可能需要经过多次迭代才能取得满意的成效。</p>
+<p><img src="https://image.rexking6.top/img/v2-6ee76414eec048974841f527c87973ad_720w.webp" alt=""></p>
+<h1 id="RAG效果评估"><a href="#RAG效果评估" class="headerlink" title="RAG效果评估"></a>RAG效果评估</h1><p>RAG的快速进步和在自然语言处理领域的广泛应用使得RAG模型评估成为大型语言模型社区研究的一个重要领域。评估的核心目的是理解和优化RAG模型在各种应用场景中的性能。<br>过去，RAG模型的评估通常集中在它们在特定下游任务中的表现，并使用与任务相关的已建立评价指标，比如问答任务的EM和F1分数，事实核查任务的准确性指标。像RALLE这样的工具也是基于这些特定任务的度量标准进行自动评估的。<br>然而，目前缺少专门评估RAG模型独特特性的研究。接下来的部分将从特定任务的评估方法转向基于RAG独特属性的文献综合。这包括探讨RAG评估的目标、评估模型的不同方面，以及可用于这些评估的基准和工具。目标是提供一个关于RAG模型评估的全面概览，并概述那些专门针对这些高级生成系统独特方面的方法论。</p>
+<h2 id="评估对象"><a href="#评估对象" class="headerlink" title="评估对象"></a>评估对象</h2><p>RAG模型的评估主要围绕两个关键组成部分展开：检索模块和生成模块。这种划分确保了对提供的上下文质量和产生的内容质量的彻底评价。</p>
+<ul>
+<li>检索质量<br>评估检索质量对于确定检索组件获取上下文的有效性至关重要。标准的来自搜索引擎、推荐系统和信息检索系统领域的度量标准被用来衡量RAG检索模块的性能。常用的度量指标包括命中率（Hit Rate）、平均倒数排名（MRR）、归一化折扣累积增益（NDCG）等。</li>
+<li>生成质量<br>生成质量的评估侧重于生成器从检索上下文中合成连贯且相关答案的能力。这种评估可以根据内容的目标分为两类：未标记内容和标记内容。对于未标记内容，评估范围包括生成答案的忠实度、相关性和无害性。相反，对于标记内容，重点是模型产生的信息的准确性。此外，检索和生成质量评估都可以通过手动或自动评估方法进行。</li>
+</ul>
+<h2 id="评估方面"><a href="#评估方面" class="headerlink" title="评估方面"></a>评估方面</h2><p>现代RAG模型的评估实践强调三个主要质量得分和四个基本能力，这些综合信息共同构成了对RAG模型两个主要目标——检索和生成的评估。</p>
+<h3 id="Quality-Scores"><a href="#Quality-Scores" class="headerlink" title="Quality Scores"></a>Quality Scores</h3><p>RAG模型的评估实践关注三个主要的质量评分：上下文相关性、答案忠实度和答案相关性。这些评分标准从多个角度评价RAG模型在信息检索和生成过程中的性能：</p>
+<ul>
+<li><strong>上下文相关性</strong>评估检索到的上下文的准确性和具体性，确保它与问题相关，从而减少处理不相关内容的开销。</li>
+<li><strong>答案忠实度</strong>确保生成的答案忠于检索到的上下文，保持与原始信息的一致性，防止产生矛盾。</li>
+<li><strong>答案相关性</strong>确保生成的答案直接关联到提出的问题，有效地解答核心询问。<br>这些质量评分共同为评估RAG模型在处理和生成信息方面的有效性提供了全面的视角</li>
+</ul>
+<h3 id="需要的能力"><a href="#需要的能力" class="headerlink" title="需要的能力"></a>需要的能力</h3><p>RAG模型的评估覆盖了指示其适应性和效率的四个重要能力：噪声鲁棒性、负面拒绝、信息整合和反事实鲁棒性。这些能力对于评价模型在多样化挑战和复杂情境下的表现至关重要。</p>
+<ul>
+<li>噪声鲁棒性关注模型处理噪声文档的能力。</li>
+<li>负面拒绝评估模型在检索文档无法提供必要知识时拒绝回应的能力。</li>
+<li>信息整合考察模型综合多个文档信息以回答复杂问题的技能。</li>
+<li>反事实鲁棒性测试模型识别并忽视文档中已知错误的能力。</li>
+</ul>
+<p>上下文相关性和噪声鲁棒性是评估检索质量的重要指标，而答案忠实度、答案相关性、负面拒绝、信息整合和反事实鲁棒性则是评估生成质量的关键。这些评估方面的具体度量标准在文献中进行了总结，但目前这些度量还不是成熟或标准化的评估方法。尽管如此，一些研究也已经开发出针对RAG模型特性的定制度量指标。</p>
+<p><img src="https://image.rexking6.top/img/v2-38c53217ab6fd1ce9a9e0837e4ba0e21_720w.webp" alt=""></p>
+<h2 id="评估的Benchmarks和工具"><a href="#评估的Benchmarks和工具" class="headerlink" title="评估的Benchmarks和工具"></a>评估的Benchmarks和工具</h2><p>这一部分介绍了RAG模型的评估框架，该框架包含基准测试和自动评估工具。这些工具提供用于衡量RAG模型性能的定量指标，并且帮助更好地理解模型在各个评估方面的能力。知名的基准测试如RGB和RECALL专注于评价RAG模型的关键能力，而最新的自动化工具如RAGAS、ARES和TruLens则利用大型语言模型来评定质量得分。这些工具和基准测试共同形成了一个为RAG模型提供系统评估的坚实框架，相关细节在下表中有所总结。</p>
+<p><img src="https://image.rexking6.top/img/v2-4bfbc7884b10a4621ae5d7d5419d0cc7_720w.webp" alt=""></p>
+<h1 id="展望"><a href="#展望" class="headerlink" title="展望"></a>展望</h1><h2 id="RAG面临的挑战"><a href="#RAG面临的挑战" class="headerlink" title="RAG面临的挑战"></a>RAG面临的挑战</h2><p>尽管RAG技术已经取得了重大进展，但仍有若干挑战需要深入研究。其中包括如何处理LLMs的上下文窗口大小限制、提升RAG的鲁棒性、探索结合RAG和微调（RAG+FT）的混合方法、扩展LLMs在RAG框架中的角色、研究规模法则在RAG中的适用性，以及实现生产就绪的RAG。特别地，需要在RAG模型中找到平衡上下文长度的方法，提高对抗性或反事实输入的抵抗力，并确定RAG与微调的最佳整合方式。同时，需要确保RAG在生产环境中的实用性和数据安全，解决检索效率和文档召回率的问题。这些挑战的探索和解决将推动RAG技术向前发展。</p>
+<h3 id="RAG的模态扩展"><a href="#RAG的模态扩展" class="headerlink" title="RAG的模态扩展"></a>RAG的模态扩展</h3><p>RAG技术已经发展到不仅限于文本问答，而是包含图像、音频、视频和代码等多种数据模态。这一扩展催生了在各个领域整合RAG概念的创新多模态模型。例如，RA-CM3作为一个多模态模型，能够检索和生成文本与图像；BLIP-2利用图像编码器和LLMs进行视觉语言预训练，实现图像到文本的转换；而”Visualize Before You Write”方法则展示了在开放式文本生成任务中的潜力。音频和视频方面的GSS方法和UEOP实现了数据的音频翻译和自动语音识别，而Vid2Seq通过引入时间标记帮助语言模型预测事件边界和文本描述。在代码领域，RBPS通过检索与开发者目标一致的代码示例擅长处理小规模学习任务，而CoK方法则通过整合知识图谱中的事实来提高问答任务的性能。这些进展表明，RAG技术在多模态数据处理和应用方面具有巨大的潜力和研究价值。</p>
+<h2 id="RAG的生态"><a href="#RAG的生态" class="headerlink" title="RAG的生态"></a>RAG的生态</h2><h3 id="下游任务和评估"><a href="#下游任务和评估" class="headerlink" title="下游任务和评估"></a>下游任务和评估</h3><p>RAG技术在丰富语言模型处理复杂查询和生成详尽回答方面表现出极大潜力，它已经在开放式问题回答和事实验证等多种下游任务中展现了优异的性能。RAG不但提升了回答的精准度和关联性，还增强了回答的多样性和深度。特别在医学、法律和教育等专业领域，RAG可能会减少培训成本，提升与传统微调方法相比的性能。为了最大化RAG在各种任务中的效用，完善其评估框架至关重要，包括开发更加细致的评估指标和工具。同时，增强RAG模型的可解释性是一个关键目标，以便用户能更好理解模型生成回答的逻辑，促进RAG应用的信任度和透明度。</p>
+<h3 id="技术栈"><a href="#技术栈" class="headerlink" title="技术栈"></a>技术栈</h3><p>RAG生态系统的发展显著受到其技术栈进化的影响。随着ChatGPT的兴起，LangChain和LLamaIndex等关键工具因其提供的丰富RAG相关API而快速流行，成为LLMs领域的核心工具。即便新兴技术栈在功能上不如它们，也通过专业化的服务来突显差异化，例如Flowise AI通过低代码途径使用户能够轻松部署AI应用。同样，HayStack、Meltano和Cohere Coral等技术因其独到的贡献而备受瞩目。<br>传统软件和云服务提供商也在拓展服务以提供RAG为中心的解决方案，如Weaviate的Verba和亚马逊的Kendra。RAG技术的演变呈现出不同的专业化方向，包括定制化、简化和专业化，以更好地适应生产环境。<br>RAG模型及其技术栈的共同成长表现在技术进步为基础设施设定了新的标准，技术栈的增强又推动了RAG能力的进一步演化。RAG工具包正在成为企业应用的基础技术栈，但一个完全集成的综合平台仍需要进一步创新和发展。</p>
+<h1 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h1><h2 id="LlamaIndex实践"><a href="#LlamaIndex实践" class="headerlink" title="LlamaIndex实践"></a>LlamaIndex实践</h2><p>本文中所提到的很多RAG的优化方案，都可以在LlamaIndex中找到对应的实现，LlamaIndex官方也出了一份官方的指南，详细介绍了一些模块的最佳实践经验。更多详情可以参考<a target="_blank" rel="noopener" href="https://blog.llamaindex.ai/a-cheat-sheet-and-some-recipes-for-building-advanced-rag-803a9d94c41b">A Cheat Sheet and Some Recipes For Building Advanced RAG</a>。<br>下图列举了一些RAG技术在llamaindex中对应的代码模块，可以参考llamaindex文档进一步尝试。</p>
+<p><img src="https://image.rexking6.top/img/v2-65acda9621e6ebd3e1a4cc4555b60188_720w.webp" alt=""></p>
+<p><img src="https://image.rexking6.top/img/v2-0514597d6f665e34307d70043208a85d_720w.webp" alt=""></p>
+<h2 id="业界实践"><a href="#业界实践" class="headerlink" title="业界实践"></a>业界实践</h2><h3 id="百川智能的RAG方案"><a href="#百川智能的RAG方案" class="headerlink" title="百川智能的RAG方案"></a>百川智能的RAG方案</h3><p>百川智能的RAG方案流程包括以下几个关键步骤：</p>
+<ol>
+<li><strong>提升上下文窗口容量</strong>：百川智能推出了Baichuan2-192K模型，它具有业界领先的192K超长上下文窗口，能一次处理高达35万汉字的文本。</li>
+<li><strong>搜索增强知识库</strong>：将向量数据库升级为搜索增强知识库，使得大模型在响应用户查询时能够访问到互联网实时信息和企业的完整知识库。</li>
+<li><strong>用户意图理解和搜索查询优化</strong>：在用户提出的Prompt（查询）基础上，使用自研大模型进行微调，将连续多轮、口语化的用户查询转换为搜索引擎更容易理解的关键词或语义结构。</li>
+<li><strong>复杂Prompt拆分与并行检索</strong>：借鉴Meta的CoVe技术，将复杂的Prompt拆分为多个可以并行检索的查询，使大模型能针对每个查询进行定向知识库搜索。</li>
+<li><strong>进一步理解用户意图</strong>：使用TSF（Think Step-Further）技术来推断用户输入背后的更深层问题，从而更全面地理解用户意图并引导模型提供更有价值的答案。</li>
+</ol>
+<p><img src="https://image.rexking6.top/img/v2-8ed2ce8d068418d8ac64afd18ba8491f_720w.webp" alt=""></p>
+<ol>
+<li><strong>向量检索、稀疏检索、Rerank的结合</strong>：为了提高知识获取效率和准确性，百川智能结合使用了向量检索与稀疏检索，形成了一种混合检索方式，以提高目标文档的召回率。</li>
+<li><strong>大模型自省技术</strong>：在通用RAG基础上，百川智能创新性地提出了Self-Critique技术，让大模型能够根据Prompt，对搜索回来的内容进行自省和筛选，以确保提供与用户查询最匹配、最优质的答案。</li>
+</ol>
+<p><img src="https://image.rexking6.top/img/v2-1839f1f74d1965fb6061d3add16a06f3_720w.webp" alt=""></p>
+<ol>
+<li><strong>模型与搜索的深度融合</strong>：通过这些步骤，百川智能实现了大模型与搜索的紧密结合，为用户提供定制化解决方案，有效降低成本、提升性能，并持续增值企业专有知识库。</li>
+</ol>
+<p>百川智能的RAG方案显著地改善了大模型在行业垂直场景中的应用，通过提供一种更低成本、更高效的定制化大模型解决方案，提升了大模型技术的落地潜力，并有望引领大模型产业走向一个全新的阶段。</p>
+<h3 id="OpenAI案例"><a href="#OpenAI案例" class="headerlink" title="OpenAI案例"></a>OpenAI案例</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://blog.langchain.dev/applying-openai-rag/">https://blog.langchain.dev/applying-openai-rag/</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.youtube.com/watch%3Fv%3DahnGLM-RC1Y">https://www.youtube.com/watch%3Fv%3DahnGLM-RC1Y</a></li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-05f0d541b9a03e4ecfe8566f5dcd5c31_720w.webp" alt=""></p>
+<p><img src="https://image.rexking6.top/img/v2-6a0a1ebbc1d3baf7b369fe539995dba0_720w.webp" alt=""></p>
+<p>OpenAI展示了一个使用检索增强生成（RAG）技术来优化问题解答系统的案例。起初，系统仅仅通过基于余弦相似度的检索方案达到45%的准确率。为了提高性能，尝试了多种策略，如HyDE检索，它通过生成虚拟答案并用其检索相关段落，以及微调嵌入模型来调整嵌入空间。虽然这些方法提高了准确性，但由于成本和速度的问题，最终并未被采用。通过调整数据分片和嵌入，准确率提升至65%；进一步通过Rerank和分类不同类型的问题，准确率提升至85%。最后，通过prompt工程、引入工具使用和查询扩展等方法，将准确率提高到了98%。在整个过程中，他们并没有进行大模型的微调，并强调了解决问题的关键在于检索系统能够提供正确的上下文信息。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p><img src="https://image.rexking6.top/img/v2-a1f7008dda0eae9d353f7e9ef83400ba_720w.webp" alt=""></p>
+<p>RAG技术通过结合语言模型中的参数化知识和外部知识库中的非参数化数据，显著提升了大型语言模型（LLMs）的能力，特别是在处理复杂查询和生成详细响应方面。RAG技术经历了从初级到高级再到模块化的演进，其中高级RAG通过引入查询重写和块重新排序等复杂架构元素，提升了性能和可解释性。RAG与微调和强化学习等其他AI方法的整合，进一步扩展了其功能。在内容检索方面，采用结构化和非结构化数据源的混合方法正成为趋势。RAG的应用范围正在扩展到多模态数据，如图像、视频和代码，突出了其在AI部署方面的实际意义。</p>
+<p>RAG生态系统的增长表现在以RAG为中心的AI应用的增加和支持工具的发展。随着RAG应用领域的扩张，提炼评估方法以跟上其进化变得迫切必要，确保性能评估的准确性和代表性对于充分捕捉RAG在AI研究和开发中的贡献至关重要。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ol>
+<li><a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/2312.10997">Gao Y, Xiong Y, Gao X, et al. Retrieval-augmented generation for large language models: A survey]. arXiv preprint arXiv:2312.10997, 2023.</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//pub.towardsai.net/advanced-rag-techniques-an-illustrated-overview-04d193d8fec6">Advanced RAG Techniques: an Illustrated Overview</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//blog.llamaindex.ai/a-cheat-sheet-and-some-recipes-for-building-advanced-rag-803a9d94c41b">A Cheat Sheet and Some Recipes For Building Advanced RAG</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//towardsdatascience.com/10-ways-to-improve-the-performance-of-retrieval-augmented-generation-systems-5fa2cee7cd5c">10 Ways to Improve the Performance of Retrieval Augmented Generation Systems</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//www.jiqizhixin.com/articles/2023-12-20-10">大模型+搜索构建完整技术栈，百川智能用搜索增强给企业定制化下了一剂「猛药」</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2023\04\17\Auto-GPT源码解读（万字干货-原理速读）\" rel="bookmark">Auto-GPT源码解读（万字干货+原理速读）</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2023\02\22\ChatGPT背后的经济账\" rel="bookmark">ChatGPT 背后的经济账</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2023\04\05\LLM-GPT入门实践\" rel="bookmark">LLM-GPT入门实践</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2024/10/17/%E5%A6%82%E4%BD%95%E7%94%A8RAG%E6%8A%80%E6%9C%AF%E6%8F%90%E5%8D%87LLM%E7%9A%84%E8%83%BD%E5%8A%9B/" title="如何用RAG技术提升LLM的能力">https://blog.rexking6.top/2024/10/17/如何用RAG技术提升LLM的能力/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" rel="tag"># 大模型</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/10/17/%E5%87%BA%E5%9B%BD%E6%B8%B8%E6%9C%BA%E7%A5%A8%E9%99%8D%E6%9C%AC%E9%A2%84%E5%AE%9A%E6%8C%87%E5%8D%97/" rel="prev" title="出国游机票降本预定指南">
+      <i class="fa fa-chevron-left"></i> 出国游机票降本预定指南
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/11/16/%E6%9D%83%E7%9B%8A%E8%B4%A8%E6%8A%BC%E3%80%81%E6%94%B6%E7%9B%8A%E8%80%95%E4%BD%9C%E5%92%8C%E6%B5%81%E5%8A%A8%E6%80%A7%E6%8C%96%E7%9F%BF%E7%A9%B6%E7%AB%9F%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F/" rel="next" title="权益质押、收益耕作和流动性挖矿究竟有什么区别？">
+      权益质押、收益耕作和流动性挖矿究竟有什么区别？ <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%E9%9D%A2%E4%B8%B4%E7%9A%84%E6%8C%91%E6%88%98"><span class="nav-number">2.</span> <span class="nav-text">大模型应用面临的挑战</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFRAG"><span class="nav-number">3.</span> <span class="nav-text">什么是RAG</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RAG%E6%A1%86%E6%9E%B6%E7%BB%93%E6%9E%84"><span class="nav-number">4.</span> <span class="nav-text">RAG框架结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%8ENaive-RAG%E8%AF%B4%E8%B5%B7"><span class="nav-number">5.</span> <span class="nav-text">从Naive RAG说起</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Naive-RAG%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B1%80%E9%99%90%E6%80%A7"><span class="nav-number">5.1.</span> <span class="nav-text">Naive RAG的一些局限性</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Advanced-RAG%E5%A6%82%E4%BD%95%E5%BA%94%E5%AF%B9%E8%BF%99%E4%BA%9B%E6%8C%91%E6%88%98"><span class="nav-number">6.</span> <span class="nav-text">Advanced RAG如何应对这些挑战</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Pre-Retrieval"><span class="nav-number">6.1.</span> <span class="nav-text">Pre-Retrieval</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Retrieval"><span class="nav-number">6.2.</span> <span class="nav-text">Retrieval</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Post-Retrieval"><span class="nav-number">6.3.</span> <span class="nav-text">Post-Retrieval</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Modular-RAG"><span class="nav-number">7.</span> <span class="nav-text">Modular RAG</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B0%E6%A8%A1%E5%9D%97"><span class="nav-number">7.1.</span> <span class="nav-text">新模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B0%E6%A8%A1%E5%BC%8F"><span class="nav-number">7.2.</span> <span class="nav-text">新模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%8C%96RAG%E7%9A%84pipeline"><span class="nav-number">7.3.</span> <span class="nav-text">优化RAG的pipeline</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Retriever%E6%A8%A1%E5%9D%97"><span class="nav-number">8.</span> <span class="nav-text">Retriever模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%BE%97%E5%88%B0%E5%87%86%E7%A1%AE%E7%9A%84%E8%AF%AD%E4%B9%89%E8%A1%A8%E5%BE%81%EF%BC%9F"><span class="nav-number">8.1.</span> <span class="nav-text">如何得到准确的语义表征？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%8C%B9%E9%85%8Dquery%E5%92%8C%E6%96%87%E6%A1%A3%E7%9A%84%E8%AF%AD%E4%B9%89%E7%A9%BA%E9%97%B4%EF%BC%9F"><span class="nav-number">8.2.</span> <span class="nav-text">如何匹配query和文档的语义空间？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AF%B9%E9%BD%90%E6%A3%80%E7%B4%A2%E7%BB%93%E6%9E%9C%E5%92%8C%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%BE%93%E5%87%BA%E5%81%8F%E5%A5%BD"><span class="nav-number">8.3.</span> <span class="nav-text">如何对齐检索结果和大模型的输出偏好</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Generator%E6%A8%A1%E5%9D%97"><span class="nav-number">9.</span> <span class="nav-text">Generator模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E9%80%9A%E8%BF%87Post-retrieval%E8%BF%87%E7%A8%8B%E5%A2%9E%E5%BC%BA%E6%A3%80%E7%B4%A2%E7%BB%93%E6%9E%9C"><span class="nav-number">9.1.</span> <span class="nav-text">如何通过Post-retrieval过程增强检索结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Fine-tuning-LLM-for-RAG"><span class="nav-number">9.2.</span> <span class="nav-text">Fine-tuning LLM for RAG</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Augmentation%E6%A8%A1%E5%9D%97"><span class="nav-number">10.</span> <span class="nav-text">Augmentation模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8%E5%93%AA%E4%BA%9B%E9%98%B6%E6%AE%B5%E8%BF%9B%E8%A1%8C%E5%A2%9E%E5%BC%BA%EF%BC%9F"><span class="nav-number">10.1.</span> <span class="nav-text">在哪些阶段进行增强？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E8%AE%AD%E7%BB%83%E9%98%B6%E6%AE%B5"><span class="nav-number">10.1.1.</span> <span class="nav-text">预训练阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Fine-tuning%E9%98%B6%E6%AE%B5"><span class="nav-number">10.1.2.</span> <span class="nav-text">Fine-tuning阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A8%E7%90%86%E9%98%B6%E6%AE%B5"><span class="nav-number">10.1.3.</span> <span class="nav-text">推理阶段</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A2%9E%E5%BC%BA%E6%95%B0%E6%8D%AE%E6%BA%90"><span class="nav-number">10.2.</span> <span class="nav-text">增强数据源</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E7%BB%93%E6%9E%84%E5%8C%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A2%9E%E5%BC%BA"><span class="nav-number">10.2.1.</span> <span class="nav-text">非结构化数据的增强</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E5%8C%96%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A2%9E%E5%BC%BA"><span class="nav-number">10.2.2.</span> <span class="nav-text">结构化数据的增强</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8RAG%E4%B8%AD%E5%88%A9%E7%94%A8LLMs%E7%94%9F%E6%88%90%E7%9A%84%E5%86%85%E5%AE%B9"><span class="nav-number">10.2.3.</span> <span class="nav-text">在RAG中利用LLMs生成的内容</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A2%9E%E5%BC%BA%E8%BF%87%E7%A8%8B"><span class="nav-number">10.3.</span> <span class="nav-text">增强过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%AD%E4%BB%A3%E6%A3%80%E7%B4%A2"><span class="nav-number">10.3.1.</span> <span class="nav-text">迭代检索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%92%E5%BD%92%E6%A3%80%E7%B4%A2"><span class="nav-number">10.3.2.</span> <span class="nav-text">递归检索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E9%80%82%E5%BA%94%E6%A3%80%E7%B4%A2"><span class="nav-number">10.3.3.</span> <span class="nav-text">自适应检索</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RAG%E5%92%8CFine-Tuning%E7%9A%84%E5%AF%B9%E6%AF%94"><span class="nav-number">11.</span> <span class="nav-text">RAG和Fine-Tuning的对比</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RAG%E6%95%88%E6%9E%9C%E8%AF%84%E4%BC%B0"><span class="nav-number">12.</span> <span class="nav-text">RAG效果评估</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E5%AF%B9%E8%B1%A1"><span class="nav-number">12.1.</span> <span class="nav-text">评估对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E6%96%B9%E9%9D%A2"><span class="nav-number">12.2.</span> <span class="nav-text">评估方面</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Quality-Scores"><span class="nav-number">12.2.1.</span> <span class="nav-text">Quality Scores</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9C%80%E8%A6%81%E7%9A%84%E8%83%BD%E5%8A%9B"><span class="nav-number">12.2.2.</span> <span class="nav-text">需要的能力</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E7%9A%84Benchmarks%E5%92%8C%E5%B7%A5%E5%85%B7"><span class="nav-number">12.3.</span> <span class="nav-text">评估的Benchmarks和工具</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B1%95%E6%9C%9B"><span class="nav-number">13.</span> <span class="nav-text">展望</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RAG%E9%9D%A2%E4%B8%B4%E7%9A%84%E6%8C%91%E6%88%98"><span class="nav-number">13.1.</span> <span class="nav-text">RAG面临的挑战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RAG%E7%9A%84%E6%A8%A1%E6%80%81%E6%89%A9%E5%B1%95"><span class="nav-number">13.1.1.</span> <span class="nav-text">RAG的模态扩展</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RAG%E7%9A%84%E7%94%9F%E6%80%81"><span class="nav-number">13.2.</span> <span class="nav-text">RAG的生态</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E6%B8%B8%E4%BB%BB%E5%8A%A1%E5%92%8C%E8%AF%84%E4%BC%B0"><span class="nav-number">13.2.1.</span> <span class="nav-text">下游任务和评估</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%80%E6%9C%AF%E6%A0%88"><span class="nav-number">13.2.2.</span> <span class="nav-text">技术栈</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E8%B7%B5"><span class="nav-number">14.</span> <span class="nav-text">实践</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#LlamaIndex%E5%AE%9E%E8%B7%B5"><span class="nav-number">14.1.</span> <span class="nav-text">LlamaIndex实践</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%9A%E7%95%8C%E5%AE%9E%E8%B7%B5"><span class="nav-number">14.2.</span> <span class="nav-text">业界实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%99%BE%E5%B7%9D%E6%99%BA%E8%83%BD%E7%9A%84RAG%E6%96%B9%E6%A1%88"><span class="nav-number">14.2.1.</span> <span class="nav-text">百川智能的RAG方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OpenAI%E6%A1%88%E4%BE%8B"><span class="nav-number">14.2.2.</span> <span class="nav-text">OpenAI案例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">15.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">16.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">241</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">85</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">84</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">4.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">64:09</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
