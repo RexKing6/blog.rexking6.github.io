@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="算法技术设计思考：迭代的思维方式">
+<meta property="og:url" content="https://blog.rexking6.top/2024/12/01/%E7%AE%97%E6%B3%95%E6%8A%80%E6%9C%AF%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%80%83%EF%BC%9A%E8%BF%AD%E4%BB%A3%E7%9A%84%E6%80%9D%E7%BB%B4%E6%96%B9%E5%BC%8F/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-12-01T10:32:02.000Z">
+<meta property="article:modified_time" content="2024-12-13T15:24:18.791Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="思考">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.rexking6.top/2024/12/01/%E7%AE%97%E6%B3%95%E6%8A%80%E6%9C%AF%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%80%83%EF%BC%9A%E8%BF%AD%E4%BB%A3%E7%9A%84%E6%80%9D%E7%BB%B4%E6%96%B9%E5%BC%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>算法技术设计思考：迭代的思维方式 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2024/12/01/%E7%AE%97%E6%B3%95%E6%8A%80%E6%9C%AF%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%80%83%EF%BC%9A%E8%BF%AD%E4%BB%A3%E7%9A%84%E6%80%9D%E7%BB%B4%E6%96%B9%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          算法技术设计思考：迭代的思维方式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-12-01 18:32:02" itemprop="dateCreated datePublished" datetime="2024-12-01T18:32:02+08:00">2024-12-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-12-13 23:24:18" itemprop="dateModified" datetime="2024-12-13T23:24:18+08:00">2024-12-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E6%80%9D%E8%80%83/" itemprop="url" rel="index"><span itemprop="name">思考</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2024/12/01/%E7%AE%97%E6%B3%95%E6%8A%80%E6%9C%AF%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%80%83%EF%BC%9A%E8%BF%AD%E4%BB%A3%E7%9A%84%E6%80%9D%E7%BB%B4%E6%96%B9%E5%BC%8F/" class="post-meta-item leancloud_visitors" data-flag-title="算法技术设计思考：迭代的思维方式" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>3.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/2mcqFGUR7ZeLXD8B1MDJ5Q">心法利器[117] | 算法技术设计思考：迭代的思维方式</a>。</p>
+<p><strong><em>很少会有人把算法实际落地的经验和心得系统化结构化地分享出来，作者属实难能可贵，牛逼！</em></strong></p>
+<p>今天想要聊的是最近领悟的一项新的思维方式，是在项目内逐步探索发现的，就是要有迭代和发展的思维方式。</p>
+<p>这次也算是试试水，做一次尝试，写一下日常方案设计过程中的一些方法论，看大家是否感兴趣，如果喜欢我会多写点。</p>
+<p>在这里，我先把这个“迭代的思维方式”展开解释一下，我这里是指，对于一个任务，在并不容易一次性解决的时候要把他拆解成逐步推进各个击破的长期任务，至于这里怎么拆，如何设计和推进，看我后面慢慢解释。</p>
+<h1 id="思路的来源"><a href="#思路的来源" class="headerlink" title="思路的来源"></a><strong>思路的来源</strong></h1><p>最近是在做一些大方案的技术设计，在设计过程汇总，会发现很多很好的方案，在现阶段可能并没有很好的落地条件，总结下来，包括但不限于下面原因：</p>
+<ul>
+<li>数据层面的基础工作不够。现实上，缺少标注数据，某些数据尚未积累，数据表还没建立，某些数据甚至还没打通，理想上的数据理解尚未到位。</li>
+<li>工程技术尚未成熟，某些算法工程做需要依赖工程支持，除了上面可能有涉及的埋点，还有类似AB实验工程、某些用户行为方案没上线、机器资源等。</li>
+<li>大而复杂的模型，影响因素过多，可能会出现众多的问题，模型结构、数据集、训练、测试等，出现问题后难以定位，直接上线的成本高。</li>
+<li>当下问题的现状，复杂模型或者方案下，能解决的问题很多，他是解决综合问题的一个组合解，并没有那么对症，然而在现实中，我们需要了解到当下环境的核心痛点，因地制宜（这个词我好像也在公众号里反复提到过），才能更高效，也更有利于推进解决问题。</li>
+<li>人的问题，合作起来存在一定困难，分工难以平衡，设置可能会影响一些人的利益（如工作被合并），从而出现困难或者未知风险。</li>
+</ul>
+<p>在这里列举下来，也是希望大家能够理解这个迭代思路的核心来源，让大家在设计方案时能够更留意到这些问题，以便进一步推进。</p>
+<p>因此在项目实施过程，直接把一些现行看到的很好的方案直接落地，而需要有计划地拆解，找到合适的切入点，逐步迭代完成最终的落地实施。</p>
+<h1 id="概述这个思路的核心点"><a href="#概述这个思路的核心点" class="headerlink" title="概述这个思路的核心点"></a><strong>概述这个思路的核心点</strong></h1><p>这只是一个比较宏观的方法论，在运用过程，要注意的部分我先列举出来，然后后面逐步展开解释。</p>
+<ul>
+<li>明确最终愿景和形态。明确适合这个场景的最终方案。</li>
+<li>了解现状。现状是一个广义概念，里面包含的东西很多，项目现状、资源现状、研究现状等。</li>
+<li>以痛点为出发点，配合现有资源的情况，开始初始方案。</li>
+<li>方案的设计，除了要求解决当下痛点，还要考虑逐步满足达成最终方案的条件。</li>
+<li>维持稳定增长的技术储备。</li>
+</ul>
+<p>我理解的核心点就是上面这些，后面我会逐步展开解释。</p>
+<h1 id="明确最终愿景和形态"><a href="#明确最终愿景和形态" class="headerlink" title="明确最终愿景和形态"></a><strong>明确最终愿景和形态</strong></h1><p>这里强调“最终”，就是因为我们需要一个最终的目标。目标的重要性已经在管理学、哲学等多门学科里被强调多次重要性，在这里，也仍旧需要强调。</p>
+<p>这里的最终愿景要明确清楚，可以通过回答以下问题来实现：</p>
+<ul>
+<li>你做的是一个什么项目，最根本的是要解决什么问题，有什么评价标准</li>
+<li>要完成这个项目，目前比较前沿或者理想的方案是什么<ul>
+<li>由哪些部分组成，每个部分的职责是什么</li>
+<li>这几个部分下的常用方案是什么</li>
+<li>每个部分是怎么协同的</li>
+<li>逐步拆解这个方案内部的内容</li>
+<li>为什么要选这个方案，优缺点是什么</li>
+</ul>
+</li>
+<li>要达成这个愿景，需要什么条件。</li>
+</ul>
+<p>最后这点，“要达成这个愿景，需要什么条件”非常重要，这是我们后续要逐步迭代的一个重要线索，我们设计的每一次迭代，除了要满足每一步所遇到或者遗留的短期问题，还需要把愿景中未满足的条件给满足了，才能最终达成我们的愿景，所以，最好盘点出来。</p>
+<h1 id="了解现状"><a href="#了解现状" class="headerlink" title="了解现状"></a><strong>了解现状</strong></h1><p>了解现状是现实工作中非常重要的步骤，在新接触一个项目时、要做方案升级时、逐步迭代过程中都非常需要，而且“现状”一次的概念也非常广，重点在于，要了解哪些现状，对一个算法技术设计而言，主要有如下方面：</p>
+<ul>
+<li>目前是否有使用什么算法方案，这个方案的效果如何（指标），使用的什么测试集</li>
+<li>从bad case分析反馈而言，目前有什么问题，重要程度如何（问题占比）</li>
+<li>用户角度的问题有哪些诉求。（此处注意多沟通挖掘）</li>
+<li>该方案目前的SOTA和口碑比较好的方案有哪些</li>
+<li>制约方案的因素要了解清楚。<ul>
+<li>上线需要多少多少耗时、并发，有多少机器资源（CPU核、内存、显卡型号显存等，涉及数据库中间件还有硬盘大小等）</li>
+<li>能支持提供多少的训练数据（无论是挖掘、自动标注还是人工标注，盘点清楚）</li>
+<li>排期时间。简单的，2天能做的事和10天能做的事肯定不一样。</li>
+</ul>
+</li>
+</ul>
+<p>能尽可能理清这些问题，大概率就能对现状有个比较清楚的把控了。</p>
+<h1 id="初始方案的设计"><a href="#初始方案的设计" class="headerlink" title="初始方案的设计"></a><strong>初始方案的设计</strong></h1><p>有关技术方案设计，之前已经有过类似的文章了：心法利器[56] | 算法技术设计思路小结。</p>
+<p>但是在这，要补充一块比较重要的内容，那就是要逐步满足最终愿景所需要的条件。在最终方案中，往往需要更多的资源和基础，例如需要埋点数据、需要基础的工程支持、需要特定数据的积累，甚至有些坑是需要提前踩的这些事，我们是可以通过前期的方案设计，把这些内容带上车一起推进。</p>
+<p>举个例子，我们要构造完整的搜索系统（前沿重器[48-54] 合集：四万字聊搜索系统），我们要有NLU、召回、排序，早期一蹴而就并不可能，但是类似召回需要的中间件、或者是用户点击之类的反馈信息，那我们完全可以在早期就提前安排，尤其像埋点这种，很早就可以安排，并行推进的，就可以在尽快安排上线。</p>
+<h1 id="维持稳定增长的技术储备"><a href="#维持稳定增长的技术储备" class="headerlink" title="维持稳定增长的技术储备"></a><strong>维持稳定增长的技术储备</strong></h1><p>持续学习肯定是非常有必要的，我们往往会纠结于学习方向是什么，而在结合项目的进展持续深入学习则是一个很好的方向。</p>
+<p>要设计方案的前提，是手里有足够多的牌，如果手里就没什么牌，轻则找不到很优秀的方案，重则无从下手，时常和朋友聊起的很扎心的话：</p>
+<ul>
+<li>你不会除了微调没有别的方法了吧。</li>
+<li>现在让你微调了，你不会还微调不好吧。</li>
+</ul>
+<p>所以维持稳定增长的技术储备是非常有必要的，大到整个框架愿景，小到每个部分，都值得持续调研学习，看论文、看分享、分析具体场景的case，都是常用的学习提升更新方案，慢慢你就会发现自己在这个领域逐步得心应手了。</p>
+<h1 id="案例"><a href="#案例" class="headerlink" title="案例"></a><strong>案例</strong></h1><p>在这里，我提供一个案例来体现这种迭代思维。先修知识还是先看看我最近写的搜索系统合集（前沿重器[48-54] 合集：四万字聊搜索系统）。</p>
+<p>现在手里拿到一个产品需求，是要为一个场景做一个知识类的搜索系统，面向的用户主要是专业人士，做专业知识的查询。目前已经有一些业务方提供的知识库，非结构化的书籍材料，由于是新产品，所以暂时完全没有用户日志数据。</p>
+<p>要做成完整的搜索系统，肯定不是一蹴而就的，确定好目标和规划，按照计划进行即可。</p>
+<p>首先对于最终形态，还是比较明确的，就是构造架构比较完善的NLU、召回、排序模块，内部结合用户搜索习惯和知识库情况划分好模块分情况处理，配合大模型的RAG能力为用户提供最精准的知识查询服务。</p>
+<p>显然这里并不能全部立刻完成，这里有几个核心的痛点需要优先考虑开展工作：</p>
+<ul>
+<li>因为书籍材料并不结构化，所以需要进行切片或者是问题挖掘之类工作。</li>
+<li>没有用户搜索习惯数据，尽快有个baseline进行小尝试是个不错的方案。</li>
+<li>目前无任何基础工作，向量或字面搜索的快速baseline可以先建立起来。NLU暂时不急，排序模块数据也不足，直接用一个召回模块快速形成搜索是个不错的方式。<ul>
+<li>字面搜索可以考虑ES，从简在数据少的情况下也可以直接用python写一个复杂度高点的字面检索模块也可以。</li>
+<li>向量召回的引擎可以用FAISS来做，模型的话参考BGE系列的模型能做较高的basleine。</li>
+<li>重点是快速成型，形成完整流程，确认效果。</li>
+</ul>
+</li>
+<li>效果验证可以让大模型、产品经理等角色出一些必过的case，然后在看开源的数据集是否有，可以先作为参考，等后续有了用户数据再来升级数据集。</li>
+</ul>
+<p>在完成了简单的baseline后，再结合产品反馈、数据集反馈的方式来优化，形成可用版本后就可以开始小范围内测使用，最终形成上线产品，待产品上线后再来考虑逐步扩展，形成项目所需的各个模块，当然随着技术变迁和需求演化，很多必要的设计在后续会有变化，到时候再见招拆招。</p>
+<p>这里可以看到：</p>
+<ul>
+<li>充分了解现状，在前面我有提到面向的用户、目前已有和缺少的关键资源。</li>
+<li>愿景是有的，但是会比较粗，只要有个相对明确的目标即可。（当然这里要注意拆解模块，这个我在后续的章节会谈如何拆解）</li>
+<li>开展的工作基本是围绕当前的关键问题以及构造最终用形态雏形来推进的。<ul>
+<li>初步方案里，对于最终目标中暂时在现在并不重要的模块，会选择性的先忽略，如NLU模块，排序模块等，或因为当前效果短板并不在此，或因为当前并无足够的数据支持该项工作。</li>
+<li>相反，在当前情况，物料，即这里的书籍材料，才是比较重要的部分，巧妇难为无米之炊，搜索系统的基础物料在早期是很重要的，处理好了后续的搜索推理阶段的工作会事半功倍。</li>
+</ul>
+</li>
+</ul>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a><strong>小结</strong></h1><p>今天主要是想给大家分享一个算法技术设计的思维方式，即迭代的思维方式，要把复杂的任务拆解放到时间线中来逐步处理，并详细解释了整个迭代的具体实施过程。在这里再补充一下这个思路的优势。</p>
+<ul>
+<li>拆解后把整体的项目压力分到了后续的时间线上，按计划推进会更明确也更有自信。</li>
+<li>构造出了入手点，让复杂的无从下手的事情有了入手点，这在方案设计这件事上，无疑是一个重大的推进。</li>
+<li>巧妙权衡了前沿技术和项目需求上的结构性差异，前沿技术可能并不符合项目目前存在的问题，但两者可以通过这个方式进行有机结合。我曾经见过很多人会吐槽搜索、推荐的论文在现实中没什么用，大概率就是这个原因，推荐系统中论文提到的某些方案是针对某些问题的，但是这个问题在现阶段场景并未暴露或成为关键点，此时用起来肯定就没什么收益甚至负收益。</li>
+</ul>
+<p>最后在这也问问大家，有关这块的思想和方法论，有没有比较成体系的学科或者理论学习，感觉这块可能已经有一些研究，但没有找到，有兴趣的欢迎在评论区讨论，另外类似的文章不知道大家的喜好怎么样，有兴趣也可以评论一下。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2024\11\25\19类Agent框架对比\" rel="bookmark">19类Agent框架对比</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\08\30\A-B测试\" rel="bookmark">A/B测试</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2018\03\28\AMPC-1080Ti机器-深度环境搭建\" rel="bookmark">AMPC-1080Ti机器-深度环境搭建</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2024/12/01/%E7%AE%97%E6%B3%95%E6%8A%80%E6%9C%AF%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%80%83%EF%BC%9A%E8%BF%AD%E4%BB%A3%E7%9A%84%E6%80%9D%E7%BB%B4%E6%96%B9%E5%BC%8F/" title="算法技术设计思考：迭代的思维方式">https://blog.rexking6.top/2024/12/01/算法技术设计思考：迭代的思维方式/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E6%80%9D%E8%80%83/" rel="tag"># 思考</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/11/25/19%E7%B1%BBAgent%E6%A1%86%E6%9E%B6%E5%AF%B9%E6%AF%94/" rel="prev" title="19类Agent框架对比">
+      <i class="fa fa-chevron-left"></i> 19类Agent框架对比
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/12/13/LLM%E5%9C%A8%E8%A1%A8%E6%A0%BC%E6%95%B0%E6%8D%AE%E7%90%86%E8%A7%A3%E4%BB%BB%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8%E6%80%9D%E8%80%83/" rel="next" title="LLM在表格数据理解任务中的应用思考">
+      LLM在表格数据理解任务中的应用思考 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%9D%E8%B7%AF%E7%9A%84%E6%9D%A5%E6%BA%90"><span class="nav-number">2.</span> <span class="nav-text">思路的来源</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0%E8%BF%99%E4%B8%AA%E6%80%9D%E8%B7%AF%E7%9A%84%E6%A0%B8%E5%BF%83%E7%82%B9"><span class="nav-number">3.</span> <span class="nav-text">概述这个思路的核心点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%98%8E%E7%A1%AE%E6%9C%80%E7%BB%88%E6%84%BF%E6%99%AF%E5%92%8C%E5%BD%A2%E6%80%81"><span class="nav-number">4.</span> <span class="nav-text">明确最终愿景和形态</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%86%E8%A7%A3%E7%8E%B0%E7%8A%B6"><span class="nav-number">5.</span> <span class="nav-text">了解现状</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E6%96%B9%E6%A1%88%E7%9A%84%E8%AE%BE%E8%AE%A1"><span class="nav-number">6.</span> <span class="nav-text">初始方案的设计</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%B4%E6%8C%81%E7%A8%B3%E5%AE%9A%E5%A2%9E%E9%95%BF%E7%9A%84%E6%8A%80%E6%9C%AF%E5%82%A8%E5%A4%87"><span class="nav-number">7.</span> <span class="nav-text">维持稳定增长的技术储备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B"><span class="nav-number">8.</span> <span class="nav-text">案例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">9.</span> <span class="nav-text">小结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">250</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">85</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">4.3m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">65:02</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

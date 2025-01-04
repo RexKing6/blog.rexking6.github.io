@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LLM在表格数据理解任务中的应用思考">
+<meta property="og:url" content="https://blog.rexking6.top/2024/12/13/LLM%E5%9C%A8%E8%A1%A8%E6%A0%BC%E6%95%B0%E6%8D%AE%E7%90%86%E8%A7%A3%E4%BB%BB%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8%E6%80%9D%E8%80%83/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-1ea0c683afa74a83bc861a9e78bb0186_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-6752ea854eb5bf013ff6628755443d6a_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-230274e6a3e80307959b8065513d6a4a_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-fdacadf798a352bbf17b8dee985ce222_1440w.jpg">
+<meta property="og:image" content="https://pic1.zhimg.com/v2-85e0c1cfea100135e18538ab5e808c28_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-70d8d7e8c0867cfde3f792be514a9474_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-fce7b4d1a81200c4c5f17ab521450fa2_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-bef047259fa0f1bc44c25b272734b645_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-ec869cbb79e71f7388043326c7e33bf0_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-2dfbc19ff75958fdd5fe6fe4f75d2b46_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-1f7afd9964d9922f4baade17175c1747_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-5e424961bb4c44d721b91a867301a137_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-4867ad16c30ed22d501d56a25fff6d8c_1440w.jpg">
+<meta property="article:published_time" content="2024-12-13T15:24:51.000Z">
+<meta property="article:modified_time" content="2024-12-13T16:03:13.440Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="大模型">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/v2-1ea0c683afa74a83bc861a9e78bb0186_1440w.jpg">
+
+<link rel="canonical" href="https://blog.rexking6.top/2024/12/13/LLM%E5%9C%A8%E8%A1%A8%E6%A0%BC%E6%95%B0%E6%8D%AE%E7%90%86%E8%A7%A3%E4%BB%BB%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8%E6%80%9D%E8%80%83/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>LLM在表格数据理解任务中的应用思考 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2024/12/13/LLM%E5%9C%A8%E8%A1%A8%E6%A0%BC%E6%95%B0%E6%8D%AE%E7%90%86%E8%A7%A3%E4%BB%BB%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8%E6%80%9D%E8%80%83/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LLM在表格数据理解任务中的应用思考
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-12-13 23:24:51" itemprop="dateCreated datePublished" datetime="2024-12-13T23:24:51+08:00">2024-12-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-12-14 00:03:13" itemprop="dateModified" datetime="2024-12-14T00:03:13+08:00">2024-12-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" itemprop="url" rel="index"><span itemprop="name">大模型</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2024/12/13/LLM%E5%9C%A8%E8%A1%A8%E6%A0%BC%E6%95%B0%E6%8D%AE%E7%90%86%E8%A7%A3%E4%BB%BB%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8%E6%80%9D%E8%80%83/" class="post-meta-item leancloud_visitors" data-flag-title="LLM在表格数据理解任务中的应用思考" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>5.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/679968911">LLM在表格数据理解任务中的应用思考</a>。</p>
+<p>表格理解任务包括基于表格的问答、表格事实验证等。与泛化的文本推理任务不同，限于表格数据的复杂性，基于表格的推理任务需要从自由形式的文本和半结构化的表格数据中提取出深层次的语义信息，才能更好地完成表格理解任务。</p>
+<p>随着大语言模型（LLMs）的飞速发展，很多研究者试图用LLM来帮助完成这一任务，并且取得了巨大的突破。本文尝试总结一些当前已有的尝试，并对未来的发展趋势做一些简单的探讨。</p>
+<p>总的来看，LLM应用在表格理解任务上的探索大致有两条不同的技术路线：</p>
+<ul>
+<li>一种是针对表格数据类型，通过训练/微调的方式对LLM做一些领域适配，使得它能够更好地支持表格数据的理解任务。</li>
+<li>另一种是直接使用预训练的通用LLM，采用一些额外的手段（比如Prompt技巧、工具使用等）让LLM完成表格理解任务。</li>
+</ul>
+<p>本文聚焦于探讨第二类技术路线涉及的一些方法。</p>
+<h1 id="1-方法概览"><a href="#1-方法概览" class="headerlink" title="1. 方法概览"></a>1. 方法概览</h1><p>直接使用预训练LLM进行表格数据理解的技术路线，目前有两种主流的做法。一种是基于文本推理的直接方式，将全量表格数据以一定的分隔符的方式标记，作为Prompt的一部分输入LLM，并结合一些Prompt技巧，直接对问题进行文本推理；另一种是基于符号推理的间接方式，将表格的结构信息（如表头、数据样例等）输入Prompt，根据任务需求指导LLM编写一定的代码（如SQL、Python等），并调用对应的工具执行代码，得到想要的结果。</p>
+<p>以下围绕这两类实现方式做一些详细的方法介绍。</p>
+<h2 id="1-1-文本推理的方式"><a href="#1-1-文本推理的方式" class="headerlink" title="1.1 文本推理的方式"></a>1.1 文本推理的方式</h2><h3 id="1-1-1-GPT4Table"><a href="#1-1-1-GPT4Table" class="headerlink" title="1.1.1 GPT4Table"></a>1.1.1 GPT4Table</h3><p>GPT4Table论文中提出了一个全新的benchmark，并在此基础上验证了ChatGPT在各个子任务上的效果。同时，提出了self-augmentation的Prompt技巧，进一步提升了理解效果。</p>
+<p>研究团队将表格数据的结构理解能力进行了拆分，分为两大类：</p>
+<ul>
+<li>区分出表格数据（从文本中定位出哪些内容表示的是表格数据）及解析表格数据（从各种类型，包括XML、CSV、XLSX等，中解析出表格数据的能力）</li>
+<li>搜索（根据值进行位置搜索/根据位置定位到单元格值）和检索（根据行列信息找到对应的值）</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-1ea0c683afa74a83bc861a9e78bb0186_1440w.jpg" alt=""></p>
+<p>围绕这些设计的能力，文中设计并对比了一系列Prompt方式进行文本推理进行表格数据理解任务的能力。文中的一些结论和技巧如下：</p>
+<ul>
+<li><strong>不同分隔符的差异</strong>：在prompt中使用HTML语言表示数据，能普遍取得比简单分隔符表示数据更好的效果。</li>
+<li><strong>1-shot相比0-shot效果提升明显</strong>：尤其是对于一些高度依赖结构解析能力的任务，1-shot能够带来巨大的提升。</li>
+<li>Prompt顺序的影响：添加的外部信息的prompt放在表格数据之前比放在之后会更好。</li>
+<li>有关Partition mark和format explanation的prompt可能损失搜索/检索相关的能力</li>
+</ul>
+<p>此外，作者提出了self-augmented prompting的技巧，提升了文本推理的效果。该prompt技巧分为两步：</p>
+<ul>
+<li>首先让LLM输出一些对表格数据的理解作为额外的知识</li>
+<li>将这些额外的知识加入到之前的问题prompt里，用于生成最终的答案</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-6752ea854eb5bf013ff6628755443d6a_1440w.jpg" alt=""></p>
+<p>更多细节可以参考论文原文或笔者之前的解读文章。</p>
+<h3 id="1-1-2-Rethinking-Tabular-Data-Understanding-with-Large-Language-Models"><a href="#1-1-2-Rethinking-Tabular-Data-Understanding-with-Large-Language-Models" class="headerlink" title="1.1.2 Rethinking Tabular Data Understanding with Large Language Models"></a>1.1.2 <strong>Rethinking Tabular Data Understanding with Large Language Models</strong></h3><p>这篇论文对LLM如何感知表格结构，如何确保它们在面对结构变化时的鲁棒性等问题进行了深入的研究。提出针对数据表的规范化方法来增强表格数据应对结构变化（如转置、乱序等）扰动的鲁棒性。</p>
+<p>优化后的文本推理方式能够在面对表的结构扰动时表现出极强的鲁棒性，在面对乱序、转置、转置+乱序的场景下都能取得和标准格式的表格数据类似的效果。</p>
+<p><img src="https://image.rexking6.top/img/v2-230274e6a3e80307959b8065513d6a4a_1440w.jpg" alt=""></p>
+<p>此外，文中还对文本推理方式常见的出错类型进行了分析，指出文本推理方式最大的挑战在于正确地解释表格。</p>
+<p><img src="https://image.rexking6.top/img/v2-fdacadf798a352bbf17b8dee985ce222_1440w.jpg" alt=""></p>
+<p>同时，本文也讨论了基于符号推理的实现方式，并提出将文本推理和符号推理的方式结合，能够进一步提升表格理解的效果。关于这部分的内容详见下文的符号推理章节以及融合章节。</p>
+<p>更多细节可参考论文原文及笔者之前的解读文章。</p>
+<h2 id="1-2-符号推理的方式"><a href="#1-2-符号推理的方式" class="headerlink" title="1.2 符号推理的方式"></a>1.2 符号推理的方式</h2><p>相较于文本推理，基于符号推理的研究以及尝试会更加丰富多样。按照推理的迭代次数来分类的话，可以分成单轮推理和多轮推理两大类。单轮推理会提示LLM一次性调用工具（如生成SQL、Python 代码）执行之后得到问题答案；多轮推理则会递进地一步步调用工具，对表格数据进行转换，将最后一轮的结果作为最终的答案。</p>
+<h3 id="1-2-1-单轮推理"><a href="#1-2-1-单轮推理" class="headerlink" title="1.2.1 单轮推理"></a>1.2.1 单轮推理</h3><p>这里所谓的单轮推理，并不是严格意义上的只会生成并运行一次代码，而值得是利用LLM生成代码时，期望只生成一份代码就能够完整回答用户的问题，而不需要通过step by step的方式每次向正确答案靠拢。当代码出现错误或者LLM判定到未能正确回答问题时，仍可能进行一些重试的操作来试图正确回答问题。</p>
+<h4 id="1-2-1-1-简单Prompt"><a href="#1-2-1-1-简单Prompt" class="headerlink" title="1.2.1.1 简单Prompt"></a>1.2.1.1 简单Prompt</h4><p>这篇论文就提出了使用ReAct的思想指导LLM生成一段python代码并运行，最后得到答案的方式。详细的Prompt如下。</p>
+<p><img src="https://pic1.zhimg.com/v2-85e0c1cfea100135e18538ab5e808c28_1440w.jpg" alt=""></p>
+<p>也取得了与文本推理接近的准确率。</p>
+<p><img src="https://image.rexking6.top/img/v2-70d8d7e8c0867cfde3f792be514a9474_1440w.jpg" alt=""></p>
+<p>同时分析出符号推理最大的挑战是在于生成错误的代码，导致代码本身无法运行或者得到错误的结果。</p>
+<h4 id="1-2-1-2-pandasai"><a href="#1-2-1-2-pandasai" class="headerlink" title="1.2.1.2 pandasai"></a>1.2.1.2 pandasai</h4><p>pandasai是一个开源的表格数据问答框架，它支持使用类似dataframe的语法进行数据问答。其主要的实现方式也是单轮的符号推理，使用固定的模版代码框架，同时支持自定义工具函数，让LLM生成数据处理的代码并执行得到运算结果。同时支持多种不同的输出类型（包括纯文本输出、DataFrame输出、图表等）。此外，针对生成的代码可能会报错的问题，pandasai设计了修改代码的流程，一旦发生语法错误，会将python解释器的报错也一起加入prompt，进行retry，默认的retry次数是三次。</p>
+<h4 id="1-2-1-3-OpenAgents-的dataagents"><a href="#1-2-1-3-OpenAgents-的dataagents" class="headerlink" title="1.2.1.3 OpenAgents 的dataagents"></a>1.2.1.3 OpenAgents 的dataagents</h4><p>OpenAgents中的data agent提供了搜索（快速定位数据）、处理（简化数据采集和处理）、操作（对数据进行修改）、可视化这几大方面的数据能力。</p>
+<p>实现上，它也是使用ReAct的思想，根据现有的数据和问题，选择合适的工具（Python或者SQL）以及代码生成的Prompt模板（如可视化就使用Echarts的代码生成模版，数据处理就用普通的代码生成模板）进行代码生成和结果回答。同时也会根据Observation的结果判定当前是否能够正确回答用户问题，如果能够正确回答就返回结果，不能则重复以上流程。</p>
+<p><img src="https://image.rexking6.top/img/v2-fce7b4d1a81200c4c5f17ab521450fa2_1440w.jpg" alt=""></p>
+<h3 id="1-2-2-多轮推理"><a href="#1-2-2-多轮推理" class="headerlink" title="1.2.2 多轮推理"></a>1.2.2 多轮推理</h3><p>多轮推理，采用的是类似CoT的思想，寄希望于LLM强大的逻辑推理能力，让LLM每次只完成一个小的功能，从而一步步地完成问题。关于详细的推理步骤，可以是事先进行全局规划，然后按照计划执行；也可以每个步骤单独根据当前的局部信息动态生成下一步的计划。</p>
+<h4 id="1-2-2-1-全局规划"><a href="#1-2-2-1-全局规划" class="headerlink" title="1.2.2.1 全局规划"></a>1.2.2.1 全局规划</h4><p>TaskWeaver是微软开源的代理框架，用于无缝规划和执行数据分析任务。这种创新框架通过代码片段解释用户请求，并以函数的形式有效协调各种插件，以有状态的方式执行数据分析任务。</p>
+<p>该框架会事先利用LLM进行任务和计划拆分，然后针对每个sub-task去生成不同的代码去执行得到中间结果，最终得到答案。</p>
+<p><img src="https://image.rexking6.top/img/v2-bef047259fa0f1bc44c25b272734b645_1440w.jpg" alt=""></p>
+<h4 id="1-2-2-2-动态生成计划"><a href="#1-2-2-2-动态生成计划" class="headerlink" title="1.2.2.2 动态生成计划"></a>1.2.2.2 动态生成计划</h4><ul>
+<li><strong>Chain-of-Table</strong></li>
+</ul>
+<p>chain-of-table提出针对一个表格问答问题，可以在每步动态地根据当前表格内容、已选择的操作历史、用户的问题，动态地确定下一步应该采用什么样的操作，从而一步步地递进对表格进行处理，得到最终的答案。</p>
+<p><img src="https://image.rexking6.top/img/v2-ec869cbb79e71f7388043326c7e33bf0_1440w.jpg" alt=""></p>
+<p>论文中的各项实验结果也表明了该方法的有效性，尤其是这中递进推理的方式，的确增强了表格问答的效果。</p>
+<p>整体来看，随着需要的推理步数的增加，意味着问题复杂度的增加，各种方法的效果都会有所下降。Chain-of-Table似乎比其他的常规方法更加稳健，即便是在操作步数适当增加的情况下，其性能下降也比较小。这意味着Chain-of-Table可能更加有利于处理实际世界中复杂多变的表格推理问题，因为它可以在问题难度升高时，保持较为稳定的性能表现。</p>
+<p><img src="https://image.rexking6.top/img/v2-2dfbc19ff75958fdd5fe6fe4f75d2b46_1440w.jpg" alt=""></p>
+<p>更多详情可以参考论文原文及笔者的详细解读。</p>
+<ul>
+<li><strong>ReAcTable</strong></li>
+</ul>
+<p>和Chain-of-Table类似，ReAcTable框架也是以迭代的方式逐步对表数据进行变换，每一步输入当前表数据及用户查询，采用ReAct的思想，让LLM有个观察-思考-行动的过程，判断选择使用SQL工具、Python工具进行数据转换或者是直接给出回答。</p>
+<p><img src="https://image.rexking6.top/img/v2-1f7afd9964d9922f4baade17175c1747_1440w.jpg" alt=""></p>
+<p>各项实验结果也表明了这种层层递进方式的有效性，从下图的实验结果也可以看到和Chain-of-Table类似的结论。</p>
+<ul>
+<li>迭代2次效果比迭代1次效果好</li>
+<li>随着迭代次数继续增加，准确率在下降，这可能由于问题本身更复杂所导致。</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-5e424961bb4c44d721b91a867301a137_1440w.jpg" alt=""></p>
+<p>更多详情可以参考论文原文及笔者的详细解读。</p>
+<h2 id="1-3-融合方法"><a href="#1-3-融合方法" class="headerlink" title="1.3 融合方法"></a>1.3 融合方法</h2><p>单次LLM的输出结果往往不一定可靠，为了提高表格数据问答的准确性，很多方法都会设计一定的技巧对多次输出的结果进行融合（其实就是机器学习中的Bagging思想）。采用一定的融合方式能够提升LLM在数据问答任务上的精度，但同时也大幅度增加了模型调用的成本，在做实际应用时要根据具体场景做取舍。</p>
+<h3 id="1-3-1-投票"><a href="#1-3-1-投票" class="headerlink" title="1.3.1 投票"></a>1.3.1 投票</h3><p>ReAcTable方法中提出了三种投票方式，并进行了一系列比较。得出的结论是简单的多数投票法就能取得不错的融合效果，其他更复杂的投票方式（如Tree-exploration voting、Execution-based voting方式）也能达到和多数投票类似的效果。</p>
+<p><img src="https://image.rexking6.top/img/v2-4867ad16c30ed22d501d56a25fff6d8c_1440w.jpg" alt=""></p>
+<h3 id="1-3-2-借助大模型进行整合"><a href="#1-3-2-借助大模型进行整合" class="headerlink" title="1.3.2 借助大模型进行整合"></a>1.3.2 借助大模型进行整合</h3><p>这篇论文为了将文本推理和符号推理两种路线的结果进行融合，提出了两种融合的方式并进行了比较。</p>
+<ul>
+<li><p>Self-Evaluation<br>用LLM对文本推理和符号推理的输出结果进行二选一，确定最终结果。</p>
+</li>
+<li><p>Mix Self-Consistency<br>融合和self-consistency和self-evaluation的思想。文本推理和符号推理各输出5个结果，然后对这10个结果进行投票，确定最终结果。</p>
+</li>
+</ul>
+<p>实验结果表明，采用mix self-consistency能够取得更好地结果，相关的方法也被llamaindex收录进行了实现。</p>
+<h1 id="2-一些思考"><a href="#2-一些思考" class="headerlink" title="2. 一些思考"></a>2. 一些思考</h1><h2 id="2-1-应用于实际场景的一些挑战"><a href="#2-1-应用于实际场景的一些挑战" class="headerlink" title="2.1 应用于实际场景的一些挑战"></a>2.1 应用于实际场景的一些挑战</h2><ul>
+<li><strong>如何应对复杂的问题</strong></li>
+</ul>
+<p>目前的表格理解任务，可能就是关注一些通用的能力，如表格结构的理解、简单的数据定位/搜索等问题，面对一些需要复杂推理的问题，能力仍然远远不够，这点ReAcTable/Chain-of-Table里也进行了一些分析。要想真正在实际场景取得比较好的效果，还需要进一步提升LLM的推理能力。</p>
+<ul>
+<li><strong>如何进行多表的联合分析</strong></li>
+</ul>
+<p>当前的研究/尝试多数还是局限于针对单个数据表的分析，而实际的应用场景往往可能会涉及多个表之间的关联关系，有些问题可能需要联合多个表的信息才能有效回答。</p>
+<p>目前来看，pandasai具备多表联合查询的能力，但是其实只是利用不同表的同字段名进行了join，本质上只是合成了一个大的宽表进行分析；如何应对更为复杂的情况还需要进一步探索。</p>
+<ul>
+<li><strong>准确率不够</strong></li>
+</ul>
+<p>目前，SOTA方法在多个数据集上的准确率大致在70%左右，距离能够让用户放心使用仍然存在一定差距。</p>
+<ul>
+<li><strong>运行效率/成本等如何权衡</strong></li>
+</ul>
+<p>许多研究采用一些融合的策略提升了回答问题的准确性，但是在实际应用场景中还需要考虑到成本和运行效率等因素，一味地通过融合方式提高精度也不可取。</p>
+<h2 id="2-2-下一步的研究方向"><a href="#2-2-下一步的研究方向" class="headerlink" title="2.2 下一步的研究方向"></a>2.2 下一步的研究方向</h2><ul>
+<li><strong>借鉴RAG等技术增强对领域知识的理解能力，提高问答效果</strong></li>
+</ul>
+<p>针对一些领域特定的场景，如果能将一些相关的背景知识通过RAG等技术与表格理解任务理解结合起来，或许能够有效提升推理能力。</p>
+<ul>
+<li><strong>分析的可靠性保证</strong></li>
+</ul>
+<p>对于每次的分析结果，能否采用一定的方式对本次回答的置信度进行评估，对于一些特殊的场景，就可以根据置信度的阈值，对可靠性低的结果做出诸如“我无法回答”、“我也不确定”之类的应答结果，避免误导用户。</p>
+<ul>
+<li><strong>整体规划与动态计划的整合</strong></li>
+</ul>
+<p>当前的方法要么就是事先制定计划之后就遵照执行，要么就是全部计划都是动态生成。是否能够结合这两种方式，先生成固定的计划，然后在执行的过程中根据实际情况对计划进行修改完善，从而提升推理的能力？</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ol>
+<li><a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/2305.13062">GPT4Table: Can Large Language Models Understand Structured Table Data? A Benchmark and Empirical Study</a></li>
+<li>pandasai <a href="https://link.zhihu.com/?target=https%3A//github.com/gventuri/pandas-ai">https://github.com/gventuri/pandas-ai</a></li>
+<li>openagents <a href="https://link.zhihu.com/?target=https%3A//github.com/xlang-ai/OpenAgents">https://github.com/xlang-ai/OpenAgents</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/2312.16702">Rethinking Tabular Data Understanding with Large Language Models</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/2401.04398">Chain-of-Table: Evolving Tables in the Reasoning Chain for Table Understanding</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/2310.00815">ReAcTable: Enhancing ReAct for Table Question Answering</a></li>
+<li><a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/2311.17541">TaskWeaver: A Code-First Agent Framework</a><a href="https://link.zhihu.com/?target=https%3A//github.com/microsoft/TaskWeaver">代码</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2024\11\25\19类Agent框架对比\" rel="bookmark">19类Agent框架对比</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2024\12\14\Chain-of-Table论文解读\" rel="bookmark">Chain-of-Table论文解读</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2023\02\22\ChatGPT背后的经济账\" rel="bookmark">ChatGPT 背后的经济账</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2024/12/13/LLM%E5%9C%A8%E8%A1%A8%E6%A0%BC%E6%95%B0%E6%8D%AE%E7%90%86%E8%A7%A3%E4%BB%BB%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8%E6%80%9D%E8%80%83/" title="LLM在表格数据理解任务中的应用思考">https://blog.rexking6.top/2024/12/13/LLM在表格数据理解任务中的应用思考/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" rel="tag"># 大模型</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/12/01/%E7%AE%97%E6%B3%95%E6%8A%80%E6%9C%AF%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%80%83%EF%BC%9A%E8%BF%AD%E4%BB%A3%E7%9A%84%E6%80%9D%E7%BB%B4%E6%96%B9%E5%BC%8F/" rel="prev" title="算法技术设计思考：迭代的思维方式">
+      <i class="fa fa-chevron-left"></i> 算法技术设计思考：迭代的思维方式
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/12/14/Rethinking-Tabular-Data-Understanding-with-Large-Language-Models%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" rel="next" title="Rethinking Tabular Data Understanding with Large Language Models阅读笔记">
+      Rethinking Tabular Data Understanding with Large Language Models阅读笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E6%96%B9%E6%B3%95%E6%A6%82%E8%A7%88"><span class="nav-number">2.</span> <span class="nav-text">1. 方法概览</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-%E6%96%87%E6%9C%AC%E6%8E%A8%E7%90%86%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 文本推理的方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-1-GPT4Table"><span class="nav-number">2.1.1.</span> <span class="nav-text">1.1.1 GPT4Table</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-2-Rethinking-Tabular-Data-Understanding-with-Large-Language-Models"><span class="nav-number">2.1.2.</span> <span class="nav-text">1.1.2 Rethinking Tabular Data Understanding with Large Language Models</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-%E7%AC%A6%E5%8F%B7%E6%8E%A8%E7%90%86%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 符号推理的方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-1-%E5%8D%95%E8%BD%AE%E6%8E%A8%E7%90%86"><span class="nav-number">2.2.1.</span> <span class="nav-text">1.2.1 单轮推理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-1-1-%E7%AE%80%E5%8D%95Prompt"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">1.2.1.1 简单Prompt</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-1-2-pandasai"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">1.2.1.2 pandasai</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-1-3-OpenAgents-%E7%9A%84dataagents"><span class="nav-number">2.2.1.3.</span> <span class="nav-text">1.2.1.3 OpenAgents 的dataagents</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-2-%E5%A4%9A%E8%BD%AE%E6%8E%A8%E7%90%86"><span class="nav-number">2.2.2.</span> <span class="nav-text">1.2.2 多轮推理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-2-1-%E5%85%A8%E5%B1%80%E8%A7%84%E5%88%92"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">1.2.2.1 全局规划</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-2-2-%E5%8A%A8%E6%80%81%E7%94%9F%E6%88%90%E8%AE%A1%E5%88%92"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">1.2.2.2 动态生成计划</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-%E8%9E%8D%E5%90%88%E6%96%B9%E6%B3%95"><span class="nav-number">2.3.</span> <span class="nav-text">1.3 融合方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-1-%E6%8A%95%E7%A5%A8"><span class="nav-number">2.3.1.</span> <span class="nav-text">1.3.1 投票</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-2-%E5%80%9F%E5%8A%A9%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%9B%E8%A1%8C%E6%95%B4%E5%90%88"><span class="nav-number">2.3.2.</span> <span class="nav-text">1.3.2 借助大模型进行整合</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E4%B8%80%E4%BA%9B%E6%80%9D%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text">2. 一些思考</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%E5%BA%94%E7%94%A8%E4%BA%8E%E5%AE%9E%E9%99%85%E5%9C%BA%E6%99%AF%E7%9A%84%E4%B8%80%E4%BA%9B%E6%8C%91%E6%88%98"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 应用于实际场景的一些挑战</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%E4%B8%8B%E4%B8%80%E6%AD%A5%E7%9A%84%E7%A0%94%E7%A9%B6%E6%96%B9%E5%90%91"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 下一步的研究方向</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">250</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">85</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">4.3m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">65:02</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

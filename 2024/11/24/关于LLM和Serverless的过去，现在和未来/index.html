@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于LLM和Serverless的过去，现在和未来">
+<meta property="og:url" content="https://blog.rexking6.top/2024/11/24/%E5%85%B3%E4%BA%8ELLM%E5%92%8CServerless%E7%9A%84%E8%BF%87%E5%8E%BB%EF%BC%8C%E7%8E%B0%E5%9C%A8%E5%92%8C%E6%9C%AA%E6%9D%A5/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-3ad890b804e78daf9265661b61bbd350_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-49a0aa6c9f26e6e7bb95c91273ee3af8_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-fa45f48c392ba7b94d272b0191a855cc_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-92a928c3458630bd373300b2a037e0fb_b.webp">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-4d1d32835d9b030bfe22c28e4eef41a6_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-4a110788545d0cec1d86f046785fbed2_1440w.jpg">
+<meta property="article:published_time" content="2024-11-24T02:37:31.000Z">
+<meta property="article:modified_time" content="2024-11-24T03:02:05.532Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="大模型">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/v2-3ad890b804e78daf9265661b61bbd350_1440w.jpg">
+
+<link rel="canonical" href="https://blog.rexking6.top/2024/11/24/%E5%85%B3%E4%BA%8ELLM%E5%92%8CServerless%E7%9A%84%E8%BF%87%E5%8E%BB%EF%BC%8C%E7%8E%B0%E5%9C%A8%E5%92%8C%E6%9C%AA%E6%9D%A5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>关于LLM和Serverless的过去，现在和未来 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2024/11/24/%E5%85%B3%E4%BA%8ELLM%E5%92%8CServerless%E7%9A%84%E8%BF%87%E5%8E%BB%EF%BC%8C%E7%8E%B0%E5%9C%A8%E5%92%8C%E6%9C%AA%E6%9D%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          关于LLM和Serverless的过去，现在和未来
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-11-24 10:37:31 / 修改时间：11:02:05" itemprop="dateCreated datePublished" datetime="2024-11-24T10:37:31+08:00">2024-11-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" itemprop="url" rel="index"><span itemprop="name">大模型</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2024/11/24/%E5%85%B3%E4%BA%8ELLM%E5%92%8CServerless%E7%9A%84%E8%BF%87%E5%8E%BB%EF%BC%8C%E7%8E%B0%E5%9C%A8%E5%92%8C%E6%9C%AA%E6%9D%A5/" class="post-meta-item leancloud_visitors" data-flag-title="关于LLM和Serverless的过去，现在和未来" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>5.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/3477976759">关于LLM和Serverless的过去，现在和未来</a>。</p>
+<p>作者：ServerlessLLM开源小组（本文主要由Yeqi Huang，Luo Mai和Yao Fu共同撰写）</p>
+<p>开源项目地址：<a target="_blank" rel="noopener" href="https://github.com/ServerlessLLM/ServerlessLLM">ServerlessLLM GitHub</a></p>
+<p>在这篇文章中，我们将探讨 LLM 与 Serverless 技术的过去、现在和未来。在正式讨论前，不妨先思考几个问题：</p>
+<ul>
+<li>从个人开发者到像 OpenAI 这样的巨头，企业通常会维持一定数量的服务器来支持业务，但在用户数量波动大的场景中，如何有效应对服务器的浪费与高峰需求？</li>
+<li>随着 Apple Intelligence 的崛起，个人模型定制化与隐私保护需求日益增长，未来我们每个人是否都会拥有自己的定制化 LLM 来帮助完成日常任务？</li>
+</ul>
+<h1 id="为什么我们需要LLM时代的“滴滴打车”，甚至全球化的“Uber”？"><a href="#为什么我们需要LLM时代的“滴滴打车”，甚至全球化的“Uber”？" class="headerlink" title="为什么我们需要LLM时代的“滴滴打车”，甚至全球化的“Uber”？"></a>为什么我们需要LLM时代的“滴滴打车”，甚至全球化的“Uber”？</h1><p>我们大约在 2018 年首次接触到 Serverless，当时它还只是用于搭建个人博客的工具。在我看来，它的发展类似于汽车行业的变革：</p>
+<ul>
+<li>买服务器部署就像买车，完全自主，但成本高昂；</li>
+<li>租服务器像租车，简化了硬件维护，却存在资源浪费的风险；</li>
+<li>购买 API 则像乘公交车，只用付出特定的服务成本。</li>
+</ul>
+<p>随着业务复杂度增加，Serverless 以其按需计费、灵活弹性等优势逐渐流行。像“滴滴”这样的共享模式出现在云计算领域，按需使用并付费，解决了服务器闲置和高额维护的痛点。然而，Serverless 背后并不简单，它需要深厚的系统架构和软件开发知识。</p>
+<p>关于 Serverless 的争议从未停息。一些文章指出，Serverless 在某些场景下并不好用，比如初创企业为了整合多个微服务，往往会面临复杂的维护问题。然而，异构计算和 AI 业务的出现为 Serverless 带来了新的活力，尤其是高性能 GPU 的按需租赁模式，可以帮助更多企业降低成本并获得强大算力。</p>
+<p>2022 年，许多个人和企业尝试将大语言模型（LLM）落地，但大部分人无法准确评估这些技术的效果和成本。在爱丁堡，我们建立了一个研究小组，专注于 Serverless 与 LLM 的结合，目标是构建一个低成本、易于部署的定制化 LLM 解决方案。随着研究深入，我们发现 LLM 和 Serverless 是绝佳的搭档。传统计算往往需要复杂的 FaaS 函数编写，且难以满足性能需求，但 LLM 的兴起简化了这些步骤。用户无需再编写繁琐代码，而是通过灵活组合模型和系统组件来完成任务。我们只需优化模型启动、存储和数据通信，便可实现高效运行。</p>
+<h1 id="Serverless-LLM-，比想象中难"><a href="#Serverless-LLM-，比想象中难" class="headerlink" title="Serverless + LLM ，比想象中难"></a>Serverless + LLM ，比想象中难</h1><p>GPU + Serverless 乍看是完美组合，但在实际开始实施时，我们遇到了很多意想不到的挑战。正如我们同事 Yeqi 在一篇博客中提到的分析那样：</p>
+<blockquote>
+<p>传统的 Serverless 业务中的一个重要环节是 cold boot，也就是常说的冷启动时间。简单来说：当一个应用场景中的用户数量增长超过现有机器的承载能力后，我们需要启动新的机器，配置上当前的业务程序去承载更多的用户。（当然，更准确的说法不是启动新的机器而是新的容器）</p>
+<p>在经典的场景中：</p>
+<p>Cold boot = 启动新容器的时间 + 容器和已有服务集群连接时间</p>
+<p>但是，在 AI 场景中，我们的应用负载有了非常大的区别：</p>
+</blockquote>
+<ul>
+<li>大型LLM检查点文件：模型本身在这种环境下是一个必须的超大文件，这部分下载需要耗费大量的时间</li>
+<li>复杂的AI硬件：我们的容器中包含了 GPU 硬件，但是运行大模型的时候，我们真正用的并不是机器内存，而是 GPU 上的显存</li>
+<li>复杂的启动过程：传统应用启动之后，我们应用可以直接运行；但是作为 AI 应用，我们需要将模型载入 GPU</li>
+</ul>
+<p>换而言之，现在 AI 时代的大模型应用：</p>
+<p>Cold boot = 启动新容器的时间 + 模型下载时间 + 模型载入内存时间 + 模型载入 GPU 时间 + 容器和已有服务集群连接时间</p>
+<p>为了给出一个更加量化的具体感受，我们测试了一个比较流行的 Serverless GPU 方案：Ray Serve + PyTorch。 实验环境采用了：10 Gbps network, A5000 with PCIe 4.0, NVMe SSD。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Download</th>
+<th>Load</th>
+<th>Token decode time</th>
+<th>End-to-end</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LLaMA-2-7B</td>
+<td>10.8 s</td>
+<td>4.8 s</td>
+<td>0.8 s</td>
+<td>20.1 s</td>
+</tr>
+<tr>
+<td>LLaMA-2-13B</td>
+<td>21.0 s</td>
+<td>9.5 s</td>
+<td>0.9 s</td>
+<td>34.5 s</td>
+</tr>
+<tr>
+<td>LLaMA-2-70B</td>
+<td>111.9 s</td>
+<td>48.0 s</td>
+<td>8.3 s</td>
+<td>173.7 s</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>不难看出，绝大部分时间的开销都在模型的下载和加载上。现有的解决方案大致有三种：</p>
+<ul>
+<li>多开（Oversubscription）：提前启动足够多的 Serverless 服务等待客户，但这种方式价格明显不合适，而且会导致资源浪费。</li>
+<li>使用 DRAM 作为缓存：空间有限，虽然之前我们认为这是最好的办法，但随着 grok 这种 600G 的模型出现，即使是 2TB 的超大内存，也只能存下几份模型副本。</li>
+<li>增加高速外部存储服务：同样太贵，不适合长期使用。</li>
+</ul>
+<p>对企业来说，部署模型最重要的永远是降本增效。增效的问题主要在模型本身，我们不是特别关心，所以如何降本就非常有讲究了。我们认为我们的机会在于利用 GPU Serverless 中被忽视的本地存储空间。GPU serverless 服务器厂商提供的服务只关心 GPU 本身，例如 banana 和 runpod 公司的服务，甚至只会暴露 GPU metrics 给客户。所以我们认为这些服务器有以下特征：</p>
+<ul>
+<li>有 TB 级别的 DRAM</li>
+<li>有几十 TB 级别的空闲 SSD</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-3ad890b804e78daf9265661b61bbd350_1440w.jpg" alt=""></p>
+<p>我们整篇工作其实都是在探讨如何更好地利用这些空间进行调度。主要有三点贡献：</p>
+<ul>
+<li>开发了一个可以快速拉起模型到 GPU 的模型格式</li>
+<li>发明了一种让模型推理可以快速迁移的方案</li>
+<li>在上面的基础上，我们设计了一种调度模式，让 Serverless 场景下 end-to-end 的延迟最低</li>
+</ul>
+<h1 id="重新思考Checkpoint格式的设计"><a href="#重新思考Checkpoint格式的设计" class="headerlink" title="重新思考Checkpoint格式的设计"></a>重新思考Checkpoint格式的设计</h1><p>为什么我们要设计新的模型格式，是 torch 和 safetensors 不够好吗？</p>
+<p>确实，在训练时，我们采用的是 Persist many, load few 的模式，因为我们需要将模型锁住，并不断更新梯度。然而在推理场景中，我们只关心加载的速度，属于 Persist once, load many 的模式。</p>
+<p>为此，我们采用了解耦设计，将模型的初始化和 checkpoint loading 独立开：</p>
+<p><img src="https://image.rexking6.top/img/v2-49a0aa6c9f26e6e7bb95c91273ee3af8_1440w.jpg" alt=""></p>
+<p>这种设计的好处是，我们可以专注于各种优化手段以加速 checkpoint loading，从而追求极致的模型加载速度。</p>
+<p>我当初加入项目时，就是负责研究这一块的 CUDA kernel 设计。最终，大家通过各种方案的组合，榨干了所有可能的带宽。结果上来看，确实达到了非常理想的效果，在许多模型上我们对比PyTorch和SafeTensor的高性能方案都取得了额外5-8倍的性能提升：</p>
+<p><img src="https://image.rexking6.top/img/v2-fa45f48c392ba7b94d272b0191a855cc_1440w.jpg" alt=""></p>
+<p>某种意义上，这项贡献可以独立于整个项目之外作为独立项目，在我们的试验环境下，模型加载速度提升了 5-8 倍。如果有更多的 PCIe 支持，我们甚至可以达到更高的加载性能。</p>
+<p>和最近的 prefill/decoding 做区分的思路一样，不同负载的任务就应该使用差异化的框架和方案。compute-bound 和 memory-bound 的任务确实应该使用不同的计算范式。我们在模型加载中的思考也一样，训练和推理就是不一样的任务，所以，用一套模型格式可能不是那么聪明的选择。</p>
+<h1 id="为什么我们需要LLM推理的在线迁移？"><a href="#为什么我们需要LLM推理的在线迁移？" class="headerlink" title="为什么我们需要LLM推理的在线迁移？"></a>为什么我们需要LLM推理的在线迁移？</h1><p>首先介绍一下，什么是在线迁移（Live Migration）？</p>
+<p>这里用一个例子直接回答这个问题（用一个动图来演示一下三种方案）：</p>
+<p><img src="https://image.rexking6.top/img/v2-92a928c3458630bd373300b2a037e0fb_b.webp" alt=""></p>
+<p>我们现在有两台服务器，第一台机器上，Model B 在 SSD 里；第二台机器上，Model B 在 DRAM 里，但第二台机器的 GPU 正在推理 Model A。现在我们希望找到一台机器去运行 Model B 的推理任务，那么哪一台更合适？</p>
+<p>如果我们直接找空闲 GPU，即图中的方案 (a)，我们需要等待模型从 SSD 中加载，这个时间开销巨大。如果我们采用抢占式方案执行，如方案（b），我们需要重新对 Model A 进行推理，打断带来的开销过高。</p>
+<p>基于对 LLM 应用特性的观察，我们最终采用了 Live Migration 策略。简单来说，就是迁移 token，而不是暴力迁移 KV-Cache 或完全从头重推。</p>
+<p><img src="https://image.rexking6.top/img/v2-4d1d32835d9b030bfe22c28e4eef41a6_1440w.jpg" alt=""></p>
+<p>基于实验设备，我们做了一个简单的评估：</p>
+<ul>
+<li>迁移 token：带宽和网络开销可以忽略不计。而且我们可以将已经处理完的 token 和原先的 prompt 合并成一个新的长 prompt，这样可以充分利用 GPU 设备的计算红利。</li>
+<li>迁移 KV-Cache：会导致网络严重拥塞，而且每一步实际上都是在重新执行 decoding。</li>
+</ul>
+<p>这两种方案的核心在于计算和通信资源的权衡。我们认为，通信资源的成本远远高于计算资源的成本。如果今天在公有云上购买计算资源，会发现按每个比特计算，数据传输的成本可能是GPU计算成本的几十倍甚至上百倍。因此，对于大多数企业和个人而言，迁移token能够显著节省网络资源，简化云网络的设计和负担。当然，最优的方案应该是计算与通信相结合。例如，当kvcache规模较小且网络带宽充裕时，迁移可能带来更大收益，这方面仍需进一步研究。</p>
+<ul>
+<li><p>方案 (a)：直接找空闲 GPU，需要等待模型从 SSD 中加载，时间开销巨大。</p>
+</li>
+<li><p>方案 (b)：采用抢占式方案执行，需要重新对 Model A 进行推理，打断带来的开销过高。</p>
+</li>
+<li>Live Migration：迁移 token，不暴力迁移 KV-Cache 或完全从头重推，利用 GPU 设备的计算红利，避免网络拥塞。</li>
+</ul>
+<p>我们刚刚说了 Live Migration 好，但是也是在网速受限，且我们重新 prefill 的代价不太高的前提下。所以我们到底要不要做 live migration，实际上是由一个简单的线性模型来决策的。</p>
+<p>我们在实验的过程中发现，live migration 的开销近似等于 prefill 的开销，而这部分和 token length 是线性相关的。</p>
+<p><img src="https://image.rexking6.top/img/v2-4a110788545d0cec1d86f046785fbed2_1440w.jpg" alt=""></p>
+<p>所以我们就可以简单地用一个算式来对我们的调度进行决策。我们最后在GPU集群调度器中实现了这个算式，让调度器可以很聪明地选择应该何时启动在线迁移，何时利用checkpoint locality从本地启动。</p>
+<h1 id="OSDI-2024-是我们的开始"><a href="#OSDI-2024-是我们的开始" class="headerlink" title="OSDI 2024 是我们的开始"></a>OSDI 2024 是我们的开始</h1><p>自从 LLM 兴起后，越来越多的企业和机构开始尝试 Serverless + LLM 的组合。学术界有 Ion Stoica 团队开发的 Ray 及其衍生项目 KubeRay 和 Ray Serve；工业界则有 Banana.dev 和 Runpods 等。这一片“百花齐放”的景象让人振奋。</p>
+<p>然而，在这繁荣的生态背后，我们一直忽视了冷启动（cold start）问题。借此机会，我们深入分析了模型训练和推理过程中对 checkpoint 格式的不同需求，定制化设计了合适的解决方案。我们花了一年时间精细打磨，最终使 Serverless + LLM 的体验更加顺滑易用。这一过程比想象中复杂得多。</p>
+<p>OSDI 2024 只是我们项目的开端，坦率地说，许多细节仍有待完善，而且未来还有很多发展空间：</p>
+<ul>
+<li><p><strong>应用层面</strong>：目前，我们的研究聚焦于 LLM 推理这种相对简单的场景。然而，对于完整应用的部署，还有许多可迁移的场景尚未探索，例如微调模型和多模态模型。由于这些应用的特性，性能分析可能与 LLM 推理不同。比如，微调模型可能只需要关注 Lora 层，切换更为轻便；而多模态模型的 token 较长，或许不再适合 token 迁移。具体情况仍需进一步测试和分析。</p>
+</li>
+<li><p><strong>存储层面</strong>：我们在文章中提到使用 local SSD 取得了理想效果，但这引出了另一个问题：每台机器的 SSD 应该预存哪些模型以优化初始加载？当机器闲置时，如何提前准备 SSD 内容以减少下一次 replica 的启动时间？这是一个接近生产环境的问题，需要了解用户行为和实际使用数据，才能深入研究。我们非常欢迎工业界的朋友提供宝贵的数据和建议。</p>
+</li>
+</ul>
+<h1 id="开源，和大家一起努力！"><a href="#开源，和大家一起努力！" class="headerlink" title="开源，和大家一起努力！"></a>开源，和大家一起努力！</h1><p>一路走来，感触颇多。从最初很多人质疑 Serverless + LLM 的价值，到我们逐步理清思路，如今初见成果，并逐渐成为业界共识。这个过程让我们倍感自豪。自论文发表以来，字节跳动、华为、AMD、英伟达、微软、谷歌、亚马逊等众多公司，以及英国、德国的超算中心等全球 GPU 基础设施提供者都纷纷关注和了解了我们的项目。这让我们欣喜不已。</p>
+<p>同时，我们深刻认识到，ServerlessLLM 不仅是科研和学术领域的产物，它应在开源生态下继续成长，吸引更多人参与开发。为此，我们将项目开源于ServerlessLLM GitHub，并持续维护和更新，欢迎大家加入讨论和开发。我们已建立了 Discord 和微信群组，期待大家的加入。如果有问题，欢迎通过 GitHub Issues 与我们联系，我们会积极回复。</p>
+<p>在十月中旬，我们在爱丁堡举办了首届开发者大会，超过 50 位关注者现场参与，讨论了许多有趣的潜在应用。目前，我们正与许多开发者合作构建新功能，其中不少创新来自本科生和研究生，甚至来自我们意想不到的机构！这些功能将陆续推出。</p>
+<p>ServerlessLLM 还有很大的提升空间。随着模型规模的扩展和异构设备的独立性增强，框架将更智能地选择硬件，使模型在最合适的设备上高效运行。我们的愿景是让每个人都能拥有属于自己的、多样化的智能代理，伴随终生，提供低成本、高稳定性的服务，成为你值得信赖的伙伴！</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2024\11\25\19类Agent框架对比\" rel="bookmark">19类Agent框架对比</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2024\12\14\Chain-of-Table论文解读\" rel="bookmark">Chain-of-Table论文解读</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2023\02\22\ChatGPT背后的经济账\" rel="bookmark">ChatGPT 背后的经济账</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2024/11/24/%E5%85%B3%E4%BA%8ELLM%E5%92%8CServerless%E7%9A%84%E8%BF%87%E5%8E%BB%EF%BC%8C%E7%8E%B0%E5%9C%A8%E5%92%8C%E6%9C%AA%E6%9D%A5/" title="关于LLM和Serverless的过去，现在和未来">https://blog.rexking6.top/2024/11/24/关于LLM和Serverless的过去，现在和未来/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" rel="tag"># 大模型</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/11/23/%E6%95%B0%E6%8D%AE%E4%B8%AD%E5%BF%83%E4%BE%9B%E7%94%B5%E6%9E%B6%E6%9E%84%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%B1%95%E6%9C%9B/" rel="prev" title="数据中心供电架构概述与展望">
+      <i class="fa fa-chevron-left"></i> 数据中心供电架构概述与展望
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/11/25/19%E7%B1%BBAgent%E6%A1%86%E6%9E%B6%E5%AF%B9%E6%AF%94/" rel="next" title="19类Agent框架对比">
+      19类Agent框架对比 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%88%91%E4%BB%AC%E9%9C%80%E8%A6%81LLM%E6%97%B6%E4%BB%A3%E7%9A%84%E2%80%9C%E6%BB%B4%E6%BB%B4%E6%89%93%E8%BD%A6%E2%80%9D%EF%BC%8C%E7%94%9A%E8%87%B3%E5%85%A8%E7%90%83%E5%8C%96%E7%9A%84%E2%80%9CUber%E2%80%9D%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">为什么我们需要LLM时代的“滴滴打车”，甚至全球化的“Uber”？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Serverless-LLM-%EF%BC%8C%E6%AF%94%E6%83%B3%E8%B1%A1%E4%B8%AD%E9%9A%BE"><span class="nav-number">3.</span> <span class="nav-text">Serverless + LLM ，比想象中难</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8D%E6%96%B0%E6%80%9D%E8%80%83Checkpoint%E6%A0%BC%E5%BC%8F%E7%9A%84%E8%AE%BE%E8%AE%A1"><span class="nav-number">4.</span> <span class="nav-text">重新思考Checkpoint格式的设计</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%88%91%E4%BB%AC%E9%9C%80%E8%A6%81LLM%E6%8E%A8%E7%90%86%E7%9A%84%E5%9C%A8%E7%BA%BF%E8%BF%81%E7%A7%BB%EF%BC%9F"><span class="nav-number">5.</span> <span class="nav-text">为什么我们需要LLM推理的在线迁移？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#OSDI-2024-%E6%98%AF%E6%88%91%E4%BB%AC%E7%9A%84%E5%BC%80%E5%A7%8B"><span class="nav-number">6.</span> <span class="nav-text">OSDI 2024 是我们的开始</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%80%E6%BA%90%EF%BC%8C%E5%92%8C%E5%A4%A7%E5%AE%B6%E4%B8%80%E8%B5%B7%E5%8A%AA%E5%8A%9B%EF%BC%81"><span class="nav-number">7.</span> <span class="nav-text">开源，和大家一起努力！</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">250</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">85</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">4.3m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">65:02</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
