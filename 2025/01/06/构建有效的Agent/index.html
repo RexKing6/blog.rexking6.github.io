@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="构建有效的Agent">
+<meta property="og:url" content="https://blog.rexking6.top/2025/01/06/%E6%9E%84%E5%BB%BA%E6%9C%89%E6%95%88%E7%9A%84Agent/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-f08062ccfab55a20d35b61b81ac47776_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-b6c176a48017b7116feec21cd6611a47_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-8582fe55478bb5923772c26e8a6326e7_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-9e88cb3d536adfa4efeefc02cba3b330_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-7401422f0cadfddaa8c59f2456a7be2b_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-cc78bc6fe65a236c7271269ea130157b_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-b80bd727499aec8cfa2bf52f63460223_1440w.jpg">
+<meta property="og:image" content="https://image.rexking6.top/img/v2-0de466cdb308d44eae93f853b38ac8da_1440w.jpg">
+<meta property="article:published_time" content="2025-01-05T16:57:59.000Z">
+<meta property="article:modified_time" content="2025-03-09T05:45:44.035Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="大模型">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/v2-f08062ccfab55a20d35b61b81ac47776_1440w.jpg">
+
+<link rel="canonical" href="https://blog.rexking6.top/2025/01/06/%E6%9E%84%E5%BB%BA%E6%9C%89%E6%95%88%E7%9A%84Agent/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>构建有效的Agent | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2025/01/06/%E6%9E%84%E5%BB%BA%E6%9C%89%E6%95%88%E7%9A%84Agent/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          构建有效的Agent
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-01-06 00:57:59" itemprop="dateCreated datePublished" datetime="2025-01-06T00:57:59+08:00">2025-01-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-03-09 13:45:44" itemprop="dateModified" datetime="2025-03-09T13:45:44+08:00">2025-03-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" itemprop="url" rel="index"><span itemprop="name">大模型</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/01/06/%E6%9E%84%E5%BB%BA%E6%9C%89%E6%95%88%E7%9A%84Agent/" class="post-meta-item leancloud_visitors" data-flag-title="构建有效的Agent" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>5.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：</p>
+<ul>
+<li><p><a target="_blank" rel="noopener" href="https://www.anthropic.com/research/building-effective-agents">构建有效的Agent</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/13760806591">【AI Agent应用综述】《Build Effective Agents》——Anthropic的Agent年终经验总结</a>。</p>
+</li>
+</ul>
+<p>在过去的一年里，Anthropic团队（后面简称“团队”）与来自各行各业的团队合作，开发了基于LLM的智能体。结果显示，最成功的实现方式并非依赖复杂的框架或专门的库，而是采用简单、可组合的模式进行构建。</p>
+<p>团队将通过这篇文章分享从客户合作和自身智能体构建中获得的经验，并为开发者提供构建高效智能体的实用建议。</p>
+<h2 id="什么是智能体（Agent）？"><a href="#什么是智能体（Agent）？" class="headerlink" title="什么是智能体（Agent）？"></a>什么是智能体（Agent）？</h2><p>“智能体”可以有多种定义。有些客户将智能体定义为完全自主的系统，这些系统能够在较长时间内独立运行，使用各种工具完成复杂任务。而另一些客户则将智能体描述为遵循预定义工作流的更具指导性的实现。</p>
+<p>在Anthropic，团队将这些变体统称为<a target="_blank" rel="noopener" href="https://zhida.zhihu.com/search?content_id=251775039&amp;content_type=Article&amp;match_order=1&amp;q=智能体系统&amp;zhida_source=entity">智能体系统</a>，但在架构上，他们在工作流和智能体之间划分了一个重要的区别：</p>
+<ul>
+<li><strong>工作流：</strong>是指通过预定义的代码路径对LLM和工具进行编排的系统。</li>
+<li><strong>智能体：</strong>是指LLM动态指挥其自身的流程和工具使用的系统，并保持对任务完成方式的控制权。</li>
+</ul>
+<p>在下面的部分中，本文将详细探讨这两种类型的智能体系统。在原文附录1（“实践中的智能体”）中将描述客户发现这些系统特别有价值的两个领域。</p>
+<h2 id="何时使用（或不使用）智能体"><a href="#何时使用（或不使用）智能体" class="headerlink" title="何时使用（或不使用）智能体"></a>何时使用（或不使用）智能体</h2><p>在使用LLM构建应用程序时，建议尽可能选择简单的解决方案，只有在必要时才增加复杂性。因此，某些情况下可能完全不需要构建智能体系统。</p>
+<p>智能体系统通常需要在延迟和成本上做出妥协，以换取更高的任务性能。在决定使用智能体之前，需要仔细评估这种权衡是否值得。</p>
+<p>当<strong>任务复杂性较高</strong>时，工作流可以为明确的任务提供稳定性和一致性，而在<strong>需要灵活性以及大规模模型驱动决策</strong>的场景中，智能体则是更好的选择。</p>
+<p>然而，<strong>对于多数应用场景</strong>，通过检索和上下文示例优化单次LLM调用通常已经足以满足需求。</p>
+<h3 id="何时以及如何使用框架"><a href="#何时以及如何使用框架" class="headerlink" title="何时以及如何使用框架"></a>何时以及如何使用框架</h3><p>目前有多种框架可以简化智能体系统的实现，包括：</p>
+<ul>
+<li><strong>LangGraph</strong>（LangChain提供的工具），</li>
+<li>亚马逊<strong>Bedrock</strong>的<strong>AI Agent框架</strong>，</li>
+<li><strong>Rivet</strong>，一个拖放式的GUI工具，用于构建LLM工作流，</li>
+<li><strong>Vellum</strong>，另一款支持构建和测试复杂工作流的GUI工具。</li>
+</ul>
+<p>这些框架通过处理底层的常规任务（如调用LLM、定义和解析工具、链式调用等），大大降低了开发难度。然而，它们也会增加额外的抽象层，可能掩盖提示词和响应的实际逻辑，从而增加调试难度。此外，这些框架可能让开发者倾向于引入不必要的复杂性，而简单的实现方式可能已经足够。</p>
+<p>建议开发者优先直接使用LLM的API，许多功能可以通过简单的几行代码实现。如果选择使用框架，<strong>务必确保理解底层的实现逻辑</strong>，因为对底层机制的错误假设往往是开发中的主要问题之一。</p>
+<p>有关具体的实现示例，请参考<a href="https://link.zhihu.com/?target=https%3A//github.com/anthropics/anthropic-cookbook/tree/main/patterns/agents">Anthropic的相关手册</a>。</p>
+<h2 id="构建模块、工作流与智能体"><a href="#构建模块、工作流与智能体" class="headerlink" title="构建模块、工作流与智能体"></a>构建模块、工作流与智能体</h2><p>本章将介绍生产环境中智能体系统的常见设计模式。从基础构建模块——增强型LLM开始，逐步扩展至复杂度更高的组合工作流和完全自主的智能体。</p>
+<h3 id="构建模块：增强型LLM"><a href="#构建模块：增强型LLM" class="headerlink" title="构建模块：增强型LLM"></a>构建模块：增强型LLM</h3><p>智能体系统的核心构建模块是增强型LLM，它结合了<strong>检索（Retrieval）</strong>、<strong>工具使用(Tools)</strong>以及<strong>记忆（Memory）</strong>等功能。目前的模型能够主动利用这些能力，例如生成搜索查询、选择适合的工具以及确定需要保存的重要信息。</p>
+<p><img src="https://image.rexking6.top/img/v2-f08062ccfab55a20d35b61b81ac47776_1440w.jpg" alt=""></p>
+<p>图1：增强型LLM</p>
+<p>在实际应用中，应重点关注两个方面：一是根据具体的业务场景对这些功能进行定制化；二是确保为LLM提供一个简洁且文档完善的接口。</p>
+<p>实现这些增强功能的方法有多种，其中之一是利用最新发布的<strong>模型上下文协议（Model Context Protocol）</strong>，通过这一协议，开发者可以使用简单的客户端集成到不断扩展的第三方工具生态系统中。</p>
+<p>在后续内容中，将默认每次LLM调用都可访问上述增强功能。</p>
+<h3 id="工作流：提示词链式调用"><a href="#工作流：提示词链式调用" class="headerlink" title="工作流：提示词链式调用"></a>工作流：提示词链式调用</h3><p>提示词链式调用是一种将任务分解为一系列步骤的流程，其中每次LLM调用都会基于上一步的输出进行处理。在流程的任意中间步骤，可以加入程序化检查（如图2中的“门控”所示），以确保流程按照预期顺利推进。</p>
+<p><img src="https://image.rexking6.top/img/v2-b6c176a48017b7116feec21cd6611a47_1440w.jpg" alt=""></p>
+<p>图2：提示词链式调用的工作流</p>
+<p><strong>适用场景</strong>：这种工作流适合那些可以被清晰分解为固定子任务的场景。其核心目标是在延迟与更高的准确性之间找到平衡，通过简化每次LLM调用的复杂度来提升整体效果。</p>
+<p><strong>提示词链式调用的典型应用示例</strong>：</p>
+<ul>
+<li>生成营销文案并将其翻译为其他语言。</li>
+<li>撰写文档的大纲，验证大纲是否符合特定标准，再基于大纲撰写完整文档。</li>
+</ul>
+<h3 id="工作流：路由"><a href="#工作流：路由" class="headerlink" title="工作流：路由"></a>工作流：路由</h3><p>路由是一种将输入分类并引导到特定后续任务的工作流。这种方法能够有效地分离关注点，便于针对不同输入类型设计更专业的提示词。如果不使用路由，优化某一类型输入时可能会影响其他输入的性能。</p>
+<p><img src="https://image.rexking6.top/img/v2-8582fe55478bb5923772c26e8a6326e7_1440w.jpg" alt=""></p>
+<p>图3：路由工作流</p>
+<p><strong>适用场景</strong>：路由适合处理复杂任务，尤其是当任务包含可分别处理的不同类别，并且可以通过LLM或传统分类模型/算法准确完成分类时。</p>
+<p><strong>路由的典型应用示例</strong>：</p>
+<ul>
+<li>将不同类型的客户服务请求（如常规问题、退款申请、技术支持）分别引导至对应的下游流程、提示词或工具。</li>
+<li>将简单或常见问题分配给较小的模型（如Claude 3.5 Haiku），将复杂或罕见问题分配给更强大的模型（如Claude 3.5 Sonnet），从而平衡成本与响应速度。</li>
+</ul>
+<h3 id="工作流：并行化"><a href="#工作流：并行化" class="headerlink" title="工作流：并行化"></a>工作流：并行化</h3><p>并行化是一种让LLM同时处理任务并通过程序汇总输出的工作流。这种方式通常有两种实现形式：</p>
+<ul>
+<li><strong>分块</strong>：将任务拆分为相互独立的子任务，并行执行。</li>
+<li><strong>投票</strong>：对同一任务运行多次，以获得多样化的视角或结果。</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-9e88cb3d536adfa4efeefc02cba3b330_1440w.jpg" alt=""></p>
+<p>图4：并行化工作流</p>
+<p><strong>适用场景</strong>：当任务能够被分解成独立子任务以提升速度，或者需要通过多次尝试来增强结果置信度时，并行化是一种高效的工作流。对于涉及多个考量的复杂任务，让LLM分别处理每个考量，可以更专注地关注各自的具体内容，从而提升整体性能。</p>
+<p><strong>并行化的典型应用示例</strong>：</p>
+<ul>
+<li><strong>分块</strong>：<ul>
+<li><strong>实现防护机制</strong>：一个模型实例负责回答用户查询，另一个实例同时筛查不适当内容或请求。将防护和核心任务分离处理的效果通常优于单一调用。</li>
+<li><strong>自动化性能评估</strong>：在评估LLM表现时，每次调用分别评估模型对特定提示词的不同性能维度。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><strong>投票</strong>：<ul>
+<li><strong>代码漏洞审查</strong>：利用多个提示词从不同角度审查代码是否存在漏洞，并标记出潜在问题。</li>
+<li><strong>内容适当性评估</strong>：通过多个提示词从不同角度对内容进行评估，并设定投票机制，如不同的通过门槛，以平衡误报与漏报的风险。</li>
+</ul>
+</li>
+</ul>
+<h3 id="工作流：协调器-工作者"><a href="#工作流：协调器-工作者" class="headerlink" title="工作流：协调器-工作者"></a>工作流：协调器-工作者</h3><p>协调器-工作者工作流由一个中心LLM负责，它根据任务动态分解子任务，分派给多个工作者LLM处理，并最终整合所有工作者的结果。</p>
+<p><img src="https://image.rexking6.top/img/v2-7401422f0cadfddaa8c59f2456a7be2b_1440w.jpg" alt=""></p>
+<p>图5：协调器-工作者工作流</p>
+<p><strong>适用场景</strong>：这种工作流非常适合处理无法预先确定子任务的复杂场景。例如，在编程任务中，需修改的文件数量及其具体修改内容通常取决于任务的具体要求。与并行化工作流类似，协调器-工作者的区别在于灵活性：子任务不是事先规划好的，而是由协调器根据输入动态生成。</p>
+<p><strong>协调器-工作者的典型应用示例</strong>：</p>
+<ul>
+<li><strong>编程工具</strong>：支持对多个文件进行复杂修改的任务，动态调整每个文件的修改内容。</li>
+<li><strong>搜索任务</strong>：从多个信息来源中动态收集、分析数据，并提取最相关的信息。</li>
+</ul>
+<h3 id="工作流：评估器-优化器"><a href="#工作流：评估器-优化器" class="headerlink" title="工作流：评估器-优化器"></a>工作流：评估器-优化器</h3><p>评估器-优化器工作流通过一个LLM生成响应，另一个LLM对其进行评估并提供反馈，形成一个迭代循环。</p>
+<p><img src="https://image.rexking6.top/img/v2-cc78bc6fe65a236c7271269ea130157b_1440w.jpg" alt=""></p>
+<p>图6：评估器-优化器工作流</p>
+<p><strong>适用场景</strong>：当任务有明确的评估标准且迭代优化能够显著提高质量时，这种工作流效果尤为突出。两个关键特征是：第一，LLM生成的响应在获得明确反馈后能够显著改进；第二，LLM可以自动生成这样的反馈。这种流程类似于人类作家通过多次修改完善文档的过程。</p>
+<p><strong>评估器-优化器的典型应用示例</strong>：</p>
+<ul>
+<li><strong>文学翻译</strong>：在翻译复杂文学作品时，翻译LLM可能无法初步捕捉其中的细微差别，而评估器LLM可以提供精准的修改建议。</li>
+<li><strong>复杂搜索任务</strong>：在需要多轮搜索和分析的场景下，评估器判断当前信息是否足够全面，并决定是否需要进一步搜索和优化。</li>
+</ul>
+<h3 id="智能体"><a href="#智能体" class="headerlink" title="智能体"></a>智能体</h3><p>随着LLM在理解复杂输入、推理与规划、工具使用的可靠性以及错误恢复能力方面不断进步，智能体在实际应用中逐渐普及。智能体的工作通常从用户指令或交互式讨论开始。在任务明确后，智能体独立规划并执行任务，并可能在执行过程中再次向用户寻求信息或判断支持。在运行过程中，智能体需要在每一步从环境中获取“真实情况”（如工具调用或代码执行的结果）来评估进展。在某些节点或遇到阻碍时，智能体可以暂停并等待用户的反馈。任务的终止条件可以是完成任务目标，也可以通过设置最大迭代次数等机制来确保运行受控。</p>
+<p>尽管智能体能够处理复杂任务，其实现方式通常较为简单，主要通过LLM基于环境反馈循环调用工具。因此，清晰设计并精心文档化的工具集对于智能体的成功运行至关重要。有关工具开发的详细建议，请参阅附录2（“工具的提示词工程”）。</p>
+<p><img src="https://image.rexking6.top/img/v2-b80bd727499aec8cfa2bf52f63460223_1440w.jpg" alt=""></p>
+<p>图7：自主智能体</p>
+<p><strong>适用场景</strong>：自主智能体适合<strong>处理开放式问题</strong>，尤其是那些<strong>难以预测所需步骤或无法通过硬编码预设路径的任务</strong>。在这些场景中，LLM可能需要经过多轮交互完成任务，因此需要对其决策能力有足够的信任。自主智能体非常适合在可信环境中扩展任务。</p>
+<p>自主智能体的高自主性同时伴随着更高的运行成本以及累积错误的潜在风险。因此，在部署前应在沙盒环境中进行充分测试，并设置适当的防护机制。</p>
+<p><strong>典型应用示例</strong>：</p>
+<ul>
+<li><strong><a target="_blank" rel="noopener" href="https://zhida.zhihu.com/search?content_id=251775039&amp;content_type=Article&amp;match_order=1&amp;q=编程智能体&amp;zhida_source=entity">编程智能体</a></strong>：处理SWE-bench任务，根据任务描述对多个文件进行复杂编辑。</li>
+<li><strong>“计算机使用”参考实现</strong>：智能体（如Claude）通过与计算机交互完成复杂任务，如数据处理或信息检索。</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/v2-0de466cdb308d44eae93f853b38ac8da_1440w.jpg" alt=""></p>
+<p>图8：编码智能体的High-Level工作流</p>
+<h2 id="结合与定制这些模式"><a href="#结合与定制这些模式" class="headerlink" title="结合与定制这些模式"></a>结合与定制这些模式</h2><p>这些构建模块并非固定流程，而是开发者可以根据具体需求灵活调整和组合的常见设计模式。成功的关键在于不断衡量系统性能，并迭代改进实现方案。</p>
+<p>请记住，<strong>仅在复杂性能显著提升结果时才应考虑引入更复杂的设计</strong>。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在LLM应用中，成功的关键不在于打造最复杂的系统，而在于找到适合自身需求的最佳方案。从简单的提示词开始，通过全面评估优化其效果，仅当简单方法不足以满足需求时再考虑引入多步骤智能体系统。</p>
+<p>在构建智能体时，应遵循以下三项核心原则：</p>
+<ol>
+<li><strong>保持简洁性</strong>：设计尽量简单，避免不必要的复杂化。</li>
+<li><strong>注重透明性</strong>：通过清晰展示智能体的规划步骤，增加系统的可理解性。</li>
+<li><strong>优化接口设计</strong>：通过完善的工具文档和全面测试，精心设计智能体与计算机的交互接口。</li>
+</ol>
+<p>框架可以帮助快速实现初步功能，但在生产环境中，逐步减少抽象层并基于基础组件进行构建更为可靠。遵循这些原则，您将能够打造强大、可靠且易于维护的智能体系统，同时赢得用户的信任。</p>
+<hr>
+<h2 id="附录1：智能体的实际应用"><a href="#附录1：智能体的实际应用" class="headerlink" title="附录1：智能体的实际应用"></a>附录1：智能体的实际应用</h2><p>通过与客户合作，团队发现智能体在两个领域中展现出显著的应用潜力，这些领域也清晰地体现了智能体模式的实际价值。这些应用表明，智能体特别适用于以下场景：需要<strong>兼顾对话与操作</strong>，<strong>有明确的成功标准</strong>，<strong>支持反馈机制</strong>，并能<strong>有效结合人类监督</strong>。</p>
+<h3 id="A-客户支持"><a href="#A-客户支持" class="headerlink" title="A. 客户支持"></a><strong>A. 客户支持</strong></h3><p>客户支持结合了聊天机器人界面的直观性与工具集成后的增强能力，是开放式智能体的理想应用场景。原因包括：</p>
+<ul>
+<li>客户支持交互既需要自然的对话流程，也需要访问外部信息和完成任务；</li>
+<li>智能体可以集成工具，用于提取客户数据、查询订单记录、访问知识库内容；</li>
+<li>操作（如退款处理或工单更新）可以通过自动化程序高效完成；</li>
+<li>成功标准清晰，可通过客户问题的解决情况进行衡量。</li>
+</ul>
+<p>一些公司已通过“基于成功解决的计费模式”验证了这一方法的可行性，这种模s式仅对成功完成问题的智能体任务收费，充分展现了对其可靠性的信心。</p>
+<h3 id="B-编程智能体"><a href="#B-编程智能体" class="headerlink" title="B. 编程智能体"></a><strong>B. 编程智能体</strong></h3><p>在软件开发领域，LLM功能从代码补全演变为自主问题解决，为智能体提供了广阔的应用前景。智能体在此领域的优势包括：</p>
+<ul>
+<li>代码解决方案可以通过自动化测试直接验证其正确性；</li>
+<li>测试结果为智能体提供反馈，帮助其反复优化解决方案；</li>
+<li>编程问题通常具有清晰的定义和结构化特征；</li>
+<li>输出质量可以通过客观的标准（如测试通过率）进行评价。</li>
+</ul>
+<p>在团队的实现中，智能体能够基于拉取请求描述，在<a href="https://link.zhihu.com/?target=https%3A//www.anthropic.com/research/swe-bench-sonnet">SWE-bench Verified</a>基准测试中解决实际的GitHub问题。然而，尽管自动化测试能够验证功能实现，确保解决方案与系统的整体需求一致仍需要人类审查的参与，以提升质量控制。</p>
+<h2 id="附录2：工具的提示词工程"><a href="#附录2：工具的提示词工程" class="headerlink" title="附录2：工具的提示词工程"></a>附录2：工具的提示词工程</h2><p>在智能体系统的构建中，工具往往是关键组成部分之一。通过API定义的工具使Claude能够与外部服务交互。当Claude需要调用工具时，API响应中会包含一个特定的工具调用部分。因此，工具的定义与规范设计应像整体提示词工程一样受到重视。以下是提示词工程在工具设计中的一些要点。</p>
+<p>通常，同一操作可以有多种定义方式。例如，文件编辑既可以通过编写差异来实现，也可以通过重写整个文件完成。而对于结构化输出，代码既可以嵌入markdown中，也可以用JSON格式返回。虽然这些在软件工程中属于可互相转换的格式，但对LLM而言，某些格式生成起来更加复杂。例如，编写差异需要在生成代码前准确计算变化的行数；而将代码嵌入JSON则需要对换行符和引号进行额外的转义。</p>
+<p>以下是选择工具格式时的一些建议：</p>
+<ul>
+<li><strong>留有余地</strong>：为模型提供足够的tokens，让其有“思考空间”，避免写入死胡同。</li>
+<li><strong>贴近自然</strong>：选择与模型在互联网上常见的格式相似的形式。</li>
+<li><strong>简化负担</strong>：避免让模型处理额外的格式复杂度，例如大规模行计数或代码转义。</li>
+</ul>
+<h3 id="智能体与计算机接口（ACI）的优化建议"><a href="#智能体与计算机接口（ACI）的优化建议" class="headerlink" title="智能体与计算机接口（ACI）的优化建议"></a>智能体与计算机接口（ACI）的优化建议</h3><p>与设计<strong>人机交互（HCI）</strong>同样重要，ACI的设计也需要足够的投入。以下是具体优化方法：</p>
+<ol>
+<li><strong>站在模型的角度思考</strong><br>确保工具描述和参数定义清晰易懂。一个优秀的工具定义应包括使用示例、特殊情况说明、输入格式要求，以及与其他工具的明确界限。</li>
+<li><strong>优化参数设计</strong><br>参数名称和描述应清晰直观，便于理解。可以将其视为为团队中的新手开发者撰写注释文档，尤其是在多个类似工具共存时，这一点尤为重要。</li>
+<li><strong>测试并迭代</strong><br>使用工作台运行大量示例输入，观察模型的错误表现，并逐步优化工具设计，确保可靠性。</li>
+<li><strong>防错设计（Poka-yoke）</strong><br>通过调整参数或设计限制，降低模型犯错的可能性。例如，将工具参数限制为绝对路径而非相对路径，可有效避免路径错误。</li>
+</ol>
+<p>在为<a href="https://link.zhihu.com/?target=https%3A//www.anthropic.com/research/swe-bench-sonnet">SWE-bench</a>构建智能体时，团队发现优化工具的重要性甚至超过了整体提示词。例如，他们发现模型在使用相对路径的工具时容易出错，特别是智能体从根目录切换到其他目录后。通过调整工具以要求使用绝对路径，模型显著提高了任务完成的准确性。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2024\11\25\19类Agent框架对比\" rel="bookmark">19类Agent框架对比</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2024\12\14\Chain-of-Table论文解读\" rel="bookmark">Chain-of-Table论文解读</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2023\02\22\ChatGPT背后的经济账\" rel="bookmark">ChatGPT 背后的经济账</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2025/01/06/%E6%9E%84%E5%BB%BA%E6%9C%89%E6%95%88%E7%9A%84Agent/" title="构建有效的Agent">https://blog.rexking6.top/2025/01/06/构建有效的Agent/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" rel="tag"># 大模型</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/12/15/%E4%B8%80%E6%96%87%E7%9C%8BSora%E6%8A%80%E6%9C%AF%E6%8E%A8%E6%BC%94/" rel="prev" title="一文看Sora技术推演">
+      <i class="fa fa-chevron-left"></i> 一文看Sora技术推演
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/02/16/%E8%85%BE%E8%AE%AF%EF%BC%9A%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%A4%8D%E6%9D%82%E6%80%A7%EF%BC%9F/" rel="next" title="腾讯：如何理解业务系统的复杂性？">
+      腾讯：如何理解业务系统的复杂性？ <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%99%BA%E8%83%BD%E4%BD%93%EF%BC%88Agent%EF%BC%89%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">什么是智能体（Agent）？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E6%97%B6%E4%BD%BF%E7%94%A8%EF%BC%88%E6%88%96%E4%B8%8D%E4%BD%BF%E7%94%A8%EF%BC%89%E6%99%BA%E8%83%BD%E4%BD%93"><span class="nav-number">1.2.</span> <span class="nav-text">何时使用（或不使用）智能体</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%95%E6%97%B6%E4%BB%A5%E5%8F%8A%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%E6%A1%86%E6%9E%B6"><span class="nav-number">1.2.1.</span> <span class="nav-text">何时以及如何使用框架</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%84%E5%BB%BA%E6%A8%A1%E5%9D%97%E3%80%81%E5%B7%A5%E4%BD%9C%E6%B5%81%E4%B8%8E%E6%99%BA%E8%83%BD%E4%BD%93"><span class="nav-number">1.3.</span> <span class="nav-text">构建模块、工作流与智能体</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E5%BB%BA%E6%A8%A1%E5%9D%97%EF%BC%9A%E5%A2%9E%E5%BC%BA%E5%9E%8BLLM"><span class="nav-number">1.3.1.</span> <span class="nav-text">构建模块：增强型LLM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E6%B5%81%EF%BC%9A%E6%8F%90%E7%A4%BA%E8%AF%8D%E9%93%BE%E5%BC%8F%E8%B0%83%E7%94%A8"><span class="nav-number">1.3.2.</span> <span class="nav-text">工作流：提示词链式调用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E6%B5%81%EF%BC%9A%E8%B7%AF%E7%94%B1"><span class="nav-number">1.3.3.</span> <span class="nav-text">工作流：路由</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E6%B5%81%EF%BC%9A%E5%B9%B6%E8%A1%8C%E5%8C%96"><span class="nav-number">1.3.4.</span> <span class="nav-text">工作流：并行化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E6%B5%81%EF%BC%9A%E5%8D%8F%E8%B0%83%E5%99%A8-%E5%B7%A5%E4%BD%9C%E8%80%85"><span class="nav-number">1.3.5.</span> <span class="nav-text">工作流：协调器-工作者</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E6%B5%81%EF%BC%9A%E8%AF%84%E4%BC%B0%E5%99%A8-%E4%BC%98%E5%8C%96%E5%99%A8"><span class="nav-number">1.3.6.</span> <span class="nav-text">工作流：评估器-优化器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%99%BA%E8%83%BD%E4%BD%93"><span class="nav-number">1.3.7.</span> <span class="nav-text">智能体</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E5%90%88%E4%B8%8E%E5%AE%9A%E5%88%B6%E8%BF%99%E4%BA%9B%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.4.</span> <span class="nav-text">结合与定制这些模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.5.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%84%E5%BD%951%EF%BC%9A%E6%99%BA%E8%83%BD%E4%BD%93%E7%9A%84%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8"><span class="nav-number">1.6.</span> <span class="nav-text">附录1：智能体的实际应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#A-%E5%AE%A2%E6%88%B7%E6%94%AF%E6%8C%81"><span class="nav-number">1.6.1.</span> <span class="nav-text">A. 客户支持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#B-%E7%BC%96%E7%A8%8B%E6%99%BA%E8%83%BD%E4%BD%93"><span class="nav-number">1.6.2.</span> <span class="nav-text">B. 编程智能体</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%84%E5%BD%952%EF%BC%9A%E5%B7%A5%E5%85%B7%E7%9A%84%E6%8F%90%E7%A4%BA%E8%AF%8D%E5%B7%A5%E7%A8%8B"><span class="nav-number">1.7.</span> <span class="nav-text">附录2：工具的提示词工程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%99%BA%E8%83%BD%E4%BD%93%E4%B8%8E%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%8E%A5%E5%8F%A3%EF%BC%88ACI%EF%BC%89%E7%9A%84%E4%BC%98%E5%8C%96%E5%BB%BA%E8%AE%AE"><span class="nav-number">1.7.1.</span> <span class="nav-text">智能体与计算机接口（ACI）的优化建议</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">275</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">87</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">4.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">67:08</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

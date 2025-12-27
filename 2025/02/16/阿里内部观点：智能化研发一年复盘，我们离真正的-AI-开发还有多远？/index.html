@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="阿里内部观点：智能化研发一年复盘，我们离真正的 AI 开发还有多远？">
+<meta property="og:url" content="https://blog.rexking6.top/2025/02/16/%E9%98%BF%E9%87%8C%E5%86%85%E9%83%A8%E8%A7%82%E7%82%B9%EF%BC%9A%E6%99%BA%E8%83%BD%E5%8C%96%E7%A0%94%E5%8F%91%E4%B8%80%E5%B9%B4%E5%A4%8D%E7%9B%98%EF%BC%8C%E6%88%91%E4%BB%AC%E7%A6%BB%E7%9C%9F%E6%AD%A3%E7%9A%84-AI-%E5%BC%80%E5%8F%91%E8%BF%98%E6%9C%89%E5%A4%9A%E8%BF%9C%EF%BC%9F/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250216201540867.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250216201653670.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250216201753088.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250216201827725.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250216202112550.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250216202138457.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250216202159070.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250216202631529.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250216202651294.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250216202726297.png">
+<meta property="article:published_time" content="2025-02-16T12:13:41.000Z">
+<meta property="article:modified_time" content="2025-02-16T12:28:10.687Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="大模型">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/image-20250216201540867.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2025/02/16/%E9%98%BF%E9%87%8C%E5%86%85%E9%83%A8%E8%A7%82%E7%82%B9%EF%BC%9A%E6%99%BA%E8%83%BD%E5%8C%96%E7%A0%94%E5%8F%91%E4%B8%80%E5%B9%B4%E5%A4%8D%E7%9B%98%EF%BC%8C%E6%88%91%E4%BB%AC%E7%A6%BB%E7%9C%9F%E6%AD%A3%E7%9A%84-AI-%E5%BC%80%E5%8F%91%E8%BF%98%E6%9C%89%E5%A4%9A%E8%BF%9C%EF%BC%9F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>阿里内部观点：智能化研发一年复盘，我们离真正的 AI 开发还有多远？ | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2025/02/16/%E9%98%BF%E9%87%8C%E5%86%85%E9%83%A8%E8%A7%82%E7%82%B9%EF%BC%9A%E6%99%BA%E8%83%BD%E5%8C%96%E7%A0%94%E5%8F%91%E4%B8%80%E5%B9%B4%E5%A4%8D%E7%9B%98%EF%BC%8C%E6%88%91%E4%BB%AC%E7%A6%BB%E7%9C%9F%E6%AD%A3%E7%9A%84-AI-%E5%BC%80%E5%8F%91%E8%BF%98%E6%9C%89%E5%A4%9A%E8%BF%9C%EF%BC%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          阿里内部观点：智能化研发一年复盘，我们离真正的 AI 开发还有多远？
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-02-16 20:13:41 / 修改时间：20:28:10" itemprop="dateCreated datePublished" datetime="2025-02-16T20:13:41+08:00">2025-02-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" itemprop="url" rel="index"><span itemprop="name">大模型</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/02/16/%E9%98%BF%E9%87%8C%E5%86%85%E9%83%A8%E8%A7%82%E7%82%B9%EF%BC%9A%E6%99%BA%E8%83%BD%E5%8C%96%E7%A0%94%E5%8F%91%E4%B8%80%E5%B9%B4%E5%A4%8D%E7%9B%98%EF%BC%8C%E6%88%91%E4%BB%AC%E7%A6%BB%E7%9C%9F%E6%AD%A3%E7%9A%84-AI-%E5%BC%80%E5%8F%91%E8%BF%98%E6%9C%89%E5%A4%9A%E8%BF%9C%EF%BC%9F/" class="post-meta-item leancloud_visitors" data-flag-title="阿里内部观点：智能化研发一年复盘，我们离真正的 AI 开发还有多远？" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>9.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>9 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/JTpLy8Z0klokHVcaDZm2RQ">阿里内部观点：智能化研发一年复盘，我们离真正的 AI 开发还有多远？</a>。</p>
+<p>Aone Copilot 是阿里内部从 2023 年 7 月就开始内测的智能化研发产品，主要聚焦于给阿里内部开发者提供服务，从去年内测以来，代码补全的平均采纳率来到 27%，日活稳定在一万人左右，初步在公司内实现了广泛的用户覆盖，用户的用脚投票以及广泛的口碑传播的同时，也面临着很大的挑战，一方面，内部用户有限，Aone Copilot 将很快在用户规模上面临天花板；另一方面，部分用户认为，在产品的深度及效率提升方面，智能化产品的表现并未达到他们的期望，这既是整个智能研发行业的普遍现象，也是特定发展阶段的问题，它们不仅受到技术水平的制约，还受到组织文化和预期管理的影响。</p>
+<h1 id="1-AI-在研发场景落地的现状"><a href="#1-AI-在研发场景落地的现状" class="headerlink" title="1. AI 在研发场景落地的现状"></a>1. AI 在研发场景落地的现状</h1><p>研发智能化是快速发展又充满挑战的领域，在阿里内部，除了实现代码补全，代码会话等常规产品能力外，还重点投入了 Prompt 市场、Extensions 等场景，让业务能具备自定义垂直场景的能力，而在外部，除了灵码 / 快码的产品都取得进步之外，还涌现了大量以独立 IDE 为代表的创业公司出圈，例如 Cursor、Windsurf 等，有不少创业公司围绕 Github 生态开发了许多局部智能化的 Agent，例如 Gru.ai 实现单测生成等。</p>
+<p>这一年里，大部分大家能想到的场景都试了一遍，令人眼花缭乱，目前研发智能化有下面几种常见的形态：</p>
+<ul>
+<li><strong>智能研发插件</strong>：以 Github Copilot/ 通义灵码 /Comate 为代表，主要以 JetBrains、VSCode 为插件形式为用户提供代码补全为主的智能编码服务</li>
+<li><strong>AI Native 的 IDE</strong>：以 Cursor、Windsurf、MarsCode 为代表，以独立 IDE 的方式为开发者提供服务，而有一些公司如 PearAI 已经开始走开源路径，他们的共同特点是以 VSCode 为技术底座进行二次开发，好处是能极大程度上利用 VSCode 的插件和开源生态</li>
+<li><strong>CodeReview 智能化</strong>：这个领域起步比较早，但效果始终一般，还需要很长时间的摸索，阿里内部很早就启动了这个项目，但效果并不显著，这里既存在模型的能力的问题，也存在工程化不足的问题</li>
+<li><strong>RAG 搜索场景</strong>：RAG 其实解决的是搜索和 Summary 的问题，例如知识搜索，智能答疑，但也存在非常大的挑战，例如用户问题的上下文不足，知识不保鲜，信息不完整，很难评测，等等，但由于其门槛比较低，反而是大多数团队会首先涉足的领域</li>
+<li><strong>其他的场景</strong>：例如智能解决代码冲突，自动解决编译问题等也都在阿里内部平台早已上线，智能诊断，智能监控等均有人在调研中</li>
+<li><strong>局部智能化的 Agent</strong>：以 Gru.ai 等产品为代表帮助用户生成单元测试，以 readme-ai 为代表帮助开发者生成 Readme，以 RepoAgent 为代表帮用户补充注释等等，而阿里在内部也还实现了帮助用户按整个仓库生成注释，生成单元测试的 Agent ，这类 Agent 的特点是场景比较比较垂直简单，问题不发散，成功率比较高</li>
+<li><strong>广泛自动化的 Agent</strong>：以 Devin、OpenDevin 为代表，以 SWE-bench 为主要评测集的方式，利用大模型生成实现一个任务的 plan，并调用工具，在一个独立的容器内执行，并且能和用户交互的方式来实现一些简单的 issue 或者需求</li>
+</ul>
+<p>对大模型的能力也逐步有了更清晰的界定，常见的一些模型缺陷都有了应对之策。</p>
+<ul>
+<li>大家会在开始回答使用 RAG 为模型增强上下文的方式来规避模型领域知识不足的问题，以此来降低模型幻觉</li>
+<li>为了应对指令跟随不强的问题，从之前的单 Agent 逐步往 MutiAgent 方向演进，让每个 Agent 只解决一个特定的问题等</li>
+</ul>
+<p>模型性能有了更广泛的提升：</p>
+<ul>
+<li>以 GPT o1 为代表，让模型学会像人类一样慢思考带来的逻辑推理能力的突飞猛进，模型不在是只依靠概率，通过工程化的手段让模型初步具备了反思，自我审视的能力</li>
+<li>推理成本变低、合成数据在训练上的应用、KV-Cache 应用越来越成熟</li>
+<li>以 Speculative decoding 为代表的推理优化手段在模型推理方面有越来越广泛的应用，使得许多应用场景和产品完成突破</li>
+</ul>
+<p>这一年里，模型发展的是如此之快，大家从最开始的信心满满每个场景都跃跃欲试，到而今除了 SWE-Bench 的榜单分数越刷越高之外，却并没有让程序员们觉得有危机感的产品出现，<strong>大家似乎对大模型能解决复杂问题越来越没什么信心了。</strong></p>
+<p><img src="https://image.rexking6.top/img/image-20250216201540867.png" alt=""></p>
+<p><strong>那么问题究竟出在哪儿呢？</strong></p>
+<h1 id="2-大家分别遇到了什么问题"><a href="#2-大家分别遇到了什么问题" class="headerlink" title="2. 大家分别遇到了什么问题"></a>2. 大家分别遇到了什么问题</h1><p>我之前一直认为，大模型 Next-Token 为基础的原理上的天然不足会影响大模型在研发智能领域的表现，但经过这半年的发展和演进，我认为问题不完全出在模型推理能力不足上，问题还出在工程能力和数据的不足上。道理很简单，即使是以推理能力见长的 gpt o1 模型发布这么久之后，我们依然没看到有产品在复杂系统研发问题上有所突破，而且在阿里内部，我们利用大模型解决简单的垂直问题也困难重重，无法达到预期。</p>
+<h2 id="2-1-即使是在非常垂直的需求也很难完全自动化实现"><a href="#2-1-即使是在非常垂直的需求也很难完全自动化实现" class="headerlink" title="2.1 即使是在非常垂直的需求也很难完全自动化实现"></a>2.1 即使是在非常垂直的需求也很难完全自动化实现</h2><p>下半年，我们在 Aone Copilot 上半年推出了 Extensions 这种业务定制 Agent 的能力，希望能让垂直业务将各自的业务沉淀到 Aone Copilot 的插件里来，让更多的人复用，这些场景包括 RAG 搜索，还有一些业务版本升级的，还有一些是直接生成垂直业务代码的，这里面有一个团队与我们共建详情页的业务逻辑，比如体育和健康的，在详情页中的展现模式是不一样的，都需要业务去代码定制。这种定制长期以来只能依赖负责这个详情页的框架的同学来做，因为只有负责框架的同学知道每个位置应该如何定制，借助 Aone Copilot 的 Extensions 我们有希望把这种专家经验和业务知识等有机的结合起来定定制这些场景的实现逻辑。</p>
+<p>但我们和业务团队都付出了几个月巨大的努力后发现，即使是这种非常垂直的场景也很难完全自动化的实现，用户几乎用不起来，通过 Extensions 生成的代码离用户想要的总是<strong>差一点点距离，最多的价值是给用户产出了一个可用的 Demo，后续还需要用户去本地调整，</strong> 这里摘录了一些用户原声（含问题和反馈）：</p>
+<ol>
+<li>诉求时想定制问大家组件内容，但是返回 PlaceHolder.empty() 和 null，代码里面没有展示具体组件内容怎么定制，可以反馈那种有真正定制问大家内容的 demo(如健康问大家的定制)。</li>
+<li>有具体的实现定制，但是每个字段的作用不是很清楚，以及前台表达是怎样也不清楚。</li>
+<li>最好先能个统一语言的输入，以及详情域的背景等知识信息，对比较不熟悉的同学可以更好入门。比如预置问题叫 sku 面板，业务输入可能是 sku 浮层、sku 弹层等等，会比较影响知识召回的准确率。</li>
+<li>当不知道选择什么扩展点时，可能不知道怎么问起，比如每次都需要 @detail 选择对应的扩展点信息再进行询问，但是可能并不知道需要什么扩展点。并且如果初次开发详情，对于扩展点的描述也是不能理解的，希望能有更多的背景描述，或者提问的方式能帮助选择扩展点。</li>
+<li>扩展点国际侧其实并没有定制过，作为开发可能也希望能希望 copilot 输出当前技术链路 (方案) 等信息，以及如果存在主站白名单、suagr 等控制，还是比较会依赖接口人。</li>
+</ol>
+<p>反思下来，我们认为这里不全是模型能力问题，也不是全是工程实现问题。</p>
+<ul>
+<li>业务上下文不足：企图让用户把需求讲清楚太难了：用户的输入要么过于简单，要么过于复杂，要么词不达意。但仔细思考这也很正常，即使是 PD 和开发之间对需求也需要反复对焦才能把需求讲清楚，即使是真人之间交流都有可能错误理解需求，何况是和程序呢，所以没有任何互动的过程是不可能把需求讲清楚的。</li>
+<li>技术和领域上下文不匹配：功能逻辑虽然垂直和简单，但业务背景却比较复杂，还有很多暗语，例如“腰带”，“背书” 这种独属于这个场景的业务知识并不是提需求的人能理解的，用户不理解这种领域模型，提的业务需求和代码工程上下文关联不起来，准确率也就大打折扣了。</li>
+<li>在详情页漫长的发展历程中，面对各种不同的情境，已经积累了丰富的实现、架构和设计经验。然而，无法详尽地记录下这些知识点，使得过往的经验与智慧难以被有效地传承和利用，导致用户的需求没有任何经验可借鉴，模型也没有任何知识可以参考。</li>
+</ul>
+<p>对需求的理解和描述不足是阻碍大模型落地的重要的原因，<strong>目前大模型落地比较好的反而是那种不需要描述需求的场景。</strong></p>
+<h2 id="2-2-过早的拔高了用户期望而很多场景实际无法落地带来的负面影响"><a href="#2-2-过早的拔高了用户期望而很多场景实际无法落地带来的负面影响" class="headerlink" title="2.2 过早的拔高了用户期望而很多场景实际无法落地带来的负面影响"></a>2.2 过早的拔高了用户期望而很多场景实际无法落地带来的负面影响</h2><p>从 GPT3.5 问世以来，乐观派们认为随着 GPT4 甚至接下来 GPT5 的到来模型能力会解决绝大部分问题，低垂的果实被摘完后，开始去探索更复杂更有想象力的的场景，不少厂商开始搭建端到端的需求实现系统，不少团队开始刷榜 SWE-Bench，但这一年下来，大家对这种榜单或者类似的故事越来越失去兴趣，公测的产品依然在公测。</p>
+<p><img src="https://image.rexking6.top/img/image-20250216201653670.png" alt=""></p>
+<p>整个行业都在憧憬大模型所带来的宏伟愿景，同时又被由此引发的焦虑所困扰。这种心态导致本应专注于基础设施和数据建设的基础工作未能得到充分重视与落实。另一个严重的问题是，许多部门管理者或企业领导者因这些热门话题而对人工智能寄予过高期望，然而当他们发现各类辅助工具并未如预期般大幅提升工作效率时，便开始对这一技术的未来持怀疑态度，并逐渐失去了对那些可能实现效率提升的应用场景的兴趣，对失败的容忍度也变得越来越低，这给研发智能化发展也蒙上了一层阴影。</p>
+<h2 id="2-3-没有解决好工程上下文问题，也没有解决好业务上下文问题"><a href="#2-3-没有解决好工程上下文问题，也没有解决好业务上下文问题" class="headerlink" title="2.3 没有解决好工程上下文问题，也没有解决好业务上下文问题"></a>2.3 没有解决好工程上下文问题，也没有解决好业务上下文问题</h2><p>大多数开发者工作的环境并不是随手画一个草图生成一个网页这么简单，<strong>而是对老的系统进行维护</strong>，<strong>解决旧有系统的缺陷，基于旧有系统开发新需求</strong> 等。</p>
+<p>如果把大模型当做一个拥有超高智商的新手，在一个从来没有接触过的项目里开发需求，那么他应该怎么开始？我想他应该会学习工程结构，理解项目目录，代码，配置等知道从哪儿着手；这个工程是如何在本地开发和调试的 ；这个项目是如何发布和线上测试灰度的 ；这个项目如何验收；这个项目是如何一步步演进至今的，避免踩坑等。除了这些工程上下文，有时候还需要理解业务上下文，这个项目是做什么的，有什么业务背景，这次的需求是什么，需求方的验收标准是什么，历史上有没有类似可以参考的逻辑等</p>
+<p>没有这些经验，则再聪明的程序员都无法驾驭一个维护中的复杂系统，也不能在一个复杂系统中游刃有余。</p>
+<p>而现如今大多数产品都无法做到满足这些条件。</p>
+<ul>
+<li>有产品形态的问题：许多初创企业和其产品因形态限制，难以获得所需的数据。若它们仅作为单一工具存在，便无法有效整合代码平台、构建平台、发布平台以及需求 / 问题系统中的数据。</li>
+<li>也有意识不足的问题：许多人尚未充分认识到这些数据在处理复杂任务中的重要性。比如，Aone Copilot 通过 @codebase 能够辅助完成某些基础需求，以往的方法仅依靠检索相关代码片段来进行修改，常常会遗漏一两个文件。然而，一旦结合用户在此仓库的历史修改记录及类似需求的具体改动情况，准确性便会显著提升。此外，在智能化代码审查（Code Review）的应用场景下，单纯基于代码上下文进行审查所能发现的业务问题是有限的；而若能引入需求文档与问题报告（Issues）等信息，则有助于识别出更多潜在的业务逻辑错误。</li>
+<li>也有基础设施的问题：由于基础设施建设和数字化水平不足，在内部研发生态系统中，需求与代码、文档与代码之间的联系十分微弱。即便是 Commit Message，也很少有团队会严格规范地编写，这导致了数据处理成本非常高，而有价值的信息和数据又特别少。为了改善这一状况，阿里内部代码平台强制为每次代码提交生成自然语言描述，但研发基础设施上的工作依然值得继续推进</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/image-20250216201753088.png" alt=""></p>
+<h2 id="2-4-忽略了“人”这个关键要素"><a href="#2-4-忽略了“人”这个关键要素" class="headerlink" title="2.4 忽略了“人”这个关键要素"></a>2.4 忽略了“人”这个关键要素</h2><p>当前，许多产品忽视了开发者在产品和业务实现过程中扮演的重要角色，期望通过一次性的需求描述就能自动生成完整的自动化代理（Agent）解决方案。然而，关键问题在于：既然人类是掌握需求并确定最终验收标准的核心因素，为何要将其排除在生产流程之外？</p>
+<p>无论是像 Copilot 这样的辅助工具，还是其他类型的智能代理，人工智能与人类的合作依然是最理想的模式。当模型存在不确定性时，它应该能够向开发者求助；而当模型完成了某些任务后，则需由开发者进行审查和确认。此外，很多知识可能仅存在于开发者的个人收藏夹里。修改后的代码同样需要经过人工审核才能决定是否采用。现在，一些本地集成开发环境（IDE）产品已经开始朝这个方向发展，比如在 Windsurf 上看到在对话框里找人类寻求人类确认的 Case，非常有意思。</p>
+<p><img src="https://image.rexking6.top/img/image-20250216201827725.png" alt=""></p>
+<p>这种理念的核心在于强调与 <strong>人类的合作而非取代</strong>，使开发者能够通过自然语言与产品进行互动，并在任何时候让用户确认并应用更改，共同完成复杂的任务。在这种协作模式下，人和 IDE 究竟谁是坐在主驾谁是在副驾位置上好像没有那么重要了。</p>
+<p>我们也在见证着一种新的产品形态：<strong>以 IDE 为平台，人和 AI 协作驱动，自然语言作为主要交流方式的产品形态。</strong></p>
+<h2 id="2-5-平台间信息整合程度不足，无法整合用户的操作行为和意图"><a href="#2-5-平台间信息整合程度不足，无法整合用户的操作行为和意图" class="headerlink" title="2.5 平台间信息整合程度不足，无法整合用户的操作行为和意图"></a>2.5 平台间信息整合程度不足，无法整合用户的操作行为和意图</h2><p>多样化的平台使得用户在各平台间的信息难以同步，这导致平台难以全面收集并理解用户的真实需求。例如，在阿里内部平台 Aone 上发布的构建问题，若用户能在求助 AI 工具前预先获得相关信息，理论上 AI 解决问题的效率将显著提升。同样地，对于监控系统而言，若在发出警报时能整合该系统的近期活动记录，如最近是否进行了变更和发布，变更内容以及是否存在对底层中间件系统的高风险操作等，便可以在向用户报告问题前提供更明确的方向指导。</p>
+<p>然而，当前这些关键数据往往彼此孤立，如同分散的岛屿，缺乏有效的连接与整合。这一现状为未来的技术发展指明了一个重要的改进方向：实现跨平台的数据共享，以更好地服务于用户体验和技术支持。</p>
+<h1 id="3-大模型时代，我们需要什么样的基础设施"><a href="#3-大模型时代，我们需要什么样的基础设施" class="headerlink" title="3. 大模型时代，我们需要什么样的基础设施"></a>3. 大模型时代，我们需要什么样的基础设施</h1><h2 id="3-1-对数据质量的重视还只停留在口头上，面向大模型的数据基础设施还远远不够"><a href="#3-1-对数据质量的重视还只停留在口头上，面向大模型的数据基础设施还远远不够" class="headerlink" title="3.1 对数据质量的重视还只停留在口头上，面向大模型的数据基础设施还远远不够"></a>3.1 对数据质量的重视还只停留在口头上，面向大模型的数据基础设施还远远不够</h2><p>业内普遍认为，大语言模型的能力主要依赖于三个关键因素：模型、数据以及推理机制。在推理能力和模型性能方面这一年里进步显著；然而，在数据领域，似乎仍停留在简单的收集与处理阶段，对于大语言模型所需的数据迭代、进化及版本管理的重要性则常被忽略。实际上，在大规模模型的微调（SFT）过程中，即便是少量的数据也能够极大地提升模型的表现，这表明我们应该高度重视每一组输入到模型中的数据，而不是仅仅依赖于模型训练完成后的评估，因为这种做法效率低下。</p>
+<p>正如复杂的工程项目一样，数据质量的提升并非一蹴而就，而是需要通过不断的迭代和演进来实现。这一过程依赖于有效的版本管理流程以及支持质量演进所需的基础设施建设。这些基础设施至少应涵盖模型版本管理、低成本的数据存储方案、高效且灵活的数据处理工具及审查系统、以及便捷的数据预览与分析功能。然而，当前的数据存储基础设施仍存在明显不足，现有的主要以 Hive 为代表的数据基础架构，其设计初衷是针对结构化数据的处理。但事实上，我们的许多私有数据和具有高价值的数据是文档化的，是非结构化的。在一个文档里，有效的数据和错误的数据很可能夹杂在一起，利用现有的数据处理基础设施很难处理这种数据。尽管数据湖被宣传为能够有效处理非结构化数据的解决方案，但在实际操作中，它在存储、管理和利用非结构化数据方面仍然面临挑战导致最终在大模型数据处理上很难充分释放价值。</p>
+<p>另一个问题是，在大模型领域，处理数据与使用数据的人员往往不是同一批人，数据工程师负责处理数据，而算法工程师则利用这些数据进行工作。至于谁应对数据的最终质量负责、谁来进行质量检查，谁来 Review 等问题，在行业内仍然缺乏明确的答案。产品的优劣很大程度上取决于个人的积极性和专业技能。</p>
+<p>经过一年多的努力改进和迭代，这些问题在 Aone Copilot 项目中得到一些解答。我们以及许多其他团队开始意识到数据质量的重要性，借助 Aone 和 Code 平台的支持，构建了数据基础设施。这使得数据成为了一种可以不断优化、审查、管理和评估的资源，同时确保了数据处理的过程具有可追踪性和透明度，类似于传统软件开发中的做法，通过这种方式，不仅能够显著提高数据的质量，还能促进不同团队间的高效合作。</p>
+<h2 id="3-2-交互非常重要，IDE-是重要的基础设施"><a href="#3-2-交互非常重要，IDE-是重要的基础设施" class="headerlink" title="3.2 交互非常重要，IDE 是重要的基础设施"></a>3.2 交互非常重要，IDE 是重要的基础设施</h2><p>今年下半年，Cursor 的突然走红让人眼前一亮，我们深刻意识到在大模型时代，IDE 不仅是一种工具，更是至关重要的基础设施。唯有通过 IDE，才能将大模型的能力与用户的实际需求紧密结合，实现更高效自然的协同。Cursor 的爆火说明 Copilot 模式没有走到尽头，依然有体验可深挖。</p>
+<p>这里我们通过拆解 Cursor 几个被人交口称赞的功能来阐述它的独到之处。它支持一次性补全多个位点，也能实现下一个位置的光标修改</p>
+<p><img src="https://image.rexking6.top/img/image-20250216202112550.png" alt=""></p>
+<p>甚至能将代码中原本有错误的内容的改对，例如这里有个错别字，会提示我，按 tab 会帮我修复这个错误</p>
+<p><img src="https://image.rexking6.top/img/image-20250216202138457.png" alt=""></p>
+<p>能实现快速的把对话框中的内容应用到编辑器里（Apply）</p>
+<p><img src="https://image.rexking6.top/img/image-20250216202159070.png" alt=""></p>
+<p>初次接触到这些特性时，我被其功能深深震撼。它们不仅与传统的基于光标位置的代码续写和补全方式截然不同，而且设计得非常优雅，使用起来自然又恰到好处。那么，这种效果是如何实现的呢，我们怀着强烈的好奇心对其进行了大胆猜测和小心求证。</p>
+<p><strong>Cursor 的核心在于“重写”</strong>——即对整个文件或特定段落进行重新编写。这一机制与传统代码补全方法有着根本性的区别，也正是它的最大奥秘所在。来看看如何通过重写来实现多位点不全和错误代码修复的以及 Apply 的，在这个 case 里，我修改了 namespace 的变量命名，</p>
+<p><img src="https://image.rexking6.top/img/image-20250216202631529.png" alt=""></p>
+<p>Cursor 能够智能地识别并重写周边需要调整的部分。它会获取由模型修改后的代码段，并与本地代码进行比对，在编辑器中标示出差异之处。这样一来，Cursor 不仅能够自动修正代码中的错误，还能在更改变量名时同步更新所有相关引用，确保代码的一致性和准确性。</p>
+<p>至于“Apply”功能，同样体现了其便捷性。大多数 IDE 插件或客户端都具备聊天对话框的功能，如上所述，右侧展示的是 Cursor 为我生成的新代码。但如何地将这部分“生成的代码”插入左侧现有代码中，往往会很棘手，因为可能需要手动去找插入位置，大部分时候还要解决新代码和原代码之间冲突，所以代码会话框的利用率并不高。</p>
+<p><img src="https://image.rexking6.top/img/image-20250216202651294.png" alt=""></p>
+<p>而 Cursor 通过 Apply 解决这个问题，它将左侧的原始代码与右侧需要修改的部分放在一起，由大语言模型负责重写左侧所有内容。之后，IDE 在本地将重写后的代码与原代码进行差异比较后，将 Diff 展示给用户，使用户能够有选择性地采纳这些改动，并将其插入原有代码之中。</p>
+<p>然而这种方法存在几个核心挑战：</p>
+<ol>
+<li>在编辑器中，Cursor 如何界定需要重写的部分？显然，不可能对整个文件进行全面重写，因为这既不实际也不高效；同时，如果选取的范围过小，则可能导致某些变量引用无法正确更新。</li>
+<li>基于源文件进行代码重写要求模型短时间内生成大量的文本片段（tokens）。无论是代码自动补全还是 Apply 操作，用户体验对于延迟极为敏感——大多数情况下，用户希望等待的时间不超过两秒。因此，如何有效降低处理过程中的延迟成为了一个亟待解决的问题。</li>
+</ol>
+<p>我们团队已基本解决上述服务端的所有技术难题，并且在智能引擎团队的支持下，实现了每秒处理 1000 个 token 的高效模型推理能力。在 JetBrains 平台上实现大部分功能并无太大阻碍，然而在 VSCode 上却面临挑战。尽管 VSCode 标榜为完全开源，但由于 GitHub Copilot 与其有千丝万缕的联系，许多高级 API 并未向第三方开发者开放，导致了用户体验上限很低。因此，是否需要开发一款独立的集成开发环境（IDE）以提供更好的用户体验成为一个值得探讨的问题。</p>
+<p>实际上，独立 IDE 的潜力远不止于此。例如，Cursor 在其高级功能实现过程中采用了“影子仓库”的机制——即对重大改动先行测试验证后才正式发布至用户界面。此外，VSCode 提供的语言服务器协议（LSP）能否作为代理工具，支持文件操作如打开、编辑及删除等功能，也是充满可能性的广阔空间。</p>
+<h2 id="3-3-研发平台作为研发基础设施，还有很多潜力可挖"><a href="#3-3-研发平台作为研发基础设施，还有很多潜力可挖" class="headerlink" title="3.3 研发平台作为研发基础设施，还有很多潜力可挖"></a>3.3 研发平台作为研发基础设施，还有很多潜力可挖</h2><p>在前面的内容中，我们详细探讨了关于数据基础设施和集成开发环境（IDE）的思考与路径。然而，真正决定 Aone Copilot 能力上限的关键在于数据——尤其是研发数据。这些数据能够揭示研发过程中复杂的、非结构化的信息。道理很简单：只有深入了解开发者是如何完成一项需求的，才有可能有效地指导 AI 去完成一项需求。</p>
+<p>那么什么是研发数据呢？这里的数据指的是研发所需要的<strong>知识和经验。</strong></p>
+<p><img src="https://image.rexking6.top/img/image-20250216202726297.png" alt=""></p>
+<p>让我们来看几个具体的例子：</p>
+<ul>
+<li><strong>需求与代码的关系</strong>：例如，通过分析 Aone 或 Issue 中的需求与相应的代码变更及 Code Review 过程，可以帮助我们理解项目的发展历程，并为未来遇到相似问题时提供解决方案。</li>
+<li><strong>设计与代码的关系</strong>：再如，通过研究架构设计文档、接口设计文档与实际的代码实现及其 Code Review 过程，可以加深对产品整体架构风格的理解，从而在面对相同类型的问题时能够更有效地应对。</li>
+</ul>
+<p>在处理这两个案例的过程中，我们通过反复实践证明了其有效性。在这方面，诸如 Aone、Code 或 GitHub 等研发平台展现出显著的优势。这些平台的优势不仅体现在数据层面，它们的多数功能还可以直接转化为代理（Agent）的工具。比如，对于大语言模型而言，系统的构建是一大挑战，但在这些开发平台上，相应的基础设施已经完备。再如，产品的独立部署对模型来说同样棘手，然而 Aone 的发布系统与项目环境能够很好地应对这一问题。此外，在进行自动 JDK 升级时，我们需要掌握 Class 和 SDK 版本之间的关系，而这方面的原始信息则由制品库提供。</p>
+<p>在大模型时代，像 Aone 这样的研发基础设施不仅需要提供数据支持，还应通过工具形式开放多种基础能力，以便智能研发工具能够更好地发挥作用，这当中蕴含着许多机遇。然而，在这两个方面，我们仍有许多工作要做。大多数团队尚未对其研发流程进行严格管理，因此历史上的有价值研发数据积累有限。即便存在一些数据，其处理与甄别成本也非常高。比如，多数开发人员编写的提交信息（Commit Message）非常随意。在以前，精心编写提交信息并将其与需求及设计文档相关联所带来的好处微乎其微，这也是导致大家不重视这类行为规范的原因。过去一年，Code 平台通过强制性地为每一次代码审查自动生成描述，并对每次推送进行总结，积累了大量有价值的数据。此外，我们也会积极引导和推动设计及需求的规范化进程。</p>
+<p>我相信，在大模型时代，若能让更多团队和开发者认识到数据的价值及其对效率的显著提升，并持续建立这种正面反馈机制，那么研发标准化的局面将会得到改善。</p>
+<h1 id="4-内部智能化产品的机会"><a href="#4-内部智能化产品的机会" class="headerlink" title="4. 内部智能化产品的机会"></a>4. 内部智能化产品的机会</h1><p>上文深入探讨了目前在实现智能体（Agent）过程中遇到的挑战，详尽阐述了即便模型具备超常的智商与复杂的推理能力，仍难以从头至尾满足无限发散的复杂需求。缺乏高质量数据支撑的广泛智能化的 Agent，犹如空中楼阁。此外，文章还分析了在大规模模型时代，数据工程与集成开发环境（IDE）为何变得至关重要，并概述了 Cursor 的主要实现机制，同时也表达了未来 AI 与人将主要长期处于合作状态，而非取代。同时，文中也探讨了研发平台作为基础建设的重要性。</p>
+<p>回到文章的开篇，当前各团队正致力于不同形式的智能化研究，作为内部的智能研发工具，一方面由于主要服务于集团内部用户，难以像 GitHub Copilot 那样拥有广泛的外部用户基础和场景去发展；但另一方面，内部的智能化研发工具却能够充分利用内部成熟的研发基础设施和丰富的沉淀历史数据为内部用户提供深层次的价值，智能研发工具的发展也会推进更标准的文档，更规范的研发习惯，甚至倒逼沉寂多年的卓越工程的发展，这是它的独特优势所在。</p>
+<blockquote>
+<p>﻿在研发模式革新的前夜，我们思考被 AI 取代究竟是杞人忧天还是庸人自扰？“我”被替代的那一天究竟何时会来临？在那一天到来之前，我又能够做些什么呢？</p>
+</blockquote>
+<p>行文至此，应该有了一些答案。</p>
+<p><strong>本文参考了部分文章</strong></p>
+<p>复旦大学彭鑫教授的 <a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzU4NDU4OTM4OQ==&amp;mid=2247510537&amp;idx=1&amp;sn=5af540c81941770070165d626c558e1c&amp;scene=21#wechat_redirect">https://mp.weixin.qq.com/s/JZMhWoB1rrOHbfJFGYNyTQ</a></p>
+<p>来自张海龙的采访 <a target="_blank" rel="noopener" href="https://www.xiaoyuzhoufm.com/episode/671c9a42eb46cd6655da1e6f">https://www.xiaoyuzhoufm.com/episode/671c9a42eb46cd6655da1e6f</a></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2024\11\25\19类Agent框架对比\" rel="bookmark">19类Agent框架对比</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2024\12\14\Chain-of-Table论文解读\" rel="bookmark">Chain-of-Table论文解读</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2023\02\22\ChatGPT背后的经济账\" rel="bookmark">ChatGPT 背后的经济账</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2025/02/16/%E9%98%BF%E9%87%8C%E5%86%85%E9%83%A8%E8%A7%82%E7%82%B9%EF%BC%9A%E6%99%BA%E8%83%BD%E5%8C%96%E7%A0%94%E5%8F%91%E4%B8%80%E5%B9%B4%E5%A4%8D%E7%9B%98%EF%BC%8C%E6%88%91%E4%BB%AC%E7%A6%BB%E7%9C%9F%E6%AD%A3%E7%9A%84-AI-%E5%BC%80%E5%8F%91%E8%BF%98%E6%9C%89%E5%A4%9A%E8%BF%9C%EF%BC%9F/" title="阿里内部观点：智能化研发一年复盘，我们离真正的 AI 开发还有多远？">https://blog.rexking6.top/2025/02/16/阿里内部观点：智能化研发一年复盘，我们离真正的-AI-开发还有多远？/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" rel="tag"># 大模型</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/02/16/%E4%BA%9A%E9%A9%AC%E9%80%8A%EF%BC%9A%E4%B8%8D%E6%96%AD%E6%BC%94%E8%BF%9B%E7%9A%84%E5%9F%BA%E7%A1%80%E6%8A%80%E6%9C%AF%E7%BB%84%E4%BB%B6%E9%99%8D%E4%BD%8E%E7%94%A8%E6%88%B7%E5%A4%8D%E6%9D%82%E7%B3%BB%E7%BB%9F%E6%9E%84%E5%BB%BA%E4%B9%8B%E8%B7%AF/" rel="prev" title="亚马逊：不断演进的基础技术组件降低用户复杂系统构建之路">
+      <i class="fa fa-chevron-left"></i> 亚马逊：不断演进的基础技术组件降低用户复杂系统构建之路
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/03/09/%E6%9C%80%E6%B8%85%E6%99%B0%E8%A7%A3%E8%AF%BB%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%8F%90%E7%A4%BA%E5%B7%A5%E7%A8%8B%EF%BC%88Prompt-Engineering%EF%BC%89/" rel="next" title="最清晰解读大模型提示工程（Prompt Engineering）">
+      最清晰解读大模型提示工程（Prompt Engineering） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-AI-%E5%9C%A8%E7%A0%94%E5%8F%91%E5%9C%BA%E6%99%AF%E8%90%BD%E5%9C%B0%E7%9A%84%E7%8E%B0%E7%8A%B6"><span class="nav-number">2.</span> <span class="nav-text">1. AI 在研发场景落地的现状</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E5%A4%A7%E5%AE%B6%E5%88%86%E5%88%AB%E9%81%87%E5%88%B0%E4%BA%86%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">2. 大家分别遇到了什么问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%E5%8D%B3%E4%BD%BF%E6%98%AF%E5%9C%A8%E9%9D%9E%E5%B8%B8%E5%9E%82%E7%9B%B4%E7%9A%84%E9%9C%80%E6%B1%82%E4%B9%9F%E5%BE%88%E9%9A%BE%E5%AE%8C%E5%85%A8%E8%87%AA%E5%8A%A8%E5%8C%96%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 即使是在非常垂直的需求也很难完全自动化实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%E8%BF%87%E6%97%A9%E7%9A%84%E6%8B%94%E9%AB%98%E4%BA%86%E7%94%A8%E6%88%B7%E6%9C%9F%E6%9C%9B%E8%80%8C%E5%BE%88%E5%A4%9A%E5%9C%BA%E6%99%AF%E5%AE%9E%E9%99%85%E6%97%A0%E6%B3%95%E8%90%BD%E5%9C%B0%E5%B8%A6%E6%9D%A5%E7%9A%84%E8%B4%9F%E9%9D%A2%E5%BD%B1%E5%93%8D"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 过早的拔高了用户期望而很多场景实际无法落地带来的负面影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-%E6%B2%A1%E6%9C%89%E8%A7%A3%E5%86%B3%E5%A5%BD%E5%B7%A5%E7%A8%8B%E4%B8%8A%E4%B8%8B%E6%96%87%E9%97%AE%E9%A2%98%EF%BC%8C%E4%B9%9F%E6%B2%A1%E6%9C%89%E8%A7%A3%E5%86%B3%E5%A5%BD%E4%B8%9A%E5%8A%A1%E4%B8%8A%E4%B8%8B%E6%96%87%E9%97%AE%E9%A2%98"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 没有解决好工程上下文问题，也没有解决好业务上下文问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-%E5%BF%BD%E7%95%A5%E4%BA%86%E2%80%9C%E4%BA%BA%E2%80%9D%E8%BF%99%E4%B8%AA%E5%85%B3%E9%94%AE%E8%A6%81%E7%B4%A0"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 忽略了“人”这个关键要素</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-%E5%B9%B3%E5%8F%B0%E9%97%B4%E4%BF%A1%E6%81%AF%E6%95%B4%E5%90%88%E7%A8%8B%E5%BA%A6%E4%B8%8D%E8%B6%B3%EF%BC%8C%E6%97%A0%E6%B3%95%E6%95%B4%E5%90%88%E7%94%A8%E6%88%B7%E7%9A%84%E6%93%8D%E4%BD%9C%E8%A1%8C%E4%B8%BA%E5%92%8C%E6%84%8F%E5%9B%BE"><span class="nav-number">3.5.</span> <span class="nav-text">2.5 平台间信息整合程度不足，无法整合用户的操作行为和意图</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%97%B6%E4%BB%A3%EF%BC%8C%E6%88%91%E4%BB%AC%E9%9C%80%E8%A6%81%E4%BB%80%E4%B9%88%E6%A0%B7%E7%9A%84%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD"><span class="nav-number">4.</span> <span class="nav-text">3. 大模型时代，我们需要什么样的基础设施</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-%E5%AF%B9%E6%95%B0%E6%8D%AE%E8%B4%A8%E9%87%8F%E7%9A%84%E9%87%8D%E8%A7%86%E8%BF%98%E5%8F%AA%E5%81%9C%E7%95%99%E5%9C%A8%E5%8F%A3%E5%A4%B4%E4%B8%8A%EF%BC%8C%E9%9D%A2%E5%90%91%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD%E8%BF%98%E8%BF%9C%E8%BF%9C%E4%B8%8D%E5%A4%9F"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 对数据质量的重视还只停留在口头上，面向大模型的数据基础设施还远远不够</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-%E4%BA%A4%E4%BA%92%E9%9D%9E%E5%B8%B8%E9%87%8D%E8%A6%81%EF%BC%8CIDE-%E6%98%AF%E9%87%8D%E8%A6%81%E7%9A%84%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 交互非常重要，IDE 是重要的基础设施</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-%E7%A0%94%E5%8F%91%E5%B9%B3%E5%8F%B0%E4%BD%9C%E4%B8%BA%E7%A0%94%E5%8F%91%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD%EF%BC%8C%E8%BF%98%E6%9C%89%E5%BE%88%E5%A4%9A%E6%BD%9C%E5%8A%9B%E5%8F%AF%E6%8C%96"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 研发平台作为研发基础设施，还有很多潜力可挖</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%E5%86%85%E9%83%A8%E6%99%BA%E8%83%BD%E5%8C%96%E4%BA%A7%E5%93%81%E7%9A%84%E6%9C%BA%E4%BC%9A"><span class="nav-number">5.</span> <span class="nav-text">4. 内部智能化产品的机会</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">275</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">87</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">4.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">67:08</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

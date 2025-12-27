@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="长短句语义相似问题探索">
+<meta property="og:url" content="https://blog.rexking6.top/2025/03/15/%E9%95%BF%E7%9F%AD%E5%8F%A5%E8%AF%AD%E4%B9%89%E7%9B%B8%E4%BC%BC%E9%97%AE%E9%A2%98%E6%8E%A2%E7%B4%A2/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-03-15T15:17:59.000Z">
+<meta property="article:modified_time" content="2025-03-15T15:56:41.824Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="自然语言处理">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.rexking6.top/2025/03/15/%E9%95%BF%E7%9F%AD%E5%8F%A5%E8%AF%AD%E4%B9%89%E7%9B%B8%E4%BC%BC%E9%97%AE%E9%A2%98%E6%8E%A2%E7%B4%A2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>长短句语义相似问题探索 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2025/03/15/%E9%95%BF%E7%9F%AD%E5%8F%A5%E8%AF%AD%E4%B9%89%E7%9B%B8%E4%BC%BC%E9%97%AE%E9%A2%98%E6%8E%A2%E7%B4%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          长短句语义相似问题探索
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-03-15 23:17:59 / 修改时间：23:56:41" itemprop="dateCreated datePublished" datetime="2025-03-15T23:17:59+08:00">2025-03-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86/" itemprop="url" rel="index"><span itemprop="name">自然语言处理</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/03/15/%E9%95%BF%E7%9F%AD%E5%8F%A5%E8%AF%AD%E4%B9%89%E7%9B%B8%E4%BC%BC%E9%97%AE%E9%A2%98%E6%8E%A2%E7%B4%A2/" class="post-meta-item leancloud_visitors" data-flag-title="长短句语义相似问题探索" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>3.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247487992&amp;idx=1&amp;sn=a07de64da1588ee3ede499413966409d&amp;chksm=e8824966dff5c070089da72c3e3bf15d2057386f71a92451ebb972998ec96443102cf9abebeb&amp;scene=21#wechat_redirect">心法利器[51] | 长短句语义相似问题探索</a>。</p>
+<h1 id="1-背景"><a href="#1-背景" class="headerlink" title="1. 背景"></a>1. 背景</h1><p>语义相似度问题已经不是很新颖的问题，甚至都已经开始往无监督、自监督之类的方向卷了，但是到了实际落地的时候，却很难说能解决的很好，其中一个很典型的问题，就是和句子长度相关的问题了，无论是长-长、长-短还是短短，其实都会有大量解决不好的情况，尤其在搜索、对话等场景，用户的大部分问题非常灵活，有比较喜欢精简直接的短句，也有力求清晰而把问题描述仔细的长句，我们会发现，这种情况的出现往往伴随语义相似度的骤降，从而导致出现了miss的情况，本期给大家介绍一下，并给大家介绍我遇到的比较好的解决方案吧。</p>
+<h1 id="2-原因和机理分析"><a href="#2-原因和机理分析" class="headerlink" title="2. 原因和机理分析"></a>2. 原因和机理分析</h1><p>通过对很多case的分析和调研，我发现导致长短句匹配没有符合我们的预期，其实主要是这几个问题：</p>
+<ol>
+<li>开放域问题和业务的区别问题。</li>
+<li>信息冗余和弥散问题——针对长句，包括长-长和长-短。</li>
+<li>信息的缺失——针对短-短的情况。</li>
+</ol>
+<p>然后我来一个一个讲。</p>
+<h1 id="3-开放域和业务的差距"><a href="#3-开放域和业务的差距" class="headerlink" title="3. 开放域和业务的差距"></a>3. 开放域和业务的差距</h1><p>语义相似度已经是一个打榜非常成熟的任务了，而这些任务大部分其实都是开放域的居多（当然也有类似BQ_corpus之类的特定领域的），此时我们是有一个共同也相对明确的，但是到了我们实际应用的时候，其实所谓的“语义相似”的概念其实就非常模糊了。</p>
+<p>以电商一个空调相关问题场景来举个例子吧。假设A1和A2是两个空调的型号，来看这两个pair：</p>
+<ul>
+<li>A1多少钱，A2多少钱。</li>
+<li>A1无理由退货，A2无理由退货。</li>
+</ul>
+<p>在业务的定义下，第一个pair答案是不同的，需要给出不同的价钱，所以我们其实并不希望他们能分在一块认为是1，但是第二个pair由于业务的定义，都归类于无理由退货的问题，此时却认为他们相似，这点和开放域的定义是完全不同的，这两个pair在开放域里面，因为实体的不同其实我们不会认为他们是相似的，但在业务里面，运营人员的角度趋势更倾向于认为后者相似，毕竟是一类典型问题。</p>
+<p>当然这不是长短句，那就来一个长短句的例子，极端一点：</p>
+<ul>
+<li>我上周买的空调，前天修好了，昨天还能用，但是今天却无法开机了，怎么回事？现在好热啊，希望能快点回复，感谢感谢。</li>
+<li>空调无法开机。</li>
+</ul>
+<p>同样的，开放域里会认为信息量上就存在巨大差距，意思差距太大，是可以认为是负类的，但是在业务角度，用户本质就是在阐述一个空调无法开机的问题，所以应该认为相似，至少在众多答案中这个应该是排在前面的。</p>
+<p>从这几个例子可以看到，业务的定义会让我们对语义相似的概念产生偏移，这点偏移让很多我们常用开放域的语义相似度定义和思路来分析并不完全可取。</p>
+<h1 id="4-信息冗余和弥散问题"><a href="#4-信息冗余和弥散问题" class="headerlink" title="4. 信息冗余和弥散问题"></a>4. 信息冗余和弥散问题</h1><p>继续取这个例子：</p>
+<ul>
+<li>我上周买的空调，前天修好了，昨天还能用，但是今天却开不了机了，怎么回事？现在好热啊，希望能快点回复，感谢感谢。</li>
+<li>空调无法开机。</li>
+</ul>
+<p>我们聊到，第一句和第二句不相似的根本原因就是第一句信息太多，而相比之下第二句没有这种信息，这就导致模型也好，人也好，很难直接认为他俩就是相似的，我们可以从两个角度来看这个问题，一个是信息冗余，一个是信息弥散。</p>
+<p>首先是信息冗余，这个很好理解，对于语义相似度本身，其实第一句话只有“空调”、“开不了机”这两个信息是有用的，其他的其实都是冗余信息，冗余信息势必会影响到我们对句子的理解和判断，直观的，我们要看完句子然后分析，这个分析成本理应更高，难度也就更大，这里要求模型也是如此，要找到最关键的信息然后进行匹配。</p>
+<p>进一步是信息弥散，从浓度而言，或者大家所谓的“干货”，其实就是讲的关键信息的含量，都是一滴墨水，滴在一勺水和滴在大海里是完全不同的效果，而在模型或者统计规则的角度来看，整体的语义比对大都是要经过把“每个词”或“对应信息”的特征加权求和或者池化等统筹的过程，说白了要把全局信息进行综合考虑得到，此时，过多的信息就会稀释句中原有的关键信息，重要性下降，从而导致匹配难度加大很多。</p>
+<p>这个问题，其实无论在长-长还是长-短句，大部分都是这个问题。</p>
+<h1 id="5-信息的缺失"><a href="#5-信息的缺失" class="headerlink" title="5. 信息的缺失"></a>5. 信息的缺失</h1><p>针对短-短句的信息缺失问题，之前的文章有提过一个点，要让模型学好，首先需要确认我们提供给模型的信息是否足够（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247487806&amp;idx=1&amp;sn=4fbfe81cf083b7d2937893556cb62558&amp;chksm=e88249a0dff5c0b67d17d31431d96853a747b9031aa1b6907973e9e5f050958039615b7afe8b&amp;scene=21#wechat_redirect">心法利器[45] | 模型需要的信息提供够了吗</a>），造成短句miss的大部分问题，往往就是这个导致。来一个例子：</p>
+<ul>
+<li>Java-渣瓦-1。</li>
+<li>叉烧-叉烧包-0。</li>
+</ul>
+<p>根据业务定义，是会存在这些情况，哪怕让模型学，其实难度也很大，因为“模型没见过”，人对没见过的事物大都是按照历史经验来判断，模型也是如此，他会根据自己所学习的样本来进行分析，而这里从人来看最简单的信息就是字面信息，毕竟样本里多少也有体现出这个现象——文字层面相同的相似的可能性更好，而字面大部分不同的就很难相似了，因此对上面两个case，模型很难不分错。</p>
+<h1 id="6-解决方案"><a href="#6-解决方案" class="headerlink" title="6. 解决方案"></a>6. 解决方案</h1><h2 id="6-1-短短句"><a href="#6-1-短短句" class="headerlink" title="6.1 短短句"></a>6.1 短短句</h2><p>首先先来聊短短句的问题，毕竟这个会比较简单一些。</p>
+<p>简单的说，其实这块问题本质就是一个同义词问题，所以最好的解决方式就是用词典来处理，当然复杂的，将句子进行规范化改写后在进行匹配也是可以的，但这里的关键其实就在于对同义词的挖掘，这点真的是需要具体业务去查找和挖掘，设置是在一些物料里面挖掘，都是非常有必要的。因为这个是一个强信息依赖的问题，找不到、告诉不了模型，那模型就是不会，这个绕不过去的。</p>
+<h2 id="6-2-长句问题"><a href="#6-2-长句问题" class="headerlink" title="6.2 长句问题"></a>6.2 长句问题</h2><p>无论长-长还是长-短，其实没什么太大差别，本质还是要解决长句信息冗余的问题。这里介绍几个关键思路吧。</p>
+<p>首先，最直接的做法就是改长句为短句。通过关键词抽取、切句抽句、丢词甚至是摘要等手段，将长句转化为短句，尤其是能代表句子关键信息的短句，这样就解决了长句的问题。</p>
+<p>其次，针对长-短这种情况，考虑使用单向句子相似度的方案，之前我提到的ctr-cqr（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247486726&amp;idx=1&amp;sn=370c5304d270517ce0cc27fc9e21d01c&amp;chksm=e8825598dff5dc8ebabb9f9454d83a37dacbfbe6b54cb399325b63e0cb36e393ed5c43b55f07&amp;scene=21#wechat_redirect">心法利器[18] | cqr&amp;ctr：文本匹配的破城长矛</a>）其实就是单向的相似度，短句对应的相似度偏高的一般都是可以认为相似的，例如这个例子：</p>
+<ul>
+<li>Query：我上周买的空调，前天修好了，昨天还能用，但是今天无法开机了，怎么回事？现在好热啊，希望能快点回复，感谢感谢。</li>
+<li>Title：空调无法开机。</li>
+</ul>
+<p>这里的ctr应该不会太低，所以这种方式是有效解决长短句问题的。</p>
+<p>第三，模型层面的控制。长句的匹配核心需要考虑的是两句的关键信息是否相同，所以attention是非常关键的措施，这也是为什么attention机制为什么会受到关注的原因，尤其是交互式，能充分提取两个句子两者视角下的关键信息从而进行匹配，能更契合这种问题，早期abcnn之类的方案其实都有体现出这个思想出来。但值得强调的是，我们是可以通过这个机制构造模型来进行解决，可是如何定义attention，什么叫做重要，这是需要我们在数据层面给模型解释清楚的，让模型知道什么是值得attention的，什么不是，只有这样，attention才能够生效。</p>
+<p>第四，根据信息弥散情况对容忍度进行控制。在前面的分析汇总我们其实可以发现，句子越长，其实相似度会更倾向于下降，这个无可厚非，但既然如此，我们是可以设计一个机制，对语义相似度的阈值进行控制，随着句子长度的增加降低认为是相似的阈值，这种方式也能有一定收益。</p>
+<p>第五，就是把多种和长度相关的因素构造成特征，用类似wide&amp;deep的模式将语义信息和长度信息，甚至是单向句子相似度信息进行整合，构造出一个合体模型来处理，当然这样的构造方式，其实就已经是将语义相似度任务在向精排模型之类的方向过渡了。</p>
+<h1 id="7-思路启示"><a href="#7-思路启示" class="headerlink" title="7. 思路启示"></a>7. 思路启示</h1><p>看完之后大家其实多少有些发现，语义相似度这类型的问题对业务有非常高的依赖度，本质其实是通用和业务的矛盾，从自己做过开源数据的角度来看，开放域对语义相似度的概念往往更加严格，但对边界更加明确，而业务则会有非常强的所谓的严格定义，这和开放域不同，但又在边界上很模糊，而相似度这个问题，在中学相信大家也有些感受，全等三角形的判别定理和规则十分清楚明确，内容并不是很多，但是相比之下相似三角形却花了大量时间来学习讨论甚至论证，其实就是因为相似这个相对模糊的定义。回过头来，语义相似度在工业界落地背后的一大难点就是业务对他的定义是困难的、复杂的，甚至是可变的，我们在设计、分析和讨论过程中，也确实要考虑到这些因素。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2023\04\25\NLP评价指标：BLEU和ROUGE\" rel="bookmark">NLP评价指标：BLEU和ROUGE</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2023\03\29\TF-IDF文本表示方法\" rel="bookmark">TF-IDF文本表示方法</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2025\03\15\cqr-ctr：文本匹配的破城长矛\" rel="bookmark">cqr&ctr：文本匹配的破城长矛</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2025/03/15/%E9%95%BF%E7%9F%AD%E5%8F%A5%E8%AF%AD%E4%B9%89%E7%9B%B8%E4%BC%BC%E9%97%AE%E9%A2%98%E6%8E%A2%E7%B4%A2/" title="长短句语义相似问题探索">https://blog.rexking6.top/2025/03/15/长短句语义相似问题探索/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86/" rel="tag"># 自然语言处理</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/03/15/%E4%BB%8E%E9%95%BF%E5%B0%BE%E9%97%AE%E9%A2%98%E5%88%B0%E4%BB%A5%E6%90%9C%E4%BB%A3%E5%88%86%E7%9A%84%E6%9C%BA%E7%90%86%E6%8E%A2%E7%B4%A2/" rel="prev" title="从长尾问题到以搜代分的机理探索">
+      <i class="fa fa-chevron-left"></i> 从长尾问题到以搜代分的机理探索
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/03/15/cqr-ctr%EF%BC%9A%E6%96%87%E6%9C%AC%E5%8C%B9%E9%85%8D%E7%9A%84%E7%A0%B4%E5%9F%8E%E9%95%BF%E7%9F%9B/" rel="next" title="cqr&ctr：文本匹配的破城长矛">
+      cqr&ctr：文本匹配的破城长矛 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E8%83%8C%E6%99%AF"><span class="nav-number">2.</span> <span class="nav-text">1. 背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E5%8E%9F%E5%9B%A0%E5%92%8C%E6%9C%BA%E7%90%86%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">2. 原因和机理分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E5%BC%80%E6%94%BE%E5%9F%9F%E5%92%8C%E4%B8%9A%E5%8A%A1%E7%9A%84%E5%B7%AE%E8%B7%9D"><span class="nav-number">4.</span> <span class="nav-text">3. 开放域和业务的差距</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%E4%BF%A1%E6%81%AF%E5%86%97%E4%BD%99%E5%92%8C%E5%BC%A5%E6%95%A3%E9%97%AE%E9%A2%98"><span class="nav-number">5.</span> <span class="nav-text">4. 信息冗余和弥散问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%E4%BF%A1%E6%81%AF%E7%9A%84%E7%BC%BA%E5%A4%B1"><span class="nav-number">6.</span> <span class="nav-text">5. 信息的缺失</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">7.</span> <span class="nav-text">6. 解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1-%E7%9F%AD%E7%9F%AD%E5%8F%A5"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 短短句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-2-%E9%95%BF%E5%8F%A5%E9%97%AE%E9%A2%98"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 长句问题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-%E6%80%9D%E8%B7%AF%E5%90%AF%E7%A4%BA"><span class="nav-number">8.</span> <span class="nav-text">7. 思路启示</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">275</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">87</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">4.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">67:08</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

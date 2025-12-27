@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="聊聊搜索系统2：常见架构">
+<meta property="og:url" content="https://blog.rexking6.top/2025/03/09/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F2%EF%BC%9A%E5%B8%B8%E8%A7%81%E6%9E%B6%E6%9E%84/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250309233335559.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250315175227827.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250315175310071.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250315175436356.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250315175511138.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250315175547195.png">
+<meta property="article:published_time" content="2025-03-09T15:31:31.000Z">
+<meta property="article:modified_time" content="2025-03-15T09:58:58.002Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="检索">
+<meta property="article:tag" content="搜索系统">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/image-20250309233335559.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2025/03/09/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F2%EF%BC%9A%E5%B8%B8%E8%A7%81%E6%9E%B6%E6%9E%84/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>聊聊搜索系统2：常见架构 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2025/03/09/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F2%EF%BC%9A%E5%B8%B8%E8%A7%81%E6%9E%B6%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          聊聊搜索系统2：常见架构
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-03-09 23:31:31" itemprop="dateCreated datePublished" datetime="2025-03-09T23:31:31+08:00">2025-03-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-03-15 17:58:58" itemprop="dateModified" datetime="2025-03-15T17:58:58+08:00">2025-03-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E6%A3%80%E7%B4%A2/" itemprop="url" rel="index"><span itemprop="name">检索</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E6%A3%80%E7%B4%A2/%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">搜索系统</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/03/09/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F2%EF%BC%9A%E5%B8%B8%E8%A7%81%E6%9E%B6%E6%9E%84/" class="post-meta-item leancloud_visitors" data-flag-title="聊聊搜索系统2：常见架构" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>6.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247489785&amp;idx=1&amp;sn=57ebf5bea1c884ae0a27d353f851749f&amp;chksm=e8824067dff5c971d4f77d0466180d73b121bbe05b8a7646dbbd13cb9588014f983c2ba1d62d&amp;scene=21#wechat_redirect">前沿重器[49] | 聊聊搜索系统2：常见架构</a>。</p>
+<p>本期给大家介绍一下目前常见的搜索系统架构，这些架构多半是大厂经过实验探索得到的比较通用的方案，时至今日仍在被广泛使用，而且这些结构很大程度上恒本RAG的应用所借鉴。</p>
+<p>本篇的结构和内容，会和之前写的对话系统类似而且有所借鉴（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247488140&amp;idx=1&amp;sn=5f2ba675982f80e93c7447675cfc7650&amp;chksm=e8824a12dff5c30449a53082bc93147856544af6dd8378fce0abdc865ff5b2b7db374b3753a0&amp;scene=21#wechat_redirect">前沿重器21-25 | 合集：两万字聊对话系统</a>），思路上是参考案例然后是进行拓展和解释。</p>
+<p>目录：</p>
+<ul>
+<li>先来几个案例</li>
+<li>搜索的架构</li>
+<li>架构背后的考量</li>
+<li>架构和项目阶段的关系</li>
+</ul>
+<h1 id="1-先来几个案例"><a href="#1-先来几个案例" class="headerlink" title="1. 先来几个案例"></a>1. 先来几个案例</h1><h2 id="1-1-腾讯搜索架构"><a href="#1-1-腾讯搜索架构" class="headerlink" title="1.1 腾讯搜索架构"></a>1.1 腾讯搜索架构</h2><p>首先放出来的是我在很早之前写的一篇有关腾讯搜索的架构文章（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247486139&amp;idx=1&amp;sn=ae4e206865676b5171779f30cb69ed62&amp;chksm=e8825225dff5db33c7c72af05dd2928b60fd4e2904e06cd6315480741ded6696084cf61bd91a&amp;scene=21#wechat_redirect">前沿重器4 | 腾讯搜索的Query理解如何直击心灵</a>），在这篇文章中，腾讯搜索给出的架构是这样的。</p>
+<p><img src="https://image.rexking6.top/img/image-20250309233335559.png" alt=""></p>
+<p>这里把整个搜索引擎划分为7个模块，分别是客户端、AS、BS、Query理解、召回组件（搜索引擎）、排序模型和离线，各有各负责的部分。</p>
+<ul>
+<li>客户端是向用户直接展示搜索功能的窗口，下属结果页、直达、联想词、相关搜索这几个部分，这也是搜索除了检索内容外的生态下其他内容。</li>
+<li>AS是高级检索，Advanced Seach，对外提供搜索引擎能力，在别的一些地方也有成为Center之类的，在我的视角下一般类似BAT之类的厂商或者有关的人员，都会有这个AS的说法，不过其他厂商好像会比较少。</li>
+<li>Query理解，是对用户输入的Query进行完整完善的解析，我们熟知的预处理、意图啥的就都放在这个部分，旨在抽取有利于后续召回、排序等步骤的信息。</li>
+<li>BS是基础检索，即Basic Search，完成基本的检索能力，文本（字面）召回、Tag召回、语义（向量）召回等都是在这个部分，直接面对的就是下面的搜索引擎了，架构上作者把排序，即精排和粗排也放在这里。</li>
+<li>召回组件，这里我倾向于叫做搜索引擎，主要是因为这个就是工程层面用于加速召回的各种检索的组件了，毕竟对于海量的知识，要快速查询出来，这个并不是一件容易的事。此处提到的是ES，即ElasticSearch，可以支持多种索引，至今仍然是很常用的搜索工具。</li>
+<li>排序，这里强调的是在线的LTR（learning to rank），结合更多其他信息来进行综合排序，注意此处不止有语义本身，还有一些额外的信息，例如文档的质量（如点击量）、用户偏好、时间热点等信息，这些信息很多都来源于离线的挖掘（按模块负责），此时简单的语义模型肯定办不到的，这里常用的模型和推荐系统很类似，例如LR、XGBoost、Wide&amp;Deep等，旨在融合多个来源的特征。</li>
+<li>离线模块主要是对各种离线数据进行处理，包括搜索文档、推搜日志的处理，这块有大量的工作，单独建立一个模块处理是非常有必要的。</li>
+</ul>
+<h2 id="1-2-电商搜索"><a href="#1-2-电商搜索" class="headerlink" title="1.2 电商搜索"></a>1.2 电商搜索</h2><p>商品搜索给出两个例子，一个是我之前写过的淘宝搜索，另一篇是闲鱼搜索。</p>
+<p>先讲淘宝搜索里面的例子，在论文”Embedding-based Product Retrieval in Taobao Search”中，作者给出了淘宝内部检索引擎中的一个初步的架构，这个同样非常有代表性。</p>
+<p><img src="https://image.rexking6.top/img/image-20250315175227827.png" alt=""></p>
+<p>商品搜索相比通用搜索带来的特殊性，这个我在上一期也有讲过（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247489768&amp;idx=1&amp;sn=5ff0ed51b023516ea7c9dbb345b864fb&amp;chksm=e8824076dff5c960f2321708c22a9b2ebfd3d36ed07401db2ccc1e2fb7331d3cf37e16717eb8&amp;scene=21#wechat_redirect">前沿重器[48] | 聊聊搜索系统1：开篇语</a>），商品搜索的用户在习惯上大都是输入简单的品牌、商品名词，这种简单输入下符合检索词的物料就会非常多，为了进行进一步的精筛，就依赖其他信息，例如用户偏好，到了这一步，与其说是搜索，不如说是推荐了，协同过滤之类的招数就直接用上了。</p>
+<p>首先对query，作者进行了3个维度的处理：倒排字面检索、item协同过滤、向量表征检索（论文的重点），而后经历合并去重后，就开始进入排序了。排序内有相似度、重排，还有考虑内容视频、广告的合并等。</p>
+<p>另外这篇论文我也写过解读（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247487695&amp;idx=1&amp;sn=370ac19afbbb2c27a07ed6c3fa8b9b70&amp;chksm=e8824851dff5c1474f522ef37a17661900fd1494c9043ebc1b94426d219fc0053f098538b4b9&amp;scene=21#wechat_redirect">前沿重器[18] | KDD21-淘宝向量检索</a>），商品搜索是通用搜索下非常特别的一个品类，仔细拼读有利于对这个方向的理解。</p>
+<p>然后是闲鱼搜索，这篇文章“电商搜索里都有啥？详解闲鱼搜索系统（长文）”，原文在：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/568564519（后面有空我应该也会专门写文章聊），这里直接给出他提供的技术架构。">https://zhuanlan.zhihu.com/p/568564519（后面有空我应该也会专门写文章聊），这里直接给出他提供的技术架构。</a></p>
+<p><img src="https://image.rexking6.top/img/image-20250315175310071.png" alt=""></p>
+<p>这个结构和前面的腾讯的结构非常接近，基本的query理解、召回等都有，只是划分会有些不一样，与之不同的是搜索相关的组件变得更加丰富。首先，大家应该比较关心的应该是推理的关键流程：</p>
+<ul>
+<li>请求接入，进入应用层。应用层实质是内部服务对外的接口层，如H5、APP端的接入。</li>
+<li>应用层请求排序接入层，这里的排序接入层是指到达核心搜索引擎内部。</li>
+<li>意图预测。此处会进行各种query理解的工作。</li>
+<li>搜索引擎。向底层数据库发起请求，进行内容的检索，重点是海选、粗排、精排3个阶段。</li>
+<li>精排模型打分。对内容进行最终的筛选。</li>
+<li>结果返回。重新返回到排序接入层、应用层、接入层，完成渲染，把结果有序返回给用户。</li>
+</ul>
+<p>而其中的不同点，我也整理了出来。</p>
+<ul>
+<li>容灾，主要针对服务，虽然没有展开说，不过提出来还是点出了安全的重要性。</li>
+<li>运营投放平台，一般是给运营使用的综合性平台，包括安全合规、广告平台等。这个的背后需要和算法等模块通力合作，才能让整个搜索系统更为可控稳定。</li>
+<li>中控台。中控此处的概念会有些不同，内容好像比较杂，舆情、debug、评测、请求回放的功能都会放在这，实质看起来像是一个供给开发等职能的工作者进行分析和研究的工具。</li>
+<li>离线，即图中的紫色部分，也给出了离线需要做的工作，包括离线的各种特征的处理、物料等内容的理解和入库、模型训练。</li>
+</ul>
+<h1 id="2-RAG架构"><a href="#2-RAG架构" class="headerlink" title="2. RAG架构"></a>2. RAG架构</h1><p>特别地，这里我把RAG的常见架构也写在文章里，这里我也根据之前我看文章的经验，把有关结构这块的讨论给出来。</p>
+<p>首先是，在科研界看来，RAG整体模块的划分，目前还在一个研究试验的阶段，无论是从RAG的综述来看（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247489372&amp;idx=1&amp;sn=8fc154edac26943a447d596a4e697ede&amp;chksm=e8824fc2dff5c6d44d8e7a1be4cc1b472e8cdd8e8484bf02d00f78ab708e6340f6f90243cb0c&amp;scene=21#wechat_redirect">前沿重器[41] | 综述-面向大模型的检索增强生成（RAG）</a>），还是在论文的讨论上看（CRAG：<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247489437&amp;idx=1&amp;sn=b70db6190484c4056318b8275b014dd6&amp;chksm=e8824f03dff5c61579c9eeb01c588f3713bbfbb0b7786cc81246144c52d65715ca31d975610f&amp;scene=21#wechat_redirect">前沿重器[43] | 谷歌中科院新文：CRAG-可矫正的检索增强生成</a>、self-RAG：<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247489393&amp;idx=1&amp;sn=1917808697d84cfd17e628d58b3bfd89&amp;chksm=e8824fefdff5c6f93a322772245c5d4c5c1b22f0f05a45f60d096a99b07bfdb12f54042d5aaf&amp;scene=21#wechat_redirect">前沿重器[42] | self-RAG-大模型决策的典型案例探究</a>），都在非常大胆的实验中，其核心原因是，需要探索Retrieval和大模型如何更好地结合，希望以更低的消耗成本达到强化效果的效果，在这个原因下，研究的中心不会局限在检索本身，但重点还是离不开优秀的检索模块，在综述来看，RAG在结构上的研究，可以简单地用这个图表示。</p>
+<p><img src="https://image.rexking6.top/img/image-20250315175436356.png" alt=""></p>
+<p>显然，模块化应该是高级RAG后续发展的共识，但具体如何划分模块，划分逻辑该是什么样的，有待进一步的实验验证，但归根结底还是离不开“Modular”这个单词。</p>
+<p>有意思的是，如何模块化这点，在被深入研究，里面划分的模块在现在比较前沿的搜索系统中还是会出现的，如Rewrite对应的是query的改写，decide、rank、rerank的设计思路和检索模块的粗排、精排、重排的概念也非常相似，大有向现行搜索系统的架构靠近的倾向。</p>
+<p>然后让我们把目光聚焦在开源项目上，之前一连3篇给大家介绍了国产RAG开源项目QAnything的源码：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247489671&amp;idx=1&amp;sn=564a232c3c7919c70a7a1cf5efa77628&amp;chksm=e8824019dff5c90f10016ca0fe41c6ba8298375fb6c936f60d0106efccc47f78b923d303e6c3&amp;scene=21#wechat_redirect">前沿重器[45] RAG开源项目Qanything源码阅读1-概述+服务</a></li>
+<li><a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247489699&amp;idx=1&amp;sn=95dc387b8935163b41035354518a182f&amp;chksm=e882403ddff5c92bb25d1741848503b91fe2cd1dc7fdd804684f888415a9acbb2fd17deab5f6&amp;scene=21#wechat_redirect">前沿重器[46] RAG开源项目Qanything源码阅读2-离线文件处理</a></li>
+<li><a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247489733&amp;idx=1&amp;sn=4477014efe1c7b97af7c2c54fd5afdfe&amp;chksm=e882405bdff5c94dce9d365a0fcc241ce3796a50e117e9cd4e640c3089331b7d3307e243f980&amp;scene=21#wechat_redirect">前沿重器[47] | RAG开源项目Qanything源码阅读3-在线推理</a></li>
+</ul>
+<p>其主要架构如图所示：</p>
+<p><img src="https://image.rexking6.top/img/image-20250315175511138.png" alt=""></p>
+<p>里面的架构是比较接近综述内所提及的Advanced RAG的概念，主要就是分了3块：</p>
+<ul>
+<li>offline：离线的文档切分梳理模块，该内容最终会入库。</li>
+<li>embedding&amp;search：向量模型和检索服务，内部提到了milvus向量检索服务和经典的Elasticsearch。</li>
+<li>LLM服务。</li>
+</ul>
+<p>这里的检索，使用的两阶段排序，这个也和现在比较完整的搜索系统架构也非常接近，有关这点，作者在README内有专门进行解释。</p>
+<blockquote>
+<p>知识库数据量大的场景下两阶段优势非常明显，如果只用一阶段embedding检索，随着数据量增大会出现检索退化的问题，如下图中绿线所示，二阶段rerank重排后能实现准确率稳定增长，即数据越多，效果越好。</p>
+</blockquote>
+<p><img src="https://image.rexking6.top/img/image-20250315175547195.png" alt=""></p>
+<p>第三想和大家分享的是我对RAG系统的理解，我自己是有对落地架构进行过讨论，（RAG落地架构：<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247489655&amp;idx=1&amp;sn=473c7fe28fdba16dec84dfb667256a4c&amp;chksm=e88240e9dff5c9ff41db16436b50a3e534a6c3f4fb0cb199cbc1ea0d8c3f42730a695a7fcc81&amp;scene=21#wechat_redirect">心法利器[113] | RAG结构思考：搜索系统范式和大模型作用压缩</a>），里面详细讨论了我对RAG架构的设计思路，并给出比较严谨的迭代思路，可以看到，在Retrieval部分，我的思路同样是比较接近现在的搜索系统的，因为从搜索系统角度来看，RAG是对搜索系统的又一次新的应用，且RAG在搜索层面，大部分情况下和传统搜索的目标是一致的——检索精准，既然如此，原本搜索系统所总结的经验，在现在RAG的应用中，想必也很有参考价值。</p>
+<h1 id="3-搜索架构"><a href="#3-搜索架构" class="headerlink" title="3. 搜索架构"></a>3. 搜索架构</h1><p>纵观上述多个不同场景搜索系统的案例，我们可以看到，比较统一的划分方式，通常有如下部分：</p>
+<ul>
+<li>离线部分：主要是内容理解工作，另外还有用户画像等工作，按需增加。</li>
+<li>Query理解：负责对用户query进行处理，并提取下游检索、排序所需要的信息。</li>
+<li>检索召回：从数据库中快速找出合适的内容，并进行阶段。</li>
+<li>排序：对内容进行精筛，找到最优的TOPN内容。</li>
+</ul>
+<p>总结下来，这4个应该是成熟的搜索系统比较关键的4个模块，里面的功能模块组可能并不一致，但是基本都会按照这个结构来划分工作，内部的功能也相对独立。</p>
+<p>搜索不可或缺的一部分就是物料，即被人检索出来的材料，这个内容无论是为了展示还是方便检索，都需要离线进行各种处理，例如清洗、合规性检测、标签实体抽取、embedding等，另外还有一些类似用户画像、模型训练的操作也是放在这里，这些都是不可避免、且不方便放在在线做的工作，这些流程不需要或者不方便跟随整个用户query请求流程做，此时就要离线或定时或实时地处理。</p>
+<p>Query理解是逐步从检索流程拆解出来的模块，要对领域划分分别处理需要意图识别，要抽取实体进行精准匹配需要实体抽取，要进行向量召回要向量化，这些本质上都是为了下游检索、精排而做的准备，同时又是针对输入query进行的针对性处理，Query理解就由此诞生。这个可以说是传统搜索在字面检索时代的产物，时至今日向量化已经蓬勃发展，但因为向量化仍无法一统江湖，所以完整的Query理解甚至是内部的意图、实体抽取工作，仍有作用，而且还是不可或缺的作用，甚至到后续的Agent崛起，例如“路由”模块的作用，仍和Query理解里的意图识别很接近。</p>
+<p>检索召回，指从海量的数据库里找到符合要求的内容，这里关键依赖的是搜索引擎，内部的通过多种数据结构的方式，把检索的时间复杂度降到最低，尽可能要求检索速度和库内数据量的关系降低，从而达到快速查询的效果，一般比较牛的检索引擎能让速度降低到几ms的级别，大大提升效率，把时间留给其他部分，如精排、生成等。</p>
+<p>排序模块的核心目标，是把检索召回的内容进行精筛，筛选出最符合用户要求的内容推送给用户，尽管不同的系统排序的逻辑不同，甚至还有多次排序，但排序模块作为确保搜索精准的最后一道防线，在架构设计上一直屹立不倒。</p>
+<h1 id="4-搜索架构设计逻辑"><a href="#4-搜索架构设计逻辑" class="headerlink" title="4. 搜索架构设计逻辑"></a>4. 搜索架构设计逻辑</h1><p>回归搜索的核心目标，给出符合用户query表达需求最佳的结果，要分裂出两个方向：</p>
+<ul>
+<li>内容，即物料，要足量，要处理好。</li>
+<li>充分理解用户需求，即对应用户query，要照着用户query提供的信息查询内容。</li>
+</ul>
+<p>对前者，要求内容的完整性、真实性，且为了更方便检索，需要构造索引，就跟图书馆要有索书号一样，而且为了多个角度都充分找到，需要对内容进行尽可能多角度的表征，就这点要求而言，一般的向量，尤其是一个向量，很难完成这事，传统的结构化方案反而更容易、且可解释地找到，例如作者、年份、类目、标签、书名，都能提取，则对于用户而言，这几个方向都能轻松定位到具体内容，因此，内容理解成为非常必要的部分。</p>
+<p>后者，这里首要的一个内容就是query的理解，而理解query是为了后面的查询用的，同样以图书检索为例，用户可能搜书名、作者、年份、标签，我们需要充分提取这些信息，以便更快从对应字段中搜出来，这就是query理解。</p>
+<p>在理解以后，则需要根据query理解检索内容进行查询了，对早期项目，查询出来根据初步的相似度排序截断即可，而为了更加精准，可能会有更严格的二次排序，亦或者根据用户偏好进行更有针对性的筛选，例如同样是“统计”，可能是数学类、金融类的统计，可以根据用户的研究背景来精筛，此时就有从检索中分裂出了召回和精排两个工作。</p>
+<p>有关召回和排序的拆分，在几年前我也对这个现象进行了分析和解释（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247486484&amp;idx=1&amp;sn=94b5fd9397616690daae093d1052f0d6&amp;chksm=e882548adff5dd9cb398bb2fe7d542c0264c83fd49a376e1c2b1e4c3c08deabbeba22fe9e319&amp;scene=21#wechat_redirect">心法利器[15] | 准招分治效果调优方案</a>），提出过一个概念——准招分治，即对准确率和召回率都比较高的时候，可以通过拆分这两者到两个模块中来进行的方式来分别调优，召回阶段负责从多角度召回大量的结果，这里也维护了搜索系统的多样性，很好地避免了召回单一内容的尴尬，提升召回率的同时，一定程度也控制了准确率不至于太低（这里指不相关的肯定不在这一轮漏斗里），而准确率的提升可以来后面的排序，借助更多维度的信息来分析那几个更适合排到前面，当然拿了，可以通过打散等方式来增加多样性，于是起到了提升准确率而控制召回率的问题，控制召回率过低的情况。</p>
+<p>另外有关多阶段排序的进一步解释，参考前面QAnything的讨论，从模型层面也可以初见端倪，一般的两阶段排序下的模型负责的任务并不相同，第一阶段的排序要负责区分“相关”和“不相关”，这本质是个二分类的问题，用简单的0-1样本基本都能做得很好，但是大量的实验表明，对于前排的几个，区分度其实并不会很高，因为相似的物料相似度基本都集中在0.9+，甚至0.95+，这块的排序效果并不是很好，此时如果再有一个模型可以优中选优，则会更加理想，这一步本质是个“排序”问题，区分的是“谁更好”，此时LTR，即learning to rank会更优秀，如果需要样本，在线的点击或者人工标注的排序样本会更加合适，虽然难度更高但是效果会很明显。</p>
+<h1 id="5-架构和项目阶段的关系"><a href="#5-架构和项目阶段的关系" class="headerlink" title="5. 架构和项目阶段的关系"></a>5. 架构和项目阶段的关系</h1><p>在之前聊对话系统架构的时候，有专门聊这个（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247488062&amp;idx=1&amp;sn=95e72a4cf55a8e1e2c40a743a6134463&amp;chksm=e8824aa0dff5c3b62bda3b9c06c95870abbc61cabad8d32d741dc5a4ea3f40c8d1eab4e41d6e&amp;scene=21#wechat_redirect">前沿重器[22] | 聊聊对话系统：技术架构</a>），此处再结合搜索系统重新聊。</p>
+<blockquote>
+<p>抛开需求谈架构绝对是不合适的。</p>
+</blockquote>
+<p>放在搜索系统里亦然，如果是项目初步建立的阶段，搜索系统并不需要上面的所有内容，只需要满足一个baseline即可。以之前我写的basic_rag项目为例（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247489343&amp;idx=1&amp;sn=44b5f90ec117a5f4f70881247483f008&amp;chksm=e8824fa1dff5c6b73c7c41ae36ae110e22d2d5f87b7b34796f0fd68e472bd8af1919bdae58c4&amp;scene=21#wechat_redirect">心法利器[105]  基础RAG-大模型和中控模块代码（含代码）</a>），这里就没有意图识别之类的模块，检索部分非常简单，就是一个向量推理+FAISS检索就完事了，对于搜索系统就是差不多这样子。</p>
+<p>下面结合项目发展阶段讲讲各个阶段的迭代建议。</p>
+<h2 id="5-1-0-1版本"><a href="#5-1-0-1版本" class="headerlink" title="5.1 0-1版本"></a>5.1 0-1版本</h2><p>早期的搜索系统，可以直接把query扔进检索引擎进行检索就可以，这里一般是两条路，是目前很常用的做法：</p>
+<ul>
+<li>ElasticSearch之类的系统搭建起检索模块，query可以直接进行字面检索，ES自带BM25排序后直接截断即可。</li>
+<li>用通用的向量召回模型对物料和query都做向量化，然后走类似Milvus、FAISS的方式向量召回。</li>
+</ul>
+<p>个人建议优先考虑前者，前者虽然泛化能力不行，但是准确率是比较可控的，甚至可以配合cqr+ctr（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247489205&amp;idx=1&amp;sn=94442b88c055fe33a20bf11247f4bdbb&amp;chksm=e8824e2bdff5c73dcb19860d8348bda86c98da66ba2bdfb88ef899866361f5fc21b57cad8279&amp;scene=21#wechat_redirect">心法利器[99] | 无监督字面相似度cqr/ctr源码</a>）的方式进行精排再把控一层，至少能出的内容还是相对可靠的，这符合搜索中的关键要素——准确。</p>
+<p>后者虽然泛化能力强，但是后者对不对称内容的能力并不突出（即类似QA匹配的相似度），而且即使内容对称，细节内容的不稳定性也比较难把控，这个相比泛化能力而言还是比较致命的，可以考虑会上，而并不要着急第一个版本上，有可能为第一版上线带来风险。</p>
+<p>注意，第一版往往需要把大量时间花在基础结构、基础代码、中间件的建立上，且发版存在工程和算法上的风险很大，因此在算法层面，需要用更稳定、可预见、可控的方案，尽可能降低这方面的风险。</p>
+<h2 id="5-2-中期"><a href="#5-2-中期" class="headerlink" title="5.2 中期"></a>5.2 中期</h2><p>等到baseline完成后，就已经到中期了，中期可以开始结合用户反馈、第一版遗留问题开始，以最终架构为蓝图逐步搭建完整的搜索体系。</p>
+<p>query理解模块可以逐步建立起来，有目的性地、分门别类地处理问题，能显著地在关键问题上得到提升（时刻注意bad case分析，具体可参考bad case系列：<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247487368&amp;idx=1&amp;sn=5daee4556d98a029d74bdcba26876970&amp;chksm=e8825716dff5de003e5f4044410421d283be7b0f2e853a78277fee3a5236a618a12e798daac2&amp;scene=21#wechat_redirect">心法利器[40] | bad case治疗术：解决篇</a>）。</p>
+<p>多路召回，配合现有的召回缺失问题（一般不会那么快暴露），开始增加召回链路，并以多路召回融合为契机，开始规划精排，从早期的规则精排开始，逐步过渡到模型精排，记得保留一定的可控可配置能力。</p>
+<h2 id="5-3-后期"><a href="#5-3-后期" class="headerlink" title="5.3 后期"></a>5.3 后期</h2><p>后期的整体架构逐步完整，场景特异化问题开始逐步突出，即出现自己场景所特有的一些问题，这时候就会转为研究型或者探索型的任务了，例如前文有提到的淘宝搜索，对用户画像等行为的表征和处理，另一方面，可以开始平台化或者通用化的沉淀，形成通用的NLP、运营平台，降低业务拓展成本，再者，也可以考虑做类似query推荐、相关搜索、多轮搜索等内容。</p>
+<h1 id="6-小结"><a href="#6-小结" class="headerlink" title="6. 小结"></a>6. 小结</h1><p>本文通过多个成熟的案例，分析了搜索系统常见的架构，提炼出搜索系统目前比较常见的拆分模式，并在最后给了迭代思路，本文有6000多字，写得好刺激，希望大家能喜欢~</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2025\03\09\聊聊搜索系统1：开篇语\" rel="bookmark">聊聊搜索系统1：开篇语</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2025\03\15\聊聊搜索系统3：文档内容处理\" rel="bookmark">聊聊搜索系统3：文档内容处理</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2025\03\15\聊聊搜索系统5：召回：检索、粗排、多路召回\" rel="bookmark">聊聊搜索系统5：召回：检索、粗排、多路召回</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2025/03/09/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F2%EF%BC%9A%E5%B8%B8%E8%A7%81%E6%9E%B6%E6%9E%84/" title="聊聊搜索系统2：常见架构">https://blog.rexking6.top/2025/03/09/聊聊搜索系统2：常见架构/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E6%A3%80%E7%B4%A2/" rel="tag"># 检索</a>
+              <a href="/tags/%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F/" rel="tag"># 搜索系统</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/03/09/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F1%EF%BC%9A%E5%BC%80%E7%AF%87%E8%AF%AD/" rel="prev" title="聊聊搜索系统1：开篇语">
+      <i class="fa fa-chevron-left"></i> 聊聊搜索系统1：开篇语
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/03/15/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F3%EF%BC%9A%E6%96%87%E6%A1%A3%E5%86%85%E5%AE%B9%E5%A4%84%E7%90%86/" rel="next" title="聊聊搜索系统3：文档内容处理">
+      聊聊搜索系统3：文档内容处理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E5%85%88%E6%9D%A5%E5%87%A0%E4%B8%AA%E6%A1%88%E4%BE%8B"><span class="nav-number">2.</span> <span class="nav-text">1. 先来几个案例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-%E8%85%BE%E8%AE%AF%E6%90%9C%E7%B4%A2%E6%9E%B6%E6%9E%84"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 腾讯搜索架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-%E7%94%B5%E5%95%86%E6%90%9C%E7%B4%A2"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 电商搜索</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-RAG%E6%9E%B6%E6%9E%84"><span class="nav-number">3.</span> <span class="nav-text">2. RAG架构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E6%90%9C%E7%B4%A2%E6%9E%B6%E6%9E%84"><span class="nav-number">4.</span> <span class="nav-text">3. 搜索架构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%E6%90%9C%E7%B4%A2%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E9%80%BB%E8%BE%91"><span class="nav-number">5.</span> <span class="nav-text">4. 搜索架构设计逻辑</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%E6%9E%B6%E6%9E%84%E5%92%8C%E9%A1%B9%E7%9B%AE%E9%98%B6%E6%AE%B5%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">6.</span> <span class="nav-text">5. 架构和项目阶段的关系</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-0-1%E7%89%88%E6%9C%AC"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 0-1版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-%E4%B8%AD%E6%9C%9F"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 中期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-3-%E5%90%8E%E6%9C%9F"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 后期</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-%E5%B0%8F%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">6. 小结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">275</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">87</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">4.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">67:08</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

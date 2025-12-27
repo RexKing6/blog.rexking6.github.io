@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="最清晰解读大模型提示工程（Prompt Engineering）">
+<meta property="og:url" content="https://blog.rexking6.top/2025/03/09/%E6%9C%80%E6%B8%85%E6%99%B0%E8%A7%A3%E8%AF%BB%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%8F%90%E7%A4%BA%E5%B7%A5%E7%A8%8B%EF%BC%88Prompt-Engineering%EF%BC%89/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/e68e7d271e0c500eaa4b850fe5cbb5b8.png">
+<meta property="og:image" content="https://image.rexking6.top/img/76afb383feb029ab57ac7e0f8408a0ea.png">
+<meta property="og:image" content="https://image.rexking6.top/img/e2c7d85b23f0e44e531cc6126ff67df4.png">
+<meta property="og:image" content="https://image.rexking6.top/img/4a6b78d6ccc99c013b24271031f5d618.png">
+<meta property="og:image" content="https://image.rexking6.top/img/ea7c6e34cc8a5d529d342ad241b8e927.png">
+<meta property="og:image" content="https://image.rexking6.top/img/7bc9cc0d99e07d3ced9e4f8f21999340.png">
+<meta property="og:image" content="https://image.rexking6.top/img/c1acf2f7dc3d0892caf42f799397e9bb.png">
+<meta property="og:image" content="https://image.rexking6.top/img/741f9d71c05fdd2b82ea511afa6568ea.png">
+<meta property="og:image" content="https://image.rexking6.top/img/3588ddb7b868c3b16e502586cad169a2.png">
+<meta property="og:image" content="https://image.rexking6.top/img/2f4969eb917a3a4cbd638a0f302e812b.png">
+<meta property="og:image" content="https://image.rexking6.top/img/2f17dbf3ec14831f890618166927394a.png">
+<meta property="og:image" content="https://image.rexking6.top/img/c1a00bcdc0f36ff66fd3c0e9ea258226.png">
+<meta property="og:image" content="https://image.rexking6.top/img/47ec5a6922c3819baa01218df5bdba93.png">
+<meta property="og:image" content="https://image.rexking6.top/img/d0190b482a88c4a28efd180bf0cffa7d.png">
+<meta property="og:image" content="https://image.rexking6.top/img/7b225957aa77e7039e87858c273e72de.png">
+<meta property="og:image" content="https://image.rexking6.top/img/6abd85de9349ec4409c87b59d057b536.png">
+<meta property="og:image" content="https://image.rexking6.top/img/87e3c7cb68845bbbd64c659bb428fb3e.png">
+<meta property="og:image" content="https://image.rexking6.top/img/2a3b529fd349134bed651bc1b568fea2.png">
+<meta property="og:image" content="https://image.rexking6.top/img/131d74dc1b0dc9d5d066e7d750547147.png">
+<meta property="og:image" content="https://image.rexking6.top/img/b21e427a075009464c2048f708b76314.png">
+<meta property="og:image" content="https://image.rexking6.top/img/ca1cd89744d8c75a3370f00271b8f8c8.png">
+<meta property="og:image" content="https://image.rexking6.top/img/25d9d249934ff451c497777df99046d7.png">
+<meta property="og:image" content="https://image.rexking6.top/img/b0c1cdd00500d2d8cba77dfe118d1257.png">
+<meta property="og:image" content="https://image.rexking6.top/img/94e4cb441ac5f5abc241db11972a79bb.png">
+<meta property="article:published_time" content="2025-03-09T06:42:39.000Z">
+<meta property="article:modified_time" content="2025-03-09T14:59:41.400Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="大模型">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/e68e7d271e0c500eaa4b850fe5cbb5b8.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2025/03/09/%E6%9C%80%E6%B8%85%E6%99%B0%E8%A7%A3%E8%AF%BB%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%8F%90%E7%A4%BA%E5%B7%A5%E7%A8%8B%EF%BC%88Prompt-Engineering%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>最清晰解读大模型提示工程（Prompt Engineering） | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2025/03/09/%E6%9C%80%E6%B8%85%E6%99%B0%E8%A7%A3%E8%AF%BB%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%8F%90%E7%A4%BA%E5%B7%A5%E7%A8%8B%EF%BC%88Prompt-Engineering%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          最清晰解读大模型提示工程（Prompt Engineering）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-03-09 14:42:39 / 修改时间：22:59:41" itemprop="dateCreated datePublished" datetime="2025-03-09T14:42:39+08:00">2025-03-09</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" itemprop="url" rel="index"><span itemprop="name">大模型</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/03/09/%E6%9C%80%E6%B8%85%E6%99%B0%E8%A7%A3%E8%AF%BB%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%8F%90%E7%A4%BA%E5%B7%A5%E7%A8%8B%EF%BC%88Prompt-Engineering%EF%BC%89/" class="post-meta-item leancloud_visitors" data-flag-title="最清晰解读大模型提示工程（Prompt Engineering）" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>11 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://blog.csdn.net/Y525698136/article/details/141086753">最清晰解读大模型提示工程（Prompt Engineering）（附教程）</a>。</p>
+<p><img src="https://image.rexking6.top/img/e68e7d271e0c500eaa4b850fe5cbb5b8.png" alt=""></p>
+<p>提示工程（Prompt Engineering），也称为上下文提示，是一种通过不更新模型的权重/参数来引导LLM行为朝着特定结果的方法。这是与AI有效交流所需结果的过程。提示工程可以用于各种任务，从回答问题到算术推理乃至各种应用领域，理解提示工程，能够帮助我们了解LLM的限制和能力。</p>
+<p>为了理解提示工程，先要澄清什么是Prompt。</p>
+<h1 id="1-什么是Prompt"><a href="#1-什么是Prompt" class="headerlink" title="1. 什么是Prompt"></a>1. 什么是Prompt</h1><p>Prompt提示是什么呢？</p>
+<p>Prompt提示是模型接收以生成响应或完成任务的初始文本输入。我们给AI一组Prompt输入，用于指导模型生成响应以执行任务。这个输入可以是一个问题、一段描述、一组关键词，或任何其他形式的文本，用于引导模型产生特定内容的响应。</p>
+<p>例如，在chatGPT中，用户通常使用 prompt 来与大语言模型进行交互，请求回答问题、生成文本、完成任务等。模型会根据提供的 prompt 来生成一个与之相关的文本，尽量符合用户的要求。</p>
+<h1 id="2-Prompt的分类"><a href="#2-Prompt的分类" class="headerlink" title="2. Prompt的分类"></a>2. Prompt的分类</h1><p>从不同的视角， 可以对Prompt 进行不同的分类。在这里，尝试根据可解释性、交互方式和应用领域三个方面对Prompt 进行分类。</p>
+<h2 id="2-1-可解释性分类：硬提示和软提示"><a href="#2-1-可解释性分类：硬提示和软提示" class="headerlink" title="2.1 可解释性分类：硬提示和软提示"></a>2.1 可解释性分类：硬提示和软提示</h2><p>提示（hard prompt ）是手工制作的、预定义的带有离散输入标记的文本，或者文本模板。静态提示可以合并到程序中用于编程、存储和重用，基于大模型的应用程序可以有多个提示模板供其使用。</p>
+<p>尽管模板带来了一定程度的灵活性，但是提示语仍然需要被设置得很好才行，换句话说，静态提示一种硬编码的提示。</p>
+<p>建立在LangChain 之上的基于大模型的 很多应用程序，其提示模板在很大程度上是静态的，它指示代理执行哪些操作。一般来说，模板包括: 定义了可以访问哪些工具，何时应该调用这些工具，以及一般的用户输入。</p>
+<p>软提示（soft prompt ）是在提示调优过程中创建的。与hard prompt 不同，软提示不能在文本中查看和编辑，包含一个嵌入或一串数字，代表从大模型中获得知识。软提示缺乏软可解释性。人工智能发现与特定任务相关的软提示，但不能解释为什么。与深度学习模型本身一样，软提示也是不透明的。软提示可以替代额外的训练数据，一个好的语言分类器软提示有几百到几千个额外的数据点。</p>
+<p>提示微调包括了在使用 LLM 之前使用一个小的可训练模型。小模型用于对文本提示进行编码并生成特定于任务的虚拟令牌。这些虚拟令牌被预先追加到Prompt上并传递给 LLM。调优过程完成后，这些虚拟令牌将存储在一个查找表中，并在推断期间使用，从而替换原来的小模型。当提供上下文时，LLM 的表现要好得多，而且提示微调是一种快速有效的方法，能够以动态地创建急需的上下文。</p>
+<h2 id="2-2-交互方式分类：在线提示-和-离线提示"><a href="#2-2-交互方式分类：在线提示-和-离线提示" class="headerlink" title="2.2 交互方式分类：在线提示 和 离线提示"></a>2.2 交互方式分类：在线提示 和 离线提示</h2><p>“online” 和 “offline” 是一种方式来区分模型互动中 prompt 的使用方式。这两种分类表示了 prompt 在与大模型互动的时间和方式上的不同。</p>
+<p>在线提示（Online prompt） 是在与模型的实时互动中提供的提示，通常用于即时的交互式应用。这种提示在用户与模型进行实际对话时提供，用户可以逐步输入、编辑或更改提示，在在线聊天、语音助手、实时问题回答等应用中常见。</p>
+<p>离线提示（Offline prompt ）是预先准备好的提示，通常在用户与模型的实际互动之前创建。这种提示在没有用户互动时预先设计和输入，然后整批输入模型进行批量处理。在离线文本生成、文章写作、大规模数据处理等应用中常见。</p>
+<p>对提示分类为 “online” 或 “offline” ，可帮助确定如何有效地使用提示，以满足不同应用的需求。在线提示通常用于需要实时交互和即时反馈的情况，而 离线提示则适用于需要大规模处理或预生成文本的情况。根据具体应用和使用情境，您可以选择适当的提示类型。</p>
+<h2 id="2-3-应用领域分类"><a href="#2-3-应用领域分类" class="headerlink" title="2.3 应用领域分类"></a>2.3 应用领域分类</h2><p>用途分类可以帮助确定 prompt 的主要目标，以便更有效地使用它们。以下是一些常见的 prompt 类别：</p>
+<ul>
+<li>Information Retrieval (信息检索):这些 prompt 用于从模型中检索特定信息，如回答问题、提供事实或解释概念。用途包括问答、信息检索、事实核实等。</li>
+<li>Text Generation (文本生成):这些 prompt 用于指导模型生成文本，可能是文章、故事、评论等。用途包括创意写作、内容生成、自动摘要等。</li>
+<li>Translation (翻译):这些 prompt 用于将文本从一种语言翻译成另一种语言。用途包括机器翻译应用。</li>
+<li>Sentiment Analysis (情感分析):这些 prompt 用于评估文本的情感倾向，如正面、负面或中性。用途包括社交媒体监测、情感分析应用。</li>
+<li>Programming and Code Generation (编程和代码生成):这些 prompt 用于生成计算机程序代码或解决编程问题。用途包括编程辅助、自动化代码生成等。</li>
+<li>Conversation (对话):这些 prompt 用于模拟对话或聊天，并回应用户提出的问题或评论。用途包括聊天机器人、虚拟助手等。</li>
+<li>Task-Specific (特定任务):这些 prompt 针对特定应用或任务，如制定旅行计划、编写营销文案、生成报告等。用途因任务而异。</li>
+<li>Custom Applications (自定义应用):这些 prompt 针对特定领域或自定义应用，具体用途由用户定义。用途根据用户需求而定。</li>
+</ul>
+<p>通过将 prompt 分类为不同的用途，可以更好地理解模型如何应用于各种任务和情境。这有助于选择合适的提示类型，并设计它们以满足特定需求。</p>
+<h1 id="3-Prompt-的一般要素"><a href="#3-Prompt-的一般要素" class="headerlink" title="3. Prompt 的一般要素"></a>3. Prompt 的一般要素</h1><p>在应用Prompt的时候，我们需要理解一个Prompt 可能包含的6个要素：任务，上下文，示例，角色，格式和语气，而且这些要素是按重要性降序排列的。</p>
+<h2 id="3-1-任务"><a href="#3-1-任务" class="headerlink" title="3.1 任务"></a>3.1 任务</h2><p>任务序列是由动词引导的，例如generate, drive, write, analyze等，而且需要明确任务目标。例如：</p>
+<p><img src="https://image.rexking6.top/img/76afb383feb029ab57ac7e0f8408a0ea.png" alt=""></p>
+<h2 id="3-2-上下文"><a href="#3-2-上下文" class="headerlink" title="3.2 上下文"></a>3.2 上下文</h2><p>背景上下文极具挑战性， 一般要描述什么是用户的背景信息，成功的结果希望是什么样子，以及他们处于怎样的环境中，例如：</p>
+<p><img src="https://image.rexking6.top/img/e2c7d85b23f0e44e531cc6126ff67df4.png" alt=""></p>
+<h2 id="3-3-示例"><a href="#3-3-示例" class="headerlink" title="3.3 示例"></a>3.3 示例</h2><p>基本上，对所有主要语言模型进行的研究表明，在提示中包含例子都将产生更高质量的答案。 例如：</p>
+<p><img src="https://image.rexking6.top/img/4a6b78d6ccc99c013b24271031f5d618.png" alt=""></p>
+<p>如果想为团队内的某个职位撰写一份JD，prompt可以是首先向ChatGPT提供情景描述（context），然后再根据已经准备好的描述提供一个参考案例（example）。</p>
+<h2 id="3-4-角色"><a href="#3-4-角色" class="headerlink" title="3.4 角色"></a>3.4 角色</h2><p>这是你希望人工智能所扮演的角色。想象一下你有一个问题，想咨询专家来解决这些疑问。例如，如果你在锻炼时受伤，你会去找一位有康复治疗师。如果你正在找工作，你会向招聘人员寻求建议。例如：</p>
+<p><img src="https://image.rexking6.top/img/ea7c6e34cc8a5d529d342ad241b8e927.png" alt=""></p>
+<h2 id="3-5-格式"><a href="#3-5-格式" class="headerlink" title="3.5 格式"></a>3.5 格式</h2><p>想象一下实现的目标，可以是个人或团体的目标，比如找到工作、成为一位优秀的演讲者等。所有这些都是零散的想法，但借助人工智能的帮助，可以将它们整理成一个特定的格式，比如一个表格。我们也可以希望得到电子邮件、要点、代码块等格式。这些格式对我们的工作也很有用，例如段落和标记。</p>
+<p>看一个电子邮件示例，给一个上下文、一个任务，并要求AI使用标题格式。</p>
+<p><img src="https://image.rexking6.top/img/7bc9cc0d99e07d3ced9e4f8f21999340.png" alt=""></p>
+<h2 id="3-6-语气"><a href="#3-6-语气" class="headerlink" title="3.6 语气"></a>3.6 语气</h2><p>如果正确衡量要使用的音调类型，“语气”者一个元素就很容易理解。</p>
+<p><img src="https://image.rexking6.top/img/c1acf2f7dc3d0892caf42f799397e9bb.png" alt=""></p>
+<p>在这6个要素中，任务是必须的，上下文和示例非常重要，而且最好也要有角色、格式和语气。下面shi一个实际示例，需要在电子邮件中传达包含相关和有影响力信息的内容。</p>
+<p><img src="https://image.rexking6.top/img/741f9d71c05fdd2b82ea511afa6568ea.png" alt=""></p>
+<p>那么，Prompt 如何在LLM起作用的呢？它个工作原理又是什么呢？</p>
+<h1 id="4-Prompt-的工作原理"><a href="#4-Prompt-的工作原理" class="headerlink" title="4. Prompt 的工作原理"></a>4. Prompt 的工作原理</h1><p>在试图理解Prompt 的工作原理之前， 需要理解大模型是如何生成文本的。简单起见，可以把大模型的文本生成理解为目标文本的补全， 在理解了LLM 文本生成的工作原理之后，就可能对Prompt 有一个相对清楚的理解。</p>
+<p>例如，假设想让“Paris is the city…”这句话继续下去。编码器使用Bloom-560M模型发送我们拥有的所有token的logits，这些logits可以使用softmax函数转换为选择生成token的概率。</p>
+<p><img src="https://image.rexking6.top/img/3588ddb7b868c3b16e502586cad169a2.png" alt=""></p>
+<p>如果查看top 5个输出token，它们都是有意义的。我们可以生成以下看起来合法的短语：</p>
+<ul>
+<li>Paris is the city of love.</li>
+<li>Paris is the city that never sleeps.</li>
+<li>Paris is the city where art and culture flourish.</li>
+<li>Paris is the city with iconic landmarks.</li>
+<li>Paris is the city in which history has a unique charm.</li>
+</ul>
+<p>然后， 有不同的策略来选择token。</p>
+<h2 id="4-1-greedy-sampling"><a href="#4-1-greedy-sampling" class="headerlink" title="4.1 greedy sampling"></a>4.1 greedy sampling</h2><p>简单来说，贪婪采样的模型在每一步都选择它认为最有可能的词语——它不考虑其他可能性或探索不同的选择。模型选择概率最高的词语，并基于选择的词语继续生成文本。</p>
+<p><img src="https://image.rexking6.top/img/2f4969eb917a3a4cbd638a0f302e812b.png" alt=""></p>
+<p>使用贪婪策略是计算效率高且直接的方法，但也会带来重复或过于确定性的输出。由于模型在每一步中只考虑最可能的标记，可能无法捕捉到上下文和语言的全部多样性，也不能产生最富创造力的回答。模型的这种目光短浅的特点仅仅关注每一步中最可能的标记，而忽视了对整个序列的整体影响。</p>
+<p>示例中生成的输出可能是：Paris is the city of the future. The</p>
+<h2 id="4-2-Beam-Search"><a href="#4-2-Beam-Search" class="headerlink" title="4.2 Beam Search"></a>4.2 Beam Search</h2><p>beam搜索是文本生成中使用的另一个策略。在beam搜索中，模型假设一组最有可能的前“k”个token，而不仅仅考虑每个步骤中最有可能的token。这组k个token被称为“beam”。</p>
+<p><img src="https://image.rexking6.top/img/2f17dbf3ec14831f890618166927394a.png" alt=""></p>
+<p>模型通过为每个token生成可能的序列，并通过扩展每个beam在文本生成的每个步骤中跟踪它们的概率来生成可能的序列。这个过程会一直持续下去，直到达到生成文本的所需长度或者每个beam遇到一个“终止”标记的时候。模型会从所有beam中选择具有最高整体概率的序列作为最终输出。从算法的角度来看，创建beam就是扩展一个k叉树。在创建beam之后，选择具有最高整体概率的分支作为最终输出。</p>
+<p>示例中生成的输出可能是：Paris is the city of history and culture.</p>
+<h2 id="4-3-probability-sampling"><a href="#4-3-probability-sampling" class="headerlink" title="4.3 probability sampling"></a>4.3 probability sampling</h2><p>简单来说就是通过选择一个随机值，并将其映射到所选的词汇来选择下一个词。可以将其想象为旋转轮盘，每个词汇的区域由其概率决定。概率越高，选中该词的机会越大。这是一个相对简单的计算解决方案，由于相对较高的随机性，句子（或词语序列）可能每次都会不同。</p>
+<p><img src="https://image.rexking6.top/img/c1a00bcdc0f36ff66fd3c0e9ea258226.png" alt=""></p>
+<h2 id="4-4-random-sampling-with-temperature"><a href="#4-4-random-sampling-with-temperature" class="headerlink" title="4.4 random sampling with temperature"></a>4.4 random sampling with temperature</h2><p>一般地，使用softmax函数将logit转换为概率。在这里，为随机采样引入了温度——一种影响文本生成随机性的超参数。比较一下激活函数，可以更好地理解温度如何影响概率计算。</p>
+<p><img src="https://image.rexking6.top/img/47ec5a6922c3819baa01218df5bdba93.png" alt=""></p>
+<p>在引入温度之后，与典型的softmax不同之处在于分母除以了温度T。温度越高（趋向1）输出结果会更加多样化，而温度越低（趋向0），输出结果则更加集中并更具确定性。当T = 1的时候，演变为最初使用的softmax函数。</p>
+<h2 id="4-5-Top-k-sampling"><a href="#4-5-Top-k-sampling" class="headerlink" title="4.5 Top-k sampling"></a>4.5 Top-k sampling</h2><p>虽然可以根据温度来调整概率，另一个改进是使用前k个token而不是全部token。这将增强文本生成的稳定性，又不会太大程度上降低创造力。现在只对前k个token进行温度下的随机抽样。唯一可能的问题可能是选择数字k，以下是如何改进它。</p>
+<p><img src="https://image.rexking6.top/img/d0190b482a88c4a28efd180bf0cffa7d.png" alt=""></p>
+<h2 id="4-6-Top-P-sampling"><a href="#4-6-Top-P-sampling" class="headerlink" title="4.6 Top-P sampling"></a>4.6 Top-P sampling</h2><p>top-p采样不是指定一个固定的“k”令牌数量，而是使用一个概率阈值“p”。该阈值代表了希望在采样中包括的累积概率。模型在每个步骤中计算所有可能令牌的概率，然后按照降序的方式对它们进行排序。</p>
+<p><img src="https://image.rexking6.top/img/7b225957aa77e7039e87858c273e72de.png" alt=""></p>
+<p>该模型将继续添加token到生成的文本中，直到它们的概率之和超过指定的阈值。top-p采样的优势在于它允许根据上下文进行更动态和自适应的标记选择。每步选择的标记数量可以根据该上下文中token的概率而变化，这可以产生更多样化和更高质量的输出。</p>
+<h2 id="4-7-Prompt-的可能工作机制"><a href="#4-7-Prompt-的可能工作机制" class="headerlink" title="4.7 Prompt 的可能工作机制"></a>4.7 Prompt 的可能工作机制</h2><p>在预训练语言模型中，解码策略对于文本生成非常重要。有多种方法来定义概率，又有多种方法来使用这些概率。温度控制了解码过程中token选择的随机性。较高的温度增强了创造力，而较低的温度则关注连贯性和结构。虽然创造力可以带来有趣的语言体验，但适度的稳定性可以确保生成的文本的优雅。</p>
+<p>那么，Prompt 的本质大概应该是语义特征的显式表达， Prompt 的工作机制很可能只是影响大模型所选择生成文本token 的概率。由于大模型在很大程度上是一个黑盒子，其涌现特性具有难解释性，而海量的数据关系很难抽象出确定性的特征，只能是概率性结果。另一方面，用户的需求千变万化，并且对于需求的表达更是极具多样性。因此， Prompt 很可能在某些限定的领域才存在一些通用的表达方式。</p>
+<h1 id="5-什么是提示工程：Prompt-Engingering"><a href="#5-什么是提示工程：Prompt-Engingering" class="headerlink" title="5. 什么是提示工程：Prompt Engingering"></a>5. 什么是提示工程：Prompt Engingering</h1><p>提示工程（Prompt Engingering），也被称为在上下文中提示，是指如何与 LLM 通信的方法，以引导其行为为期望的结果，而无需更新模型权重。提示工程关注提示词的开发和优化，帮助用户将大模型用于各场景和研究领域。这是一门经验科学，Prompt Engingering的效果在不同模型之间可能有很大差异，因此需要大量的试验和启发。</p>
+<p>因此，提示工程旨在获取这些提示并帮助模型在其输出中实现高准确度和相关性，掌握提示工程相关技能将有助于用户更好地了解大型语言模型的能力和局限性。特别地， 矢量数据库、agent和prompt pipeline已经被用作在对话中，作为向 LLM 提供相关上下文数据的途径。</p>
+<p>提示工程不仅仅是关于设计和研发提示词。它包含了与大语言模型交互和研发的各种技能和技术。提示工程在实现和大语言模型交互、对接，以及理解大语言模型能力方面都起着重要作用。用户可以通过提示工程来提高大语言模型的安全性，也可以赋能大语言模型，比如借助专业领域知识和外部工具来增强大语言模型能力。例如，流水线、Agent代理、CoT思维链等基于 LLM 的实现都是以某种形式的提示工程为前提的。</p>
+<p>提示工程涉及选择、编写和组织提示，以便获得所需的输出，主要包括以下方面：</p>
+<ul>
+<li>Prompt 格式：确定 prompt 的结构和格式，例如，问题形式、描述形式、关键词形式等。</li>
+<li>Prompt 内容：选择合适的词语、短语或问题，以确保模型理解用户的意图。</li>
+<li>Prompt 上下文：考虑前文或上下文信息，以确保模型的回应与先前的对话或情境相关。</li>
+<li>Prompt 编写技巧：使用清晰、简洁和明了的语言编写 prompt，以准确传达用户的需求。</li>
+<li>Prompt 优化：在尝试不同 prompt 后，根据结果对 prompt 进行调整和优化，以获得更满意的回应。</li>
+</ul>
+<p>提示工程可以帮助改善大语言模型的性能，使其更好地满足用户需求。这是在与模型互动时常用的策略，特别是在自然语言处理任务和生成性任务中，如文本生成、答案生成、文章写作等。</p>
+<h1 id="6-提示工程（Prompt-Engingeering）的基本方式"><a href="#6-提示工程（Prompt-Engingeering）的基本方式" class="headerlink" title="6. 提示工程（Prompt Engingeering）的基本方式"></a>6. 提示工程（Prompt Engingeering）的基本方式</h1><h2 id="6-1-Zero-shot-Prompting"><a href="#6-1-Zero-shot-Prompting" class="headerlink" title="6.1 Zero-shot Prompting"></a>6.1 Zero-shot Prompting</h2><p>Zero-shot Prompting涉及将任务输入模型，而没有任何示例表明所需的输出，因此称为Zero-shot 。例如，我们可以向模型提供一个句子，并期望它输出该句子的情感。让我们看一个来自DAIR-AI的示例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-Prompt: Classify the text into neutral, negative, or positive.</span><br><span class="line"></span><br><span class="line"> Text: I think the vacation is okay.</span><br><span class="line"></span><br><span class="line">**** Output: Neutral</span><br></pre></td></tr></table></figure>
+<h2 id="6-2-Few-shot-Prompting"><a href="#6-2-Few-shot-Prompting" class="headerlink" title="6.2 Few-shot Prompting"></a>6.2 Few-shot Prompting</h2><p>few-shot prompting则是通过提供模型少量高质量的示例，这些示例包括目标任务的输入和期望输出。通过观察这些良好的示例，模型可以更好地理解人类意图和生成准确输出的标准。因此，与zero-shot相比，few-shot 通常会产生更好的性能。然而，这种方法可能会消耗更多的token，并且在处理长文本的输入或者输出的时候可能会遇到上下文长度限制的问题。</p>
+<p>大型语言模型（例如GPT-3）在zero-shot能力方面表现出色。但对于复杂任务，few-shot 提示性能更好。为了提高性能，我们使用，few-shot 提示进行上下文学习，通过在提示中提供演示来指导模型执行任务。换句话说，将模型置于一些特定任务的示例中有助于提高模型性能。</p>
+<p>让我们看一下面的例子，来自<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2005.14165">https://arxiv.org/abs/2005.14165</a><br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- Prompt: A &quot;whatpu&quot; is a small, furry animal native to Tanzania.</span><br><span class="line"></span><br><span class="line">An example of a sentence that uses the word whatpu is:</span><br><span class="line"></span><br><span class="line">We were traveling in Africa and we saw these very cute whatpus.</span><br></pre></td></tr></table></figure></p>
+<p>我们可以从上面的提示中看到，模型被给定一个例子，然后能够为下一个问题生成答案。</p>
+<h2 id="6-3-instruction-Prompting"><a href="#6-3-instruction-Prompting" class="headerlink" title="6.3 instruction Prompting"></a>6.3 instruction Prompting</h2><p>指令提示是LLM的最常见用途，尤其是像ChatGPT这样的聊天机器人。举个提示指令的例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- Prompt: Define Onomatopoeia **in** one sentence.</span><br><span class="line">**** Output: Onomatopoeia **is** the use of words that imitate **or** suggest the natural sound of a thing **or** action.</span><br></pre></td></tr></table></figure>
+<p>指令提示旨在向大语言模型提供指令提示示例，以便它可以消除训练或测试差异（模型是在Web规模语料库上训练并在大多数指令上进行测试），并模拟聊天机器人的实际使用场景。指令提示使用（任务说明，输入，真实输出）元组对预训练模型进行微调，以使模型更好地与用户意图对齐并遵循说明。与说明模型交互时，应该详细描述任务要求，尽量具体和准确，清楚地指定要做什么（而不是说不要做某事）。</p>
+<h1 id="7-Prompt-Engingeering的组合方式"><a href="#7-Prompt-Engingeering的组合方式" class="headerlink" title="7. Prompt Engingeering的组合方式"></a>7. Prompt Engingeering的组合方式</h1><p>Prompt Engingeering 之所以成为工程方式，是因为存在着各种相对复杂的Prompt方式，主要包括思维链（CoT） 和 递归提示（ Recursive Prompting）等。</p>
+<h2 id="7-1-Chain-of-Thought-Prompting"><a href="#7-1-Chain-of-Thought-Prompting" class="headerlink" title="7.1 Chain-of-Thought Prompting"></a>7.1 Chain-of-Thought Prompting</h2><p>Chain-of-Thought（CoT）提示生成一系列短句，即被称为推理链的句子。这些句子描述了逐步推理逻辑，导致最终答案，对于复杂推理的任务和较大的模型，可获得更多的好处。常见的两种基本CoT提示包括Few-shot CoT 和 Zero-Shot CoT，并在下面对它们进行描述。</p>
+<h3 id="7-1-1-Few-shot-CoT"><a href="#7-1-1-Few-shot-CoT" class="headerlink" title="7.1.1 Few-shot CoT"></a>7.1.1 Few-shot CoT</h3><p>Few-shot CoT 允许模型查看一些高质量推理链的演示。让我们看 下面的例子：</p>
+<p><img src="https://image.rexking6.top/img/6abd85de9349ec4409c87b59d057b536.png" alt=""></p>
+<h3 id="7-1-2-Zero-shot-CoT"><a href="#7-1-2-Zero-shot-CoT" class="headerlink" title="7.1.2 Zero-shot CoT"></a>7.1.2 Zero-shot CoT</h3><p>Zero-shot CoT是由Kojima等人在2022年首先提出的，它在提示中添加了“让我们逐步思考”，有助于提高模型性能。让我们看一个下面的例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Prompt:</span><br><span class="line">**-** I went to the market **and** bought 10 apples. I gave 2 apples to the neighbor **and** 2 to the repairman. I then went **and** bought 5 more apples **and** ate 1. How many apples did I remain **with**?</span><br><span class="line">**-** Let&#x27;s think step by step.</span><br><span class="line">Output:</span><br><span class="line">- First, you started with 10 apples.</span><br><span class="line">-You gave away 2 apples to the neighbor and 2 to the repairman, so you had 6 apples left.</span><br><span class="line">-Then you bought 5 more apples, so now you had 11 apples.</span><br><span class="line">-Finally, you ate 1 apple, so you would remain with 10 apples.</span><br></pre></td></tr></table></figure>
+<p>Zero-shot CoT能够帮助我们看到模型内部，并了解它是如何推理得出答案的。</p>
+<h2 id="7-2-Recursive-Prompting"><a href="#7-2-Recursive-Prompting" class="headerlink" title="7.2 Recursive Prompting"></a>7.2 Recursive Prompting</h2><p>递归提示是一种问题解决方法，它涉及将复杂问题分解成更小、更易管理的子问题，然后通过一系列提示递归地解决这些子问题。这种方法对需要组合泛化的任务尤其有用，其中语言模型必须学习如何组合不同的信息来解决问题。</p>
+<p>在自然语言处理的背景下，递归提示可以使用少量提示方法将复杂问题分解为子问题，然后顺序解决提取的子问题，使用前一个子问题的解决方案来回答下一个子问题。这种方法可以用于数学问题或问答等任务，其中语言模型需要能够将复杂问题分解为更小、更易管理的部分，以得出解决方案。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Calculate the product of the length **and** width:</span><br><span class="line">prompt: &quot;What is the product of 8 and 6?&quot;</span><br><span class="line">answer: 48</span><br><span class="line"></span><br><span class="line">Substitute the given values **for** length **and** width into the equation:</span><br><span class="line">prompt: &quot;What is the area of a rectangle with length 8 and width 6?&quot;</span><br><span class="line">answer: &quot;The area of a rectangle with length 8 and width 6 is 48.&quot;</span><br></pre></td></tr></table></figure>
+<p>recursive prompting 的更多示例 如下：</p>
+<p><img src="https://image.rexking6.top/img/87e3c7cb68845bbbd64c659bb428fb3e.png" alt=""></p>
+<h2 id="7-3-CoT-与-递归提示的混合使用"><a href="#7-3-CoT-与-递归提示的混合使用" class="headerlink" title="7.3 CoT 与 递归提示的混合使用"></a>7.3 CoT 与 递归提示的混合使用</h2><p>自我提问（self-ask ）可以视为另一种类型的递归提示，是一种反复提示模型提出后续问题以迭代构建思维过程的方法。后续问题可以通过搜索引擎结果来回答。类似地，IRCoT 和 ReAct将迭代 CoT 提示与对 Wikipedia API 的查询相结合，以搜索相关实体和内容，然后将其添加回上下文中。示例如下：</p>
+<p><img src="https://image.rexking6.top/img/2a3b529fd349134bed651bc1b568fea2.png" alt=""></p>
+<p>思维树（Tree of Thought）通过探索每一步的多种推理可能性来扩展 CoT。它首先将问题分解为多个思维步骤，并在每个步骤中生成多个思维，实质上是创建一个树形结构。搜索过程可以是广度优先过程或深度优先的过程，而每个节点的评估分类器可以通过Prompt提示的方式完成。</p>
+<p><img src="https://image.rexking6.top/img/131d74dc1b0dc9d5d066e7d750547147.png" alt=""></p>
+<h1 id="8-自动提示的设计"><a href="#8-自动提示的设计" class="headerlink" title="8. 自动提示的设计"></a>8. 自动提示的设计</h1><p>一般而言，Prompt 相当于一系列前缀令牌，它们增加了在给定输入时获得所需输出的概率。因此，可以将它们视为可训练的参数，并通过梯度下降法直接在嵌入空间上对它们进行优化，例如 AutoPrompt ，Prefix-Tuning ，P 微调和 Prompt-Tuning，从自动提示到提示微调的趋势是设置的逐渐简化。</p>
+<h2 id="8-1-自动提示工程"><a href="#8-1-自动提示工程" class="headerlink" title="8.1 自动提示工程"></a>8.1 自动提示工程</h2><p>APE是一种在模型生成的Prompt候选集中搜索的方法，然后根据选择的得分函数过滤候选集，以最终选择得分最高的最佳候选提示。</p>
+<ul>
+<li>提示 LLM 根据输入输出健值对形式的一个小集合尝试生成候选指令。</li>
+<li>给定一个数据集 Dtrain = {(x，y)} ，希望找到一个指令ρ，使：</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/b21e427a075009464c2048f708b76314.png" alt=""></p>
+<ul>
+<li>f (.)是每个样本的得分函数，例如执行精度或对数概率。</li>
+<li>使用蒙特卡罗搜索方法进行迭代，通过prompt生成下列指令的变体，同时保持语义，提出语义相似的变体，从而改进最佳候选项。</li>
+</ul>
+<h2 id="8-2-自动构建CoT"><a href="#8-2-自动构建CoT" class="headerlink" title="8.2 自动构建CoT"></a>8.2 自动构建CoT</h2><p>为了自动构建思维链，Shum 等人(2023)提出了增强-修剪-选择，一个三步过程:</p>
+<ul>
+<li>增强: 使用few-shot或zero shot 的 CoT Prompt 生成给定问题的多个伪思维链。</li>
+<li>修剪: 基于生成的答案是否匹配基本真相来修剪这些伪思维链。</li>
+<li>选择: 应用降低方差的梯度策略来学习选定示例的概率分布，同时考虑将示例的概率分布作为策略，并将验证集的准确性作为奖励。</li>
+</ul>
+<h2 id="8-3-基于聚类的CoT-构建"><a href="#8-3-基于聚类的CoT-构建" class="headerlink" title="8.3 基于聚类的CoT 构建"></a>8.3 基于聚类的CoT 构建</h2><p>采用聚类技术对问题进行抽样，然后生成链（2023）。LLM 倾向于犯某些类型的错误，一类错误可以在嵌入空间中相似，因此可以组合在一起。通过只从频繁错误集群中抽样一个或几个，可以防止一个错误类型的过多错误演示，并收集一组不同的示例。</p>
+<ul>
+<li>问题聚类: 嵌入问题并采用K-means聚类的运行方式。</li>
+<li>表征选择: 从每个聚类中选择一组有代表性的问题，即从一个聚类中选择一个表征样例。每个簇中的样本按照到簇中心的距离进行排序，首先选择离簇中心较近的样本。</li>
+<li>基本关系的生成: 使用zero-shot CoT 为选定的问题生成推理链，构造few-shot prompt进行推理。</li>
+</ul>
+<h1 id="9-提示工程的常见实践"><a href="#9-提示工程的常见实践" class="headerlink" title="9. 提示工程的常见实践"></a>9. 提示工程的常见实践</h1><p>提示工程的实现涉及到基于LLM应用中的各个方面，这里给出一些提示工程的常见实践：</p>
+<ol>
+<li>静态提示：Prompt可以遵循zero、single或few shot的方法。LLM 的生成能力通过在Prompt中包含示例数据来遵循一次性学习或几次性学习得到了极大的增强。</li>
+<li>上下文提示：上下文提示在生成响应时提供对 LLM 的参考框架，在很大程度上可以避免 LLM 的幻觉。</li>
+<li>提示模板：静态提示转换为模板，其中键值被替换为占位符，占位符在运行时被应用程序的值/变量替换。提示模板中的变量或占位符通过用户提出的问题，以及从知识存储中搜索的知识来填充，因此也称为提示注入或实体注入。</li>
+<li>提示链：提示链，也称为LLM链，是创建一个由一系列模型调用组成的链的概念。这一系列调用相继发生，其中一个链的输出作为另一个链的输入。每个链的目标都是小型且范围良好的子任务，因此单个 LLM 是用于寻址任务的多个有序子组件之一。</li>
+<li>提示流水线：在机器学习中，流水线可以描述为端到端结构，来协调事件和数据流。流水线由触发器启动或启动; 并且基于某些事件和参数，遵循一个流程，该流程将产生一个输出。对于提示流水线而言，流在大多数情况下是由用户请求启动的，请求被定向到特定的提示模板。因此，提示流水线可以描述为提示模板的智能扩展。</li>
+<li>Agent代理：对于 LLM 相关的操作，其自动化的形式是所谓的Agent代理。提示链是执行预先确定和设置的操作序列，Agent 不遵循预先确定的事件顺序，可以保持高度的自主性。Agent可以访问一组工具，任何属于这些工具范围的请求都可以由Agent处理。执行流水线为Agent提供了自治权，在代理到达最终答案之前可能需要进行多次迭代。</li>
+<li>CoT提示：CoT提示使大型语言模型(LLM)能够处理常识推理和算术等复杂任务。通过Prompt建立CoT推理并相应地指导 LLM，这是一种相当直接的实现。标准提示与CoT提示的对比如下：</li>
+</ol>
+<p><img src="https://image.rexking6.top/img/ca1cd89744d8c75a3370f00271b8f8c8.png" alt=""></p>
+<p>思维链提示特别有用的地方在于，通过分解 LLM 输入和 LLM 输出，它创建了一个洞察和解释窗口。</p>
+<ol>
+<li>ChatML：LLM 的主要安全漏洞和滥用途径是Prompt注入攻击，ChatML 将允许针对这些类型的攻击提供保护。为了消除prompt注入攻击，会话被分为以下几个层次或角色: 系统、助理和用户等， 然后做相应的prompt防护。</li>
+</ol>
+<p><img src="https://image.rexking6.top/img/25d9d249934ff451c497777df99046d7.png" alt=""></p>
+<h1 id="10-Prompt-engineering-的挑战与未来"><a href="#10-Prompt-engineering-的挑战与未来" class="headerlink" title="10. Prompt engineering 的挑战与未来"></a>10. Prompt engineering 的挑战与未来</h1><p>有人可以说，Prompt Engineering是以某种方式构建的自然语言。但OpenAI首席执行官所指的似乎是真正的非结构化和高度直观的交互界面，在某种程度上，这种说法是值得商榷的，因为如此多的技术和创新都是基于Prompt engineering的基本原理来实现的。</p>
+<p><img src="https://image.rexking6.top/img/b0c1cdd00500d2d8cba77dfe118d1257.png" alt=""></p>
+<p>考虑到企业用例，操纵LLM的两种主要方法是微调和将上下文参考数据注入到推理prompt中，两种方法不是互斥的。模型微调会更改LLM的行为和响应，RAG通过上下文参考来补充用户的输入。</p>
+<p>提示工程的主要挑战之一是问题的陈述和形式化表达，将思想中存在的需求转化为文本请求。退一步而言，在传统的聊天机器人中建立上下文是非常重要的。上下文首先是通过根据一个或多个意图对用户输入进行分类来建立的，通过先前的对话、对其他系统的API调用等建立进一步的上下文。上下文在很大程度上也取决于时间和地点，以及提出问题时的背景参考是什么。</p>
+<p>除了上下文感知外，歧义性是另一个挑战。有些形式的歧义对我们人类来说很容易理解，但传统上对NLU/聊天机器人来说很难。在OpenAI的实现中，LLM输入方面出现了chatML，定义了角色，并为LLM的输入提供了明确的结构。LLM输出方面出现了function call，聊天的完成模式被设置为事实上的标准。</p>
+<p>意图、上下文、歧义和消除歧义都是任何对话的组成部分。有了人类语言界面，语境和语境感知将永远是重要的。歧义是存在的，一定程度的歧义消除是人类对话的一部分。在对话中，我们不断使用“歧义消除”来确立意义和意图，在上下文中可以在一定程度上自动消除歧义。例如，要求LLM生成五个选项，然后让用户选择生成的最佳答案，就是一种消除歧义的形式。</p>
+<p>企业实施将是特定于领域的，需要约束，并具有一定程度的域外检测。问题或请求的分解对于创建一个思维链推理过程非常重要。微调设置模型行为，而RAG为LLM创建了一个上下文参考，以便在推理过程中使用。数据管理将始终是LLM应用程序的一部分。</p>
+<p><img src="https://image.rexking6.top/img/94e4cb441ac5f5abc241db11972a79bb.png" alt=""></p>
+<p>复杂性从不会消失，只会从一个地方转移到另一个地方。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2024\11\25\19类Agent框架对比\" rel="bookmark">19类Agent框架对比</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2024\12\14\Chain-of-Table论文解读\" rel="bookmark">Chain-of-Table论文解读</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2023\02\22\ChatGPT背后的经济账\" rel="bookmark">ChatGPT 背后的经济账</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2025/03/09/%E6%9C%80%E6%B8%85%E6%99%B0%E8%A7%A3%E8%AF%BB%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%8F%90%E7%A4%BA%E5%B7%A5%E7%A8%8B%EF%BC%88Prompt-Engineering%EF%BC%89/" title="最清晰解读大模型提示工程（Prompt Engineering）">https://blog.rexking6.top/2025/03/09/最清晰解读大模型提示工程（Prompt-Engineering）/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" rel="tag"># 大模型</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/02/16/%E9%98%BF%E9%87%8C%E5%86%85%E9%83%A8%E8%A7%82%E7%82%B9%EF%BC%9A%E6%99%BA%E8%83%BD%E5%8C%96%E7%A0%94%E5%8F%91%E4%B8%80%E5%B9%B4%E5%A4%8D%E7%9B%98%EF%BC%8C%E6%88%91%E4%BB%AC%E7%A6%BB%E7%9C%9F%E6%AD%A3%E7%9A%84-AI-%E5%BC%80%E5%8F%91%E8%BF%98%E6%9C%89%E5%A4%9A%E8%BF%9C%EF%BC%9F/" rel="prev" title="阿里内部观点：智能化研发一年复盘，我们离真正的 AI 开发还有多远？">
+      <i class="fa fa-chevron-left"></i> 阿里内部观点：智能化研发一年复盘，我们离真正的 AI 开发还有多远？
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/03/09/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F1%EF%BC%9A%E5%BC%80%E7%AF%87%E8%AF%AD/" rel="next" title="聊聊搜索系统1：开篇语">
+      聊聊搜索系统1：开篇语 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AFPrompt"><span class="nav-number">2.</span> <span class="nav-text">1. 什么是Prompt</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Prompt%E7%9A%84%E5%88%86%E7%B1%BB"><span class="nav-number">3.</span> <span class="nav-text">2. Prompt的分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%E5%8F%AF%E8%A7%A3%E9%87%8A%E6%80%A7%E5%88%86%E7%B1%BB%EF%BC%9A%E7%A1%AC%E6%8F%90%E7%A4%BA%E5%92%8C%E8%BD%AF%E6%8F%90%E7%A4%BA"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 可解释性分类：硬提示和软提示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%E4%BA%A4%E4%BA%92%E6%96%B9%E5%BC%8F%E5%88%86%E7%B1%BB%EF%BC%9A%E5%9C%A8%E7%BA%BF%E6%8F%90%E7%A4%BA-%E5%92%8C-%E7%A6%BB%E7%BA%BF%E6%8F%90%E7%A4%BA"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 交互方式分类：在线提示 和 离线提示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-%E5%BA%94%E7%94%A8%E9%A2%86%E5%9F%9F%E5%88%86%E7%B1%BB"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 应用领域分类</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Prompt-%E7%9A%84%E4%B8%80%E8%88%AC%E8%A6%81%E7%B4%A0"><span class="nav-number">4.</span> <span class="nav-text">3. Prompt 的一般要素</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-%E4%BB%BB%E5%8A%A1"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 上下文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-%E7%A4%BA%E4%BE%8B"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-%E8%A7%92%E8%89%B2"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 角色</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-5-%E6%A0%BC%E5%BC%8F"><span class="nav-number">4.5.</span> <span class="nav-text">3.5 格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-6-%E8%AF%AD%E6%B0%94"><span class="nav-number">4.6.</span> <span class="nav-text">3.6 语气</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-Prompt-%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">5.</span> <span class="nav-text">4. Prompt 的工作原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-greedy-sampling"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 greedy sampling</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-Beam-Search"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 Beam Search</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-probability-sampling"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 probability sampling</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-4-random-sampling-with-temperature"><span class="nav-number">5.4.</span> <span class="nav-text">4.4 random sampling with temperature</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-5-Top-k-sampling"><span class="nav-number">5.5.</span> <span class="nav-text">4.5 Top-k sampling</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-6-Top-P-sampling"><span class="nav-number">5.6.</span> <span class="nav-text">4.6 Top-P sampling</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-7-Prompt-%E7%9A%84%E5%8F%AF%E8%83%BD%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6"><span class="nav-number">5.7.</span> <span class="nav-text">4.7 Prompt 的可能工作机制</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%E4%BB%80%E4%B9%88%E6%98%AF%E6%8F%90%E7%A4%BA%E5%B7%A5%E7%A8%8B%EF%BC%9APrompt-Engingering"><span class="nav-number">6.</span> <span class="nav-text">5. 什么是提示工程：Prompt Engingering</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-%E6%8F%90%E7%A4%BA%E5%B7%A5%E7%A8%8B%EF%BC%88Prompt-Engingeering%EF%BC%89%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%96%B9%E5%BC%8F"><span class="nav-number">7.</span> <span class="nav-text">6. 提示工程（Prompt Engingeering）的基本方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1-Zero-shot-Prompting"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 Zero-shot Prompting</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-2-Few-shot-Prompting"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 Few-shot Prompting</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-3-instruction-Prompting"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 instruction Prompting</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-Prompt-Engingeering%E7%9A%84%E7%BB%84%E5%90%88%E6%96%B9%E5%BC%8F"><span class="nav-number">8.</span> <span class="nav-text">7. Prompt Engingeering的组合方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#7-1-Chain-of-Thought-Prompting"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 Chain-of-Thought Prompting</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-1-Few-shot-CoT"><span class="nav-number">8.1.1.</span> <span class="nav-text">7.1.1 Few-shot CoT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-2-Zero-shot-CoT"><span class="nav-number">8.1.2.</span> <span class="nav-text">7.1.2 Zero-shot CoT</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-2-Recursive-Prompting"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 Recursive Prompting</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-3-CoT-%E4%B8%8E-%E9%80%92%E5%BD%92%E6%8F%90%E7%A4%BA%E7%9A%84%E6%B7%B7%E5%90%88%E4%BD%BF%E7%94%A8"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 CoT 与 递归提示的混合使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-%E8%87%AA%E5%8A%A8%E6%8F%90%E7%A4%BA%E7%9A%84%E8%AE%BE%E8%AE%A1"><span class="nav-number">9.</span> <span class="nav-text">8. 自动提示的设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#8-1-%E8%87%AA%E5%8A%A8%E6%8F%90%E7%A4%BA%E5%B7%A5%E7%A8%8B"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 自动提示工程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-2-%E8%87%AA%E5%8A%A8%E6%9E%84%E5%BB%BACoT"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 自动构建CoT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-3-%E5%9F%BA%E4%BA%8E%E8%81%9A%E7%B1%BB%E7%9A%84CoT-%E6%9E%84%E5%BB%BA"><span class="nav-number">9.3.</span> <span class="nav-text">8.3 基于聚类的CoT 构建</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#9-%E6%8F%90%E7%A4%BA%E5%B7%A5%E7%A8%8B%E7%9A%84%E5%B8%B8%E8%A7%81%E5%AE%9E%E8%B7%B5"><span class="nav-number">10.</span> <span class="nav-text">9. 提示工程的常见实践</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#10-Prompt-engineering-%E7%9A%84%E6%8C%91%E6%88%98%E4%B8%8E%E6%9C%AA%E6%9D%A5"><span class="nav-number">11.</span> <span class="nav-text">10. Prompt engineering 的挑战与未来</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">275</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">87</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">4.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">67:08</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

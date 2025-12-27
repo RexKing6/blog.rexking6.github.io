@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="聊聊搜索系统4：query理解">
+<meta property="og:url" content="https://blog.rexking6.top/2025/03/15/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F4%EF%BC%9Aquery%E7%90%86%E8%A7%A3/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250315200918489.png">
+<meta property="article:published_time" content="2025-03-15T11:58:49.000Z">
+<meta property="article:modified_time" content="2025-03-15T12:15:45.345Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="检索">
+<meta property="article:tag" content="搜索系统">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/image-20250315200918489.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2025/03/15/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F4%EF%BC%9Aquery%E7%90%86%E8%A7%A3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>聊聊搜索系统4：query理解 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2025/03/15/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F4%EF%BC%9Aquery%E7%90%86%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          聊聊搜索系统4：query理解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-03-15 19:58:49 / 修改时间：20:15:45" itemprop="dateCreated datePublished" datetime="2025-03-15T19:58:49+08:00">2025-03-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E6%A3%80%E7%B4%A2/" itemprop="url" rel="index"><span itemprop="name">检索</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E6%A3%80%E7%B4%A2/%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">搜索系统</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/03/15/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F4%EF%BC%9Aquery%E7%90%86%E8%A7%A3/" class="post-meta-item leancloud_visitors" data-flag-title="聊聊搜索系统4：query理解" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>5.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247489857&amp;idx=1&amp;sn=842ad63192fd3191111b9483c76fee0e&amp;chksm=e88241dfdff5c8c92dd6a0ddb201b2ef856c0536776c9e495647830cf48cc2430d3baf162e6d&amp;scene=21#wechat_redirect">前沿重器[51] | 聊聊搜索系统4：query理解</a>。</p>
+<p>query理解在我之前的文章里可以说写的非常多了，但是随着技术发展，这个模块无论是所需要做的事，还是完成任务的方法，都已经发生了很大的变化，本期我会在原有技术体系的同时，也放入一些比较新的思路和技术方案。往期提及的可能有这些：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247488093&amp;idx=1&amp;sn=446b6b2ee51feebf56d16b852f0c8471&amp;chksm=e8824ac3dff5c3d57f9079b66387b6e8a709652afdeb44cc2f16fbc7112330812fc893b335b8&amp;scene=21#wechat_redirect">前沿重器23 | 聊聊对话系统：query理解</a></li>
+<li><a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247487273&amp;idx=1&amp;sn=1b7cf49f906942b145815532582efdee&amp;chksm=e88257b7dff5dea15b9471cf97c481514e3461505a3e29688927b484edf10d871ee71680dc30&amp;scene=21#wechat_redirect">心法利器34 | 报告小结：query理解概述</a></li>
+<li><a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247486139&amp;idx=1&amp;sn=ae4e206865676b5171779f30cb69ed62&amp;chksm=e8825225dff5db33c7c72af05dd2928b60fd4e2904e06cd6315480741ded6696084cf61bd91a&amp;scene=21#wechat_redirect">前沿重器4 | 腾讯搜索的Query理解如何直击心灵</a></li>
+<li><a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247485241&amp;idx=1&amp;sn=a4ecae4a076ab89702bfb1f5e6361747&amp;chksm=e8825fa7dff5d6b1043e2b82a0de55adc591d33d8bcbc18d0534876890d2778beea370a826d5&amp;scene=21#wechat_redirect">R&amp;S24 | 浅谈Query理解和分析</a></li>
+</ul>
+<p>另外，一些之前写过的内容，本文就不再展开了，我会在对应位置放上我之前写过文章的链接，大家有兴趣可以跳转链接学习。</p>
+<h1 id="1-query理解目标"><a href="#1-query理解目标" class="headerlink" title="1. query理解目标"></a>1. <strong>query理解目标</strong></h1><p>query理解是对query内容的处理并进行信息抽取，query是用户最直接表达的需求，毋庸置疑，尤其是搜索场景，在用户已经明确提出需求的情况下，只有充分理解用户的需求，才能得到正确的结构。</p>
+<p>显然，query理解，处理对象就是query，而具体需要做什么，是要根据下游需求来定的，例如如果需要特定的实体，则query理解要抽实体，如果下游要做向量召回，则query理解需要做向量化。</p>
+<p>拍脑袋想或者是扩大需求范围、难度都是无意义的。有些时候我们考虑的比较多也比较深入，例如多意图、不连续实体、指代之类的问题，在特定项目或者特定阶段下并非高频、重点问题时，可以暂时跳过，优先处理高频、重点问题，等后续类似这些问题逐步明显再来考虑，这个错误很容易在做query理解时犯，所以特别提醒一下。常见的问题一般是实体说法覆盖度、分类边界、长句短句等的问题会比较多。</p>
+<p>写的过程中回忆起，在大模型出来不久后我就对query理解的地位和意义做了一些分析（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247488762&amp;idx=1&amp;sn=f38df281092cda169e090e0f3b02142a&amp;chksm=e8824c64dff5c5721990df99de0b2f0ae54247e113ff2dbb36c094d4ee310a9c6e232ed05326&amp;scene=21#wechat_redirect">心法利器82 | chatgpt下query理解是否还有意义</a>），现在回头看一些技术判断还是正确的，随着大模型系统的逐渐成熟，某些关键部位还是得以保留，大模型逐渐成为更底层基础的能力，但是架构设计考虑的可能更加多元化，可维护性、性能、成本等，在探索后还是重新收敛回目前的状态，形成共识。</p>
+<h1 id="2-主要工作概述"><a href="#2-主要工作概述" class="headerlink" title="2. 主要工作概述"></a>2. <strong>主要工作概述</strong></h1><p>主要是新技术逐步引入和迭代，此处分为基础工作和拓展工作，基础工作主要聚焦传统的信息抽取，如意图、实体之类的基础工作，而拓展工作则更多是向量化、改写（特指类似大模型拓展之类的工作）等比较新的工作。</p>
+<h2 id="2-1-基础工作"><a href="#2-1-基础工作" class="headerlink" title="2.1 基础工作"></a>2.1 <strong>基础工作</strong></h2><p>query理解是需要对query内容进行处理并进行信息抽取。我们来从下面一张腾讯搜索给出的图，粗略地看query理解需要经历哪些流程（这张图来自<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/112719984，同时我也对该文章进行过解读[前沿重器4">https://zhuanlan.zhihu.com/p/112719984，同时我也对该文章进行过解读[前沿重器4</a> | 腾讯搜索的Query理解如何直击心灵](<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247486139&amp;idx=1&amp;sn=ae4e206865676b5171779f30cb69ed62&amp;chksm=e8825225dff5db33c7c72af05dd2928b60fd4e2904e06cd6315480741ded6696084cf61bd91a&amp;scene=21#wechat_redirect)）。">http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247486139&amp;idx=1&amp;sn=ae4e206865676b5171779f30cb69ed62&amp;chksm=e8825225dff5db33c7c72af05dd2928b60fd4e2904e06cd6315480741ded6696084cf61bd91a&amp;scene=21#wechat_redirect)）。</a></p>
+<p><img src="https://image.rexking6.top/img/image-20250315200918489.png" alt="query理解过程"></p>
+<p>从图中可以看到，主要有下面几个工作（之前专门写过的，我会附上我之前写过的文章）：</p>
+<ul>
+<li>预处理：大小写、全半角、繁简体、长度截断。</li>
+<li>分词：领域词库、新词发现、多粒度、词性、停用词等。</li>
+<li>query改写：纠错（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247485846&amp;idx=1&amp;sn=c1afbd844f9464753ac7879c82201274&amp;chksm=e8825108dff5d81ea13818328ce574d304754c2e18039b4708162ff8c6df35c3a393cfdb96ee&amp;scene=21#wechat_redirect">NLP.TM37 | 深入讨论纠错系统</a>）、归一、拓展。</li>
+<li>Term分析：分词、重要性（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247484979&amp;idx=1&amp;sn=5bfb68d7347b57f0f0e2caf13014e4f7&amp;chksm=e8825eaddff5d7bb9899ef50043a852886999a3f20c7c22661879c6214093fbf2b4c8f61aa79&amp;scene=21#wechat_redirect">NLP.TM20 | 词权重问题</a>、<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247487163&amp;idx=1&amp;sn=2079c31eb0bcbe2fe419c5e22a22caba&amp;chksm=e8825625dff5df33f159f5d504587057646258e023fc807d6ef41382c767f1d0dcfba9d48374&amp;scene=21#wechat_redirect">心法利器33 | 快速的关键词抽取baseline</a>）、紧密度。（这里我要补充一个NER，我理解NER应该属于这个位置且不可或缺）</li>
+<li>意图识别（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247485259&amp;idx=3&amp;sn=712712b3d350d9ddfce4637429b78f92&amp;chksm=e8825fd5dff5d6c32d1bfeb317bd0423b6ea74c7671c5b13d0066e1127f92b19e00f5a3d1f48&amp;scene=21#wechat_redirect">R&amp;S25 | 搜索中的意图识别</a>、<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247488016&amp;idx=1&amp;sn=840dcd8585c294a5611e99888a27ae1b&amp;chksm=e8824a8edff5c39821117112b85636411d53b312440f070aeb5e31d4f79ef2a5d5fb443324fe&amp;scene=21#wechat_redirect">前沿重器20 | 文本分类和意图识别调研思考</a>）：精准&amp;模糊。</li>
+<li>敏感识别、时效分析、人工干预等。</li>
+</ul>
+<p>从这个流程来看，大到意图识别、改写、term分析这些常见且精力花费比较多的模块，小到大小写、新词发现之类的小操作，都被放在了query理解里面，这些工作尽管历史已经非常悠久（其实也就十来年吧），但目前，无论是历史同样悠久的成熟搜索系统，还是新建的搜索系统（甚至包括multiagent），都仍有他们的影子，还是非常重要。</p>
+<h2 id="2-2-拓展工作"><a href="#2-2-拓展工作" class="headerlink" title="2.2 拓展工作"></a>2.2 <strong>拓展工作</strong></h2><p>拓展工作因为还处于探索阶段，所以并没有体系化，从我现在的视角看，有两个非常重要的工作要提及。</p>
+<p>第一是向量化。向量化是随着向量表征模型以及向量索引的发展而逐步成为了一个基本操作，对现在的很多系统而言，向量检索都是大家很容易想到的方法，而他的便捷性也让他最近的选型优先级超过字面检索成为了重要的baseline。</p>
+<p>第二是改写。与其说是新工作，不如说是原有改写工作的升级。大模型的出现让句子改写这一任务的门槛降低，且用户对性能的容忍度提高。改写能让下游检索和相似度计算更加简单，且prompt工程能让bad case修复变得更加简单，所以也成为query理解中的宠儿。</p>
+<p>下面我就展开讲几个比较重要。通用的query理解模块。</p>
+<h1 id="3-意图识别"><a href="#3-意图识别" class="headerlink" title="3. 意图识别"></a>3. <strong>意图识别</strong></h1><p>意图识别应该是我的文章里聊的最多的东西了，因为无论是在搜索还是在对话，都有很重要的作用，甚至可以说，贯穿整个系统的生命周期，一直需要花费很多精力。</p>
+<p>先说什么是意图识别。从用户需求出发，意图识别是为了识别用户具体要什么，以便系统给出适当的回应；而对于系统而言，他是拆分后续处理模式的一个分流器，举个例子，用户是想查天气，系统是通过query来理解到这层信息，让下游去执行查天气这个动作，这个分流动作在现实应用并不罕见，语音助手里可以叫技能识别，多轮下要做对话决策，大模型里的function call需要决策用哪个function，Agent领域里有路由，本质上都是类似的工作，细品这里面的关系，可以发现领域不同叫法不同罢了。</p>
+<p>有关意图识别的技术方案，目前已经形成比较稳定的几个技术流派：</p>
+<ul>
+<li>词典/规则/正则：（词典匹配可以参考这个：<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247487674&amp;idx=1&amp;sn=d7c37cffab4b61ce08d0ddd8c26c0934&amp;chksm=e8824824dff5c132b530e6bc36fd980064be421cbc58f13fd77c5d76efa6234d669ea2123e5b&amp;scene=21#wechat_redirect">心法利器41 | 我常说的词典匹配到底怎么做</a>）顾名思义不多解释，技术落地非常简单，而且准确率高，比较适合特征明显、名词性很强的领域，另外对变化频繁的领域也适合（因为可以配置词典）。但是众所周知的泛化能力低，所以挺多人不喜欢用吧（我自己其实还挺喜欢的。。。）</li>
+<li>分类模型：看成是分类问题，然后用分类模型来做，textcnn、bert都可以，甚至用大模型（特指训练这种模式）也是可以的。是通用性最高的方案了，所以被很多场景选用。而且大家研究的深度也比较深，已经探索到OOD域外识别（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247488750&amp;idx=1&amp;sn=2a2ed73023e3bd555d1e85b2ca4c649a&amp;chksm=e8824c70dff5c566363799bec2b5d4be15cc020ad8a004ee579e79f2fdcedb650a908b2c1794&amp;scene=21#wechat_redirect">前沿重器32 | 域外意图检测——解决“没见过”的问题</a>）、超多分类（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247488146&amp;idx=1&amp;sn=8dee9218fa6042ab997e647428fc3123&amp;chksm=e8824a0cdff5c31a824532441674b799a3f021dabddbea48eda3e18cdbb74b99b0168d9ac198&amp;scene=21#wechat_redirect">心法利器57 | 文本多分类问题经验</a>）等搜索比较常见的问题也有被拿来研究。但是因为模型的分类信息来源于训练数据，根据业务发展变化的敏捷性可能会不足。（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247488603&amp;idx=1&amp;sn=0f3ed1b1089d172445d95e454678e938&amp;chksm=e8824cc5dff5c5d3a64d7b60ccbe217b2dbfefbf1ccd90283e8a7e2b0c43a01151b0212783bf&amp;scene=21#wechat_redirect">心法利器77 | 文本分类日常提点技巧</a>、<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247487944&amp;idx=1&amp;sn=091d4a6647e7cf70fa6d813376f1cb57&amp;chksm=e8824956dff5c040e3c7ffa8c0301bc839eb9d832f77663bc4f5bc4f49a3ae178287aade4303&amp;scene=21#wechat_redirect">心法利器48 | 开放域文本分类技术思考</a>、<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247487101&amp;idx=1&amp;sn=f511c12331fb7c2b33bdd973efd4e2a7&amp;chksm=e88256e3dff5dff57393ea70a09544c5e949cefb6b2c25588ea4069008e52387a279e34fb815&amp;scene=21#wechat_redirect">心法利器29 | 把文本分类任务做成一个系统</a>、<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247487101&amp;idx=1&amp;sn=f511c12331fb7c2b33bdd973efd4e2a7&amp;chksm=e88256e3dff5dff57393ea70a09544c5e949cefb6b2c25588ea4069008e52387a279e34fb815&amp;scene=21#wechat_redirect">心法利器29 | 把文本分类任务做成一个系统</a>）</li>
+<li>以搜代分（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247487022&amp;idx=1&amp;sn=8d4637014107c76c895cbed2e3d6f81b&amp;chksm=e88256b0dff5dfa61c3b8fe5b7041b7b2a172ca5df4aca02decec6abfcff2b61b48e7687d1df&amp;scene=21#wechat_redirect">心法利器26 | 以搜代分：文本多分类新思路</a>、<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247488192&amp;idx=1&amp;sn=34c58a1035d3521d10ea7d4001d27d82&amp;chksm=e8824a5edff5c3484acb9a891d8ac936df89504ab78138fb5828cd602c55bb795b5887f2909f&amp;scene=21#wechat_redirect">心法利器58 | 从长尾问题到以搜代分的机理探索</a>、<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247488263&amp;idx=1&amp;sn=9d0cc44ddd621fe56731eabbaecf3990&amp;chksm=e8824b99dff5c28f7723688c924e67519b40a78e61d051f983318c34ce037a187cb3aa724f5b&amp;scene=21#wechat_redirect">心法利器60 | 以搜代分的生效机理</a>）：用检索来进行分类识别。相比分类模型，他对模型的依赖会更小，只要一个语义表征问题就能有优化，而且面对few-shot、变化频繁的任务也非常适合，不过效果上限对样本，即入库的数据依赖性很大，复杂场景就有可能会逐步退化为词典方案（仔细想词典匹配本身也属于一种搜索）。</li>
+<li>大模型：常规的大模型已经具有一定的推理能力，在简单场景，通过prompt描述规则或者通过in-context learning的方式，能较快完成基础操作，属于快速启动的一种方案，大大降低了在数据挖掘、标注方面的成本，但性能、资源消耗还是大模型固有的问题，而且上限并未和传统分类模型拉开差距，因此只能是其中一种选择。</li>
+</ul>
+<p>我在意图识别做的时间比较久了，斗胆在这里提几个可能比较经常遇到的难题以及解决方案吧。</p>
+<ul>
+<li>高频类目体系变化的问题。对于一个还在发展建设的搜索提供，意图增加是很正常，如果用一个分类模型来做所有的意图识别（多分类），越到后面越会觉得力不从心，此时可以考虑多个小的二分类模型或者长尾的意图，用以搜代分来处理，然后定期对稳定且比较大的类目用多分类模型管理起来，这套方案会更合适。</li>
+<li>超多分类。在电商搜索、成熟开放域推荐系统、复杂对话系统等常见可能会遇到，成百上千的分类，而且类目样本数据很不均衡，对于高频的类目，可以考虑用多分类模型（预留other类），低频类目在这个多分类模型下会被分到other类，再用以搜代分处理，毕竟样本很少分类模型也不好学。</li>
+<li>兜底问题。无意义、超纲query出现的概率很低，在各个分类模型下，需要预留other类来作为“垃圾桶”放这些东西，否则模型会自己选一个已有的类作为这个“垃圾桶”，从而出现无法观测的bad case。</li>
+<li>短句问题。类似手机场景，用户对长句输入一般是反感的，所以短句非常常见，但短句是模型容易失效的部分，没有上下文信息，无法推测，而词典规则则很好处理，如果大部分样本都是3-5字以内的短句，推荐大家优先考虑词典之类的方式来做。</li>
+<li>长句问题。长句也是模型容易出问题的部分，一方面在训练集里容易比较低频，另一方面长句信息多容易造成干扰、丢失和稀释。针对这个问题，一般可以升级（使用更大size的）模型、增加长句样本、句子截断等方式来做。(之前我有专门聊过长短句的问题：<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247487992&amp;idx=1&amp;sn=a07de64da1588ee3ede499413966409d&amp;chksm=e8824966dff5c070089da72c3e3bf15d2057386f71a92451ebb972998ec96443102cf9abebeb&amp;scene=21#wechat_redirect">心法利器51 | 长短句语义相似问题探索</a>）</li>
+</ul>
+<h1 id="4-Term分析"><a href="#4-Term分析" class="headerlink" title="4. Term分析"></a>4. <strong>Term分析</strong></h1><p>如果说意图识别是对整个query进行分析，那Term分析就是对query内部的内容进行分析了，常规的工作有这些：</p>
+<ul>
+<li>实体抽取。方便下游进行结构化检索，用实体去查实体，具有很高的准确性。</li>
+<li>词权重（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247484979&amp;idx=1&amp;sn=5bfb68d7347b57f0f0e2caf13014e4f7&amp;chksm=e8825eaddff5d7bb9899ef50043a852886999a3f20c7c22661879c6214093fbf2b4c8f61aa79&amp;scene=21#wechat_redirect">NLP.TM20 | 词权重问题</a>、<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247487163&amp;idx=1&amp;sn=2079c31eb0bcbe2fe419c5e22a22caba&amp;chksm=e8825625dff5df33f159f5d504587057646258e023fc807d6ef41382c767f1d0dcfba9d48374&amp;scene=21#wechat_redirect">心法利器33 | 快速的关键词抽取baseline</a>）。词权重配合BM25或者是cqr/ctr之类的字面相似度计算方案（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247486726&amp;idx=1&amp;sn=370c5304d270517ce0cc27fc9e21d01c&amp;chksm=e8825598dff5dc8ebabb9f9454d83a37dacbfbe6b54cb399325b63e0cb36e393ed5c43b55f07&amp;scene=21#wechat_redirect">心法利器18 | cqr&amp;ctr：文本匹配的破城长矛</a>、<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247489205&amp;idx=1&amp;sn=94442b88c055fe33a20bf11247f4bdbb&amp;chksm=e8824e2bdff5c73dcb19860d8348bda86c98da66ba2bdfb88ef899866361f5fc21b57cad8279&amp;scene=21#wechat_redirect">心法利器99 | 无监督字面相似度cqr/ctr源码</a>），能提升字面相似度计算的效果。</li>
+<li>紧密度。也是字面检索阶段的产物，配合字面相似度，能解决“雪花牛肉”误召回“雪花啤酒、红烧牛肉”的问题。</li>
+</ul>
+<p>这里重点讲一下实体抽取，有两个需要强调的内容。</p>
+<ul>
+<li>实体抽取的重要性。向量召回不太好解决的常见，往往用实体抽取配合字面检索有很好的效果，例如数字相关的召回（1962年出生的人）、严格名词相关的召回（搜“周杰”容易误召“周杰伦”）</li>
+<li>大模型对实体抽取的提升是很大的。早年用实体抽取模型，尽管纸面指标比较好，但是仍然会出现归一化、不连续实体之类的问题，需要配合分类模型或者魔改模型来做，但是大模型这种生成式的方案，能很大程度解决上述的问题。</li>
+</ul>
+<h1 id="5-改写"><a href="#5-改写" class="headerlink" title="5. 改写"></a>5. <strong>改写</strong></h1><p>改写也是搜索中常见的手段，主要目标是通过改写，改成适合下游进行检索、相似度计算的说法，例如KFC改成肯德基，能很大程度方便直接字面检索，向量检索上也有很大收益（毕竟向量模型也会很大程度参考字面的相似度）。有些时候，也会把纠错放在这个模块里（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247485846&amp;idx=1&amp;sn=c1afbd844f9464753ac7879c82201274&amp;chksm=e8825108dff5d81ea13818328ce574d304754c2e18039b4708162ff8c6df35c3a393cfdb96ee&amp;scene=21#wechat_redirect">NLP.TM37 | 深入讨论纠错系统</a>），因为两者性质还是接近的。</p>
+<p>常见的改写手段，就是挖掘同义词然后同义词替换，然后就是纠错了，当然有些场景会训练一些seq2seq的方式来做，之前我也分享过知乎的改写工作（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247487149&amp;idx=1&amp;sn=9554931fa7e5b1049531366adbaf9ac3&amp;chksm=e8825633dff5df25c37887a211f68331e1cb8b98f681d4b62298cf530c7a56a1caff8b222500&amp;scene=21#wechat_redirect">前沿重器13 | 知乎query改写思路启示</a>），但在实践上这么操作还是比较少，主要是因为改写一般业务定制的要求会比较高，他的输出对下游计算的影响很大，但可控性又比较尴尬，因此也会相对谨慎。</p>
+<p>然而大模型的出现，生成任务的启动成本降低，类似换个说法、风格迁移之类的问题能很快解决，因此改写能做的事产生了一定的变化，有些时候甚至可以帮忙做拓展了，而不只是改写那么简单。例如我之前分享过的query2doc（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247489295&amp;idx=1&amp;sn=fcb269e47dc27fcaf31201aa1c75dafb&amp;chksm=e8824f91dff5c687a3a95d18490c8d2ba9b18d1b7cd5bc614e01ef3d7dd6d72aa62bcc0c2b0d&amp;scene=21#wechat_redirect">前沿重器38 | 微软新文query2doc：用大模型做query检索拓展</a>）以及在此之前的HyDE论文都有提到，可以通过让大模型提前回复用户的问题，用大模型的答案来做检索提升召回率的方案，这个在我自己的场景下也有重大收益，非常推荐大家尝试，尤其是早期各种数据都不太够的情况下，同时大家也能继续发挥想象，看看这个领域还有什么可以尝试的创新点。</p>
+<h1 id="6-向量化"><a href="#6-向量化" class="headerlink" title="6. 向量化"></a>6. <strong>向量化</strong></h1><p>向量化这事并不是最近一两年就有，而是很久之前就已经有了，而且也被广泛应用在多个领域。（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247488338&amp;idx=1&amp;sn=d38ab9ee03cc70aef25e74ef5e2d4ca5&amp;chksm=e8824bccdff5c2da04706c93223e6a306d8c91e51ffbdff7215924e18bce1ced3debc0130402&amp;scene=21#wechat_redirect">前沿重器28 | 前沿的向量召回都是怎么做的</a>、<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247487695&amp;idx=1&amp;sn=370ac19afbbb2c27a07ed6c3fa8b9b70&amp;chksm=e8824851dff5c1474f522ef37a17661900fd1494c9043ebc1b94426d219fc0053f098538b4b9&amp;scene=21#wechat_redirect">前沿重器18 | KDD21-淘宝向量检索</a>）</p>
+<p>搜索里比较常见的向量化目标，大都是基于语义，即对用户query进行语义表征，从早年的孪生网络到sentence-bert，再到对比学习为代表的simcse，以及目前比较流行的BGE等，都是各个时代的优秀代表。</p>
+<p>之前的研究都聚焦在对称相似度上，即query和doc都在同一语义空间，两个句子在语义层面就是相同的，这种方式方便标注和训练，因此这类型的问题在三四年前就已经比较成熟，随着对比学习的发展，simcse成为那时候的版本答案，但现实中我们很难抽到很合适的样本做在线推理，我们更多时候只有文档而没有问题，此时对称相似度就很尴尬，因此大家的目标会转向不对称相似度。</p>
+<p>不对称相似度强调两个句子并不在语义空间，例如问答对，早年都依赖样本训练，在后续的发展中，如BGE等，在prompt和类似RetroMAE模型架构升级下，不对称相似度模型的通用能力得到大幅加强，即使不进行训练也有不错的效果。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2025\03\09\聊聊搜索系统2：常见架构\" rel="bookmark">聊聊搜索系统2：常见架构</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2025\03\09\聊聊搜索系统1：开篇语\" rel="bookmark">聊聊搜索系统1：开篇语</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2025\03\15\聊聊搜索系统3：文档内容处理\" rel="bookmark">聊聊搜索系统3：文档内容处理</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2025/03/15/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F4%EF%BC%9Aquery%E7%90%86%E8%A7%A3/" title="聊聊搜索系统4：query理解">https://blog.rexking6.top/2025/03/15/聊聊搜索系统4：query理解/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E6%A3%80%E7%B4%A2/" rel="tag"># 检索</a>
+              <a href="/tags/%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F/" rel="tag"># 搜索系统</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/03/15/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F3%EF%BC%9A%E6%96%87%E6%A1%A3%E5%86%85%E5%AE%B9%E5%A4%84%E7%90%86/" rel="prev" title="聊聊搜索系统3：文档内容处理">
+      <i class="fa fa-chevron-left"></i> 聊聊搜索系统3：文档内容处理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/03/15/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F5%EF%BC%9A%E5%8F%AC%E5%9B%9E%EF%BC%9A%E6%A3%80%E7%B4%A2%E3%80%81%E7%B2%97%E6%8E%92%E3%80%81%E5%A4%9A%E8%B7%AF%E5%8F%AC%E5%9B%9E/" rel="next" title="聊聊搜索系统5：召回：检索、粗排、多路召回">
+      聊聊搜索系统5：召回：检索、粗排、多路召回 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-query%E7%90%86%E8%A7%A3%E7%9B%AE%E6%A0%87"><span class="nav-number">2.</span> <span class="nav-text">1. query理解目标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E4%B8%BB%E8%A6%81%E5%B7%A5%E4%BD%9C%E6%A6%82%E8%BF%B0"><span class="nav-number">3.</span> <span class="nav-text">2. 主要工作概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%E5%9F%BA%E7%A1%80%E5%B7%A5%E4%BD%9C"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 基础工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%E6%8B%93%E5%B1%95%E5%B7%A5%E4%BD%9C"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 拓展工作</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E6%84%8F%E5%9B%BE%E8%AF%86%E5%88%AB"><span class="nav-number">4.</span> <span class="nav-text">3. 意图识别</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-Term%E5%88%86%E6%9E%90"><span class="nav-number">5.</span> <span class="nav-text">4. Term分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%E6%94%B9%E5%86%99"><span class="nav-number">6.</span> <span class="nav-text">5. 改写</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-%E5%90%91%E9%87%8F%E5%8C%96"><span class="nav-number">7.</span> <span class="nav-text">6. 向量化</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">275</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">87</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">4.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">67:08</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

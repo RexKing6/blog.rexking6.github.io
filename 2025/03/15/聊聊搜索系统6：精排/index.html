@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+  <link rel="mask-icon" href="/images/favicon.ico" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.rexking6.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":true,"show_result":true,"style":"flat"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#37c6c0","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"YS7HT61SEB","apiKey":"0fd1eba022e7883c76ff4a71aee2acdc","indexName":"blog_NAME","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"找不到关于 ${query} 的文章","hits_stats":"共找到 ${hits} 篇文章，花了 ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="聊聊搜索系统6：精排">
+<meta property="og:url" content="https://blog.rexking6.top/2025/03/15/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F6%EF%BC%9A%E7%B2%BE%E6%8E%92/">
+<meta property="og:site_name" content="RexKing6&#39;s Note">
+<meta property="og:description" content="...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250315203722765.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250315203749462.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250315203830950.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250315203858755.png">
+<meta property="og:image" content="https://image.rexking6.top/img/image-20250315203936071.png">
+<meta property="article:published_time" content="2025-03-15T12:33:43.000Z">
+<meta property="article:modified_time" content="2025-03-15T12:41:28.661Z">
+<meta property="article:author" content="Run-Qing Chen">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="检索">
+<meta property="article:tag" content="搜索系统">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image.rexking6.top/img/image-20250315203722765.png">
+
+<link rel="canonical" href="https://blog.rexking6.top/2025/03/15/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F6%EF%BC%9A%E7%B2%BE%E6%8E%92/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>聊聊搜索系统6：精排 | RexKing6's Note</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="RexKing6's Note" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">RexKing6's Note</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container"></div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="algolia-results">
+  <div id="algolia-stats"></div>
+  <div id="algolia-hits"></div>
+  <div id="algolia-pagination" class="algolia-pagination"></div>
+</div>
+
+      
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/rexking6" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.rexking6.top/2025/03/15/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F6%EF%BC%9A%E7%B2%BE%E6%8E%92/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Run-Qing Chen">
+      <meta itemprop="description" content="覆苍天以为衾，卧大地以为庐。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="RexKing6's Note">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          聊聊搜索系统6：精排
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-03-15 20:33:43 / 修改时间：20:41:28" itemprop="dateCreated datePublished" datetime="2025-03-15T20:33:43+08:00">2025-03-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E6%A3%80%E7%B4%A2/" itemprop="url" rel="index"><span itemprop="name">检索</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/%E6%A3%80%E7%B4%A2/%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">搜索系统</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/03/15/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F6%EF%BC%9A%E7%B2%BE%E6%8E%92/" class="post-meta-item leancloud_visitors" data-flag-title="聊聊搜索系统6：精排" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>转载于：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/aIVYnms6SfMbWmOpTqcTIQ">前沿重器[53] | 聊聊搜索系统6：精排</a>。</p>
+<p>本期的内容是精排，即对召回的内容进行进一步筛选，从而得到更好的结果。</p>
+<p>目录：</p>
+<ul>
+<li>精排的意义</li>
+<li>精排需要考虑的因素</li>
+<li>精排方案设计的框架</li>
+<li>案例分析</li>
+<li>补充讲重排</li>
+<li>大模型精排</li>
+<li>小结</li>
+</ul>
+<p>这个可以说是最百花齐放的模块了，在实践过程中，搜索发展到后期这部分的花活就会变得异常多，无论是论文还是各种分享，但我发现论文和各种分享多半是从自身面对的场景出发的，因地制宜的成分很多，因此这次我换个说法，先从思路下手，先把这部分的整体逻辑讲明白，然后再用一些案例来进行讲解。</p>
+<h1 id="1-精排的意义"><a href="#1-精排的意义" class="headerlink" title="1. 精排的意义"></a>1. <strong>精排的意义</strong></h1><p>首先，还是要重申一下精排的概念。所谓的精排，在整个搜索里，核心功能是在获得召回结果的基础上，整理出精准的结果。这里有一个前提，那就是在召回结果的基础上，没有召回的精排是没有意义的。</p>
+<p>这里就要引出一个问题，就是两者会有什么区别。这个问题谈清楚了，大家就会明白精排在整个搜索过程中的作用。</p>
+<p>最直接的，召回和精排的对象是不一样的。召回面对的是整个数据库里的所有数据，而精排面对的是召回已经找回来的少量数据，这是两者处理思路不同的核心原因。</p>
+<p>召回是大海捞针，精排是百里挑一。召回的过程类似筛简历，用一些比较粗暴的方式快速过滤很多“一定不对的内容”，从而得到相对不那么离谱的答案。类似向量召回之类的，要通过把句子向量化才能进行快速匹配和筛选，其本质就是在空间中以query为中心画个圈，只把圈内的内容拿出来；精排则像是面试，对几个简历还算不错的人进行进一步的筛选，这一步因为是进行深入面试和理解，尽管精排的准确性高但是速度慢，所以需要召回来进行配合。</p>
+<p>精排的性质是优中选优。继续从对象触发，精排面对的是召回已经找出的数据，这些数据从某个角度而言，已经被判为和query存在一定关系，但是随着物料的增加，“有一点关系”并不足够满足用户需求，所以要进行更精确的比对，因此此处要做的是进一步提升召回物料之间的差距。</p>
+<p>另外，精排的综合性要求更高。召回层是可以基于很多不同的依据来分别做的，而精排则不然，需要尽可能把多个因素放一起综合地来做。</p>
+<h1 id="2-精排需要考虑的因素"><a href="#2-精排需要考虑的因素" class="headerlink" title="2. 精排需要考虑的因素"></a>2. <strong>精排需要考虑的因素</strong></h1><p>前文有提到，精排的综合性要求很高，我们就需要考虑很多因素，相比召回，我们在这一步就要求考虑的很全面，现在我先把需要考虑的因素用比较笼统的方式列举出来，然后我们再逐个剖析他们如何表征以及怎么放入模型中。</p>
+<ul>
+<li>和query的相关性。这点毫无疑问应该排在前列，毕竟用户进行搜索的核心目标就是要解决query描述的问题，不相关的话搜索无从谈起。</li>
+<li>物料质量。在物料已经比较多的情况下，就要开始考虑把质量比较高的物料放到前面。</li>
+<li>用户偏好。在有用户信息的搜索系统下，或者因为业务需求，就需要将结合考虑到用户的偏好，比较典型的像音乐、电商等搜索场景，对个性化的要求就会比较高。</li>
+</ul>
+<p>和query的相关性，主要可以从这几个角度来去看。</p>
+<ul>
+<li>语义相似度。这个大家应该都比较容易想到，早年比较流行的方式就是类似ESIM之类的方案来做（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247486697&amp;idx=2&amp;sn=186f232ff36593033e1e64b16043d3b6&amp;chksm=e8825477dff5dd615f67646a5690aa99155ceac4c150fa6d74bdb77bc3afe5b4170a73d6bc3a&amp;scene=21#wechat_redirect">前沿重器9 | ESIM：语义相似度领域小模型的尊严</a>），效果确实比非交互的相似度效果好，后续基于bert的句子对相似度也是不错的，而且训练的模式会比较简单，直接用‘q-d-label’的模式就能训练一个还可以的结果，在后续的版本中，迭代到learning to rank方案也比较丝滑。</li>
+<li>用户行为体现的相似度。这个思路和推荐中用的点击率预估是非常相似的，用户搜Q点D，本质就是对内容一定程度的认可，甚至是更为直接的相似度信息，毕竟用户是对这个结果认可的。当然了，有些内容，即使不相关用户也可能点进去，例如某些猎奇或者不合规的内容。</li>
+</ul>
+<p>至于物料的质量，这个可以从两个角度出发。</p>
+<ul>
+<li>物料本身的质量。如话题、文案的合规性、丰富度、新鲜度等，这个会比较简单。</li>
+<li>用户群体对物料的评价。如点击率、单位时间点击量、命中query丰富度、停留时间、点击离开率等，这些是基于用户行为对物料的评价。</li>
+</ul>
+<p>最后就是用户偏好，应该也是后期需要花费时间比较多的一部分。</p>
+<ul>
+<li>多个维度的协同过滤的方式。例如搜索这个query的用户更倾向于点击的内容、某个画像的用户更倾向于点击的内容（群体特征）、该用户平时的点击偏好（个人直接特征）等。</li>
+</ul>
+<p>尽管上述的因素在生产实践中并不是按照这个来应用的，但因为特征来源广泛，往往还充斥着很多无效的信息。我所提出的上述思路更多是为了让大家更加结构化地理解整个精排内部所需要的信息，不容易错漏，相比一个一个比对，根据特定结构化思维来整理效率会更高。</p>
+<p>当然，这只是我们常说的考虑因素，而在实践过程，我们需要把上面考虑的因素，结合信息来源和使用方法，构造成适合应用的模式，即特征，从而应用在精排模型中，于是我们就能推导出精排方案的框架。</p>
+<h1 id="3-精排方案的框架"><a href="#3-精排方案的框架" class="headerlink" title="3. 精排方案的框架"></a>3. <strong>精排方案的框架</strong></h1><p>常规的算法建模，不外乎要考虑的就是三点：数据、特征、模型。早期数据可以通过语义相似度或者是人工标注数据快速构造baseline，后续则逐步切换为在线用户的行为数据，此处不赘述，本章重点讲解后面两种。</p>
+<p>在前面一章节讲到了需要考虑的因素，在实际应用情况，我们会把内容根据信息来源以及后续使用方法进行有机组合构建。</p>
+<p>一般地，从数据来源来看，会把所有特征按照4个维度来构造。</p>
+<ul>
+<li>Query侧：通过query理解来获取，常见的意图、实体包括某些关键词等。</li>
+<li>Doc侧：即文档信息，一般通过内容理解，即在文档内容处理模块处理构造（<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247489797&amp;idx=1&amp;sn=842095bf602758dd3d56fb1297c59ded&amp;chksm=e882419bdff5c88d02634ced0a8bd2fbb497de9bf93cd6e2060919cb7c96087ec3aec5f88814&amp;scene=21#wechat_redirect">前沿重器50 | 聊聊搜索系统3：文档内容处理</a>），这里包括一些类似物料质量、文档摘要等的内容。</li>
+<li>用户侧：用户偏好信息，这个一般是在用户出现行为的过程就能记录，在推理过程一般只需要读取。</li>
+<li>交互特征：Query和Doc之间的匹配度特征，注意这里是一些小特征，如某些计算得到的相似度，语义相似度、字面相似度等，还有一些统计得到的特征，如如历史的曝光点击率等，再者还有一些召回层带下来的信息，多种粗排的相似度特征，召回链路及其个数等。</li>
+</ul>
+<p>有了这些特征就可以开始构造模型把他们融合起来了。合并的链路我喜欢分为3个流派。</p>
+<ul>
+<li>规则加分模式。在前期数据不足不好训练的情况下，直接对几个特征用规则进行简单组合即可使用，别小看这个方法，这个方案在很长一段时间都可以拿来使用。</li>
+<li>机器学习组合模式。通过机器学习模型，例如比较有名的xgboost，可以快速把这些特征进行组合构造。</li>
+<li>深度学习及其变体。因为特别的特征需要用特别的结构来吸纳，所以出现了多种魔改的特征，但效果确实在对应场景有所提升。</li>
+</ul>
+<p>于是，便有了我们所期待的模型。</p>
+<p>这便是我想聊的框架，数据、特征、模型的基础框架，构成搜索精排在实践过程的重要组成部分。在这个框架下，我们可以结合搜索当前的状态以及目前可获得的资源，来灵活设计自己目前需要的方案。</p>
+<ul>
+<li>数据是模型学习的基础，是特征的原料。借助数据能发现可解释的规律，各种突出区分度的特征则是从数据筛选、分析而来。</li>
+<li>特征是数据依据的表达，是query和doc匹配的信息来源。只有构造合理的特征，模型才会生效，所以他是数据依据的表达，同时q和d所谓的是否匹配，</li>
+<li>模型是数据的通用表示，是特征有机组合完成推理的桥梁。</li>
+</ul>
+<h1 id="4-案例分析"><a href="#4-案例分析" class="headerlink" title="4. 案例分析"></a>4. <strong>案例分析</strong></h1><p>相比列举方法，案例在这里可能会更合适，通过案例分析，尤其对他们面对的问题分析，让大家进一步理解“因地制宜”的重要性。</p>
+<h2 id="4-1-美团"><a href="#4-1-美团" class="headerlink" title="4.1 美团"></a>4.1 <strong>美团</strong></h2><p>美团的分享一直都维持的很好，在搜索方面也涌现了很多优秀的文章，具体可以在这里翻阅：<a target="_blank" rel="noopener" href="https://www.zhihu.com/org/mei-tuan-dian-ping-ji-shu-tuan-dui。本次要讲的精排，并非作为一个专题来讲，而是分布在很多文章内部，通过多篇文章的阅读才梳理出内部的一些细节。涉及这些关键文章：">https://www.zhihu.com/org/mei-tuan-dian-ping-ji-shu-tuan-dui。本次要讲的精排，并非作为一个专题来讲，而是分布在很多文章内部，通过多篇文章的阅读才梳理出内部的一些细节。涉及这些关键文章：</a></p>
+<ul>
+<li>搜索广告召回技术在美团的实践：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/707169501">https://zhuanlan.zhihu.com/p/707169501</a></li>
+<li>大众点评内容搜索算法优化的探索与实践：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/688404734">https://zhuanlan.zhihu.com/p/688404734</a></li>
+<li>多业务建模在美团搜索排序中的实践：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/388211657">https://zhuanlan.zhihu.com/p/388211657</a></li>
+<li>Transformer 在美团搜索排序中的实践：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/131590390">https://zhuanlan.zhihu.com/p/131590390</a></li>
+</ul>
+<p>美团搜索毫无疑问是一个非常具有特点的场景，我的理解结合众多技术文章的分析来看，美团搜索在场景上，具有如下的特点：</p>
+<ul>
+<li>特殊的多业务场景。美食、电影、机票、酒店等个典型场景聚合，显然这种聚合和一般地百度开放域搜索还不太一样，业务场景各异，且各自之间存在高低频的差异，再者不同业务还可能有不同的子目标。</li>
+<li>和电商类似，用户在输入习惯上，可能有大量的内容聚焦在特定的专有名词或者tag上，如“烧烤”、“麦当劳”等。</li>
+<li>检索需要很大程度以来用户画像信息。典型的例子——地点，美团是一个高度依赖地点的场景，美团的几乎所有场景在用户检索时都很大程度依赖地点信息，用户搜索的“烧烤”就需要很大程度地参考地点信息，当然还有别的类似用户个人偏好等也有结合实际场景的依赖，例如美食对口味有依赖等。</li>
+</ul>
+<p>结合上面特点，美团也进行了大量的特别设计。</p>
+<p>首先是特殊的多业务场景，构造了多业务配额模型（Multi-Business Quota Model，MQM）以确认综合搜索下各个业务的配额，有利于他们的有机组合。下面提供了MQM-V2的结构图，从图中可以看到：</p>
+<ul>
+<li>采用多目标的建模方式，以每一路召回是否被点击为目标进行建模，并计算他们整体的联合概率。</li>
+<li>引入了按业务拆分的召回方式，同时这些召回方式在精排内存在一定冷启动需求，所以构造了二维目标应对这种冷启动问题。</li>
+<li>此处的特征考虑了query、user、context、cross等特征。</li>
+<li>用户行为建模上，使用的是transformers结构。</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/image-20250315203722765.png" alt="MQM-V2 模型结构图"></p>
+<p>另外，多业务的精排模型（Multi-Business Network，MBN）也根据这个场景问题进行了特别的优化，下面给出的是精排模型V4的结构。可以看到有如下特点：</p>
+<ul>
+<li>最下游子模块各自建模，应对不同的业务需求，形成快速、独立迭代能力。</li>
+<li>此处特殊的是CGC层，这是一种多任务学习下的思路，来源于腾讯提出的PLE（Progressive Layered Extraction (PLE): A Novel Multi-Task Learning (MTL) Model for Personalized Recommendations），考虑多个专家的模式应对不同场景的问题。（补充，在V3版本中有考虑过MMOE（Modeling Task Relationships in Multi-task Learning with Multi-gate Mixture-of-Experts））（再补充，注意这篇文章的时间线是21年7月，即3年前）</li>
+<li>值得注意的是，这里单独把POI特征给单独拿了出来做表征。</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/image-20250315203749462.png" alt="MBN-V4 模型结构图"></p>
+<p>至于第二点，就是用户比较喜欢输入tag、专名的问题，其实在特征工程上就能发现，在query特征之外，还考虑到了大量其他的特征，尤其是user、poi等特征，特别地针对用户兴趣建模，也是有专门的设计。这里比较有特点的是考虑了transformers结构，此处给出一个美团曾经使用过的一种结构（Transformer&amp;Deep），这篇一定程度参考了AutoInt（Automatic Feature Interaction Learning via Self-Attentive Neural Networks）</p>
+<p><img src="https://image.rexking6.top/img/image-20250315203830950.png" alt="Transformer&amp;Deep"></p>
+<p>至于最后一点，就是用户画像信息的使用，这点承接第二点，从上述模型来看，美团在用户信息表征上做了很多研究工作，尤其是用户的个人行为，毕竟用户行为很大程度反映了用户的偏好，这里给出第三版本的用户行为建模网络。同时友好的是，作者在文章里讲述了很多transformer应用的经验。</p>
+<ul>
+<li>实验表明Transformer能更好地对用户行为（item序列）进行有效建模，甚至由于相对简单的Attention-pooling。</li>
+<li>长序列下Transformer对比GRU优势会更明显，短序列尽管会缩小但仍旧优秀。</li>
+<li>位置编码对长序列有一定效果，但如果已经切分，则效果会被大幅度削弱。</li>
+<li>Transformer编码层不需要太多。</li>
+<li>“头”的个数影响不大。</li>
+</ul>
+<p><img src="https://image.rexking6.top/img/image-20250315203858755.png" alt="用户行为建模网络-V3"></p>
+<h2 id="4-2-知乎"><a href="#4-2-知乎" class="headerlink" title="4.2 知乎"></a>4.2 <strong>知乎</strong></h2><p>相比美团，知乎更像是传统意义的搜索，其主要的物料基本是用户UGC的问答和博客文章，知乎在搜索精排上的迭代发展，也表现出这一特点，而且这个过程会更加纯粹，对用户的参考会更少一些，通过分析可以看到比较纯粹的搜索精排优化，我们来看一起看看。<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/DZZ_BCiNw0EZg7V0KvhXVw">https://mp.weixin.qq.com/s/DZZ_BCiNw0EZg7V0KvhXVw</a></p>
+<p>我们直接从整个优化历程来逐个分析。</p>
+<p>GBDT。GBDT具备比较基础的特征融合能力，也是比较高的baseline。这应该是很多搜索系统常见的基础工作了。</p>
+<p>TF-Ranking。考虑特征容量和技术迭代，以及多目标排序原因，而升级DNN，同时形成了比较规范的特征输入模块、特征转化模块和主网络部分。</p>
+<p><img src="https://image.rexking6.top/img/image-20250315203936071.png" alt="TF-Ranking"></p>
+<p>主网络下，开始考虑多目标排序，权衡阅读时长、点赞、收藏、分享、评论等反馈行为，简单的考虑共享参数层+任务独立参数层的结构来完成（文章中使用Hard sharing来表示）（类似前面美团提到的多业务配额模型），该方式需要通过实验的方式来权衡多目标之间的关系，后面则优化升级为MMOE（Modeling task relationships in multi-task learning with multi-gate mixture-of-experts.），即多个expert加权的方式，权重任务间共享又让任务之间存在独立性。</p>
+<p>考虑搜索中常见的位置偏差（用户浏览行为是从上到下，因此靠前的更容易得到点击），这方面推荐中也是有的，因此优化方案上也存在一些推荐系统的影子，此处考虑两个策略：</p>
+<ul>
+<li>降低头部样本权重，如硬编码位置权重、自学习位置权重等。该方案收益不高。</li>
+<li>通过一个独立的 shallow tower 对 Position Bias 进行建模（Recommending what video to watch next: a multitask ranking system）。如前面的TF-Ranking的图中提到的（Card position）部分。</li>
+</ul>
+<p>学习排序问题。前面一再强调，精排是一个优中选优的对比问题，而这类型的问题，在学术界也有专门的研究，即learning to rank（LTR，之前我竟然还写过点简单的入门，很早之前了<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzIzMzYwNzY2NQ==&amp;mid=2247484897&amp;idx=1&amp;sn=18f855802c0a82c15e2c8b30623d81d2&amp;chksm=e8825d7fdff5d4697efcbcb2ac9fe71b0774704b0bafe9419b6e7ba0b45530cfb532ebf4f2eb&amp;scene=21#wechat_redirect">R&amp;S19 | 学习排序入门级概述</a>），此处考虑使用List wise loss方案（综合效果最优），在推理阶段同样要考虑到list wise，即在对单条打分的同时也要考虑其他被召回的文档，此处使用的是SE Block的结构（Squeeze-and-excitation networks.）。</p>
+<p>文本特征也是需要考虑的。比较简单的方式就是先计算一个语义相似度然后把语义相似度当做特征放入模型，而比较详细的方案就是直接把语义模型（如bert）放入到LTR中进行训练，甚至是整体模型中进行训练。</p>
+<p>另外还有一些诸如个性化、GBDT编码特征、生成对抗模型、在线学习等思路在文中也有简单提到，不赘述。</p>
+<h1 id="5-补充讲重排"><a href="#5-补充讲重排" class="headerlink" title="5. 补充讲重排"></a>5. 补充讲重排</h1><p>重排是基于业务的一个特殊排序阶段，和推荐类似，很多时候精排考虑的更多的还是query+用户画像和doc之间的匹配度，但在重排阶段还需要考虑实际的业务需求，如多样性、内容连贯性等，例如常规的相似度的排序结果在搜索里面很可能会出现同质化，此时就需要通过重排来一定程度实现更符合业务目标的排序。</p>
+<p>这里提3个比较常用的重排策略（<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/462539445/answer/3079023802）。">https://www.zhihu.com/question/462539445/answer/3079023802）。</a></p>
+<ul>
+<li>全局排序——listwise策略，这个同样是LTR的内容，采用诸如序列生成的方式，输出一个用户体验最好的内容序列。</li>
+<li>流量调控——在重排层，借助流量的调控，把热门、新品等有利因素的物料往前倾斜。</li>
+<li>打散策略——在一定窗口下，通过惩罚的方式把某些过于同质的内容往后调整。</li>
+</ul>
+<p>当然，这里的策略都有提到一个点，这些重排策略或多或少都有提到目标，从目标出发解决问题才更直接，不能因为的新颖性或者自己新学到而迫切考虑使用。</p>
+<h1 id="6-大模型精排"><a href="#6-大模型精排" class="headerlink" title="6. 大模型精排"></a>6. 大模型精排</h1><p>有关大模型的精排部分，我是有在阅读一些论文并进行一些常识。不过在实践上收益其实并不高，初步结论是“用处不大没必要硬用”，当然这个也有待进一步探索。目前是发现在精排层会有如下问题。</p>
+<ul>
+<li>由于特征的稀疏性、表征连续性、上下文信息等问题，这些特征很难通过prompt的形式有效输入，尤其是后期比较完善的系统。</li>
+<li>实验表现上，输入大模型的数据顺序对最终决策的影响还是比较大。</li>
+<li>上限很难打过现有比较完善的精排模型。</li>
+<li>老生常谈了，大模型的成本和更新敏捷度问题。</li>
+</ul>
+<p>但值得注意的是，在比较早期，特征不多也不复杂的情况下，可以暂时充当精排模块，但也只是暂时，在同一时期只要有比较好的语义相似度模型（甚至粗排的语义表征相似度），也有可能超过简单基于prompt的大模型。</p>
+<h1 id="7-小结"><a href="#7-小结" class="headerlink" title="7. 小结"></a>7. 小结</h1><p>精排是搜索后期优化的重点部分了，结合大厂走在前面的先决条件，精排方面的分享、论文都很多，所以本文聊下来挺容易刹不住车的，但我还是聚焦于精排研发的常用思路，方便大家把零散的内容给串起来，同时，精排以及重排是最接近用户的一部分了，因此和用户习惯、业务需求关系最为紧密，我们在进行分析的过程，还是需要多看case，多剖析用户习惯，从而实现更优秀的精排效果。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2025\03\09\聊聊搜索系统2：常见架构\" rel="bookmark">聊聊搜索系统2：常见架构</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2025\03\09\聊聊搜索系统1：开篇语\" rel="bookmark">聊聊搜索系统1：开篇语</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2025\03\15\聊聊搜索系统3：文档内容处理\" rel="bookmark">聊聊搜索系统3：文档内容处理</a></div>
+    </li>
+  </ul>
+
+        <div class="reward-container">
+  <div>一分一毛，也是心意。</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Run-Qing Chen 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Run-Qing Chen 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Run-Qing Chen
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://blog.rexking6.top/2025/03/15/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F6%EF%BC%9A%E7%B2%BE%E6%8E%92/" title="聊聊搜索系统6：精排">https://blog.rexking6.top/2025/03/15/聊聊搜索系统6：精排/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+              <a href="/tags/%E6%A3%80%E7%B4%A2/" rel="tag"># 检索</a>
+              <a href="/tags/%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F/" rel="tag"># 搜索系统</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/03/15/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F5%EF%BC%9A%E5%8F%AC%E5%9B%9E%EF%BC%9A%E6%A3%80%E7%B4%A2%E3%80%81%E7%B2%97%E6%8E%92%E3%80%81%E5%A4%9A%E8%B7%AF%E5%8F%AC%E5%9B%9E/" rel="prev" title="聊聊搜索系统5：召回：检索、粗排、多路召回">
+      <i class="fa fa-chevron-left"></i> 聊聊搜索系统5：召回：检索、粗排、多路召回
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/03/15/%E8%81%8A%E8%81%8A%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F7%EF%BC%9A%E8%A1%A5%E5%85%85%E6%A8%A1%E5%9D%97/" rel="next" title="聊聊搜索系统7：补充模块">
+      聊聊搜索系统7：补充模块 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+    <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E7%B2%BE%E6%8E%92%E7%9A%84%E6%84%8F%E4%B9%89"><span class="nav-number">2.</span> <span class="nav-text">1. 精排的意义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E7%B2%BE%E6%8E%92%E9%9C%80%E8%A6%81%E8%80%83%E8%99%91%E7%9A%84%E5%9B%A0%E7%B4%A0"><span class="nav-number">3.</span> <span class="nav-text">2. 精排需要考虑的因素</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E7%B2%BE%E6%8E%92%E6%96%B9%E6%A1%88%E7%9A%84%E6%A1%86%E6%9E%B6"><span class="nav-number">4.</span> <span class="nav-text">3. 精排方案的框架</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%E6%A1%88%E4%BE%8B%E5%88%86%E6%9E%90"><span class="nav-number">5.</span> <span class="nav-text">4. 案例分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-%E7%BE%8E%E5%9B%A2"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 美团</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-%E7%9F%A5%E4%B9%8E"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 知乎</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%E8%A1%A5%E5%85%85%E8%AE%B2%E9%87%8D%E6%8E%92"><span class="nav-number">6.</span> <span class="nav-text">5. 补充讲重排</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%B2%BE%E6%8E%92"><span class="nav-number">7.</span> <span class="nav-text">6. 大模型精排</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-%E5%B0%8F%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">7. 小结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Run-Qing Chen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Run-Qing Chen</p>
+  <div class="site-description" itemprop="description">覆苍天以为衾，卧大地以为庐。</div>
+</div>
+
+
+   <div class="feed-link motion-element">
+     <a href="/atom.xml" rel="alternate">
+       <i class="fa fa-rss"></i>
+       RSS
+     </a>
+   </div>
+ 
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">275</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">87</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/RexKing6" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;RexKing6" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1010026261@qq.com" title="E-Mail → mailto:1010026261@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      友情链接
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://zhimi.vercel.app/index_zh-cn.html" title="https:&#x2F;&#x2F;zhimi.vercel.app&#x2F;index_zh-cn.html" rel="noopener" target="_blank">執迷</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://whitepuffer.github.io/" title="https:&#x2F;&#x2F;whitepuffer.github.io&#x2F;" rel="noopener" target="_blank">江斓</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://kexue.fm/" title="https:&#x2F;&#x2F;kexue.fm&#x2F;" rel="noopener" target="_blank">科学空间</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://yongyuan.name/" title="https:&#x2F;&#x2F;yongyuan.name&#x2F;" rel="noopener" target="_blank">袁勇</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/abcjennifer" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;abcjennifer" rel="noopener" target="_blank">Rachel Zhang</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://dmkf.xyz/" title="http:&#x2F;&#x2F;dmkf.xyz&#x2F;" rel="noopener" target="_blank">代码咖啡</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://wuxiaolong.me/" title="http:&#x2F;&#x2F;wuxiaolong.me&#x2F;" rel="noopener" target="_blank">吴小龙同学</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.tennfy.com/" title="http:&#x2F;&#x2F;www.tennfy.com&#x2F;" rel="noopener" target="_blank">TENNFY WU</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fab fa-accessible-icon"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Run-Qing Chen</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">4.4m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">67:08</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"6XDsO3aHIjDk3nV6eLJCufbl-MdYXbMMI","app_key":"YK4qOc0TpkazN6exhuqsnwmB","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="//cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="//cdn.jsdelivr.net/npm/instantsearch.js@4/dist/instantsearch.production.min.js"></script>
+<script src="/js/algolia-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
